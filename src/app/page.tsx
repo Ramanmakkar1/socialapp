@@ -33,6 +33,42 @@ const faqs = [
   { q: "Can I cancel any time?", a: "Yes. Plans are monthly or yearly and you can cancel in one click." },
 ];
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": BRAND.url + "#org",
+      name: BRAND.company,
+      url: BRAND.url,
+      email: BRAND.supportEmail,
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: BRAND.name,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      url: BRAND.url,
+      description: BRAND.description,
+      publisher: { "@id": BRAND.url + "#org" },
+      offers: plans.map((p) => ({
+        "@type": "Offer",
+        name: p.name,
+        price: p.price.replace("$", ""),
+        priceCurrency: "USD",
+      })),
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    },
+  ],
+};
+
 function Nav() {
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/80 backdrop-blur">
@@ -110,6 +146,7 @@ export default function Home() {
     <>
       <Nav />
       <main className="flex-1">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         {/* Hero */}
         <section className="relative overflow-hidden px-4 pt-16 pb-10 sm:pt-24">
           <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
