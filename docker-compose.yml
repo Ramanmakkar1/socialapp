@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4338:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NEXT_PUBLIC_SITE_URL: https://socialapp.splitforms.com
