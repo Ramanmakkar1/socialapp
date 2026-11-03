@@ -10,8 +10,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(BRAND.url),
   title: { default: `${BRAND.name} — Social media scheduler + Instagram auto-DM`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
-  // Staging only until launch: keep it out of Google.
-  robots: { index: false, follow: false },
+  // Staging only until launch: robots value comes from BRAND.indexable.
+  robots: BRAND.indexable ? { index: true, follow: true } : { index: false, follow: false },
+  alternates: { canonical: "/" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
