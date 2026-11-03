@@ -6,6 +6,9 @@ const PUBLIC_PATHS = ["/", "/instagram-auto-dm", "/privacy", "/terms", "/data-de
 const META: Record<string, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
   "/": { priority: 1, changeFrequency: "weekly" },
   "/instagram-auto-dm": { priority: 0.8, changeFrequency: "weekly" },
+  "/privacy": { priority: 0.3, changeFrequency: "yearly" },
+  "/terms": { priority: 0.3, changeFrequency: "yearly" },
+  "/data-deletion": { priority: 0.3, changeFrequency: "yearly" },
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
