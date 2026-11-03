@@ -249,7 +249,8 @@ export default function Home() {
       <footer className="border-t border-line px-4 py-8 text-sm text-muted">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
           <span>© 2026 {BRAND.company}</span>
-          <div className="flex gap-5">
+          <div className="flex flex-wrap justify-center gap-5">
+            <Link href="/instagram-auto-dm" className="hover:text-ink">Instagram auto DM</Link>
             <Link href="/privacy" className="hover:text-ink">Privacy</Link>
             <Link href="/terms" className="hover:text-ink">Terms</Link>
             <Link href="/data-deletion" className="hover:text-ink">Data deletion</Link>
