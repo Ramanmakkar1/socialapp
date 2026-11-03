@@ -8,6 +8,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
   ```bash
   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
   ```
+- `CRON_SECRET` — shared secret for the DM send worker; a cron calls `POST /api/jobs/send-dms` every minute with header `x-cron-secret: $CRON_SECRET` (wrong or missing secret returns 401).
 
 Run database migrations with:
 
