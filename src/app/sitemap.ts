@@ -1,7 +1,12 @@
 import type { MetadataRoute } from "next";
 import { BRAND } from "@/lib/brand";
 
-const PUBLIC_PATHS = ["/", "/privacy", "/terms", "/data-deletion"];
+const PUBLIC_PATHS = ["/", "/instagram-auto-dm", "/privacy", "/terms", "/data-deletion"];
+
+const META: Record<string, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
+  "/": { priority: 1, changeFrequency: "weekly" },
+  "/instagram-auto-dm": { priority: 0.8, changeFrequency: "weekly" },
+};
 
 export default function sitemap(): MetadataRoute.Sitemap {
   if (!BRAND.indexable) {
@@ -11,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return PUBLIC_PATHS.map((path) => ({
     url: `${BRAND.url}${path}`,
     lastModified,
-    changeFrequency: path === "/" ? ("weekly" as const) : ("yearly" as const),
-    priority: path === "/" ? 1 : 0.3,
+    changeFrequency: META[path]?.changeFrequency ?? ("yearly" as const),
+    priority: META[path]?.priority ?? 0.3,
   }));
 }
