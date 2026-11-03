@@ -1,5 +1,22 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment
+
+- `DATABASE_URL` — PostgreSQL connection string (required for the database).
+- `DATABASE_SSL` — optional; set to `false` to disable SSL.
+- `TOKEN_ENCRYPTION_KEY` — 32-byte base64 key for AES-256-GCM token encryption. Generate one with:
+  ```bash
+  node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+  ```
+
+Run database migrations with:
+
+```bash
+npm run db:migrate
+```
+
+Never commit a `.env` file.
+
 ## Getting Started
 
 First, run the development server:
