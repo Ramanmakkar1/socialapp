@@ -251,6 +251,7 @@ export default function Home() {
           <span>© 2026 {BRAND.company}</span>
           <div className="flex flex-wrap justify-center gap-5">
             <Link href="/instagram-auto-dm" className="hover:text-ink">Instagram auto DM</Link>
+            <Link href="/tools/instagram-caption-counter" className="hover:text-ink">Caption counter</Link>
             <Link href="/privacy" className="hover:text-ink">Privacy</Link>
             <Link href="/terms" className="hover:text-ink">Terms</Link>
             <Link href="/data-deletion" className="hover:text-ink">Data deletion</Link>
