@@ -3,6 +3,7 @@
 import { useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
+import AutomationMessagePreview from "@/components/AutomationMessagePreview";
 import CommentKeywordTester from "@/components/CommentKeywordTester";
 import {
   createRule,
@@ -305,6 +306,12 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
             Require follow
           </label>
         </div>
+        <AutomationMessagePreview
+          dmText={dmText}
+          linkUrl={linkUrl}
+          emailGate={emailGate}
+          followGate={followGate}
+        />
         {errors.length > 0 && (
           <ul role="alert" className="max-w-full space-y-1 break-words text-sm text-warn">
             {errors.map((err) => (
