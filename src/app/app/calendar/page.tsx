@@ -16,6 +16,13 @@ type WeekPost = {
   platforms: string[];
 };
 
+type PublishedPost = {
+  id: string;
+  caption: string;
+  published_at: Date | string | null;
+  platforms: string[];
+};
+
 type RuleOption = { id: string; name: string; status: string };
 
 function mondayUtcStart(d: Date): Date {
@@ -81,6 +88,7 @@ export default async function CalendarPage({
   let rows: Post[] = [];
   let weekRows: WeekPost[] = [];
   let rules: RuleOption[] = [];
+  let publishedRows: PublishedPost[] = [];
 
   if (isDbConfigured()) {
     const user = await requireUser();
@@ -92,6 +100,10 @@ export default async function CalendarPage({
     } catch {
       rules = [];
     }
+    const publishedPromise = query<PublishedPost>(
+      "select p.id, p.caption, max(t.published_at) as published_at, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status = 'published' group by p.id order by max(t.published_at) desc nulls last limit 10",
+      [user.id],
+    ).catch(() => [] as PublishedPost[]);
     try {
       rows = await query<Post>(
         "select p.id, p.caption, p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50",
@@ -105,6 +117,7 @@ export default async function CalendarPage({
       rows = [];
       weekRows = [];
     }
+    publishedRows = await publishedPromise;
   }
 
   return (
@@ -150,6 +163,31 @@ export default async function CalendarPage({
         </section>
       )}
       <PostList posts={rows} />
+      {publishedRows.length > 0 && (
+        <section className="mt-8" aria-labelledby="recently-published-heading">
+          <h2 id="recently-published-heading" className="text-lg font-semibold">Recently published</h2>
+          <ul className="mt-4 divide-y divide-line rounded-2xl border border-line bg-surface">
+            {publishedRows.map((post) => (
+              <li key={post.id} className="flex min-w-0 flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="min-w-0 break-words text-sm text-ink-2">
+                  {post.caption.length > 80 ? `${post.caption.slice(0, 80)}…` : post.caption}
+                </p>
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-ok bg-surface-2 px-3 py-1 text-xs font-medium text-ok">Published</span>
+                  {post.platforms.map((platform) => (
+                    <span key={platform} className="rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium capitalize text-ink-2">
+                      {platform}
+                    </span>
+                  ))}
+                  <span className="text-xs text-muted" suppressHydrationWarning>
+                    {post.published_at ? new Date(post.published_at).toLocaleString() : "Time unknown"}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </>
   );
 }
