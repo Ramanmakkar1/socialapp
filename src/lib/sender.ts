@@ -13,7 +13,14 @@ const SEND_TIMEOUT_MS = 15_000;
 const RATE_LIMIT_PAUSE_MS = 15 * 60 * 1000;
 
 type AccountRow = { id: string; external_id: string; access_token_enc: string | null };
-type QueueRow = { id: string; comment_id: string; message: string; attempts: number };
+type QueueRow = {
+  id: string;
+  comment_id: string | null;
+  recipient_external_id: string;
+  message: string;
+  attempts: number;
+  kind: string;
+};
 
 export type SendResult = { sent: number; retried: number; failed: number };
 
@@ -50,7 +57,9 @@ async function sendPrivateReply(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        recipient: { comment_id: row.comment_id },
+        recipient: row.comment_id
+          ? { comment_id: row.comment_id }
+          : { id: row.recipient_external_id },
         message: { text: row.message },
       }),
       signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
@@ -110,7 +119,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
         continue;
       }
       const due = await client.query<QueueRow>(
-        `select id, comment_id, message, attempts from socialapp.dm_queue
+        `select id, comment_id, recipient_external_id, message, attempts, kind from socialapp.dm_queue
          where social_account_id=$1 and status='pending' and next_attempt_at <= now()
          order by created_at limit $2 for update skip locked`,
         [account.id, budget]
