@@ -8,6 +8,7 @@ import { BRAND } from "@/lib/brand";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
+const LIVE_PLATFORMS: PlatformId[] = ["instagram"];
 const HANDLE = `@${BRAND.name.toLowerCase()}`;
 
 const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
@@ -47,8 +48,8 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
 
   const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>({
     instagram: true,
-    facebook: true,
-    threads: true,
+    facebook: false,
+    threads: false,
   });
   const [activeTab, setActiveTab] = useState<PlatformId>("instagram");
   const [mainCaption, setMainCaption] = useState("");
@@ -76,6 +77,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
   }, []);
 
   function togglePlatform(platform: PlatformId) {
+    if (!LIVE_PLATFORMS.includes(platform)) return;
     const next = { ...enabled, [platform]: !enabled[platform] };
     setEnabled(next);
     if (!next[platform] && activeTab === platform) {
@@ -144,20 +146,36 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
             <div className="mt-2 flex flex-wrap gap-2">
               {PLATFORM_ORDER.map((platform) => {
                 const Icon = PLATFORM_ICON[platform];
+                const live = LIVE_PLATFORMS.includes(platform);
                 const on = enabled[platform];
                 return (
                   <button
                     key={platform}
                     type="button"
-                    aria-pressed={on}
-                    aria-label={`${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}`}
+                    disabled={!live}
+                    aria-disabled={!live || undefined}
+                    aria-pressed={live ? on : undefined}
+                    aria-label={
+                      live
+                        ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}`
+                        : `${PLATFORMS[platform].label} publishing coming soon`
+                    }
                     onClick={() => togglePlatform(platform)}
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                      on ? "border-brand bg-brand/10 text-brand" : "border-line bg-surface text-muted"
+                      live
+                        ? on
+                          ? "border-brand bg-brand/10 text-brand"
+                          : "border-line bg-surface text-muted"
+                        : "cursor-not-allowed border-line bg-surface text-muted opacity-60"
                     }`}
                   >
                     <Icon className="h-4 w-4" aria-hidden />
                     {PLATFORMS[platform].label}
+                    {!live && (
+                      <span className="rounded-full bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted">
+                        Soon
+                      </span>
+                    )}
                   </button>
                 );
               })}

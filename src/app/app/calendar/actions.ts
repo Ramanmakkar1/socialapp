@@ -99,6 +99,13 @@ export async function savePost(
     if (!ALLOWED_PLATFORMS.includes(p)) {
       return { ok: false, error: "Invalid platform." };
     }
+    if (p !== "instagram") {
+      return {
+        ok: false,
+        error:
+          "Facebook and Threads publishing is coming soon. For now, schedule this post for Instagram only.",
+      };
+    }
     platforms.push(p);
   }
 
