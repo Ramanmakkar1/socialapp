@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
+import LoadFailed, { type LoadError } from "./LoadFailed";
 
 type WeekViewPost = {
   id: string;
@@ -18,6 +19,7 @@ type WeekViewProps = {
   weekStart: Date;
   prevHref: string;
   nextHref: string;
+  loadError?: LoadError;
 };
 
 function utcDateKey(d: Date): string {
@@ -47,7 +49,7 @@ function isMovable(status: string): boolean {
   return status === "scheduled" || status === "draft";
 }
 
-export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekViewProps) {
+export default function WeekView({ posts, weekStart, prevHref, nextHref, loadError }: WeekViewProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +113,7 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekV
           {error}
         </p>
       )}
+      {loadError && <LoadFailed {...loadError} className="mb-3" />}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-7">
         {days.map((day) => {
           const key = utcDateKey(day);
@@ -146,7 +149,7 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekV
               </p>
               <div className="mt-2 space-y-1">
                 {dayPosts.length === 0 ? (
-                  <p className="text-xs text-muted">—</p>
+                  loadError ? null : <p className="text-xs text-muted">—</p>
                 ) : (
                   dayPosts.map((post) => (
                     <span

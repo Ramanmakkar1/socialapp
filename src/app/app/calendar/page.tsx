@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Composer from "./Composer";
+import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post } from "./PostList";
 import WeekView from "./WeekView";
@@ -91,6 +92,15 @@ export default async function CalendarPage({
   let rules: RuleOption[] = [];
   let publishedRows: PublishedPost[] = [];
   let commentHourRows: { hour: number; count: number }[] = [];
+  let rulesFailed = false;
+  let rowsFailed = false;
+  let weekRowsFailed = false;
+  let publishedFailed = false;
+
+  const reloadHref =
+    view === "month"
+      ? `/app/calendar?view=month&month=${monthQueryParam(monthStart)}`
+      : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
 
   if (isDbConfigured()) {
     const user = await requireUser();
@@ -102,32 +112,32 @@ export default async function CalendarPage({
     } catch {
       commentHourRows = [];
     }
-    try {
-      rules = await query<RuleOption>(
+    const [rulesRes, upcomingRes, rangeRes, publishedRes] = await Promise.allSettled([
+      query<RuleOption>(
         "select id, name, status from socialapp.dm_rules where user_id = $1 order by created_at desc",
         [user.id],
-      );
-    } catch {
-      rules = [];
-    }
-    const publishedPromise = query<PublishedPost>(
-      "select p.id, p.caption, max(t.published_at) as published_at, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status = 'published' group by p.id order by max(t.published_at) desc nulls last limit 10",
-      [user.id],
-    ).catch(() => [] as PublishedPost[]);
-    try {
-      rows = await query<Post>(
+      ),
+      query<Post>(
         "select p.id, p.caption, p.first_comment, p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50",
         [user.id],
-      );
-      weekRows = await query<WeekPost>(
+      ),
+      query<WeekPost>(
         "select p.id, p.caption, p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.scheduled_at >= $2 and p.scheduled_at < $3 group by p.id order by p.scheduled_at limit 200",
         [user.id, rangeStart, rangeEnd],
-      );
-    } catch {
-      rows = [];
-      weekRows = [];
-    }
-    publishedRows = await publishedPromise;
+      ),
+      query<PublishedPost>(
+        "select p.id, p.caption, max(t.published_at) as published_at, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status = 'published' group by p.id order by max(t.published_at) desc nulls last limit 10",
+        [user.id],
+      ),
+    ]);
+    if (rulesRes.status === "fulfilled") rules = rulesRes.value;
+    else rulesFailed = true;
+    if (upcomingRes.status === "fulfilled") rows = upcomingRes.value;
+    else rowsFailed = true;
+    if (rangeRes.status === "fulfilled") weekRows = rangeRes.value;
+    else weekRowsFailed = true;
+    if (publishedRes.status === "fulfilled") publishedRows = publishedRes.value;
+    else publishedFailed = true;
   }
 
   const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
@@ -138,7 +148,17 @@ export default async function CalendarPage({
         <h1 className="text-2xl font-semibold">Calendar</h1>
         <p className="text-sm text-muted">Plan posts for Instagram, Facebook and Threads.</p>
       </div>
-      <Composer rules={rules} bestHoursUtc={bestHoursUtc} />
+      {rulesFailed ? (
+        <section className="mt-6" aria-labelledby="composer-unavailable">
+          <h2 id="composer-unavailable" className="sr-only">Composer unavailable</h2>
+          <LoadFailed
+            message="We couldn’t load your auto-DM rules, so the composer is hidden. Scheduling now could post without the automation you meant to attach."
+            reloadHref={reloadHref}
+          />
+        </section>
+      ) : (
+        <Composer rules={rules} bestHoursUtc={bestHoursUtc} />
+      )}
       <div className="mt-8 flex gap-2" role="group" aria-label="Calendar view">
         <Link
           href="/app/calendar?view=week"
@@ -162,6 +182,11 @@ export default async function CalendarPage({
             monthStart={monthStart}
             prevHref={`/app/calendar?view=month&month=${monthQueryParam(prevMonth)}`}
             nextHref={`/app/calendar?view=month&month=${monthQueryParam(nextMonth)}`}
+            loadError={
+              weekRowsFailed
+                ? { message: "We couldn’t load the posts scheduled for this month. They may still exist.", reloadHref }
+                : undefined
+            }
           />
         </section>
       ) : (
@@ -171,10 +196,32 @@ export default async function CalendarPage({
             weekStart={weekStart}
             prevHref={`/app/calendar?week=${weekQueryParam(prevStart)}`}
             nextHref={`/app/calendar?week=${weekQueryParam(nextStart)}`}
+            loadError={
+              weekRowsFailed
+                ? { message: "We couldn’t load the posts scheduled for this week. They may still exist.", reloadHref }
+                : undefined
+            }
           />
         </section>
       )}
-      <PostList posts={rows} />
+      <PostList
+        posts={rows}
+        loadError={
+          rowsFailed
+            ? { message: "We couldn’t load your scheduled posts and drafts. They may still exist.", reloadHref }
+            : undefined
+        }
+      />
+      {publishedFailed && (
+        <section className="mt-8" aria-label="Recently published">
+          <h2 className="text-lg font-semibold">Recently published</h2>
+          <LoadFailed
+            message="We couldn’t load your publishing history. Your published posts are still there."
+            reloadHref={reloadHref}
+            className="mt-3"
+          />
+        </section>
+      )}
       {publishedRows.length > 0 && (
         <section className="mt-8" aria-labelledby="recently-published-heading">
           <h2 id="recently-published-heading" className="text-lg font-semibold">Recently published</h2>

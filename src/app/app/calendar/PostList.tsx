@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { deletePost } from "./actions";
+import LoadFailed, { type LoadError } from "./LoadFailed";
 import { duplicatePost } from "./duplicateActions";
 import { retryPost } from "./retryActions";
 
@@ -15,7 +16,7 @@ export type Post = {
   error?: string | null;
 };
 
-export default function PostList({ posts }: { posts: Post[] }) {
+export default function PostList({ posts, loadError }: { posts: Post[]; loadError?: LoadError }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +61,9 @@ export default function PostList({ posts }: { posts: Post[] }) {
     <section className="mt-8" aria-labelledby="upcoming-posts-heading">
       <h2 id="upcoming-posts-heading" className="text-lg font-semibold">Upcoming &amp; drafts</h2>
       {error && <p role="alert" className="mt-3 text-sm text-brand-2">{error}</p>}
-      {posts.length === 0 ? (
+      {loadError ? (
+        <LoadFailed message={loadError.message} reloadHref={loadError.reloadHref} className="mt-3" />
+      ) : posts.length === 0 ? (
         <p className="mt-3 text-sm text-muted">Nothing scheduled yet. Write your first post above.</p>
       ) : (
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">

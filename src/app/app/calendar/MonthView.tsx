@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
+import LoadFailed, { type LoadError } from "./LoadFailed";
 
 type MonthViewPost = {
   id: string;
@@ -18,6 +19,7 @@ type MonthViewProps = {
   monthStart: Date;
   prevHref: string;
   nextHref: string;
+  loadError?: LoadError;
 };
 
 const MAX_CHIPS = 3;
@@ -55,7 +57,7 @@ function isMovable(status: string): boolean {
   return status === "scheduled" || status === "draft";
 }
 
-export default function MonthView({ posts, monthStart, prevHref, nextHref }: MonthViewProps) {
+export default function MonthView({ posts, monthStart, prevHref, nextHref, loadError }: MonthViewProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -134,6 +136,7 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref }: Mon
           {error}
         </p>
       )}
+      {loadError && <LoadFailed {...loadError} className="mb-3" />}
       <div className="overflow-x-auto">
         <div className="grid min-w-[640px] grid-cols-7 gap-2">
           {WEEKDAYS.map((name) => (
