@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Zap } from "lucide-react";
+import { SiteHeader } from "@/components/SiteHeader";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -36,19 +37,7 @@ export default function GettingStartedHelpPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
       />
-      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg">
-              <Zap className="h-4 w-4" />
-            </span>
-            {BRAND.name}
-          </Link>
-          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
-            Start free
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
       <main className="flex-1 px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-2xl">
           <Link href="/help" className="inline-flex items-center gap-1 text-sm text-brand hover:underline">
