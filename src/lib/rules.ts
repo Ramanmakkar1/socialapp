@@ -53,6 +53,7 @@ export function renderDm(rule: DmRule, input: { username: string }): string {
 export function validateRule(rule: DmRule): string[] {
   const errors: string[] = [];
   if (rule.matchMode !== 'any' && !rule.keywords.some((keyword) => normalize(keyword))) errors.push('Add at least one keyword, or choose “Any comment”.');
+  if (!rule.dmMessage.trim()) errors.push('DM message is required.');
   if (rule.dmMessage.length > 1000) errors.push('DM message must be 1000 characters or fewer.');
   if (rule.linkUrl && !rule.linkUrl.startsWith('https://')) errors.push('Link URL must start with https://.');
   return errors;
