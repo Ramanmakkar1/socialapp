@@ -2,6 +2,10 @@ import {
   extractCommentEvents,
   processCommentEvents,
 } from "@/lib/comments";
+import {
+  extractMessageEvents,
+  processMessageEvents,
+} from "@/lib/messages";
 import { isDbConfigured, query } from "@/lib/db";
 import { metaConfig, verifySignature } from "@/lib/meta";
 
@@ -62,6 +66,12 @@ export async function POST(request: Request) {
       if (n) console.log("queued DMs", n);
     } catch (err) {
       console.error("comment processing failed", err);
+    }
+    try {
+      const m = await processMessageEvents(extractMessageEvents(body));
+      if (m) console.log("contacts updated from DMs", m);
+    } catch (err) {
+      console.error("message processing failed", err);
     }
   }
 
