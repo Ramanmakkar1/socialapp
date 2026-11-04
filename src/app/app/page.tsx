@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Plus, Instagram } from "lucide-react";
 
 export const metadata = { title: "Dashboard" };
@@ -8,7 +9,7 @@ export default function AppHome() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div><h1 className="text-2xl font-semibold">Good morning 👋</h1><p className="text-sm text-muted">Here&apos;s your week.</p></div>
-        <button className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"><Plus className="h-4 w-4" />New post</button>
+        <Link href="/app/calendar#new" className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"><Plus className="h-4 w-4" />New post</Link>
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[["Scheduled", "0"], ["DMs sent", "0"], ["Leads", "0"], ["Link clicks", "0"]].map(([l, v]) => (

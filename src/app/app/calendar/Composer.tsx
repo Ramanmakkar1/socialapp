@@ -1,0 +1,271 @@
+"use client";
+
+import { useEffect, useId, useState } from "react";
+import { AtSign, Facebook, Instagram } from "lucide-react";
+import { BRAND } from "@/lib/brand";
+import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
+
+const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
+const HANDLE = `@${BRAND.name.toLowerCase()}`;
+
+const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
+  instagram: Instagram,
+  facebook: Facebook,
+  threads: AtSign,
+};
+
+function counterClass(length: number, max: number): string {
+  if (length > max) return "text-brand-2";
+  if (length >= max * 0.9) return "text-warn";
+  return "text-muted";
+}
+
+function previewCaption(platform: PlatformId, text: string): string {
+  if (platform !== "instagram") return text;
+  if (text.length <= 125) return text;
+  return `${text.slice(0, 125)}… more`;
+}
+
+function effectiveCaption(
+  platform: PlatformId,
+  main: string,
+  customize: Record<PlatformId, boolean>,
+  custom: Record<PlatformId, string>,
+): string {
+  return customize[platform] ? custom[platform] : main;
+}
+
+export default function Composer() {
+  const mainId = useId();
+  const scheduleId = useId();
+  const dmRuleId = useId();
+
+  const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>({
+    instagram: true,
+    facebook: true,
+    threads: true,
+  });
+  const [activeTab, setActiveTab] = useState<PlatformId>("instagram");
+  const [mainCaption, setMainCaption] = useState("");
+  const [customize, setCustomize] = useState<Record<PlatformId, boolean>>({
+    instagram: false,
+    facebook: false,
+    threads: false,
+  });
+  const [customCaption, setCustomCaption] = useState<Record<PlatformId, string>>({
+    instagram: "",
+    facebook: "",
+    threads: "",
+  });
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [timeZone, setTimeZone] = useState("");
+
+  useEffect(() => {
+    // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- boss-mandated pattern for #new composer
+    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
+
+  function togglePlatform(platform: PlatformId) {
+    const next = { ...enabled, [platform]: !enabled[platform] };
+    setEnabled(next);
+    if (!next[platform] && activeTab === platform) {
+      const fallback = PLATFORM_ORDER.find((p) => next[p]);
+      if (fallback) setActiveTab(fallback);
+    }
+  }
+
+  const selected = PLATFORM_ORDER.filter((p) => enabled[p]);
+
+  return (
+    <section id="new" className="mt-6 scroll-mt-20" aria-labelledby={`${mainId}-heading`}>
+      <h2 id={`${mainId}-heading`} className="sr-only">
+        New post composer
+      </h2>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+        <div className="space-y-6">
+          <div>
+            <span className="text-sm font-medium text-ink-2">Platforms</span>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {PLATFORM_ORDER.map((platform) => {
+                const Icon = PLATFORM_ICON[platform];
+                const on = enabled[platform];
+                return (
+                  <button
+                    key={platform}
+                    type="button"
+                    aria-pressed={on}
+                    aria-label={`${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}`}
+                    onClick={() => togglePlatform(platform)}
+                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                      on ? "border-brand bg-brand/10 text-brand" : "border-line bg-surface text-muted"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" aria-hidden />
+                    {PLATFORMS[platform].label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor={mainId} className="text-sm font-medium text-ink-2">
+              Caption
+            </label>
+            <textarea
+              id={mainId}
+              value={mainCaption}
+              onChange={(e) => setMainCaption(e.target.value)}
+              rows={6}
+              placeholder="Write once — customize per platform below if you need to."
+              className="mt-2 w-full resize-y rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+            />
+          </div>
+
+          {selected.length > 0 && (
+            <div>
+              <div className="flex flex-wrap gap-1 border-b border-line">
+                {selected.map((platform) => (
+                  <button
+                    key={platform}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === platform}
+                    onClick={() => setActiveTab(platform)}
+                    className={`rounded-t-lg px-3 py-2 text-sm font-medium ${
+                      activeTab === platform ? "border border-b-0 border-line bg-surface text-ink" : "text-muted"
+                    }`}
+                  >
+                    {PLATFORMS[platform].label}
+                  </button>
+                ))}
+              </div>
+              <div className="rounded-b-xl rounded-tr-xl border border-line bg-surface p-4">
+                {(() => {
+                  const platform = activeTab;
+                  if (!enabled[platform]) return null;
+                  const config = PLATFORMS[platform];
+                  const text = effectiveCaption(platform, mainCaption, customize, customCaption);
+                  const check = checkCaption(platform, text);
+                  return (
+                    <>
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+                        <input
+                          type="checkbox"
+                          checked={customize[platform]}
+                          onChange={(e) =>
+                            setCustomize((c) => ({ ...c, [platform]: e.target.checked }))
+                          }
+                          className="rounded border-line text-brand focus:ring-brand"
+                        />
+                        Customize for {config.label}
+                      </label>
+                      {customize[platform] && (
+                        <textarea
+                          aria-label={`${config.label} caption`}
+                          value={customCaption[platform]}
+                          onChange={(e) =>
+                            setCustomCaption((c) => ({ ...c, [platform]: e.target.value }))
+                          }
+                          rows={4}
+                          className="mt-3 w-full resize-y rounded-lg border border-line bg-bg px-3 py-2 text-sm focus:border-brand focus:outline-none"
+                        />
+                      )}
+                      <p className={`mt-3 text-sm tabular-nums ${counterClass(check.length, config.captionMax)}`}>
+                        {check.length.toLocaleString("en-US")} / {config.captionMax.toLocaleString("en-US")}
+                      </p>
+                      {check.errors.length > 0 && (
+                        <ul className="mt-2 space-y-1 text-sm text-brand-2" aria-live="polite">
+                          {check.errors.map((msg) => (
+                            <li key={msg}>{msg}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {check.warnings.length > 0 && (
+                        <ul className="mt-2 space-y-1 text-sm text-warn" aria-live="polite">
+                          {check.warnings.map((msg) => (
+                            <li key={msg}>{msg}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor={scheduleId} className="text-sm font-medium text-ink-2">
+                Schedule
+              </label>
+              <input
+                id={scheduleId}
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none"
+              />
+              <p className="mt-1 text-xs text-muted">Timezone: {timeZone || "…"}</p>
+            </div>
+            <div>
+              <label htmlFor={dmRuleId} className="text-sm font-medium text-ink-2">
+                Attach auto-DM rule
+              </label>
+              <select
+                id={dmRuleId}
+                disabled
+                defaultValue=""
+                className="mt-2 w-full rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm text-muted"
+              >
+                <option value="">Create rules in Auto-DM</option>
+              </select>
+            </div>
+          </div>
+
+          <p className="text-xs text-muted">Publishing arrives in Phase 2 via official Meta APIs.</p>
+        </div>
+
+        <div className="space-y-4">
+          <span className="text-sm font-medium text-ink-2">Preview</span>
+          {selected.map((platform) => {
+            const text = effectiveCaption(platform, mainCaption, customize, customCaption);
+            const Icon = PLATFORM_ICON[platform];
+            return (
+              <article
+                key={platform}
+                aria-label={`${PLATFORMS[platform].label} preview`}
+                className="rounded-2xl border border-line bg-surface p-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-10 w-10 shrink-0 rounded-full bg-surface-2"
+                    aria-hidden
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 text-sm font-semibold">
+                      <Icon className="h-3.5 w-3.5 text-brand" aria-hidden />
+                      {BRAND.name}
+                    </div>
+                    <div className="truncate text-xs text-muted">{HANDLE}</div>
+                  </div>
+                </div>
+                <div
+                  className="mt-3 aspect-square w-full rounded-lg bg-surface-2"
+                  aria-hidden
+                />
+                <p className="mt-3 whitespace-pre-wrap text-sm text-ink-2">
+                  {previewCaption(platform, text) || (
+                    <span className="text-muted">Your caption appears here.</span>
+                  )}
+                </p>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
