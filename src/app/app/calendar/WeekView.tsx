@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import type { DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
@@ -41,6 +41,17 @@ function formatTimeUtc(at: Date | string): string {
   return `${h}:${m}`;
 }
 
+function formatLocal(at: Date | string): string {
+  const d = typeof at === "string" ? new Date(at) : at;
+  return d.toLocaleString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 function captionPreview(caption: string): string {
   return caption.trim().slice(0, 40);
 }
@@ -54,6 +65,11 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
+  const [tz, setTz] = useState("");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Read the browser time zone after hydration, matching Composer.
+    setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
   const todayKey = utcDateKey(new Date());
   const byDay = new Map<string, WeekViewPost[]>();
 
@@ -97,7 +113,10 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-ink">{formatWeekRange(weekStart)}</p>
-          <p className="hidden text-xs text-muted sm:block">Drag a post to another day to move it.</p>
+          <p className="text-xs text-muted">
+            Days and times shown in UTC{tz ? ` (your time zone: ${tz})` : ""}.
+            <span className="hidden sm:inline"> Drag a post to another day to move it.</span>
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <a href={prevHref} className={navClass}>
@@ -166,9 +185,9 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
                       className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${
                         post.status === "failed" ? "text-brand-2" : "text-ink-2"
                       } ${isMovable(post.status) ? "sm:cursor-grab" : ""}`}
-                      title={post.caption}
+                      title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
                     >
-                      {formatTimeUtc(post.scheduled_at!)} {captionPreview(post.caption)}
+                      {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
                     </span>
                   ))
                 )}
