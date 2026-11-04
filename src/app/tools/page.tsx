@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Hash, Image as ImageIcon, ShieldCheck, TextQuote, Zap } from "lucide-react";
+import { ArrowRight, Hash, Image as ImageIcon, Percent, ShieldCheck, TextQuote, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 
 const PATH = "/tools";
@@ -36,6 +36,12 @@ const tools = [
     title: "Instagram font generator",
     description: "Create and copy Unicode font styles for your Instagram bio and captions.",
     icon: TextQuote,
+  },
+  {
+    href: "/tools/instagram-engagement-rate-calculator",
+    title: "Instagram engagement rate calculator",
+    description: "Calculate engagement rate by followers or reach from likes, comments, saves and shares.",
+    icon: Percent,
   },
 ];
 

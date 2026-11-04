@@ -15,6 +15,7 @@ const PUBLIC_PATHS = [
   "/tools/instagram-line-break-generator",
   "/tools/instagram-image-size",
   "/tools/instagram-font-generator",
+  "/tools/instagram-engagement-rate-calculator",
   "/tools",
 ];
 
@@ -32,6 +33,7 @@ const META: Record<string, { priority: number; changeFrequency: "weekly" | "year
   "/tools/instagram-line-break-generator": { priority: 0.7, changeFrequency: "weekly" },
   "/tools/instagram-image-size": { priority: 0.7, changeFrequency: "weekly" },
   "/tools/instagram-font-generator": { priority: 0.7, changeFrequency: "weekly" },
+  "/tools/instagram-engagement-rate-calculator": { priority: 0.7, changeFrequency: "weekly" },
   "/tools": { priority: 0.6, changeFrequency: "weekly" },
 };
 
