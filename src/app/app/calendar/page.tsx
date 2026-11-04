@@ -149,7 +149,7 @@ export default async function CalendarPage({
     <>
       <div>
         <h1 className="text-2xl font-semibold">Calendar</h1>
-        <p className="text-sm text-muted">Plan posts for Instagram, Facebook and Threads.</p>
+        <p className="text-sm text-muted">Plan and schedule Instagram posts. Facebook and Threads are coming soon.</p>
       </div>
       {rulesFailed ? (
         <section className="mt-6" aria-labelledby="composer-unavailable">
