@@ -2,7 +2,7 @@ import Link from "next/link";
 import Composer from "./Composer";
 import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
-import PostList, { type Post } from "./PostList";
+import PostList, { type Post, type PostFilter } from "./PostList";
 import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
@@ -67,9 +67,10 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string }>;
 }) {
-  const { week, view: viewParam, month } = await searchParams;
+  const { week, view: viewParam, month, status } = await searchParams;
+  const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
   const view: "week" | "month" = viewParam === "month" ? "month" : "week";
   const weekStart = parseWeekParam(week);
   const monthStart = parseMonthParam(month);
@@ -101,6 +102,8 @@ export default async function CalendarPage({
     view === "month"
       ? `/app/calendar?view=month&month=${monthQueryParam(monthStart)}`
       : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
+
+  const queueReloadHref = initialFilter === "all" ? reloadHref : `${reloadHref}&status=${initialFilter}`;
 
   if (isDbConfigured()) {
     const user = await requireUser();
@@ -206,9 +209,10 @@ export default async function CalendarPage({
       )}
       <PostList
         posts={rows}
+        initialFilter={initialFilter}
         loadError={
           rowsFailed
-            ? { message: "We couldn’t load your scheduled posts and drafts. They may still exist.", reloadHref }
+            ? { message: "We couldn’t load your scheduled posts and drafts. They may still exist.", reloadHref: queueReloadHref }
             : undefined
         }
       />

@@ -39,7 +39,7 @@ export default async function AppHome() {
         <Link href="/app/calendar#new" className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"><Plus className="h-4 w-4" />New post</Link>
       </div>
       {stats.failed > 0 && (
-        <div role="alert" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-2 bg-surface p-4 text-sm"><span className="text-ink">{stats.failed} {stats.failed === 1 ? "post" : "posts"} failed to publish.</span><Link href="/app/calendar" className="font-medium text-brand hover:underline">Review and retry</Link></div>
+        <div role="alert" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-2 bg-surface p-4 text-sm"><span className="text-ink">{stats.failed} {stats.failed === 1 ? "post" : "posts"} failed to publish.</span><Link href="/app/calendar?status=failed" className="font-medium text-brand hover:underline">Review and retry</Link></div>
       )}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map(([l, v]) => (
