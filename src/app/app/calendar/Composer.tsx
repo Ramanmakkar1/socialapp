@@ -40,6 +40,7 @@ export default function Composer() {
   const mainId = useId();
   const scheduleId = useId();
   const dmRuleId = useId();
+  const imageId = useId();
 
   const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>({
     instagram: true,
@@ -58,6 +59,7 @@ export default function Composer() {
     facebook: "",
     threads: "",
   });
+  const [imageUrl, setImageUrl] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
@@ -94,6 +96,7 @@ export default function Composer() {
       overrides,
       scheduledAt: scheduledAt || null,
       mode,
+      imageUrl: imageUrl.trim() !== "" ? imageUrl.trim() : null,
     };
   }
 
@@ -118,6 +121,7 @@ export default function Composer() {
       }
       setMainCaption("");
       setCustomCaption({ instagram: "", facebook: "", threads: "" });
+      setImageUrl("");
     });
   }
 
@@ -165,6 +169,48 @@ export default function Composer() {
               placeholder="Write once — customize per platform below if you need to."
               className="mt-2 w-full resize-y rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
             />
+          </div>
+
+          <div>
+            <label htmlFor={imageId} className="text-sm font-medium text-ink-2">
+              Image link (https, .jpg or .png)
+            </label>
+            <input
+              id={imageId}
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://…/photo.jpg"
+              className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+            />
+            {(() => {
+              let url: URL | null = null;
+              try {
+                url = new URL(imageUrl);
+              } catch {
+                url = null;
+              }
+              if (url && url.protocol === "https:") {
+                return (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url.href}
+                      alt="Post image preview"
+                      className="mt-2 h-32 w-auto rounded-xl border border-line object-cover"
+                    />
+                    <p className="mt-1 text-xs text-muted">
+                      Instagram needs an image. Paste a public link for now; upload is coming soon.
+                    </p>
+                  </>
+                );
+              }
+              return (
+                <p className="mt-1 text-xs text-muted">
+                  Instagram needs an image. Paste a public link for now; upload is coming soon.
+                </p>
+              );
+            })()}
           </div>
 
           {selected.length > 0 && (
