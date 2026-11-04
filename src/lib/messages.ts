@@ -1,4 +1,4 @@
-import { query } from "@/lib/db";
+import { getPool, query } from "@/lib/db";
 import { accountToken, isFollower } from "@/lib/followCheck";
 import { shortLinkFor } from "@/lib/links";
 import {
@@ -10,6 +10,80 @@ import {
 
 export type { MessageEvent };
 export { extractEmail, extractMessageEvents, extractPhone };
+
+type DmEnqueueKind = "gated_link" | "follow_nudge";
+
+/** Serializes gated_link / follow_nudge inserts per contact+rule (webhook concurrency). */
+async function enqueueDmIfAllowed(params: {
+  userId: string;
+  socialAccountId: string;
+  ruleId: string;
+  contactId: string;
+  recipientExternalId: string;
+  kind: DmEnqueueKind;
+  message: string;
+}): Promise<void> {
+  const {
+    userId,
+    socialAccountId,
+    ruleId,
+    contactId,
+    recipientExternalId,
+    kind,
+    message,
+  } = params;
+  const client = await getPool().connect();
+  try {
+    await client.query("begin");
+    await client.query(
+      "select pg_advisory_xact_lock(hashtext($1::text), hashtext($2::text))",
+      [contactId, ruleId],
+    );
+    if (kind === "gated_link") {
+      const dup = await client.query(
+        "select 1 as ok from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and kind='gated_link'",
+        [contactId, ruleId],
+      );
+      if (dup.rows.length === 0) {
+        await client.query(
+          `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind) values ($1,$2,$3,$4,null,$5,$6,'gated_link')`,
+          [
+            userId,
+            socialAccountId,
+            ruleId,
+            contactId,
+            recipientExternalId,
+            message,
+          ],
+        );
+      }
+    } else {
+      const nudges = await client.query<{ n: number }>(
+        "select count(*)::int as n from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and kind='follow_nudge'",
+        [contactId, ruleId],
+      );
+      if ((nudges.rows[0]?.n ?? 0) < 2) {
+        await client.query(
+          `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind) values ($1,$2,$3,$4,null,$5,$6,'follow_nudge')`,
+          [
+            userId,
+            socialAccountId,
+            ruleId,
+            contactId,
+            recipientExternalId,
+            message,
+          ],
+        );
+      }
+    }
+    await client.query("commit");
+  } catch (err) {
+    await client.query("rollback").catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
 
 type ContactRuleRow = {
   id: string;
@@ -92,57 +166,42 @@ export async function processMessageEvents(
         }
       }
       if (emailOk && followOk) {
-        const dup = await query<{ ok: number }>(
-          "select 1 as ok from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and kind='gated_link'",
-          [contactBefore.id, ruleId],
-        );
-        if (dup.length === 0) {
-          let link = contactBefore.link_url;
-          try {
-            link = await shortLinkFor(
-              account.user_id,
-              ruleId,
-              contactBefore.link_url,
-            );
-          } catch {
-            /* use raw link_url */
-          }
-          const dmMessage = "Thanks! Here's your link: " + link;
-          await query(
-            `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind) values ($1,$2,$3,$4,null,$5,$6,'gated_link')`,
-            [
-              account.user_id,
-              account.id,
-              ruleId,
-              contactBefore.id,
-              event.senderId,
-              dmMessage,
-            ],
+        let link = contactBefore.link_url;
+        try {
+          link = await shortLinkFor(
+            account.user_id,
+            ruleId,
+            contactBefore.link_url,
           );
+        } catch {
+          /* use raw link_url */
         }
+        const dmMessage = "Thanks! Here's your link: " + link;
+        await enqueueDmIfAllowed({
+          userId: account.user_id,
+          socialAccountId: account.id,
+          ruleId,
+          contactId: contactBefore.id,
+          recipientExternalId: event.senderId,
+          kind: "gated_link",
+          message: dmMessage,
+        });
       } else if (
         ruleFollowGate &&
         !followOk &&
         emailOk &&
         !followCheckFailed
       ) {
-        const nudges = await query<{ n: number }>(
-          "select count(*)::int as n from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and kind='follow_nudge'",
-          [contactBefore.id, ruleId],
-        );
-        if ((nudges[0]?.n ?? 0) < 2) {
-          await query(
-            `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind) values ($1,$2,$3,$4,null,$5,$6,'follow_nudge')`,
-            [
-              account.user_id,
-              account.id,
-              ruleId,
-              contactBefore.id,
-              event.senderId,
-              "Looks like you're not following yet - follow us and reply 'done' again to get the link.",
-            ],
-          );
-        }
+        await enqueueDmIfAllowed({
+          userId: account.user_id,
+          socialAccountId: account.id,
+          ruleId,
+          contactId: contactBefore.id,
+          recipientExternalId: event.senderId,
+          kind: "follow_nudge",
+          message:
+            "Looks like you're not following yet - follow us and reply 'done' again to get the link.",
+        });
       }
     } catch (err) {
       console.error("processMessageEvents event failed", err);
