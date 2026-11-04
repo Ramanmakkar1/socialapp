@@ -11,6 +11,34 @@ export type DashboardStats = {
 
 export const EMPTY_STATS: DashboardStats = { scheduled: 0, dmsSent: 0, leads: 0, linkClicks: 0, hasAccount: false };
 
+export type RuleStats = {
+  id: string;
+  name: string;
+  status: string;
+  dmsSent: number;
+  dmsFailed: number;
+  leads: number;
+  clicks: number;
+};
+
+export async function getRuleStats(userId: string): Promise<RuleStats[]> {
+  if (!isDbConfigured()) {
+    return [];
+  }
+  return query<RuleStats>(
+    `select r.id, r.name, r.status,
+      (select count(*)::int from socialapp.dm_queue q where q.rule_id = r.id and q.status = 'sent') as "dmsSent",
+      (select count(*)::int from socialapp.dm_queue q where q.rule_id = r.id and q.status = 'failed') as "dmsFailed",
+      (select count(*)::int from socialapp.contacts c where c.source_rule_id = r.id) as "leads",
+      (select coalesce(sum(s.clicks), 0)::int from socialapp.short_links s where s.rule_id = r.id) as "clicks"
+    from socialapp.dm_rules r
+    where r.user_id = $1
+    order by r.created_at desc
+    limit 100`,
+    [userId]
+  );
+}
+
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
   if (!isDbConfigured()) {
     return EMPTY_STATS;
