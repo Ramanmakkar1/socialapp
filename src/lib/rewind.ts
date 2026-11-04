@@ -68,8 +68,7 @@ async function collectCommentsForAccount(
   } catch {
     return events;
   }
-  const mediaItems = (mediaBody.data ?? []).filter((m) => m.id && isWithinWindow(m.timestamp, sinceMs));
-  const mediaSlice = mediaItems.slice(0, MEDIA_LIMIT);
+  const mediaSlice = (mediaBody.data ?? []).filter((m) => m.id).slice(0, MEDIA_LIMIT);
 
   for (const media of mediaSlice) {
     const mediaId = media.id as string;

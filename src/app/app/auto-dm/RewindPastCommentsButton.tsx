@@ -35,6 +35,9 @@ export function RewindPastCommentsButton({ ruleId }: Props) {
       >
         {pending ? "Scanning…" : "Send to past comments (7 days)"}
       </button>
+      <span className="text-xs text-ink-2">
+        Scans up to 25 latest posts and 50 comments per post; only comments from the past 7 days qualify.
+      </span>
       {result?.kind === "ok" && (
         <span className="text-sm text-ink-2">
           Queued {result.queued} DMs from {result.scanned} recent comments
