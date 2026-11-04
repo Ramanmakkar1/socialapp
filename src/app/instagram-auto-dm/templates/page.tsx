@@ -101,6 +101,12 @@ export default function DmTemplatesPage() {
                     </div>
                   )}
                   <p className="mt-4 text-sm leading-6 text-muted"><span className="font-medium text-ink-2">Tip:</span> {t.tip}</p>
+                  <Link
+                    href={`/app/auto-dm?template=${t.slug}`}
+                    className="btn-primary mt-4 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+                  >
+                    Use this template
+                  </Link>
                 </article>
               ))}
             </div>
