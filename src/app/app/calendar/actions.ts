@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
-import { isDbConfigured, query } from "@/lib/db";
+import { getPool, isDbConfigured, query } from "@/lib/db";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { checkCaption, type PlatformId } from "@/lib/platforms";
 
@@ -223,8 +223,13 @@ export async function savePost(
     dmRuleId = input.dmRuleId;
   }
 
+  const pool = getPool();
+  const client = await pool.connect();
+  let id: string | undefined;
   try {
-    const rows = await query<{ id: string }>(
+    await client.query("begin");
+
+    const postRes = await client.query<{ id: string }>(
       "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) returning id",
       [
         user.id,
@@ -237,8 +242,9 @@ export async function savePost(
         igFormat === "story" ? null : firstComment || null,
       ],
     );
-    const id = rows[0]?.id;
+    id = postRes.rows[0]?.id;
     if (!id) {
+      await client.query("rollback");
       return { ok: false, error: "Could not save post." };
     }
 
@@ -248,17 +254,22 @@ export async function savePost(
       const captionOverride =
         customized && raw !== undefined && raw.trim() !== "" ? raw : null;
 
-      await query(
+      await client.query(
         "insert into post_targets (post_id, platform, caption_override) values ($1, $2, $3)",
         [id, platform, captionOverride],
       );
     }
 
-    revalidatePath("/app/calendar");
-    revalidatePath("/app");
-
-    return { ok: true, id };
+    await client.query("commit");
   } catch {
+    await client.query("rollback").catch(() => {});
     return { ok: false, error: "Could not save post." };
+  } finally {
+    client.release();
   }
+
+  revalidatePath("/app/calendar");
+  revalidatePath("/app");
+
+  return { ok: true, id: id! };
 }
