@@ -256,8 +256,11 @@ export default function Home() {
             <Link href="/instagram-auto-dm" className="hover:text-ink">Instagram auto DM</Link>
             <Link href="/instagram-auto-dm/templates" className="hover:text-ink">DM templates</Link>
             <Link href="/buffer-alternative" className="hover:text-ink">Buffer alternative</Link>
+            <Link href="/manychat-alternative" className="hover:text-ink">ManyChat alternative</Link>
             <Link href="/tools/instagram-caption-counter" className="hover:text-ink">Caption counter</Link>
             <Link href="/tools/instagram-line-break-generator" className="hover:text-ink">Line break generator</Link>
+            <Link href="/tools/instagram-image-size" className="hover:text-ink">Image size guide</Link>
+            <Link href="/tools" className="hover:text-ink">Free tools</Link>
             <Link href="/privacy" className="hover:text-ink">Privacy</Link>
             <Link href="/terms" className="hover:text-ink">Terms</Link>
             <Link href="/data-deletion" className="hover:text-ink">Data deletion</Link>
