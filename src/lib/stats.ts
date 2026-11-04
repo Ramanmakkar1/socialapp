@@ -42,6 +42,40 @@ export async function getRuleStats(userId: string): Promise<RuleStats[]> {
   );
 }
 
+export type RecentPost = {
+  id: string;
+  caption: string;
+  publishedAt: string | null;
+  platforms: string[];
+  ruleName: string | null;
+};
+
+export async function getRecentPosts(userId: string): Promise<RecentPost[]> {
+  if (!isDbConfigured()) {
+    return [];
+  }
+  try {
+    return await query<RecentPost>(
+      `select p.id, p.caption,
+        to_json(max(t.published_at)) #>> '{}' as "publishedAt",
+        array_agg(distinct t.platform) as "platforms",
+        r.name as "ruleName"
+      from socialapp.scheduled_posts p
+      join socialapp.post_targets t on t.post_id = p.id
+      left join socialapp.dm_rules r on r.id = p.dm_rule_id
+      where p.user_id = $1
+        and t.status = 'published'
+        and t.published_at > now() - interval '30 days'
+      group by p.id, r.name
+      order by max(t.published_at) desc
+      limit 20`,
+      [userId]
+    );
+  } catch {
+    return [];
+  }
+}
+
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
   if (!isDbConfigured()) {
     return EMPTY_STATS;

@@ -3,7 +3,7 @@ import { BarChart3 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { hourBars, topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
-import { getDashboardStats, getRuleStats } from "@/lib/stats";
+import { getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import EmptyState from "../EmptyState";
 
 export const metadata = { title: "Analytics" };
@@ -14,9 +14,30 @@ function clickRate(clicks: number, dmsSent: number): string {
   return `${((clicks / dmsSent) * 100).toLocaleString("en-US", { maximumFractionDigits: 1 })}%`;
 }
 
+function shortCaption(caption: string): string {
+  const text = caption.trim();
+  if (!text) return "(no caption)";
+  return text.length > 60 ? `${text.slice(0, 60).trimEnd()}…` : text;
+}
+
+function formatPublished(value: string | null): string {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+}
+
+function formatPlatforms(platforms: string[]): string {
+  return platforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(", ");
+}
+
 export default async function AnalyticsPage() {
   const user = await requireUser();
-  const [stats, rules] = await Promise.all([getDashboardStats(user.id), getRuleStats(user.id)]);
+  const [stats, rules, recentPosts] = await Promise.all([
+    getDashboardStats(user.id),
+    getRuleStats(user.id),
+    getRecentPosts(user.id),
+  ]);
 
   let commentHourRows: { hour: number; count: number }[] = [];
   if (isDbConfigured()) {
@@ -164,6 +185,43 @@ export default async function AnalyticsPage() {
             </Link>
           </div>
         </>
+      )}
+      {recentPosts.length > 0 ? (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold">Recent posts</h2>
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-surface">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-line text-muted">
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Post
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Published
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Platforms
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Auto-DM rule
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentPosts.map((post) => (
+                  <tr key={post.id} className="border-b border-line last:border-b-0">
+                    <td className="px-4 py-3">{shortCaption(post.caption)}</td>
+                    <td className="px-4 py-3 tabular-nums">{formatPublished(post.publishedAt)}</td>
+                    <td className="px-4 py-3">{formatPlatforms(post.platforms)}</td>
+                    <td className="px-4 py-3">{post.ruleName ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-8 text-sm text-muted">No posts published in the last 30 days.</p>
       )}
     </>
   );
