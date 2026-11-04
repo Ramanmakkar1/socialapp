@@ -188,6 +188,7 @@ export default function InstagramAutoDm() {
           <div className="flex flex-wrap justify-center gap-5">
             <Link href="/instagram-auto-dm/templates" className="hover:text-ink">DM templates</Link>
             <Link href="/buffer-alternative" className="hover:text-ink">Buffer alternative</Link>
+            <Link href="/manychat-alternative" className="hover:text-ink">ManyChat alternative</Link>
             <Link href="/tools/instagram-caption-counter" className="hover:text-ink">Caption counter</Link>
           </div>
         </div>
