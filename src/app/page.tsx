@@ -9,10 +9,10 @@ import { BRAND } from "@/lib/brand";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const features = [
-  { icon: CalendarDays, title: "Schedule everywhere", text: "Plan a week of posts in minutes. One post, tuned for Instagram, Facebook and Threads, published at the right time." },
-  { icon: MessageCircleHeart, title: "Comment → DM, instantly", text: "Someone comments “GUIDE”? They get your link in their DMs within seconds — 24/7, on every post." },
+  { icon: CalendarDays, title: "Schedule everywhere", text: "Plan a week of posts in minutes. One post, tuned for Instagram, Facebook and Threads, published at the right time.", href: "/instagram-scheduler" },
+  { icon: MessageCircleHeart, title: "Comment → DM, instantly", text: "Someone comments “GUIDE”? They get your link in their DMs within seconds — 24/7, on every post.", href: "/instagram-auto-dm" },
   { icon: Sparkles, title: "AI that replies like you", text: "Captions, hashtags and DM replies written in your voice. Follow-up questions answered, calls booked." },
-  { icon: Users, title: "Leads, not just likes", text: "Collect emails and phone numbers before sending the link. Every contact lands in your lead list." },
+  { icon: Users, title: "Leads, not just likes", text: "Collect emails and phone numbers before sending the link. Every contact lands in your lead list.", href: "/instagram-auto-dm/templates" },
   { icon: Link2, title: "Link in bio + click tracking", text: "A beautiful bio page and tracked links, so you know which post made money." },
   { icon: BarChart3, title: "One dashboard", text: "Reach, comments, DMs sent, clicks and leads — per post, per platform, in one place." },
 ];
@@ -182,13 +182,30 @@ export default function Home() {
             <p className="mt-4 text-ink-2">A Buffer-style scheduler and a ManyChat-style auto-DM that finally talk to each other.</p>
           </div>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map(({ icon: Icon, title, text }) => (
+            {features.map(({ icon: Icon, title, text, href }) => (
               <div key={title} className="rounded-2xl border border-line bg-surface p-6 transition hover:-translate-y-0.5 hover:shadow-lg">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-brand"><Icon className="h-5 w-5" /></span>
                 <h3 className="mt-4 font-semibold">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-ink-2">{text}</p>
+                {href ? (
+                  <Link href={href} className="mt-3 inline-flex items-center gap-1 text-sm text-brand hover:underline">
+                    Learn more <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                ) : null}
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Free Instagram tools */}
+        <section className="mx-auto max-w-6xl px-4 pb-8">
+          <h2 className="text-center text-xl font-semibold tracking-tight sm:text-2xl">Free Instagram tools</h2>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <Link href="/tools/instagram-caption-counter" className="rounded-full border border-line bg-surface px-3 py-1 text-sm">Caption counter</Link>
+            <Link href="/tools/instagram-font-generator" className="rounded-full border border-line bg-surface px-3 py-1 text-sm">Font generator</Link>
+            <Link href="/tools/instagram-line-break-generator" className="rounded-full border border-line bg-surface px-3 py-1 text-sm">Line break generator</Link>
+            <Link href="/tools/instagram-image-size" className="rounded-full border border-line bg-surface px-3 py-1 text-sm">Image size guide</Link>
+            <Link href="/tools" className="rounded-full border border-line bg-surface px-3 py-1 text-sm">All tools</Link>
           </div>
         </section>
 
