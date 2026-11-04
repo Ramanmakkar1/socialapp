@@ -70,7 +70,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <a href="/api/instagram/connect" className="btn-primary">Connect Instagram</a>
       </div>
       {accounts.length === 0 ? (
-        <EmptyState icon={Settings} title="No connected accounts" text="Connect your Instagram professional account to schedule posts and auto-DM commenters." phase={1} />
+        <EmptyState icon={Settings} title="No connected accounts" text="Connect your Instagram professional account to schedule posts and auto-DM commenters." />
       ) : (
         <ul className="mt-4 space-y-3">
           {accounts.map((a, i) => {

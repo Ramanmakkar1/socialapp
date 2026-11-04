@@ -424,7 +424,6 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
             icon={MessageCircleHeart}
             title="No automations yet"
             text="Create a keyword rule to send DMs when someone comments on your posts."
-            phase={2}
           />
           <div className="mt-4 text-center">
             <button type="button" onClick={openCreate} className="btn-primary rounded-full px-5 py-2 text-sm font-semibold">

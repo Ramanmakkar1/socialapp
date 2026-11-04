@@ -91,7 +91,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         filterActive ? (
           <p className="mt-6 text-sm text-muted">No leads match your search.</p>
         ) : (
-          <EmptyState icon={Users} title="No leads yet" text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Emails and phones collected by your DMs will show here, exportable to CSV. Lead capture isn't live yet."} phase={1} />
+          <EmptyState icon={Users} title="No leads yet" text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting leads."} />
         )
       ) : (
         <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-surface">

@@ -685,7 +685,6 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
             </p>
           )}
 
-          <p className="text-xs text-muted">Publishing arrives in Phase 2 via official Meta APIs.</p>
         </div>
 
         <div className="space-y-4">

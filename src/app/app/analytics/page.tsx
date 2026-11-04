@@ -344,7 +344,6 @@ export default async function AnalyticsPage() {
             icon={BarChart3}
             title="No analytics yet"
             text="Create your first auto-DM rule to see results here."
-            phase={3}
           />
           <div className="mt-4 text-center">
             <Link href="/app/auto-dm" className="btn-primary inline-block rounded-full px-5 py-2 text-sm font-medium">
