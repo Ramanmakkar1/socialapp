@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Instagram } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { EMPTY_STATS, getDashboardStats } from "@/lib/stats";
 
@@ -18,6 +18,13 @@ function greeting(): string {
 export default async function AppHome() {
   const user = await getCurrentUser();
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
+  const steps = [
+    { done: stats.hasAccount, label: "Connect Instagram", href: "/app/settings" },
+    { done: stats.hasRule, label: "Create your first auto-DM rule", href: "/app/auto-dm" },
+    { done: stats.hasPost, label: "Schedule your first post", href: "/app/calendar#new" },
+  ];
+  const doneCount = steps.filter(s => s.done).length;
+  const firstIncompleteIndex = steps.findIndex(s => !s.done);
   const tiles: [string, number][] = [
     ["Scheduled", stats.scheduled],
     ["DMs sent (7 days)", stats.dmsSent],
@@ -38,7 +45,36 @@ export default async function AppHome() {
           <div key={l} className="rounded-2xl border border-line bg-surface p-5"><div className="text-sm text-muted">{l}</div><div className="mt-1 text-3xl font-semibold">{v.toLocaleString("en-US")}</div></div>
         ))}
       </div>
-      {stats.hasAccount ? (
+      {doneCount < 3 ? (
+        <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-semibold">Get set up in 3 minutes</h2>
+            <span className="text-sm text-muted">{doneCount} of 3 done</span>
+          </div>
+          <div className="mt-3 h-2 rounded-full bg-line">
+            <div className="h-2 rounded-full bg-brand" style={{ width: `${(doneCount / 3) * 100}%` }} />
+          </div>
+          <ol className="mt-4 space-y-3">
+            {steps.map((step, index) => (
+              <li key={step.href} className="flex flex-wrap items-center gap-3">
+                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${step.done ? "bg-brand text-white" : "border border-line text-muted"}`}>
+                  {step.done ? <><Check className="h-4 w-4" aria-hidden="true" /><span className="sr-only">Completed:</span></> : index + 1}
+                </span>
+                <div className="min-w-0 flex-1 text-sm">
+                  {step.done ? (
+                    <span className="text-muted line-through">{step.label}</span>
+                  ) : (
+                    <Link href={step.href} className="font-medium text-brand hover:underline">{step.label}</Link>
+                  )}
+                </div>
+                {index === firstIncompleteIndex && (
+                  <Link href={step.href} className="btn-primary rounded-full px-3 py-1 text-xs" aria-label={`Start: ${step.label}`}>Start</Link>
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : (
         <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
           <h2 className="font-semibold">Next steps</h2>
           <ul className="mt-3 space-y-2 text-sm text-ink-2">
@@ -46,13 +82,6 @@ export default async function AppHome() {
             <li><Link href="/app/calendar#new" className="text-brand hover:underline">Schedule a post</Link></li>
             <li><Link href="/app/leads" className="text-brand hover:underline">See your leads</Link></li>
           </ul>
-        </div>
-      ) : (
-        <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-10 text-center">
-          <Instagram className="mx-auto h-8 w-8 text-brand" />
-          <h2 className="mt-3 font-semibold">Connect your first account</h2>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-ink-2">Connect Instagram to schedule posts and turn comments into DMs and leads.</p>
-          <Link href="/app/settings" className="btn-primary mt-5 inline-block rounded-full px-5 py-2 text-sm font-medium">Connect Instagram</Link>
         </div>
       )}
     </>

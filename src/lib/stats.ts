@@ -8,9 +8,11 @@ export type DashboardStats = {
   leads: number;
   linkClicks: number;
   hasAccount: boolean;
+  hasRule: boolean;
+  hasPost: boolean;
 };
 
-export const EMPTY_STATS: DashboardStats = { scheduled: 0, failed: 0, dmsSent: 0, leads: 0, linkClicks: 0, hasAccount: false };
+export const EMPTY_STATS: DashboardStats = { scheduled: 0, failed: 0, dmsSent: 0, leads: 0, linkClicks: 0, hasAccount: false, hasRule: false, hasPost: false };
 
 export type RuleStats = {
   id: string;
@@ -51,7 +53,9 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
       (select count(*)::int from socialapp.dm_queue where user_id = $1 and status = 'sent' and sent_at > now() - interval '7 days') as "dmsSent",
       (select count(*)::int from socialapp.contacts where user_id = $1) as "leads",
       (select count(*)::int from socialapp.link_clicks c join socialapp.short_links s on s.code = c.code where s.user_id = $1) as "linkClicks",
-      exists(select 1 from socialapp.social_accounts where user_id = $1) as "hasAccount"`,
+      exists(select 1 from socialapp.social_accounts where user_id = $1) as "hasAccount",
+      exists(select 1 from socialapp.dm_rules where user_id = $1) as "hasRule",
+      exists(select 1 from socialapp.scheduled_posts where user_id = $1 and status in ('scheduled','published')) as "hasPost"`,
     [userId]
   );
   return rows[0] ?? EMPTY_STATS;
