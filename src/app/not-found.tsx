@@ -33,6 +33,7 @@ export default function NotFound() {
         <nav aria-label="Recovery links" className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href="/" className="btn-primary inline-flex min-h-11 items-center justify-center rounded-full px-6 font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand)]">Go to homepage</Link>
           <Link href="/help" className="inline-flex min-h-11 items-center justify-center rounded-full border border-line bg-surface-2 px-6 font-medium hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand)]">Visit help</Link>
+          <Link href="/contact" className="inline-flex min-h-11 items-center justify-center rounded-full border border-line bg-surface-2 px-6 font-medium hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand)]">Contact support</Link>
         </nav>
       </section>
     </main>
