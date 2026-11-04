@@ -25,8 +25,8 @@ const compare: [string, string, string][] = [
   ["Comment→DM keyword automation", "Yes", "No"],
   ["Email capture in the DM", "Yes", "No"],
   ["Link click tracking", "Yes", "See their site"],
-  ["Lead CSV export", "Coming soon", "No"],
-  ["AI captions", "Coming soon", "See their site"],
+  ["Lead CSV export", "Yes", "No"],
+  ["AI caption ideas", "Yes", "See their site"],
 ];
 
 const switchSteps = [
