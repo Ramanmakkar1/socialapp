@@ -1,5 +1,5 @@
 import { BRAND } from "@/lib/brand";
-export const metadata = { title: "Privacy policy" };
+export const metadata = { title: "Privacy policy", alternates: { canonical: "/privacy" } };
 export default function Page() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 leading-7 text-ink-2">

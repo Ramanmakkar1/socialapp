@@ -1,5 +1,5 @@
 import { BRAND } from "@/lib/brand";
-export const metadata = { title: "Data deletion" };
+export const metadata = { title: "Data deletion", alternates: { canonical: "/data-deletion" } };
 export default function Page() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 leading-7 text-ink-2">

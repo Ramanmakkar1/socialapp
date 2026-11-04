@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   description: BRAND.description,
   // Staging only until launch: robots value comes from BRAND.indexable.
   robots: BRAND.indexable ? { index: true, follow: true } : { index: false, follow: false },
-  alternates: { canonical: "/" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

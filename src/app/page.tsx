@@ -1,9 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   CalendarDays, MessageCircleHeart, Sparkles, BarChart3, Users, Link2, Check, ArrowRight,
   Instagram, Facebook, AtSign, Zap, ShieldCheck,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const features = [
   { icon: CalendarDays, title: "Schedule everywhere", text: "Plan a week of posts in minutes. One post, tuned for Instagram, Facebook and Threads, published at the right time." },
