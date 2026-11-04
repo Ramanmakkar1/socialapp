@@ -58,6 +58,13 @@ export function validateRule(rule: DmRule): string[] {
   if ((rule.askEmail || rule.requireFollow) && !rule.linkUrl?.trim()) {
     errors.push('Link URL is required when asking for email or requiring a follow.');
   }
-  if (rule.linkUrl && !rule.linkUrl.startsWith('https://')) errors.push('Link URL must start with https://.');
+  if (rule.linkUrl && rule.linkUrl.trim()) {
+    try {
+      const url = new URL(rule.linkUrl);
+      if (url.protocol !== 'https:' || !url.hostname || url.username || url.password) throw new Error();
+    } catch {
+      errors.push('Enter a valid HTTPS link without a username or password.');
+    }
+  }
   return errors;
 }
