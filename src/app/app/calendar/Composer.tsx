@@ -2,9 +2,11 @@
 
 import { useEffect, useId, useState, useTransition } from "react";
 import Link from "next/link";
-import { AtSign, Facebook, Instagram } from "lucide-react";
+import { AtSign, Facebook, Instagram, Sparkles } from "lucide-react";
 import { savePost } from "./actions";
+import { aiAvailable, suggestCaptions } from "./aiActions";
 import { BRAND } from "@/lib/brand";
+import type { CaptionIdea } from "@/lib/ai";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
@@ -45,6 +47,8 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
   const scheduleId = useId();
   const dmRuleId = useId();
   const imageId = useId();
+  const aiTopicId = useId();
+  const aiToneId = useId();
 
   const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>({
     instagram: true,
@@ -69,11 +73,32 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
   const [timeZone, setTimeZone] = useState("");
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [aiOn, setAiOn] = useState<boolean | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiTone, setAiTone] = useState("friendly");
+  const [aiIdeas, setAiIdeas] = useState<CaptionIdea[]>([]);
+  const [aiError, setAiError] = useState("");
+  const [aiPending, startAiTransition] = useTransition();
 
   useEffect(() => {
     // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- boss-mandated pattern for #new composer
     setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    aiAvailable()
+      .then((available) => {
+        if (active) setAiOn(available);
+      })
+      .catch(() => {
+        if (active) setAiOn(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   function togglePlatform(platform: PlatformId) {
@@ -194,6 +219,92 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
               placeholder="Write once — customize per platform below if you need to."
               className="mt-2 w-full resize-y rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
             />
+            <button
+              type="button"
+              disabled={aiOn === false}
+              onClick={() => setAiOpen((open) => !open)}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Sparkles className="h-4 w-4" aria-hidden />
+              {aiOn === false ? "AI captions: coming soon" : "Write with AI"}
+            </button>
+            {aiOpen && aiOn && (
+              <div className="mt-3 rounded-xl border border-line bg-surface p-4">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <div className="min-w-0 flex-1">
+                    <label htmlFor={aiTopicId} className="text-sm font-medium text-ink-2">
+                      What is this post about?
+                    </label>
+                    <input
+                      id={aiTopicId}
+                      type="text"
+                      maxLength={300}
+                      value={aiTopic}
+                      onChange={(e) => setAiTopic(e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none"
+                    />
+                  </div>
+                  <div className="sm:w-44">
+                    <label htmlFor={aiToneId} className="text-sm font-medium text-ink-2">
+                      Tone
+                    </label>
+                    <select
+                      id={aiToneId}
+                      value={aiTone}
+                      onChange={(e) => setAiTone(e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none"
+                    >
+                      {(["friendly", "professional", "playful", "bold"] as const).map((tone) => (
+                        <option key={tone} value={tone}>{tone[0].toUpperCase() + tone.slice(1)}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  disabled={aiPending || !aiTopic.trim()}
+                  onClick={() => {
+                    setAiError("");
+                    setAiIdeas([]);
+                    startAiTransition(async () => {
+                      try {
+                        const result = await suggestCaptions({ topic: aiTopic, draft: mainCaption, tone: aiTone });
+                        if (result.ok) setAiIdeas(result.ideas);
+                        else setAiError(result.error);
+                      } catch {
+                        setAiError("AI request failed. Try again.");
+                      }
+                    });
+                  }}
+                  className="mt-3 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-60"
+                >
+                  {aiPending ? "Thinking…" : "Get ideas"}
+                </button>
+                {aiError && <p className="mt-2 text-sm text-brand-2" aria-live="polite">{aiError}</p>}
+                {aiIdeas.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {aiIdeas.map((idea, index) => (
+                      <article key={`${index}-${idea.caption}`} className="rounded-xl border border-line bg-bg p-3">
+                        <p className="whitespace-pre-wrap text-sm text-ink-2">{idea.caption}</p>
+                        {idea.hashtags.length > 0 && (
+                          <p className="mt-2 text-sm text-muted">{idea.hashtags.join(" ")}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMainCaption(idea.hashtags.length > 0 ? `${idea.caption}\n\n${idea.hashtags.join(" ")}` : idea.caption);
+                            setAiOpen(false);
+                          }}
+                          className="mt-2 text-sm font-medium text-brand"
+                        >
+                          Use this
+                        </button>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div>
