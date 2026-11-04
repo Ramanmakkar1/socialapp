@@ -5,6 +5,8 @@ import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { validateRule, type DmRule } from "@/lib/rules";
 
+export type RuleTrigger = "comment" | "story_reply";
+
 export type RuleFormInput = {
   name: string;
   keywords: string[];
@@ -13,6 +15,7 @@ export type RuleFormInput = {
   linkUrl: string;
   emailGate: boolean;
   followGate: boolean;
+  triggers: RuleTrigger[];
 };
 
 export type RuleActionResult = { ok: true } | { ok: false; errors: string[] };
@@ -27,7 +30,7 @@ function formToDmRule(input: RuleFormInput, id: string, active: boolean): DmRule
     name: input.name.trim(),
     keywords: input.keywords,
     matchMode: input.matchType,
-    triggers: ["comment"],
+    triggers: input.triggers,
     replyPublicly: false,
     publicReplies: [],
     dmMessage: input.dmText,
@@ -38,9 +41,21 @@ function formToDmRule(input: RuleFormInput, id: string, active: boolean): DmRule
   };
 }
 
+const ALLOWED_TRIGGERS: ReadonlySet<RuleTrigger> = new Set(["comment", "story_reply"]);
+
 function validateFormInput(input: RuleFormInput): string[] {
   const errors: string[] = [];
   const name = input.name.trim();
+  if (!input.triggers?.length) {
+    errors.push("Choose at least one trigger.");
+  } else {
+    for (const t of input.triggers) {
+      if (!ALLOWED_TRIGGERS.has(t)) {
+        errors.push("Invalid trigger.");
+        break;
+      }
+    }
+  }
   if (!name) {
     errors.push("Name is required.");
   }
@@ -72,8 +87,8 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
   const link = input.linkUrl.trim() || null;
   try {
     await query(
-      `insert into socialapp.dm_rules (user_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, 'active')`,
+      `insert into socialapp.dm_rules (user_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, triggers, status)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active')`,
       [
         user.id,
         input.name.trim(),
@@ -83,6 +98,7 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
         link,
         input.emailGate,
         input.followGate,
+        input.triggers,
       ],
     );
     revalidatePath("/app/auto-dm");
@@ -107,8 +123,8 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
   const link = input.linkUrl.trim() || null;
   try {
     const rows = await query<{ id: string }>(
-      `update socialapp.dm_rules set name=$2, keywords=$3, match_type=$4, dm_text=$5, link_url=$6, email_gate=$7, follow_gate=$8, updated_at=now()
-       where id=$1 and user_id=$9 returning id`,
+      `update socialapp.dm_rules set name=$2, keywords=$3, match_type=$4, dm_text=$5, link_url=$6, email_gate=$7, follow_gate=$8, triggers=$9, updated_at=now()
+       where id=$1 and user_id=$10 returning id`,
       [
         id,
         input.name.trim(),
@@ -118,6 +134,7 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
         link,
         input.emailGate,
         input.followGate,
+        input.triggers,
         user.id,
       ],
     );

@@ -15,7 +15,7 @@ export default async function AutoDmPage({
   const templateSlug = typeof templateParam === "string" ? templateParam : templateParam?.[0];
 
   const rules = await query<DbRuleRow>(
-    `select id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status
+    `select id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status, triggers
      from socialapp.dm_rules where user_id = $1 order by created_at desc`,
     [user.id],
   );
@@ -33,6 +33,7 @@ export default async function AutoDmPage({
         emailGate: tpl.askEmail,
         followGate: tpl.requireFollow,
         matchType: tpl.matchMode === "any" ? "contains" : tpl.matchMode,
+        triggers: tpl.slug === "story-freebie" ? ["story_reply"] : ["comment"],
       };
       if (tpl.matchMode === "any") {
         templateNote =

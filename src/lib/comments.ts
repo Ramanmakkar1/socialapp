@@ -104,7 +104,7 @@ export async function processCommentEvents(
         continue;
       }
       const rules = await query<DmRuleRow>(
-        "select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp.dm_rules where user_id=$1 and status='active' and (social_account_id is null or social_account_id=$2) order by created_at",
+        "select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp.dm_rules where user_id=$1 and status='active' and (social_account_id is null or social_account_id=$2) and 'comment' = any(triggers) order by created_at",
         [account.user_id, account.id],
       );
       const ruleId = matchRule(event.text, rules);

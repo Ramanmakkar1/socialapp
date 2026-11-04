@@ -9,6 +9,7 @@ import {
   toggleRule,
   updateRule,
   type RuleFormInput,
+  type RuleTrigger,
 } from "./actions";
 
 const INPUT =
@@ -24,6 +25,7 @@ export type DbRuleRow = {
   email_gate: boolean;
   follow_gate: boolean;
   status: "active" | "paused";
+  triggers: string[];
 };
 
 export type RuleFormDefaults = {
@@ -34,6 +36,7 @@ export type RuleFormDefaults = {
   linkUrl?: string;
   emailGate?: boolean;
   followGate?: boolean;
+  triggers?: RuleTrigger[];
   matchModeNote?: string;
 };
 
@@ -42,6 +45,14 @@ function parseKeywords(raw: string): string[] {
     .split(/[,，]/)
     .map((part) => part.trim())
     .filter(Boolean);
+}
+
+function normalizeTriggers(raw: string[] | RuleTrigger[] | undefined): RuleTrigger[] {
+  const list = raw?.length ? raw : ["comment"];
+  const out: RuleTrigger[] = [];
+  if (list.includes("comment")) out.push("comment");
+  if (list.includes("story_reply")) out.push("story_reply");
+  return out.length > 0 ? out : ["comment"];
 }
 
 function defaultsToInput(defaults: RuleFormDefaults | undefined): Partial<RuleFormInput> {
@@ -54,6 +65,7 @@ function defaultsToInput(defaults: RuleFormDefaults | undefined): Partial<RuleFo
     linkUrl: defaults.linkUrl ?? "",
     emailGate: defaults.emailGate,
     followGate: defaults.followGate,
+    triggers: defaults.triggers ? normalizeTriggers(defaults.triggers) : undefined,
   };
 }
 
@@ -73,9 +85,12 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
   const linkId = useId();
   const emailId = useId();
   const followId = useId();
+  const triggerCommentId = useId();
+  const triggerStoryId = useId();
   const dmRef = useRef<HTMLTextAreaElement>(null);
 
   const base = defaultsToInput(initial);
+  const initialTriggers = normalizeTriggers(base.triggers);
   const [name, setName] = useState(base.name ?? "");
   const [keywordText, setKeywordText] = useState((base.keywords ?? []).join(", "));
   const [matchType, setMatchType] = useState<"contains" | "exact">(base.matchType ?? "contains");
@@ -83,6 +98,8 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
   const [linkUrl, setLinkUrl] = useState(base.linkUrl ?? "");
   const [emailGate, setEmailGate] = useState(base.emailGate ?? false);
   const [followGate, setFollowGate] = useState(base.followGate ?? false);
+  const [triggerComment, setTriggerComment] = useState(initialTriggers.includes("comment"));
+  const [triggerStoryReply, setTriggerStoryReply] = useState(initialTriggers.includes("story_reply"));
   const [errors, setErrors] = useState<string[]>([]);
   const [pending, startTransition] = useTransition();
 
@@ -106,6 +123,9 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
   }
 
   function buildInput(): RuleFormInput {
+    const triggers: RuleTrigger[] = [];
+    if (triggerComment) triggers.push("comment");
+    if (triggerStoryReply) triggers.push("story_reply");
     return {
       name,
       keywords: parseKeywords(keywordText),
@@ -114,6 +134,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
       linkUrl,
       emailGate,
       followGate,
+      triggers,
     };
   }
 
@@ -202,6 +223,27 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
             </label>
           </div>
         </fieldset>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-ink-2">When to send</p>
+          <label htmlFor={triggerCommentId} className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+            <input
+              id={triggerCommentId}
+              type="checkbox"
+              checked={triggerComment}
+              onChange={(e) => setTriggerComment(e.target.checked)}
+            />
+            Comments on my posts
+          </label>
+          <label htmlFor={triggerStoryId} className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+            <input
+              id={triggerStoryId}
+              type="checkbox"
+              checked={triggerStoryReply}
+              onChange={(e) => setTriggerStoryReply(e.target.checked)}
+            />
+            Replies to my stories
+          </label>
+        </div>
         <div>
           <label htmlFor={dmId} className="text-sm font-medium text-ink-2">DM message</label>
           <textarea
@@ -320,6 +362,7 @@ export function AutoDmView({ rules, templateDefaults, templateNote }: AutoDmView
         linkUrl: editing.link_url ?? "",
         emailGate: editing.email_gate,
         followGate: editing.follow_gate,
+        triggers: normalizeTriggers(editing.triggers),
       }
     : templateDefaults;
 
