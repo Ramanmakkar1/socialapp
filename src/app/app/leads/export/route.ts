@@ -16,13 +16,29 @@ function csvField(value: string | null): string {
   return `"${field.replace(/"/g, '""')}"`;
 }
 
-export async function GET() {
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, "\\$&");
+}
+
+export async function GET(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
+  const url = new URL(request.url);
+  const search = (url.searchParams.get("q") ?? "").trim().slice(0, 100);
+  const onlyWithEmail = url.searchParams.get("email") === "1";
+
+  const conditions = ["c.user_id = $1"];
+  const params: string[] = [user.id];
+  if (search) {
+    conditions.push("(c.username ilike $2 or c.name ilike $2 or c.email ilike $2 or c.phone ilike $2)");
+    params.push(`%${escapeLike(search)}%`);
+  }
+  if (onlyWithEmail) conditions.push("c.email is not null and c.email <> ''");
+
   const leads = await query<Lead>(
-    "select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where c.user_id = $1 order by c.created_at desc limit 10000",
-    [user.id]
+    `select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where ${conditions.join(" and ")} order by c.created_at desc limit 10000`,
+    params
   );
   const rows = [
     ["username", "name", "email", "phone", "rule", "created_at"],
