@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { BarChart3 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
+import { hourBars, topHours } from "@/lib/bestTime";
+import { isDbConfigured, query } from "@/lib/db";
 import { getDashboardStats, getRuleStats } from "@/lib/stats";
 import EmptyState from "../EmptyState";
 
@@ -15,6 +17,22 @@ function clickRate(clicks: number, dmsSent: number): string {
 export default async function AnalyticsPage() {
   const user = await requireUser();
   const [stats, rules] = await Promise.all([getDashboardStats(user.id), getRuleStats(user.id)]);
+
+  let commentHourRows: { hour: number; count: number }[] = [];
+  if (isDbConfigured()) {
+    try {
+      commentHourRows = await query<{ hour: number; count: number }>(
+        `select extract(hour from created_at at time zone 'UTC')::int as hour, count(*)::int as count from socialapp.dm_queue where user_id=$1 and created_at > now() - interval '30 days' group by 1`,
+        [user.id]
+      );
+    } catch {
+      commentHourRows = [];
+    }
+  }
+  const bestTimes = topHours(commentHourRows, 3);
+  const hourBarCounts = hourBars(commentHourRows);
+  const maxHourCount = Math.max(...hourBarCounts, 0);
+
   const tiles: [string, number][] = [
     ["Scheduled", stats.scheduled],
     ["DMs sent (7 days)", stats.dmsSent],
@@ -35,6 +53,44 @@ export default async function AnalyticsPage() {
             <div className="mt-1 text-3xl font-semibold">{v.toLocaleString("en-US")}</div>
           </div>
         ))}
+      </div>
+      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
+        <h2 className="text-lg font-semibold">Best time to post</h2>
+        <p className="mt-1 text-sm text-muted">
+          Hours (UTC) when people commented on your posts in the last 30 days.
+        </p>
+        {bestTimes.length > 0 ? (
+          <>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {bestTimes.map((slot) => (
+                <span
+                  key={slot.hour}
+                  className="inline-flex items-center rounded-full border border-line bg-bg px-3 py-1 text-sm font-medium"
+                >
+                  {slot.label}
+                  <span className="ml-1.5 text-muted tabular-nums">({slot.count.toLocaleString("en-US")})</span>
+                </span>
+              ))}
+            </div>
+            <div className="mt-5 flex h-24 items-end gap-1" role="img" aria-label="Comment volume by hour UTC">
+              {hourBarCounts.map((count, hour) => {
+                const heightPct = maxHourCount > 0 ? (count / maxHourCount) * 100 : 0;
+                return (
+                  <div
+                    key={hour}
+                    title={`${String(hour).padStart(2, "0")}:00 – ${count.toLocaleString("en-US")} comment${count === 1 ? "" : "s"}`}
+                    className="min-h-0 flex-1 rounded-sm bg-brand"
+                    style={{ height: `${heightPct}%` }}
+                  />
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <p className="mt-4 text-sm text-muted">
+            Not enough comments yet. This fills in once your auto-DM rules start getting comments.
+          </p>
+        )}
       </div>
       {rules.length > 0 ? (
         <div className="mt-8">
