@@ -6,7 +6,7 @@ import { BRAND } from "@/lib/brand";
 import styles from "./landing.module.css";
 const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-instrument-sans" });
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-instrument-serif" });
-const title = `Instagram Scheduler & Comment-to-DM Automation | ${BRAND.name}`;
+const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = "Schedule Instagram posts, auto-DM keyword comments and capture leads with Poskoo. Start free using the official Meta API. No credit card needed.";
 export const metadata: Metadata = {
  title: { absolute: title }, description, alternates: { canonical: "/" },
