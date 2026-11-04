@@ -6,8 +6,6 @@ import { encryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
 import { IG_SCOPES, exchangeCode, fetchProfile, longLivedToken } from "@/lib/instagram";
 
-export const dynamic = "force-dynamic";
-
 function back(result: "connected" | "error") {
   return NextResponse.redirect(new URL(`/app/settings?ig=${result}`, BRAND.url));
 }

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
 import { Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
@@ -8,7 +8,15 @@ import { logoutAction } from "../login/actions";
 import SidebarNav from "./SidebarNav";
 
 // Shared dashboard shell. Guests are sent to /login by requireUser().
-export default async function AppLayout({ children }: { children: ReactNode }) {
+export default function AppLayout({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<p role="status" className="p-6 text-sm text-muted">Loading dashboard…</p>}>
+      <AppShell>{children}</AppShell>
+    </Suspense>
+  );
+}
+
+async function AppShell({ children }: { children: ReactNode }) {
   const user = await requireUser();
   let needsReconnect = false;
   if (isDbConfigured()) {

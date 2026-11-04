@@ -1,10 +1,10 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { Plus, Check } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { EMPTY_STATS, getDashboardStats } from "@/lib/stats";
 
 export const metadata = { title: "Dashboard" };
-export const dynamic = "force-dynamic";
 
 function greeting(): string {
   const hour = new Date().getHours();
@@ -16,6 +16,7 @@ function greeting(): string {
 // Dashboard overview with the logged-in user's real numbers.
 // Guests see zeros.
 export default async function AppHome() {
+  await connection();
   const user = await getCurrentUser();
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
   const steps = [

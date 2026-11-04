@@ -1,9 +1,9 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured, query } from "@/lib/db";
 
 export const metadata = { title: "Data deletion status", robots: { index: false, follow: false } };
-export const dynamic = "force-dynamic";
 
 type Row = { status: string; requested_at: Date; completed_at: Date | null };
 
@@ -17,7 +17,17 @@ function fmt(d: Date | null): string {
   return d ? new Date(d).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }) + " UTC" : "—";
 }
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ code?: string | string[] }> }) {
+type StatusPageProps = { searchParams: Promise<{ code?: string | string[] }> };
+
+export default function Page({ searchParams }: StatusPageProps) {
+  return (
+    <Suspense fallback={<p role="status" className="mx-auto max-w-3xl px-4 py-16 text-muted">Loading deletion status…</p>}>
+      <DeletionStatus searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function DeletionStatus({ searchParams }: StatusPageProps) {
   const { code: raw } = await searchParams;
   const code = typeof raw === "string" ? raw.trim().slice(0, 64) : "";
   let row: Row | null = null;

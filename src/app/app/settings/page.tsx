@@ -7,7 +7,6 @@ import { disconnectAccountAction, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 
 export const metadata = { title: "Settings" };
-export const dynamic = "force-dynamic";
 
 type Account = {
   id: string;

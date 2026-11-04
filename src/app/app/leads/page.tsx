@@ -4,7 +4,6 @@ import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../EmptyState";
 
 export const metadata = { title: "Leads" };
-export const dynamic = "force-dynamic";
 
 type Lead = {
   id: string;

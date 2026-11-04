@@ -4,8 +4,6 @@ import { isDbConfigured } from "@/lib/db";
 import { igConfig } from "@/lib/instagram";
 import { parseSignedRequest, readSignedRequest } from "@/lib/signedRequest";
 
-export const dynamic = "force-dynamic";
-
 export async function POST(request: Request) {
   const payload = parseSignedRequest(await readSignedRequest(request), igConfig().appSecret);
   if (!payload) {

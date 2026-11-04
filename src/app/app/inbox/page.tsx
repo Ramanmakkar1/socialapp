@@ -6,7 +6,6 @@ import { DM_WINDOW_MS, PRIVATE_REPLY_WINDOW_MS, loadInbox, withinWindow, type Th
 import { privateReplyAction, replyInThreadAction, replyToCommentAction } from "./actions";
 
 export const metadata = { title: "Inbox" };
-export const dynamic = "force-dynamic";
 
 const OK_TEXT: Record<string, string> = {
   comment: "Reply posted under the comment.",

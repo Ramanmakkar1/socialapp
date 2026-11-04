@@ -3,7 +3,6 @@ import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 
 export const metadata = { title: "App review guide", robots: { index: false, follow: false } };
-export const dynamic = "force-dynamic";
 
 const STEPS: { title: string; permission: string; href: string; cta: string; body: string[] }[] = [
   {

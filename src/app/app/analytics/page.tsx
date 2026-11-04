@@ -9,7 +9,6 @@ import EmptyState from "../EmptyState";
 import AccountInsightsPanel from "../AccountInsights";
 
 export const metadata = { title: "Analytics" };
-export const dynamic = "force-dynamic";
 
 function clickRate(clicks: number, dmsSent: number): string {
   if (dmsSent === 0) return "—";

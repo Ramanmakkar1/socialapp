@@ -5,8 +5,6 @@ import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { authorizeUrl, isIgConfigured } from "@/lib/instagram";
 
-export const dynamic = "force-dynamic";
-
 export async function GET() {
   await requireUser();
   if (!isIgConfigured()) {
