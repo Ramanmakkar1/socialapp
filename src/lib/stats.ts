@@ -3,13 +3,14 @@ import { isDbConfigured, query } from "@/lib/db";
 
 export type DashboardStats = {
   scheduled: number;
+  failed: number;
   dmsSent: number;
   leads: number;
   linkClicks: number;
   hasAccount: boolean;
 };
 
-export const EMPTY_STATS: DashboardStats = { scheduled: 0, dmsSent: 0, leads: 0, linkClicks: 0, hasAccount: false };
+export const EMPTY_STATS: DashboardStats = { scheduled: 0, failed: 0, dmsSent: 0, leads: 0, linkClicks: 0, hasAccount: false };
 
 export type RuleStats = {
   id: string;
@@ -46,6 +47,7 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   const rows = await query<DashboardStats>(
     `select
       (select count(*)::int from socialapp.scheduled_posts where user_id = $1 and status = 'scheduled') as "scheduled",
+      (select count(*)::int from socialapp.scheduled_posts where user_id = $1 and status = 'failed') as "failed",
       (select count(*)::int from socialapp.dm_queue where user_id = $1 and status = 'sent' and sent_at > now() - interval '7 days') as "dmsSent",
       (select count(*)::int from socialapp.contacts where user_id = $1) as "leads",
       (select count(*)::int from socialapp.link_clicks c join socialapp.short_links s on s.code = c.code where s.user_id = $1) as "linkClicks",

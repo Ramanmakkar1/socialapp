@@ -14,7 +14,7 @@ function greeting(): string {
 }
 
 // Dashboard overview with the logged-in user's real numbers.
-// Uses getCurrentUser (not requireUser) because /login does not exist yet; guests see zeros.
+// Guests see zeros.
 export default async function AppHome() {
   const user = await getCurrentUser();
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
@@ -30,6 +30,9 @@ export default async function AppHome() {
         <div><h1 className="text-2xl font-semibold">{greeting()}</h1><p className="text-sm text-muted">Here&apos;s your week.</p></div>
         <Link href="/app/calendar#new" className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"><Plus className="h-4 w-4" />New post</Link>
       </div>
+      {stats.failed > 0 && (
+        <div role="alert" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-2 bg-surface p-4 text-sm"><span className="text-ink">{stats.failed} {stats.failed === 1 ? "post" : "posts"} failed to publish.</span><Link href="/app/calendar" className="font-medium text-brand hover:underline">Review and retry</Link></div>
+      )}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map(([l, v]) => (
           <div key={l} className="rounded-2xl border border-line bg-surface p-5"><div className="text-sm text-muted">{l}</div><div className="mt-1 text-3xl font-semibold">{v.toLocaleString("en-US")}</div></div>
