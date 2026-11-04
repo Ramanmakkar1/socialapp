@@ -20,22 +20,32 @@ function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }
 
-export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ q?: string; email?: string }> }) {
-  const { q = '', email = '' } = await searchParams;
+export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ q?: string; email?: string; rule?: string }> }) {
+  const { q = '', email = '', rule = '' } = await searchParams;
   const user = await requireUser();
   const configured = isDbConfigured();
+  const rules = configured ? await query<{ id: string; name: string }>(
+    "select id, name from socialapp.dm_rules where user_id=$1 order by name",
+    [user.id]
+  ) : [];
 
   const search = q.trim().slice(0, 100);
   const onlyWithEmail = email === "1";
-  const filterActive = search.length > 0 || onlyWithEmail;
+  const selectedRule = rules.some((item) => item.id === rule) ? rule : "";
+  const filterActive = search.length > 0 || onlyWithEmail || selectedRule.length > 0;
 
   const conditions = ["c.user_id = $1"];
   const params: string[] = [user.id];
   if (search) {
-    conditions.push("(c.username ilike $2 or c.name ilike $2 or c.email ilike $2 or c.phone ilike $2)");
+    const searchParam = `$${params.length + 1}`;
+    conditions.push(`(c.username ilike ${searchParam} or c.name ilike ${searchParam} or c.email ilike ${searchParam} or c.phone ilike ${searchParam})`);
     params.push(`%${escapeLike(search)}%`);
   }
   if (onlyWithEmail) conditions.push("c.email is not null and c.email <> ''");
+  if (selectedRule) {
+    conditions.push(`c.source_rule_id = $${params.length + 1}`);
+    params.push(selectedRule);
+  }
 
   const leads = configured ? await query<Lead>(
     `select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where ${conditions.join(" and ")} order by c.created_at desc limit 200`,
@@ -45,6 +55,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   const exportParams = new URLSearchParams();
   if (search) exportParams.set("q", search);
   if (onlyWithEmail) exportParams.set("email", "1");
+  if (selectedRule) exportParams.set("rule", selectedRule);
   const exportQuery = exportParams.toString();
   const exportHref = exportQuery ? `/app/leads/export?${exportQuery}` : "/app/leads/export";
 
@@ -64,6 +75,11 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           defaultValue={search}
           className="rounded-full border border-line bg-surface px-4 py-2 text-sm"
         />
+        <label htmlFor="leads-rule" className="sr-only">From rule</label>
+        <select id="leads-rule" name="rule" defaultValue={selectedRule} className="rounded-full border border-line bg-surface px-4 py-2 text-sm">
+          <option value="">All rules</option>
+          {rules.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+        </select>
         <label htmlFor="leads-email" className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
           <input id="leads-email" type="checkbox" name="email" value="1" defaultChecked={onlyWithEmail} />
           Only with email
