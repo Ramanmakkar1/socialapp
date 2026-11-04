@@ -1,7 +1,15 @@
 import type { MetadataRoute } from "next";
 import { BRAND } from "@/lib/brand";
 
-const PUBLIC_PATHS = ["/", "/instagram-auto-dm", "/privacy", "/terms", "/data-deletion", "/tools/instagram-caption-counter"];
+const PUBLIC_PATHS = [
+  "/",
+  "/instagram-auto-dm",
+  "/privacy",
+  "/terms",
+  "/data-deletion",
+  "/tools/instagram-caption-counter",
+  "/tools/instagram-line-break-generator",
+];
 
 const META: Record<string, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
   "/": { priority: 1, changeFrequency: "weekly" },
@@ -10,6 +18,7 @@ const META: Record<string, { priority: number; changeFrequency: "weekly" | "year
   "/terms": { priority: 0.3, changeFrequency: "yearly" },
   "/data-deletion": { priority: 0.3, changeFrequency: "yearly" },
   "/tools/instagram-caption-counter": { priority: 0.7, changeFrequency: "weekly" },
+  "/tools/instagram-line-break-generator": { priority: 0.7, changeFrequency: "weekly" },
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
