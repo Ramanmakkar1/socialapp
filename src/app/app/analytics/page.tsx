@@ -3,7 +3,7 @@ import { BarChart3 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { hourBars, topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
-import { getCommentActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
+import { getCommentActivity, getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import EmptyState from "../EmptyState";
 
 export const metadata = { title: "Analytics" };
@@ -38,13 +38,20 @@ function formatPlatforms(platforms: string[]): string {
   return platforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(", ");
 }
 
+function shortDayUtc(day: string): string {
+  const d = new Date(`${day}T12:00:00Z`);
+  if (Number.isNaN(d.getTime())) return day;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
 export default async function AnalyticsPage() {
   const user = await requireUser();
-  const [stats, rules, recentPosts, activity] = await Promise.all([
+  const [stats, rules, recentPosts, activity, dailyActivity] = await Promise.all([
     getDashboardStats(user.id),
     getRuleStats(user.id),
     getRecentPosts(user.id),
     getCommentActivity(user.id),
+    getDailyActivity(user.id),
   ]);
 
   let commentHourRows: { hour: number; count: number }[] = [];
@@ -81,6 +88,9 @@ export default async function AnalyticsPage() {
       }
     })
   );
+
+  const dailyMax = dailyActivity.reduce((max, row) => Math.max(max, row.dms, row.leads), 0);
+  const hasDailyActivity = dailyMax > 0;
 
   const tiles: [string, number][] = [
     ["Scheduled", stats.scheduled],
@@ -156,6 +166,53 @@ export default async function AnalyticsPage() {
           <p className="mt-4 text-sm text-muted">
             No comments yet. Once your auto-DM rules start getting comments, your best posting times show up here.
           </p>
+        )}
+      </div>
+      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
+        <h2 className="text-lg font-semibold">Last 14 days</h2>
+        <p className="mt-1 text-sm text-muted">DMs sent and leads captured per day (UTC)</p>
+        {hasDailyActivity ? (
+          <>
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-4 shrink-0 rounded-sm bg-brand" aria-hidden />
+                DMs sent
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-4 shrink-0 rounded-sm bg-brand-2" aria-hidden />
+                Leads
+              </span>
+            </div>
+            <ul className="mt-4 space-y-3">
+              {dailyActivity.map((row) => (
+                <li key={row.day} className="flex items-start gap-2 sm:gap-3">
+                  <span className="w-11 shrink-0 pt-0.5 text-sm text-muted sm:w-12">{shortDayUtc(row.day)}</span>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-3 min-w-0 flex-1 rounded bg-bg">
+                        <div
+                          className="h-full min-w-0 rounded bg-brand"
+                          style={{ width: dailyMax > 0 ? `${(row.dms / dailyMax) * 100}%` : "0%" }}
+                        />
+                      </div>
+                      <span className="w-8 shrink-0 text-right text-sm tabular-nums">{row.dms.toLocaleString("en-US")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-2 min-w-0 flex-1 rounded bg-bg">
+                        <div
+                          className="h-full min-w-0 rounded bg-brand-2"
+                          style={{ width: dailyMax > 0 ? `${(row.leads / dailyMax) * 100}%` : "0%" }}
+                        />
+                      </div>
+                      <span className="w-8 shrink-0 text-right text-sm tabular-nums">{row.leads.toLocaleString("en-US")}</span>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className="mt-4 text-sm text-muted">No activity in the last 14 days yet.</p>
         )}
       </div>
       <div className="mt-6 rounded-2xl border border-line bg-surface p-5">

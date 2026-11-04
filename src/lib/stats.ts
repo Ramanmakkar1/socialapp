@@ -98,6 +98,37 @@ export async function getCommentActivity(userId: string): Promise<ActivityCell[]
   }
 }
 
+export type DailyActivityRow = { day: string; dms: number; leads: number };
+
+export async function getDailyActivity(userId: string): Promise<DailyActivityRow[]> {
+  if (!isDbConfigured()) {
+    return [];
+  }
+  try {
+    return await query<DailyActivityRow>(
+      `with days as (
+        select generate_series(
+          (now() at time zone 'UTC')::date - 13,
+          (now() at time zone 'UTC')::date,
+          interval '1 day'
+        )::date as day
+      )
+      select to_char(d.day, 'YYYY-MM-DD') as day,
+        (select count(*)::int from socialapp.dm_queue q
+          where q.user_id = $1 and q.status = 'sent'
+            and (q.sent_at at time zone 'UTC')::date = d.day) as dms,
+        (select count(*)::int from socialapp.contacts c
+          where c.user_id = $1 and c.email is not null
+            and (c.created_at at time zone 'UTC')::date = d.day) as leads
+      from days d
+      order by d.day`,
+      [userId]
+    );
+  } catch {
+    return [];
+  }
+}
+
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
   if (!isDbConfigured()) {
     return EMPTY_STATS;
