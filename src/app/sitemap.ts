@@ -4,6 +4,7 @@ import { BRAND } from "@/lib/brand";
 const PUBLIC_PATHS = [
   "/",
   "/instagram-auto-dm",
+  "/instagram-auto-dm/templates",
   "/privacy",
   "/terms",
   "/data-deletion",
@@ -14,6 +15,7 @@ const PUBLIC_PATHS = [
 const META: Record<string, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
   "/": { priority: 1, changeFrequency: "weekly" },
   "/instagram-auto-dm": { priority: 0.8, changeFrequency: "weekly" },
+  "/instagram-auto-dm/templates": { priority: 0.7, changeFrequency: "weekly" },
   "/privacy": { priority: 0.3, changeFrequency: "yearly" },
   "/terms": { priority: 0.3, changeFrequency: "yearly" },
   "/data-deletion": { priority: 0.3, changeFrequency: "yearly" },

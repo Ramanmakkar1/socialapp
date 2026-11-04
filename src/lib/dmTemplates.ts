@@ -1,0 +1,177 @@
+import type { DmRule } from './rules';
+
+export type DmTemplate = {
+  slug: string;
+  useCase: string;
+  title: string;
+  keywords: string[];
+  matchMode: DmRule['matchMode'];
+  dmMessage: string;
+  askEmail: boolean;
+  requireFollow: boolean;
+  publicReply: string;
+  tip: string;
+};
+
+export const DM_TEMPLATES: DmTemplate[] = [
+  {
+    slug: 'free-guide',
+    useCase: 'Lead magnets',
+    title: 'Free guide or lead magnet',
+    keywords: ['GUIDE'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Thanks for commenting 🙌\n\nHere is the free guide you asked for 👉 {{link}}\n\nLet me know which tip you try first!',
+    askEmail: false,
+    requireFollow: false,
+    publicReply: 'Sent it to your DMs! 📩',
+    tip: 'Put the keyword in the first line of your caption and on the cover of the reel so people know what to type.',
+  },
+  {
+    slug: 'email-checklist',
+    useCase: 'Lead magnets',
+    title: 'Email-gated checklist',
+    keywords: ['CHECKLIST'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Here is your checklist 👉 {{link}}\n\nWant the printable version too? Reply with your email and I will send it.',
+    askEmail: true,
+    requireFollow: false,
+    publicReply: 'Check your DMs for the checklist ✅',
+    tip: 'Offer something extra for the email (a printable or a bonus) so giving it feels like a fair trade.',
+  },
+  {
+    slug: 'follow-bonus',
+    useCase: 'Lead magnets',
+    title: 'Follow-gated bonus',
+    keywords: ['BONUS'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Thanks for following 💛\n\nHere is your bonus, as promised 👉 {{link}}',
+    askEmail: false,
+    requireFollow: true,
+    publicReply: 'Bonus is in your DMs! Make sure you follow so it unlocks 🔓',
+    tip: 'Say in the caption that the bonus is for followers, so nobody is surprised by the follow step.',
+  },
+  {
+    slug: 'product-link',
+    useCase: 'Selling products',
+    title: 'Product link',
+    keywords: ['LINK', 'SHOP'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Here is the link to the product from the post 👉 {{link}}\n\nAny questions about sizes or shipping? Just reply here.',
+    askEmail: false,
+    requireFollow: false,
+    publicReply: 'Link sent to your DMs 🛍️',
+    tip: 'Use one keyword per product. If a post shows several products, give each one its own word.',
+  },
+  {
+    slug: 'price-request',
+    useCase: 'Selling products',
+    title: 'Price request',
+    keywords: ['PRICE'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Thanks for asking 😊\n\nYou can see the price and all the options here 👉 {{link}}\n\nReply if you want help picking the right one.',
+    askEmail: false,
+    requireFollow: false,
+    publicReply: 'Just sent you the price in DMs 💬',
+    tip: 'Answering "price?" comments in DMs keeps the thread clean and starts a private chat where people are more likely to buy.',
+  },
+  {
+    slug: 'discount-code',
+    useCase: 'Selling products',
+    title: 'Discount code',
+    keywords: ['CODE'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Here is your discount code 🎉\n\nUse it at checkout here 👉 {{link}}',
+    askEmail: false,
+    requireFollow: false,
+    publicReply: 'Your code is in your DMs 🎁',
+    tip: 'Set an end date for the code in your caption to give people a reason to use it now.',
+  },
+  {
+    slug: 'webinar-signup',
+    useCase: 'Events and calls',
+    title: 'Webinar or event signup',
+    keywords: ['WEBINAR'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! You are almost in 🎟️\n\nSave your seat here 👉 {{link}}\n\nI will see you there!',
+    askEmail: true,
+    requireFollow: false,
+    publicReply: 'Sent you the signup link! 📅',
+    tip: 'Asking for the email in the DM lets you send a reminder before the event starts.',
+  },
+  {
+    slug: 'book-a-call',
+    useCase: 'Events and calls',
+    title: 'Book a call',
+    keywords: ['BOOK', 'CALL'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Happy to chat 👋\n\nPick a time that works for you here 👉 {{link}}\n\nIf none of the times fit, reply here and we will sort it out.',
+    askEmail: false,
+    requireFollow: false,
+    publicReply: 'Booking link is in your DMs 📞',
+    tip: 'Great for coaches and agencies: post a client question, then invite people to comment BOOK for a call.',
+  },
+  {
+    slug: 'course-waitlist',
+    useCase: 'Events and calls',
+    title: 'Course waitlist',
+    keywords: ['WAITLIST'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Thanks for your interest in the course 🚀\n\nJoin the waitlist here 👉 {{link}}\n\nYou will be the first to know when doors open.',
+    askEmail: true,
+    requireFollow: false,
+    publicReply: 'Waitlist link sent to your DMs ✨',
+    tip: 'Collect emails before launch day so you can tell the waitlist first.',
+  },
+  {
+    slug: 'recipe-download',
+    useCase: 'Content and downloads',
+    title: 'Recipe or download',
+    keywords: ['RECIPE'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Here is the full recipe 🍝 👉 {{link}}\n\nTag me if you make it, I would love to see it!',
+    askEmail: false,
+    requireFollow: false,
+    publicReply: 'Recipe sent to your DMs 😋',
+    tip: 'Show the finished dish in the first second of the reel and the keyword on screen at the end.',
+  },
+  {
+    slug: 'giveaway-entry',
+    useCase: 'Content and downloads',
+    title: 'Giveaway entry',
+    keywords: ['ENTER', 'GIVEAWAY'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Thanks for entering 🎉\n\nHere are the giveaway rules and how winners are picked 👉 {{link}}\n\nGood luck!',
+    askEmail: false,
+    requireFollow: true,
+    publicReply: 'You are in! Check your DMs for the details 🍀',
+    tip: 'Link to clear giveaway rules and follow Instagram’s promotion guidelines.',
+  },
+  {
+    slug: 'story-freebie',
+    useCase: 'Content and downloads',
+    title: 'Story-reply freebie',
+    keywords: ['FREE'],
+    matchMode: 'contains',
+    dmMessage: 'Hey {{username}}! Thanks for replying to my story 💌\n\nHere is your freebie 👉 {{link}}',
+    askEmail: false,
+    requireFollow: false,
+    publicReply: '',
+    tip: 'Add a sticker or text to the story that says “Reply FREE”. Story replies arrive as DMs, so there is no public reply.',
+  },
+];
+
+export function toRule(t: DmTemplate): DmRule {
+  return {
+    id: `template-${t.slug}`,
+    name: t.title,
+    keywords: [...t.keywords],
+    matchMode: t.matchMode,
+    triggers: t.slug === 'story-freebie' ? ['story_reply'] : ['comment'],
+    replyPublicly: Boolean(t.publicReply),
+    publicReplies: t.publicReply ? [t.publicReply] : [],
+    dmMessage: t.dmMessage,
+    askEmail: t.askEmail,
+    requireFollow: t.requireFollow,
+    active: false,
+  };
+}
