@@ -48,6 +48,9 @@ export type RecentPost = {
   publishedAt: string | null;
   platforms: string[];
   ruleName: string | null;
+  dmsSent: number;
+  linkClicks: number;
+  leads: number;
 };
 
 export async function getRecentPosts(userId: string): Promise<RecentPost[]> {
@@ -56,18 +59,33 @@ export async function getRecentPosts(userId: string): Promise<RecentPost[]> {
   }
   try {
     return await query<RecentPost>(
-      `select p.id, p.caption,
+      `with rp as (
+      select p.id, p.caption,
         to_json(max(t.published_at)) #>> '{}' as "publishedAt",
         array_agg(distinct t.platform) as "platforms",
-        r.name as "ruleName"
+        r.name as "ruleName", p.dm_rule_id as rule_id,
+        max(t.published_at) as published_ts
       from socialapp.scheduled_posts p
       join socialapp.post_targets t on t.post_id = p.id
       left join socialapp.dm_rules r on r.id = p.dm_rule_id
       where p.user_id = $1
         and t.status = 'published'
         and t.published_at > now() - interval '30 days'
-      group by p.id, r.name
-      order by max(t.published_at) desc
+      group by p.id, r.name, p.dm_rule_id
+      )
+      select rp.id, rp.caption, rp."publishedAt", rp.platforms, rp."ruleName",
+        coalesce((select count(*)::int from socialapp.dm_queue q
+          where q.user_id = $1 and q.rule_id = rp.rule_id and q.status = 'sent'
+            and q.created_at >= rp.published_ts), 0) as "dmsSent",
+        coalesce((select count(*)::int from socialapp.link_clicks c
+          join socialapp.short_links s on s.code = c.code
+          where s.user_id = $1 and s.rule_id = rp.rule_id
+            and c.clicked_at >= rp.published_ts), 0) as "linkClicks",
+        coalesce((select count(*)::int from socialapp.contacts ct
+          where ct.user_id = $1 and ct.source_rule_id = rp.rule_id and ct.email is not null
+            and ct.created_at >= rp.published_ts), 0) as "leads"
+      from rp
+      order by rp.published_ts desc
       limit 20`,
       [userId]
     );

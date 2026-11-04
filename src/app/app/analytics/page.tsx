@@ -345,6 +345,9 @@ export default async function AnalyticsPage() {
                   <th scope="col" className="px-4 py-3 font-medium">
                     Auto-DM rule
                   </th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">DMs</th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">Clicks</th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">Leads</th>
                 </tr>
               </thead>
               <tbody>
@@ -354,6 +357,9 @@ export default async function AnalyticsPage() {
                     <td className="px-4 py-3 tabular-nums">{formatPublished(post.publishedAt)}</td>
                     <td className="px-4 py-3">{formatPlatforms(post.platforms)}</td>
                     <td className="px-4 py-3">{post.ruleName ?? "—"}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{post.ruleName === null ? "—" : post.dmsSent.toLocaleString("en-US")}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{post.ruleName === null ? "—" : post.linkClicks.toLocaleString("en-US")}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{post.ruleName === null ? "—" : post.leads.toLocaleString("en-US")}</td>
                   </tr>
                 ))}
               </tbody>
