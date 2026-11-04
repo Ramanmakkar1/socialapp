@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
 import { DM_WINDOW_MS, PRIVATE_REPLY_WINDOW_MS, loadInbox, withinWindow, type Thread } from "@/lib/inbox";
 import { privateReplyAction, replyInThreadAction, replyToCommentAction } from "./actions";
+import ReplySubmitButton from "./ReplySubmitButton";
 
 export const metadata = { title: "Inbox" };
 
@@ -100,7 +101,7 @@ export default async function InboxPage({
                       <input type="hidden" name="comment_id" value={c.commentId} />
                       <label className="sr-only" htmlFor={`pub-${c.commentId}`}>Public reply</label>
                       <input id={`pub-${c.commentId}`} name="message" required maxLength={2200} placeholder="Reply publicly under the comment…" className={inputCls} />
-                      <button type="submit" className="btn-primary">Post reply</button>
+                      <ReplySubmitButton label="Post reply" />
                     </form>
                     {canPrivate ? (
                       <form action={privateReplyAction} className="mt-2 flex flex-wrap gap-2">
@@ -108,7 +109,7 @@ export default async function InboxPage({
                         <input type="hidden" name="comment_id" value={c.commentId} />
                         <label className="sr-only" htmlFor={`dm-${c.commentId}`}>Private reply</label>
                         <input id={`dm-${c.commentId}`} name="message" required maxLength={1000} placeholder="Send one private DM reply…" className={inputCls} />
-                        <button type="submit" className="btn-primary">Send DM</button>
+                        <ReplySubmitButton label="Send DM" />
                       </form>
                     ) : (
                       <p className="mt-2 text-xs text-muted">Private DM reply: Instagram allows one per comment, within 7 days.</p>
@@ -141,7 +142,7 @@ export default async function InboxPage({
               <input type="hidden" name="sender_id" value={openThread.senderId} />
               <label className="sr-only" htmlFor="thread-reply">Reply</label>
               <input id="thread-reply" name="message" required maxLength={1000} placeholder="Write a reply…" className={inputCls} />
-              <button type="submit" className="btn-primary">Send</button>
+              <ReplySubmitButton label="Send" />
             </form>
           ) : (
             <p className="mt-4 text-sm text-muted">Instagram only allows replies within 24 hours of this person&apos;s last message. You can reply again once they message you.</p>
