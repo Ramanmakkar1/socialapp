@@ -155,6 +155,14 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
     const client = await pool.connect();
     try {
       await client.query("begin");
+      const lockRes = await client.query(
+        "select id from socialapp.social_accounts where id=$1 and status='active' for update skip locked",
+        [account.id]
+      );
+      if (!lockRes.rows.length) {
+        await client.query("commit");
+        continue;
+      }
       const sentRes = await client.query<{ n: number }>(
         "select count(*)::int as n from socialapp.dm_queue where social_account_id=$1 and status='sent' and sent_at > now() - interval '1 hour'",
         [account.id]
