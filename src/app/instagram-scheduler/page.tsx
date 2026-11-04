@@ -14,7 +14,7 @@ import {
 import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Instagram Scheduler: Plan and Auto-Publish Posts, Reels and Stories",
+  title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
   description:
     "Schedule Instagram posts, reels, carousels and stories, see the best time to post, and auto-DM everyone who comments. Free plan available.",
   alternates: { canonical: "/instagram-scheduler" },

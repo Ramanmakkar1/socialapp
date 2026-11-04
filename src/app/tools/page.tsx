@@ -6,7 +6,7 @@ import { BRAND } from "@/lib/brand";
 const PATH = "/tools";
 
 export const metadata: Metadata = {
-  title: { absolute: "Free Instagram Tools: Caption Counter, Line Breaks, Image Sizes" },
+  title: { absolute: "Free Instagram Tools: Caption Counter, Fonts, Image Sizes" },
   description:
     "Free Instagram tools: count caption characters and hashtags, keep line breaks in captions, and check image sizes and crops before you post.",
   alternates: { canonical: PATH },

@@ -7,7 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 
 export const metadata: Metadata = {
-  title: "Later Alternative With Instagram Auto-DM Built In | Postflow",
+  title: { absolute: `Later Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
     "A Later alternative that schedules Instagram, Facebook and Threads posts and auto-DMs commenters with a keyword, plus email capture and lead export.",
   alternates: { canonical: "/later-alternative" },

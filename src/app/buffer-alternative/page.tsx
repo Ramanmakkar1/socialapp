@@ -7,7 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 
 export const metadata: Metadata = {
-  title: "Buffer Alternative With Instagram Auto DM | Schedule + Automate",
+  title: { absolute: `Buffer Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
     "A Buffer alternative that schedules Instagram, Facebook and Threads posts and auto-DMs everyone who comments a keyword, with email capture and AI replies.",
   alternates: { canonical: "/buffer-alternative" },

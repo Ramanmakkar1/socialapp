@@ -7,7 +7,7 @@ import EngagementCalculator from "./EngagementCalculator";
 const PATH = "/tools/instagram-engagement-rate-calculator";
 
 export const metadata: Metadata = {
-  title: { absolute: "Instagram Engagement Rate Calculator (Free, by Followers or Reach)" },
+  title: { absolute: `Free Instagram Engagement Rate Calculator | ${BRAND.name}` },
   description:
     "Free Instagram engagement rate calculator: enter likes, comments, saves and shares, then divide by followers or reach to get your rate in seconds.",
   alternates: { canonical: PATH },

@@ -7,7 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 
 export const metadata: Metadata = {
-  title: "ManyChat Alternative for Instagram Comment-to-DM + Scheduling",
+  title: { absolute: "ManyChat Alternative: Instagram Comment-to-DM + Scheduler" },
   description:
     "A ManyChat alternative with Instagram comment-to-DM automation, post scheduling and lead capture in one tool, built on the official Meta API.",
   alternates: { canonical: "/manychat-alternative" },
