@@ -22,6 +22,12 @@ function one(v: string | string[] | undefined): string {
   return typeof v === "string" ? v : "";
 }
 
+function inboxRetryHref(tab: string, threadKey: string): string {
+  if (threadKey) return `/app/inbox?thread=${encodeURIComponent(threadKey)}`;
+  if (tab === "messages") return "/app/inbox?tab=messages";
+  return "/app/inbox";
+}
+
 const inputCls =
   "min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none";
 
@@ -57,8 +63,15 @@ export default async function InboxPage({
       </div>
       {ok && <p className="mt-4 rounded-xl border border-ok px-4 py-2 text-sm text-ok">{ok}</p>}
       {error && <p className="mt-4 rounded-xl border border-warn px-4 py-2 text-sm text-warn">{error}</p>}
-      {loadFailed && <p className="mt-4 rounded-xl border border-warn px-4 py-2 text-sm text-warn">We couldn&apos;t load your inbox right now. Please refresh in a moment.</p>}
-
+      {loadFailed ? (
+        <p className="mt-4 rounded-xl border border-warn px-4 py-2 text-sm text-warn">
+          We couldn&apos;t load your inbox right now.{" "}
+          <Link href={inboxRetryHref(tab, threadKey)} className="font-medium text-brand hover:underline">
+            Retry
+          </Link>
+        </p>
+      ) : (
+        <>
       <div className="mt-6 flex gap-2 text-sm" role="tablist">
         <Link href="/app/inbox" role="tab" aria-selected={tab === "comments"} className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 ${tab === "comments" ? "border-brand font-medium text-brand" : "border-line text-ink-2"}`}>
           <MessageCircle className="h-4 w-4" /> Comments ({data.comments.length})
@@ -68,7 +81,7 @@ export default async function InboxPage({
         </Link>
       </div>
 
-      {data.accounts.length === 0 && !loadFailed ? (
+      {data.accounts.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-line bg-surface p-10 text-center">
           <Inbox className="mx-auto h-8 w-8 text-brand" />
           <h2 className="mt-3 font-semibold">Connect Instagram to see comments and DMs</h2>
@@ -167,6 +180,8 @@ export default async function InboxPage({
             </li>
           ))}
         </ul>
+      )}
+        </>
       )}
     </>
   );
