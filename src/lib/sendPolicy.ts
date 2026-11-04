@@ -51,6 +51,33 @@ export function nextAttemptDelayMs(
   return Math.round(Math.min(base * factor, MAX_DELAY_MS));
 }
 
+// Instagram messaging windows: a DM reply only within 24 h of the person's message,
+// a private reply to a comment only within 7 days of the comment.
+export const DM_WINDOW_MS = 24 * 60 * 60 * 1000;
+export const COMMENT_REPLY_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+// Returns a skip reason when the queued DM is outside the allowed window, otherwise null.
+export function messagingWindowError(
+  row: { comment_id: string | null; created_at?: Date | string | number | null },
+  now: number = Date.now()
+): string | null {
+  if (row.created_at == null) return null;
+  const created = new Date(row.created_at).getTime();
+  if (!Number.isFinite(created)) return null;
+  const age = now - created;
+  if (row.comment_id) {
+    return age > COMMENT_REPLY_WINDOW_MS ? "Outside Instagram's 7-day private reply window" : null;
+  }
+  return age > DM_WINDOW_MS ? "Outside Instagram's 24-hour messaging window" : null;
+}
+
+// Expired / revoked token (OAuth error 190 or HTTP 401): stop sending for this account.
+export function isTokenError(status: number, body: unknown): boolean {
+  if (status === 401) return true;
+  const code = metaErrorCode(body);
+  return code === 190 || code === 102;
+}
+
 export function remainingBudget(sentInLastHour: number): number {
   const sent = Number.isFinite(sentInLastHour) ? Math.max(0, sentInLastHour) : 0;
   return Math.max(0, HOURLY_LIMIT_PER_ACCOUNT - Math.floor(sent));

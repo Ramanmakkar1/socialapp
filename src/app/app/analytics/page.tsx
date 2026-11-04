@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { BarChart3 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { hourBars, topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { getCommentActivity, getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import EmptyState from "../EmptyState";
+import AccountInsightsPanel from "../AccountInsights";
 
 export const metadata = { title: "Analytics" };
 export const dynamic = "force-dynamic";
@@ -135,6 +137,9 @@ export default async function AnalyticsPage() {
           </div>
         ))}
       </div>
+      <Suspense fallback={<div className="mt-6 h-32 animate-pulse rounded-2xl border border-line bg-surface" aria-label="Loading Instagram insights" />}>
+        <AccountInsightsPanel userId={user.id} />
+      </Suspense>
       <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
         <h2 className="text-lg font-semibold">When your audience comments</h2>
         <p className="mt-1 text-sm text-muted">Last 30 days, times in UTC</p>

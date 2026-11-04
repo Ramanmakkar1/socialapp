@@ -10,6 +10,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
   ```
 - `CRON_SECRET` — shared secret for the DM send worker; a cron calls `POST /api/jobs/send-dms` every minute with header `x-cron-secret: $CRON_SECRET` (wrong or missing secret returns 401).
 
+- `INSTAGRAM_APP_ID` / `INSTAGRAM_APP_SECRET` — Instagram API with Instagram Login. In the Meta app set the Deauthorize callback to `/api/instagram/deauthorize` and the Data deletion request URL to `/api/instagram/data-deletion` (both verify Meta's `signed_request` with `INSTAGRAM_APP_SECRET`).
+- `REVIEWER_EMAIL` / `REVIEWER_PASSWORD` — optional Meta App Review demo login (disabled when either is empty; password needs 8+ characters). Reviewers follow `/app/review-guide`.
+
+See `.env.example` for the full list.
+
 Run database migrations with:
 
 ```bash

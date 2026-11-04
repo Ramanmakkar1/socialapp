@@ -3,12 +3,25 @@ import Link from "next/link";
 import { Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { requireUser } from "@/lib/auth";
+import { isDbConfigured, query } from "@/lib/db";
 import { logoutAction } from "../login/actions";
 import SidebarNav from "./SidebarNav";
 
 // Shared dashboard shell. Guests are sent to /login by requireUser().
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
+  let needsReconnect = false;
+  if (isDbConfigured()) {
+    try {
+      const rows = await query<{ n: number }>(
+        "select count(*)::int as n from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='expired'",
+        [user.id]
+      );
+      needsReconnect = (rows[0]?.n ?? 0) > 0;
+    } catch {
+      needsReconnect = false;
+    }
+  }
   return (
     <div className="flex min-h-screen">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface p-4 md:flex">
@@ -33,6 +46,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <SidebarNav variant="tabs" />
         </div>
+        {needsReconnect && (
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 border-b border-warn bg-surface px-6 py-3 text-sm">
+            <span className="text-ink">Instagram access expired or was removed. Posts and auto-DMs are paused until you reconnect.</span>
+            <a href="/api/instagram/connect" className="btn-primary">Reconnect Instagram</a>
+          </div>
+        )}
         <div className="p-6">{children}</div>
       </main>
     </div>

@@ -37,6 +37,13 @@ export async function GET(request: Request) {
        on conflict (platform, external_id) do update set user_id=excluded.user_id, username=excluded.username, access_token_enc=excluded.access_token_enc, token_expires_at=excluded.token_expires_at, scopes=excluded.scopes, status='active', updated_at=now()`,
       [user.id, externalId, profile.username || null, encryptToken(long.access_token), String(long.expires_in), IG_SCOPES]
     );
+    // App-scoped id = the user_id Meta sends in deauthorize/data-deletion signed_requests (migration 012).
+    if (short.user_id) {
+      await query(
+        "update socialapp.social_accounts set app_user_id=$2 where platform='instagram' and external_id=$1",
+        [externalId, short.user_id]
+      ).catch(() => undefined);
+    }
     return back("connected");
   } catch {
     return back("error");

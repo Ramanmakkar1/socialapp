@@ -4,9 +4,27 @@ import {
   HOURLY_LIMIT_PER_ACCOUNT,
   MAX_ATTEMPTS,
   classifyMetaError,
+  isTokenError,
+  messagingWindowError,
   nextAttemptDelayMs,
   remainingBudget,
 } from './sendPolicy.ts';
+
+test('messaging windows: 24 h for DMs, 7 days for comment private replies', () => {
+  const now = Date.parse('2026-11-04T12:00:00Z');
+  const hours = (h: number) => new Date(now - h * 3_600_000);
+  assert.equal(messagingWindowError({ comment_id: null, created_at: hours(23) }, now), null);
+  assert.match(messagingWindowError({ comment_id: null, created_at: hours(25) }, now) ?? '', /24-hour/);
+  assert.equal(messagingWindowError({ comment_id: 'c1', created_at: hours(25) }, now), null);
+  assert.match(messagingWindowError({ comment_id: 'c1', created_at: hours(24 * 7 + 1) }, now) ?? '', /7-day/);
+  assert.equal(messagingWindowError({ comment_id: null, created_at: null }, now), null);
+});
+
+test('token errors: 401 and OAuth code 190', () => {
+  assert.equal(isTokenError(401, null), true);
+  assert.equal(isTokenError(400, { error: { code: 190 } }), true);
+  assert.equal(isTokenError(400, { error: { code: 100 } }), false);
+});
 
 test('429 and Meta throttling codes are rate_limited', () => {
   assert.equal(classifyMetaError(429, null), 'rate_limited');

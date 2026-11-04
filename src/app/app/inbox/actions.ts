@@ -1,0 +1,104 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/auth";
+import { isDbConfigured, query } from "@/lib/db";
+import { GraphError, graphCall, replyToCommentPublicly, sendDirectMessage, userAccount } from "@/lib/igGraph";
+import { DM_WINDOW_MS, PRIVATE_REPLY_WINDOW_MS, commentReceivedAt, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
+
+function field(formData: FormData, key: string, max = 1000): string {
+  const v = formData.get(key);
+  return typeof v === "string" ? v.trim().slice(0, max) : "";
+}
+
+function back(params: Record<string, string>): never {
+  redirect(`/app/inbox?${new URLSearchParams(params).toString()}`);
+}
+
+function failMessage(err: unknown): string {
+  if (err instanceof GraphError) return err.message;
+  return "Instagram didn't accept the reply. Please try again.";
+}
+
+// Public reply under a comment (instagram_business_manage_comments).
+export async function replyToCommentAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const accountId = field(formData, "account_id", 64);
+  const commentId = field(formData, "comment_id", 64);
+  const message = field(formData, "message", 2200);
+  if (!isDbConfigured() || !accountId || !commentId || !message) back({ error: "Write a reply first." });
+  const account = await userAccount(user.id, accountId);
+  if (!account) back({ error: "Reconnect Instagram in Settings to reply." });
+  const comment = await commentReceivedAt(account.external_id, commentId);
+  if (!comment) back({ error: "We couldn't find that comment." });
+  let error = "";
+  try {
+    await replyToCommentPublicly(account, commentId, message);
+  } catch (err) {
+    error = failMessage(err);
+  }
+  back(error ? { error } : { ok: "comment" });
+}
+
+// One private DM reply to a comment (allowed within 7 days of the comment).
+export async function privateReplyAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const accountId = field(formData, "account_id", 64);
+  const commentId = field(formData, "comment_id", 64);
+  const message = field(formData, "message", 1000);
+  if (!isDbConfigured() || !accountId || !commentId || !message) back({ error: "Write a message first." });
+  const account = await userAccount(user.id, accountId);
+  if (!account) back({ error: "Reconnect Instagram in Settings to send DMs." });
+  const comment = await commentReceivedAt(account.external_id, commentId);
+  if (!comment || !withinWindow(comment.at, PRIVATE_REPLY_WINDOW_MS)) {
+    back({ error: "Instagram only allows a private reply within 7 days of the comment." });
+  }
+  // Claim the comment first so an auto-DM and a manual reply can never both go out.
+  const claimed = await query<{ id: string }>(
+    `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, status, kind)
+     values ($1,$2,null,null,$3,$4,$5,'skipped','manual_reply') on conflict (comment_id) do nothing returning id`,
+    [user.id, account.id, commentId, comment.fromId, message]
+  );
+  const rowId = claimed[0]?.id;
+  if (!rowId) back({ error: "This comment already got a private reply." });
+  let error = "";
+  try {
+    await graphCall(account, `${encodeURIComponent(account.external_id)}/messages`, {
+      method: "POST",
+      body: { recipient: { comment_id: commentId }, message: { text: message } },
+    });
+    await query("update socialapp.dm_queue set status='sent', sent_at=now(), attempts=1 where id=$1", [rowId]);
+  } catch (err) {
+    error = failMessage(err);
+    await query("update socialapp.dm_queue set status='failed', attempts=1, last_error=$2 where id=$1", [rowId, error]);
+  }
+  back(error ? { error } : { ok: "private" });
+}
+
+// Reply inside a DM thread (instagram_business_manage_messages), only within 24 h of their last message.
+export async function replyInThreadAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const accountId = field(formData, "account_id", 64);
+  const senderId = field(formData, "sender_id", 64);
+  const message = field(formData, "message", 1000);
+  const thread = `${accountId}:${senderId}`;
+  if (!isDbConfigured() || !accountId || !senderId || !message) back({ thread, error: "Write a message first." });
+  const account = await userAccount(user.id, accountId);
+  if (!account) back({ thread, error: "Reconnect Instagram in Settings to send DMs." });
+  const last = await lastInboundMessageAt(account.external_id, senderId);
+  if (!withinWindow(last, DM_WINDOW_MS)) {
+    back({ thread, error: "Instagram only allows replies within 24 hours of this person's last message." });
+  }
+  let error = "";
+  try {
+    await sendDirectMessage(account, senderId, message);
+    await query(
+      `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, status, kind, attempts, sent_at)
+       values ($1,$2,null,null,null,$3,$4,'sent','manual_reply',1,now())`,
+      [user.id, account.id, senderId, message]
+    );
+  } catch (err) {
+    error = failMessage(err);
+  }
+  back(error ? { thread, error } : { thread, ok: "dm" });
+}

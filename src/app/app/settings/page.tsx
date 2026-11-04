@@ -1,16 +1,26 @@
+import { Suspense } from "react";
 import { Settings } from "lucide-react";
 import EmptyState from "../EmptyState";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
-import { saveBrandVoice } from "./actions";
+import { disconnectAccountAction, saveBrandVoice } from "./actions";
+import AccountProfile from "./AccountProfile";
 
 export const metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
 
-type Account = { platform: string; username: string | null; status: string; token_expires_at: Date | null };
+type Account = {
+  id: string;
+  external_id: string;
+  access_token_enc: string | null;
+  platform: string;
+  username: string | null;
+  status: string;
+  token_expires_at: Date | null;
+};
 
 function tokenState(a: Account): "ok" | "expiring" | "expired" {
-  if (a.status === "expired") return "expired";
+  if (a.status === "expired" || a.status === "disconnected") return "expired";
   if (a.token_expires_at) {
     const exp = new Date(a.token_expires_at).getTime();
     const now = Date.now();
@@ -31,6 +41,7 @@ const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   connected: { tone: "ok", text: "Instagram account connected." },
   error: { tone: "warn", text: "We couldn't connect your Instagram account. Please try again." },
   not_configured: { tone: "warn", text: "Instagram connection isn't set up on this server yet." },
+  disconnected: { tone: "ok", text: "Instagram account disconnected. Its access token was deleted." },
 };
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[] }> }) {
@@ -40,7 +51,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
   const accounts = isDbConfigured()
     ? await query<Account>(
-        "select platform, username, status, token_expires_at from socialapp.social_accounts where user_id=$1 order by created_at",
+        "select id, external_id, access_token_enc, platform, username, status, token_expires_at from socialapp.social_accounts where user_id=$1 order by created_at",
         [user.id]
       )
     : [];
@@ -67,8 +78,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             const pill = TOKEN_PILL[state];
             return (
               <li key={`${a.platform}-${a.username ?? i}`} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">@{a.username ?? "unknown"}</span>
+                <div className="flex min-w-0 items-center gap-2">
+                  {a.platform === "instagram" && a.status === "active" && a.access_token_enc ? (
+                    <Suspense fallback={<span className="font-medium">@{a.username ?? "unknown"}</span>}>
+                      <AccountProfile account={a} fallbackUsername={a.username} />
+                    </Suspense>
+                  ) : (
+                    <span className="font-medium">@{a.username ?? "unknown"}</span>
+                  )}
                   <span className="rounded-full border border-line px-2 text-xs capitalize text-muted">{a.platform}</span>
                 </div>
                 <div className="flex flex-col items-end gap-2 text-sm">
@@ -78,11 +95,23 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   )}
                   {(state === "expiring" || state === "expired") && (
                     <>
-                      <p className="max-w-xs text-right text-xs text-muted">Instagram needs you to reconnect so auto-DMs keep sending.</p>
+                      <p className="max-w-xs text-right text-xs text-muted">
+                        {a.status === "disconnected"
+                          ? "Disconnected. Connect again to schedule posts and send auto-DMs."
+                          : state === "expired"
+                            ? "Instagram access expired or was removed. Reconnect so posts publish and auto-DMs keep sending."
+                            : "Instagram needs you to reconnect so auto-DMs keep sending."}
+                      </p>
                       <a href="/api/instagram/connect" className="btn-primary">
                         Reconnect
                       </a>
                     </>
+                  )}
+                  {a.status !== "disconnected" && (
+                    <form action={disconnectAccountAction}>
+                      <input type="hidden" name="account_id" value={a.id} />
+                      <button type="submit" className="text-xs font-medium text-ink-2 hover:underline">Disconnect</button>
+                    </form>
                   )}
                 </div>
               </li>

@@ -446,7 +446,17 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
       await refreshPostStatus(row.post_id);
       result.published += 1;
     } else {
-      await markTargetFailed(row.id, row.post_id, outcome.error, token);
+      // Expired or revoked token: flag the account so Settings shows a clear Reconnect prompt.
+      const tokenDead = /HTTP 401\b|OAuthException|access token|session has expired/i.test(outcome.error);
+      if (tokenDead) {
+        await pool
+          .query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [account.id])
+          .catch(() => undefined);
+      }
+      const error = tokenDead
+        ? `Instagram access expired or was removed. Reconnect Instagram in Settings, then retry. (${outcome.error})`
+        : outcome.error;
+      await markTargetFailed(row.id, row.post_id, error, token);
       result.failed += 1;
     }
   }

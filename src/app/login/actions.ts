@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createUser, endSession, startSession, verifyLogin } from "@/lib/auth";
 import { validateSignup } from "@/lib/password";
+import { reviewerLogin } from "@/lib/reviewer";
 
 export type AuthState = { error?: string } | undefined;
 
@@ -41,7 +42,7 @@ export async function loginAction(_prev: AuthState, formData: FormData): Promise
     return { error: "Wrong email or password." };
   }
   try {
-    const user = await verifyLogin(email, password);
+    const user = (await reviewerLogin(email, password)) ?? (await verifyLogin(email, password));
     if (!user) {
       return { error: "Wrong email or password." };
     }

@@ -5,6 +5,8 @@ import { getPool } from "@/lib/db";
 import {
   MAX_ATTEMPTS,
   classifyMetaError,
+  isTokenError,
+  messagingWindowError,
   nextAttemptDelayMs,
   remainingBudget,
 } from "@/lib/sendPolicy";
@@ -25,13 +27,14 @@ type QueueRow = {
   message: string;
   attempts: number;
   kind: string;
+  created_at?: Date | null;
 };
 
 export type SendResult = { sent: number; retried: number; failed: number; skipped: number };
 
 type SendOutcome =
   | { ok: true }
-  | { ok: false; kind: "retry" | "fatal" | "rate_limited"; error: string };
+  | { ok: false; kind: "retry" | "fatal" | "rate_limited" | "token"; error: string };
 
 export type GateDmResult =
   | { action: "send" }
@@ -117,7 +120,7 @@ async function sendPrivateReply(
     }
     return {
       ok: false,
-      kind: classifyMetaError(res.status, body),
+      kind: isTokenError(res.status, body) ? "token" : classifyMetaError(res.status, body),
       error: cleanError(`HTTP ${res.status}: ${metaMessage(body, text)}`, token),
     };
   } catch (err) {
@@ -163,7 +166,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
       }
       const dueLimit = Math.min(DUE_ROW_LIMIT, budget);
       const due = await client.query<QueueRow>(
-        `select q.id, q.user_id, q.rule_id, q.comment_id, q.recipient_external_id, q.message, q.attempts, q.kind
+        `select q.id, q.user_id, q.rule_id, q.comment_id, q.recipient_external_id, q.message, q.attempts, q.kind, q.created_at
          from socialapp.dm_queue q
          where q.social_account_id=$1 and q.status='pending' and q.next_attempt_at <= now()
          and not exists (
@@ -194,6 +197,15 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           left -= 1;
           continue;
         }
+        const windowError = messagingWindowError(row);
+        if (windowError) {
+          await client.query(
+            "update socialapp.dm_queue set status='skipped', last_error=$2 where id=$1",
+            [row.id, windowError]
+          );
+          result.skipped += 1;
+          continue;
+        }
 
         const outcome = await sendPrivateReply(account.external_id, token, row);
         left -= 1;
@@ -204,6 +216,19 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           );
           result.sent += 1;
           continue;
+        }
+        if (outcome.kind === "token") {
+          // Token expired or revoked: keep the DM pending, flag the account so the app asks to reconnect.
+          await client.query(
+            "update socialapp.dm_queue set last_error=$2 where id=$1",
+            [row.id, "Instagram access expired. Reconnect Instagram in Settings."]
+          );
+          await client.query(
+            "update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'",
+            [account.id]
+          );
+          result.retried += 1;
+          break;
         }
         if (outcome.kind === "rate_limited") {
           await client.query(
