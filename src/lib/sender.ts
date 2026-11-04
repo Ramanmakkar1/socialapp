@@ -1,4 +1,5 @@
 // Server only: sends queued DMs through the official Instagram API.
+import type pg from "pg";
 import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
 import {
@@ -11,10 +12,14 @@ import {
 const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const SEND_TIMEOUT_MS = 15_000;
 const RATE_LIMIT_PAUSE_MS = 15 * 60 * 1000;
+/** Max pending rows considered per account per run (must exclude paused rules in SQL). */
+export const DUE_ROW_LIMIT = 500;
 
 type AccountRow = { id: string; external_id: string; access_token_enc: string | null };
 type QueueRow = {
   id: string;
+  user_id: string;
+  rule_id: string | null;
   comment_id: string | null;
   recipient_external_id: string;
   message: string;
@@ -22,11 +27,16 @@ type QueueRow = {
   kind: string;
 };
 
-export type SendResult = { sent: number; retried: number; failed: number };
+export type SendResult = { sent: number; retried: number; failed: number; skipped: number };
 
 type SendOutcome =
   | { ok: true }
   | { ok: false; kind: "retry" | "fatal" | "rate_limited"; error: string };
+
+export type GateDmResult =
+  | { action: "send" }
+  | { action: "wait" }
+  | { action: "skip"; error: string };
 
 function cleanError(message: string, token: string): string {
   const safe = token ? message.split(token).join("[redacted]") : message;
@@ -42,6 +52,39 @@ function metaMessage(body: unknown, fallback: string): string {
     }
   }
   return fallback;
+}
+
+/** Revalidate queue row against dm_rules immediately before send. */
+export async function gateDmSendByRule(
+  client: pg.PoolClient,
+  row: Pick<QueueRow, "rule_id" | "user_id">,
+  socialAccountId: string
+): Promise<GateDmResult> {
+  if (!row.rule_id) {
+    return { action: "skip", error: "Automation rule is missing" };
+  }
+  const ruleRes = await client.query<{
+    status: string;
+    user_id: string;
+    social_account_id: string | null;
+  }>("select status, user_id, social_account_id from socialapp.dm_rules where id=$1", [row.rule_id]);
+  const rule = ruleRes.rows[0];
+  if (!rule) {
+    return { action: "skip", error: "Automation rule was deleted" };
+  }
+  if (rule.user_id !== row.user_id) {
+    return { action: "skip", error: "Automation rule does not belong to this user" };
+  }
+  if (rule.social_account_id && rule.social_account_id !== socialAccountId) {
+    return { action: "skip", error: "Automation rule is scoped to a different Instagram account" };
+  }
+  if (rule.status === "paused") {
+    return { action: "wait" };
+  }
+  if (rule.status !== "active") {
+    return { action: "skip", error: "Automation rule is not active" };
+  }
+  return { action: "send" };
 }
 
 async function sendPrivateReply(
@@ -88,7 +131,7 @@ async function sendPrivateReply(
 }
 
 export async function sendDueDms(limit = 50): Promise<SendResult> {
-  const result: SendResult = { sent: 0, retried: 0, failed: 0 };
+  const result: SendResult = { sent: 0, retried: 0, failed: 0, skipped: 0 };
   const pool = getPool();
   const accounts = await pool.query<AccountRow>(
     "select id, external_id, access_token_enc from socialapp.social_accounts where platform='instagram' and status='active' order by created_at"
@@ -118,14 +161,40 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
         await client.query("commit");
         continue;
       }
+      const dueLimit = Math.min(DUE_ROW_LIMIT, budget);
       const due = await client.query<QueueRow>(
-        `select id, comment_id, recipient_external_id, message, attempts, kind from socialapp.dm_queue
-         where social_account_id=$1 and status='pending' and next_attempt_at <= now()
-         order by created_at limit $2 for update skip locked`,
-        [account.id, budget]
+        `select q.id, q.user_id, q.rule_id, q.comment_id, q.recipient_external_id, q.message, q.attempts, q.kind
+         from socialapp.dm_queue q
+         where q.social_account_id=$1 and q.status='pending' and q.next_attempt_at <= now()
+         and not exists (
+           select 1 from socialapp.dm_rules r
+           where r.id = q.rule_id
+             and r.user_id = q.user_id
+             and (r.social_account_id is null or r.social_account_id = q.social_account_id)
+             and r.status = 'paused'
+         )
+         order by q.created_at
+         limit $2
+         for update of q skip locked`,
+        [account.id, dueLimit]
       );
 
       for (const row of due.rows) {
+        if (left <= 0) break;
+        const gate = await gateDmSendByRule(client, row, account.id);
+        if (gate.action === "wait") {
+          continue;
+        }
+        if (gate.action === "skip") {
+          await client.query(
+            "update socialapp.dm_queue set status='skipped', last_error=$2 where id=$1",
+            [row.id, gate.error]
+          );
+          result.skipped += 1;
+          left -= 1;
+          continue;
+        }
+
         const outcome = await sendPrivateReply(account.external_id, token, row);
         left -= 1;
         if (outcome.ok) {
@@ -137,7 +206,6 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           continue;
         }
         if (outcome.kind === "rate_limited") {
-          // Meta throttled this account: wait, keep the attempt count, stop this account for now.
           await client.query(
             "update socialapp.dm_queue set last_error=$2, next_attempt_at=now() + ($3::int * interval '1 millisecond') where id=$1",
             [row.id, outcome.error, RATE_LIMIT_PAUSE_MS]
