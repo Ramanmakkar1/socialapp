@@ -1,3 +1,10 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import type { DragEvent } from "react";
+import { useRouter } from "next/navigation";
+import { reschedulePost } from "./rescheduleActions";
+
 type WeekViewPost = {
   id: string;
   caption: string;
@@ -36,7 +43,15 @@ function captionPreview(caption: string): string {
   return caption.trim().slice(0, 40);
 }
 
+function isMovable(status: string): boolean {
+  return status === "scheduled" || status === "draft";
+}
+
 export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekViewProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const todayKey = utcDateKey(new Date());
   const byDay = new Map<string, WeekViewPost[]>();
 
@@ -58,10 +73,30 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekV
   const navClass =
     "rounded-full border border-line px-3 py-1.5 text-sm hover:bg-surface-2";
 
+  function handleDrop(e: DragEvent<HTMLDivElement>, key: string, current: WeekViewPost[]) {
+    e.preventDefault();
+    setDragOverKey(null);
+    const id = e.dataTransfer.getData("text/plain");
+    if (!id || isPending) return;
+    if (current.some((p) => p.id === id)) return;
+    setError(null);
+    startTransition(async () => {
+      const res = await reschedulePost(id, key);
+      if (!res.ok) {
+        setError(res.error ?? "Could not move post.");
+        return;
+      }
+      router.refresh();
+    });
+  }
+
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-medium text-ink">{formatWeekRange(weekStart)}</p>
+        <div>
+          <p className="text-sm font-medium text-ink">{formatWeekRange(weekStart)}</p>
+          <p className="hidden text-xs text-muted sm:block">Drag a post to another day to move it.</p>
+        </div>
         <div className="flex flex-wrap gap-2">
           <a href={prevHref} className={navClass}>
             ← Previous
@@ -71,6 +106,11 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekV
           </a>
         </div>
       </div>
+      {error && (
+        <p role="alert" className="mb-3 text-sm text-brand-2">
+          {error}
+        </p>
+      )}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-7">
         {days.map((day) => {
           const key = utcDateKey(day);
@@ -89,7 +129,17 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekV
           return (
             <div
               key={key}
-              className={`min-h-28 rounded-2xl border bg-surface p-3 ${isToday ? "border-brand" : "border-line"}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (dragOverKey !== key) setDragOverKey(key);
+              }}
+              onDragLeave={() => {
+                if (dragOverKey === key) setDragOverKey(null);
+              }}
+              onDrop={(e) => handleDrop(e, key, dayPosts)}
+              className={`min-h-28 rounded-2xl border p-3 ${isToday ? "border-brand" : "border-line"} ${
+                dragOverKey === key ? "bg-surface-2 ring-1 ring-line" : "bg-surface"
+              }`}
             >
               <p className="text-xs text-muted">
                 {weekday} · {dateLabel}
@@ -101,9 +151,18 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref }: WeekV
                   dayPosts.map((post) => (
                     <span
                       key={post.id}
+                      draggable={isMovable(post.status)}
+                      onDragStart={
+                        isMovable(post.status)
+                          ? (e) => {
+                              e.dataTransfer.setData("text/plain", post.id);
+                              e.dataTransfer.effectAllowed = "move";
+                            }
+                          : undefined
+                      }
                       className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${
                         post.status === "failed" ? "text-brand-2" : "text-ink-2"
-                      }`}
+                      } ${isMovable(post.status) ? "sm:cursor-grab" : ""}`}
                       title={post.caption}
                     >
                       {formatTimeUtc(post.scheduled_at!)} {captionPreview(post.caption)}
