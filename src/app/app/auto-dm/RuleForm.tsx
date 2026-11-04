@@ -402,6 +402,7 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
       {formOpen && (
         <div className="mt-6">
           <RuleForm
+            key={editing ? `edit:${editing.id}` : "create"}
             mode={editing ? "edit" : "create"}
             ruleId={editing?.id}
             initial={formDefaults}
