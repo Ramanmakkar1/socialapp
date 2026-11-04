@@ -76,6 +76,28 @@ export async function getRecentPosts(userId: string): Promise<RecentPost[]> {
   }
 }
 
+export type ActivityCell = { dow: number; block: number; count: number };
+
+// Comment times (auto-DM queue rows) in the last 30 days, grouped by ISO weekday (1=Mon..7=Sun) and 3-hour UTC block (0..7).
+export async function getCommentActivity(userId: string): Promise<ActivityCell[]> {
+  if (!isDbConfigured()) {
+    return [];
+  }
+  try {
+    return await query<ActivityCell>(
+      `select extract(isodow from created_at at time zone 'UTC')::int as dow,
+        (extract(hour from created_at at time zone 'UTC')::int / 3) as block,
+        count(*)::int as count
+      from socialapp.dm_queue
+      where user_id = $1 and created_at > now() - interval '30 days'
+      group by 1, 2`,
+      [userId]
+    );
+  } catch {
+    return [];
+  }
+}
+
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
   if (!isDbConfigured()) {
     return EMPTY_STATS;

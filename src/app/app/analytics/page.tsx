@@ -3,7 +3,7 @@ import { BarChart3 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { hourBars, topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
-import { getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
+import { getCommentActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import EmptyState from "../EmptyState";
 
 export const metadata = { title: "Analytics" };
@@ -27,16 +27,24 @@ function formatPublished(value: string | null): string {
   return d.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 }
 
+const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const BLOCK_LABELS = ["12a", "3a", "6a", "9a", "12p", "3p", "6p", "9p"];
+
+function blockRange(block: number): string {
+  return `${BLOCK_LABELS[block]}–${BLOCK_LABELS[(block + 1) % 8]}`;
+}
+
 function formatPlatforms(platforms: string[]): string {
   return platforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(", ");
 }
 
 export default async function AnalyticsPage() {
   const user = await requireUser();
-  const [stats, rules, recentPosts] = await Promise.all([
+  const [stats, rules, recentPosts, activity] = await Promise.all([
     getDashboardStats(user.id),
     getRuleStats(user.id),
     getRecentPosts(user.id),
+    getCommentActivity(user.id),
   ]);
 
   let commentHourRows: { hour: number; count: number }[] = [];
@@ -53,6 +61,26 @@ export default async function AnalyticsPage() {
   const bestTimes = topHours(commentHourRows, 3);
   const hourBarCounts = hourBars(commentHourRows);
   const maxHourCount = Math.max(...hourBarCounts, 0);
+
+  // 7 rows (Mon..Sun) x 8 columns (3-hour UTC blocks).
+  const activityGrid: number[][] = DAY_LABELS.map(() => BLOCK_LABELS.map(() => 0));
+  for (const cell of activity) {
+    if (cell.dow >= 1 && cell.dow <= 7 && cell.block >= 0 && cell.block <= 7) {
+      activityGrid[cell.dow - 1][cell.block] += cell.count;
+    }
+  }
+  let activityTotal = 0;
+  let activityMax = 0;
+  let activityBest = { day: 0, block: 0 };
+  activityGrid.forEach((row, day) =>
+    row.forEach((count, block) => {
+      activityTotal += count;
+      if (count > activityMax) {
+        activityMax = count;
+        activityBest = { day, block };
+      }
+    })
+  );
 
   const tiles: [string, number][] = [
     ["Scheduled", stats.scheduled],
@@ -74,6 +102,61 @@ export default async function AnalyticsPage() {
             <div className="mt-1 text-3xl font-semibold">{v.toLocaleString("en-US")}</div>
           </div>
         ))}
+      </div>
+      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
+        <h2 className="text-lg font-semibold">When your audience comments</h2>
+        <p className="mt-1 text-sm text-muted">Last 30 days, times in UTC</p>
+        {activityTotal > 0 ? (
+          <>
+            <div className="mt-4 overflow-x-auto">
+              <table className="border-separate border-spacing-1 text-xs">
+                <thead>
+                  <tr>
+                    <th scope="col" className="sr-only">
+                      Day
+                    </th>
+                    {BLOCK_LABELS.map((label) => (
+                      <th key={label} scope="col" className="px-1 text-center font-medium text-muted">
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {activityGrid.map((row, day) => (
+                    <tr key={DAY_LABELS[day]}>
+                      <th scope="row" className="pr-2 text-left font-medium text-muted">
+                        {DAY_LABELS[day]}
+                      </th>
+                      {row.map((count, block) => {
+                        const text = `${DAY_LABELS[day]} ${blockRange(block)}: ${count.toLocaleString("en-US")} comment${count === 1 ? "" : "s"}`;
+                        return (
+                          <td key={block} className="p-0">
+                            <div
+                              title={text}
+                              aria-label={text}
+                              role="img"
+                              className="h-7 w-9 rounded-md bg-brand"
+                              style={{ opacity: count === 0 ? 0.06 : 0.1 + (0.9 * count) / activityMax }}
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 text-sm">
+              <span className="font-medium">Best time to post:</span> {DAY_LABELS[activityBest.day]}{" "}
+              {blockRange(activityBest.block)} UTC
+            </p>
+          </>
+        ) : (
+          <p className="mt-4 text-sm text-muted">
+            No comments yet. Once your auto-DM rules start getting comments, your best posting times show up here.
+          </p>
+        )}
       </div>
       <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
         <h2 className="text-lg font-semibold">Best time to post</h2>
