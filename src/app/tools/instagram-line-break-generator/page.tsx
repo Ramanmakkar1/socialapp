@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import LineBreakTool from "./LineBreakTool";
 
@@ -166,6 +167,7 @@ export default function InstagramLineBreakGeneratorPage() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

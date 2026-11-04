@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import FontTool from "./FontTool";
 
 const PATH = "/tools/instagram-font-generator";
@@ -49,6 +50,7 @@ export default function InstagramFontGeneratorPage() {
         <section className="mx-auto max-w-3xl px-4 py-16"><h2 className="text-center text-3xl font-semibold tracking-tight">Instagram font FAQ</h2><div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">{faqs.map((f) => <details key={f.q} className="group p-5"><summary className="cursor-pointer list-none font-medium">{f.q}</summary><p className="mt-2 text-sm text-ink-2">{f.a}</p></details>)}</div></section>
         <section className="px-4 pb-24"><div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center"><h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule posts and auto-DM everyone who comments</h2><p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p><Link href="/signup" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link></div></section>
       </main>
+      <SiteFooter />
     </>
   );
 }

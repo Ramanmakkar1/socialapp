@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Mail, UserPlus, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import { DM_TEMPLATES, type DmTemplate } from "@/lib/dmTemplates";
 import CopyButton from "./CopyButton";
 
@@ -138,19 +139,7 @@ export default function DmTemplatesPage() {
           </div>
         </section>
       </main>
-      <footer className="border-t border-line px-4 py-8 text-sm text-muted">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
-          <span>© 2026 {BRAND.company}</span>
-          <div className="flex flex-wrap justify-center gap-5">
-            <Link href="/instagram-auto-dm" className="hover:text-ink">Instagram auto DM</Link>
-            <Link href="/tools/instagram-caption-counter" className="hover:text-ink">Caption counter</Link>
-            <Link href="/tools/instagram-line-break-generator" className="hover:text-ink">Line break generator</Link>
-            <Link href="/privacy" className="hover:text-ink">Privacy</Link>
-            <Link href="/terms" className="hover:text-ink">Terms</Link>
-            <Link href="/data-deletion" className="hover:text-ink">Data deletion</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

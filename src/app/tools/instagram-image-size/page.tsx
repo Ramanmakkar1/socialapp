@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import { IG_FORMATS } from "@/lib/igSizes";
 import CropPreview from "./CropPreview";
 
@@ -215,6 +216,7 @@ export default function InstagramImageSizePage() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

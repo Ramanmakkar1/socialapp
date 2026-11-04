@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ImagePlus, Scan, TextQuote, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import PostPreviewTool from "./PostPreviewTool";
 
 const PATH = "/tools/instagram-post-preview";
@@ -80,6 +81,7 @@ export default function InstagramPostPreviewPage() {
           <StudioScene /><h2 className="text-3xl font-semibold">Give your next post a head start</h2><p className="mx-auto mt-3 max-w-lg text-ink-2">Copy your caption, keep your original image handy and explore {BRAND.name} for your next step.</p><Link href="/signup" className="btn-primary mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Create your account <ArrowRight className="h-4 w-4" /></Link>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

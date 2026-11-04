@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ExternalLink, ShieldCheck, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import CaptionCounter from "./CaptionCounter";
 
@@ -162,6 +163,7 @@ export default function InstagramCaptionCounterPage() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

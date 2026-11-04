@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ExternalLink, ShieldCheck, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import EngagementCalculator from "./EngagementCalculator";
 
 const PATH = "/tools/instagram-engagement-rate-calculator";
@@ -183,6 +184,7 @@ export default function InstagramEngagementRateCalculatorPage() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 import BioTool from "./BioTool";
 
 const PATH = "/tools/instagram-bio-generator";
@@ -149,6 +150,7 @@ export default function InstagramBioGeneratorPage() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }
