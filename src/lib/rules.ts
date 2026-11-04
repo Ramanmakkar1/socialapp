@@ -55,6 +55,9 @@ export function validateRule(rule: DmRule): string[] {
   if (rule.matchMode !== 'any' && !rule.keywords.some((keyword) => normalize(keyword))) errors.push('Add at least one keyword, or choose “Any comment”.');
   if (!rule.dmMessage.trim()) errors.push('DM message is required.');
   if (rule.dmMessage.length > 1000) errors.push('DM message must be 1000 characters or fewer.');
+  if ((rule.askEmail || rule.requireFollow) && !rule.linkUrl?.trim()) {
+    errors.push('Link URL is required when asking for email or requiring a follow.');
+  }
   if (rule.linkUrl && !rule.linkUrl.startsWith('https://')) errors.push('Link URL must start with https://.');
   return errors;
 }

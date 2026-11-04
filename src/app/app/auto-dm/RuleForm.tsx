@@ -105,6 +105,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
   const [pending, startTransition] = useTransition();
 
   const keywords = parseKeywords(keywordText);
+  const linkRequired = emailGate || followGate;
 
   function insertToken(token: string) {
     const el = dmRef.current;
@@ -275,15 +276,20 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
           </div>
         </div>
         <div>
-          <label htmlFor={linkId} className="text-sm font-medium text-ink-2">Link URL <span className="text-muted">(optional)</span></label>
+          <label htmlFor={linkId} className="text-sm font-medium text-ink-2">Link URL <span className="text-muted">({linkRequired ? "required" : "optional"})</span></label>
           <input
             id={linkId}
             type="url"
+            required={linkRequired}
+            aria-describedby={linkRequired ? `${linkId}-help` : undefined}
             value={linkUrl}
             onChange={(e) => setLinkUrl(e.target.value)}
             className={INPUT}
             placeholder="https://yoursite.com/guide"
           />
+          {linkRequired && (
+            <p id={`${linkId}-help`} className="mt-1 text-xs text-muted">The link is delivered after the selected requirements are met.</p>
+          )}
         </div>
         <div className="space-y-2">
           <label htmlFor={emailId} className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
