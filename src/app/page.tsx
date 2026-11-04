@@ -255,6 +255,7 @@ export default function Home() {
           <div className="flex flex-wrap justify-center gap-5">
             <Link href="/instagram-auto-dm" className="hover:text-ink">Instagram auto DM</Link>
             <Link href="/instagram-auto-dm/templates" className="hover:text-ink">DM templates</Link>
+            <Link href="/buffer-alternative" className="hover:text-ink">Buffer alternative</Link>
             <Link href="/tools/instagram-caption-counter" className="hover:text-ink">Caption counter</Link>
             <Link href="/tools/instagram-line-break-generator" className="hover:text-ink">Line break generator</Link>
             <Link href="/privacy" className="hover:text-ink">Privacy</Link>
