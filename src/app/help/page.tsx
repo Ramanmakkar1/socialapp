@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Help center",
   description:
-    "Step-by-step guides for Postflow: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.",
+    `Step-by-step guides for ${BRAND.name}: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`,
   alternates: { canonical: "/help" },
 };
 

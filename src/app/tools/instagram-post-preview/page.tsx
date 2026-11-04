@@ -6,7 +6,7 @@ import PostPreviewTool from "./PostPreviewTool";
 
 const PATH = "/tools/instagram-post-preview";
 export const metadata: Metadata = {
-  title: { absolute: "Instagram Post Preview: Free Feed Mockup Tool | Postflow" },
+  title: { absolute: `Instagram Post Preview: Free Feed Mockup Tool | ${BRAND.name}` },
   description: "Preview your Instagram post with a local photo, display handle and caption. Compare square and portrait crops, check line breaks and copy your caption.",
   alternates: { canonical: `${BRAND.url}${PATH}` },
 };

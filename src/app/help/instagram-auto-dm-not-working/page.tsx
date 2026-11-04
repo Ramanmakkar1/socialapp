@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Instagram auto DM not working? Fix it step by step",
   description:
-    "Troubleshoot Postflow comment-to-DM: Instagram connection, message access, active rules, keyword match, follow and email gates, send queue timing, and reconnect.",
+    `Troubleshoot ${BRAND.name} comment-to-DM: Instagram connection, message access, active rules, keyword match, follow and email gates, send queue timing, and reconnect.`,
   alternates: { canonical: "/help/instagram-auto-dm-not-working" },
 };
 

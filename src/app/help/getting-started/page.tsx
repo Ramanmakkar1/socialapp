@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Getting started in 3 minutes",
   description:
-    "Connect Instagram, create your first comment-to-DM rule from a template, and schedule a post in Postflow — the same three steps as the dashboard checklist.",
+    `Connect Instagram, create your first comment-to-DM rule from a template, and schedule a post in ${BRAND.name} — the same three steps as the dashboard checklist.`,
   alternates: { canonical: "/help/getting-started" },
 };
 
