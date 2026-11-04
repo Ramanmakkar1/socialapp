@@ -98,6 +98,7 @@ export async function processMessageEvents(
   events: MessageEvent[],
 ): Promise<number> {
   let updated = 0;
+  let hadFailure = false;
   for (const event of events) {
     try {
       const accounts = await query<{ id: string; user_id: string }>(
@@ -205,7 +206,11 @@ export async function processMessageEvents(
       }
     } catch (err) {
       console.error("processMessageEvents event failed", err);
+      hadFailure = true;
     }
+  }
+  if (hadFailure) {
+    throw new Error("message event processing incomplete");
   }
   return updated;
 }

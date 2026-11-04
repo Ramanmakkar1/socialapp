@@ -97,6 +97,7 @@ export async function processCommentEvents(
   scope?: ReplayScope,
 ): Promise<number> {
   let inserted = 0;
+  let hadFailure = false;
   for (const event of events) {
     try {
       const accounts = await query<{ id: string; user_id: string }>(
@@ -183,7 +184,11 @@ export async function processCommentEvents(
       }
     } catch (err) {
       console.error("processCommentEvents event failed", err);
+      hadFailure = true;
     }
+  }
+  if (hadFailure) {
+    throw new Error("comment event processing incomplete");
   }
   return inserted;
 }
