@@ -14,6 +14,7 @@ const PUBLIC_PATHS = [
   "/tools/instagram-caption-counter",
   "/tools/instagram-line-break-generator",
   "/tools/instagram-image-size",
+  "/tools/instagram-font-generator",
   "/tools",
 ];
 
@@ -30,6 +31,7 @@ const META: Record<string, { priority: number; changeFrequency: "weekly" | "year
   "/tools/instagram-caption-counter": { priority: 0.7, changeFrequency: "weekly" },
   "/tools/instagram-line-break-generator": { priority: 0.7, changeFrequency: "weekly" },
   "/tools/instagram-image-size": { priority: 0.7, changeFrequency: "weekly" },
+  "/tools/instagram-font-generator": { priority: 0.7, changeFrequency: "weekly" },
   "/tools": { priority: 0.6, changeFrequency: "weekly" },
 };
 

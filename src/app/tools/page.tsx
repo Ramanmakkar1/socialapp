@@ -31,6 +31,12 @@ const tools = [
     description: "Check the right sizes for posts, portraits and Stories, and preview the 1:1, 4:5, 3:4 and 9:16 crops of your photo.",
     icon: ImageIcon,
   },
+  {
+    href: "/tools/instagram-font-generator",
+    title: "Instagram font generator",
+    description: "Create and copy Unicode font styles for your Instagram bio and captions.",
+    icon: TextQuote,
+  },
 ];
 
 const itemListJsonLd = {
