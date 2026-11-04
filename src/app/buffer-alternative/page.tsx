@@ -4,6 +4,7 @@ import {
   ArrowRight, Check, Minus, Zap, CalendarDays, Layers, Mail, ShieldCheck, CalendarClock, MessageCircleHeart,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 
 export const metadata: Metadata = {
   title: "Buffer Alternative With Instagram Auto DM | Schedule + Automate",
@@ -182,6 +183,7 @@ export default function BufferAlternative() {
             <Link href="/instagram-auto-dm" className="inline-flex items-center gap-1 font-medium text-brand hover:underline">Instagram auto DM <ArrowRight className="h-4 w-4" /></Link>
             <Link href="/tools/instagram-caption-counter" className="inline-flex items-center gap-1 font-medium text-brand hover:underline">Instagram caption counter <ArrowRight className="h-4 w-4" /></Link>
           </div>
+          <CompareAlternativesNav current="buffer" />
         </section>
       </main>
     </>

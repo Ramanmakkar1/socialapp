@@ -4,6 +4,7 @@ import {
   ArrowRight, Check, Minus, Zap, Layers, Mail, ShieldCheck, CalendarClock, MessageCircleHeart, KeyRound,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 
 export const metadata: Metadata = {
   title: "ManyChat Alternative for Instagram Comment-to-DM + Scheduling",
@@ -196,6 +197,7 @@ export default function ManyChatAlternative() {
             <Link href="/instagram-auto-dm/templates" className="inline-flex items-center gap-1 font-medium text-brand hover:underline">DM templates <ArrowRight className="h-4 w-4" /></Link>
             <Link href="/buffer-alternative" className="inline-flex items-center gap-1 font-medium text-brand hover:underline">Buffer alternative <ArrowRight className="h-4 w-4" /></Link>
           </div>
+          <CompareAlternativesNav current="manychat" />
         </section>
       </main>
     </>
