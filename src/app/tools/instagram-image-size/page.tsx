@@ -80,7 +80,7 @@ export default function InstagramImageSizePage() {
             </span>
             {BRAND.name}
           </Link>
-          <Link href="/app" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
+          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
             Start free
           </Link>
         </div>

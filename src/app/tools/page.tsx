@@ -60,7 +60,7 @@ export default function ToolsPage() {
             </span>
             {BRAND.name}
           </Link>
-          <Link href="/app" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
+          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
             Start free
           </Link>
         </div>
@@ -105,7 +105,7 @@ export default function ToolsPage() {
           <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule posts and auto-DM everyone who comments</h2>
             <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <Link href="/app" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">
+            <Link href="/signup" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">
               Start free <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

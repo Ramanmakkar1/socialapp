@@ -75,7 +75,7 @@ export default function InstagramLineBreakGeneratorPage() {
             </span>
             {BRAND.name}
           </Link>
-          <Link href="/app" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
+          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
             Start free
           </Link>
         </div>
@@ -156,7 +156,7 @@ export default function InstagramLineBreakGeneratorPage() {
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule this caption and auto-DM everyone who comments</h2>
             <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
             <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/app" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">
+              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">
                 Start free <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/tools/instagram-caption-counter" className="font-medium underline underline-offset-4">

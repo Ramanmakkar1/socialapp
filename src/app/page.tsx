@@ -87,8 +87,8 @@ function Nav() {
           <a href="#faq" className="hover:text-ink">FAQ</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/app" className="hidden rounded-full px-4 py-2 text-sm text-ink-2 hover:text-ink sm:block">Log in</Link>
-          <Link href="/app" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">Start free</Link>
+          <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm text-ink-2 hover:text-ink sm:block">Log in</Link>
+          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">Start free</Link>
         </div>
       </div>
     </header>
@@ -162,7 +162,7 @@ export default function Home() {
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">{BRAND.description}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/app" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
               <a href="#how" className="rounded-full border border-line bg-surface px-6 py-3 font-medium">See how it works</a>
             </div>
             <div className="mt-6 flex items-center justify-center gap-5 text-sm text-muted">
@@ -221,7 +221,7 @@ export default function Home() {
                 <ul className="mt-6 space-y-2.5 text-sm">
                   {p.items.map((i) => <li key={i} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{i}</li>)}
                 </ul>
-                <Link href="/app" className={`mt-7 block rounded-full py-2.5 text-center text-sm font-medium ${p.popular ? "btn-primary" : "border border-line"}`}>{p.cta}</Link>
+                <Link href="/signup" className={`mt-7 block rounded-full py-2.5 text-center text-sm font-medium ${p.popular ? "btn-primary" : "border border-line"}`}>{p.cta}</Link>
               </div>
             ))}
           </div>
@@ -245,7 +245,7 @@ export default function Home() {
           <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Your next post could bring 100 leads.</h2>
             <p className="mx-auto mt-3 max-w-xl opacity-90">Start free. No credit card. Connect your account in one tap.</p>
-            <Link href="/app" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/signup" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </section>
       </main>

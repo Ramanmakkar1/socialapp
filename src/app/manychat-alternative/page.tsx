@@ -65,7 +65,7 @@ export default function ManyChatAlternative() {
             <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg"><Zap className="h-4 w-4" /></span>
             {BRAND.name}
           </Link>
-          <Link href="/app" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">Start free</Link>
+          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">Start free</Link>
         </div>
       </header>
       <main className="flex-1">
@@ -83,7 +83,7 @@ export default function ManyChatAlternative() {
               DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/app" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
               <a href="#compare" className="rounded-full border border-line bg-surface px-6 py-3 font-medium">Compare features</a>
             </div>
           </div>
@@ -187,7 +187,7 @@ export default function ManyChatAlternative() {
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Auto-DM your commenters and schedule your posts in one place.</h2>
             <p className="mx-auto mt-3 max-w-xl opacity-90">Start free. No credit card. Connect Instagram in one tap.</p>
             <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/app" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
               <Link href="/" className="font-medium underline underline-offset-4">See the full product</Link>
             </div>
           </div>
