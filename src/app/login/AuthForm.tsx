@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import AuthIllustration from "@/components/AuthIllustration";
 import { loginAction, signupAction } from "./actions";
 
 const INPUT =
@@ -15,7 +16,8 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm rounded-2xl border border-line bg-surface p-8">
+      <div className="mx-auto grid w-full max-w-5xl items-center gap-8 lg:grid-cols-2">
+      <div className="w-full max-w-sm mx-auto rounded-2xl border border-line bg-surface p-8 shadow-sm">
         <Link href="/" className="mb-6 flex items-center gap-2 font-semibold">
           <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg"><Zap className="h-4 w-4" /></span>{BRAND.name}
         </Link>
@@ -60,6 +62,10 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
             <>No account? <Link href="/signup" className="font-medium text-ink-2 underline">Create one</Link></>
           )}
         </p>
+      </div>
+      <div className="hidden lg:block">
+        <AuthIllustration mode={mode} />
+      </div>
       </div>
     </main>
   );
