@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Hash, Image as ImageIcon, Percent, ShieldCheck, TextQuote, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const PATH = "/tools";
 
@@ -129,6 +130,7 @@ export default function ToolsPage() {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

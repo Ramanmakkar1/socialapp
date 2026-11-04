@@ -12,6 +12,7 @@ import {
   MessageCircleHeart,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
@@ -246,25 +247,7 @@ export default function InstagramScheduler() {
           </div>
         </section>
       </main>
-      <footer className="border-t border-line px-4 py-8 text-sm text-muted">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
-          <span>© 2026 {BRAND.company}</span>
-          <div className="flex flex-wrap justify-center gap-5">
-            <Link href="/instagram-auto-dm" className="hover:text-ink">
-              Instagram auto DM
-            </Link>
-            <Link href="/buffer-alternative" className="hover:text-ink">
-              Buffer alternative
-            </Link>
-            <Link href="/later-alternative" className="hover:text-ink">
-              Later alternative
-            </Link>
-            <Link href="/tools" className="hover:text-ink">
-              Free tools
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

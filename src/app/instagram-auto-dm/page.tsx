@@ -4,6 +4,7 @@ import {
   ArrowRight, Check, Minus, Zap, MessageCircleHeart, Mail, UserPlus, Film, Sparkles, BarChart3, ShieldCheck,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Instagram Auto DM: Send a DM to Everyone Who Comments",
@@ -182,17 +183,7 @@ export default function InstagramAutoDm() {
           </div>
         </section>
       </main>
-      <footer className="border-t border-line px-4 py-8 text-sm text-muted">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
-          <span>© 2026 {BRAND.company}</span>
-          <div className="flex flex-wrap justify-center gap-5">
-            <Link href="/instagram-auto-dm/templates" className="hover:text-ink">DM templates</Link>
-            <Link href="/buffer-alternative" className="hover:text-ink">Buffer alternative</Link>
-            <Link href="/manychat-alternative" className="hover:text-ink">ManyChat alternative</Link>
-            <Link href="/tools/instagram-caption-counter" className="hover:text-ink">Caption counter</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

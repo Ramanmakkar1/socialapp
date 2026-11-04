@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BookOpen, LifeBuoy, Rocket, Wrench, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Help center",
@@ -119,14 +120,7 @@ export default function HelpHubPage() {
           .
         </p>
       </main>
-      <footer className="border-t border-line px-4 py-8 text-sm text-muted">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
-          <span>© 2026 {BRAND.company}</span>
-          <Link href="/" className="hover:text-ink">
-            Home
-          </Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
