@@ -4,6 +4,7 @@ import MonthView from "./MonthView";
 import PostList, { type Post } from "./PostList";
 import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
+import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 
 export const metadata = { title: "Calendar" };
@@ -89,9 +90,18 @@ export default async function CalendarPage({
   let weekRows: WeekPost[] = [];
   let rules: RuleOption[] = [];
   let publishedRows: PublishedPost[] = [];
+  let commentHourRows: { hour: number; count: number }[] = [];
 
   if (isDbConfigured()) {
     const user = await requireUser();
+    try {
+      commentHourRows = await query<{ hour: number; count: number }>(
+        `select extract(hour from created_at at time zone 'UTC')::int as hour, count(*)::int as count from socialapp.dm_queue where user_id=$1 and created_at > now() - interval '30 days' group by 1`,
+        [user.id],
+      );
+    } catch {
+      commentHourRows = [];
+    }
     try {
       rules = await query<RuleOption>(
         "select id, name, status from socialapp.dm_rules where user_id = $1 order by created_at desc",
@@ -120,13 +130,15 @@ export default async function CalendarPage({
     publishedRows = await publishedPromise;
   }
 
+  const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
+
   return (
     <>
       <div>
         <h1 className="text-2xl font-semibold">Calendar</h1>
         <p className="text-sm text-muted">Plan posts for Instagram, Facebook and Threads.</p>
       </div>
-      <Composer rules={rules} />
+      <Composer rules={rules} bestHoursUtc={bestHoursUtc} />
       <div className="mt-8 flex gap-2" role="group" aria-label="Calendar view">
         <Link
           href="/app/calendar?view=week"

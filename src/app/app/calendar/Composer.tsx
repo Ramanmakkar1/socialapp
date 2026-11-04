@@ -43,7 +43,19 @@ function effectiveCaption(
 
 type RuleOption = { id: string; name: string; status: string };
 
-export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
+function nextSlotLocal(hourUtc: number): Date {
+  const now = new Date();
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hourUtc, 0, 0));
+  if (d.getTime() <= now.getTime() + 15 * 60_000) d.setUTCDate(d.getUTCDate() + 1);
+  return d;
+}
+
+function toLocalInputValue(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: RuleOption[]; bestHoursUtc?: number[] }) {
   const mainId = useId();
   const firstCommentId = useId();
   const scheduleId = useId();
@@ -604,6 +616,25 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
                 onChange={(e) => setScheduledAt(e.target.value)}
                 className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none"
               />
+              {timeZone && bestHoursUtc.length > 0 && (
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted">Best times:</span>
+                  {bestHoursUtc.map((h) => {
+                    const label = nextSlotLocal(h).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" });
+                    return (
+                      <button
+                        key={h}
+                        type="button"
+                        aria-label={`Schedule for ${label}`}
+                        onClick={() => setScheduledAt(toLocalInputValue(nextSlotLocal(h)))}
+                        className="rounded-full border border-line px-3 py-1 text-xs text-ink-2 hover:border-brand hover:text-brand"
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
               <p className="mt-1 text-xs text-muted">Timezone: {timeZone || "…"}</p>
             </div>
           </div>
