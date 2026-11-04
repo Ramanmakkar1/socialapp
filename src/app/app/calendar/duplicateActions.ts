@@ -15,7 +15,7 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
   const user = await requireUser();
   try {
     const rows = await query<{ id: string }>(
-      "insert into socialapp.scheduled_posts (caption, media, user_id, scheduled_at, status, ig_format) select caption, media, user_id, null, 'draft', ig_format from socialapp.scheduled_posts where id=$1 and user_id=$2 returning id",
+      "insert into socialapp.scheduled_posts (caption, media, user_id, scheduled_at, status, ig_format, first_comment) select caption, media, user_id, null, 'draft', ig_format, first_comment from socialapp.scheduled_posts where id=$1 and user_id=$2 returning id",
       [id, user.id],
     );
     if (!rows[0]) {

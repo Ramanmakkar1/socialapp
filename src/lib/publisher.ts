@@ -1,6 +1,7 @@
 // Server only: publishes due scheduled posts through the official Instagram API.
 import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
+import { shouldPostFirstComment } from "@/lib/firstComment";
 
 const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const PUBLISH_TIMEOUT_MS = 20_000;
@@ -13,6 +14,7 @@ type ClaimedRow = {
   media: unknown;
   user_id: string;
   ig_format: string;
+  first_comment: string | null;
 };
 
 type AccountRow = {
@@ -367,7 +369,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
          limit $1
          for update of t2 skip locked
        )
-     returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format`,
+     returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment`,
     [limit],
   );
 
@@ -417,6 +419,18 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
          published_at=now(), error=null, social_account_id=$3 where id=$1`,
         [row.id, outcome.externalPostId, account.id],
       );
+      if (shouldPostFirstComment(igFormat, row.first_comment)) {
+        try {
+          const comment = await postForId(
+            `${encodeURIComponent(outcome.externalPostId)}/comments`, token,
+            { message: row.first_comment },
+          );
+          if (!comment.ok) throw new Error(comment.error);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.error("First comment failed:", cleanError(message, token));
+        }
+      }
       // This loop only claims Instagram targets; switch on the post's attached auto-DM rule.
       try {
         await pool.query(

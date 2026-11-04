@@ -7,6 +7,7 @@ import { savePost } from "./actions";
 import { aiAvailable, suggestCaptions } from "./aiActions";
 import { BRAND } from "@/lib/brand";
 import type { CaptionIdea } from "@/lib/ai";
+import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
@@ -44,6 +45,7 @@ type RuleOption = { id: string; name: string; status: string };
 
 export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
   const mainId = useId();
+  const firstCommentId = useId();
   const scheduleId = useId();
   const dmRuleId = useId();
   const imageId = useId();
@@ -58,6 +60,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
   });
   const [activeTab, setActiveTab] = useState<PlatformId>("instagram");
   const [mainCaption, setMainCaption] = useState("");
+  const [firstComment, setFirstComment] = useState("");
   const [customize, setCustomize] = useState<Record<PlatformId, boolean>>({
     instagram: false,
     facebook: false,
@@ -128,6 +131,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
     }
     return {
       caption: mainCaption,
+      firstComment,
       platforms,
       overrides,
       scheduledAt: scheduledAt || null,
@@ -163,6 +167,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
         setFeedback({ kind: "ok", text: `Scheduled for ${when}` });
       }
       setMainCaption("");
+      setFirstComment("");
       setCustomCaption({ instagram: "", facebook: "", threads: "" });
       setMediaUrls([""]);
       setIgFormat("feed");
@@ -317,6 +322,28 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
               </div>
             )}
           </div>
+
+          {igFormat !== "story" && (
+            <div>
+              <label htmlFor={firstCommentId} className="text-sm font-medium text-ink-2">
+                First comment (Instagram) (optional)
+              </label>
+              <textarea
+                id={firstCommentId}
+                value={firstComment}
+                onChange={(e) => setFirstComment(e.target.value)}
+                rows={3}
+                aria-describedby={`${firstCommentId}-help`}
+                className="mt-2 w-full resize-y rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+              />
+              <p id={`${firstCommentId}-help`} className="mt-1 text-xs text-muted">
+                Posted from your account right after the post goes live. Good for hashtags.
+              </p>
+              <p className={`mt-1 text-xs ${counterClass(countChars(firstComment), PLATFORM_LIMITS.instagram.max ?? 2200)}`}>
+                {countChars(firstComment)} / {PLATFORM_LIMITS.instagram.max} characters
+              </p>
+            </div>
+          )}
 
           <div>
             <span className="text-sm font-medium text-ink-2">

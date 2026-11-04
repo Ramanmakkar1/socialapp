@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
+import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { checkCaption, type PlatformId } from "@/lib/platforms";
 
 const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads"];
@@ -31,6 +32,7 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
 
 type SavePostInput = {
   caption: string;
+  firstComment?: string;
   platforms: ("instagram" | "facebook" | "threads")[];
   overrides: Partial<Record<string, string>>;
   scheduledAt: string | null;
@@ -148,6 +150,10 @@ export async function savePost(
   const igFormatRaw = input.igFormat;
   const igFormat = igFormatRaw === "story" ? "story" : "feed";
   const instagramSelected = platforms.includes("instagram");
+  const firstComment = typeof input.firstComment === "string" ? input.firstComment.trim() : "";
+  if (countChars(firstComment) > (PLATFORM_LIMITS.instagram.max ?? 2200)) {
+    return { ok: false, error: "First comment must be 2,200 characters or fewer." };
+  }
 
   if (igFormat === "story" && mediaItems.length > 1) {
     return { ok: false, error: "A Story takes one image or video." };
@@ -219,7 +225,7 @@ export async function savePost(
 
   try {
     const rows = await query<{ id: string }>(
-      "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format) values ($1, $2, $3, $4, $5::jsonb, $6, $7) returning id",
+      "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) returning id",
       [
         user.id,
         input.caption,
@@ -228,6 +234,7 @@ export async function savePost(
         JSON.stringify(mediaItems),
         dmRuleId,
         instagramSelected ? igFormat : "feed",
+        igFormat === "story" ? null : firstComment || null,
       ],
     );
     const id = rows[0]?.id;

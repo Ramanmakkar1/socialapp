@@ -8,6 +8,7 @@ import { retryPost } from "./retryActions";
 export type Post = {
   id: string;
   caption: string;
+  first_comment: string | null;
   scheduled_at: Date | string | null;
   status: string;
   platforms: string[];
@@ -103,6 +104,9 @@ export default function PostList({ posts }: { posts: Post[] }) {
               </p>
               <p className="mt-2 text-sm capitalize text-ink-2">{post.platforms.join(", ")}</p>
               <p className="mt-3 whitespace-pre-wrap break-words text-sm text-ink-2">{post.caption.slice(0, 140)}</p>
+              {post.first_comment && (
+                <span className="mt-3 inline-block rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium text-ink-2">First comment</span>
+              )}
               {post.status === "failed" && (
                 <p className="mt-3 rounded-xl border border-line bg-surface-2 p-3 text-xs text-brand-2" role="status">
                   Couldn’t publish: {(post.error ?? "Unknown error").slice(0, 200)}
