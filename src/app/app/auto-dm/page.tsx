@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
 import { AutoDmView, type DbRuleRow, type RuleFormDefaults } from "./RuleForm";
+import { RewindPastCommentsButton } from "./RewindPastCommentsButton";
 
 export const metadata = { title: "Auto-DM" };
 
@@ -42,5 +43,12 @@ export default async function AutoDmPage({
     }
   }
 
-  return <AutoDmView rules={rules} templateDefaults={templateDefaults} templateNote={templateNote} />;
+  return (
+    <AutoDmView
+      rules={rules}
+      templateDefaults={templateDefaults}
+      templateNote={templateNote}
+      rewindButton={RewindPastCommentsButton}
+    />
+  );
 }

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { validateRule, type DmRule } from "@/lib/rules";
+import { rewindRule } from "@/lib/rewind";
 
 export type RuleTrigger = "comment" | "story_reply";
 
@@ -169,6 +170,26 @@ export async function toggleRule(id: string): Promise<RuleActionResult> {
     return { ok: true };
   } catch {
     return { ok: false, errors: ["Could not update status."] };
+  }
+}
+
+export async function rewindRuleAction(
+  id: string,
+): Promise<{ ok: true; queued: number; scanned: number } | { ok: false; error: string }> {
+  if (!isDbConfigured()) {
+    return { ok: false, error: "Database not configured." };
+  }
+  if (!UUID_RE.test(id)) {
+    return { ok: false, error: "Invalid automation." };
+  }
+  const user = await requireUser();
+  try {
+    const result = await rewindRule(user.id, id);
+    revalidatePath("/app/auto-dm");
+    return { ok: true, queued: result.queued, scanned: result.scanned };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Could not scan past comments.";
+    return { ok: false, error: message };
   }
 }
 

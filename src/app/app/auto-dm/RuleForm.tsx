@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, useTransition } from "react";
+import { useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
 import {
@@ -315,9 +315,10 @@ type AutoDmViewProps = {
   rules: DbRuleRow[];
   templateDefaults?: RuleFormDefaults;
   templateNote?: string;
+  rewindButton?: ComponentType<{ ruleId: string }>;
 };
 
-export function AutoDmView({ rules, templateDefaults, templateNote }: AutoDmViewProps) {
+export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton: RewindButton }: AutoDmViewProps) {
   const [formOpen, setFormOpen] = useState(Boolean(templateDefaults));
   const [editing, setEditing] = useState<DbRuleRow | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -430,6 +431,7 @@ export function AutoDmView({ rules, templateDefaults, templateNote }: AutoDmView
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2">
+                  {rule.status === "active" && RewindButton ? <RewindButton ruleId={rule.id} /> : null}
                   <button
                     type="button"
                     disabled={pending}
