@@ -10,6 +10,9 @@ type Lead = {
   created_at: Date;
 };
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 function csvField(value: string | null): string {
   let field = value ?? "";
   if (/^[=+\-@]/.test(field)) field = `'${field}`;
@@ -28,11 +31,19 @@ export async function GET(request: Request) {
   const search = (url.searchParams.get("q") ?? "").trim().slice(0, 100);
   const onlyWithEmail = url.searchParams.get("email") === "1";
   const requestedRule = url.searchParams.get("rule") ?? "";
-  const ruleRows = requestedRule ? await query<{ exists: number }>(
-    "select 1 as exists from socialapp.dm_rules where id=$1 and user_id=$2",
-    [requestedRule, user.id]
-  ) : [];
-  const selectedRule = ruleRows.length > 0 ? requestedRule : "";
+  if (requestedRule) {
+    if (!UUID_RE.test(requestedRule)) {
+      return new Response("Invalid rule", { status: 400 });
+    }
+    const ruleRows = await query<{ exists: number }>(
+      "select 1 as exists from socialapp.dm_rules where id=$1 and user_id=$2",
+      [requestedRule, user.id]
+    );
+    if (ruleRows.length === 0) {
+      return new Response("Invalid rule", { status: 400 });
+    }
+  }
+  const selectedRule = requestedRule;
 
   const conditions = ["c.user_id = $1"];
   const params: string[] = [user.id];
