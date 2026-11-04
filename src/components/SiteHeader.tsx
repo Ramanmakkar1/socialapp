@@ -6,7 +6,6 @@ const NAV_LINKS = [
   { href: "/instagram-scheduler", label: "Scheduler" },
   { href: "/instagram-auto-dm", label: "Auto DM" },
   { href: "/tools", label: "Free tools" },
-  // No /pricing route yet; plans live in the homepage #pricing section.
   { href: "/#pricing", label: "Pricing" },
   { href: "/help", label: "Help" },
 ];
