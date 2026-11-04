@@ -46,6 +46,7 @@ export async function generateCaptionIdeas(input: {
   topic: string;
   draft?: string;
   tone?: string;
+  brandVoice?: string;
 }): Promise<CaptionIdeasResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return { ok: false, error: "AI is not set up yet." };
@@ -53,6 +54,7 @@ export async function generateCaptionIdeas(input: {
   const lines = [`Topic: ${input.topic}`];
   if (input.draft) lines.push(`Current draft:\n${input.draft}`);
   if (input.tone) lines.push(`Tone: ${input.tone}`);
+  if (input.brandVoice) lines.push(`Brand voice (follow this style): ${input.brandVoice}`);
 
   let text: string;
   try {
