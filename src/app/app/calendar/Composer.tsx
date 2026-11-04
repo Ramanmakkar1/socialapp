@@ -134,6 +134,14 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
   const selected = PLATFORM_ORDER.filter((p) => enabled[p]);
 
   function buildSaveInput(mode: "draft" | "schedule") {
+    const scheduleDate = scheduledAt ? new Date(scheduledAt) : null;
+    if (
+      (scheduleDate && Number.isNaN(scheduleDate.getTime())) ||
+      (scheduleDate && toLocalInputValue(scheduleDate) !== scheduledAt) ||
+      (mode === "schedule" && !scheduleDate)
+    ) {
+      return null;
+    }
     const platforms = PLATFORM_ORDER.filter((p) => enabled[p]);
     const overrides: Partial<Record<string, string>> = {};
     for (const p of platforms) {
@@ -146,7 +154,7 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
       firstComment,
       platforms,
       overrides,
-      scheduledAt: scheduledAt || null,
+      scheduledAt: scheduleDate?.toISOString() ?? null,
       mode,
       imageUrl: mediaUrls[0]?.trim() !== "" ? mediaUrls[0].trim() : null,
       mediaUrls,
@@ -161,8 +169,19 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
 
   function handleSave(mode: "draft" | "schedule") {
     setFeedback(null);
+    const input = buildSaveInput(mode);
+    if (!input) {
+      setFeedback({ kind: "err", text: "Choose a valid local date and time before saving." });
+      return;
+    }
     startTransition(async () => {
-      const result = await savePost(buildSaveInput(mode));
+      let result;
+      try {
+        result = await savePost(input);
+      } catch {
+        setFeedback({ kind: "err", text: "Could not save your post. Your changes are still here. Please try again." });
+        return;
+      }
       if (!result.ok) {
         setFeedback({ kind: "err", text: result.error });
         return;
@@ -170,8 +189,8 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
       if (mode === "draft") {
         setFeedback({ kind: "ok", text: "Draft saved" });
       } else {
-        const when = scheduledAt
-          ? new Date(scheduledAt).toLocaleString(undefined, {
+        const when = input.scheduledAt
+          ? new Date(input.scheduledAt).toLocaleString(undefined, {
               dateStyle: "medium",
               timeStyle: "short",
             })
@@ -660,7 +679,7 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
           {feedback && (
             <p
               className={`text-sm ${feedback.kind === "ok" ? "text-ok" : "text-brand-2"}`}
-              aria-live="polite"
+              role={feedback.kind === "err" ? "alert" : "status"}
             >
               {feedback.text}
             </p>
