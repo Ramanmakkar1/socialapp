@@ -112,8 +112,14 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
     for (const s of sent) {
       if (s.comment_id) dmByComment.set(s.comment_id, s.status);
       if (s.status !== "sent") continue;
-      const t = threads.get(threadKey(s.social_account_id, s.recipient_external_id));
-      if (t) t.messages.push({ direction: "out", text: s.message, at: s.sent_at ?? s.created_at });
+      const key = threadKey(s.social_account_id, s.recipient_external_id);
+      const at = s.sent_at ?? s.created_at;
+      let t = threads.get(key);
+      if (!t) {
+        t = { accountId: s.social_account_id, senderId: s.recipient_external_id, username: null, lastInboundAt: null, lastAt: at, lastText: s.message, messages: [] };
+        threads.set(key, t);
+      }
+      t.messages.push({ direction: "out", text: s.message, at });
     }
     for (const c of comments) c.dmStatus = dmByComment.get(c.commentId) ?? null;
 
