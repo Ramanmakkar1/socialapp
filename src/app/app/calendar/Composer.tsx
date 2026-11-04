@@ -230,7 +230,7 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
                     aria-label={
                       live
                         ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}`
-                        : `${PLATFORMS[platform].label} publishing coming soon`
+                        : `${PLATFORMS[platform].label} publishing is not available yet`
                     }
                     onClick={() => togglePlatform(platform)}
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -273,7 +273,7 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
               className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Sparkles className="h-4 w-4" aria-hidden />
-              {aiOn === false ? "AI captions: coming soon" : "Write with AI"}
+              {aiOn === false ? "AI captions are not switched on" : "Write with AI"}
             </button>
             {aiOpen && aiOn && (
               <div className="mt-3 rounded-xl border border-line bg-surface p-4">
@@ -494,16 +494,16 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
                       className="mt-2 h-32 w-auto rounded-xl border border-line object-cover"
                     />
                     <p className="mt-1 text-xs text-muted">
-                      Paste a public https link; a .mp4 link is posted as a Reel. 2–10 image links =
-                      carousel post. Upload is coming soon.
+                      Paste a public https link (for example from your website or cloud storage); a .mp4 link is posted as a Reel. 2–10 image links =
+                      carousel post.
                     </p>
                   </>
                 );
               }
               return (
                 <p className="mt-1 text-xs text-muted">
-                  Paste a public https link; a .mp4 link is posted as a Reel. 2–10 image links =
-                  carousel post. Upload is coming soon.
+                  Paste a public https link (for example from your website or cloud storage); a .mp4 link is posted as a Reel. 2–10 image links =
+                  carousel post.
                 </p>
               );
             })()}
