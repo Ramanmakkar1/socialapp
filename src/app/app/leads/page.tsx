@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+﻿import { Users } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../EmptyState";
@@ -19,8 +19,8 @@ function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }
 
-export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ q?: string; email?: string; rule?: string }> }) {
-  const { q = '', email = '', rule = '' } = await searchParams;
+export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ q?: string; email?: string; rule?: string; page?: string }> }) {
+  const { q = '', email = '', rule = '', page: requestedPage = '' } = await searchParams;
   const user = await requireUser();
   const configured = isDbConfigured();
   const rules = configured ? await query<{ id: string; name: string }>(
@@ -46,9 +46,19 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
     params.push(selectedRule);
   }
 
-  const leads = configured ? await query<Lead>(
-    `select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where ${conditions.join(" and ")} order by c.created_at desc limit 200`,
+  const pageSize = 50;
+  const parsedPage = typeof requestedPage === "string" && /^\d+$/.test(requestedPage) ? Number(requestedPage) : 1;
+  const validPage = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const countRows = configured ? await query<{ total: string }>(
+    `select count(*) as total from socialapp.contacts c where ${conditions.join(" and ")}`,
     params
+  ) : [];
+  const total = Number(countRows[0]?.total ?? 0);
+  const page = Math.min(validPage, Math.max(1, Math.ceil(total / pageSize)));
+  const offset = (page - 1) * pageSize;
+  const leads = configured ? await query<Lead>(
+    `select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where ${conditions.join(" and ")} order by c.created_at desc, c.id desc limit $${params.length + 1} offset $${params.length + 2}`,
+    [...params, pageSize, offset]
   ) : [];
 
   const exportParams = new URLSearchParams();
@@ -57,11 +67,16 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   if (selectedRule) exportParams.set("rule", selectedRule);
   const exportQuery = exportParams.toString();
   const exportHref = exportQuery ? `/app/leads/export?${exportQuery}` : "/app/leads/export";
+  function pageHref(target: number) {
+    const pageParams = new URLSearchParams(exportParams);
+    pageParams.set("page", String(target));
+    return `/app/leads?${pageParams.toString()}`;
+  }
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h1 className="text-2xl font-semibold">Leads</h1><p className="text-sm text-muted">{leads.length ? `${leads.length} leads` : "Emails and phones collected by your DMs."}</p></div>
+        <div><h1 className="text-2xl font-semibold">Leads</h1><p className="text-sm text-muted">{total > 0 ? `${total} leads | ${offset + 1}-${offset + leads.length} shown` : "0 leads"}</p></div>
         {leads.length > 0 && <a href={exportHref} className="rounded-full border border-line px-4 py-2 text-sm">Export CSV</a>}
       </div>
       <form method="get" className="mt-6 flex flex-wrap items-center gap-3">
@@ -72,7 +87,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           name="q"
           placeholder="Search username, name, email or phone"
           defaultValue={search}
-          className="rounded-full border border-line bg-surface px-4 py-2 text-sm"
+          className="w-full min-w-0 rounded-full border border-line bg-surface px-4 py-2 text-sm sm:w-auto"
         />
         <label htmlFor="leads-rule" className="sr-only">From rule</label>
         <select id="leads-rule" name="rule" defaultValue={selectedRule} className="rounded-full border border-line bg-surface px-4 py-2 text-sm">
@@ -108,6 +123,13 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
             ))}</tbody>
           </table>
         </div>
+      )}
+      {total > pageSize && (
+        <nav aria-label="Leads pagination" className="mt-6 flex flex-wrap items-center gap-3 text-sm">
+          {page > 1 && <a href={pageHref(page - 1)} className="rounded-full border border-line px-4 py-2">Previous</a>}
+          <span className="text-muted">Page {page} of {Math.ceil(total / pageSize)}</span>
+          {page < Math.ceil(total / pageSize) && <a href={pageHref(page + 1)} className="rounded-full border border-line px-4 py-2">Next</a>}
+        </nav>
       )}
     </>
   );
