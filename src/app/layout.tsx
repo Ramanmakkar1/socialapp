@@ -10,6 +10,18 @@ export const metadata: Metadata = {
   metadataBase: new URL(BRAND.url),
   title: { default: `${BRAND.name} — Social media scheduler + Instagram auto-DM`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
+  openGraph: {
+    type: "website",
+    siteName: BRAND.name,
+    title: `${BRAND.name} — Social media scheduler + Instagram auto-DM`,
+    description: BRAND.description,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${BRAND.name} — Social media scheduler + Instagram auto-DM`,
+    description: BRAND.description,
+  },
   // Staging only until launch: robots value comes from BRAND.indexable.
   robots: BRAND.indexable ? { index: true, follow: true } : { index: false, follow: false },
 };
