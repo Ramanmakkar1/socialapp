@@ -42,16 +42,22 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-function firstMedia(media: unknown): { type: "image" | "video"; url: string } | null {
+function firstMedia(
+  media: unknown,
+): { type: "image" | "video"; url: string; story?: boolean } | null {
   if (!Array.isArray(media)) return null;
   for (const item of media) {
     if (typeof item === "object" && item !== null) {
-      const row = item as { type?: unknown; url?: unknown };
+      const row = item as { type?: unknown; url?: unknown; story?: unknown };
       if (
         (row.type === "image" || row.type === "video") &&
         typeof row.url === "string"
       ) {
-        return { type: row.type, url: row.url };
+        return {
+          type: row.type,
+          url: row.url,
+          ...(row.story === true ? { story: true } : {}),
+        };
       }
     }
   }
@@ -229,6 +235,74 @@ async function publishToInstagram(
   }
 
   try {
+    if (media.story) {
+      const createBody =
+        media.type === "video"
+          ? { media_type: "STORIES", video_url: media.url }
+          : { media_type: "STORIES", image_url: media.url };
+
+      const created = await postForId(igPath, token, createBody);
+      if (!created.ok) {
+        return created;
+      }
+      const creationId = created.id;
+
+      if (media.type === "video") {
+        const maxTries = 24;
+        for (let attempt = 0; attempt < maxTries; attempt += 1) {
+          const statusRes = await fetch(
+            `${GRAPH_BASE}/${encodeURIComponent(creationId)}?fields=status_code`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+              signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
+            },
+          );
+          const statusText = await statusRes.text().catch(() => "");
+          let statusBody: unknown = statusText;
+          try {
+            statusBody = JSON.parse(statusText);
+          } catch {
+            // keep raw text
+          }
+          if (!statusRes.ok) {
+            return {
+              ok: false,
+              error: cleanError(
+                `HTTP ${statusRes.status}: ${metaMessage(statusBody, statusText)}`,
+                token,
+              ),
+            };
+          }
+          const statusCode =
+            typeof statusBody === "object" && statusBody !== null
+              ? (statusBody as { status_code?: unknown }).status_code
+              : undefined;
+          if (statusCode === "FINISHED") break;
+          if (statusCode === "ERROR" || statusCode === "EXPIRED") {
+            return {
+              ok: false,
+              error: cleanError(
+                `Instagram could not process the video (status ${String(statusCode)})`,
+                token,
+              ),
+            };
+          }
+          if (attempt === maxTries - 1) {
+            return {
+              ok: false,
+              error: cleanError(
+                "Instagram is still processing the video, try Retry in a few minutes",
+                token,
+              ),
+            };
+          }
+          await sleep(5000);
+        }
+      }
+
+      return publishCreationId(igUserId, token, creationId);
+    }
+
     const createBody =
       media.type === "video"
         ? { media_type: "REELS", video_url: media.url, caption }

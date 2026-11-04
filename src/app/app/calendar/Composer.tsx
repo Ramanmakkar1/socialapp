@@ -47,6 +47,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
   const scheduleId = useId();
   const dmRuleId = useId();
   const imageId = useId();
+  const igFormatLegendId = useId();
   const aiTopicId = useId();
   const aiToneId = useId();
 
@@ -68,6 +69,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
     threads: "",
   });
   const [mediaUrls, setMediaUrls] = useState<string[]>([""]);
+  const [igFormat, setIgFormat] = useState<"feed" | "story">("feed");
   const [selectedRuleId, setSelectedRuleId] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
@@ -105,6 +107,9 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
     if (!LIVE_PLATFORMS.includes(platform)) return;
     const next = { ...enabled, [platform]: !enabled[platform] };
     setEnabled(next);
+    if (platform === "instagram" && !next.instagram) {
+      setIgFormat("feed");
+    }
     if (!next[platform] && activeTab === platform) {
       const fallback = PLATFORM_ORDER.find((p) => next[p]);
       if (fallback) setActiveTab(fallback);
@@ -130,8 +135,13 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
       imageUrl: mediaUrls[0]?.trim() !== "" ? mediaUrls[0].trim() : null,
       mediaUrls,
       dmRuleId: selectedRuleId || null,
+      igFormat: enabled.instagram ? igFormat : "feed",
     };
   }
+
+  const filledMediaCount = mediaUrls.map((u) => u.trim()).filter((u) => u !== "").length;
+  const storyMediaError =
+    enabled.instagram && igFormat === "story" && filledMediaCount > 1;
 
   function handleSave(mode: "draft" | "schedule") {
     setFeedback(null);
@@ -155,6 +165,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
       setMainCaption("");
       setCustomCaption({ instagram: "", facebook: "", threads: "" });
       setMediaUrls([""]);
+      setIgFormat("feed");
       setSelectedRuleId("");
     });
   }
@@ -387,7 +398,53 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
                 </p>
               );
             })()}
+            {storyMediaError && (
+              <p className="mt-2 text-sm text-brand-2" aria-live="polite">
+                Stories need exactly one image or video link.
+              </p>
+            )}
           </div>
+
+          {enabled.instagram && (
+            <fieldset className="border-0 p-0">
+              <legend id={igFormatLegendId} className="text-sm font-medium text-ink-2">
+                Post as
+              </legend>
+              <div
+                className="mt-2 flex flex-wrap gap-4 text-sm text-ink-2"
+                role="radiogroup"
+                aria-labelledby={igFormatLegendId}
+              >
+                <label className="flex cursor-pointer items-center gap-2">
+                  <input
+                    type="radio"
+                    name="ig_format"
+                    value="feed"
+                    checked={igFormat === "feed"}
+                    onChange={() => setIgFormat("feed")}
+                    className="rounded border-line text-brand focus:ring-brand"
+                  />
+                  Feed
+                </label>
+                <label className="flex cursor-pointer items-center gap-2">
+                  <input
+                    type="radio"
+                    name="ig_format"
+                    value="story"
+                    checked={igFormat === "story"}
+                    onChange={() => setIgFormat("story")}
+                    className="rounded border-line text-brand focus:ring-brand"
+                  />
+                  Story
+                </label>
+              </div>
+              {igFormat === "story" && (
+                <p className="mt-1 text-xs text-muted">
+                  Stories need one image or one video. Captions are not shown on Stories.
+                </p>
+              )}
+            </fieldset>
+          )}
 
           <div>
             {rules.length > 0 ? (
@@ -517,7 +574,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              disabled={isPending}
+              disabled={isPending || storyMediaError}
               onClick={() => handleSave("draft")}
               className="rounded-full border border-line px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
             >
@@ -525,7 +582,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
             </button>
             <button
               type="button"
-              disabled={isPending || !scheduledAt}
+              disabled={isPending || !scheduledAt || storyMediaError}
               onClick={() => handleSave("schedule")}
               className="btn-primary rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60"
             >

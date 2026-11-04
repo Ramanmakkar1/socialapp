@@ -38,9 +38,10 @@ type SavePostInput = {
   imageUrl?: string | null;
   mediaUrls?: string[];
   dmRuleId?: string | null;
+  igFormat?: string | null;
 };
 
-type MediaItem = { type: "image" | "video"; url: string };
+type MediaItem = { type: "image" | "video"; url: string; story?: boolean };
 
 function parseMediaLink(
   trimmed: string,
@@ -144,6 +145,20 @@ export async function savePost(
     return { ok: false, error: "Carousels can only have images for now." };
   }
 
+  const igFormatRaw = typeof input.igFormat === "string" ? input.igFormat : "feed";
+  const igFormat = igFormatRaw === "story" ? "story" : "feed";
+  const instagramSelected = platforms.includes("instagram");
+  const storyForInstagram = instagramSelected && igFormat === "story";
+
+  if (storyForInstagram && mediaItems.length !== 1) {
+    return { ok: false, error: "Stories need exactly one image or video link." };
+  }
+
+  let mediaToSave: MediaItem[] = mediaItems;
+  if (storyForInstagram && mediaItems.length === 1) {
+    mediaToSave = [{ ...mediaItems[0], story: true }];
+  }
+
   if (platforms.includes("instagram") && input.mode === "schedule" && mediaItems.length === 0) {
     return {
       ok: false,
@@ -196,7 +211,7 @@ export async function savePost(
   try {
     const rows = await query<{ id: string }>(
       "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id) values ($1, $2, $3, $4, $5::jsonb, $6) returning id",
-      [user.id, input.caption, scheduledAt, status, JSON.stringify(mediaItems), dmRuleId],
+      [user.id, input.caption, scheduledAt, status, JSON.stringify(mediaToSave), dmRuleId],
     );
     const id = rows[0]?.id;
     if (!id) {
