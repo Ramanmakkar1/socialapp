@@ -1,3 +1,4 @@
+import { buildCommentDmMessage } from "@/lib/commentMessage";
 import { query } from "@/lib/db";
 import { shortLinkFor } from "@/lib/links";
 import { matchComment, type MatchableRule } from "@/lib/match";
@@ -143,27 +144,28 @@ export async function processCommentEvents(
       if (!contactId) {
         continue;
       }
-      let message = rule.dm_text;
-      if (rule.follow_gate && rule.link_url) {
-        if (rule.email_gate) {
-          message +=
-            "\n\nFollow us, then reply here with your email address and I'll send you the link.";
-        } else {
-          message +=
-            "\n\nFollow us first, then reply 'done' to this message and I'll send you the link.";
-        }
-      } else if (rule.email_gate && rule.link_url) {
-        message +=
-          "\n\nReply to this message with your email address and I'll send you the link right away.";
-      } else if (rule.link_url) {
-        let link = rule.link_url;
+      const gated = rule.email_gate || rule.follow_gate;
+      let resolvedLink: string | null = null;
+      if (!gated && rule.link_url) {
+        resolvedLink = rule.link_url;
         try {
-          link = await shortLinkFor(account.user_id, rule.id, rule.link_url);
+          resolvedLink = await shortLinkFor(
+            account.user_id,
+            rule.id,
+            rule.link_url,
+          );
         } catch {
           /* use raw link_url */
         }
-        message += "\n" + link;
       }
+      const message = buildCommentDmMessage({
+        dmText: rule.dm_text,
+        fromUsername: event.fromUsername,
+        linkUrl: rule.link_url,
+        emailGate: rule.email_gate,
+        followGate: rule.follow_gate,
+        resolvedLink,
+      });
       const rows = await query<{ id: string }>(
         `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message) values ($1,$2,$3,$4,$5,$6,$7) on conflict (comment_id) do nothing returning id`,
         [
