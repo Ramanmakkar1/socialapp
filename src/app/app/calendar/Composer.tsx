@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useTransition } from "react";
 import { AtSign, Facebook, Instagram } from "lucide-react";
+import { savePost } from "./actions";
 import { BRAND } from "@/lib/brand";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
 
@@ -59,6 +60,8 @@ export default function Composer() {
   });
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
+  const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.
@@ -76,6 +79,47 @@ export default function Composer() {
   }
 
   const selected = PLATFORM_ORDER.filter((p) => enabled[p]);
+
+  function buildSaveInput(mode: "draft" | "schedule") {
+    const platforms = PLATFORM_ORDER.filter((p) => enabled[p]);
+    const overrides: Partial<Record<string, string>> = {};
+    for (const p of platforms) {
+      if (customize[p]) {
+        overrides[p] = customCaption[p];
+      }
+    }
+    return {
+      caption: mainCaption,
+      platforms,
+      overrides,
+      scheduledAt: scheduledAt || null,
+      mode,
+    };
+  }
+
+  function handleSave(mode: "draft" | "schedule") {
+    setFeedback(null);
+    startTransition(async () => {
+      const result = await savePost(buildSaveInput(mode));
+      if (!result.ok) {
+        setFeedback({ kind: "err", text: result.error });
+        return;
+      }
+      if (mode === "draft") {
+        setFeedback({ kind: "ok", text: "Draft saved" });
+      } else {
+        const when = scheduledAt
+          ? new Date(scheduledAt).toLocaleString(undefined, {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })
+          : "";
+        setFeedback({ kind: "ok", text: `Scheduled for ${when}` });
+      }
+      setMainCaption("");
+      setCustomCaption({ instagram: "", facebook: "", threads: "" });
+    });
+  }
 
   return (
     <section id="new" className="mt-6 scroll-mt-20" aria-labelledby={`${mainId}-heading`}>
@@ -224,6 +268,33 @@ export default function Composer() {
               </select>
             </div>
           </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => handleSave("draft")}
+              className="rounded-full border border-line px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
+            >
+              {isPending ? "Saving…" : "Save draft"}
+            </button>
+            <button
+              type="button"
+              disabled={isPending || !scheduledAt}
+              onClick={() => handleSave("schedule")}
+              className="btn-primary rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60"
+            >
+              {isPending ? "Saving…" : "Schedule"}
+            </button>
+          </div>
+          {feedback && (
+            <p
+              className={`text-sm ${feedback.kind === "ok" ? "text-ok" : "text-brand-2"}`}
+              aria-live="polite"
+            >
+              {feedback.text}
+            </p>
+          )}
 
           <p className="text-xs text-muted">Publishing arrives in Phase 2 via official Meta APIs.</p>
         </div>
