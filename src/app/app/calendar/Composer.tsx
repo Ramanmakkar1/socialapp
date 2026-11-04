@@ -356,7 +356,58 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
                 );
               })}
             </div>
-            {mediaUrls.length < 10 && (
+            {enabled.instagram && (
+              <fieldset className="mt-3 border-0 p-0">
+                <legend id={igFormatLegendId} className="text-sm font-medium text-ink-2">
+                  Instagram format:
+                </legend>
+                <div
+                  className="mt-2 inline-flex rounded-xl border border-line bg-surface p-0.5 text-sm"
+                  role="radiogroup"
+                  aria-labelledby={igFormatLegendId}
+                >
+                  <label
+                    className={`cursor-pointer rounded-lg px-3 py-1.5 font-medium transition-colors ${
+                      igFormat === "feed" ? "bg-brand/10 text-brand" : "text-muted"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="ig_format"
+                      value="feed"
+                      checked={igFormat === "feed"}
+                      onChange={() => setIgFormat("feed")}
+                      className="sr-only"
+                    />
+                    Post
+                  </label>
+                  <label
+                    className={`cursor-pointer rounded-lg px-3 py-1.5 font-medium transition-colors ${
+                      igFormat === "story" ? "bg-brand/10 text-brand" : "text-muted"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="ig_format"
+                      value="story"
+                      checked={igFormat === "story"}
+                      onChange={() => {
+                        setIgFormat("story");
+                        setMediaUrls((prev) => [prev.map((u) => u.trim()).find((u) => u !== "") ?? prev[0] ?? ""]);
+                      }}
+                      className="sr-only"
+                    />
+                    Story
+                  </label>
+                </div>
+                {igFormat === "story" && (
+                  <p className="mt-1 text-xs text-muted">
+                    Stories show the image or video only. The caption is not shown on Instagram.
+                  </p>
+                )}
+              </fieldset>
+            )}
+            {mediaUrls.length < 10 && !(enabled.instagram && igFormat === "story") && (
               <button
                 type="button"
                 onClick={() =>
@@ -400,51 +451,10 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
             })()}
             {storyMediaError && (
               <p className="mt-2 text-sm text-brand-2" aria-live="polite">
-                Stories need exactly one image or video link.
+                A Story takes one image or video.
               </p>
             )}
           </div>
-
-          {enabled.instagram && (
-            <fieldset className="border-0 p-0">
-              <legend id={igFormatLegendId} className="text-sm font-medium text-ink-2">
-                Post as
-              </legend>
-              <div
-                className="mt-2 flex flex-wrap gap-4 text-sm text-ink-2"
-                role="radiogroup"
-                aria-labelledby={igFormatLegendId}
-              >
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    name="ig_format"
-                    value="feed"
-                    checked={igFormat === "feed"}
-                    onChange={() => setIgFormat("feed")}
-                    className="rounded border-line text-brand focus:ring-brand"
-                  />
-                  Feed
-                </label>
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    name="ig_format"
-                    value="story"
-                    checked={igFormat === "story"}
-                    onChange={() => setIgFormat("story")}
-                    className="rounded border-line text-brand focus:ring-brand"
-                  />
-                  Story
-                </label>
-              </div>
-              {igFormat === "story" && (
-                <p className="mt-1 text-xs text-muted">
-                  Stories need one image or one video. Captions are not shown on Stories.
-                </p>
-              )}
-            </fieldset>
-          )}
 
           <div>
             {rules.length > 0 ? (
