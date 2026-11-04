@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  Zap,
   ShieldCheck,
   CalendarDays,
   Layers,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
@@ -116,19 +116,7 @@ export default function InstagramScheduler() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
-      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg">
-              <Zap className="h-4 w-4" />
-            </span>
-            {BRAND.name}
-          </Link>
-          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
-            Start free
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden px-4 pt-16 pb-16 sm:pt-24">

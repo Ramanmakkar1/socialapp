@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LifeBuoy, Mail, MessageCircleQuestion, Zap } from "lucide-react";
+import { LifeBuoy, Mail, MessageCircleQuestion } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: `${BRAND.name} support: help with scheduling and auto-DM`,
@@ -46,15 +47,7 @@ const cards = [
 export default function ContactPage() {
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg"><Zap className="h-4 w-4" /></span>
-            {BRAND.name}
-          </Link>
-          <Link href="/help" className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-ink-2 hover:text-ink">Help center</Link>
-        </div>
-      </header>
+      <SiteHeader />
       <main className="flex-1 px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Contact support</h1>

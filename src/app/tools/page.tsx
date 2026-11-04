@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Hash, Image as ImageIcon, Percent, ShieldCheck, TextQuote, UserRound, Zap } from "lucide-react";
+import { ArrowRight, Hash, Image as ImageIcon, Percent, ShieldCheck, TextQuote, UserRound } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 
 const PATH = "/tools";
 
@@ -77,19 +78,7 @@ export default function ToolsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd).replace(/</g, "\\u003c") }}
       />
-      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg">
-              <Zap className="h-4 w-4" />
-            </span>
-            {BRAND.name}
-          </Link>
-          <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">
-            Start free
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
       <main className="flex-1 overflow-x-hidden">
         <section className="relative px-4 pt-10 pb-16 sm:pt-16">
           <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
