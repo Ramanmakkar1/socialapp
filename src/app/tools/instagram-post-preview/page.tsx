@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ImagePlus, Scan, TextQuote, Zap } from "lucide-react";
+import { SiteHeader } from "@/components/SiteHeader";
+import { ArrowRight, ImagePlus, Scan, TextQuote } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import PostPreviewTool from "./PostPreviewTool";
@@ -53,12 +54,7 @@ export default function InstagramPostPreviewPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(app).replace(/</g, "\\u003c") }} />
-      <header className="border-b border-line bg-surface">
-        <nav aria-label="Main navigation" className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold"><span className="btn-primary rounded-lg p-2"><Zap className="h-4 w-4" /></span>{BRAND.name}</Link>
-          <Link href="/signup" className="btn-primary rounded-full px-4 py-3 text-sm font-medium">Start free</Link>
-        </nav>
-      </header>
+      <SiteHeader />
       <main className="mx-auto w-full max-w-6xl px-4 pb-16">
         <nav aria-label="Breadcrumb" className="mt-6 text-sm text-ink-2"><Link href="/tools" className="underline">Free Instagram tools</Link> / Post preview</nav>
         <section className="py-10 sm:py-14">
