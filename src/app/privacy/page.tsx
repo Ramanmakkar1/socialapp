@@ -24,6 +24,23 @@ export default function Page() {
       <p className="mt-3"><strong>Disconnect and delete.</strong> Disconnect any time in Settings → Connected accounts, or remove {BRAND.name} in Instagram (Settings → Website permissions → Apps and websites). See the <a className="underline" href="/data-deletion">data deletion page</a> for every option.</p>
       <h2 className="mt-8 text-xl font-semibold text-ink">Deleting your data</h2>
       <p>You can disconnect an account or delete everything at any time — see our <a className="underline" href="/data-deletion">data deletion page</a>.</p>
+      <h2 id="cookies" className="mt-8 text-xl font-semibold text-ink scroll-mt-24">Cookies</h2>
+      <p>
+        We use only essential cookies — no advertising or cross-site tracking cookies. Specifically:{" "}
+        <strong className="font-medium text-ink">pf_session</strong> (httpOnly, about 30 days) keeps you logged in after sign-in; and{" "}
+        <strong className="font-medium text-ink">ig_oauth_state</strong> (httpOnly, up to about 10 minutes, only while you connect Instagram)
+        protects the Instagram OAuth flow by matching the state parameter when Meta redirects back to us. Both are set by our server when you log in or start
+        connecting an account.
+      </p>
+      <p>
+        We do not use third-party advertising cookies. This staging site does not load third-party web analytics scripts today. If we enable
+        privacy-friendly, env-driven site analytics before launch, we will describe the provider and what it collects in this section — still without
+        selling your data or using your information for ads.
+      </p>
+      <p>
+        You can clear or block cookies anytime in your browser settings (often under Privacy, Security, or Site data). Clearing{" "}
+        <strong className="font-medium text-ink">pf_session</strong> signs you out; you can sign in again whenever you like.
+      </p>
       <p className="mt-8">Questions: {BRAND.supportEmail}</p>
     </main>
   );
