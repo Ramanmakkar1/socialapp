@@ -68,6 +68,7 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
 
   const comments: InboxComment[] = [];
   const seenComments = new Set<string>();
+  const seenMessages = new Set<string>();
   const threads = new Map<string, Thread>();
   const threadKey = (accountId: string, senderId: string) => `${accountId}:${senderId}`;
 
@@ -78,9 +79,16 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
       seenComments.add(c.commentId);
       comments.push({ ...c, accountId: acc.id, receivedAt: ev.received_at, dmStatus: null });
     }
+  }
+  for (const ev of [...events].reverse()) {
     for (const m of extractMessageEvents(ev.payload)) {
       const acc = byExternal.get(m.accountExternalId);
       if (!acc) continue;
+      if (m.mid !== null) {
+        const messageKey = JSON.stringify([acc.id, m.senderId, m.mid]);
+        if (seenMessages.has(messageKey)) continue;
+        seenMessages.add(messageKey);
+      }
       const key = threadKey(acc.id, m.senderId);
       let t = threads.get(key);
       if (!t) {
