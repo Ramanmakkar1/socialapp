@@ -82,26 +82,39 @@ export async function savePost(
     }
   }
 
-  let imageUrl: string | null = null;
+  let mediaItem: { type: "image" | "video"; url: string } | null = null;
   if (input.imageUrl && input.imageUrl.trim() !== "") {
     const trimmed = input.imageUrl.trim();
     let parsed: URL;
     try {
       parsed = new URL(trimmed);
     } catch {
-      return { ok: false, error: "Image link must be a public https link to a .jpg or .png file." };
+      return {
+        ok: false,
+        error: "Media link must be a public https link to a .jpg, .png or .mp4 file.",
+      };
     }
     const pathname = parsed.pathname.toLowerCase();
-    const okFile =
-      pathname.endsWith(".jpg") || pathname.endsWith(".jpeg") || pathname.endsWith(".png");
-    if (parsed.protocol !== "https:" || trimmed.length > 2000 || !okFile) {
-      return { ok: false, error: "Image link must be a public https link to a .jpg or .png file." };
+    let detectedType: "image" | "video" | null = null;
+    if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg") || pathname.endsWith(".png")) {
+      detectedType = "image";
+    } else if (pathname.endsWith(".mp4") || pathname.endsWith(".mov")) {
+      detectedType = "video";
     }
-    imageUrl = trimmed;
+    if (parsed.protocol !== "https:" || trimmed.length > 2000 || !detectedType) {
+      return {
+        ok: false,
+        error: "Media link must be a public https link to a .jpg, .png or .mp4 file.",
+      };
+    }
+    mediaItem = { type: detectedType, url: trimmed };
   }
 
-  if (platforms.includes("instagram") && input.mode === "schedule" && !imageUrl) {
-    return { ok: false, error: "Instagram posts need an image. Add an image link or untick Instagram." };
+  if (platforms.includes("instagram") && input.mode === "schedule" && !mediaItem) {
+    return {
+      ok: false,
+      error: "Instagram posts need an image or video link. Add one or untick Instagram.",
+    };
   }
 
   let scheduledAt: Date | null = null;
@@ -149,7 +162,7 @@ export async function savePost(
   try {
     const rows = await query<{ id: string }>(
       "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id) values ($1, $2, $3, $4, $5::jsonb, $6) returning id",
-      [user.id, input.caption, scheduledAt, status, JSON.stringify(imageUrl ? [{ type: "image", url: imageUrl }] : []), dmRuleId],
+      [user.id, input.caption, scheduledAt, status, JSON.stringify(mediaItem ? [mediaItem] : []), dmRuleId],
     );
     const id = rows[0]?.id;
     if (!id) {

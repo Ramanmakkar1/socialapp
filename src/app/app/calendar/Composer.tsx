@@ -179,7 +179,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
 
           <div>
             <label htmlFor={imageId} className="text-sm font-medium text-ink-2">
-              Image link (https, .jpg or .png)
+              Image or video link (https, .jpg, .png or .mp4)
             </label>
             <input
               id={imageId}
@@ -206,14 +206,15 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
                       className="mt-2 h-32 w-auto rounded-xl border border-line object-cover"
                     />
                     <p className="mt-1 text-xs text-muted">
-                      Instagram needs an image. Paste a public link for now; upload is coming soon.
+                      Paste a public https link; a .mp4 link is posted as a Reel. Upload is coming
+                      soon.
                     </p>
                   </>
                 );
               }
               return (
                 <p className="mt-1 text-xs text-muted">
-                  Instagram needs an image. Paste a public link for now; upload is coming soon.
+                  Paste a public https link; a .mp4 link is posted as a Reel. Upload is coming soon.
                 </p>
               );
             })()}

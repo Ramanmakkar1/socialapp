@@ -38,12 +38,21 @@ function metaMessage(body: unknown, fallback: string): string {
   return fallback;
 }
 
-function firstImageUrl(media: unknown): string | null {
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function firstMedia(media: unknown): { type: "image" | "video"; url: string } | null {
   if (!Array.isArray(media)) return null;
   for (const item of media) {
     if (typeof item === "object" && item !== null) {
       const row = item as { type?: unknown; url?: unknown };
-      if (row.type === "image" && typeof row.url === "string") return row.url;
+      if (
+        (row.type === "image" || row.type === "video") &&
+        typeof row.url === "string"
+      ) {
+        return { type: row.type, url: row.url };
+      }
     }
   }
   return null;
@@ -79,17 +88,22 @@ async function refreshPostStatus(postId: string): Promise<void> {
 async function publishToInstagram(
   igUserId: string,
   token: string,
-  imageUrl: string,
+  media: { type: "image" | "video"; url: string },
   caption: string,
 ): Promise<{ ok: true; externalPostId: string } | { ok: false; error: string }> {
   try {
+    const createBody =
+      media.type === "video"
+        ? { media_type: "REELS", video_url: media.url, caption }
+        : { image_url: media.url, caption };
+
     const mediaRes = await fetch(`${GRAPH_BASE}/${encodeURIComponent(igUserId)}/media`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image_url: imageUrl, caption }),
+      body: JSON.stringify(createBody),
       signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
     });
     const mediaText = await mediaRes.text().catch(() => "");
@@ -111,6 +125,59 @@ async function publishToInstagram(
         : undefined;
     if (typeof creationId !== "string" || !creationId) {
       return { ok: false, error: cleanError("Instagram media create returned no id", token) };
+    }
+
+    if (media.type === "video") {
+      const maxTries = 24;
+      for (let attempt = 0; attempt < maxTries; attempt += 1) {
+        const statusRes = await fetch(
+          `${GRAPH_BASE}/${encodeURIComponent(creationId)}?fields=status_code`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
+          },
+        );
+        const statusText = await statusRes.text().catch(() => "");
+        let statusBody: unknown = statusText;
+        try {
+          statusBody = JSON.parse(statusText);
+        } catch {
+          // keep raw text
+        }
+        if (!statusRes.ok) {
+          return {
+            ok: false,
+            error: cleanError(
+              `HTTP ${statusRes.status}: ${metaMessage(statusBody, statusText)}`,
+              token,
+            ),
+          };
+        }
+        const statusCode =
+          typeof statusBody === "object" && statusBody !== null
+            ? (statusBody as { status_code?: unknown }).status_code
+            : undefined;
+        if (statusCode === "FINISHED") break;
+        if (statusCode === "ERROR" || statusCode === "EXPIRED") {
+          return {
+            ok: false,
+            error: cleanError(
+              `Instagram could not process the video (status ${String(statusCode)})`,
+              token,
+            ),
+          };
+        }
+        if (attempt === maxTries - 1) {
+          return {
+            ok: false,
+            error: cleanError(
+              "Instagram is still processing the video, try Retry in a few minutes",
+              token,
+            ),
+          };
+        }
+        await sleep(5000);
+      }
     }
 
     const publishRes = await fetch(
@@ -191,9 +258,9 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
       continue;
     }
 
-    const imageUrl = firstImageUrl(row.media);
-    if (!imageUrl) {
-      await markTargetFailed(row.id, row.post_id, "Instagram needs an image", token);
+    const postMedia = firstMedia(row.media);
+    if (!postMedia) {
+      await markTargetFailed(row.id, row.post_id, "Instagram needs an image or video", token);
       result.failed += 1;
       continue;
     }
@@ -210,7 +277,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     const outcome = await publishToInstagram(
       account.external_id,
       token,
-      imageUrl,
+      postMedia,
       caption,
     );
 
