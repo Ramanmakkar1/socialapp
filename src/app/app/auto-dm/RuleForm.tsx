@@ -144,15 +144,19 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
     setErrors([]);
     startTransition(async () => {
       const input = buildInput();
-      const result =
-        mode === "edit" && ruleId
-          ? await updateRule(ruleId, input)
-          : await createRule(input);
-      if (result.ok) {
-        onSaved();
-        onClose();
-      } else {
-        setErrors(result.errors);
+      try {
+        const result =
+          mode === "edit" && ruleId
+            ? await updateRule(ruleId, input)
+            : await createRule(input);
+        if (result.ok) {
+          onSaved();
+          onClose();
+        } else {
+          setErrors(result.errors);
+        }
+      } catch {
+        setErrors(["Could not save this automation. Please try again."]);
       }
     });
   }
@@ -161,7 +165,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
     <div className="rounded-2xl border border-line bg-surface p-6">
       <div className="flex items-start justify-between gap-3">
         <h2 className="text-lg font-semibold">{mode === "edit" ? "Edit automation" : "New automation"}</h2>
-        <button type="button" onClick={onClose} className="rounded-lg p-1 text-muted hover:bg-surface-2 hover:text-ink" aria-label="Close">
+        <button type="button" disabled={pending} onClick={onClose} className="rounded-lg p-1 text-muted hover:bg-surface-2 hover:text-ink disabled:opacity-60" aria-label="Close">
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -302,7 +306,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
           </label>
         </div>
         {errors.length > 0 && (
-          <ul role="alert" className="space-y-1 text-sm text-warn">
+          <ul role="alert" className="max-w-full space-y-1 break-words text-sm text-warn">
             {errors.map((err) => (
               <li key={err}>{err}</li>
             ))}
@@ -312,7 +316,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
           <button type="button" disabled={pending} onClick={submit} className="btn-primary rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-60">
             {pending ? "Saving…" : mode === "edit" ? "Save changes" : "Create automation"}
           </button>
-          <button type="button" onClick={onClose} className="rounded-full border border-line px-5 py-2 text-sm font-medium text-ink-2 hover:text-ink">
+          <button type="button" disabled={pending} onClick={onClose} className="rounded-full border border-line px-5 py-2 text-sm font-medium text-ink-2 hover:text-ink disabled:opacity-60">
             Cancel
           </button>
         </div>
