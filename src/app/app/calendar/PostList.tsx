@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { deletePost } from "./actions";
+import { duplicatePost } from "./duplicateActions";
 import { retryPost } from "./retryActions";
 
 export type Post = {
@@ -26,6 +27,18 @@ export default function PostList({ posts }: { posts: Post[] }) {
         if (!result.ok) setError(result.error ?? "Could not delete post.");
       } catch {
         setError("Could not delete post.");
+      }
+    });
+  }
+
+  function handleDuplicate(id: string) {
+    setError(null);
+    startTransition(async () => {
+      try {
+        const result = await duplicatePost(id);
+        if (!result.ok) setError(result.error ?? "Could not duplicate post.");
+      } catch {
+        setError("Could not duplicate post.");
       }
     });
   }
@@ -67,6 +80,14 @@ export default function PostList({ posts }: { posts: Post[] }) {
                       Retry
                     </button>
                   )}
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => handleDuplicate(post.id)}
+                    className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
+                  >
+                    Duplicate
+                  </button>
                   <button
                     type="button"
                     disabled={isPending}
