@@ -73,6 +73,18 @@ export async function longLivedToken(short: string): Promise<{ access_token: str
   return { access_token: json.access_token, expires_in: Number(json.expires_in ?? 0) };
 }
 
+export async function refreshLongLivedToken(token: string): Promise<{ access_token: string; expires_in: number }> {
+  const params = new URLSearchParams({
+    grant_type: "ig_refresh_token",
+    access_token: token,
+  });
+  const res = await fetch(`https://graph.instagram.com/refresh_access_token?${params.toString()}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Instagram token refresh failed (${res.status})`);
+  const json = (await res.json()) as { access_token?: string; expires_in?: number };
+  if (!json.access_token) throw new Error("Instagram token refresh missing access_token");
+  return { access_token: json.access_token, expires_in: Number(json.expires_in ?? 0) };
+}
+
 export async function fetchProfile(token: string): Promise<{ user_id: string; username: string }> {
   const params = new URLSearchParams({ fields: "user_id,username", access_token: token });
   const res = await fetch(`https://graph.instagram.com/me?${params.toString()}`, { cache: "no-store" });
