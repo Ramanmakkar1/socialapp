@@ -14,6 +14,12 @@ export const metadata: Metadata = {
 
 const tools = [
   {
+    href: "/tools/instagram-post-preview",
+    title: "Instagram post preview",
+    description: "Preview a local photo and caption in a feed mockup, compare square and portrait crops, and copy your caption.",
+    icon: ImageIcon,
+  },
+  {
     href: "/tools/instagram-caption-counter",
     title: "Instagram caption counter",
     description: "Count characters and hashtags as you type and see how close your caption is to the Instagram limit.",
