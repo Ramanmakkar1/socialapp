@@ -99,9 +99,13 @@ export default function InstagramCaptionCounterPage() {
               <CaptionCounter />
             </div>
             <p className="mt-6 text-center text-sm text-ink-2">
-              Need blank lines between paragraphs?{" "}
+              More free Instagram tools:{" "}
               <Link href="/tools/instagram-line-break-generator" className="font-medium text-brand underline underline-offset-2">
                 Line break generator
+              </Link>
+              {" · "}
+              <Link href="/tools/instagram-image-size" className="font-medium text-brand underline underline-offset-2">
+                Image size guide
               </Link>
             </p>
           </div>

@@ -100,11 +100,14 @@ export default function InstagramLineBreakGeneratorPage() {
               <LineBreakTool />
             </div>
             <p className="mt-6 text-center text-sm text-ink-2">
-              Also check length and hashtags with our{" "}
+              More free Instagram tools:{" "}
               <Link href="/tools/instagram-caption-counter" className="font-medium text-brand underline underline-offset-2">
-                Instagram caption counter
+                Caption counter
               </Link>
-              .
+              {" · "}
+              <Link href="/tools/instagram-image-size" className="font-medium text-brand underline underline-offset-2">
+                Image size guide
+              </Link>
             </p>
           </div>
         </section>
