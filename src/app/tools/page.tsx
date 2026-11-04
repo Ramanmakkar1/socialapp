@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Hash, Image as ImageIcon, Percent, ShieldCheck, TextQuote, Zap } from "lucide-react";
+import { ArrowRight, Hash, Image as ImageIcon, Percent, ShieldCheck, TextQuote, UserRound, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 
 const PATH = "/tools";
 
 export const metadata: Metadata = {
-  title: { absolute: "Free Instagram Tools: Caption Counter, Fonts, Image Sizes" },
+  title: { absolute: "Free Instagram Tools: Captions, Bios, Fonts & Image Sizes" },
   description:
-    "Free Instagram tools: count caption characters and hashtags, keep line breaks in captions, and check image sizes and crops before you post.",
+    "Free Instagram tools: count caption characters, keep line breaks, write a bio, make fonts, check image sizes and work out your engagement rate.",
   alternates: { canonical: PATH },
 };
 
@@ -43,6 +43,12 @@ const tools = [
     title: "Instagram font generator",
     description: "Create and copy Unicode font styles for your Instagram bio and captions.",
     icon: TextQuote,
+  },
+  {
+    href: "/tools/instagram-bio-generator",
+    title: "Instagram bio generator",
+    description: "Get ready-to-copy Instagram bio ideas for your niche, with emojis, line breaks and a clear call to action.",
+    icon: UserRound,
   },
   {
     href: "/tools/instagram-engagement-rate-calculator",
