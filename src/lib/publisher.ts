@@ -385,5 +385,24 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
+  try {
+    const unsupported = await pool.query<{ post_id: string }>(
+      `update socialapp.post_targets t set status='failed',
+         error='Facebook and Threads publishing is coming soon. Remove this platform from the post (or duplicate it for Instagram only).',
+         published_at=null, external_post_id=null
+       from socialapp.scheduled_posts p
+       where t.post_id=p.id and t.platform <> 'instagram' and t.status='pending'
+         and p.status='scheduled' and p.scheduled_at <= now()
+         and not exists (select 1 from socialapp.post_targets i
+           where i.post_id=p.id and i.platform='instagram' and i.status in ('pending','publishing'))
+       returning t.post_id`,
+    );
+    const postIds = [...new Set(unsupported.rows.map((r) => r.post_id))];
+    for (const postId of postIds) await refreshPostStatus(postId);
+    result.failed += unsupported.rows.length;
+  } catch {
+    // Never fail the publish pass because unsupported platforms could not be marked failed.
+  }
+
   return result;
 }
