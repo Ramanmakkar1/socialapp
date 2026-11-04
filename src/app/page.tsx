@@ -263,6 +263,7 @@ export default function Home() {
             <Link href="/tools/instagram-image-size" className="hover:text-ink">Image size guide</Link>
             <Link href="/tools/instagram-font-generator" className="hover:text-ink">Font generator</Link>
             <Link href="/tools" className="hover:text-ink">Free tools</Link>
+            <Link href="/help" className="hover:text-ink">Help</Link>
             <Link href="/privacy" className="hover:text-ink">Privacy</Link>
             <Link href="/terms" className="hover:text-ink">Terms</Link>
             <Link href="/data-deletion" className="hover:text-ink">Data deletion</Link>

@@ -49,7 +49,12 @@ export default async function AppHome() {
         <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-semibold">Get set up in 3 minutes</h2>
-            <span className="text-sm text-muted">{doneCount} of 3 done</span>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <Link href="/help/getting-started" className="text-brand hover:underline">
+                Help
+              </Link>
+              <span className="text-muted">{doneCount} of 3 done</span>
+            </div>
           </div>
           <div className="mt-3 h-2 rounded-full bg-line">
             <div className="h-2 rounded-full bg-brand" style={{ width: `${(doneCount / 3) * 100}%` }} />

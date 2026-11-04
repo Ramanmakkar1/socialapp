@@ -17,6 +17,9 @@ const PUBLIC_PATHS = [
   "/tools/instagram-font-generator",
   "/tools/instagram-engagement-rate-calculator",
   "/tools",
+  "/help",
+  "/help/getting-started",
+  "/help/instagram-auto-dm-not-working",
 ];
 
 const META: Record<string, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
@@ -35,6 +38,9 @@ const META: Record<string, { priority: number; changeFrequency: "weekly" | "year
   "/tools/instagram-font-generator": { priority: 0.7, changeFrequency: "weekly" },
   "/tools/instagram-engagement-rate-calculator": { priority: 0.7, changeFrequency: "weekly" },
   "/tools": { priority: 0.6, changeFrequency: "weekly" },
+  "/help": { priority: 0.7, changeFrequency: "weekly" },
+  "/help/getting-started": { priority: 0.7, changeFrequency: "weekly" },
+  "/help/instagram-auto-dm-not-working": { priority: 0.6, changeFrequency: "weekly" },
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
