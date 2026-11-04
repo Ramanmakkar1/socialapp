@@ -220,6 +220,18 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
          published_at=now(), error=null, social_account_id=$3 where id=$1`,
         [row.id, outcome.externalPostId, account.id],
       );
+      // This loop only claims Instagram targets; switch on the post's attached auto-DM rule.
+      try {
+        await pool.query(
+          `update socialapp.dm_rules r set status='active',
+           social_account_id=coalesce(r.social_account_id,$2), updated_at=now()
+           from socialapp.scheduled_posts p
+           where p.id=$1 and r.id=p.dm_rule_id and r.user_id=p.user_id`,
+          [row.post_id, account.id],
+        );
+      } catch {
+        // Never fail a published post because the rule could not be switched on.
+      }
       await refreshPostStatus(row.post_id);
       result.published += 1;
     } else {

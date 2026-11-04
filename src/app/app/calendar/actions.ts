@@ -36,6 +36,7 @@ type SavePostInput = {
   scheduledAt: string | null;
   mode: "draft" | "schedule";
   imageUrl?: string | null;
+  dmRuleId?: string | null;
 };
 
 function effectiveCaption(
@@ -123,10 +124,32 @@ export async function savePost(
 
   const status = input.mode === "draft" ? "draft" : "scheduled";
 
+  let dmRuleId: string | null = null;
+  if (input.dmRuleId) {
+    if (
+      typeof input.dmRuleId !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.dmRuleId)
+    ) {
+      return { ok: false, error: "Auto-DM rule not found" };
+    }
+    try {
+      const owned = await query(
+        "select 1 from socialapp.dm_rules where id = $1 and user_id = $2",
+        [input.dmRuleId, user.id],
+      );
+      if (owned.length === 0) {
+        return { ok: false, error: "Auto-DM rule not found" };
+      }
+    } catch {
+      return { ok: false, error: "Auto-DM rule not found" };
+    }
+    dmRuleId = input.dmRuleId;
+  }
+
   try {
     const rows = await query<{ id: string }>(
-      "insert into scheduled_posts (user_id, caption, scheduled_at, status, media) values ($1, $2, $3, $4, $5::jsonb) returning id",
-      [user.id, input.caption, scheduledAt, status, JSON.stringify(imageUrl ? [{ type: "image", url: imageUrl }] : [])],
+      "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id) values ($1, $2, $3, $4, $5::jsonb, $6) returning id",
+      [user.id, input.caption, scheduledAt, status, JSON.stringify(imageUrl ? [{ type: "image", url: imageUrl }] : []), dmRuleId],
     );
     const id = rows[0]?.id;
     if (!id) {

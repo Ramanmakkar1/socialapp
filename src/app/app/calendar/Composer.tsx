@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState, useTransition } from "react";
+import Link from "next/link";
 import { AtSign, Facebook, Instagram } from "lucide-react";
 import { savePost } from "./actions";
 import { BRAND } from "@/lib/brand";
@@ -36,7 +37,9 @@ function effectiveCaption(
   return customize[platform] ? custom[platform] : main;
 }
 
-export default function Composer() {
+type RuleOption = { id: string; name: string; status: string };
+
+export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
   const mainId = useId();
   const scheduleId = useId();
   const dmRuleId = useId();
@@ -60,6 +63,7 @@ export default function Composer() {
     threads: "",
   });
   const [imageUrl, setImageUrl] = useState("");
+  const [selectedRuleId, setSelectedRuleId] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
@@ -97,6 +101,7 @@ export default function Composer() {
       scheduledAt: scheduledAt || null,
       mode,
       imageUrl: imageUrl.trim() !== "" ? imageUrl.trim() : null,
+      dmRuleId: selectedRuleId || null,
     };
   }
 
@@ -122,6 +127,7 @@ export default function Composer() {
       setMainCaption("");
       setCustomCaption({ instagram: "", facebook: "", threads: "" });
       setImageUrl("");
+      setSelectedRuleId("");
     });
   }
 
@@ -213,6 +219,42 @@ export default function Composer() {
             })()}
           </div>
 
+          <div>
+            {rules.length > 0 ? (
+              <>
+                <label htmlFor={dmRuleId} className="text-sm font-medium text-ink-2">
+                  Auto-DM rule (optional)
+                </label>
+                <select
+                  id={dmRuleId}
+                  value={selectedRuleId}
+                  onChange={(e) => setSelectedRuleId(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none"
+                >
+                  <option value="">None</option>
+                  {rules.map((rule) => (
+                    <option key={rule.id} value={rule.id}>
+                      {rule.name}
+                      {rule.status === "paused" ? " (paused)" : ""}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-muted">
+                  We switch this rule on when the post goes live, so you can keep it paused until then.
+                </p>
+              </>
+            ) : (
+              <>
+                <span className="text-sm font-medium text-ink-2">Auto-DM rule (optional)</span>
+                <p className="mt-1 text-xs text-muted">
+                  <Link href="/app/auto-dm" className="text-brand hover:underline">
+                    Create an auto-DM rule
+                  </Link>
+                </p>
+              </>
+            )}
+          </div>
+
           {selected.length > 0 && (
             <div>
               <div className="flex flex-wrap gap-1 border-b border-line">
@@ -299,19 +341,6 @@ export default function Composer() {
                 className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none"
               />
               <p className="mt-1 text-xs text-muted">Timezone: {timeZone || "…"}</p>
-            </div>
-            <div>
-              <label htmlFor={dmRuleId} className="text-sm font-medium text-ink-2">
-                Attach auto-DM rule
-              </label>
-              <select
-                id={dmRuleId}
-                disabled
-                defaultValue=""
-                className="mt-2 w-full rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm text-muted"
-              >
-                <option value="">Create rules in Auto-DM</option>
-              </select>
             </div>
           </div>
 

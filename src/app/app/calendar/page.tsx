@@ -16,6 +16,8 @@ type WeekPost = {
   platforms: string[];
 };
 
+type RuleOption = { id: string; name: string; status: string };
+
 function mondayUtcStart(d: Date): Date {
   const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
   const dow = date.getUTCDay();
@@ -78,9 +80,18 @@ export default async function CalendarPage({
 
   let rows: Post[] = [];
   let weekRows: WeekPost[] = [];
+  let rules: RuleOption[] = [];
 
   if (isDbConfigured()) {
     const user = await requireUser();
+    try {
+      rules = await query<RuleOption>(
+        "select id, name, status from socialapp.dm_rules where user_id = $1 order by created_at desc",
+        [user.id],
+      );
+    } catch {
+      rules = [];
+    }
     try {
       rows = await query<Post>(
         "select p.id, p.caption, p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50",
@@ -102,7 +113,7 @@ export default async function CalendarPage({
         <h1 className="text-2xl font-semibold">Calendar</h1>
         <p className="text-sm text-muted">Plan posts for Instagram, Facebook and Threads.</p>
       </div>
-      <Composer />
+      <Composer rules={rules} />
       <div className="mt-8 flex gap-2" role="group" aria-label="Calendar view">
         <Link
           href="/app/calendar?view=week"
