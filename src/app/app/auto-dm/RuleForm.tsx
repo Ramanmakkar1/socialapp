@@ -323,6 +323,7 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
   const [editing, setEditing] = useState<DbRuleRow | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [actionError, setActionError] = useState<string | null>(null);
 
   function openCreate() {
     setEditing(null);
@@ -340,16 +341,29 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
   }
 
   function onToggle(id: string) {
+    setActionError(null);
     startTransition(async () => {
-      await toggleRule(id);
+      try {
+        const result = await toggleRule(id);
+        if (!result.ok) setActionError(result.errors.join(" "));
+      } catch {
+        setActionError("Could not update this automation. Please try again.");
+      }
     });
   }
 
   function onDelete(id: string) {
+    setActionError(null);
     startTransition(async () => {
-      const result = await deleteRule(id);
-      if (result.ok) {
-        setConfirmDeleteId(null);
+      try {
+        const result = await deleteRule(id);
+        if (result.ok) {
+          setConfirmDeleteId(null);
+        } else {
+          setActionError(result.errors.join(" "));
+        }
+      } catch {
+        setActionError("Could not delete this automation. Please try again.");
       }
     });
   }
@@ -392,6 +406,12 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
             onSaved={() => {}}
           />
         </div>
+      )}
+
+      {actionError && (
+        <p role="alert" className="mt-4 max-w-full break-words rounded-xl border border-warn/30 bg-warn/10 px-3 py-2 text-sm text-warn">
+          {actionError}
+        </p>
       )}
 
       {rules.length === 0 && !formOpen ? (
@@ -443,6 +463,7 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
                   <button
                     type="button"
                     onClick={() => openEdit(rule)}
+                    disabled={pending}
                     className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-2 hover:text-ink"
                   >
                     <Pencil className="h-3.5 w-3.5" /> Edit
@@ -450,18 +471,19 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
                   {confirmDeleteId === rule.id ? (
                     <span className="flex flex-wrap items-center gap-2 text-sm">
                       <span className="text-ink-2">Delete this rule?</span>
-                      <button type="button" disabled={pending} onClick={() => onDelete(rule.id)} className="rounded-full bg-warn/15 px-3 py-1.5 font-medium text-warn">
+                      <button type="button" disabled={pending} onClick={() => onDelete(rule.id)} className="rounded-full bg-warn/15 px-3 py-1.5 font-medium text-warn disabled:opacity-60">
                         Yes, delete
                       </button>
-                      <button type="button" onClick={() => setConfirmDeleteId(null)} className="rounded-full border border-line px-3 py-1.5 text-ink-2">
+                      <button type="button" disabled={pending} onClick={() => setConfirmDeleteId(null)} className="rounded-full border border-line px-3 py-1.5 text-ink-2 disabled:opacity-60">
                         Cancel
                       </button>
                     </span>
                   ) : (
                     <button
                       type="button"
+                      disabled={pending}
                       onClick={() => setConfirmDeleteId(rule.id)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-2 hover:text-warn"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-2 hover:text-warn disabled:opacity-60"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Delete
                     </button>
