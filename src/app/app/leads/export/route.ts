@@ -15,7 +15,7 @@ const UUID_RE =
 
 function csvField(value: string | null): string {
   let field = value ?? "";
-  if (/^[=+\-@]/.test(field)) field = `'${field}`;
+  if (/^[\s\u0000-\u001F]*[=+\-@]/.test(field)) field = `'${field}`;
   return `"${field.replace(/"/g, '""')}"`;
 }
 
