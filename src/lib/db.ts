@@ -48,20 +48,26 @@ export async function dbHealth(): Promise<{
     return { status: "not_configured" };
   }
   const start = Date.now();
+  let deadlineExpired = false;
+  let deadline: ReturnType<typeof setTimeout> | undefined;
   try {
     const pool = getPool();
     const timeout = new Promise<never>((_, reject) => {
-      const t = setTimeout(
-        () => reject(new Error("db health check timed out after 3000ms")),
-        3000
-      );
-      t.unref?.();
+      deadline = setTimeout(() => {
+        deadlineExpired = true;
+        reject(new Error("db health check timed out after 3000ms"));
+      }, 3000);
+      deadline.unref?.();
     });
-    const client = await Promise.race([pool.connect(), timeout]);
+    const connection = pool.connect().then((client) => {
+      if (deadlineExpired) client.release(true);
+      return client;
+    });
+    const client = await Promise.race([connection, timeout]);
     try {
       await Promise.race([client.query("select 1"), timeout]);
     } finally {
-      client.release();
+      client.release(deadlineExpired);
     }
     return { status: "ok", latencyMs: Date.now() - start };
   } catch (err) {
@@ -73,5 +79,7 @@ export async function dbHealth(): Promise<{
         ? "db connection error"
         : message,
     };
+  } finally {
+    clearTimeout(deadline);
   }
 }
