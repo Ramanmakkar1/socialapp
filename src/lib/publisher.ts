@@ -58,6 +58,105 @@ function firstMedia(media: unknown): { type: "image" | "video"; url: string } | 
   return null;
 }
 
+function allImages(media: unknown): string[] {
+  if (!Array.isArray(media)) return [];
+  const urls: string[] = [];
+  for (const item of media) {
+    if (typeof item === "object" && item !== null) {
+      const row = item as { type?: unknown; url?: unknown };
+      if (row.type === "image" && typeof row.url === "string") {
+        urls.push(row.url);
+      }
+    }
+  }
+  return urls;
+}
+
+async function postForId(
+  path: string,
+  token: string,
+  body: Record<string, unknown>,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  try {
+    const mediaRes = await fetch(`${GRAPH_BASE}/${path}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
+    });
+    const mediaText = await mediaRes.text().catch(() => "");
+    let mediaBody: unknown = mediaText;
+    try {
+      mediaBody = JSON.parse(mediaText);
+    } catch {
+      // keep raw text
+    }
+    if (!mediaRes.ok) {
+      return {
+        ok: false,
+        error: cleanError(`HTTP ${mediaRes.status}: ${metaMessage(mediaBody, mediaText)}`, token),
+      };
+    }
+    const id =
+      typeof mediaBody === "object" && mediaBody !== null
+        ? (mediaBody as { id?: unknown }).id
+        : undefined;
+    if (typeof id !== "string" || !id) {
+      return { ok: false, error: cleanError("Instagram media create returned no id", token) };
+    }
+    return { ok: true, id };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: cleanError(`network: ${message}`, token) };
+  }
+}
+
+async function publishCreationId(
+  igUserId: string,
+  token: string,
+  creationId: string,
+): Promise<{ ok: true; externalPostId: string } | { ok: false; error: string }> {
+  const publishRes = await fetch(
+    `${GRAPH_BASE}/${encodeURIComponent(igUserId)}/media_publish`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ creation_id: creationId }),
+      signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
+    },
+  );
+  const publishText = await publishRes.text().catch(() => "");
+  let publishBody: unknown = publishText;
+  try {
+    publishBody = JSON.parse(publishText);
+  } catch {
+    // keep raw text
+  }
+  if (!publishRes.ok) {
+    return {
+      ok: false,
+      error: cleanError(
+        `HTTP ${publishRes.status}: ${metaMessage(publishBody, publishText)}`,
+        token,
+      ),
+    };
+  }
+  const externalPostId =
+    typeof publishBody === "object" && publishBody !== null
+      ? (publishBody as { id?: unknown }).id
+      : undefined;
+  if (typeof externalPostId !== "string" || !externalPostId) {
+    return { ok: false, error: cleanError("Instagram publish returned no id", token) };
+  }
+  return { ok: true, externalPostId };
+}
+
 async function markTargetFailed(
   targetId: string,
   postId: string,
@@ -88,44 +187,58 @@ async function refreshPostStatus(postId: string): Promise<void> {
 async function publishToInstagram(
   igUserId: string,
   token: string,
-  media: { type: "image" | "video"; url: string },
+  mediaRaw: unknown,
   caption: string,
 ): Promise<{ ok: true; externalPostId: string } | { ok: false; error: string }> {
+  const igPath = `${encodeURIComponent(igUserId)}/media`;
+  const carouselImages = allImages(mediaRaw);
+  if (carouselImages.length >= 2) {
+    try {
+      const childIds: string[] = [];
+      for (const imageUrl of carouselImages) {
+        const child = await postForId(igPath, token, {
+          image_url: imageUrl,
+          is_carousel_item: true,
+        });
+        if (!child.ok) {
+          return {
+            ok: false,
+            error: cleanError(`Carousel slide failed: ${child.error}`, token),
+          };
+        }
+        childIds.push(child.id);
+      }
+      const carousel = await postForId(igPath, token, {
+        media_type: "CAROUSEL",
+        children: childIds.join(","),
+        caption,
+      });
+      if (!carousel.ok) {
+        return carousel;
+      }
+      return publishCreationId(igUserId, token, carousel.id);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: cleanError(`network: ${message}`, token) };
+    }
+  }
+
+  const media = firstMedia(mediaRaw);
+  if (!media) {
+    return { ok: false, error: cleanError("Instagram needs an image or video", token) };
+  }
+
   try {
     const createBody =
       media.type === "video"
         ? { media_type: "REELS", video_url: media.url, caption }
         : { image_url: media.url, caption };
 
-    const mediaRes = await fetch(`${GRAPH_BASE}/${encodeURIComponent(igUserId)}/media`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(createBody),
-      signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
-    });
-    const mediaText = await mediaRes.text().catch(() => "");
-    let mediaBody: unknown = mediaText;
-    try {
-      mediaBody = JSON.parse(mediaText);
-    } catch {
-      // keep raw text
+    const created = await postForId(igPath, token, createBody);
+    if (!created.ok) {
+      return created;
     }
-    if (!mediaRes.ok) {
-      return {
-        ok: false,
-        error: cleanError(`HTTP ${mediaRes.status}: ${metaMessage(mediaBody, mediaText)}`, token),
-      };
-    }
-    const creationId =
-      typeof mediaBody === "object" && mediaBody !== null
-        ? (mediaBody as { id?: unknown }).id
-        : undefined;
-    if (typeof creationId !== "string" || !creationId) {
-      return { ok: false, error: cleanError("Instagram media create returned no id", token) };
-    }
+    const creationId = created.id;
 
     if (media.type === "video") {
       const maxTries = 24;
@@ -180,42 +293,7 @@ async function publishToInstagram(
       }
     }
 
-    const publishRes = await fetch(
-      `${GRAPH_BASE}/${encodeURIComponent(igUserId)}/media_publish`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ creation_id: creationId }),
-        signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
-      },
-    );
-    const publishText = await publishRes.text().catch(() => "");
-    let publishBody: unknown = publishText;
-    try {
-      publishBody = JSON.parse(publishText);
-    } catch {
-      // keep raw text
-    }
-    if (!publishRes.ok) {
-      return {
-        ok: false,
-        error: cleanError(
-          `HTTP ${publishRes.status}: ${metaMessage(publishBody, publishText)}`,
-          token,
-        ),
-      };
-    }
-    const externalPostId =
-      typeof publishBody === "object" && publishBody !== null
-        ? (publishBody as { id?: unknown }).id
-        : undefined;
-    if (typeof externalPostId !== "string" || !externalPostId) {
-      return { ok: false, error: cleanError("Instagram publish returned no id", token) };
-    }
-    return { ok: true, externalPostId };
+    return publishCreationId(igUserId, token, creationId);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { ok: false, error: cleanError(`network: ${message}`, token) };
@@ -259,7 +337,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
 
     const postMedia = firstMedia(row.media);
-    if (!postMedia) {
+    if (!postMedia && allImages(row.media).length < 2) {
       await markTargetFailed(row.id, row.post_id, "Instagram needs an image or video", token);
       result.failed += 1;
       continue;
@@ -277,7 +355,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     const outcome = await publishToInstagram(
       account.external_id,
       token,
-      postMedia,
+      row.media,
       caption,
     );
 

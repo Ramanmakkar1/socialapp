@@ -62,7 +62,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
     facebook: "",
     threads: "",
   });
-  const [imageUrl, setImageUrl] = useState("");
+  const [mediaUrls, setMediaUrls] = useState<string[]>([""]);
   const [selectedRuleId, setSelectedRuleId] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
@@ -100,7 +100,8 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
       overrides,
       scheduledAt: scheduledAt || null,
       mode,
-      imageUrl: imageUrl.trim() !== "" ? imageUrl.trim() : null,
+      imageUrl: mediaUrls[0]?.trim() !== "" ? mediaUrls[0].trim() : null,
+      mediaUrls,
       dmRuleId: selectedRuleId || null,
     };
   }
@@ -126,7 +127,7 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
       }
       setMainCaption("");
       setCustomCaption({ instagram: "", facebook: "", threads: "" });
-      setImageUrl("");
+      setMediaUrls([""]);
       setSelectedRuleId("");
     });
   }
@@ -178,43 +179,82 @@ export default function Composer({ rules = [] }: { rules?: RuleOption[] }) {
           </div>
 
           <div>
-            <label htmlFor={imageId} className="text-sm font-medium text-ink-2">
+            <span className="text-sm font-medium text-ink-2">
               Image or video link (https, .jpg, .png or .mp4)
-            </label>
-            <input
-              id={imageId}
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://…/photo.jpg"
-              className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
-            />
+            </span>
+            <div className="mt-2 space-y-2">
+              {mediaUrls.map((url, index) => {
+                const fieldId = index === 0 ? imageId : `${imageId}-${index}`;
+                return (
+                  <div key={fieldId} className="flex gap-2">
+                    <input
+                      id={fieldId}
+                      type="url"
+                      value={url}
+                      onChange={(e) =>
+                        setMediaUrls((prev) =>
+                          prev.map((u, i) => (i === index ? e.target.value : u)),
+                        )
+                      }
+                      placeholder="https://…/photo.jpg"
+                      className="min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+                    />
+                    {mediaUrls.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setMediaUrls((prev) =>
+                            prev.length <= 1 ? prev : prev.filter((_, i) => i !== index),
+                          )
+                        }
+                        className="shrink-0 rounded-lg border border-line px-2 py-2 text-xs font-medium text-muted transition-colors hover:bg-surface-2"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {mediaUrls.length < 10 && (
+              <button
+                type="button"
+                onClick={() =>
+                  setMediaUrls((prev) => (prev.length >= 10 ? prev : [...prev, ""]))
+                }
+                className="mt-2 text-sm font-medium text-brand hover:underline"
+              >
+                + Add another image
+              </button>
+            )}
             {(() => {
-              let url: URL | null = null;
+              const previewUrl = mediaUrls.map((u) => u.trim()).find((u) => u !== "") ?? "";
+              let parsed: URL | null = null;
               try {
-                url = new URL(imageUrl);
+                parsed = previewUrl ? new URL(previewUrl) : null;
               } catch {
-                url = null;
+                parsed = null;
               }
-              if (url && url.protocol === "https:") {
+              if (parsed && parsed.protocol === "https:") {
                 return (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={url.href}
+                      src={parsed.href}
                       alt="Post image preview"
                       className="mt-2 h-32 w-auto rounded-xl border border-line object-cover"
                     />
                     <p className="mt-1 text-xs text-muted">
-                      Paste a public https link; a .mp4 link is posted as a Reel. Upload is coming
-                      soon.
+                      Paste a public https link; a .mp4 link is posted as a Reel. 2–10 image links =
+                      carousel post. Upload is coming soon.
                     </p>
                   </>
                 );
               }
               return (
                 <p className="mt-1 text-xs text-muted">
-                  Paste a public https link; a .mp4 link is posted as a Reel. Upload is coming soon.
+                  Paste a public https link; a .mp4 link is posted as a Reel. 2–10 image links =
+                  carousel post. Upload is coming soon.
                 </p>
               );
             })()}

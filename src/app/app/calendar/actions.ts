@@ -36,8 +36,39 @@ type SavePostInput = {
   scheduledAt: string | null;
   mode: "draft" | "schedule";
   imageUrl?: string | null;
+  mediaUrls?: string[];
   dmRuleId?: string | null;
 };
+
+type MediaItem = { type: "image" | "video"; url: string };
+
+function parseMediaLink(
+  trimmed: string,
+): { ok: true; item: MediaItem } | { ok: false; error: string } {
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return {
+      ok: false,
+      error: "Media link must be a public https link to a .jpg, .png or .mp4 file.",
+    };
+  }
+  const pathname = parsed.pathname.toLowerCase();
+  let detectedType: "image" | "video" | null = null;
+  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg") || pathname.endsWith(".png")) {
+    detectedType = "image";
+  } else if (pathname.endsWith(".mp4") || pathname.endsWith(".mov")) {
+    detectedType = "video";
+  }
+  if (parsed.protocol !== "https:" || trimmed.length > 2000 || !detectedType) {
+    return {
+      ok: false,
+      error: "Media link must be a public https link to a .jpg, .png or .mp4 file.",
+    };
+  }
+  return { ok: true, item: { type: detectedType, url: trimmed } };
+}
 
 function effectiveCaption(
   platform: PlatformId,
@@ -82,35 +113,31 @@ export async function savePost(
     }
   }
 
-  let mediaItem: { type: "image" | "video"; url: string } | null = null;
-  if (input.imageUrl && input.imageUrl.trim() !== "") {
-    const trimmed = input.imageUrl.trim();
-    let parsed: URL;
-    try {
-      parsed = new URL(trimmed);
-    } catch {
-      return {
-        ok: false,
-        error: "Media link must be a public https link to a .jpg, .png or .mp4 file.",
-      };
-    }
-    const pathname = parsed.pathname.toLowerCase();
-    let detectedType: "image" | "video" | null = null;
-    if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg") || pathname.endsWith(".png")) {
-      detectedType = "image";
-    } else if (pathname.endsWith(".mp4") || pathname.endsWith(".mov")) {
-      detectedType = "video";
-    }
-    if (parsed.protocol !== "https:" || trimmed.length > 2000 || !detectedType) {
-      return {
-        ok: false,
-        error: "Media link must be a public https link to a .jpg, .png or .mp4 file.",
-      };
-    }
-    mediaItem = { type: detectedType, url: trimmed };
+  const urlList =
+    input.mediaUrls !== undefined
+      ? input.mediaUrls.map((u) => u.trim()).filter((u) => u !== "")
+      : input.imageUrl && input.imageUrl.trim() !== ""
+        ? [input.imageUrl.trim()]
+        : [];
+
+  if (urlList.length > 10) {
+    return { ok: false, error: "Up to 10 images per carousel." };
   }
 
-  if (platforms.includes("instagram") && input.mode === "schedule" && !mediaItem) {
+  const mediaItems: MediaItem[] = [];
+  for (const trimmed of urlList) {
+    const parsed = parseMediaLink(trimmed);
+    if (!parsed.ok) {
+      return { ok: false, error: parsed.error };
+    }
+    mediaItems.push(parsed.item);
+  }
+
+  if (mediaItems.length > 1 && mediaItems.some((m) => m.type === "video")) {
+    return { ok: false, error: "Carousels can only have images for now." };
+  }
+
+  if (platforms.includes("instagram") && input.mode === "schedule" && mediaItems.length === 0) {
     return {
       ok: false,
       error: "Instagram posts need an image or video link. Add one or untick Instagram.",
@@ -162,7 +189,7 @@ export async function savePost(
   try {
     const rows = await query<{ id: string }>(
       "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id) values ($1, $2, $3, $4, $5::jsonb, $6) returning id",
-      [user.id, input.caption, scheduledAt, status, JSON.stringify(mediaItem ? [mediaItem] : []), dmRuleId],
+      [user.id, input.caption, scheduledAt, status, JSON.stringify(mediaItems), dmRuleId],
     );
     const id = rows[0]?.id;
     if (!id) {
