@@ -1,5 +1,6 @@
 // Server-only dashboard numbers for one user.
 import { isDbConfigured, query } from "@/lib/db";
+import type { MediaInsights } from "@/lib/insights";
 
 export type DashboardStats = {
   scheduled: number;
@@ -51,6 +52,7 @@ export type RecentPost = {
   dmsSent: number;
   linkClicks: number;
   leads: number;
+  insights: MediaInsights | null;
 };
 
 export async function getRecentPosts(userId: string): Promise<RecentPost[]> {
@@ -83,7 +85,10 @@ export async function getRecentPosts(userId: string): Promise<RecentPost[]> {
             and c.clicked_at >= rp.published_ts), 0) as "linkClicks",
         coalesce((select count(*)::int from socialapp.contacts ct
           where ct.user_id = $1 and ct.source_rule_id = rp.rule_id and ct.email is not null
-            and ct.created_at >= rp.published_ts), 0) as "leads"
+            and ct.created_at >= rp.published_ts), 0) as "leads",
+        (select t2.insights from socialapp.post_targets t2
+          where t2.post_id = rp.id and t2.platform = 'instagram' and t2.status = 'published'
+          limit 1) as insights
       from rp
       order by rp.published_ts desc
       limit 20`,

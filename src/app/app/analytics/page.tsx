@@ -27,6 +27,13 @@ function formatPublished(value: string | null): string {
   return d.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 }
 
+function formatInsightMetric(value: number | null | undefined): string {
+  if (value == null) return "—";
+  return value.toLocaleString("en-US");
+}
+
+const INSIGHTS_SCOPE = "instagram_business_manage_insights";
+
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const BLOCK_LABELS = ["12a", "3a", "6a", "9a", "12p", "3p", "6p", "9p"];
 
@@ -91,6 +98,21 @@ export default async function AnalyticsPage() {
 
   const dailyMax = dailyActivity.reduce((max, row) => Math.max(max, row.dms, row.leads), 0);
   const hasDailyActivity = dailyMax > 0;
+
+  let missingInsightsScope = false;
+  if (isDbConfigured()) {
+    try {
+      const igAccounts = await query<{ scopes: string[] | null }>(
+        `select scopes from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active'`,
+        [user.id]
+      );
+      missingInsightsScope = igAccounts.some(
+        (a) => !Array.isArray(a.scopes) || !a.scopes.includes(INSIGHTS_SCOPE)
+      );
+    } catch {
+      missingInsightsScope = false;
+    }
+  }
 
   const tiles: [string, number][] = [
     ["Scheduled", stats.scheduled],
@@ -329,8 +351,17 @@ export default async function AnalyticsPage() {
       {recentPosts.length > 0 ? (
         <div className="mt-8">
           <h2 className="text-lg font-semibold">Recent posts</h2>
+          {missingInsightsScope ? (
+            <p className="mt-2 text-sm text-muted">
+              Reconnect Instagram in{" "}
+              <Link href="/app/settings" className="text-brand hover:underline">
+                Settings
+              </Link>{" "}
+              to see reach and likes.
+            </p>
+          ) : null}
           <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-surface">
-            <table className="w-full min-w-[640px] text-left text-sm">
+            <table className="w-full min-w-[960px] text-left text-sm">
               <thead>
                 <tr className="border-b border-line text-muted">
                   <th scope="col" className="px-4 py-3 font-medium">
@@ -341,6 +372,18 @@ export default async function AnalyticsPage() {
                   </th>
                   <th scope="col" className="px-4 py-3 font-medium">
                     Platforms
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">
+                    Reach
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">
+                    Likes
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">
+                    Comments
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right font-medium">
+                    Saves
                   </th>
                   <th scope="col" className="px-4 py-3 font-medium">
                     Auto-DM rule
@@ -356,6 +399,10 @@ export default async function AnalyticsPage() {
                     <td className="px-4 py-3">{shortCaption(post.caption)}</td>
                     <td className="px-4 py-3 tabular-nums">{formatPublished(post.publishedAt)}</td>
                     <td className="px-4 py-3">{formatPlatforms(post.platforms)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{formatInsightMetric(post.insights?.reach)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{formatInsightMetric(post.insights?.likes)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{formatInsightMetric(post.insights?.comments)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{formatInsightMetric(post.insights?.saved)}</td>
                     <td className="px-4 py-3">{post.ruleName ?? "—"}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{post.ruleName === null ? "—" : post.dmsSent.toLocaleString("en-US")}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{post.ruleName === null ? "—" : post.linkClicks.toLocaleString("en-US")}</td>
