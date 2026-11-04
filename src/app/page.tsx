@@ -87,10 +87,21 @@ function Nav() {
           <a href="#faq" className="hover:text-ink">FAQ</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm text-ink-2 hover:text-ink sm:block">Log in</Link>
+          <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm text-ink-2 hover:text-ink md:block">Log in</Link>
           <Link href="/signup" className="btn-primary rounded-full px-4 py-2 text-sm font-medium">Start free</Link>
         </div>
       </div>
+      <nav aria-label="Mobile navigation" className="mx-auto flex max-w-6xl flex-wrap px-2 pb-2 text-sm text-ink-2 md:hidden">
+        {[
+          { href: "#features", label: "Features" },
+          { href: "#how", label: "How it works" },
+          { href: "#pricing", label: "Pricing" },
+          { href: "#faq", label: "FAQ" },
+          { href: "/login", label: "Log in" },
+        ].map(({ href, label }) => (
+          <Link key={href} href={href} className="inline-flex min-h-11 items-center rounded-lg px-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand">{label}</Link>
+        ))}
+      </nav>
     </header>
   );
 }
@@ -176,7 +187,7 @@ export default function Home() {
         </section>
 
         {/* Features */}
-        <section id="features" className="mx-auto max-w-6xl px-4 py-20">
+        <section id="features" className="mx-auto max-w-6xl scroll-mt-40 px-4 py-20 md:scroll-mt-16">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Two tools you pay for today. <span className="gradient-text">Now one.</span></h2>
             <p className="mt-4 text-ink-2">A Buffer-style scheduler and a ManyChat-style auto-DM that finally talk to each other.</p>
@@ -210,7 +221,7 @@ export default function Home() {
         </section>
 
         {/* How it works */}
-        <section id="how" className="border-y border-line bg-surface px-4 py-20">
+        <section id="how" className="scroll-mt-40 border-y border-line bg-surface px-4 py-20 md:scroll-mt-16">
           <div className="mx-auto max-w-5xl">
             <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">Live in 3 minutes</h2>
             <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -226,7 +237,7 @@ export default function Home() {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="mx-auto max-w-6xl px-4 py-20">
+        <section id="pricing" className="mx-auto max-w-6xl scroll-mt-40 px-4 py-20 md:scroll-mt-16">
           <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">Simple pricing</h2>
           <p className="mt-3 text-center text-ink-2">Less than paying for a scheduler and a DM tool separately.</p>
           <div className="mt-12 grid gap-4 lg:grid-cols-3">
@@ -245,7 +256,7 @@ export default function Home() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="mx-auto max-w-3xl px-4 pb-20">
+        <section id="faq" className="mx-auto max-w-3xl scroll-mt-40 px-4 pb-20 md:scroll-mt-16">
           <h2 className="text-center text-3xl font-semibold tracking-tight">Questions</h2>
           <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
             {faqs.map((f) => (
