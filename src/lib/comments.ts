@@ -86,8 +86,14 @@ export function extractCommentEvents(body: unknown): CommentEvent[] {
   return out;
 }
 
+export type ReplayScope = {
+  userId: string;
+  ruleId: string;
+};
+
 export async function processCommentEvents(
   events: CommentEvent[],
+  scope?: ReplayScope,
 ): Promise<number> {
   let inserted = 0;
   for (const event of events) {
@@ -100,13 +106,21 @@ export async function processCommentEvents(
       if (!account) {
         continue;
       }
+      if (scope && account.user_id !== scope.userId) {
+        continue;
+      }
       if (event.fromId === event.accountExternalId) {
         continue;
       }
-      const rules = await query<DmRuleRow>(
-        "select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp.dm_rules where user_id=$1 and status='active' and (social_account_id is null or social_account_id=$2) and 'comment' = any(triggers) order by created_at",
-        [account.user_id, account.id],
-      );
+      let ruleSql =
+        "select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp.dm_rules where user_id=$1 and status='active' and (social_account_id is null or social_account_id=$2) and 'comment' = any(triggers)";
+      const ruleParams: string[] = [account.user_id, account.id];
+      if (scope) {
+        ruleSql += " and id=$3";
+        ruleParams.push(scope.ruleId);
+      }
+      ruleSql += " order by created_at";
+      const rules = await query<DmRuleRow>(ruleSql, ruleParams);
       const ruleId = matchRule(event.text, rules);
       if (!ruleId) {
         continue;

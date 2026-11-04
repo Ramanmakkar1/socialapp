@@ -134,6 +134,6 @@ export async function rewindRule(
     allEvents.push(...events);
   }
 
-  const queued = await processCommentEvents(allEvents);
+  const queued = await processCommentEvents(allEvents, { userId, ruleId });
   return { queued, scanned: allEvents.length };
 }
