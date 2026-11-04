@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Getting started in 3 minutes",
@@ -136,6 +137,7 @@ export default function GettingStartedHelpPage() {
           </div>
         </div>
       </main>
+      <SiteFooter />
     </>
   );
 }

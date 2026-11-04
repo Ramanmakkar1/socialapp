@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LifeBuoy, Mail, MessageCircleQuestion, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: `${BRAND.name} support: help with scheduling and auto-DM`,
@@ -72,12 +73,7 @@ export default function ContactPage() {
           For details about how {BRAND.company} handles your information, see our <Link className="text-brand underline-offset-4 hover:underline" href="/privacy">Privacy Policy</Link>, <Link className="text-brand underline-offset-4 hover:underline" href="/terms">Terms of Service</Link> and <Link className="text-brand underline-offset-4 hover:underline" href="/data-deletion">data deletion instructions</Link>.
         </p>
       </main>
-      <footer className="border-t border-line px-4 py-8 text-sm text-muted">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
-          <span>© 2026 {BRAND.company}</span>
-          <Link href="/" className="inline-flex min-h-11 items-center hover:text-ink">Home</Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

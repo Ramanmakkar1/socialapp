@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Zap } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Instagram auto DM not working? Fix it step by step",
@@ -205,6 +206,7 @@ export default function InstagramAutoDmNotWorkingPage() {
           </p>
         </div>
       </main>
+      <SiteFooter />
     </>
   );
 }

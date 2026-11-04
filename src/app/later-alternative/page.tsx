@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: { absolute: `Later Alternative With Instagram Auto-DM | ${BRAND.name}` },
@@ -175,6 +176,7 @@ export default function LaterAlternative() {
           <CompareAlternativesNav current="later" />
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }
