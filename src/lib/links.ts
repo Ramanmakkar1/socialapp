@@ -40,16 +40,24 @@ export async function resolveAndCount(code: string): Promise<string | null> {
     return null;
   }
   const rows = await query<{ target_url: string }>(
-    "update socialapp.short_links set clicks = clicks + 1 where code=$1 returning target_url",
+    "select target_url from socialapp.short_links where code=$1",
     [code],
   );
   const targetUrl = rows[0]?.target_url;
   if (!targetUrl) {
     return null;
   }
-  await query(
-    "insert into socialapp.link_clicks (code) values ($1)",
-    [code],
-  );
+  try {
+    await query(
+      "update socialapp.short_links set clicks = clicks + 1 where code=$1",
+      [code],
+    );
+    await query(
+      "insert into socialapp.link_clicks (code) values ($1)",
+      [code],
+    );
+  } catch {
+    console.error("Failed to record link click");
+  }
   return targetUrl;
 }
