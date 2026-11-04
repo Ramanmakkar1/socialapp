@@ -15,6 +15,7 @@ type DmRuleRow = MatchableRule & {
   dm_text: string;
   link_url: string | null;
   email_gate: boolean;
+  follow_gate: boolean;
 };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -103,7 +104,7 @@ export async function processCommentEvents(
         continue;
       }
       const rules = await query<DmRuleRow>(
-        "select id, keywords, match_type, status, dm_text, link_url, email_gate from socialapp.dm_rules where user_id=$1 and status='active' and (social_account_id is null or social_account_id=$2) order by created_at",
+        "select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp.dm_rules where user_id=$1 and status='active' and (social_account_id is null or social_account_id=$2) order by created_at",
         [account.user_id, account.id],
       );
       const ruleId = matchRule(event.text, rules);
@@ -129,7 +130,15 @@ export async function processCommentEvents(
         continue;
       }
       let message = rule.dm_text;
-      if (rule.email_gate && rule.link_url) {
+      if (rule.follow_gate && rule.link_url) {
+        if (rule.email_gate) {
+          message +=
+            "\n\nFollow us, then reply here with your email address and I'll send you the link.";
+        } else {
+          message +=
+            "\n\nFollow us first, then reply 'done' to this message and I'll send you the link.";
+        }
+      } else if (rule.email_gate && rule.link_url) {
         message +=
           "\n\nReply to this message with your email address and I'll send you the link right away.";
       } else if (rule.link_url) {
