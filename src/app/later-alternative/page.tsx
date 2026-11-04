@@ -11,7 +11,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: { absolute: `Later Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
-    "A Later alternative that schedules Instagram, Facebook and Threads posts and auto-DMs commenters with a keyword, plus email capture and lead export.",
+    "A Later alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export. Facebook and Threads coming soon.",
   alternates: { canonical: "/later-alternative" },
 };
 
@@ -22,7 +22,7 @@ const whyLook = [
 ];
 
 const compare: [string, string, string][] = [
-  ["Scheduling for Instagram, Facebook and Threads", "Yes", "Yes"],
+  ["Scheduling for Instagram, Facebook and Threads", "Instagram now, Facebook & Threads soon", "Yes"],
   ["Visual calendar", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "No"],
   ["Email capture in the DM", "Yes", "No"],
@@ -33,15 +33,15 @@ const compare: [string, string, string][] = [
 
 const switchSteps = [
   { icon: CalendarClock, title: "Connect Instagram", text: "Sign up, connect your Instagram Business or Creator account through Meta login. No password sharing." },
-  { icon: KeyRound, title: "Recreate your queue", text: "Add upcoming posts to the calendar for Instagram, Facebook or Threads. Paste captions from Later if you like." },
+  { icon: KeyRound, title: "Recreate your queue", text: "Add upcoming Instagram posts to the calendar. Paste captions from Later if you like." },
   { icon: MessageCircleHeart, title: "Attach DM rules", text: "For lead posts, set a comment keyword and DM message on each scheduled post. Publish on time; commenters get the link in DMs." },
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Later alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar and publishing for Instagram, Facebook and Threads, and adds Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
+  { q: `Is ${BRAND.name} a Later alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram scheduling and publishing today, Facebook Pages and Threads coming soon, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
   { q: "Does Later send automatic DMs when someone comments?", a: "Later is built for planning and publishing social content. Comment-to-DM automation is not part of Later itself; teams usually add a tool like ManyChat for that." },
   { q: "Can I import my Later media library or schedule?", a: `There is no Later import yet. Download assets from Later if needed, then upload them when you create posts in ${BRAND.name}. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
-  { q: "Which platforms does each tool support?", a: `${BRAND.name} focuses on Instagram, Facebook Pages and Threads at launch, with more networks planned later. Later supports additional networks such as Pinterest and TikTok; see their site for the current list.` },
+  { q: "Which platforms does each tool support?", a: `Instagram scheduling and auto-DMs work today on ${BRAND.name}. Facebook Pages and Threads publishing are coming soon, then more networks. Later supports additional networks such as Pinterest and TikTok; see their site for the current list.` },
   { q: "Is comment-to-DM allowed on Instagram?", a: `Yes, through the official Instagram API. ${BRAND.name} only messages people who commented first, uses Meta login, and never asks for your password.` },
 ];
 
@@ -73,7 +73,7 @@ export default function LaterAlternative() {
               Later alternative with Instagram auto-DM built in
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">
-              Keep a visual calendar for Instagram, Facebook and Threads, and auto-DM everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads without a second subscription.
+              Keep a visual calendar with Instagram scheduling today (Facebook Pages and Threads coming soon), and auto-DM everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads without a second subscription.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>

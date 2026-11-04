@@ -11,7 +11,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: { absolute: `Buffer Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
-    "A Buffer alternative that schedules Instagram, Facebook and Threads posts and auto-DMs everyone who comments a keyword, with email capture and AI replies.",
+    "A Buffer alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and AI replies. Facebook and Threads soon.",
   alternates: { canonical: "/buffer-alternative" },
 };
 
@@ -25,8 +25,8 @@ const compare: [string, string, string, string][] = [
   ["Post scheduling", "Yes", "Yes", "Yes"],
   ["Calendar view", "Yes", "Yes", "Yes"],
   ["Instagram publishing", "Yes", "Yes", "Yes"],
-  ["Facebook publishing", "Yes", "Yes", "Yes"],
-  ["Threads publishing", "Yes", "Yes", "Yes"],
+  ["Facebook publishing", "Coming soon", "Yes", "Yes"],
+  ["Threads publishing", "Coming soon", "Yes", "Yes"],
   ["Comment-to-DM automation", "Yes", "No", "Yes"],
   ["Email capture in DMs", "Yes", "No", "Yes"],
   ["AI DM replies", "Yes", "No", "Yes"],
@@ -36,7 +36,7 @@ const compare: [string, string, string, string][] = [
 const faqs = [
   { q: `Is ${BRAND.name} a Buffer alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts like Buffer does, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in.` },
   { q: "Can I import my existing Buffer schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
-  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages and Threads at launch. YouTube, LinkedIn, Pinterest, TikTok and WhatsApp are coming next." },
+  { q: "Which platforms are supported?", a: "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads publishing are coming soon, then YouTube, LinkedIn, Pinterest, TikTok and WhatsApp." },
   { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
@@ -69,7 +69,7 @@ export default function BufferAlternative() {
               The Buffer alternative that also <span className="gradient-text">turns comments into leads</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">
-              Schedule your posts to Instagram, Facebook and Threads, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, answer with AI and track every lead.
+              Schedule your Instagram posts (Facebook and Threads coming soon), and let {BRAND.name} DM everyone who comments a keyword. Capture their email, answer with AI and track every lead.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
