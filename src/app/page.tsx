@@ -5,6 +5,7 @@ import {
   Instagram, Facebook, AtSign, Zap, ShieldCheck,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import HomeProductPreview from "@/components/HomeProductPreview";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -106,55 +107,6 @@ function Nav() {
   );
 }
 
-function HeroMock() {
-  return (
-    <div className="glow relative mx-auto mt-14 max-w-5xl overflow-hidden rounded-2xl border border-line bg-surface">
-      <div className="flex items-center gap-1.5 border-b border-line px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-        <span className="ml-3 text-xs text-muted">{BRAND.name} · This week</span>
-      </div>
-      <div className="grid gap-px bg-line md:grid-cols-[1.4fr_1fr]">
-        <div className="bg-surface p-5">
-          <div className="mb-3 text-sm font-medium">Content calendar</div>
-          <div className="grid grid-cols-7 gap-2 text-[11px]">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d, i) => (
-              <div key={d} className="min-h-28 rounded-lg bg-surface-2 p-2">
-                <div className="mb-2 text-muted">{d}</div>
-                {i % 2 === 0 && (
-                  <div className="mb-1.5 rounded-md border border-line bg-surface p-1.5">
-                    <div className="flex items-center gap-1 text-brand"><Instagram className="h-3 w-3" /> 6:00 pm</div>
-                    <div className="mt-1 truncate text-ink-2">Reel · 5 tips</div>
-                  </div>
-                )}
-                {i % 3 === 1 && (
-                  <div className="rounded-md border border-line bg-surface p-1.5">
-                    <div className="flex items-center gap-1 text-brand-2"><Facebook className="h-3 w-3" /> 9:30 am</div>
-                    <div className="mt-1 truncate text-ink-2">Carousel</div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="bg-surface p-5">
-          <div className="mb-3 text-sm font-medium">Auto-DM · Reel “5 tips”</div>
-          <div className="space-y-3 text-sm">
-            <div className="rounded-xl bg-surface-2 p-3"><span className="font-medium">@maya.fit</span> <span className="text-ink-2">commented</span> “GUIDE” 🔥</div>
-            <div className="ml-6 rounded-xl btn-primary p-3">Hey Maya! Here’s your free guide 👉 link.to/guide — want the 7-day plan too?</div>
-            <div className="rounded-xl bg-surface-2 p-3">yes please! 🙌</div>
-            <div className="ml-6 rounded-xl border border-line p-3 text-ink-2"><Sparkles className="mr-1 inline h-3.5 w-3.5 text-brand" />AI: Sure! What’s the best email to send it to?</div>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-            {[["1,284", "DMs sent"], ["612", "Leads"], ["9.4%", "Click rate"]].map(([v, l]) => (
-              <div key={l} className="rounded-lg bg-surface-2 p-2"><div className="font-semibold">{v}</div><div className="text-[11px] text-muted">{l}</div></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   return (
     <>
@@ -183,7 +135,7 @@ export default function Home() {
               <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4" />Official Meta API</span>
             </div>
           </div>
-          <HeroMock />
+          <HomeProductPreview />
         </section>
 
         {/* Features */}
