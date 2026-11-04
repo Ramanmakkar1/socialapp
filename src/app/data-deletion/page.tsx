@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
+import { SiteFooter } from "@/components/SiteFooter";
 import { BRAND } from "@/lib/brand";
-export const metadata = { title: "Data deletion", alternates: { canonical: "/data-deletion" } };
+
+export const metadata: Metadata = {
+  title: "Delete your Poskoo data and accounts",
+  description: "Learn how to disconnect Instagram or Facebook from Poskoo and request deletion of all stored account data, including posts and messages.",
+  alternates: { canonical: "/data-deletion" },
+};
 export default function Page() {
   return (
+    <>
     <main className="mx-auto max-w-3xl px-4 py-16 leading-7 text-ink-2">
       <h1 className="mb-6 text-3xl font-semibold text-ink">Delete your data</h1>
       <ol className="list-decimal space-y-2 pl-5">
@@ -11,5 +19,7 @@ export default function Page() {
       </ol>
       <p className="mt-6">We delete your connected-account tokens, posts, messages and contacts within 30 days of the request.</p>
     </main>
+    <SiteFooter />
+    </>
   );
 }

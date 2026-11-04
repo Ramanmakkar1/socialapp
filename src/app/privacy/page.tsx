@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
+import { SiteFooter } from "@/components/SiteFooter";
 import { BRAND } from "@/lib/brand";
-export const metadata = { title: "Privacy policy", alternates: { canonical: "/privacy" } };
+
+export const metadata: Metadata = {
+  title: "Privacy policy: how Poskoo handles your data",
+  description: "Read how Poskoo stores your Instagram, Facebook and Threads data, which cookies we use, and how to export or delete your account at any time.",
+  alternates: { canonical: "/privacy" },
+};
 export default function Page() {
   return (
+    <>
     <main className="mx-auto max-w-3xl px-4 py-16 leading-7 text-ink-2">
       <h1 className="mb-6 text-3xl font-semibold text-ink">Privacy policy</h1>
       <p>{BRAND.name} ({BRAND.company}) helps you schedule social posts and automatically reply to comments and messages on accounts you connect.</p>
@@ -43,5 +51,7 @@ export default function Page() {
       </p>
       <p className="mt-8">Questions: {BRAND.supportEmail}</p>
     </main>
+    <SiteFooter />
+    </>
   );
 }
