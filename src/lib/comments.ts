@@ -1,4 +1,5 @@
 import { query } from "@/lib/db";
+import { shortLinkFor } from "@/lib/links";
 import { matchComment, type MatchableRule } from "@/lib/match";
 
 export type CommentEvent = {
@@ -128,7 +129,13 @@ export async function processCommentEvents(
       }
       let message = rule.dm_text;
       if (rule.link_url) {
-        message += "\n" + rule.link_url;
+        let link = rule.link_url;
+        try {
+          link = await shortLinkFor(account.user_id, rule.id, rule.link_url);
+        } catch {
+          /* use raw link_url */
+        }
+        message += "\n" + link;
       }
       const rows = await query<{ id: string }>(
         `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message) values ($1,$2,$3,$4,$5,$6,$7) on conflict (comment_id) do nothing returning id`,
