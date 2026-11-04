@@ -7,6 +7,28 @@ import { checkCaption, type PlatformId } from "@/lib/platforms";
 
 const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads"];
 
+export async function deletePost(id: string): Promise<{ ok: boolean; error?: string }> {
+  if (typeof id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return { ok: false, error: "Invalid post." };
+  }
+  if (!isDbConfigured()) {
+    return { ok: false, error: "Database not configured" };
+  }
+
+  const user = await requireUser();
+  try {
+    await query(
+      "delete from scheduled_posts where id = $1 and user_id = $2 and status in ('draft','scheduled','failed')",
+      [id, user.id],
+    );
+    revalidatePath("/app/calendar");
+    revalidatePath("/app");
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Could not delete post." };
+  }
+}
+
 type SavePostInput = {
   caption: string;
   platforms: ("instagram" | "facebook" | "threads")[];
