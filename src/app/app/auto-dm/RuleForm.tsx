@@ -3,6 +3,7 @@
 import { useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
+import CommentKeywordTester from "@/components/CommentKeywordTester";
 import {
   createRule,
   deleteRule,
@@ -243,6 +244,9 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
             />
             Replies to my stories
           </label>
+        </div>
+        <div>
+          <CommentKeywordTester keywords={keywords} matchType={matchType} commentTrigger={triggerComment} />
         </div>
         <div>
           <label htmlFor={dmId} className="text-sm font-medium text-ink-2">DM message</label>
