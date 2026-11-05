@@ -59,22 +59,27 @@ async function collectCommentsForAccount(
   externalId: string,
   token: string,
   sinceMs: number,
-): Promise<CommentEvent[]> {
+): Promise<{ events: CommentEvent[]; failures: number; completed: number }> {
   const events: CommentEvent[] = [];
+  let failures = 0;
+  let completed = 0;
   const mediaUrl = `${GRAPH_BASE}/${encodeURIComponent(externalId)}/media?fields=id,timestamp&limit=${MEDIA_LIMIT}`;
   let mediaBody: GraphMediaList;
   try {
     mediaBody = await fetchJson<GraphMediaList>(mediaUrl, token);
+    if (!Array.isArray(mediaBody?.data)) throw new Error("Invalid media response");
   } catch {
-    return events;
+    return { events, failures: 1, completed };
   }
   const mediaSlice = (mediaBody.data ?? []).filter((m) => m.id).slice(0, MEDIA_LIMIT);
+  if (mediaSlice.length === 0) completed += 1;
 
   for (const media of mediaSlice) {
     const mediaId = media.id as string;
     const commentsUrl = `${GRAPH_BASE}/${encodeURIComponent(mediaId)}/comments?fields=id,text,timestamp,from&limit=${COMMENTS_LIMIT}`;
     try {
       const commentsBody = await fetchJson<GraphCommentList>(commentsUrl, token);
+      if (!Array.isArray(commentsBody?.data)) throw new Error("Invalid comments response");
       for (const c of commentsBody.data ?? []) {
         if (!c.id || !c.from?.id) continue;
         if (!isWithinWindow(c.timestamp, sinceMs)) continue;
@@ -87,17 +92,18 @@ async function collectCommentsForAccount(
           mediaId,
         });
       }
+      completed += 1;
     } catch {
-      continue;
+      failures += 1;
     }
   }
-  return events;
+  return { events, failures, completed };
 }
 
 export async function rewindRule(
   userId: string,
   ruleId: string,
-): Promise<{ queued: number; scanned: number }> {
+): Promise<{ queued: number; scanned: number; failures: number }> {
   const rules = await query<RuleRow>(
     "select id, social_account_id from socialapp.dm_rules where id=$1 and user_id=$2 and status='active'",
     [ruleId, userId],
@@ -115,24 +121,38 @@ export async function rewindRule(
     accountParams.push(rule.social_account_id);
   }
   const accounts = await query<AccountRow>(accountSql, accountParams);
+  if (accounts.length === 0) {
+    throw new Error("No active Instagram accounts are available for this rule. Connect an account and try again.");
+  }
 
   const sinceMs = Date.now() - WINDOW_MS;
   const allEvents: CommentEvent[] = [];
+  let failures = 0;
+  let completed = 0;
 
   for (const account of accounts) {
     if (!account.access_token_enc) {
+      failures += 1;
       continue;
     }
     let token: string;
     try {
       token = decryptToken(account.access_token_enc);
+      if (!token) throw new Error("Account unavailable");
     } catch {
+      failures += 1;
       continue;
     }
-    const events = await collectCommentsForAccount(account.external_id, token, sinceMs);
-    allEvents.push(...events);
+    const result = await collectCommentsForAccount(account.external_id, token, sinceMs);
+    allEvents.push(...result.events);
+    failures += result.failures;
+    completed += result.completed;
+  }
+
+  if (failures > 0 && completed === 0 && allEvents.length === 0) {
+    throw new Error("Could not scan past comments. Please try again. If this continues, reconnect your Instagram account.");
   }
 
   const queued = await processCommentEvents(allEvents, { userId, ruleId });
-  return { queued, scanned: allEvents.length };
+  return { queued, scanned: allEvents.length, failures };
 }

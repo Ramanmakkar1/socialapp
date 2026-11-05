@@ -10,17 +10,21 @@ type Props = {
 export function RewindPastCommentsButton({ ruleId }: Props) {
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<
-    { kind: "ok"; queued: number; scanned: number } | { kind: "err"; error: string } | null
+    { kind: "ok"; queued: number; scanned: number; failures: number } | { kind: "err"; error: string } | null
   >(null);
 
   function run() {
     setResult(null);
     startTransition(async () => {
-      const out = await rewindRuleAction(ruleId);
-      if (out.ok) {
-        setResult({ kind: "ok", queued: out.queued, scanned: out.scanned });
-      } else {
-        setResult({ kind: "err", error: out.error });
+      try {
+        const out = await rewindRuleAction(ruleId);
+        if (out.ok) {
+          setResult({ kind: "ok", queued: out.queued, scanned: out.scanned, failures: out.failures });
+        } else {
+          setResult({ kind: "err", error: out.error });
+        }
+      } catch {
+        setResult({ kind: "err", error: "Could not scan past comments. Please try again." });
       }
     });
   }
@@ -38,16 +42,24 @@ export function RewindPastCommentsButton({ ruleId }: Props) {
       <span className="text-xs text-ink-2">
         Scans up to 25 latest posts and 50 comments per post; only comments from the past 7 days qualify.
       </span>
-      {result?.kind === "ok" && (
-        <span className="text-sm text-ink-2">
-          Queued {result.queued} DMs from {result.scanned} recent comments
-        </span>
-      )}
-      {result?.kind === "err" && (
-        <span className="text-sm text-warn" role="alert">
-          {result.error}
-        </span>
-      )}
+      <span role="status" aria-live="polite" aria-atomic="true">
+        {pending && <span className="sr-only">Scanning past comments.</span>}
+        {result?.kind === "ok" && (
+          <span className="text-sm text-ink-2">
+            Queued {result.queued} DMs from {result.scanned} recent comments.
+            {result.failures > 0 && (
+              <span className="text-warn">
+                {" "}Partial scan: {result.failures} account or post scans failed. Some comments could not be checked. Please try again.
+              </span>
+            )}
+          </span>
+        )}
+        {result?.kind === "err" && (
+          <span className="text-sm text-warn">
+            {result.error}
+          </span>
+        )}
+      </span>
     </span>
   );
 }

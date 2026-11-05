@@ -207,7 +207,7 @@ export async function toggleRule(id: string): Promise<RuleActionResult> {
 
 export async function rewindRuleAction(
   id: string,
-): Promise<{ ok: true; queued: number; scanned: number } | { ok: false; error: string }> {
+): Promise<{ ok: true; queued: number; scanned: number; failures: number } | { ok: false; error: string }> {
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured." };
   }
@@ -218,7 +218,7 @@ export async function rewindRuleAction(
   try {
     const result = await rewindRule(user.id, id);
     revalidatePath("/app/auto-dm");
-    return { ok: true, queued: result.queued, scanned: result.scanned };
+    return { ok: true, queued: result.queued, scanned: result.scanned, failures: result.failures };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Could not scan past comments.";
     return { ok: false, error: message };
