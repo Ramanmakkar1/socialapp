@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, useTransition } from "react";
+import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AtSign, Facebook, Instagram, Sparkles } from "lucide-react";
@@ -71,6 +71,7 @@ function toLocalInputValue(d: Date): string {
 export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial }) {
   const router = useRouter();
   const [draftId, setDraftId] = useState(initialDraft?.id);
+  const lastDraftIdRef = useRef<string | undefined>(undefined);
   const mainId = useId();
   const platformsFocusId = useId();
   const customCaptionId = useId();
@@ -115,11 +116,44 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
   const [aiError, setAiError] = useState("");
   const [aiPending, startAiTransition] = useTransition();
 
+  const resetComposerForNewPost = useCallback(() => {
+    setMainCaption("");
+    setFirstComment("");
+    setCustomCaption({ instagram: "", facebook: "", threads: "" });
+    setMediaUrls([""]);
+    setIgFormat("feed");
+    setSelectedRuleId("");
+    setCustomize({ instagram: false, facebook: false, threads: false });
+    setEnabled({ instagram: true, facebook: false, threads: false });
+    setActiveTab("instagram");
+    setScheduledAt("");
+    setDraftId(undefined);
+    setAiOpen(false);
+    setAiTopic("");
+    setAiTone("friendly");
+    setAiIdeas([]);
+    setAiError("");
+    lastDraftIdRef.current = undefined;
+  }, []);
+
   useEffect(() => {
     // Queue direct-load initialization until after hydration; cancel stale loads.
     let active = true;
     queueMicrotask(() => {
-      if (!active || !initialDraft) return;
+      if (!active) return;
+      if (!initialDraft) {
+        // Only leaving an initialized draft should discard composer edits.
+        if (lastDraftIdRef.current !== undefined) {
+          resetComposerForNewPost();
+          setFeedback(null);
+        }
+        return;
+      }
+      // A refresh of the same draft must preserve unsaved edits.
+      if (lastDraftIdRef.current === initialDraft.id) return;
+      lastDraftIdRef.current = initialDraft.id;
+      setDraftId(initialDraft.id);
+      setFeedback(null);
       const overrides = initialDraft.overrides;
       const hasOverride = (platform: PlatformId) => LIVE_PLATFORMS.includes(platform) && Object.prototype.hasOwnProperty.call(overrides, platform);
       setMainCaption(initialDraft.caption);
@@ -133,7 +167,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
       setScheduledAt(initialDraft.scheduledAt ? toLocalInputValue(new Date(initialDraft.scheduledAt)) : "");
     });
     return () => { active = false; };
-  }, [initialDraft]);
+  }, [initialDraft, resetComposerForNewPost]);
 
   useEffect(() => {
     // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.
@@ -273,17 +307,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
           : "";
         setFeedback({ kind: "ok", text: `Scheduled for ${when}` });
       }
-      setMainCaption("");
-      setFirstComment("");
-      setCustomCaption({ instagram: "", facebook: "", threads: "" });
-      setMediaUrls([""]);
-      setIgFormat("feed");
-      setSelectedRuleId("");
-      setCustomize({ instagram: false, facebook: false, threads: false });
-      setEnabled({ instagram: true, facebook: false, threads: false });
-      setActiveTab("instagram");
-      setScheduledAt("");
-      setDraftId(undefined);
+      resetComposerForNewPost();
       if (draftId) router.replace("/app/calendar#new");
       else router.refresh();
     });
