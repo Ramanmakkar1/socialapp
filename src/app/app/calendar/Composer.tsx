@@ -4,6 +4,7 @@ import { useEffect, useId, useState, useTransition } from "react";
 import Link from "next/link";
 import { AtSign, Facebook, Instagram, Sparkles } from "lucide-react";
 import { savePost } from "./actions";
+import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import { aiAvailable, suggestCaptions } from "./aiActions";
 import { BRAND } from "@/lib/brand";
 import type { CaptionIdea } from "@/lib/ai";
@@ -57,6 +58,8 @@ function toLocalInputValue(d: Date): string {
 
 export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: RuleOption[]; bestHoursUtc?: number[] }) {
   const mainId = useId();
+  const platformsFocusId = useId();
+  const customCaptionId = useId();
   const firstCommentId = useId();
   const scheduleId = useId();
   const dmRuleId = useId();
@@ -167,6 +170,44 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
   const storyMediaError =
     enabled.instagram && igFormat === "story" && filledMediaCount > 1;
 
+  function focusChecklistTarget(target: ChecklistFixTarget) {
+    const focusEl = (id: string | undefined) => {
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (el && "focus" in el) {
+        el.focus({ preventScroll: false });
+      }
+    };
+    switch (target.kind) {
+      case "platforms":
+        focusEl(platformsFocusId);
+        break;
+      case "mainCaption":
+        focusEl(mainId);
+        break;
+      case "firstComment":
+        focusEl(firstCommentId);
+        break;
+      case "media":
+        focusEl(imageId);
+        break;
+      case "schedule":
+        focusEl(scheduleId);
+        break;
+      case "igFormat": {
+        const fieldset = document.getElementById(igFormatLegendId);
+        fieldset?.focus();
+        break;
+      }
+      case "platformCaption":
+        setActiveTab(target.platform);
+        requestAnimationFrame(() => {
+          focusEl(`${customCaptionId}-${target.platform}`);
+        });
+        break;
+    }
+  }
+
   function handleSave(mode: "draft" | "schedule") {
     setFeedback(null);
     const input = buildSaveInput(mode);
@@ -215,7 +256,11 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
         <div className="space-y-6">
           <div>
             <span className="text-sm font-medium text-ink-2">Platforms</span>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div
+              id={platformsFocusId}
+              tabIndex={-1}
+              className="mt-2 flex flex-wrap gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            >
               {PLATFORM_ORDER.map((platform) => {
                 const Icon = PLATFORM_ICON[platform];
                 const live = LIVE_PLATFORMS.includes(platform);
@@ -415,14 +460,14 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
               })}
             </div>
             {enabled.instagram && (
-              <fieldset className="mt-3 border-0 p-0">
-                <legend id={igFormatLegendId} className="text-sm font-medium text-ink-2">
+              <fieldset id={igFormatLegendId} tabIndex={-1} className="mt-3 border-0 p-0 outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                <legend className="text-sm font-medium text-ink-2">
                   Instagram format:
                 </legend>
                 <div
                   className="mt-2 inline-flex rounded-xl border border-line bg-surface p-0.5 text-sm"
                   role="radiogroup"
-                  aria-labelledby={igFormatLegendId}
+                  aria-label="Instagram format"
                 >
                   <label
                     className={`cursor-pointer rounded-lg px-3 py-1.5 font-medium transition-colors ${
@@ -590,6 +635,7 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
                       </label>
                       {customize[platform] && (
                         <textarea
+                          id={`${customCaptionId}-${platform}`}
                           aria-label={`${config.label} caption`}
                           value={customCaption[platform]}
                           onChange={(e) =>
@@ -688,6 +734,18 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
         </div>
 
         <div className="space-y-4">
+          <PublishingChecklist
+            enabled={enabled}
+            mainCaption={mainCaption}
+            firstComment={firstComment}
+            customize={customize}
+            customCaption={customCaption}
+            mediaUrls={mediaUrls}
+            igFormat={igFormat}
+            scheduledAt={scheduledAt}
+            timeZone={timeZone}
+            onFix={focusChecklistTarget}
+          />
           <span className="text-sm font-medium text-ink-2">Preview</span>
           {selected.map((platform) => {
             const text = effectiveCaption(platform, mainCaption, customize, customCaption);
