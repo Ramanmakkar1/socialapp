@@ -226,8 +226,13 @@ export async function savePost(
     dmRuleId = input.dmRuleId;
   }
 
-  const pool = getPool();
-  const client = await pool.connect();
+  let client;
+  try {
+    client = await getPool().connect();
+  } catch {
+    return { ok: false, error: "Could not save post. Please try again." };
+  }
+
   let id: string | undefined;
   try {
     await client.query("begin");
