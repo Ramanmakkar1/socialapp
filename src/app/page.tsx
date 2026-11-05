@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
+import { PLANS, PLANS_NOTE } from "@/lib/plans";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
@@ -11,54 +12,6 @@ export const metadata: Metadata = {
  openGraph: { title, description, url: "/", siteName: BRAND.name, images: [{ url: "/landing/hero.webp", width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: ["/landing/hero.webp"] },
 };
-type PlanItem = { text: string; soon?: boolean };
-const plans: { name: string; price: string; per: string; popular?: boolean; items: PlanItem[]; cta: string; ctaHref: string }[] = [
-  {
-    name: "Free",
-    price: "$0",
-    per: "forever",
-    items: [
-      { text: "2 social accounts" },
-      { text: "10 scheduled posts / month" },
-      { text: "500 auto-DMs / month" },
-      { text: "Link in bio page", soon: true },
-    ],
-    cta: "Start free",
-    ctaHref: "/signup",
-  },
-  {
-    name: "Pro",
-    price: "$19",
-    per: "/ month",
-    popular: true,
-    items: [
-      { text: "5 social accounts" },
-      { text: "Unlimited scheduling" },
-      { text: "10,000 auto-DMs / month" },
-      { text: "AI captions + AI DM replies" },
-      { text: "Email & phone capture" },
-      { text: "Click + lead analytics" },
-    ],
-    cta: "Start free, upgrade later",
-    ctaHref: "/signup",
-  },
-  {
-    name: "Agency",
-    price: "$49",
-    per: "/ month",
-    items: [
-      { text: "25 social accounts" },
-      { text: "50,000 auto-DMs / month" },
-      { text: "Client workspaces", soon: true },
-      { text: "Approve-before-post", soon: true },
-      { text: "Team seats", soon: true },
-      { text: "Priority support" },
-    ],
-    cta: "Start free, upgrade later",
-    ctaHref: "/signup",
-  },
-];
-
 const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}];
 const jsonLd = {
   "@context": "https://schema.org",
@@ -78,7 +31,7 @@ const jsonLd = {
       url: BRAND.url,
       description: BRAND.description,
       publisher: { "@id": BRAND.url + "#org" },
-      offers: plans.map((p) => ({
+      offers: PLANS.map((p) => ({
         "@type": "Offer",
         name: p.name,
         price: p.price.replace("$", ""),
@@ -214,7 +167,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <section id="pricing"><div className="wrap">
   <div className="head"><p className="eyebrow">Pricing</p><h2>Simple plans. <em className="s">Start free.</em></h2></div>
   <div className="plans">
-    {plans.map((p) => (
+    {PLANS.map((p) => (
       <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
         {p.popular ? <span className="tag">Most popular</span> : null}
         <h3>{p.name}</h3>
@@ -232,7 +185,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
       </div>
     ))}
   </div>
-  <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>Every account starts on the Free plan. Paid plans open soon. You will never be charged without choosing a plan first.</p>
+  <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{PLANS_NOTE}</p>
 </div></section>
 
 <section id="faq" style={{"paddingTop": "20px"}}><div className="wrap">
