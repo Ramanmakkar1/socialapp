@@ -128,8 +128,14 @@ export async function processMessageEvents(
         continue;
       }
       const rows = await query<{ id: string }>(
-        `update socialapp.contacts set email = coalesce($3, email), phone = coalesce($4, phone), last_seen_at = now() where user_id=$1 and platform='instagram' and external_id=$2 returning id`,
-        [account.user_id, event.senderId, email, phone],
+        `insert into socialapp.contacts (user_id, social_account_id, platform, external_id, email, phone)
+         values ($1, $5, 'instagram', $2, $3, $4)
+         on conflict (user_id, platform, external_id) do update
+         set email = coalesce(excluded.email, socialapp.contacts.email),
+             phone = coalesce(excluded.phone, socialapp.contacts.phone),
+             last_seen_at = now()
+         returning id`,
+        [account.user_id, event.senderId, email, phone, account.id],
       );
       if (rows.length > 0) {
         updated += rows.length;

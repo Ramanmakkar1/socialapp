@@ -116,7 +116,7 @@ test("follow verification preserves retries and gated-link deduplication", async
             source_rule_id: "rule", link_url: "https://example.com/lead",
             email_gate: true, follow_gate: true }] };
         }
-        if (sql.startsWith("update socialapp.contacts")) {
+        if (sql.startsWith("insert into socialapp.contacts")) {
           updated.push(params[1]);
           return { rows: [{ id: params[1] }] };
         }
@@ -232,7 +232,7 @@ test("processMessageEvents blocks ineligible rule context but keeps capture", as
             ],
           };
         }
-        if (sql.startsWith("update socialapp.contacts")) {
+        if (sql.startsWith("insert into socialapp.contacts")) {
           return { rows: [{ id: "contact-1" }] };
         }
         if (sql.includes("insert into socialapp.dm_queue")) {
@@ -326,7 +326,7 @@ test("processMessageEvents eligible rules keep gating and dedupe", async (t) => 
             ],
           };
         }
-        if (sql.startsWith("update socialapp.contacts")) {
+        if (sql.startsWith("insert into socialapp.contacts")) {
           return { rows: [{ id: "contact-1" }] };
         }
         if (sql.includes("insert into socialapp.short_links")) {
@@ -385,6 +385,106 @@ test("processMessageEvents eligible rules keep gating and dedupe", async (t) => 
         else process.env.DATABASE_URL = previousUrl;
         if (previousKey === undefined) delete process.env.TOKEN_ENCRYPTION_KEY;
         else process.env.TOKEN_ENCRYPTION_KEY = previousKey;
+      }
+    });
+  }
+});
+
+
+test("inbound contact details upsert without unsolicited automation", async (t) => {
+  const { processMessageEvents } = await import("./messages.ts");
+  for (const text of ["Email First@Example.com", "Call +1 (416) 555-0199"]) {
+    await t.test(text, async () => {
+      const previousPool = globalThis.__socialappPool;
+      const previousUrl = process.env.DATABASE_URL;
+      type Contact = {
+        id: string; user_id: string; social_account_id: string;
+        platform: string; external_id: string; email: string | null;
+        phone: string | null; source_rule_id: string | null;
+        name: string | null; tags: string[]; last_seen_at: number;
+      };
+      const contacts = new Map<string, Contact>();
+      let writes = 0;
+      let queued = 0;
+      process.env.DATABASE_URL = "mock";
+      const query = async (sql: string, params: unknown[] = []) => {
+        if (sql.includes("select id, user_id")) {
+          const id = String(params[0]);
+          return { rows: [{ id, user_id: id === "other-account" ? "other-owner" : "owner" }] };
+        }
+        const key = JSON.stringify([params[0], "instagram", params[1]]);
+        if (sql.includes("from socialapp.contacts c")) {
+          assert.match(sql, /c.user_id = \$1.*c.platform = 'instagram'.*c.external_id = \$2/);
+          const contact = contacts.get(key);
+          // No rule, or an existing rule ineligible on the receiving account.
+          return { rows: contact ? [{ ...contact, link_url: null,
+            email_gate: null, follow_gate: null }] : [] };
+        }
+        if (sql.startsWith("insert into socialapp.contacts")) {
+          assert.match(sql, /\(user_id, social_account_id, platform, external_id, email, phone\)/);
+          assert.match(sql, /values \(\$1, \$5, 'instagram', \$2, \$3, \$4\)/);
+          assert.match(sql, /on conflict \(user_id, platform, external_id\) do update/);
+          assert.match(sql, /returning id/);
+          const updates = sql.split("do update")[1].split("returning")[0].trim();
+          assert.equal(updates.replace(/\s+/g, " "),
+            "set email = coalesce(excluded.email, socialapp.contacts.email), " +
+            "phone = coalesce(excluded.phone, socialapp.contacts.phone), last_seen_at = now()");
+          writes++;
+          const contact = contacts.get(key) ?? {
+            id: `contact-${contacts.size}`, user_id: String(params[0]),
+            social_account_id: String(params[4]), platform: "instagram",
+            external_id: String(params[1]), email: null, phone: null,
+            source_rule_id: null, name: null, tags: [], last_seen_at: 0,
+          };
+          contact.email = params[2] as string | null ?? contact.email;
+          contact.phone = params[3] as string | null ?? contact.phone;
+          contact.last_seen_at = writes;
+          contacts.set(key, contact);
+          return { rows: [{ id: contact.id }] };
+        }
+        if (sql.includes("insert into socialapp.dm_queue")) queued++;
+        assert.fail(`Unexpected database operation: ${sql}`);
+      };
+      globalThis.__socialappPool = {
+        query,
+        connect: async () => assert.fail("No outbound queue transaction expected"),
+      } as unknown as pg.Pool;
+      const event = { accountExternalId: "account", senderId: "lead", text, mid: "m1" };
+      const ownerKey = JSON.stringify(["owner", "instagram", "lead"]);
+      try {
+        assert.equal(await processMessageEvents([{ ...event, text: "hello" }]), 0);
+        assert.equal(writes, 0);
+        assert.equal(await processMessageEvents([event]), 1);
+        const first = { ...contacts.get(ownerKey)! };
+        assert.equal(first.email, extractEmail(text));
+        assert.equal(first.phone, extractPhone(text));
+        assert.equal(first.social_account_id, "account");
+        assert.equal(first.source_rule_id, null);
+        assert.equal(await processMessageEvents([event]), 1);
+        assert.equal(contacts.size, 1);
+        assert.equal(contacts.get(ownerKey)!.id, first.id);
+        assert.ok(contacts.get(ownerKey)!.last_seen_at > first.last_seen_at);
+        const attributed = { ...contacts.get(ownerKey)!, social_account_id: "original-account",
+          source_rule_id: "original-rule", name: "Original name", tags: ["original-tag"],
+          email: "old@example.com", phone: "+14165550100" };
+        contacts.set(ownerKey, { ...attributed });
+        assert.equal(await processMessageEvents([event]), 1);
+        assert.deepEqual(contacts.get(ownerKey), { ...attributed,
+          email: extractEmail(text) ?? attributed.email,
+          phone: extractPhone(text) ?? attributed.phone, last_seen_at: writes });
+        const ownerSnapshot = { ...contacts.get(ownerKey)! };
+        assert.equal(await processMessageEvents([{ ...event, accountExternalId: "other-account" }]), 1);
+        assert.equal(contacts.size, 2);
+        assert.deepEqual(contacts.get(ownerKey), ownerSnapshot);
+        const other = contacts.get(JSON.stringify(["other-owner", "instagram", "lead"]))!;
+        assert.notEqual(other.id, first.id);
+        assert.equal(other.social_account_id, "other-account");
+        assert.equal(other.source_rule_id, null);
+        assert.equal(queued, 0);
+      } finally {
+        globalThis.__socialappPool = previousPool;
+        if (previousUrl === undefined) delete process.env.DATABASE_URL;
+        else process.env.DATABASE_URL = previousUrl;
       }
     });
   }
