@@ -1,4 +1,5 @@
-﻿import { Users } from "lucide-react";
+﻿import Link from "next/link";
+import { Users } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../EmptyState";
@@ -24,6 +25,32 @@ function escapeLike(value: string): string {
 function formatLeadDate(value: Date | null): string {
   if (!value) return "—";
   return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function ChatToContactIllustration({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 56 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="2" y="6" width="26" height="20" rx="8" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
+      <path d="M8 14h14M8 19h10" stroke="var(--brand)" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M28 16h6l4 4v6a2 2 0 01-2 2H28"
+        stroke="var(--brand-2)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray="2 2"
+      />
+      <rect x="34" y="10" width="20" height="24" rx="10" fill="color-mix(in srgb, var(--brand) 12%, transparent)" stroke="var(--brand)" strokeWidth="1.5" />
+      <circle cx="44" cy="18" r="4" fill="var(--brand)" opacity="0.35" />
+      <path d="M40 26h8M40 30h5" stroke="var(--ink-2)" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
+    </svg>
+  );
 }
 
 function LeadsContactIllustration() {
@@ -72,7 +99,14 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   const search = q.trim().slice(0, 100);
   const onlyWithEmail = email === "1";
   const selectedRule = rules.some((item) => item.id === rule) ? rule : "";
+  const selectedRuleName = selectedRule ? rules.find((item) => item.id === selectedRule)?.name : undefined;
   const filterActive = search.length > 0 || onlyWithEmail || selectedRule.length > 0;
+  const leadsWithoutRuleParams = new URLSearchParams();
+  if (search) leadsWithoutRuleParams.set("q", search);
+  if (onlyWithEmail) leadsWithoutRuleParams.set("email", "1");
+  const showAllLeadsHref = leadsWithoutRuleParams.toString()
+    ? `/app/leads?${leadsWithoutRuleParams.toString()}`
+    : "/app/leads";
 
   const conditions = ["c.user_id = $1"];
   const params: string[] = [user.id];
@@ -167,10 +201,41 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           Only with email
         </label>
         <button type="submit" className="btn-primary rounded-full px-4 py-2 text-sm">Search</button>
-        {filterActive && <a href="/app/leads" className="text-sm text-muted underline">Clear</a>}
+        {filterActive && !selectedRuleName && <a href="/app/leads" className="text-sm text-muted underline">Clear</a>}
       </form>
+      {selectedRuleName ? (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-brand/25 bg-brand/5 px-4 py-3">
+          <ChatToContactIllustration className="h-10 w-14 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted">Campaign</p>
+            <p className="truncate text-sm font-semibold text-ink">{selectedRuleName}</p>
+          </div>
+          <div className="flex w-full flex-wrap gap-x-4 gap-y-2 sm:w-auto sm:justify-end">
+            <Link href="/app/auto-dm" className="text-sm font-medium text-brand underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+              Manage automations
+            </Link>
+            <Link href={showAllLeadsHref} className="text-sm font-medium text-brand underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+              Show all leads
+            </Link>
+          </div>
+        </div>
+      ) : null}
       {leads.length === 0 ? (
-        filterActive ? (
+        selectedRuleName ? (
+          <div className="mt-6 rounded-2xl border border-line bg-surface px-4 py-5 text-sm text-ink-2">
+            <p>
+              No leads captured for{" "}
+              <span className="font-semibold text-ink">{selectedRuleName}</span>
+              {search || onlyWithEmail ? " with your current filters" : " yet"}.
+            </p>
+            <p className="mt-2 text-muted">
+              Turn on email capture or run the automation on Instagram comments — contacts appear here as people complete your DM flow.
+            </p>
+            <Link href="/app/auto-dm" className="mt-3 inline-flex min-h-[44px] items-center font-medium text-brand underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+              Back to this automation
+            </Link>
+          </div>
+        ) : filterActive ? (
           <p className="mt-6 text-sm text-muted">No leads match your search.</p>
         ) : (
           <EmptyState icon={Users} title="No leads yet" text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting leads."} />

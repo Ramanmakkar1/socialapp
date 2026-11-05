@@ -674,6 +674,12 @@ export function AutoDmView({
                       <Trash2 className="h-3.5 w-3.5" /> Delete
                     </button>
                   )}
+                  <Link
+                    href={`/app/leads?rule=${encodeURIComponent(rule.id)}`}
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-line px-3 py-1.5 text-sm font-medium text-brand hover:border-brand hover:bg-brand/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                  >
+                    View captured leads
+                  </Link>
                 </div>
               </li>
             ))}
