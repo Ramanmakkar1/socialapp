@@ -3,6 +3,7 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
+// Poskoo mark (same as the landing-page logo) on the landing "paper" background.
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -13,15 +14,20 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 40,
-          background: "linear-gradient(135deg, #6d4aff, #ff4fa3)",
+          background: "#FFFCF6",
         }}
       >
-        <svg width="112" height="112" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg width="140" height="140" viewBox="0 0 40 40" aria-hidden="true">
           <path
-            d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
-            fill="white"
+            d="M20 3c9.4 0 17 6.7 17 15.4S29.4 34 20 34c-1.6 0-3.1-.2-4.6-.5L8 37.5l1.7-6.6C5.6 28.1 3 23.6 3 18.4 3 9.7 10.6 3 20 3z"
+            fill="#FF6A3D"
+            stroke="#1E1631"
+            strokeWidth="2.4"
+            strokeLinejoin="round"
           />
+          <circle cx="14.5" cy="18.5" r="2.4" fill="#1E1631" />
+          <circle cx="25.5" cy="18.5" r="2.4" fill="#1E1631" />
+          <path d="M16 24c2.4 2 5.6 2 8 0" stroke="#1E1631" strokeWidth="2.2" fill="none" strokeLinecap="round" />
         </svg>
       </div>
     ),
