@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
 import {
   ArrowRight, Check, Minus, CalendarDays, Layers, Mail, ShieldCheck, CalendarClock, MessageCircleHeart, KeyRound,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: { absolute: `Later Alternative With Instagram Auto-DM | ${BRAND.name}` },
