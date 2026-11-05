@@ -11,7 +11,8 @@ export const metadata: Metadata = {
  openGraph: { title, description, url: "/", siteName: BRAND.name, images: [{ url: "/landing/hero.webp", width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: ["/landing/hero.webp"] },
 };
-const plans = [
+type PlanItem = { text: string; soon?: boolean };
+const plans: { name: string; price: string; per: string; popular?: boolean; items: PlanItem[]; cta: string; ctaHref: string }[] = [
   {
     name: "Free",
     price: "$0",
