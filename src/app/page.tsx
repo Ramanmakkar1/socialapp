@@ -30,6 +30,7 @@ const jsonLd = {
       url: BRAND.url,
       name: BRAND.name,
       publisher: { "@id": BRAND.url + "#org" },
+      inLanguage: "en",
     },
     {
       "@type": "SoftwareApplication",
