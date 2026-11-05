@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { BRAND } from "@/lib/brand";
 import CookieNotice from "@/components/CookieNotice";
+import Analytics from "@/components/Analytics";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <CookieNotice />
+        <Analytics />
       </body>
     </html>
   );
