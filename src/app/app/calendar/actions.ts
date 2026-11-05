@@ -34,7 +34,7 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
 }
 
 type SavePostInput = {
-  id?: string;
+  draftId?: string;
   caption: string;
   firstComment?: string;
   platforms: ("instagram" | "facebook" | "threads")[];
@@ -97,7 +97,10 @@ export async function savePost(
 
   const user = await requireUser();
 
-  if (input.id !== undefined && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.id)) {
+  if (
+    input.draftId !== undefined &&
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.draftId)
+  ) {
     return { ok: false, error: "Invalid draft." };
   }
 
@@ -242,30 +245,76 @@ export async function savePost(
   try {
     await client.query("begin");
 
-    const postRes = await client.query<{ id: string }>(
-      input.id
-        ? "update scheduled_posts set caption=$2, scheduled_at=$3, status=$4, media=$5::jsonb, dm_rule_id=$6, ig_format=$7, first_comment=$8 where user_id=$1 and id=$9 and status='draft' returning id"
-        : "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) returning id",
-      [
-        user.id,
-        input.caption,
-        scheduledAt,
-        status,
-        JSON.stringify(mediaItems),
-        dmRuleId,
-        instagramSelected ? igFormat : "feed",
-        igFormat === "story" ? null : firstComment || null,
-        ...(input.id ? [input.id] : []),
-      ],
-    );
-    id = postRes.rows[0]?.id;
-    if (!id) {
-      await client.query("rollback");
-      return { ok: false, error: "Could not save post." };
-    }
+    if (input.draftId) {
+      const locked = await client.query<{ status: string }>(
+        "select status from scheduled_posts where id = $1 and user_id = $2 for update",
+        [input.draftId, user.id],
+      );
+      if (locked.rows.length === 0) {
+        await client.query("rollback");
+        return {
+          ok: false,
+          error: "That draft wasn't found. It may have been deleted or belongs to another account.",
+        };
+      }
+      if (locked.rows[0].status !== "draft") {
+        await client.query("rollback");
+        return {
+          ok: false,
+          error: "This post is no longer a draft. Manage it from your queue instead of the composer.",
+        };
+      }
+      const strayTargets = await client.query(
+        "select 1 from post_targets where post_id = $1 and status <> 'pending' limit 1",
+        [input.draftId],
+      );
+      if (strayTargets.rows.length > 0) {
+        await client.query("rollback");
+        return {
+          ok: false,
+          error: "This draft can't be edited here because publishing has already started.",
+        };
+      }
 
-    if (input.id) {
+      const postRes = await client.query<{ id: string }>(
+        "update scheduled_posts set caption=$2, scheduled_at=$3, status=$4, media=$5::jsonb, dm_rule_id=$6, ig_format=$7, first_comment=$8, updated_at=now() where id=$1 returning id",
+        [
+          input.draftId,
+          input.caption,
+          scheduledAt,
+          status,
+          JSON.stringify(mediaItems),
+          dmRuleId,
+          instagramSelected ? igFormat : "feed",
+          igFormat === "story" ? null : firstComment || null,
+        ],
+      );
+      id = postRes.rows[0]?.id;
+      if (!id) {
+        await client.query("rollback");
+        return { ok: false, error: "Could not save post." };
+      }
+
       await client.query("delete from post_targets where post_id = $1", [id]);
+    } else {
+      const postRes = await client.query<{ id: string }>(
+        "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) returning id",
+        [
+          user.id,
+          input.caption,
+          scheduledAt,
+          status,
+          JSON.stringify(mediaItems),
+          dmRuleId,
+          instagramSelected ? igFormat : "feed",
+          igFormat === "story" ? null : firstComment || null,
+        ],
+      );
+      id = postRes.rows[0]?.id;
+      if (!id) {
+        await client.query("rollback");
+        return { ok: false, error: "Could not save post." };
+      }
     }
 
     for (const platform of platforms) {

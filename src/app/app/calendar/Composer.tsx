@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AtSign, Facebook, Instagram, Sparkles } from "lucide-react";
 import { savePost } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
@@ -70,6 +70,7 @@ function toLocalInputValue(d: Date): string {
 
 export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [draftId, setDraftId] = useState(initialDraft?.id);
   const lastDraftIdRef = useRef<string | undefined>(undefined);
   const mainId = useId();
@@ -115,6 +116,16 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
   const [aiIdeas, setAiIdeas] = useState<CaptionIdea[]>([]);
   const [aiError, setAiError] = useState("");
   const [aiPending, startAiTransition] = useTransition();
+
+  const calendarHrefWithoutDraft = useCallback(
+    (hash = "#new") => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("draft");
+      const query = params.toString();
+      return query ? `/app/calendar?${query}${hash}` : `/app/calendar${hash}`;
+    },
+    [searchParams],
+  );
 
   const resetComposerForNewPost = useCallback(() => {
     setMainCaption("");
@@ -221,7 +232,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
       }
     }
     return {
-      id: draftId,
+      draftId,
       caption: mainCaption,
       firstComment,
       platforms,
@@ -284,6 +295,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
       setFeedback({ kind: "err", text: "Choose a valid local date and time before saving." });
       return;
     }
+    const editingDraftId = draftId;
     startTransition(async () => {
       let result;
       try {
@@ -308,8 +320,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
         setFeedback({ kind: "ok", text: `Scheduled for ${when}` });
       }
       resetComposerForNewPost();
-      if (draftId) router.replace("/app/calendar#new");
-      else router.refresh();
+      if (editingDraftId) {
+        router.replace(calendarHrefWithoutDraft());
+      }
+      router.refresh();
     });
   }
 
@@ -318,7 +332,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
       <h2 id={`${mainId}-heading`} className="sr-only">
         {draftId ? "Edit draft" : "New post composer"}
       </h2>
-      {draftId && <Link href="/app/calendar#new" className="mb-4 inline-block text-sm text-brand">Cancel editing · New post</Link>}
+      {draftId && (
+        <Link href={calendarHrefWithoutDraft()} className="mb-4 inline-block text-sm text-brand">
+          Cancel editing · New post
+        </Link>
+      )}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div className="space-y-6">
           <div>
