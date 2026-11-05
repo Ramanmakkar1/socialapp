@@ -4,6 +4,7 @@ import { ArrowRight, BookOpen, LifeBuoy, Rocket, Wrench } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import SupportIllustration from "@/components/SupportIllustration";
 
 export const metadata: Metadata = {
   title: "Help center",
@@ -53,11 +54,14 @@ export default function HelpHubPage() {
     <>
       <SiteHeader />
       <main className="flex-1 px-4 py-12 sm:py-16">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Help center</h1>
-          <p className="mt-3 text-ink-2">
-            Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
-          </p>
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Help center</h1>
+            <p className="mt-3 text-ink-2">
+              Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
+            </p>
+          </div>
+          <SupportIllustration className="w-40 shrink-0 sm:w-56" />
         </div>
 
         <section className="mx-auto mt-12 max-w-5xl">

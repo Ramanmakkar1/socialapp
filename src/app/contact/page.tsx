@@ -4,6 +4,7 @@ import { KeyRound, LifeBuoy, Mail, MessageCircleQuestion } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import SupportIllustration from "@/components/SupportIllustration";
 
 export const metadata: Metadata = {
   title: `${BRAND.name} support: help with scheduling and auto-DM`,
@@ -49,9 +50,12 @@ export default function ContactPage() {
     <>
       <SiteHeader />
       <main className="flex-1 px-4 py-12 sm:py-16">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Contact support</h1>
-          <p className="mt-3 text-ink-2">Need a hand with scheduling, Instagram auto-DM or your account? Choose the support option that fits.</p>
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Contact support</h1>
+            <p className="mt-3 text-ink-2">Need a hand with scheduling, Instagram auto-DM or your account? Choose the support option that fits.</p>
+          </div>
+          <SupportIllustration className="w-40 shrink-0 sm:w-56" />
         </div>
         <section aria-label="Support options" className="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-3">
           {cards.map(({ icon: Icon, title, content }) => (
