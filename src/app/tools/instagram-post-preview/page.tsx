@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
 import { ArrowRight, ImagePlus, Scan, TextQuote } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import PostPreviewTool from "./PostPreviewTool";
 
 const PATH = "/tools/instagram-post-preview";

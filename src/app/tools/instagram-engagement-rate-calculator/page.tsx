@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
 import { ArrowRight, ExternalLink, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import EngagementCalculator from "./EngagementCalculator";
 
 const PATH = "/tools/instagram-engagement-rate-calculator";
