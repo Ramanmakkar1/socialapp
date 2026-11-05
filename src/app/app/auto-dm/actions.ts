@@ -17,6 +17,8 @@ export type RuleFormInput = {
   emailGate: boolean;
   followGate: boolean;
   triggers: RuleTrigger[];
+  /** null = all connected Instagram accounts */
+  socialAccountId: string | null;
 };
 
 export type RuleActionResult = { ok: true } | { ok: false; errors: string[] };
@@ -76,6 +78,26 @@ function dbNotReady(): RuleActionResult {
   return { ok: false, errors: ["Database not configured."] };
 }
 
+async function resolveSocialAccountId(
+  userId: string,
+  socialAccountId: string | null,
+): Promise<{ id: string | null } | { error: string }> {
+  if (socialAccountId === null || socialAccountId === "") {
+    return { id: null };
+  }
+  if (!UUID_RE.test(socialAccountId)) {
+    return { error: "Invalid Instagram account." };
+  }
+  const rows = await query<{ id: string }>(
+    `select id from socialapp.social_accounts where id = $1 and user_id = $2 and platform = 'instagram'`,
+    [socialAccountId, userId],
+  );
+  if (!rows[0]) {
+    return { error: "This Instagram account isn't connected to your workspace." };
+  }
+  return { id: socialAccountId };
+}
+
 export async function createRule(input: RuleFormInput): Promise<RuleActionResult> {
   if (!isDbConfigured()) {
     return dbNotReady();
@@ -85,13 +107,18 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
   if (errors.length > 0) {
     return { ok: false, errors };
   }
+  const account = await resolveSocialAccountId(user.id, input.socialAccountId);
+  if ("error" in account) {
+    return { ok: false, errors: [account.error] };
+  }
   const link = input.linkUrl.trim() || null;
   try {
     await query(
-      `insert into socialapp.dm_rules (user_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, triggers, status)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active')`,
+      `insert into socialapp.dm_rules (user_id, social_account_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, triggers, status)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active')`,
       [
         user.id,
+        account.id,
         input.name.trim(),
         input.keywords,
         input.matchType,
@@ -121,11 +148,15 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
   if (errors.length > 0) {
     return { ok: false, errors };
   }
+  const account = await resolveSocialAccountId(user.id, input.socialAccountId);
+  if ("error" in account) {
+    return { ok: false, errors: [account.error] };
+  }
   const link = input.linkUrl.trim() || null;
   try {
     const rows = await query<{ id: string }>(
-      `update socialapp.dm_rules set name=$2, keywords=$3, match_type=$4, dm_text=$5, link_url=$6, email_gate=$7, follow_gate=$8, triggers=$9, updated_at=now()
-       where id=$1 and user_id=$10 returning id`,
+      `update socialapp.dm_rules set name=$2, keywords=$3, match_type=$4, dm_text=$5, link_url=$6, email_gate=$7, follow_gate=$8, triggers=$9, social_account_id=$10, updated_at=now()
+       where id=$1 and user_id=$11 returning id`,
       [
         id,
         input.name.trim(),
@@ -136,6 +167,7 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
         input.emailGate,
         input.followGate,
         input.triggers,
+        account.id,
         user.id,
       ],
     );

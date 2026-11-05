@@ -17,6 +17,12 @@ import {
 const INPUT =
   "mt-1.5 w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none";
 
+export type InstagramAccountOption = {
+  id: string;
+  username: string | null;
+  status: string;
+};
+
 export type DbRuleRow = {
   id: string;
   name: string;
@@ -28,6 +34,7 @@ export type DbRuleRow = {
   follow_gate: boolean;
   status: "active" | "paused";
   triggers: string[];
+  social_account_id: string | null;
 };
 
 export type RuleFormDefaults = {
@@ -40,7 +47,70 @@ export type RuleFormDefaults = {
   followGate?: boolean;
   triggers?: RuleTrigger[];
   matchModeNote?: string;
+  socialAccountId?: string | null;
 };
+
+const ALL_ACCOUNTS_VALUE = "";
+
+function accountStatusLabel(status: string): string {
+  if (status === "active") return "Connected";
+  if (status === "expired" || status === "disconnected") return "Reconnect needed";
+  return status;
+}
+
+function defaultNewAccountId(accounts: InstagramAccountOption[]): string | null {
+  const connected = accounts.find((a) => a.status === "active");
+  return connected?.id ?? null;
+}
+
+function ruleAccountLabel(rule: DbRuleRow, accounts: InstagramAccountOption[]): string {
+  if (!rule.social_account_id) {
+    return "All connected Instagram accounts";
+  }
+  const match = accounts.find((a) => a.id === rule.social_account_id);
+  if (match?.username) {
+    return `@${match.username}`;
+  }
+  return "Instagram account";
+}
+
+function MultiAccountRoutingIllustration({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="120"
+      height="72"
+      viewBox="0 0 120 72"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <rect x="44" y="8" width="32" height="32" rx="16" fill="color-mix(in srgb, var(--brand) 18%, transparent)" />
+      <circle cx="60" cy="20" r="6" fill="var(--brand)" />
+      <path d="M52 30c2-3 14-3 16 0" stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" />
+      <rect x="8" y="40" width="28" height="28" rx="14" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
+      <circle cx="22" cy="50" r="5" fill="color-mix(in srgb, var(--brand-2) 55%, var(--brand))" />
+      <path d="M38 48 L48 36" stroke="var(--brand)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" />
+      <rect x="84" y="40" width="28" height="28" rx="14" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
+      <circle cx="98" cy="50" r="5" fill="color-mix(in srgb, var(--brand) 70%, var(--brand-2))" />
+      <path d="M82 48 L72 36" stroke="var(--brand-2)" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" />
+      <path
+        d="M56 34c-6 4-10 10-10 14h8"
+        stroke="var(--brand)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M64 34c6 4 10 10 10 14h-8"
+        stroke="var(--brand-2)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
 
 function parseKeywords(raw: string): string[] {
   return raw
@@ -68,6 +138,7 @@ function defaultsToInput(defaults: RuleFormDefaults | undefined): Partial<RuleFo
     emailGate: defaults.emailGate,
     followGate: defaults.followGate,
     triggers: defaults.triggers ? normalizeTriggers(defaults.triggers) : undefined,
+    socialAccountId: defaults.socialAccountId,
   };
 }
 
@@ -76,12 +147,14 @@ type RuleFormProps = {
   ruleId?: string;
   initial?: RuleFormDefaults;
   matchModeNote?: string;
+  instagramAccounts: InstagramAccountOption[];
   onClose: () => void;
   onSaved: () => void;
 };
 
-export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSaved }: RuleFormProps) {
+export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccounts, onClose, onSaved }: RuleFormProps) {
   const nameId = useId();
+  const accountId = useId();
   const keywordsId = useId();
   const dmId = useId();
   const linkId = useId();
@@ -102,6 +175,13 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
   const [followGate, setFollowGate] = useState(base.followGate ?? false);
   const [triggerComment, setTriggerComment] = useState(initialTriggers.includes("comment"));
   const [triggerStoryReply, setTriggerStoryReply] = useState(initialTriggers.includes("story_reply"));
+  const initialAccount =
+    base.socialAccountId !== undefined
+      ? base.socialAccountId
+      : mode === "create"
+        ? defaultNewAccountId(instagramAccounts)
+        : null;
+  const [socialAccountId, setSocialAccountId] = useState<string | null>(initialAccount);
   const [errors, setErrors] = useState<string[]>([]);
   const [pending, startTransition] = useTransition();
 
@@ -138,6 +218,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
       emailGate,
       followGate,
       triggers,
+      socialAccountId,
     };
   }
 
@@ -174,6 +255,37 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
         <p className="mt-3 rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm text-ink-2">{matchModeNote}</p>
       )}
       <div className="mt-5 space-y-4">
+        <div className="rounded-xl border border-line bg-surface-2 p-4">
+          <div className="flex flex-wrap items-start gap-4">
+            <MultiAccountRoutingIllustration className="shrink-0" />
+            <div className="min-w-0 flex-1">
+              <label htmlFor={accountId} className="text-sm font-medium text-ink-2">
+                Instagram account
+              </label>
+              <select
+                id={accountId}
+                value={socialAccountId ?? ALL_ACCOUNTS_VALUE}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setSocialAccountId(v === ALL_ACCOUNTS_VALUE ? null : v);
+                }}
+                className={INPUT}
+              >
+                <option value={ALL_ACCOUNTS_VALUE}>All connected Instagram accounts</option>
+                {instagramAccounts.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    @{a.username ?? "unknown"} ({accountStatusLabel(a.status)})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-xs leading-relaxed text-muted">
+                Rules scoped to one profile only run on comments for that account. Choose{" "}
+                <span className="text-ink-2">All connected Instagram accounts</span> to reuse the same keywords and DM
+                on every profile you connect.
+              </p>
+            </div>
+          </div>
+        </div>
         <div>
           <label htmlFor={nameId} className="text-sm font-medium text-ink-2">Name</label>
           <input
@@ -334,12 +446,19 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, onClose, onSave
 
 type AutoDmViewProps = {
   rules: DbRuleRow[];
+  instagramAccounts: InstagramAccountOption[];
   templateDefaults?: RuleFormDefaults;
   templateNote?: string;
   rewindButton?: ComponentType<{ ruleId: string }>;
 };
 
-export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton: RewindButton }: AutoDmViewProps) {
+export function AutoDmView({
+  rules,
+  instagramAccounts,
+  templateDefaults,
+  templateNote,
+  rewindButton: RewindButton,
+}: AutoDmViewProps) {
   const [formOpen, setFormOpen] = useState(Boolean(templateDefaults));
   const [editing, setEditing] = useState<DbRuleRow | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -399,6 +518,7 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
         emailGate: editing.email_gate,
         followGate: editing.follow_gate,
         triggers: normalizeTriggers(editing.triggers),
+        socialAccountId: editing.social_account_id,
       }
     : templateDefaults;
 
@@ -408,6 +528,11 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
         <div>
           <h1 className="text-2xl font-semibold">Auto-DM</h1>
           <p className="text-sm text-muted">Send a DM to everyone who comments a keyword.</p>
+          {instagramAccounts.length > 1 && (
+            <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted">
+              Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
+            </p>
+          )}
         </div>
         {!formOpen && (
           <button type="button" onClick={openCreate} className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold">
@@ -424,6 +549,7 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
             ruleId={editing?.id}
             initial={formDefaults}
             matchModeNote={!editing ? templateNote : undefined}
+            instagramAccounts={instagramAccounts}
             onClose={closeForm}
             onSaved={() => {}}
           />
@@ -457,6 +583,10 @@ export function AutoDmView({ rules, templateDefaults, templateNote, rewindButton
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h2 className="font-semibold">{rule.name}</h2>
+                    <p className="mt-1 text-xs text-muted">
+                      <span className="font-medium text-ink-2">Account:</span>{" "}
+                      {ruleAccountLabel(rule, instagramAccounts)}
+                    </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {rule.keywords.map((k) => (
                         <span key={k} className="inline-block rounded-md bg-surface-2 px-2 py-0.5 font-mono text-xs font-semibold text-brand">

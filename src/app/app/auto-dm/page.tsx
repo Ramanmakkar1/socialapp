@@ -15,11 +15,18 @@ export default async function AutoDmPage({
   const { template: templateParam } = await searchParams;
   const templateSlug = typeof templateParam === "string" ? templateParam : templateParam?.[0];
 
-  const rules = await query<DbRuleRow>(
-    `select id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status, triggers
-     from socialapp.dm_rules where user_id = $1 order by created_at desc`,
-    [user.id],
-  );
+  const [rules, instagramAccounts] = await Promise.all([
+    query<DbRuleRow>(
+      `select id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status, triggers, social_account_id
+       from socialapp.dm_rules where user_id = $1 order by created_at desc`,
+      [user.id],
+    ),
+    query<{ id: string; username: string | null; status: string }>(
+      `select id, username, status from socialapp.social_accounts
+       where user_id = $1 and platform = 'instagram' order by created_at`,
+      [user.id],
+    ),
+  ]);
 
   let templateDefaults: RuleFormDefaults | undefined;
   let templateNote: string | undefined;
@@ -46,6 +53,7 @@ export default async function AutoDmPage({
   return (
     <AutoDmView
       rules={rules}
+      instagramAccounts={instagramAccounts}
       templateDefaults={templateDefaults}
       templateNote={templateNote}
       rewindButton={RewindPastCommentsButton}
