@@ -1,3 +1,5 @@
+import { buildCommentDmMessage } from './commentMessage';
+
 export type DmRule = {
   id: string;
   name: string;
@@ -55,6 +57,19 @@ export function validateRule(rule: DmRule): string[] {
   if (rule.matchMode !== 'any' && !rule.keywords.some((keyword) => normalize(keyword))) errors.push('Add at least one keyword, or choose “Any comment”.');
   if (!rule.dmMessage.trim()) errors.push('DM message is required.');
   if (rule.dmMessage.length > 1000) errors.push('DM message must be 1000 characters or fewer.');
+  if (rule.askEmail || rule.requireFollow) {
+    const message = buildCommentDmMessage({
+      dmText: rule.dmMessage,
+      // Reserve the maximum username length for every token replacement.
+      fromUsername: 'u'.repeat(30),
+      linkUrl: rule.linkUrl?.trim() || null,
+      emailGate: rule.askEmail,
+      followGate: rule.requireFollow,
+    });
+    if (message.length > 1000) {
+      errors.push('Shorten the DM message to leave room for usernames and gate instructions within the 1000-character limit.');
+    }
+  }
   if ((rule.askEmail || rule.requireFollow) && !rule.linkUrl?.trim()) {
     errors.push('Link URL is required when asking for email or requiring a follow.');
   }

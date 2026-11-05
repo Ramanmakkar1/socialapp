@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateRule, type DmRule } from './rules';
+import { buildCommentDmMessage } from './commentMessage';
 
 function makeRule(dmMessage: string): DmRule {
   return {
@@ -58,3 +59,45 @@ test('rejects malformed, insecure, and credential-bearing destinations', () => {
     ], linkUrl);
   }
 });
+
+const gateLengthError = 'Shorten the DM message to leave room for usernames and gate instructions within the 1000-character limit.';
+
+for (const [name, askEmail, requireFollow] of [
+  ['email-only', true, false],
+  ['follow-only', false, true],
+  ['combined', true, true],
+] as const) {
+  const gatedRule = (dmMessage: string): DmRule => ({
+    ...makeRule(dmMessage), askEmail, requireFollow, linkUrl: 'https://example.com',
+  });
+  const render = (rule: DmRule) => buildCommentDmMessage({
+    dmText: rule.dmMessage, fromUsername: 'u'.repeat(30), linkUrl: rule.linkUrl!,
+    emailGate: rule.askEmail, followGate: rule.requireFollow,
+  });
+
+  test(`${name} gate rejects a generated DM over the limit without truncating`, () => {
+    const rule = gatedRule('a'.repeat(950));
+    const message = render(rule);
+    assert.ok(message.length > 1000);
+    assert.deepEqual(validateRule(rule), [gateLengthError]);
+    assert.equal(render(rule), message);
+    assert.equal(rule.dmMessage.length, 950);
+  });
+
+  test(`${name} gate accepts exactly 1000 rendered characters and rejects 1001`, () => {
+    const overhead = render(gatedRule('')).length;
+    const rule = gatedRule('a'.repeat(1000 - overhead));
+    assert.equal(render(rule).length, 1000);
+    assert.deepEqual(validateRule(rule), []);
+    assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [gateLengthError]);
+  });
+
+  test(`${name} gate reserves 30 characters for every repeated username token`, () => {
+    const template = '{{username}} {{username}} {{link}}';
+    const overhead = render(gatedRule(template)).length;
+    const rule = gatedRule(template + 'a'.repeat(1000 - overhead));
+    assert.equal(render(rule).length, 1000);
+    assert.deepEqual(validateRule(rule), []);
+    assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [gateLengthError]);
+  });
+}
