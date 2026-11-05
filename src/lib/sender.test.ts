@@ -728,6 +728,132 @@ test("sendDueDms: old queued DM follow-up sends when inbound message is recent",
   );
 });
 
+test("sendDueDms: DM follow-up ignores inbound on another Instagram account", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([
+    [`ig-other:customer-1`, new Date(Date.now() - HOUR_MS)],
+  ]);
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [dmFollowUpRow({ id: "q-wrong-account-inbound", social_account_id: accountId })],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.skipped, 1);
+      assert.equal(fetchCalls, 0);
+      assert.match(ctx.queue[0]?.last_error ?? "", /No inbound message/);
+    },
+    inbound
+  );
+});
+
+test("sendDueDms: DM follow-up ignores inbound from a different customer", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([
+    [`${externalId}:customer-other`, new Date(Date.now() - HOUR_MS)],
+  ]);
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [dmFollowUpRow({ id: "q-wrong-sender-inbound", social_account_id: accountId })],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.skipped, 1);
+      assert.equal(fetchCalls, 0);
+      assert.match(ctx.queue[0]?.last_error ?? "", /No inbound message/);
+    },
+    inbound
+  );
+});
+
+test("sendDueDms: comment reply still uses queue age, not inbound messaging window", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async (url: string, init?: RequestInit) => {
+    fetchCalls += 1;
+    assert.match(url, /graph\.instagram\.com/);
+    const body = JSON.parse(String(init?.body)) as { recipient: { comment_id: string } };
+    assert.equal(body.recipient.comment_id, "c1");
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([
+    [`${externalId}:r1`, new Date(Date.now() - 25 * HOUR_MS)],
+  ]);
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [
+      baseQueueRow({
+        id: "q-comment-recent",
+        social_account_id: accountId,
+        created_at: Date.now(),
+      }),
+    ],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.sent, 1);
+      assert.equal(fetchCalls, 1);
+      assert.equal(ctx.queue[0]?.status, "sent");
+    },
+    inbound
+  );
+});
+
 test("sendDueDms: inbound lookup failure keeps the DM pending via rollback", async () => {
   const accountId = "acc-1";
   const externalId = "ig-1";
