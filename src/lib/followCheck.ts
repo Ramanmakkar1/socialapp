@@ -2,6 +2,7 @@ import { decryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
 
 const GRAPH_BASE = "https://graph.instagram.com/v21.0";
+const FOLLOW_CHECK_TIMEOUT_MS = 6_000;
 
 export async function isFollower(
   igsid: string,
@@ -13,6 +14,7 @@ export async function isFollower(
       {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
+        signal: AbortSignal.timeout(FOLLOW_CHECK_TIMEOUT_MS),
       },
     );
     if (!res.ok) {
