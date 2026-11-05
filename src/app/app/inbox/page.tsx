@@ -3,8 +3,9 @@ import { Inbox, MessageCircle, MessagesSquare } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
 import { DM_WINDOW_MS, PRIVATE_REPLY_WINDOW_MS, loadInbox, withinWindow, type Thread } from "@/lib/inbox";
-import { privateReplyAction, replyInThreadAction, replyToCommentAction } from "./actions";
+import { privateReplyAction, replyToCommentAction } from "./actions";
 import ReplySubmitButton from "./ReplySubmitButton";
+import ThreadReplyComposer from "./ThreadReplyComposer";
 
 export const metadata = { title: "Inbox" };
 
@@ -150,13 +151,13 @@ export default async function InboxPage({
             ))}
           </ul>
           {withinWindow(openThread.lastInboundAt, DM_WINDOW_MS) ? (
-            <form action={replyInThreadAction} className="mt-4 flex flex-wrap gap-2">
-              <input type="hidden" name="account_id" value={openThread.accountId} />
-              <input type="hidden" name="sender_id" value={openThread.senderId} />
-              <label className="sr-only" htmlFor="thread-reply">Reply</label>
-              <input id="thread-reply" name="message" required maxLength={1000} placeholder="Write a reply…" className={inputCls} />
-              <ReplySubmitButton label="Send" />
-            </form>
+            <ThreadReplyComposer
+              key={JSON.stringify([user.id, openThread.accountId, openThread.senderId])}
+              userId={user.id}
+              accountId={openThread.accountId}
+              senderId={openThread.senderId}
+              sent={one(sp.ok) === "dm" && !error}
+            />
           ) : (
             <p className="mt-4 text-sm text-muted">Instagram only allows replies within 24 hours of this person&apos;s last message. You can reply again once they message you.</p>
           )}
