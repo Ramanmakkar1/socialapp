@@ -253,8 +253,10 @@
   display:flex;gap:1.4rem;flex-wrap:wrap}
 .landing :global(footer a){
   text-decoration:none}
+/* The illustrations have transparent backgrounds (2026-11-04), so no blend mode: multiply left a light box on the
+   tilted cards and darkened the art on the dark CTA band. The CTA art sits on its own light tile instead. */
 .landing :global(.hero-art img),.landing :global(.pcard img),.landing :global(.art img),.landing :global(.cta img){
-  mix-blend-mode:multiply}
+  mix-blend-mode:normal}
 .landing :global(.cta img){
   background:var(--paper)}
 
