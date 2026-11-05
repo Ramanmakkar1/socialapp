@@ -2,6 +2,7 @@
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../EmptyState";
+import LoadFailed from "../calendar/LoadFailed";
 import LeadContactActions from "./LeadContactActions";
 
 export const metadata = { title: "Leads" };
@@ -43,10 +44,30 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   const { q = '', email = '', rule = '', page: requestedPage = '' } = await searchParams;
   const user = await requireUser();
   const configured = isDbConfigured();
-  const rules = configured ? await query<{ id: string; name: string }>(
-    "select id, name from socialapp.dm_rules where user_id=$1 order by name",
-    [user.id]
-  ) : [];
+  const reloadParams = new URLSearchParams();
+  for (const [key, value] of Object.entries({ q, email, rule, page: requestedPage })) {
+    if (value) reloadParams.set(key, value);
+  }
+  const reloadQuery = reloadParams.toString();
+  const loadFailure = (
+    <>
+      <h1 className="text-2xl font-semibold">Leads</h1>
+      <LoadFailed
+        className="mt-6"
+        message="Leads could not be loaded. Your saved contacts may still exist. Reload to try again."
+        reloadHref={reloadQuery ? `/app/leads?${reloadQuery}` : "/app/leads"}
+      />
+    </>
+  );
+  let rules: { id: string; name: string }[];
+  try {
+    rules = configured ? await query<{ id: string; name: string }>(
+      "select id, name from socialapp.dm_rules where user_id=$1 order by name",
+      [user.id]
+    ) : [];
+  } catch {
+    return loadFailure;
+  }
 
   const search = q.trim().slice(0, 100);
   const onlyWithEmail = email === "1";
@@ -69,17 +90,27 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   const pageSize = 50;
   const parsedPage = typeof requestedPage === "string" && /^\d+$/.test(requestedPage) ? Number(requestedPage) : 1;
   const validPage = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-  const countRows = configured ? await query<{ total: string }>(
-    `select count(*) as total from socialapp.contacts c where ${conditions.join(" and ")}`,
-    params
-  ) : [];
+  let countRows: { total: string }[];
+  try {
+    countRows = configured ? await query<{ total: string }>(
+      `select count(*) as total from socialapp.contacts c where ${conditions.join(" and ")}`,
+      params
+    ) : [];
+  } catch {
+    return loadFailure;
+  }
   const total = Number(countRows[0]?.total ?? 0);
   const page = Math.min(validPage, Math.max(1, Math.ceil(total / pageSize)));
   const offset = (page - 1) * pageSize;
-  const leads = configured ? await query<Lead>(
-    `select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where ${conditions.join(" and ")} order by c.created_at desc, c.id desc limit $${params.length + 1} offset $${params.length + 2}`,
-    [...params, pageSize, offset]
-  ) : [];
+  let leads: Lead[];
+  try {
+    leads = configured ? await query<Lead>(
+      `select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where ${conditions.join(" and ")} order by c.created_at desc, c.id desc limit $${params.length + 1} offset $${params.length + 2}`,
+      [...params, pageSize, offset]
+    ) : [];
+  } catch {
+    return loadFailure;
+  }
 
   const exportParams = new URLSearchParams();
   if (search) exportParams.set("q", search);
