@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
@@ -528,6 +529,10 @@ export function AutoDmView({
         <div>
           <h1 className="text-2xl font-semibold">Auto-DM</h1>
           <p className="text-sm text-muted">Send a DM to everyone who comments a keyword.</p>
+          <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            <Link href="/app/auto-dm/activity" className="font-medium text-brand hover:underline">Activity</Link>
+            <Link href="/help/instagram-auto-dm-not-working" className="font-medium text-brand hover:underline">DMs not sending?</Link>
+          </p>
           {instagramAccounts.length > 1 && (
             <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted">
               Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
