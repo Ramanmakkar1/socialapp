@@ -250,6 +250,50 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <div><h2>Your next post could fill your inbox <em className="s">with leads.</em></h2><p>Start free. Connect your account in one tap.</p><Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link></div>
     <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
   </div>
-  <footer><span>© 2026 Poskoo · Town Media Labs</span><span className="fl"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/data-deletion">Data deletion</Link><Link href="/contact">Contact</Link><Link href="/help">Help</Link></span></footer>
+  <footer className="rich">
+    <div className="fbrand">
+      <Link className="logo" href="/"><svg width="30" height="30" aria-hidden="true"><use href="#mark"/></svg>poskoo<b>.</b></Link>
+      <p>Schedule Instagram posts and auto-DM every comment, on the official Meta API.</p>
+    </div>
+    <nav aria-label="Product">
+      <p className="fh">Product</p>
+      <ul>
+        <li><Link href="/instagram-scheduler">Instagram scheduler</Link></li>
+        <li><Link href="/instagram-auto-dm">Instagram auto DM</Link></li>
+        <li><Link href="/instagram-auto-dm/templates">Auto-DM templates</Link></li>
+        <li><Link href="/#pricing">Pricing</Link></li>
+      </ul>
+    </nav>
+    <nav aria-label="Free tools">
+      <p className="fh">Free tools</p>
+      <ul>
+        <li><Link href="/tools/instagram-hashtag-generator">Hashtag generator</Link></li>
+        <li><Link href="/tools/instagram-caption-counter">Caption counter</Link></li>
+        <li><Link href="/tools/instagram-font-generator">Font generator</Link></li>
+        <li><Link href="/tools/instagram-bio-generator">Bio generator</Link></li>
+        <li><Link href="/tools/instagram-image-size">Image size guide</Link></li>
+        <li><Link href="/tools">All free tools</Link></li>
+      </ul>
+    </nav>
+    <nav aria-label="Compare">
+      <p className="fh">Compare</p>
+      <ul>
+        <li><Link href="/buffer-alternative">Buffer alternative</Link></li>
+        <li><Link href="/later-alternative">Later alternative</Link></li>
+        <li><Link href="/manychat-alternative">ManyChat alternative</Link></li>
+      </ul>
+    </nav>
+    <nav aria-label="Company">
+      <p className="fh">Company</p>
+      <ul>
+        <li><Link href="/help">Help center</Link></li>
+        <li><Link href="/contact">Contact</Link></li>
+        <li><Link href="/privacy">Privacy</Link></li>
+        <li><Link href="/terms">Terms</Link></li>
+        <li><Link href="/data-deletion">Data deletion</Link></li>
+      </ul>
+    </nav>
+    <div className="legal"><span>© 2026 Poskoo · Town Media Labs</span></div>
+  </footer>
 </div>
 </main>; }

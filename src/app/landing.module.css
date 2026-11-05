@@ -253,6 +253,18 @@
   display:flex;gap:1.4rem;flex-wrap:wrap}
 .landing :global(footer a){
   text-decoration:none}
+.landing :global(footer.rich){
+  display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:32px;border-top:1px solid var(--line,rgba(0,0,0,.08));padding-block:48px 32px;align-items:start}
+.landing :global(footer.rich ul){
+  list-style:none;padding:0;margin:0;display:grid;gap:4px}
+.landing :global(footer.rich a){
+  color:var(--muted);display:inline-flex;min-height:40px;align-items:center}
+.landing :global(footer.rich a:hover){
+  color:var(--ink)}
+.landing :global(footer.rich .fh){
+  color:var(--ink);font-weight:600;margin-bottom:8px}
+.landing :global(footer.rich .legal){
+  grid-column:1 / -1;padding-top:20px;border-top:1px solid var(--line,rgba(0,0,0,.08))}
 /* The illustrations have transparent backgrounds (2026-11-04), so no blend mode: multiply left a light box on the
    tilted cards and darkened the art on the dark CTA band. The CTA art sits on its own light tile instead. */
 .landing :global(.hero-art img),.landing :global(.pcard img),.landing :global(.art img),.landing :global(.cta img){
@@ -307,10 +319,14 @@
 }
 
 
-.landing {
-   width:100%;
-  overflow-x:clip;
+@media (max-width: 760px) {
+  .landing :global(footer.rich) {
+    grid-template-columns: 1fr 1fr;
   }
+  .landing :global(footer.rich .fbrand) {
+    grid-column: 1 / -1;
+  }
+}
 
 .landing :global(.pill) {
    max-width:100%;
