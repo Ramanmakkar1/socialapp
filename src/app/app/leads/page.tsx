@@ -5,6 +5,7 @@ import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../EmptyState";
 import LoadFailed from "../calendar/LoadFailed";
 import LeadContactActions from "./LeadContactActions";
+import LocalTime from "@/components/LocalTime";
 
 export const metadata = { title: "Leads" };
 
@@ -20,11 +21,6 @@ type Lead = {
 
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
-}
-
-function formatLeadDate(value: Date | null): string {
-  if (!value) return "—";
-  return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 function ChatToContactIllustration({ className }: { className?: string }) {
@@ -263,7 +259,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     </div>
                     <div>
                       <dt className="text-xs text-muted">Captured</dt>
-                      <dd>{formatLeadDate(lead.created_at)}</dd>
+                      <dd><LocalTime value={lead.created_at} style="medium" fallback="-" /></dd>
                     </div>
                   </dl>
                   <LeadContactActions email={lead.email} phone={lead.phone} />
@@ -281,7 +277,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                   <td className="px-4 py-3">{lead.email || "—"}</td>
                   <td className="px-4 py-3">{lead.phone || "—"}</td>
                   <td className="px-4 py-3">{lead.rule_name || "—"}</td>
-                  <td className="px-4 py-3">{formatLeadDate(lead.created_at)}</td>
+                  <td className="px-4 py-3"><LocalTime value={lead.created_at} style="medium" fallback="-" /></td>
                 </tr>
               ))}</tbody>
             </table>
