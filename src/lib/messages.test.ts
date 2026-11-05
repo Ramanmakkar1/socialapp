@@ -123,6 +123,9 @@ test("follow verification preserves retries and gated-link deduplication", async
         if (sql.includes("insert into socialapp.short_links")) {
           return { rows: [{ code: "abc123" }] };
         }
+        if (sql.includes("comment_reply")) {
+          return { rows: [{ ok: 1 }] };
+        }
         if (sql.includes("select 1 as ok")) {
           return { rows: queued.filter((row) => row.contact === params[0] && row.kind === "gated_link") };
         }
@@ -332,6 +335,16 @@ test("processMessageEvents eligible rules keep gating and dedupe", async (t) => 
         if (sql.includes("insert into socialapp.short_links")) {
           return { rows: [{ code: "abc123" }] };
         }
+        if (sql.includes("comment_reply")) {
+          return { rows: [{ ok: 1 }] };
+        }
+        if (sql.includes("select 1 as ok")) {
+          return {
+            rows: queued.filter(
+              (row) => row.kind === "gated_link" && row.contact === params[0],
+            ),
+          };
+        }
         if (sql.includes("select count(*)")) {
           return {
             rows: [
@@ -390,6 +403,162 @@ test("processMessageEvents eligible rules keep gating and dedupe", async (t) => 
   }
 });
 
+
+test("gated link requires a sent prompt and ignores older unsent prompts", async (t) => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const { encryptToken } = await import("./crypto.ts");
+  type Prompt = { account: string; recipient: string; status: string };
+  type Rule = {
+    link_url: string | null;
+    email_gate: boolean | null;
+    follow_gate: boolean | null;
+  };
+  const scenarios: {
+    name: string;
+    prompts: Prompt[];
+    rule: Rule;
+    expectQueued: number;
+    expectUpdated: number;
+  }[] = [
+    {
+      name: "sent prompt alongside older failed/skipped and a pending prompt queues once",
+      prompts: [
+        { account: "account-1", recipient: "lead", status: "sent" },
+        { account: "account-1", recipient: "lead", status: "failed" },
+        { account: "account-1", recipient: "lead", status: "skipped" },
+        { account: "account-1", recipient: "lead", status: "pending" },
+      ],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      expectQueued: 1,
+      expectUpdated: 1,
+    },
+    {
+      name: "unsent-only prompt stays ineligible",
+      prompts: [{ account: "account-1", recipient: "lead", status: "pending" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      expectQueued: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "paused rule stays ineligible",
+      prompts: [{ account: "account-1", recipient: "lead", status: "sent" }],
+      rule: { link_url: null, email_gate: null, follow_gate: null },
+      expectQueued: 0,
+      expectUpdated: 0,
+    },
+    {
+      name: "mismatched account stays ineligible",
+      prompts: [{ account: "other-account", recipient: "lead", status: "sent" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      expectQueued: 0,
+      expectUpdated: 1,
+    },
+  ];
+  for (const scenario of scenarios) {
+    await t.test(scenario.name, async () => {
+      const previousPool = globalThis.__socialappPool;
+      const previousUrl = process.env.DATABASE_URL;
+      const previousKey = process.env.TOKEN_ENCRYPTION_KEY;
+      const previousFetch = globalThis.fetch;
+      process.env.DATABASE_URL = "mock";
+      process.env.TOKEN_ENCRYPTION_KEY = Buffer.alloc(32).toString("base64");
+      const token = encryptToken("test-token");
+      const queued: { kind: string; contact: unknown }[] = [];
+      const query = async (sql: string, params: unknown[] = []) => {
+        if (sql.includes("select id, user_id")) {
+          return { rows: [{ id: "account-1", user_id: "owner" }] };
+        }
+        if (sql.includes("select access_token_enc")) {
+          return { rows: [{ access_token_enc: token }] };
+        }
+        if (sql.includes("from socialapp.contacts c")) {
+          return {
+            rows: [
+              {
+                id: "contact-1",
+                email: "lead@example.com",
+                source_rule_id: "rule-1",
+                ...scenario.rule,
+              },
+            ],
+          };
+        }
+        if (sql.startsWith("insert into socialapp.contacts")) {
+          return { rows: [{ id: "contact-1" }] };
+        }
+        if (sql.includes("insert into socialapp.short_links")) {
+          return { rows: [{ code: "abc123" }] };
+        }
+        if (sql.includes("comment_reply")) {
+          const account = String(params[2]);
+          const recipient = String(params[3]);
+          const hasSent = scenario.prompts.some(
+            (p) =>
+              p.account === account &&
+              p.recipient === recipient &&
+              p.status === "sent",
+          );
+          return { rows: hasSent ? [{ ok: 1 }] : [] };
+        }
+        if (sql.includes("kind='gated_link'")) {
+          return {
+            rows: queued.filter(
+              (row) => row.kind === "gated_link" && row.contact === params[0],
+            ),
+          };
+        }
+        if (sql.includes("select count(*)")) {
+          return {
+            rows: [
+              {
+                n: queued.filter(
+                  (row) => row.kind === "follow_nudge" && row.contact === params[0],
+                ).length,
+              },
+            ],
+          };
+        }
+        if (sql.includes("insert into socialapp.dm_queue")) {
+          const kind = sql.includes("'gated_link'") ? "gated_link" : "follow_nudge";
+          queued.push({ kind, contact: params[3] });
+          return { rows: [] };
+        }
+        assert.ok(
+          ["begin", "commit", "rollback"].includes(sql) ||
+            sql.includes("pg_advisory_xact_lock"),
+          sql,
+        );
+        return { rows: [] };
+      };
+      globalThis.__socialappPool = {
+        query,
+        connect: async () => ({ query, release: () => {} }),
+      } as unknown as pg.Pool;
+      globalThis.fetch = async () =>
+        Response.json({ is_user_follow_business: true });
+      const event = {
+        accountExternalId: "account-1",
+        senderId: "lead",
+        text: "done",
+        mid: "m1",
+      };
+      try {
+        assert.equal(await processMessageEvents([event]), scenario.expectUpdated);
+        assert.equal(
+          queued.filter((row) => row.kind === "gated_link").length,
+          scenario.expectQueued,
+        );
+      } finally {
+        globalThis.__socialappPool = previousPool;
+        globalThis.fetch = previousFetch;
+        if (previousUrl === undefined) delete process.env.DATABASE_URL;
+        else process.env.DATABASE_URL = previousUrl;
+        if (previousKey === undefined) delete process.env.TOKEN_ENCRYPTION_KEY;
+        else process.env.TOKEN_ENCRYPTION_KEY = previousKey;
+      }
+    });
+  }
+});
 
 test("inbound contact details upsert without unsolicited automation", async (t) => {
   const { processMessageEvents } = await import("./messages.ts");

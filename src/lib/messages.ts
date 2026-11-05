@@ -94,6 +94,22 @@ type ContactRuleRow = {
   follow_gate: boolean | null;
 };
 
+/**
+ * A gate prompt that was actually sent to this contact. Only the absence of a
+ * sent prompt blocks the gated link; older pending, failed or skipped prompts
+ * for the same contact/account/rule do not.
+ */
+const OUTSTANDING_GATED_RULES_SQL = `
+  select 1 as ok
+  from socialapp.dm_queue
+  where contact_id = $1
+    and rule_id = $2
+    and kind = 'comment_reply'
+    and social_account_id = $3
+    and recipient_external_id = $4
+    and status = 'sent'
+`;
+
 export async function processMessageEvents(
   events: MessageEvent[],
 ): Promise<number> {
@@ -180,6 +196,15 @@ export async function processMessageEvents(
         hadFailure = true;
       }
       if (emailOk && followOk) {
+        const outstanding = await query(OUTSTANDING_GATED_RULES_SQL, [
+          contactBefore.id,
+          ruleId,
+          account.id,
+          event.senderId,
+        ]);
+        if (outstanding.length === 0) {
+          continue;
+        }
         let link = contactBefore.link_url;
         try {
           link = await shortLinkFor(
