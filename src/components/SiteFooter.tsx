@@ -37,6 +37,7 @@ export function SiteFooter() {
           <FooterColumn
             title="Free tools"
             links={[
+              { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
               { href: "/tools/instagram-caption-counter", label: "Caption counter" },
               { href: "/tools/instagram-font-generator", label: "Font generator" },
               { href: "/tools/instagram-image-size", label: "Image size guide" },

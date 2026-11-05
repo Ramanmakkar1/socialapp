@@ -16,6 +16,12 @@ export const metadata: Metadata = {
 
 const tools = [
   {
+    href: "/tools/instagram-hashtag-generator",
+    title: "Instagram hashtag generator",
+    description: "Build a hand-curated hashtag set for your niche, mix broad and specific tags, and copy up to 30 at once.",
+    icon: Hash,
+  },
+  {
     href: "/tools/instagram-post-preview",
     title: "Instagram post preview",
     description: "Preview a local photo and caption in a feed mockup, compare square and portrait crops, and copy your caption.",
