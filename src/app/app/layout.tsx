@@ -32,12 +32,14 @@ async function AppShell({ children }: { children: ReactNode }) {
   }
   return (
     <div className="app-theme flex min-h-screen">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface p-4 md:flex">
-        <Link href="/" className="mb-8 flex items-center gap-2 font-semibold">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface p-4 md:sticky md:top-0 md:flex md:h-dvh md:max-h-screen md:overflow-hidden">
+        <Link href="/" className="mb-6 flex shrink-0 items-center gap-2 font-semibold">
           <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg"><Zap className="h-4 w-4" /></span>{BRAND.name}
         </Link>
-        <SidebarNav />
-        <div className="mt-auto border-t border-line pt-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <SidebarNav />
+        </div>
+        <div className="mt-4 shrink-0 border-t border-line pt-4">
           <p className="truncate text-sm text-muted" title={user.email}>{user.email}</p>
           <form action={logoutAction}>
             <button type="submit" className="mt-2 text-sm font-medium text-ink-2 hover:underline">Log out</button>
@@ -60,7 +62,7 @@ async function AppShell({ children }: { children: ReactNode }) {
             <a href="/api/instagram/connect" className="btn-primary">Reconnect Instagram</a>
           </div>
         )}
-        <div className="p-6">{children}</div>
+        <div className="mx-auto w-full min-w-0 max-w-[1140px] px-4 py-6 sm:px-6 lg:px-8">{children}</div>
       </main>
     </div>
   );
