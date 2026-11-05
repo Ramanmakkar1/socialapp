@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { DM_TEMPLATES, type DmTemplate } from "@/lib/dmTemplates";
+import TemplateChooser from "./TemplateChooser";
 import CopyButton from "./CopyButton";
 
 export const metadata: Metadata = {
@@ -62,6 +63,9 @@ export default function DmTemplatesPage() {
             </nav>
           </div>
         </section>
+
+        {/* Goal-based chooser */}
+        <TemplateChooser />
 
         {/* Templates */}
         {groups.map((g) => (
