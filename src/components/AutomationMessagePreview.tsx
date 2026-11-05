@@ -5,6 +5,7 @@ import {
   buildCommentDmMessage,
   COMMENT_USERNAME_FALLBACK,
 } from "@/lib/commentMessage";
+import AutomationJourneyPreview from "@/components/AutomationJourneyPreview";
 
 type Props = {
   dmText: string;
@@ -210,10 +211,17 @@ export default function AutomationMessagePreview({
       )}
 
       <p className="mt-3 text-xs leading-relaxed text-ink-2">
-        This preview uses your destination URL as written. It does not simulate successful follow
-        checks, email collection, or later reply messages—only the first outgoing DM from this
-        automation.
+        This preview uses your destination URL as written. Use the optional rehearsal below to
+        simulate sample replies and a follow result locally—nothing is checked on Instagram.
       </p>
+
+      <AutomationJourneyPreview
+        key={JSON.stringify([dmText, trimmedLink, emailGate, followGate])}
+        initialMessage={messageBody}
+        linkUrl={trimmedLink}
+        emailGate={emailGate}
+        followGate={followGate}
+      />
     </section>
   );
 }
