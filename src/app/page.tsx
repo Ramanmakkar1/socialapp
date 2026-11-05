@@ -12,12 +12,53 @@ export const metadata: Metadata = {
  twitter: { card: "summary_large_image", title, description, images: ["/landing/hero.webp"] },
 };
 const plans = [
-  { name: "Free", price: "$0", per: "forever", items: ["2 social accounts", "10 scheduled posts / month", "500 auto-DMs / month", "Link in bio page"], cta: "Start free" },
-  { name: "Pro", price: "$19", per: "/ month", popular: true, items: ["5 social accounts", "Unlimited scheduling", "10,000 auto-DMs / month", "AI captions + AI DM replies", "Email & phone capture", "Click + lead analytics"], cta: "Start 14-day trial" },
-  { name: "Agency", price: "$49", per: "/ month", items: ["25 social accounts", "50,000 auto-DMs / month", "Client workspaces", "Approve-before-post", "Team seats", "Priority support"], cta: "Start 14-day trial" },
+  {
+    name: "Free",
+    price: "$0",
+    per: "forever",
+    items: [
+      { text: "2 social accounts" },
+      { text: "10 scheduled posts / month" },
+      { text: "500 auto-DMs / month" },
+      { text: "Link in bio page", soon: true },
+    ],
+    cta: "Start free",
+    ctaHref: "/signup",
+  },
+  {
+    name: "Pro",
+    price: "$19",
+    per: "/ month",
+    popular: true,
+    items: [
+      { text: "5 social accounts" },
+      { text: "Unlimited scheduling" },
+      { text: "10,000 auto-DMs / month" },
+      { text: "AI captions + AI DM replies" },
+      { text: "Email & phone capture" },
+      { text: "Click + lead analytics" },
+    ],
+    cta: "Start free, upgrade later",
+    ctaHref: "/signup",
+  },
+  {
+    name: "Agency",
+    price: "$49",
+    per: "/ month",
+    items: [
+      { text: "25 social accounts" },
+      { text: "50,000 auto-DMs / month" },
+      { text: "Client workspaces", soon: true },
+      { text: "Approve-before-post", soon: true },
+      { text: "Team seats", soon: true },
+      { text: "Priority support" },
+    ],
+    cta: "Start free, upgrade later",
+    ctaHref: "/signup",
+  },
 ];
 
-const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Plans are month to month. Cancel in settings and keep access until the end of your paid period."}];
+const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}];
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -172,16 +213,25 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <section id="pricing"><div className="wrap">
   <div className="head"><p className="eyebrow">Pricing</p><h2>Simple plans. <em className="s">Start free.</em></h2></div>
   <div className="plans">
-    <div className="plan"><h3>Free</h3><div className="price">$0 <small>forever</small></div><ul>
-      <li><svg width="16" height="16"><use href="#ok"/></svg>2 social accounts</li><li><svg width="16" height="16"><use href="#ok"/></svg>10 scheduled posts a month</li><li><svg width="16" height="16"><use href="#ok"/></svg>500 auto-DMs a month</li><li><svg width="16" height="16"><use href="#ok"/></svg>Link in bio page</li></ul>
-      <Link className="btn btn-line" href="/signup">Start free</Link></div>
-    <div className="plan pop"><span className="tag">Most popular</span><h3>Pro</h3><div className="price">$19 <small>/ month</small></div><ul>
-      <li><svg width="16" height="16"><use href="#ok"/></svg>5 social accounts</li><li><svg width="16" height="16"><use href="#ok"/></svg>Unlimited scheduling</li><li><svg width="16" height="16"><use href="#ok"/></svg>10,000 auto-DMs a month</li><li><svg width="16" height="16"><use href="#ok"/></svg>AI captions and AI DM replies</li><li><svg width="16" height="16"><use href="#ok"/></svg>Email and phone capture</li><li><svg width="16" height="16"><use href="#ok"/></svg>Click and lead analytics</li></ul>
-      <Link className="btn btn-dark" href="/signup">Start 14-day trial</Link></div>
-    <div className="plan"><h3>Agency</h3><div className="price">$49 <small>/ month</small></div><ul>
-      <li><svg width="16" height="16"><use href="#ok"/></svg>25 social accounts</li><li><svg width="16" height="16"><use href="#ok"/></svg>50,000 auto-DMs a month</li><li><svg width="16" height="16"><use href="#ok"/></svg>Client workspaces</li><li><svg width="16" height="16"><use href="#ok"/></svg>Approve before posting</li><li><svg width="16" height="16"><use href="#ok"/></svg>Team seats</li><li><svg width="16" height="16"><use href="#ok"/></svg>Priority support</li></ul>
-      <Link className="btn btn-line" href="/signup">Start 14-day trial</Link></div>
+    {plans.map((p) => (
+      <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
+        {p.popular ? <span className="tag">Most popular</span> : null}
+        <h3>{p.name}</h3>
+        <div className="price">{p.price} <small>{p.per}</small></div>
+        <ul>
+          {p.items.map((item) => (
+            <li key={item.text}>
+              <svg width="16" height="16"><use href="#ok"/></svg>
+              {item.text}
+              {item.soon ? <small className="soon"> · coming soon</small> : null}
+            </li>
+          ))}
+        </ul>
+        <Link className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</Link>
+      </div>
+    ))}
   </div>
+  <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>Every account starts on the Free plan. Paid plans open soon. You will never be charged without choosing a plan first.</p>
 </div></section>
 
 <section id="faq" style={{"paddingTop": "20px"}}><div className="wrap">
@@ -190,7 +240,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <details open><summary>Is it safe for my Instagram account?</summary><p>Yes. Poskoo uses Meta&apos;s official Instagram API. You log in on Instagram&apos;s own screen, we never see your password, and you can disconnect any time.</p></details>
     <details><summary>Which platforms are supported?</summary><p>Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon.</p></details>
     <details><summary>Do I need a business account?</summary><p>For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app.</p></details>
-    <details><summary>Can I cancel any time?</summary><p>Yes. Plans are month to month. Cancel in settings and keep access until the end of your paid period.</p></details>
+    <details><summary>Can I cancel any time?</summary><p>Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel.</p></details>
   </div>
 </div></section>
 
