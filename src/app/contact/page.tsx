@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LifeBuoy, Mail, MessageCircleQuestion } from "lucide-react";
+import { KeyRound, LifeBuoy, Mail, MessageCircleQuestion } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -61,6 +61,23 @@ export default function ContactPage() {
               <div className="mt-2">{content}</div>
             </article>
           ))}
+          <article id="password-reset" className="rounded-2xl border border-line bg-surface p-6">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-brand">
+              <KeyRound className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <h2 className="mt-4 font-semibold">Forgot your password?</h2>
+            <div className="mt-2">
+              <p className="text-sm leading-6 text-ink-2">
+                Email us from the address you signed up with and we will help you get back into your account.
+              </p>
+              <a
+                className="btn-primary mt-4 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
+                href={`mailto:${BRAND.supportEmail}?subject=${encodeURIComponent("Password reset")}`}
+              >
+                Email support
+              </a>
+            </div>
+          </article>
         </section>
         <p className="mx-auto mt-10 max-w-3xl text-center text-sm leading-6 text-ink-2">
           For details about how {BRAND.company} handles your information, see our <Link className="text-brand underline-offset-4 hover:underline" href="/privacy">Privacy Policy</Link>, <Link className="text-brand underline-offset-4 hover:underline" href="/terms">Terms of Service</Link> and <Link className="text-brand underline-offset-4 hover:underline" href="/data-deletion">data deletion instructions</Link>.

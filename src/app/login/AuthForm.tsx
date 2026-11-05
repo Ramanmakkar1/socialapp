@@ -48,6 +48,13 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
               className={INPUT}
             />
           </div>
+          {!signup && (
+            <div className="flex justify-end">
+              <Link href="/contact#password-reset" className="text-sm font-medium text-ink-2 underline">
+                Forgot password?
+              </Link>
+            </div>
+          )}
           {state?.error && (
             <p role="alert" className="text-sm text-warn">{state.error}</p>
           )}
