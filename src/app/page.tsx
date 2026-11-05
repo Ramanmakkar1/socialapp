@@ -1,11 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import { BRAND } from "@/lib/brand";
+import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
-const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-instrument-sans" });
-const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-instrument-serif" });
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = "Schedule Instagram posts, auto-DM keyword comments and capture leads with Poskoo. Start free using the official Meta API. No credit card needed.";
 export const metadata: Metadata = {
@@ -56,7 +54,7 @@ const jsonLd = {
   ],
 };
 
-export default function Home() { return <main className={`${styles.landing} ${sans.variable} ${serif.variable}`}>
+export default function Home() { return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
   <symbol id="ok" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--green)"/><path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></symbol>

@@ -14,6 +14,37 @@
   --brand-ink: #ffffff;
   --ok: #12a150;
   --warn: #c98a00;
+
+  /* Poskoo v8 shared palette & chrome (landing + opt-in app theme) */
+  --poskoo-paper: #fffcf6;
+  --poskoo-card: #ffffff;
+  --poskoo-ink: #1e1631;
+  --poskoo-muted: #5f5873;
+  --poskoo-line: #ece6da;
+  --poskoo-lilac: #cdbdf6;
+  --poskoo-peach: #ffcf96;
+  --poskoo-pink: #f6b6da;
+  --poskoo-mint: #bdebd2;
+  --poskoo-lime: #ddf46b;
+  --poskoo-coral: #ff6a3d;
+  --poskoo-violet: #6b4eff;
+  --poskoo-green: #1fa971;
+  --poskoo-red: #e5484d;
+  --poskoo-band: #f3eeff;
+  --poskoo-pill-border: #e2d9ff;
+  --poskoo-radius-sm: 18px;
+  --poskoo-radius-md: 20px;
+  --poskoo-radius-panel: 24px;
+  --poskoo-radius-card: 26px;
+  --poskoo-radius-band: 36px;
+  --poskoo-radius-pill: 999px;
+  --poskoo-shadow-card: 0 2px 0 rgba(30, 22, 49, 0.06), 0 18px 30px -22px rgba(30, 22, 49, 0.35);
+  --poskoo-shadow-float: 0 22px 40px -22px rgba(30, 22, 49, 0.45);
+  --poskoo-shadow-accent: 8px 8px 0 var(--poskoo-lime);
+  --poskoo-type-base: 17px;
+  --poskoo-type-base-lh: 1.6;
+  --poskoo-type-heading-ls: -0.035em;
+  --poskoo-type-heading-lh: 1.02;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -64,6 +95,43 @@ body {
 .btn-primary {
   background: linear-gradient(100deg, var(--brand), var(--brand-2));
   color: var(--brand-ink);
+}
+
+/* Opt-in dashboard / app shell: Poskoo v8 semantics without retheming public marketing pages. */
+.app-theme {
+  color-scheme: light;
+  --bg: var(--poskoo-paper);
+  --surface: var(--poskoo-card);
+  --surface-2: var(--poskoo-band);
+  --ink: var(--poskoo-ink);
+  --ink-2: #3d3450;
+  --muted: var(--poskoo-muted);
+  --line: var(--poskoo-line);
+  --brand: var(--poskoo-violet);
+  --brand-2: var(--poskoo-coral);
+  --brand-ink: #ffffff;
+  --ok: var(--poskoo-green);
+  --warn: var(--poskoo-coral);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.app-theme .btn-primary {
+  background: var(--ink);
+  color: #fff;
+}
+
+.app-theme h1,
+.app-theme h2,
+.app-theme h3 {
+  font-weight: 700;
+  letter-spacing: var(--poskoo-type-heading-ls);
+  line-height: var(--poskoo-type-heading-lh);
+}
+
+.app-theme :where(a, button, summary, input, select, textarea):focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
 }
 
 .glow {

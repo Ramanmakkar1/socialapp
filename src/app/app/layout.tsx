@@ -31,7 +31,7 @@ async function AppShell({ children }: { children: ReactNode }) {
     }
   }
   return (
-    <div className="flex min-h-screen">
+    <div className="app-theme flex min-h-screen">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface p-4 md:flex">
         <Link href="/" className="mb-8 flex items-center gap-2 font-semibold">
           <span className="btn-primary grid h-8 w-8 place-items-center rounded-lg"><Zap className="h-4 w-4" /></span>{BRAND.name}
