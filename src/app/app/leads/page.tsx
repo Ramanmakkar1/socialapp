@@ -2,6 +2,7 @@
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../EmptyState";
+import LeadContactActions from "./LeadContactActions";
 
 export const metadata = { title: "Leads" };
 
@@ -17,6 +18,25 @@ type Lead = {
 
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
+}
+
+function formatLeadDate(value: Date | null): string {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function LeadsContactIllustration() {
+  return (
+    <svg aria-hidden="true" className="h-11 w-11 shrink-0" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="8" width="36" height="28" rx="8" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
+      <circle cx="16" cy="20" r="5" fill="var(--brand)" opacity="0.25" />
+      <rect x="24" y="17" width="12" height="3" rx="1.5" fill="var(--brand)" />
+      <rect x="24" y="23" width="8" height="3" rx="1.5" fill="var(--ink-2)" opacity="0.35" />
+      <path d="M12 32h20" stroke="var(--brand-2)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="32" cy="32" r="6" fill="var(--brand-2)" opacity="0.2" />
+      <path d="M30 32l1.5 1.5L34 31" stroke="var(--brand-2)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ q?: string; email?: string; rule?: string; page?: string }> }) {
@@ -76,7 +96,13 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h1 className="text-2xl font-semibold">Leads</h1><p className="text-sm text-muted">{total > 0 ? `${total} leads | ${offset + 1}-${offset + leads.length} shown` : "0 leads"}</p></div>
+        <div className="flex min-w-0 items-start gap-3">
+          <LeadsContactIllustration />
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold">Leads</h1>
+            <p className="text-sm text-muted">{total > 0 ? `${total} leads | ${offset + 1}-${offset + leads.length} shown` : "0 leads"}</p>
+          </div>
+        </div>
         {leads.length > 0 && <a href={exportHref} className="rounded-full border border-line px-4 py-2 text-sm">Export CSV</a>}
       </div>
       <form method="get" className="mt-6 flex flex-wrap items-center gap-3">
@@ -108,21 +134,52 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           <EmptyState icon={Users} title="No leads yet" text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting leads."} />
         )
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-surface">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-line text-muted"><tr>{["Instagram", "Name", "Email", "Phone", "From rule", "Date"].map((heading) => <th key={heading} scope="col" className="px-4 py-3 font-medium">{heading}</th>)}</tr></thead>
-            <tbody>{leads.map((lead) => (
-              <tr key={lead.id} className="border-b border-line last:border-0">
-                <td className="px-4 py-3">{lead.username ? `@${lead.username}` : "—"}</td>
-                <td className="px-4 py-3">{lead.name || "—"}</td>
-                <td className="px-4 py-3">{lead.email || "—"}</td>
-                <td className="px-4 py-3">{lead.phone || "—"}</td>
-                <td className="px-4 py-3">{lead.rule_name || "—"}</td>
-                <td className="px-4 py-3">{lead.created_at ? new Date(lead.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}</td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
+        <>
+          <ul className="mt-6 space-y-3 md:hidden">
+            {leads.map((lead) => (
+              <li key={lead.id}>
+                <article className="rounded-2xl border border-line bg-surface p-4">
+                  <p className="break-all font-semibold text-ink">{lead.username ? `@${lead.username}` : "—"}</p>
+                  {lead.name ? <p className="mt-1 break-all text-sm text-ink-2">{lead.name}</p> : null}
+                  <dl className="mt-3 space-y-2 text-sm">
+                    <div>
+                      <dt className="text-xs text-muted">Email</dt>
+                      <dd className="break-all">{lead.email || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-muted">Phone</dt>
+                      <dd className="break-all">{lead.phone || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-muted">From rule</dt>
+                      <dd className="break-all">{lead.rule_name || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-muted">Captured</dt>
+                      <dd>{formatLeadDate(lead.created_at)}</dd>
+                    </div>
+                  </dl>
+                  <LeadContactActions email={lead.email} phone={lead.phone} />
+                </article>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 hidden overflow-x-auto rounded-2xl border border-line bg-surface md:block">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-line text-muted"><tr>{["Instagram", "Name", "Email", "Phone", "From rule", "Date"].map((heading) => <th key={heading} scope="col" className="px-4 py-3 font-medium">{heading}</th>)}</tr></thead>
+              <tbody>{leads.map((lead) => (
+                <tr key={lead.id} className="border-b border-line last:border-0">
+                  <td className="px-4 py-3">{lead.username ? `@${lead.username}` : "—"}</td>
+                  <td className="px-4 py-3">{lead.name || "—"}</td>
+                  <td className="px-4 py-3">{lead.email || "—"}</td>
+                  <td className="px-4 py-3">{lead.phone || "—"}</td>
+                  <td className="px-4 py-3">{lead.rule_name || "—"}</td>
+                  <td className="px-4 py-3">{formatLeadDate(lead.created_at)}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </>
       )}
       {total > pageSize && (
         <nav aria-label="Leads pagination" className="mt-6 flex flex-wrap items-center gap-3 text-sm">
