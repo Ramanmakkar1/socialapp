@@ -85,8 +85,16 @@ export default async function CalendarPage({
   const weekEndExclusive = new Date(weekStart);
   weekEndExclusive.setUTCDate(weekEndExclusive.getUTCDate() + 7);
 
-  const rangeStart = view === "month" ? monthStart : weekStart;
-  const rangeEnd = view === "month" ? nextMonth : weekEndExclusive;
+  const monthGridStart = mondayUtcStart(monthStart);
+  const monthLastDay = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() + 1, 0));
+  const monthGridEndSunday = new Date(monthLastDay);
+  const monthEndDow = monthGridEndSunday.getUTCDay();
+  monthGridEndSunday.setUTCDate(monthGridEndSunday.getUTCDate() + (monthEndDow === 0 ? 0 : 7 - monthEndDow));
+  const monthRangeEnd = new Date(monthGridEndSunday);
+  monthRangeEnd.setUTCDate(monthRangeEnd.getUTCDate() + 1);
+
+  const rangeStart = view === "month" ? monthGridStart : weekStart;
+  const rangeEnd = view === "month" ? monthRangeEnd : weekEndExclusive;
 
   let rows: Post[] = [];
   let weekRows: WeekPost[] = [];
