@@ -109,13 +109,13 @@ export default function ToolsPage() {
       <main className="flex-1 overflow-x-hidden">
         <section className="relative px-4 pt-10 pb-16 sm:pt-16">
           <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
+          <div className="relative mx-auto w-full max-w-[1140px]">
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div className="text-center lg:text-left">
                 <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
                   <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · no signup needed
                 </span>
-                <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
+                <h1 className="mx-auto mt-5 max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl lg:mx-0">
                   Free <span className="gradient-text">Instagram tools</span>
                 </h1>
                 <p className="mx-auto mt-4 max-w-xl text-ink-2">
@@ -127,10 +127,10 @@ export default function ToolsPage() {
                 <ToolsHeroIllustration />
               </div>
             </div>
-            <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {tools.map((t) => (
-                <div key={t.href} className="flex flex-col rounded-2xl border border-line bg-surface p-6">
-                  <span className="grid h-10 w-10 place-items-center rounded-lg border border-line bg-bg text-brand">
+                <div key={t.href} className="flex min-w-0 flex-col rounded-2xl border border-line bg-surface p-6">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-bg text-brand">
                     <t.icon className="h-5 w-5" />
                   </span>
                   <h2 className="mt-4 text-lg font-semibold">{t.title}</h2>
@@ -148,7 +148,7 @@ export default function ToolsPage() {
         </section>
 
         <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
+          <div className="btn-primary mx-auto w-full max-w-[1140px] rounded-3xl px-6 py-14 text-center">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule posts and auto-DM everyone who comments</h2>
             <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
             <Link href="/signup" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">
