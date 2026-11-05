@@ -49,74 +49,76 @@ export default async function AppHome() {
           <div key={l} className="rounded-2xl border border-line bg-surface p-5"><div className="text-sm text-muted">{l}</div><div className="mt-1 text-3xl font-semibold">{v.toLocaleString("en-US")}</div></div>
         ))}
       </div>
-      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-semibold">Up next</h2>
-          <Link href="/app/calendar" className="inline-flex min-h-11 items-center text-sm font-medium text-brand hover:underline">
-            View calendar
-          </Link>
-        </div>
-        {upcoming.length === 0 ? (
-          <EmptyState
-            icon={Calendar}
-            title="Nothing scheduled yet"
-            text="Your next queued posts will show here with local date and time."
-          >
-            <Link
-              href="/app/calendar#new"
-              className="btn-primary inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2 text-sm font-medium"
-            >
-              Schedule your first post
+      <div className="mt-6 grid gap-6 items-start xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="min-w-0 rounded-2xl border border-line bg-surface p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-semibold">Up next</h2>
+            <Link href="/app/calendar" className="inline-flex min-h-11 items-center text-sm font-medium text-brand hover:underline">
+              View calendar
             </Link>
-          </EmptyState>
+          </div>
+          {upcoming.length === 0 ? (
+            <EmptyState
+              icon={Calendar}
+              title="Nothing scheduled yet"
+              text="Your next queued posts will show here with local date and time."
+            >
+              <Link
+                href="/app/calendar#new"
+                className="btn-primary inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2 text-sm font-medium"
+              >
+                Schedule your first post
+              </Link>
+            </EmptyState>
+          ) : (
+            <UpcomingPosts posts={upcoming} />
+          )}
+        </div>
+        {doneCount < 3 ? (
+          <div className="min-w-0 rounded-2xl border border-line bg-surface p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-semibold">Get set up in 3 minutes</h2>
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <Link href="/help/getting-started" className="text-brand hover:underline">
+                  Help
+                </Link>
+                <span className="text-muted">{doneCount} of 3 done</span>
+              </div>
+            </div>
+            <div className="mt-3 h-2 rounded-full bg-line">
+              <div className="h-2 rounded-full bg-brand" style={{ width: `${(doneCount / 3) * 100}%` }} />
+            </div>
+            <ol className="mt-4 space-y-3">
+              {steps.map((step, index) => (
+                <li key={step.href} className="flex flex-wrap items-center gap-3">
+                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${step.done ? "bg-brand text-white" : "border border-line text-muted"}`}>
+                    {step.done ? <><Check className="h-4 w-4" aria-hidden="true" /><span className="sr-only">Completed:</span></> : index + 1}
+                  </span>
+                  <div className="min-w-0 flex-1 text-sm">
+                    {step.done ? (
+                      <span className="text-muted line-through">{step.label}</span>
+                    ) : (
+                      <Link href={step.href} className="font-medium text-brand hover:underline">{step.label}</Link>
+                    )}
+                  </div>
+                  {index === firstIncompleteIndex && (
+                    <Link href={step.href} className="btn-primary rounded-full px-3 py-1 text-xs" aria-label={`Start: ${step.label}`}>Start</Link>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
         ) : (
-          <UpcomingPosts posts={upcoming} />
+          <div className="min-w-0 rounded-2xl border border-line bg-surface p-5">
+            <h2 className="font-semibold">Next steps</h2>
+            <ul className="mt-3 space-y-2 text-sm text-ink-2">
+              <li><Link href="/app/auto-dm" className="text-brand hover:underline">Create an auto-DM rule</Link></li>
+              <li><Link href="/app/calendar#new" className="text-brand hover:underline">Schedule a post</Link></li>
+              <li><Link href="/app/leads" className="text-brand hover:underline">See your leads</Link></li>
+            </ul>
+          </div>
         )}
       </div>
-      {doneCount < 3 ? (
-        <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-semibold">Get set up in 3 minutes</h2>
-            <div className="flex flex-wrap items-center gap-3 text-sm">
-              <Link href="/help/getting-started" className="text-brand hover:underline">
-                Help
-              </Link>
-              <span className="text-muted">{doneCount} of 3 done</span>
-            </div>
-          </div>
-          <div className="mt-3 h-2 rounded-full bg-line">
-            <div className="h-2 rounded-full bg-brand" style={{ width: `${(doneCount / 3) * 100}%` }} />
-          </div>
-          <ol className="mt-4 space-y-3">
-            {steps.map((step, index) => (
-              <li key={step.href} className="flex flex-wrap items-center gap-3">
-                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${step.done ? "bg-brand text-white" : "border border-line text-muted"}`}>
-                  {step.done ? <><Check className="h-4 w-4" aria-hidden="true" /><span className="sr-only">Completed:</span></> : index + 1}
-                </span>
-                <div className="min-w-0 flex-1 text-sm">
-                  {step.done ? (
-                    <span className="text-muted line-through">{step.label}</span>
-                  ) : (
-                    <Link href={step.href} className="font-medium text-brand hover:underline">{step.label}</Link>
-                  )}
-                </div>
-                {index === firstIncompleteIndex && (
-                  <Link href={step.href} className="btn-primary rounded-full px-3 py-1 text-xs" aria-label={`Start: ${step.label}`}>Start</Link>
-                )}
-              </li>
-            ))}
-          </ol>
-        </div>
-      ) : (
-        <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
-          <h2 className="font-semibold">Next steps</h2>
-          <ul className="mt-3 space-y-2 text-sm text-ink-2">
-            <li><Link href="/app/auto-dm" className="text-brand hover:underline">Create an auto-DM rule</Link></li>
-            <li><Link href="/app/calendar#new" className="text-brand hover:underline">Schedule a post</Link></li>
-            <li><Link href="/app/leads" className="text-brand hover:underline">See your leads</Link></li>
-          </ul>
-        </div>
-      )}
     </>
   );
 }
