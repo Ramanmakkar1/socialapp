@@ -6,6 +6,7 @@ import {
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import AutoDmDemo from "@/components/AutoDmDemo";
 
 export const metadata: Metadata = {
   title: "Instagram Auto DM: Send a DM to Everyone Who Comments",
@@ -81,6 +82,8 @@ export default function InstagramAutoDm() {
             </div>
           </div>
         </section>
+
+        <AutoDmDemo />
 
         {/* How it works */}
         <section id="how" className="border-y border-line bg-surface px-4 py-20">
