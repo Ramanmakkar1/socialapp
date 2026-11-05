@@ -49,11 +49,12 @@ export async function resolveAndCount(code: string): Promise<string | null> {
   }
   try {
     await query(
-      "update socialapp.short_links set clicks = clicks + 1 where code=$1",
-      [code],
-    );
-    await query(
-      "insert into socialapp.link_clicks (code) values ($1)",
+      `with tracked_link as (
+         update socialapp.short_links set clicks = clicks + 1 where code=$1
+         returning code
+       )
+       insert into socialapp.link_clicks (code)
+       select code from tracked_link`,
       [code],
     );
   } catch {
