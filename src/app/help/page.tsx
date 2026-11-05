@@ -54,24 +54,24 @@ export default function HelpHubPage() {
     <>
       <SiteHeader />
       <main className="flex-1 px-4 py-12 sm:py-16">
-        <div className="mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+        <div className="mx-auto grid w-full max-w-[1140px] grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]">
+          <div className="max-w-prose">
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Help center</h1>
             <p className="mt-3 text-ink-2">
               Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
             </p>
           </div>
-          <SupportIllustration className="w-40 shrink-0 sm:w-56" />
+          <SupportIllustration className="w-40 shrink-0 sm:w-56 lg:w-full lg:justify-self-end" />
         </div>
 
-        <section className="mx-auto mt-12 max-w-5xl">
+        <section className="mx-auto mt-12 w-full max-w-[1140px]">
           <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Guides</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {guides.map((g) => (
               <Link
                 key={g.href}
                 href={g.href}
-                className="group rounded-2xl border border-line bg-surface p-6 transition hover:border-brand/40"
+                className="group min-w-0 rounded-2xl border border-line bg-surface p-6 transition hover:border-brand/40"
               >
                 <g.icon className="h-6 w-6 text-brand" aria-hidden="true" />
                 <h3 className="mt-3 font-semibold group-hover:text-brand">{g.title}</h3>
@@ -84,14 +84,14 @@ export default function HelpHubPage() {
           </div>
         </section>
 
-        <section className="mx-auto mt-12 max-w-5xl">
+        <section className="mx-auto mt-12 w-full max-w-[1140px]">
           <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Product resources</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {resources.map((r) => (
               <Link
                 key={r.href}
                 href={r.href}
-                className="rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40"
+                className="min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40"
               >
                 <r.icon className="h-5 w-5 text-brand" aria-hidden="true" />
                 <h3 className="mt-2 font-medium">{r.title}</h3>
