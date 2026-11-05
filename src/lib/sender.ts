@@ -177,6 +177,11 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
         `select q.id, q.user_id, q.rule_id, q.comment_id, q.recipient_external_id, q.message, q.attempts, q.kind, q.created_at
          from socialapp.dm_queue q
          where q.social_account_id=$1 and q.status='pending' and q.next_attempt_at <= now()
+         and exists (
+           select 1 from socialapp.social_accounts a
+           where a.id = q.social_account_id
+             and (a.dm_cooldown_until is null or a.dm_cooldown_until <= now())
+         )
          and not exists (
            select 1 from socialapp.dm_rules r
            where r.id = q.rule_id
@@ -239,6 +244,10 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           break;
         }
         if (outcome.kind === "rate_limited") {
+          await client.query(
+            "update socialapp.social_accounts set dm_cooldown_until=now() + ($2::int * interval '1 millisecond') where id=$1",
+            [account.id, RATE_LIMIT_PAUSE_MS]
+          );
           await client.query(
             "update socialapp.dm_queue set last_error=$2, next_attempt_at=now() + ($3::int * interval '1 millisecond') where id=$1",
             [row.id, outcome.error, RATE_LIMIT_PAUSE_MS]
