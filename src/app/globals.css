@@ -69,3 +69,19 @@ body {
 .glow {
   box-shadow: 0 30px 80px -30px color-mix(in srgb, var(--brand) 45%, transparent);
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes hero-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .hero-float {
+    animation: hero-float 6s ease-in-out infinite;
+    transform-box: fill-box;
+  }
+
+  .hero-float-delay {
+    animation-delay: -3s;
+  }
+}

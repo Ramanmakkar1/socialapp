@@ -13,6 +13,7 @@ import {
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import SchedulerHeroIllustration from "@/components/SchedulerHeroIllustration";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
@@ -144,6 +145,7 @@ export default function InstagramScheduler() {
               </a>
             </div>
           </div>
+          <SchedulerHeroIllustration />
         </section>
 
         {/* Benefits */}
