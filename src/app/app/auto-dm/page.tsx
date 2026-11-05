@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
 import { AutoDmView, type DbRuleRow, type RuleFormDefaults } from "./RuleForm";
+import { DmDeliveryStatus, loadDmDeliveryRows, type DmDeliveryRow } from "./DmDeliveryStatus";
 import { RewindPastCommentsButton } from "./RewindPastCommentsButton";
 
 export const metadata = { title: "Auto-DM" };
@@ -50,13 +51,24 @@ export default async function AutoDmPage({
     }
   }
 
+  let deliveryRows: DmDeliveryRow[] | null = null;
+  let deliveryLoadError = false;
+  try {
+    deliveryRows = await loadDmDeliveryRows(user.id);
+  } catch {
+    deliveryLoadError = true;
+  }
+
   return (
-    <AutoDmView
-      rules={rules}
-      instagramAccounts={instagramAccounts}
-      templateDefaults={templateDefaults}
-      templateNote={templateNote}
-      rewindButton={RewindPastCommentsButton}
-    />
+    <>
+      <AutoDmView
+        rules={rules}
+        instagramAccounts={instagramAccounts}
+        templateDefaults={templateDefaults}
+        templateNote={templateNote}
+        rewindButton={RewindPastCommentsButton}
+      />
+      <DmDeliveryStatus rows={deliveryRows} loadError={deliveryLoadError} asOf={new Date()} />
+    </>
   );
 }
