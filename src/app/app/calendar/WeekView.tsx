@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import type { DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
+import RescheduleControl from "./RescheduleControl";
 import LoadFailed, { type LoadError } from "./LoadFailed";
 
 type WeekViewPost = {
@@ -159,7 +160,7 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
                 if (dragOverKey === key) setDragOverKey(null);
               }}
               onDrop={(e) => handleDrop(e, key, dayPosts)}
-              className={`min-h-28 rounded-2xl border p-3 ${isToday ? "border-brand" : "border-line"} ${
+              className={`min-h-28 min-w-0 rounded-2xl border p-3 ${isToday ? "border-brand" : "border-line"} ${
                 dragOverKey === key ? "bg-surface-2 ring-1 ring-line" : "bg-surface"
               }`}
             >
@@ -171,24 +172,28 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
                   loadError ? null : <p className="text-xs text-muted">—</p>
                 ) : (
                   dayPosts.map((post) => (
-                    <span
-                      key={post.id}
-                      draggable={isMovable(post.status)}
-                      onDragStart={
-                        isMovable(post.status)
-                          ? (e) => {
-                              e.dataTransfer.setData("text/plain", post.id);
-                              e.dataTransfer.effectAllowed = "move";
-                            }
-                          : undefined
-                      }
-                      className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${
-                        post.status === "failed" ? "text-brand-2" : "text-ink-2"
-                      } ${isMovable(post.status) ? "sm:cursor-grab" : ""}`}
-                      title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
-                    >
-                      {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
-                    </span>
+                    <div key={`${post.id}-${utcDateKey(new Date(post.scheduled_at!))}`} className="min-w-0">
+                      <span
+                        draggable={isMovable(post.status)}
+                        onDragStart={
+                          isMovable(post.status)
+                            ? (e) => {
+                                e.dataTransfer.setData("text/plain", post.id);
+                                e.dataTransfer.effectAllowed = "move";
+                              }
+                            : undefined
+                        }
+                        className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${
+                          post.status === "failed" ? "text-brand-2" : "text-ink-2"
+                        } ${isMovable(post.status) ? "sm:cursor-grab" : ""}`}
+                        title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
+                      >
+                        {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
+                      </span>
+                      {isMovable(post.status) && (
+                        <RescheduleControl id={post.id} scheduledAt={post.scheduled_at!} caption={post.caption} />
+                      )}
+                    </div>
                   ))
                 )}
               </div>

@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import type { DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
+import RescheduleControl from "./RescheduleControl";
 import LoadFailed, { type LoadError } from "./LoadFailed";
 
 type MonthViewPost = {
@@ -157,9 +158,9 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
       )}
       {loadError && <LoadFailed {...loadError} className="mb-3" />}
       <div className="overflow-x-auto">
-        <div className="grid min-w-[640px] grid-cols-7 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-7">
           {WEEKDAYS.map((name) => (
-            <p key={name} className="px-1 text-xs font-medium text-muted">
+            <p key={name} className="hidden px-1 text-xs font-medium text-muted sm:block">
               {name}
             </p>
           ))}
@@ -181,33 +182,37 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
                   if (dragOverKey === key) setDragOverKey(null);
                 }}
                 onDrop={(e) => handleDrop(e, key, dayPosts)}
-                className={`min-h-24 rounded-2xl border p-2 ${isToday ? "border-brand" : "border-line"} ${inMonth ? "" : "opacity-60"} ${
+                className={`min-h-24 min-w-0 rounded-2xl border p-2 ${isToday ? "border-brand" : "border-line"} ${inMonth ? "" : "opacity-60"} ${
                   dragOverKey === key ? "bg-surface-2 ring-1 ring-line" : "bg-surface"
                 }`}
               >
                 <p className={`text-xs ${inMonth ? "text-ink" : "text-muted"}`}>
-                  {day.getUTCDate()}
+                  <span className="sm:hidden">{day.toLocaleDateString("en-US", { weekday: "short", month: "short", timeZone: "UTC" })} </span>{day.getUTCDate()}
                 </p>
                 <div className="mt-1 space-y-1">
                   {dayPosts.slice(0, MAX_CHIPS).map((post) => (
-                    <span
-                      key={post.id}
-                      draggable={isMovable(post.status)}
-                      onDragStart={
-                        isMovable(post.status)
-                          ? (e) => {
-                              e.dataTransfer.setData("text/plain", post.id);
-                              e.dataTransfer.effectAllowed = "move";
-                            }
-                          : undefined
-                      }
-                      className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${chipColor(post.status)} ${
-                        isMovable(post.status) ? "sm:cursor-grab" : ""
-                      }`}
-                      title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
-                    >
-                      {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
-                    </span>
+                    <div key={`${post.id}-${utcDateKey(new Date(post.scheduled_at!))}`} className="min-w-0">
+                      <span
+                        draggable={isMovable(post.status)}
+                        onDragStart={
+                          isMovable(post.status)
+                            ? (e) => {
+                                e.dataTransfer.setData("text/plain", post.id);
+                                e.dataTransfer.effectAllowed = "move";
+                              }
+                            : undefined
+                        }
+                        className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${chipColor(post.status)} ${
+                          isMovable(post.status) ? "sm:cursor-grab" : ""
+                        }`}
+                        title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
+                      >
+                        {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
+                      </span>
+                      {isMovable(post.status) && (
+                        <RescheduleControl id={post.id} scheduledAt={post.scheduled_at!} caption={post.caption} />
+                      )}
+                    </div>
                   ))}
                   {extra > 0 ? <p className="px-1 text-xs text-muted">+{extra} more</p> : null}
                 </div>
