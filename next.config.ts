@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Render metadata in <head> for every user agent, so crawlers and audits always see title/description/canonical.
   htmlLimitedBots: /.*/,
-  /* config options here */
   turbopack: {
     rules: {
       "globals.css": {
