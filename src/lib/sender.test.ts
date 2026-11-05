@@ -195,14 +195,41 @@ type MockSocialAccount = {
   created_at: number;
 };
 
-type MockDmQueueRow = QueueRow & { next_attempt_at?: number; sent_at?: number | null };
+type MockDmQueueRow = QueueRow & { next_attempt_at?: number; sent_at?: number | null; last_error?: string | null };
 
-function installSendDueDmsHarness(accounts: MockSocialAccount[], queue: MockDmQueueRow[], rules: RuleRow[]) {
+type InboundMock = Date | null | "throw";
+
+function inboundEventRow(accountExternalId: string, senderId: string, at: Date) {
+  return {
+    payload: {
+      entry: [
+        {
+          id: accountExternalId,
+          messaging: [
+            {
+              timestamp: at.getTime(),
+              sender: { id: senderId },
+              message: { mid: "inbound-m1", text: "hey" },
+            },
+          ],
+        },
+      ],
+    },
+    received_at: new Date(),
+  };
+}
+
+function installSendDueDmsHarness(
+  accounts: MockSocialAccount[],
+  queue: MockDmQueueRow[],
+  rules: RuleRow[],
+  inboundByThread: Map<string, InboundMock> = new Map()
+) {
   const advisoryByAccount = new Map<string, string>();
   const locksByClient = new Map<string, Set<string>>();
   let clientSeq = 0;
 
-  const poolQuery = async (sql: string) => {
+  const poolQuery = async (sql: string, params?: unknown[]) => {
     if (sql.includes("platform='instagram' and status='active'")) {
       return {
         rows: accounts
@@ -214,6 +241,15 @@ function installSendDueDmsHarness(accounts: MockSocialAccount[], queue: MockDmQu
             access_token_enc: a.access_token_enc,
           })),
       };
+    }
+    if (sql.includes("interval '2 days'") && sql.includes("messaging")) {
+      const accountExternalId = params?.[0] as string;
+      const senderId = params?.[1] as string;
+      const key = `${accountExternalId}:${senderId}`;
+      const mock = inboundByThread.get(key);
+      if (mock === "throw") throw new Error("inbound lookup failed");
+      if (mock == null) return { rows: [] };
+      return { rows: [inboundEventRow(accountExternalId, senderId, mock)] };
     }
     throw new Error(`unexpected pool query: ${sql.slice(0, 80)}`);
   };
@@ -294,6 +330,14 @@ function installSendDueDmsHarness(accounts: MockSocialAccount[], queue: MockDmQu
       const rule = rules.find((r) => r.id === params?.[0]);
       return { rows: rule ? [rule] : [] };
     }
+    if (sql.includes("update socialapp.dm_queue set status='skipped'")) {
+      const row = queue.find((q) => q.id === params?.[0]);
+      if (row) {
+        row.status = "skipped";
+        row.last_error = params?.[1] as string;
+      }
+      return { rows: [] };
+    }
     if (sql.startsWith("update socialapp.dm_queue set status='sent'")) {
       const row = queue.find((q) => q.id === params?.[0]);
       if (row) {
@@ -331,7 +375,8 @@ async function withSendDueDmsEnv<T>(
   accounts: MockSocialAccount[],
   queue: MockDmQueueRow[],
   rules: RuleRow[],
-  run: (ctx: ReturnType<typeof installSendDueDmsHarness>) => Promise<T>
+  run: (ctx: ReturnType<typeof installSendDueDmsHarness>) => Promise<T>,
+  inboundByThread: Map<string, InboundMock> = new Map()
 ): Promise<T> {
   const previousPool = globalThis.__socialappPool;
   const previousUrl = process.env.DATABASE_URL;
@@ -343,7 +388,7 @@ async function withSendDueDmsEnv<T>(
   for (const acct of accounts) {
     if (!acct.access_token_enc) acct.access_token_enc = encryptToken("test-token");
   }
-  const ctx = installSendDueDmsHarness(accounts, queue, rules);
+  const ctx = installSendDueDmsHarness(accounts, queue, rules, inboundByThread);
   globalThis.__socialappPool = ctx.pool;
   try {
     return await run(ctx);
@@ -499,5 +544,224 @@ test("sendDueDms: cooldown on one account does not block another account", async
       assert.equal(result.sent, 1);
       assert.equal(fetchCalls, 1);
     }
+  );
+});
+
+const HOUR_MS = 60 * 60 * 1000;
+const DM_WINDOW_MS = 24 * HOUR_MS;
+
+function dmFollowUpRow(overrides: Partial<MockDmQueueRow> & Pick<MockDmQueueRow, "id" | "social_account_id">): MockDmQueueRow {
+  return baseQueueRow({
+    comment_id: null,
+    kind: "dm_follow_up",
+    recipient_external_id: "customer-1",
+    ...overrides,
+  });
+}
+
+test("sendDueDms: DM follow-up skips when inbound message is outside the 24-hour window", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([
+    [`${externalId}:customer-1`, new Date(Date.now() - 25 * HOUR_MS)],
+  ]);
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [
+      dmFollowUpRow({
+        id: "q-fresh-expired-inbound",
+        social_account_id: accountId,
+        created_at: Date.now(),
+      }),
+    ],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.skipped, 1);
+      assert.equal(result.sent, 0);
+      assert.equal(fetchCalls, 0);
+      assert.equal(ctx.queue[0]?.status, "skipped");
+      assert.match(ctx.queue[0]?.last_error ?? "", /24-hour/);
+    },
+    inbound
+  );
+});
+
+test("sendDueDms: DM follow-up skips when no inbound timestamp is on record", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [dmFollowUpRow({ id: "q-missing-inbound", social_account_id: accountId })],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.skipped, 1);
+      assert.equal(fetchCalls, 0);
+      assert.match(ctx.queue[0]?.last_error ?? "", /No inbound message/);
+    }
+  );
+});
+
+test("sendDueDms: DM follow-up at exact 24-hour inbound boundary is skipped", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([
+    [`${externalId}:customer-1`, new Date(Date.now() - DM_WINDOW_MS)],
+  ]);
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [dmFollowUpRow({ id: "q-boundary", social_account_id: accountId })],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.skipped, 1);
+      assert.equal(fetchCalls, 0);
+      assert.equal(ctx.queue[0]?.status, "skipped");
+    },
+    inbound
+  );
+});
+
+test("sendDueDms: old queued DM follow-up sends when inbound message is recent", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async (url: string, init?: RequestInit) => {
+    fetchCalls += 1;
+    assert.match(url, /graph\.instagram\.com/);
+    const body = JSON.parse(String(init?.body)) as { recipient: { id: string } };
+    assert.equal(body.recipient.id, "customer-1");
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([
+    [`${externalId}:customer-1`, new Date(Date.now() - HOUR_MS)],
+  ]);
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [
+      dmFollowUpRow({
+        id: "q-old-queue",
+        social_account_id: accountId,
+        created_at: Date.now() - 30 * HOUR_MS,
+      }),
+    ],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.sent, 1);
+      assert.equal(fetchCalls, 1);
+      assert.equal(ctx.queue[0]?.status, "sent");
+    },
+    inbound
+  );
+});
+
+test("sendDueDms: inbound lookup failure keeps the DM pending via rollback", async () => {
+  const accountId = "acc-1";
+  const externalId = "ig-1";
+  const rules: RuleRow[] = [
+    { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
+  ];
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([[`${externalId}:customer-1`, "throw"]]);
+
+  await withSendDueDmsEnv(
+    [
+      {
+        id: accountId,
+        external_id: externalId,
+        status: "active",
+        dm_cooldown_until: null,
+        access_token_enc: "",
+        created_at: 1,
+      },
+    ],
+    [dmFollowUpRow({ id: "q-lookup-fail", social_account_id: accountId })],
+    rules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.sent, 0);
+      assert.equal(result.skipped, 0);
+      assert.equal(fetchCalls, 0);
+      assert.equal(ctx.queue[0]?.status, "pending");
+    },
+    inbound
   );
 });

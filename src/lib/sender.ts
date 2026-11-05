@@ -2,6 +2,7 @@
 import type pg from "pg";
 import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
+import { DM_WINDOW_MS, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
 import {
   MAX_ATTEMPTS,
   classifyMetaError,
@@ -90,6 +91,20 @@ export async function gateDmSendByRule(
     return { action: "skip", error: "Automation rule is not active" };
   }
   return { action: "send" };
+}
+
+/** 24 h rule for normal DMs: keyed off the person's last inbound message, not queue age. */
+async function inboundDmWindowError(
+  accountExternalId: string,
+  recipientExternalId: string,
+  now = Date.now()
+): Promise<string | null> {
+  const lastInbound = await lastInboundMessageAt(accountExternalId, recipientExternalId);
+  if (withinWindow(lastInbound, DM_WINDOW_MS, now)) return null;
+  if (!lastInbound) {
+    return "No inbound message on record; outside Instagram's 24-hour messaging window";
+  }
+  return "Outside Instagram's 24-hour messaging window";
 }
 
 async function sendPrivateReply(
@@ -233,7 +248,9 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           left -= 1;
           continue;
         }
-        const windowError = messagingWindowError(row);
+        const windowError = row.comment_id
+          ? messagingWindowError(row)
+          : await inboundDmWindowError(account.external_id, row.recipient_external_id);
         if (windowError) {
           await client.query(
             "update socialapp.dm_queue set status='skipped', last_error=$2 where id=$1",
