@@ -6,6 +6,7 @@ import {
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import ToolsHeroIllustration from "@/components/ToolsHeroIllustration";
 
 const PATH = "/tools";
 
@@ -103,17 +104,22 @@ export default function ToolsPage() {
         <section className="relative px-4 pt-10 pb-16 sm:pt-16">
           <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
           <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · no signup needed
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Free <span className="gradient-text">Instagram tools</span>
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Small, fast tools for getting a post ready: check your caption length and hashtags, keep the spacing you
-                typed, and pick the right image size before you post or schedule with {BRAND.name}.
-              </p>
+            <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <div className="text-center lg:text-left">
+                <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
+                  <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · no signup needed
+                </span>
+                <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
+                  Free <span className="gradient-text">Instagram tools</span>
+                </h1>
+                <p className="mx-auto mt-4 max-w-xl text-ink-2">
+                  Small, fast tools for getting a post ready: check your caption length and hashtags, keep the spacing you
+                  typed, and pick the right image size before you post or schedule with {BRAND.name}.
+                </p>
+              </div>
+              <div className="mx-auto w-full max-w-xs lg:max-w-md">
+                <ToolsHeroIllustration />
+              </div>
             </div>
             <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
               {tools.map((t) => (
