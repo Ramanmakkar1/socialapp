@@ -1,8 +1,11 @@
 "use client";
 
 import { useId, useState } from "react";
-import { Check, Copy } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Check, Copy, Smartphone } from "lucide-react";
 import { PLATFORMS, PLATFORM_LIMITS, analyzeCaption, type Platform } from "@/lib/captionLimits";
+import { writeCaptionHandoff } from "@/lib/captionHandoff";
 
 const SAMPLE =
   "New drop is live ✨ Comment GUIDE and we'll DM you the full styling guide.\nThanks @studio.north for the shoot!\n\n#fashion #ootd #smallbusiness";
@@ -66,6 +69,8 @@ export default function CaptionCounter() {
   const [text, setText] = useState(SAMPLE);
   const [platform, setPlatform] = useState<Platform>("instagram");
   const [copied, setCopied] = useState(false);
+  const [storageFailed, setStorageFailed] = useState(false);
+  const router = useRouter();
   const id = useId();
   const limit = PLATFORM_LIMITS[platform];
   const a = analyzeCaption(text, platform);
@@ -83,6 +88,16 @@ export default function CaptionCounter() {
     } catch {
       setCopied(false);
     }
+  }
+
+  function previewCaption() {
+    if (platform !== "instagram") return;
+    const result = writeCaptionHandoff(text);
+    if (result.ok) {
+      router.push("/tools/instagram-post-preview?from=caption-counter");
+      return;
+    }
+    setStorageFailed(true);
   }
 
   return (
@@ -106,15 +121,49 @@ export default function CaptionCounter() {
         <div className="min-w-0">
           <div className="flex items-center justify-between gap-2">
             <label htmlFor={id} className="text-sm font-medium">Your caption</label>
-            <button
-              type="button"
-              onClick={copy}
-              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-bg px-3 py-1 text-xs font-medium hover:text-brand"
-            >
-              {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "Copied" : "Copy"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={copy}
+                className="inline-flex items-center gap-1.5 rounded-full border border-line bg-bg px-3 py-1 text-xs font-medium hover:text-brand"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? "Copied" : "Copy"}
+              </button>
+              {platform === "instagram" && (
+                <button
+                  type="button"
+                  onClick={previewCaption}
+                  disabled={storageFailed}
+                  className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium disabled:opacity-50 hover:text-brand"
+                >
+                  <Smartphone className="h-3.5 w-3.5" /> Preview this caption
+                </button>
+              )}
+            </div>
           </div>
+          {storageFailed && (
+            <div className="mt-3 rounded-xl border border-line bg-brand/10 p-3 text-sm">
+              <p className="font-medium text-ink">Storage is unavailable in this tab.</p>
+              <p className="mt-1 text-xs text-ink-2">
+                Copy your caption below, then open the feed preview and paste it in.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  onClick={copy}
+                  className="btn-primary min-h-11 rounded-full px-5 py-3 text-sm font-medium"
+                >
+                  Copy caption
+                </button>
+                <Link
+                  href="/tools/instagram-post-preview?from=caption-counter"
+                  className="min-h-11 rounded-full border border-line px-5 py-3 text-sm font-medium text-ink-2 underline"
+                >
+                  Open post preview
+                </Link>
+              </div>
+            </div>
+          )}
           <textarea
             id={id}
             value={text}

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
-import { Heart, ImagePlus, MessageCircle, Send } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Heart, ImagePlus, MessageCircle, Send } from "lucide-react";
 import { analyzeCaption, PLATFORM_LIMITS } from "@/lib/captionLimits";
+import { readCaptionHandoff } from "@/lib/captionHandoff";
 
 export default function PostPreviewTool() {
   const [caption, setCaption] = useState("A little behind the scenes ✨\n\nGood things start with a first draft. What are you creating today?");
@@ -12,7 +14,9 @@ export default function PostPreviewTool() {
   const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [copyStatus, setCopyStatus] = useState("");
+  const [imported, setImported] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const consumed = useRef(false);
   const id = useId();
   const analysis = analyzeCaption(caption, "instagram");
   const displayHandle = handle.trim().replace(/^@+/, "") || "your.studio";
@@ -21,6 +25,19 @@ export default function PostPreviewTool() {
   useEffect(() => {
     return () => { if (image) URL.revokeObjectURL(image); };
   }, [image]);
+
+  // One-shot read of the caption handoff: consume and remove it exactly once
+  // on mount. Direct visits (empty storage) leave the sample caption intact.
+  useEffect(() => {
+    if (consumed.current) return;
+    const result = readCaptionHandoff();
+    if (result.ok) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCaption(result.caption);
+      setImported(true);
+    }
+    consumed.current = true;
+  }, []);
 
   function selectImage(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -78,8 +95,34 @@ export default function PostPreviewTool() {
         </fieldset>
         <button type="button" onClick={copyCaption} disabled={!caption} className="btn-primary min-h-11 rounded-full px-5 py-3 text-sm font-medium disabled:opacity-50">Copy caption</button>
         <p role="status" aria-live="polite" aria-atomic="true" className="min-h-6 text-sm text-ink-2">{copyStatus}</p>
+        {imported && (
+          <div role="status" aria-live="polite" aria-atomic="true" className="mt-4 rounded-xl border border-line bg-brand/10 p-3">
+            <p className="font-medium text-ink">Caption imported from the Instagram caption counter</p>
+            <p className="mt-1 text-xs text-ink-2">Emoji and line breaks carried over exactly — length and preview updated above. Edit freely, then copy or schedule.</p>
+          </div>
+        )}
       </div>
       <div className="min-w-0">
+        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Caption flows into a phone feed preview" className="mx-auto mb-3 w-full max-w-xs motion-safe:hero-float motion-reduce:animate-none">
+          <defs>
+            <linearGradient id="handoff-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="var(--brand)" />
+              <stop offset="100%" stopColor="var(--brand-2)" />
+            </linearGradient>
+          </defs>
+          <rect x="14" y="14" width="96" height="56" rx="10" fill="var(--surface)" stroke="var(--line)" strokeWidth="2" />
+          <line x1="24" y1="34" x2="86" y2="34" stroke="var(--ink-2)" strokeWidth="3" strokeLinecap="round" />
+          <line x1="24" y1="46" x2="70" y2="46" stroke="var(--ink-2)" strokeWidth="3" strokeLinecap="round" />
+          <line x1="24" y1="58" x2="50" y2="58" stroke="var(--ink-2)" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="24" cy="70" r="4" fill="var(--brand-2)" />
+          <path d="M116 44h24" stroke="var(--brand)" strokeWidth="4" strokeLinecap="round" />
+          <path d="M142 40L152 48L142 56" fill="none" stroke="var(--brand)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="150" y="8" width="44" height="80" rx="10" fill="var(--ink)" />
+          <rect x="156" y="14" width="32" height="44" rx="6" fill="var(--surface)" />
+          <line x1="164" y1="26" x2="182" y2="26" stroke="var(--ink-2)" strokeWidth="2" strokeLinecap="round" />
+          <line x1="164" y1="34" x2="176" y2="34" stroke="var(--ink-2)" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="172" cy="76" r="3" fill="var(--brand-2)" />
+        </svg>
         <h2 className="mb-3 text-sm font-medium text-ink-2">Your feed preview</h2>
         <article aria-label="Instagram feed mockup" className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-line bg-bg shadow-sm">
           <div className="flex min-w-0 items-center gap-3 p-4">
@@ -104,6 +147,19 @@ export default function PostPreviewTool() {
           </div>
         </article>
         <p className="mx-auto mt-4 max-w-sm text-xs leading-relaxed text-ink-2">Cropping and caption truncation are approximations. This centered crop and estimated caption fold may differ from Instagram on your device. Your original file is unchanged.</p>
+        <p className="mx-auto mt-5 max-w-sm text-sm leading-relaxed text-ink-2">
+          Working sequence: <span className="font-semibold">check length</span> in the caption counter,{" "}
+          <span className="font-semibold">inspect the approximate feed preview</span> here, then{" "}
+          <span className="font-semibold">explore scheduling</span> to publish it automatically.
+        </p>
+        <p className="mx-auto mt-2 max-w-sm">
+          <Link
+            href="/instagram-scheduler"
+            className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-medium text-brand underline"
+          >
+            Open the Instagram scheduler <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </p>
       </div>
     </div>
   );
