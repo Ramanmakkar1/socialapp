@@ -183,3 +183,209 @@ test("follow verification preserves retries and gated-link deduplication", async
     });
   }
 });
+
+test("processMessageEvents blocks ineligible rule context but keeps capture", async (t) => {
+  const { processMessageEvents } = await import("./messages.ts");
+  type RuleJoin = {
+    link_url: string | null;
+    email_gate: boolean | null;
+    follow_gate: boolean | null;
+  };
+  const ineligible: { name: string; rule: RuleJoin; text: string }[] = [
+    {
+      name: "paused rule",
+      rule: { link_url: null, email_gate: null, follow_gate: null },
+      text: "done",
+    },
+    {
+      name: "contact on another account",
+      rule: { link_url: null, email_gate: null, follow_gate: null },
+      text: "done",
+    },
+    {
+      name: "rule scoped to another account",
+      rule: { link_url: null, email_gate: null, follow_gate: null },
+      text: "done",
+    },
+  ];
+  for (const scenario of ineligible) {
+    await t.test(scenario.name, async () => {
+      const previousPool = globalThis.__socialappPool;
+      const previousUrl = process.env.DATABASE_URL;
+      const previousFetch = globalThis.fetch;
+      const queued: unknown[] = [];
+      const verified: string[] = [];
+      process.env.DATABASE_URL = "mock";
+      const query = async (sql: string, params: unknown[] = []) => {
+        if (sql.includes("select id, user_id")) {
+          return { rows: [{ id: "account-1", user_id: "owner" }] };
+        }
+        if (sql.includes("from socialapp.contacts c")) {
+          return {
+            rows: [
+              {
+                id: "contact-1",
+                email: "lead@example.com",
+                source_rule_id: "rule-1",
+                ...scenario.rule,
+              },
+            ],
+          };
+        }
+        if (sql.startsWith("update socialapp.contacts")) {
+          return { rows: [{ id: "contact-1" }] };
+        }
+        if (sql.includes("insert into socialapp.dm_queue")) {
+          queued.push(params);
+          return { rows: [] };
+        }
+        assert.ok(
+          ["begin", "commit", "rollback"].includes(sql) ||
+            sql.includes("pg_advisory_xact_lock"),
+          sql,
+        );
+        return { rows: [] };
+      };
+      globalThis.__socialappPool = {
+        query,
+        connect: async () => ({ query, release: () => {} }),
+      } as unknown as pg.Pool;
+      globalThis.fetch = async (input) => {
+        verified.push(new URL(String(input)).pathname.split("/").pop()!);
+        return Response.json({ is_user_follow_business: true });
+      };
+      try {
+        assert.equal(
+          await processMessageEvents([
+            {
+              accountExternalId: "account-1",
+              senderId: "lead",
+              text: scenario.text,
+              mid: "m1",
+            },
+          ]),
+          0,
+        );
+        assert.deepEqual(queued, []);
+        assert.deepEqual(verified, []);
+        assert.equal(
+          await processMessageEvents([
+            {
+              accountExternalId: "account-1",
+              senderId: "lead",
+              text: "reach me at new@example.com",
+              mid: "m2",
+            },
+          ]),
+          1,
+        );
+        assert.deepEqual(queued, []);
+        assert.deepEqual(verified, []);
+      } finally {
+        globalThis.__socialappPool = previousPool;
+        globalThis.fetch = previousFetch;
+        if (previousUrl === undefined) delete process.env.DATABASE_URL;
+        else process.env.DATABASE_URL = previousUrl;
+      }
+    });
+  }
+});
+
+test("processMessageEvents eligible rules keep gating and dedupe", async (t) => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const { encryptToken } = await import("./crypto.ts");
+  for (const label of ["all accounts", "matching account"] as const) {
+    await t.test(label, async () => {
+      const previousPool = globalThis.__socialappPool;
+      const previousUrl = process.env.DATABASE_URL;
+      const previousKey = process.env.TOKEN_ENCRYPTION_KEY;
+      const previousFetch = globalThis.fetch;
+      process.env.DATABASE_URL = "mock";
+      process.env.TOKEN_ENCRYPTION_KEY = Buffer.alloc(32).toString("base64");
+      const token = encryptToken("test-token");
+      const queued: { kind: string; contact: unknown }[] = [];
+      const query = async (sql: string, params: unknown[] = []) => {
+        if (sql.includes("select id, user_id")) {
+          return { rows: [{ id: "account-1", user_id: "owner" }] };
+        }
+        if (sql.includes("select access_token_enc")) {
+          return { rows: [{ access_token_enc: token }] };
+        }
+        if (sql.includes("from socialapp.contacts c")) {
+          assert.equal(params[2], "account-1");
+          return {
+            rows: [
+              {
+                id: "contact-1",
+                email: "lead@example.com",
+                source_rule_id: "rule-1",
+                link_url: "https://example.com/lead",
+                email_gate: true,
+                follow_gate: true,
+              },
+            ],
+          };
+        }
+        if (sql.startsWith("update socialapp.contacts")) {
+          return { rows: [{ id: "contact-1" }] };
+        }
+        if (sql.includes("insert into socialapp.short_links")) {
+          return { rows: [{ code: "abc123" }] };
+        }
+        if (sql.includes("select count(*)")) {
+          return {
+            rows: [
+              {
+                n: queued.filter(
+                  (row) => row.kind === "follow_nudge" && row.contact === params[0],
+                ).length,
+              },
+            ],
+          };
+        }
+        if (sql.includes("insert into socialapp.dm_queue")) {
+          const kind = sql.includes("'gated_link'") ? "gated_link" : "follow_nudge";
+          if (kind === "gated_link") {
+            const dup = queued.some((row) => row.kind === "gated_link");
+            if (dup) return { rows: [] };
+          }
+          queued.push({ kind, contact: params[3] });
+          return { rows: [] };
+        }
+        assert.ok(
+          ["begin", "commit", "rollback"].includes(sql) ||
+            sql.includes("pg_advisory_xact_lock"),
+          sql,
+        );
+        return { rows: [] };
+      };
+      globalThis.__socialappPool = {
+        query,
+        connect: async () => ({ query, release: () => {} }),
+      } as unknown as pg.Pool;
+      globalThis.fetch = async () =>
+        Response.json({ is_user_follow_business: true });
+      const event = {
+        accountExternalId: "account-1",
+        senderId: "lead",
+        text: "done",
+        mid: "m1",
+      };
+      try {
+        assert.equal(await processMessageEvents([event]), 1);
+        assert.equal(await processMessageEvents([event]), 1);
+        assert.deepEqual(
+          queued.filter((row) => row.kind === "gated_link").length,
+          1,
+        );
+      } finally {
+        globalThis.__socialappPool = previousPool;
+        globalThis.fetch = previousFetch;
+        if (previousUrl === undefined) delete process.env.DATABASE_URL;
+        else process.env.DATABASE_URL = previousUrl;
+        if (previousKey === undefined) delete process.env.TOKEN_ENCRYPTION_KEY;
+        else process.env.TOKEN_ENCRYPTION_KEY = previousKey;
+      }
+    });
+  }
+});

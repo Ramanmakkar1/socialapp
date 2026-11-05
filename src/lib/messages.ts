@@ -114,9 +114,13 @@ export async function processMessageEvents(
       const existing = await query<ContactRuleRow>(
         `select c.id, c.email, c.source_rule_id, r.link_url, r.email_gate, r.follow_gate
          from socialapp.contacts c
-         left join socialapp.dm_rules r on r.id = c.source_rule_id and r.user_id = $1
+         left join socialapp.dm_rules r on r.id = c.source_rule_id
+           and r.user_id = $1
+           and r.status = 'active'
+           and (r.social_account_id is null or r.social_account_id = $3)
+           and c.social_account_id = $3
          where c.user_id = $1 and c.platform = 'instagram' and c.external_id = $2`,
-        [account.user_id, event.senderId],
+        [account.user_id, event.senderId, account.id],
       );
       const contactBefore = existing[0];
       const followGate = contactBefore?.follow_gate === true;
