@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
+import TemplatePicker from "./TemplatePicker";
 import AutomationMessagePreview from "@/components/AutomationMessagePreview";
 import CommentKeywordTester from "@/components/CommentKeywordTester";
 import {
@@ -465,9 +466,22 @@ export function AutoDmView({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [actionError, setActionError] = useState<string | null>(null);
+  // Picking a template is a client-side navigation, so open the draft when the template changes.
+  const templateKey = templateDefaults?.name ?? "";
+  const [seenTemplateKey, setSeenTemplateKey] = useState(templateKey);
+  const [blankDraft, setBlankDraft] = useState(false);
+  if (templateKey !== seenTemplateKey) {
+    setSeenTemplateKey(templateKey);
+    if (templateKey) {
+      setEditing(null);
+      setBlankDraft(false);
+      setFormOpen(true);
+    }
+  }
 
-  function openCreate() {
+  function openCreate(blank = false) {
     setEditing(null);
+    setBlankDraft(blank);
     setFormOpen(true);
   }
 
@@ -521,7 +535,9 @@ export function AutoDmView({
         triggers: normalizeTriggers(editing.triggers),
         socialAccountId: editing.social_account_id,
       }
-    : templateDefaults;
+    : blankDraft
+      ? undefined
+      : templateDefaults;
 
   return (
     <>
@@ -540,7 +556,7 @@ export function AutoDmView({
           )}
         </div>
         {!formOpen && (
-          <button type="button" onClick={openCreate} className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold">
+          <button type="button" onClick={() => openCreate(true)} className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold">
             <Plus className="h-4 w-4" /> New automation
           </button>
         )}
@@ -549,17 +565,19 @@ export function AutoDmView({
       {formOpen && (
         <div className="mt-6">
           <RuleForm
-            key={editing ? `edit:${editing.id}` : "create"}
+            key={editing ? `edit:${editing.id}` : blankDraft ? "create:blank" : `create:${templateKey}`}
             mode={editing ? "edit" : "create"}
             ruleId={editing?.id}
             initial={formDefaults}
-            matchModeNote={!editing ? templateNote : undefined}
+            matchModeNote={!editing && !blankDraft ? templateNote : undefined}
             instagramAccounts={instagramAccounts}
             onClose={closeForm}
             onSaved={() => {}}
           />
         </div>
       )}
+
+      {!formOpen && <TemplatePicker activeTitle={templateKey} onReopen={() => openCreate()} />}
 
       {actionError && (
         <p role="alert" className="mt-4 max-w-full break-words rounded-xl border border-warn/30 bg-warn/10 px-3 py-2 text-sm text-warn">
@@ -575,7 +593,7 @@ export function AutoDmView({
             text="Create a keyword rule to send DMs when someone comments on your posts."
           />
           <div className="mt-4 text-center">
-            <button type="button" onClick={openCreate} className="btn-primary rounded-full px-5 py-2 text-sm font-semibold">
+            <button type="button" onClick={() => openCreate()} className="btn-primary rounded-full px-5 py-2 text-sm font-semibold">
               Create your first automation
             </button>
           </div>
