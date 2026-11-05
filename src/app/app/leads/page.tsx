@@ -87,6 +87,8 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   if (selectedRule) exportParams.set("rule", selectedRule);
   const exportQuery = exportParams.toString();
   const exportHref = exportQuery ? `/app/leads/export?${exportQuery}` : "/app/leads/export";
+  const exportCap = 10_000;
+  const exportCapped = total > exportCap;
   function pageHref(target: number) {
     const pageParams = new URLSearchParams(exportParams);
     pageParams.set("page", String(target));
@@ -103,7 +105,16 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
             <p className="text-sm text-muted">{total > 0 ? `${total} leads | ${offset + 1}-${offset + leads.length} shown` : "0 leads"}</p>
           </div>
         </div>
-        {leads.length > 0 && <a href={exportHref} className="rounded-full border border-line px-4 py-2 text-sm">Export CSV</a>}
+        {leads.length > 0 && (
+          <div className="flex max-w-xs flex-col items-end gap-1.5 text-right">
+            <a href={exportHref} className="rounded-full border border-line px-4 py-2 text-sm">
+              {exportCapped ? "Export latest 10,000" : "Export CSV"}
+            </a>
+            {exportCapped ? (
+              <p className="text-xs text-muted">CSV downloads are limited to the 10,000 newest matching leads. Narrow with search, rule, or email filters.</p>
+            ) : null}
+          </div>
+        )}
       </div>
       <form method="get" className="mt-6 flex flex-wrap items-center gap-3">
         <label htmlFor="leads-search" className="sr-only">Search leads</label>
