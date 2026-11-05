@@ -19,17 +19,22 @@ type AccountRow = {
   access_token_enc: string | null;
 };
 
-type GraphMediaList = {
-  data?: { id?: string; timestamp?: string }[];
+type GraphPaging = {
+  cursors?: { before?: string | null; after?: string | null };
+  next?: string | null;
 };
 
-type GraphCommentList = {
-  data?: {
-    id?: string;
-    text?: string;
-    timestamp?: string;
-    from?: { id?: string; username?: string };
-  }[];
+type PagedBody<T> = {
+  data?: T[];
+  paging?: GraphPaging;
+};
+
+type MediaItem = { id?: string; timestamp?: string };
+type CommentItem = {
+  id?: string;
+  text?: string;
+  timestamp?: string;
+  from?: { id?: string; username?: string };
 };
 
 function isWithinWindow(isoTimestamp: string | undefined, sinceMs: number): boolean {
@@ -55,6 +60,41 @@ async function fetchJson<T>(url: string, token: string): Promise<T> {
   }
 }
 
+async function fetchPaged<T>(
+  buildUrl: (after: string | null) => string,
+  token: string,
+  cap: number,
+  keyOf: (item: T) => string | undefined,
+  keep: (item: T) => boolean,
+): Promise<{ items: T[]; failures: number }> {
+  const items: T[] = [];
+  const seen = new Set<string>();
+  let failures = 0;
+  let after: string | null = null;
+  while (seen.size < cap) {
+    const before = seen.size;
+    let body: PagedBody<T>;
+    try {
+      body = await fetchJson<PagedBody<T>>(buildUrl(after), token);
+      if (!Array.isArray(body?.data)) throw new Error("Invalid Graph API response");
+    } catch {
+      failures += 1;
+      break;
+    }
+    for (const item of body.data) {
+      const key = keyOf(item);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      if (keep(item)) items.push(item);
+      if (seen.size >= cap) break;
+    }
+    const next = body.paging?.cursors?.after ?? null;
+    if (seen.size === before || !next || next === after) break;
+    after = next;
+  }
+  return { items, failures };
+}
+
 async function collectCommentsForAccount(
   externalId: string,
   token: string,
@@ -63,38 +103,44 @@ async function collectCommentsForAccount(
   const events: CommentEvent[] = [];
   let failures = 0;
   let completed = 0;
-  const mediaUrl = `${GRAPH_BASE}/${encodeURIComponent(externalId)}/media?fields=id,timestamp&limit=${MEDIA_LIMIT}`;
-  let mediaBody: GraphMediaList;
-  try {
-    mediaBody = await fetchJson<GraphMediaList>(mediaUrl, token);
-    if (!Array.isArray(mediaBody?.data)) throw new Error("Invalid media response");
-  } catch {
-    return { events, failures: 1, completed };
-  }
-  const mediaSlice = (mediaBody.data ?? []).filter((m) => m.id).slice(0, MEDIA_LIMIT);
-  if (mediaSlice.length === 0) completed += 1;
+  const media = await fetchPaged<MediaItem>(
+    (after) => {
+      const params = new URLSearchParams({ fields: "id,timestamp", limit: String(MEDIA_LIMIT) });
+      if (after) params.set("after", after);
+      return `${GRAPH_BASE}/${encodeURIComponent(externalId)}/media?${params.toString()}`;
+    },
+    token,
+    MEDIA_LIMIT,
+    (m) => m.id,
+    () => true,
+  );
+  failures += media.failures;
+  if (media.items.length === 0 && media.failures === 0) completed += 1;
 
-  for (const media of mediaSlice) {
-    const mediaId = media.id as string;
-    const commentsUrl = `${GRAPH_BASE}/${encodeURIComponent(mediaId)}/comments?fields=id,text,timestamp,from&limit=${COMMENTS_LIMIT}`;
-    try {
-      const commentsBody = await fetchJson<GraphCommentList>(commentsUrl, token);
-      if (!Array.isArray(commentsBody?.data)) throw new Error("Invalid comments response");
-      for (const c of commentsBody.data ?? []) {
-        if (!c.id || !c.from?.id) continue;
-        if (!isWithinWindow(c.timestamp, sinceMs)) continue;
-        events.push({
-          accountExternalId: externalId,
-          commentId: String(c.id),
-          text: c.text ?? "",
-          fromId: String(c.from.id),
-          fromUsername: c.from.username ?? null,
-          mediaId,
-        });
-      }
-      completed += 1;
-    } catch {
-      failures += 1;
+  for (const mediaItem of media.items) {
+    const mediaId = mediaItem.id as string;
+    const comments = await fetchPaged<CommentItem>(
+      (after) => {
+        const params = new URLSearchParams({ fields: "id,text,timestamp,from", limit: String(COMMENTS_LIMIT) });
+        if (after) params.set("after", after);
+        return `${GRAPH_BASE}/${encodeURIComponent(mediaId)}/comments?${params.toString()}`;
+      },
+      token,
+      COMMENTS_LIMIT,
+      (c) => c.id,
+      (c) => Boolean(c.from?.id) && isWithinWindow(c.timestamp, sinceMs),
+    );
+    failures += comments.failures;
+    if (comments.failures === 0) completed += 1;
+    for (const c of comments.items) {
+      events.push({
+        accountExternalId: externalId,
+        commentId: String(c.id),
+        text: c.text ?? "",
+        fromId: String(c.from?.id),
+        fromUsername: c.from?.username ?? null,
+        mediaId,
+      });
     }
   }
   return { events, failures, completed };
