@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Hash, Image as ImageIcon, Link as LinkIcon, Percent, ShieldCheck, TextQuote, UserRound } from "lucide-react";
+import {
+  ArrowRight, Hash, Image as ImageIcon, Link as LinkIcon, MessageCircle, Percent, ShieldCheck, TextQuote, UserRound,
+} from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -32,6 +34,12 @@ const tools = [
     title: "Instagram caption counter",
     description: "Count characters and hashtags as you type and see how close your caption is to the Instagram limit.",
     icon: Hash,
+  },
+  {
+    href: "/tools/instagram-comment-keyword-tester",
+    title: "Instagram comment keyword tester",
+    description: "Try comment keywords and contains vs exact match before you turn on Instagram auto-DM rules.",
+    icon: MessageCircle,
   },
   {
     href: "/tools/instagram-dm-link-generator",

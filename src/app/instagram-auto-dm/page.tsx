@@ -80,6 +80,11 @@ export default function InstagramAutoDm() {
               <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
               <a href="#how" className="rounded-full border border-line bg-surface px-6 py-3 font-medium">How it works</a>
             </div>
+            <p className="mt-4 text-sm text-ink-2">
+              <Link href="/tools/instagram-comment-keyword-tester" className="font-medium text-brand underline underline-offset-2">
+                Test your keywords free
+              </Link>
+            </p>
           </div>
         </section>
 
