@@ -417,7 +417,9 @@ test("gated link requires a sent prompt and ignores older unsent prompts", async
     name: string;
     prompts: Prompt[];
     rule: Rule;
+    following: boolean;
     expectQueued: number;
+    expectNudged: number;
     expectUpdated: number;
   }[] = [
     {
@@ -429,28 +431,113 @@ test("gated link requires a sent prompt and ignores older unsent prompts", async
         { account: "account-1", recipient: "lead", status: "pending" },
       ],
       rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: true,
       expectQueued: 1,
+      expectNudged: 0,
       expectUpdated: 1,
     },
     {
       name: "unsent-only prompt stays ineligible",
       prompts: [{ account: "account-1", recipient: "lead", status: "pending" }],
       rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: true,
       expectQueued: 0,
+      expectNudged: 0,
       expectUpdated: 1,
     },
     {
       name: "paused rule stays ineligible",
       prompts: [{ account: "account-1", recipient: "lead", status: "sent" }],
       rule: { link_url: null, email_gate: null, follow_gate: null },
+      following: true,
       expectQueued: 0,
+      expectNudged: 0,
       expectUpdated: 0,
     },
     {
       name: "mismatched account stays ineligible",
       prompts: [{ account: "other-account", recipient: "lead", status: "sent" }],
       rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: true,
       expectQueued: 0,
+      expectNudged: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "absent prompt produces no follow nudge",
+      prompts: [],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "pending prompt produces no follow nudge",
+      prompts: [{ account: "account-1", recipient: "lead", status: "pending" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "failed prompt produces no follow nudge",
+      prompts: [{ account: "account-1", recipient: "lead", status: "failed" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "skipped prompt produces no follow nudge",
+      prompts: [{ account: "account-1", recipient: "lead", status: "skipped" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "sent prompt on another account produces no follow nudge",
+      prompts: [{ account: "other-account", recipient: "lead", status: "sent" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "sent prompt for another recipient produces no follow nudge",
+      prompts: [{ account: "account-1", recipient: "other-lead", status: "sent" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 0,
+      expectUpdated: 1,
+    },
+    {
+      name: "matching sent prompt permits the follow nudge",
+      prompts: [{ account: "account-1", recipient: "lead", status: "sent" }],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 1,
+      expectUpdated: 1,
+    },
+    {
+      name: "matching sent prompt permits the nudge alongside older unsent prompts",
+      prompts: [
+        { account: "account-1", recipient: "lead", status: "sent" },
+        { account: "account-1", recipient: "lead", status: "pending" },
+        { account: "account-1", recipient: "lead", status: "failed" },
+        { account: "account-1", recipient: "lead", status: "skipped" },
+      ],
+      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
+      following: false,
+      expectQueued: 0,
+      expectNudged: 1,
       expectUpdated: 1,
     },
   ];
@@ -535,7 +622,7 @@ test("gated link requires a sent prompt and ignores older unsent prompts", async
         connect: async () => ({ query, release: () => {} }),
       } as unknown as pg.Pool;
       globalThis.fetch = async () =>
-        Response.json({ is_user_follow_business: true });
+        Response.json({ is_user_follow_business: scenario.following });
       const event = {
         accountExternalId: "account-1",
         senderId: "lead",
@@ -547,6 +634,10 @@ test("gated link requires a sent prompt and ignores older unsent prompts", async
         assert.equal(
           queued.filter((row) => row.kind === "gated_link").length,
           scenario.expectQueued,
+        );
+        assert.equal(
+          queued.filter((row) => row.kind === "follow_nudge").length,
+          scenario.expectNudged,
         );
       } finally {
         globalThis.__socialappPool = previousPool;

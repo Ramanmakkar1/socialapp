@@ -96,8 +96,8 @@ type ContactRuleRow = {
 
 /**
  * A gate prompt that was actually sent to this contact. Only the absence of a
- * sent prompt blocks the gated link; older pending, failed or skipped prompts
- * for the same contact/account/rule do not.
+ * sent prompt blocks the gated link and the follow nudge; older pending,
+ * failed or skipped prompts for the same contact/account/rule do not.
  */
 const OUTSTANDING_GATED_RULES_SQL = `
   select 1 as ok
@@ -167,6 +167,15 @@ export async function processMessageEvents(
       const ruleId = contactBefore.source_rule_id;
       const emailOk =
         !emailGate || Boolean(contactBefore.email) || email !== null;
+      const outstanding = await query(OUTSTANDING_GATED_RULES_SQL, [
+        contactBefore.id,
+        ruleId,
+        account.id,
+        event.senderId,
+      ]);
+      if (outstanding.length === 0) {
+        continue;
+      }
       let followOk = true;
       let followCheckFailed = false;
       if (ruleFollowGate) {
@@ -196,15 +205,6 @@ export async function processMessageEvents(
         hadFailure = true;
       }
       if (emailOk && followOk) {
-        const outstanding = await query(OUTSTANDING_GATED_RULES_SQL, [
-          contactBefore.id,
-          ruleId,
-          account.id,
-          event.senderId,
-        ]);
-        if (outstanding.length === 0) {
-          continue;
-        }
         let link = contactBefore.link_url;
         try {
           link = await shortLinkFor(
