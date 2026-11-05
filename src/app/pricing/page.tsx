@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { PLANS, PLANS_NOTE } from "@/lib/plans";
+import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -60,7 +60,7 @@ const appJsonLd = {
   url: `${BRAND.url}${PATH}`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  offers: PLANS.map((p) => ({ "@type": "Offer", name: p.name, price: p.price.replace("$", ""), priceCurrency: "USD" })),
+  offers: SOFTWARE_APPLICATION_OFFERS,
   publisher: { "@type": "Organization", name: BRAND.company },
 };
 const breadcrumbJsonLd = {

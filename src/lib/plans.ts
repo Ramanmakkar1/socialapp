@@ -47,3 +47,14 @@ export const PLANS: Plan[] = [
   },
 ];
 export const PLANS_NOTE = "Every account starts on the Free plan. Paid plans open soon. You will never be charged without choosing a plan first.";
+
+const freePlan = PLANS.find((p) => p.name === "Free") ?? PLANS[0];
+/** JSON-LD offers for SoftwareApplication — only plans available at launch (Free). */
+export const SOFTWARE_APPLICATION_OFFERS = [
+  {
+    "@type": "Offer" as const,
+    name: freePlan.name,
+    price: freePlan.price.replace("$", ""),
+    priceCurrency: "USD",
+  },
+];

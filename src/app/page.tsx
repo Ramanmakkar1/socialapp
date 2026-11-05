@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
-import { PLANS, PLANS_NOTE } from "@/lib/plans";
+import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
@@ -31,12 +31,7 @@ const jsonLd = {
       url: BRAND.url,
       description: BRAND.description,
       publisher: { "@id": BRAND.url + "#org" },
-      offers: PLANS.map((p) => ({
-        "@type": "Offer",
-        name: p.name,
-        price: p.price.replace("$", ""),
-        priceCurrency: "USD",
-      })),
+      offers: SOFTWARE_APPLICATION_OFFERS,
     },
     {
       "@type": "FAQPage",
