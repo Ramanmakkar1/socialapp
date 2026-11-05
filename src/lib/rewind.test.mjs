@@ -8,9 +8,10 @@ const compiled = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
 }).outputText;
 
-function harness({ mediaPages, commentPages, fail } = {}) {
+function harness({ mediaPages, commentPages, fail, triggers = ["comment"] } = {}) {
   const requests = [];
   const processed = [];
+  let accountQueries = 0;
   const timestamp = (days) => new Date(Date.now() - days * 86_400_000).toISOString();
   const imports = (id) => {
     if (id === "@/lib/crypto") return { decryptToken: () => "token" };
@@ -21,8 +22,9 @@ function harness({ mediaPages, commentPages, fail } = {}) {
     if (id === "@/lib/db") return { query: async (sql, params) => {
       if (sql.includes("dm_rules")) {
         assert.deepEqual(params, ["rule", "owner"]);
-        return [{ id: "rule", social_account_id: "account" }];
+        return [{ id: "rule", social_account_id: "account", triggers }];
       }
+      accountQueries += 1;
       assert.deepEqual(params, ["owner", "account"]);
       return [{ id: "account", external_id: "instagram", access_token_enc: "encrypted" }];
     } };
@@ -63,8 +65,26 @@ function harness({ mediaPages, commentPages, fail } = {}) {
   };
   const exports = {};
   new Function("require", "exports", "fetch", compiled)(imports, exports, fetch);
-  return { run: () => exports.rewindRule("owner", "rule"), requests, processed };
+  return { run: () => exports.rewindRule("owner", "rule"), requests, processed, get accountQueries() { return accountQueries; } };
 }
+
+test("story-reply-only rules reject before accounts, Graph API or replay processing", async () => {
+  const scan = harness({ triggers: ["story_reply"] });
+  await assert.rejects(scan.run(), /comment trigger/);
+  assert.equal(scan.accountQueries, 0);
+  assert.equal(scan.requests.length, 0);
+  assert.equal(scan.processed.length, 0);
+});
+
+test("comment-only and combined-trigger rules still replay normally", async () => {
+  const commentOnly = harness({ triggers: ["comment"] });
+  assert.deepEqual(await commentOnly.run(), { queued: 1, scanned: 1, failures: 0 });
+  assert.equal(commentOnly.accountQueries, 1);
+
+  const combined = harness({ triggers: ["comment", "story_reply"] });
+  assert.deepEqual(await combined.run(), { queued: 1, scanned: 1, failures: 0 });
+  assert.equal(combined.requests.length, 26);
+});
 
 test("recent comments on older posts reach replay; expired comments and excess posts do not", async () => {
   const scan = harness();

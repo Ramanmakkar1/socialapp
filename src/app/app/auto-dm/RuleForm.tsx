@@ -635,7 +635,9 @@ export function AutoDmView({
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2">
-                  {rule.status === "active" && RewindButton ? <RewindButton ruleId={rule.id} /> : null}
+                  {rule.status === "active" && rule.triggers.includes("comment") && RewindButton ? (
+                    <RewindButton ruleId={rule.id} />
+                  ) : null}
                   <button
                     type="button"
                     disabled={pending}

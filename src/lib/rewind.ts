@@ -11,6 +11,7 @@ const WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 type RuleRow = {
   id: string;
   social_account_id: string | null;
+  triggers: string[];
 };
 
 type AccountRow = {
@@ -151,13 +152,18 @@ export async function rewindRule(
   ruleId: string,
 ): Promise<{ queued: number; scanned: number; failures: number }> {
   const rules = await query<RuleRow>(
-    "select id, social_account_id from socialapp.dm_rules where id=$1 and user_id=$2 and status='active'",
+    "select id, social_account_id, triggers from socialapp.dm_rules where id=$1 and user_id=$2 and status='active'",
     [ruleId, userId],
   );
   if (!rules[0]) {
     throw new Error("Rule not found or paused");
   }
   const rule = rules[0];
+  if (!rule.triggers?.includes("comment")) {
+    throw new Error(
+      "Past comment replay only works when the automation includes a comment trigger. Turn on comments on your posts in this rule, or use a comment-only automation.",
+    );
+  }
 
   let accountSql =
     "select id, external_id, access_token_enc from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active'";
