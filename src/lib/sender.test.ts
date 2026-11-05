@@ -687,9 +687,9 @@ test("sendDueDms: old queued DM follow-up sends when inbound message is recent",
     { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
   ];
   let fetchCalls = 0;
-  globalThis.fetch = async (url: string, init?: RequestInit) => {
+  globalThis.fetch = async (url, init) => {
     fetchCalls += 1;
-    assert.match(url, /graph\.instagram\.com/);
+    assert.match(String(url), /graph\.instagram\.com/);
     const body = JSON.parse(String(init?.body)) as { recipient: { id: string } };
     assert.equal(body.recipient.id, "customer-1");
     return { ok: true, text: async () => "" } as Response;
@@ -813,9 +813,9 @@ test("sendDueDms: comment reply still uses queue age, not inbound messaging wind
     { id: "rule-active", user_id: "user-1", social_account_id: accountId, status: "active" },
   ];
   let fetchCalls = 0;
-  globalThis.fetch = async (url: string, init?: RequestInit) => {
+  globalThis.fetch = async (url, init) => {
     fetchCalls += 1;
-    assert.match(url, /graph\.instagram\.com/);
+    assert.match(String(url), /graph\.instagram\.com/);
     const body = JSON.parse(String(init?.body)) as { recipient: { comment_id: string } };
     assert.equal(body.recipient.comment_id, "c1");
     return { ok: true, text: async () => "" } as Response;
