@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Inbox } from "lucide-react";
+import LocalTime from "@/components/LocalTime";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../../EmptyState";
@@ -43,11 +44,6 @@ function explainError(error: string | null): string | null {
   if (e.startsWith("network")) return "Instagram could not be reached.";
   if (e.startsWith("http")) return "Instagram did not accept this message.";
   return "This message could not be delivered.";
-}
-
-function formatTime(value: Date | null): string {
-  if (!value) return "";
-  return `${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(new Date(value))} UTC`;
 }
 
 function DeliveryIllustration() {
@@ -129,7 +125,7 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
                 <div className="min-w-0">
                   <p className="truncate font-medium">{row.rule_name ?? "Deleted automation"}</p>
                   <p className="mt-1 text-xs text-muted">
-                    {row.status === "sent" && row.sent_at ? `Sent ${formatTime(row.sent_at)}` : `Queued ${formatTime(row.created_at)}`}
+                    {row.status === "sent" && row.sent_at ? <>Sent <LocalTime value={row.sent_at} /></> : <>Queued <LocalTime value={row.created_at} /></>}
                     {" · "}
                     {row.attempts} {row.attempts === 1 ? "attempt" : "attempts"}
                   </p>
@@ -137,7 +133,7 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
                     <p className="mt-2 text-sm text-ink-2">Waiting: this automation is paused.</p>
                   )}
                   {row.status === "pending" && !row.rule_paused && row.next_attempt_at && (
-                    <p className="mt-2 text-sm text-ink-2">Next try: {formatTime(row.next_attempt_at)}</p>
+                    <p className="mt-2 text-sm text-ink-2">Next try: <LocalTime value={row.next_attempt_at} /></p>
                   )}
                   {reason && <p className="mt-2 text-sm text-ink-2">{reason}</p>}
                 </div>

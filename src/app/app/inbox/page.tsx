@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Inbox, MessageCircle, MessagesSquare } from "lucide-react";
+import LocalTime from "@/components/LocalTime";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
 import { DM_WINDOW_MS, PRIVATE_REPLY_WINDOW_MS, loadInbox, withinWindow, type Thread } from "@/lib/inbox";
@@ -14,10 +15,6 @@ const OK_TEXT: Record<string, string> = {
   private: "Private reply sent.",
   dm: "Message sent.",
 };
-
-function fmt(d: Date | string): string {
-  return new Date(d).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
-}
 
 function one(v: string | string[] | undefined): string {
   return typeof v === "string" ? v : "";
@@ -100,7 +97,7 @@ export default async function InboxPage({
                 <li key={c.commentId} className="rounded-2xl border border-line bg-surface p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
                     <span className="font-medium">@{c.fromUsername ?? "instagram user"}</span>
-                    <span className="text-muted">on @{usernames.get(c.accountId) ?? "your account"} · {fmt(c.receivedAt)}</span>
+                    <span className="text-muted">on @{usernames.get(c.accountId) ?? "your account"} · <LocalTime value={c.receivedAt} style="medium" /></span>
                   </div>
                   <p className="mt-2 break-words text-ink">{c.text}</p>
                   <p className="mt-2 text-xs text-muted">
@@ -145,7 +142,7 @@ export default async function InboxPage({
               <li key={i} className={`flex ${m.direction === "out" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.direction === "out" ? "bg-brand text-white" : "bg-surface-2 text-ink"}`}>
                   <p className="whitespace-pre-wrap break-words">{m.text}</p>
-                  <p className={`mt-1 text-[11px] ${m.direction === "out" ? "text-white/80" : "text-muted"}`}>{fmt(m.at)}</p>
+                  <p className={`mt-1 text-[11px] ${m.direction === "out" ? "text-white/80" : "text-muted"}`}><LocalTime value={m.at} style="medium" /></p>
                 </div>
               </li>
             ))}
@@ -174,7 +171,7 @@ export default async function InboxPage({
                   <p className="truncate text-sm text-muted">{t.lastText}</p>
                 </div>
                 <div className="shrink-0 text-right text-xs text-muted">
-                  <p>{fmt(t.lastAt)}</p>
+                  <p><LocalTime value={t.lastAt} style="medium" /></p>
                   {withinWindow(t.lastInboundAt, DM_WINDOW_MS) && <p className="text-ok">Can reply</p>}
                 </div>
               </Link>
