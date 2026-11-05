@@ -225,6 +225,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   }
 
   function submit() {
+    if (pending) return;
     setErrors([]);
     startTransition(async () => {
       const input = buildInput();
@@ -246,7 +247,14 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   }
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-6">
+    <form
+      className="rounded-2xl border border-line bg-surface p-6"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (pending) return;
+        submit();
+      }}
+    >
       <div className="flex items-start justify-between gap-3">
         <h2 className="text-lg font-semibold">{mode === "edit" ? "Edit automation" : "New automation"}</h2>
         <button type="button" disabled={pending} onClick={onClose} className="rounded-lg p-1 text-muted hover:bg-surface-2 hover:text-ink disabled:opacity-60" aria-label="Close">
@@ -256,7 +264,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
       {matchModeNote && (
         <p className="mt-3 rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm text-ink-2">{matchModeNote}</p>
       )}
-      <div className="mt-5 space-y-4">
+      <fieldset disabled={pending} className="mt-5 min-w-0 space-y-4 border-0 p-0">
         <div className="rounded-xl border border-line bg-surface-2 p-4">
           <div className="flex flex-wrap items-start gap-4">
             <MultiAccountRoutingIllustration className="shrink-0" />
@@ -293,6 +301,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           <input
             id={nameId}
             type="text"
+            required
             maxLength={80}
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -373,6 +382,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           <textarea
             id={dmId}
             ref={dmRef}
+            required
             rows={6}
             maxLength={1000}
             value={dmText}
@@ -434,15 +444,15 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           </ul>
         )}
         <div className="flex flex-wrap gap-2 pt-1">
-          <button type="button" disabled={pending} onClick={submit} className="btn-primary rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-60">
+          <button type="submit" className="btn-primary rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-60">
             {pending ? "Saving…" : mode === "edit" ? "Save changes" : "Create automation"}
           </button>
-          <button type="button" disabled={pending} onClick={onClose} className="rounded-full border border-line px-5 py-2 text-sm font-medium text-ink-2 hover:text-ink disabled:opacity-60">
+          <button type="button" onClick={onClose} className="rounded-full border border-line px-5 py-2 text-sm font-medium text-ink-2 hover:text-ink disabled:opacity-60">
             Cancel
           </button>
         </div>
-      </div>
-    </div>
+      </fieldset>
+    </form>
   );
 }
 
