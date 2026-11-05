@@ -246,7 +246,7 @@
 .landing :global(.cta .btn){
   background:var(--lime);color:var(--ink);margin-top:24px}
 .landing :global(.cta img){
-  width:100%;height:auto;display:block;background:var(--paper);border-radius:24px}
+  width:100%;height:auto;display:block;border-radius:24px}
 .landing :global(footer){
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;color:var(--muted);font-size:.92rem;padding-block:40px 32px}
 .landing :global(footer .fl){
@@ -257,8 +257,6 @@
    tilted cards and darkened the art on the dark CTA band. The CTA art sits on its own light tile instead. */
 .landing :global(.hero-art img),.landing :global(.pcard img),.landing :global(.art img),.landing :global(.cta img){
   mix-blend-mode:normal}
-.landing :global(.cta img){
-  background:var(--paper)}
 
 
 @keyframes bob{
