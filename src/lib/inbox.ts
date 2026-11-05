@@ -1,7 +1,7 @@
 // Server only: comment list + DM threads built from stored Meta webhook events and sent DMs.
 import { extractCommentEvents } from "@/lib/comments";
 import { query } from "@/lib/db";
-import { extractMessageEvents } from "@/lib/messageParse";
+import { extractTimedMessageEvents } from "@/lib/inboxTime";
 import { COMMENT_REPLY_WINDOW_MS, DM_WINDOW_MS } from "@/lib/sendPolicy";
 
 // Instagram allows a normal DM reply only within 24 h of the person's last message,
@@ -81,7 +81,7 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
     }
   }
   for (const ev of [...events].reverse()) {
-    for (const m of extractMessageEvents(ev.payload)) {
+    for (const m of extractTimedMessageEvents(ev.payload, ev.received_at)) {
       const acc = byExternal.get(m.accountExternalId);
       if (!acc) continue;
       if (m.mid !== null) {
@@ -95,8 +95,8 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
         t = { accountId: acc.id, senderId: m.senderId, username: null, lastInboundAt: null, lastAt: ev.received_at, lastText: m.text, messages: [] };
         threads.set(key, t);
       }
-      t.messages.push({ direction: "in", text: m.text, at: ev.received_at });
-      if (!t.lastInboundAt || ev.received_at > t.lastInboundAt) t.lastInboundAt = ev.received_at;
+      t.messages.push({ direction: "in", text: m.text, at: m.eventAt ?? ev.received_at });
+      if (m.eventAt && (!t.lastInboundAt || m.eventAt > t.lastInboundAt)) t.lastInboundAt = m.eventAt;
     }
   }
 
@@ -145,18 +145,25 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
 
 // Time of the latest message this person sent to the account (for the 24-hour rule).
 export async function lastInboundMessageAt(accountExternalId: string, senderId: string): Promise<Date | null> {
-  const rows = await query<{ received_at: Date }>(
-    `select received_at from socialapp.events
+  const rows = await query<EventRow>(
+    `select payload, received_at from socialapp.events
      where source='meta' and received_at > now() - interval '2 days'
        and exists (
          select 1 from jsonb_array_elements(case when jsonb_typeof(payload->'entry')='array' then payload->'entry' else '[]'::jsonb end) e,
            jsonb_array_elements(case when jsonb_typeof(e->'messaging')='array' then e->'messaging' else '[]'::jsonb end) m
-         where e->>'id' = $1 and m->'sender'->>'id' = $2 and m ? 'message' and coalesce((m->'message'->>'is_echo')::boolean, false) = false
+         where e->>'id' = $1 and m->'sender'->>'id' = $2 and m ? 'message'
        )
-     order by received_at desc limit 1`,
+     order by received_at asc`,
     [accountExternalId, senderId]
   );
-  return rows[0]?.received_at ?? null;
+  let latest: Date | null = null;
+  for (const row of rows) {
+    for (const m of extractTimedMessageEvents(row.payload, row.received_at)) {
+      if (m.accountExternalId !== accountExternalId || m.senderId !== senderId) continue;
+      if (m.eventAt && (!latest || m.eventAt > latest)) latest = m.eventAt;
+    }
+  }
+  return latest;
 }
 
 // Time the comment webhook arrived (for the 7-day private-reply rule), plus the commenter's id.
