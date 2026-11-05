@@ -100,12 +100,16 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
     if (current.some((p) => p.id === id)) return;
     setError(null);
     startTransition(async () => {
-      const res = await reschedulePost(id, key);
-      if (!res.ok) {
-        setError(res.error ?? "Could not move post.");
-        return;
+      try {
+        const res = await reschedulePost(id, key);
+        if (!res.ok) {
+          setError(res.error ?? "Could not move post.");
+          return;
+        }
+        router.refresh();
+      } catch {
+        setError("Could not move post. Please try again.");
       }
-      router.refresh();
     });
   }
 

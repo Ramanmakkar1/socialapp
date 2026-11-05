@@ -123,12 +123,16 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
     if (current.some((p) => p.id === id)) return;
     setError(null);
     startTransition(async () => {
-      const res = await reschedulePost(id, key);
-      if (!res.ok) {
-        setError(res.error ?? "Could not move post.");
-        return;
+      try {
+        const res = await reschedulePost(id, key);
+        if (!res.ok) {
+          setError(res.error ?? "Could not move post.");
+          return;
+        }
+        router.refresh();
+      } catch {
+        setError("Could not move post. Please try again.");
       }
-      router.refresh();
     });
   }
 
