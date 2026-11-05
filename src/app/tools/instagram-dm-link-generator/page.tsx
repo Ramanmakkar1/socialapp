@@ -136,6 +136,13 @@ export default function InstagramDmLinkGeneratorPage() {
                   “Message on Instagram” button.
                 </li>
                 <li>
+                  <strong className="font-medium text-ink">Website links you share in DMs:</strong> tag them with the{" "}
+                  <Link href="/tools/instagram-utm-builder" className="font-medium text-brand underline underline-offset-2">
+                    Instagram UTM builder
+                  </Link>{" "}
+                  so your site analytics shows which bio, Story or auto-DM link sent the visit.
+                </li>
+                <li>
                   <strong className="font-medium text-ink">QR codes:</strong> encode the ig.me URL so print materials or events
                   open DMs on scan.
                 </li>

@@ -49,6 +49,12 @@ const tools = [
     icon: LinkIcon,
   },
   {
+    href: "/tools/instagram-utm-builder",
+    title: "Instagram UTM builder",
+    description: "Tag links for your bio, Story stickers and auto-DMs with UTM campaign fields so your website analytics shows what Instagram sent.",
+    icon: LinkIcon,
+  },
+  {
     href: "/tools/instagram-line-break-generator",
     title: "Instagram line break generator",
     description: "Keep blank lines and paragraph spacing in your captions so they don’t collapse into one block of text.",
