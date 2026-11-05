@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Hash, Image as ImageIcon, Percent, ShieldCheck, TextQuote, UserRound } from "lucide-react";
+import { ArrowRight, Hash, Image as ImageIcon, Link as LinkIcon, Percent, ShieldCheck, TextQuote, UserRound } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -26,6 +26,12 @@ const tools = [
     title: "Instagram caption counter",
     description: "Count characters and hashtags as you type and see how close your caption is to the Instagram limit.",
     icon: Hash,
+  },
+  {
+    href: "/tools/instagram-dm-link-generator",
+    title: "Instagram DM link generator",
+    description: "Create an ig.me link that opens a direct message with your account—copy it for bio, Stories and email.",
+    icon: LinkIcon,
   },
   {
     href: "/tools/instagram-line-break-generator",
