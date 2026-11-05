@@ -162,3 +162,30 @@ test('ungated rule accepts exactly 1000 rendered characters and rejects 1001', (
   assert.deepEqual(validateRule(rule), []);
   assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [ungatedLengthError]);
 });
+
+const keywordError = 'Add at least one keyword with usable text (mentions like @brand and punctuation are removed before matching), or choose “Any comment”.';
+
+test('rejects a mention-only keyword list', () => {
+  const rule: DmRule = { ...makeRule('Hello'), keywords: ['@brand'] };
+  assert.deepEqual(validateRule(rule), [keywordError]);
+});
+
+test('rejects a punctuation-only keyword list', () => {
+  const rule: DmRule = { ...makeRule('Hello'), keywords: ['!!!', '...'] };
+  assert.deepEqual(validateRule(rule), [keywordError]);
+});
+
+test('accepts a valid keyword mixed with ignored entries', () => {
+  const rule: DmRule = { ...makeRule('Hello'), keywords: ['@brand', '!!!', 'guide'] };
+  assert.deepEqual(validateRule(rule), []);
+});
+
+test('accepts "@brand GUIDE" because GUIDE has usable text', () => {
+  const rule: DmRule = { ...makeRule('Hello'), keywords: ['@brand GUIDE'] };
+  assert.deepEqual(validateRule(rule), []);
+});
+
+test('skips the keyword check for matchMode any', () => {
+  const rule: DmRule = { ...makeRule('Hello'), keywords: ['@brand'], matchMode: 'any' };
+  assert.deepEqual(validateRule(rule), []);
+});
