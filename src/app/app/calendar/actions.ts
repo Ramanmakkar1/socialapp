@@ -34,6 +34,7 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
 }
 
 type SavePostInput = {
+  id?: string;
   caption: string;
   firstComment?: string;
   platforms: ("instagram" | "facebook" | "threads")[];
@@ -95,6 +96,10 @@ export async function savePost(
   }
 
   const user = await requireUser();
+
+  if (input.id !== undefined && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.id)) {
+    return { ok: false, error: "Invalid draft." };
+  }
 
   if (input.platforms.length === 0) {
     return { ok: false, error: "Select at least one platform." };
@@ -238,7 +243,9 @@ export async function savePost(
     await client.query("begin");
 
     const postRes = await client.query<{ id: string }>(
-      "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) returning id",
+      input.id
+        ? "update scheduled_posts set caption=$2, scheduled_at=$3, status=$4, media=$5::jsonb, dm_rule_id=$6, ig_format=$7, first_comment=$8 where user_id=$1 and id=$9 and status='draft' returning id"
+        : "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) returning id",
       [
         user.id,
         input.caption,
@@ -248,6 +255,7 @@ export async function savePost(
         dmRuleId,
         instagramSelected ? igFormat : "feed",
         igFormat === "story" ? null : firstComment || null,
+        ...(input.id ? [input.id] : []),
       ],
     );
     id = postRes.rows[0]?.id;
@@ -256,11 +264,14 @@ export async function savePost(
       return { ok: false, error: "Could not save post." };
     }
 
+    if (input.id) {
+      await client.query("delete from post_targets where post_id = $1", [id]);
+    }
+
     for (const platform of platforms) {
       const customized = Object.prototype.hasOwnProperty.call(input.overrides, platform);
       const raw = customized ? input.overrides[platform] : undefined;
-      const captionOverride =
-        customized && raw !== undefined && raw.trim() !== "" ? raw : null;
+      const captionOverride = customized ? raw ?? "" : null;
 
       await client.query(
         "insert into post_targets (post_id, platform, caption_override) values ($1, $2, $3)",

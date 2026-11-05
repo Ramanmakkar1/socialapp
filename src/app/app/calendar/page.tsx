@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Composer from "./Composer";
+import Composer, { type ComposerDraftInitial } from "./Composer";
 import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
@@ -26,6 +26,13 @@ type PublishedPost = {
 };
 
 type RuleOption = { id: string; name: string; status: string };
+type DraftRow = Omit<ComposerDraftInitial, "scheduledAt" | "firstComment" | "mediaUrls" | "dmRuleId" | "igFormat"> & {
+  scheduled_at: Date | string | null;
+  first_comment: string | null;
+  media: { url: string }[];
+  dm_rule_id: string | null;
+  ig_format: "feed" | "story";
+};
 
 function mondayUtcStart(d: Date): Date {
   const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
@@ -67,9 +74,9 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string }>;
 }) {
-  const { week, view: viewParam, month, status } = await searchParams;
+  const { week, view: viewParam, month, status, draft } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
   const view: "week" | "month" = viewParam === "month" ? "month" : "week";
   const weekStart = parseWeekParam(week);
@@ -105,6 +112,8 @@ export default async function CalendarPage({
   let rowsFailed = false;
   let weekRowsFailed = false;
   let publishedFailed = false;
+  let initialDraft: ComposerDraftInitial | undefined;
+  let draftFailed = Boolean(draft);
 
   const reloadHref =
     view === "month"
@@ -115,6 +124,27 @@ export default async function CalendarPage({
 
   if (isDbConfigured()) {
     const user = await requireUser();
+    if (draft && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(draft)) {
+      try {
+        const [row] = await query<DraftRow>(
+          `select p.id, p.caption, p.first_comment, p.scheduled_at, p.media, p.dm_rule_id, p.ig_format,
+           coalesce(array_agg(t.platform) filter (where t.platform is not null), '{}') as platforms,
+           coalesce(jsonb_object_agg(t.platform, t.caption_override) filter (where t.caption_override is not null), '{}'::jsonb) as overrides
+           from scheduled_posts p left join post_targets t on t.post_id = p.id
+           where p.id = $1 and p.user_id = $2 and p.status = 'draft' group by p.id`,
+          [draft, user.id],
+        );
+        if (row) {
+          initialDraft = {
+            id: row.id, caption: row.caption, platforms: row.platforms, overrides: row.overrides,
+            firstComment: row.first_comment ?? "", mediaUrls: row.media.map((item) => item.url),
+            scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
+            dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
+          };
+          draftFailed = false;
+        }
+      } catch { /* Keep the composer hidden rather than overwrite an unloaded draft. */ }
+    }
     try {
       commentHourRows = await query<{ hour: number; count: number }>(
         `select extract(hour from created_at at time zone 'UTC')::int as hour, count(*)::int as count from socialapp.dm_queue where user_id=$1 and created_at > now() - interval '30 days' group by 1`,
@@ -159,7 +189,9 @@ export default async function CalendarPage({
         <h1 className="text-2xl font-semibold">Calendar</h1>
         <p className="text-sm text-muted">Plan and schedule Instagram posts. Facebook and Threads are coming soon.</p>
       </div>
-      {rulesFailed ? (
+      {draftFailed ? (
+        <LoadFailed message="We couldn’t load this draft. Your saved post is unchanged." reloadHref={`/app/calendar?draft=${encodeURIComponent(draft ?? "")}#new`} />
+      ) : rulesFailed ? (
         <section className="mt-6" aria-labelledby="composer-unavailable">
           <h2 id="composer-unavailable" className="sr-only">Composer unavailable</h2>
           <LoadFailed
@@ -168,7 +200,7 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <Composer rules={rules} bestHoursUtc={bestHoursUtc} />
+        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} />
       )}
       <div className="mt-8 flex gap-2" role="group" aria-label="Calendar view">
         <Link

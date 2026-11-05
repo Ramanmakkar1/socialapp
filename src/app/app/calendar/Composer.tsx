@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AtSign, Facebook, Instagram, Sparkles } from "lucide-react";
 import { savePost } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
@@ -43,6 +44,17 @@ function effectiveCaption(
 }
 
 type RuleOption = { id: string; name: string; status: string };
+export type ComposerDraftInitial = {
+  id: string;
+  caption: string;
+  firstComment: string;
+  platforms: string[];
+  overrides: Partial<Record<PlatformId, string>>;
+  mediaUrls: string[];
+  igFormat: "feed" | "story";
+  dmRuleId: string | null;
+  scheduledAt: string | null;
+};
 
 function nextSlotLocal(hourUtc: number): Date {
   const now = new Date();
@@ -56,7 +68,9 @@ function toLocalInputValue(d: Date): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: RuleOption[]; bestHoursUtc?: number[] }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial }) {
+  const router = useRouter();
+  const [draftId, setDraftId] = useState(initialDraft?.id);
   const mainId = useId();
   const platformsFocusId = useId();
   const customCaptionId = useId();
@@ -100,6 +114,26 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
   const [aiIdeas, setAiIdeas] = useState<CaptionIdea[]>([]);
   const [aiError, setAiError] = useState("");
   const [aiPending, startAiTransition] = useTransition();
+
+  useEffect(() => {
+    // Queue direct-load initialization until after hydration; cancel stale loads.
+    let active = true;
+    queueMicrotask(() => {
+      if (!active || !initialDraft) return;
+      const overrides = initialDraft.overrides;
+      const hasOverride = (platform: PlatformId) => LIVE_PLATFORMS.includes(platform) && Object.prototype.hasOwnProperty.call(overrides, platform);
+      setMainCaption(initialDraft.caption);
+      setFirstComment(initialDraft.firstComment);
+      setEnabled({ instagram: initialDraft.platforms.includes("instagram"), facebook: false, threads: false });
+      setCustomize({ instagram: hasOverride("instagram"), facebook: hasOverride("facebook"), threads: hasOverride("threads") });
+      setCustomCaption({ instagram: overrides.instagram ?? "", facebook: "", threads: "" });
+      setMediaUrls(initialDraft.mediaUrls.length ? initialDraft.mediaUrls : [""]);
+      setIgFormat(initialDraft.igFormat);
+      setSelectedRuleId(initialDraft.dmRuleId ?? "");
+      setScheduledAt(initialDraft.scheduledAt ? toLocalInputValue(new Date(initialDraft.scheduledAt)) : "");
+    });
+    return () => { active = false; };
+  }, [initialDraft]);
 
   useEffect(() => {
     // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.
@@ -153,6 +187,7 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
       }
     }
     return {
+      id: draftId,
       caption: mainCaption,
       firstComment,
       platforms,
@@ -244,14 +279,22 @@ export default function Composer({ rules = [], bestHoursUtc = [] }: { rules?: Ru
       setMediaUrls([""]);
       setIgFormat("feed");
       setSelectedRuleId("");
+      setCustomize({ instagram: false, facebook: false, threads: false });
+      setEnabled({ instagram: true, facebook: false, threads: false });
+      setActiveTab("instagram");
+      setScheduledAt("");
+      setDraftId(undefined);
+      if (draftId) router.replace("/app/calendar#new");
+      else router.refresh();
     });
   }
 
   return (
     <section id="new" className="mt-6 scroll-mt-20" aria-labelledby={`${mainId}-heading`}>
       <h2 id={`${mainId}-heading`} className="sr-only">
-        New post composer
+        {draftId ? "Edit draft" : "New post composer"}
       </h2>
+      {draftId && <Link href="/app/calendar#new" className="mb-4 inline-block text-sm text-brand">Cancel editing · New post</Link>}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div className="space-y-6">
           <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { deletePost } from "./actions";
 import LoadFailed, { type LoadError } from "./LoadFailed";
 import { duplicatePost } from "./duplicateActions";
@@ -142,6 +143,9 @@ export default function PostList({ posts, loadError, initialFilter = "all" }: { 
                   {post.status.replace(/[_-]+/g, " ").replace(/^./, (letter) => letter.toUpperCase())}
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
+                  {post.status === "draft" && (
+                    <Link href={`/app/calendar?draft=${post.id}#new`} className="min-h-11 rounded-full border border-line px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-2">Edit draft</Link>
+                  )}
                   {post.status === "failed" && (
                     <button
                       type="button"
