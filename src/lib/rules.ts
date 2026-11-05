@@ -1,4 +1,5 @@
 import { buildCommentDmMessage } from './commentMessage';
+import { BRAND } from './brand';
 
 export type DmRule = {
   id: string;
@@ -68,6 +69,26 @@ export function validateRule(rule: DmRule): string[] {
     });
     if (message.length > 1000) {
       errors.push('Shorten the DM message to leave room for usernames and gate instructions within the 1000-character limit.');
+    }
+  } else {
+    // Reserve the maximum username length for every token replacement.
+    const username = 'u'.repeat(30);
+    const linkUrl = rule.linkUrl?.trim() || null;
+    // Check the raw destination and the longest tracked URL (16-character code) it can be replaced with.
+    const variants = linkUrl ? [linkUrl, `${BRAND.url}/l/${'a'.repeat(16)}`] : [null];
+    for (const resolvedLink of variants) {
+      const message = buildCommentDmMessage({
+        dmText: rule.dmMessage,
+        fromUsername: username,
+        linkUrl,
+        emailGate: false,
+        followGate: false,
+        resolvedLink,
+      });
+      if (message.length > 1000) {
+        errors.push('Shorten the DM message to leave room for usernames and links within the 1000-character limit.');
+        break;
+      }
     }
   }
   if ((rule.askEmail || rule.requireFollow) && !rule.linkUrl?.trim()) {

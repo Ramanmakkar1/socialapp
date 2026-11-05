@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateRule, type DmRule } from './rules';
 import { buildCommentDmMessage } from './commentMessage';
+import { BRAND } from './brand';
 
 function makeRule(dmMessage: string): DmRule {
   return {
@@ -101,3 +102,63 @@ for (const [name, askEmail, requireFollow] of [
     assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [gateLengthError]);
   });
 }
+
+const ungatedLengthError = 'Shorten the DM message to leave room for usernames and links within the 1000-character limit.';
+const trackedUrl = `${BRAND.url}/l/${'a'.repeat(16)}`;
+
+function ungatedRender(dmText: string, linkUrl: string | null, resolvedLink?: string | null): string {
+  return buildCommentDmMessage({
+    dmText,
+    fromUsername: 'u'.repeat(30),
+    linkUrl,
+    emailGate: false,
+    followGate: false,
+    resolvedLink,
+  });
+}
+
+test('ungated rule reserves 30 characters for every repeated username token', () => {
+  const template = '{{username}} {{username}}';
+  const overhead = ungatedRender(template, null).length;
+  const rule = makeRule(template + 'a'.repeat(1000 - overhead));
+  assert.equal(ungatedRender(rule.dmMessage, null).length, 1000);
+  assert.deepEqual(validateRule(rule), []);
+  assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [ungatedLengthError]);
+});
+
+test('ungated rule rejects an appended link that pushes the message over the limit', () => {
+  const linkUrl = 'https://example.com';
+  const overhead = ungatedRender('', linkUrl, trackedUrl).length;
+  const rule = { ...makeRule('a'.repeat(1000 - overhead)), linkUrl };
+  assert.equal(ungatedRender(rule.dmMessage, linkUrl, trackedUrl).length, 1000);
+  assert.deepEqual(validateRule(rule), []);
+  assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [ungatedLengthError]);
+});
+
+test('ungated rule rejects repeated link tokens that push the message over the limit', () => {
+  const linkUrl = 'https://example.com/offer';
+  const template = '{{link}} {{link}}';
+  const overhead = ungatedRender(template, linkUrl, trackedUrl).length;
+  const rule = { ...makeRule(template + 'a'.repeat(1000 - overhead)), linkUrl };
+  assert.equal(ungatedRender(rule.dmMessage, linkUrl, trackedUrl).length, 1000);
+  assert.deepEqual(validateRule(rule), []);
+  assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [ungatedLengthError]);
+});
+
+test('ungated rule rejects a tracked URL longer than the destination even when the raw link fits', () => {
+  const linkUrl = 'https://example.com';
+  const rawOverhead = ungatedRender('', linkUrl).length;
+  const rule = { ...makeRule('a'.repeat(1000 - rawOverhead)), linkUrl };
+  assert.equal(ungatedRender(rule.dmMessage, linkUrl).length, 1000);
+  assert.ok(ungatedRender(rule.dmMessage, linkUrl, trackedUrl).length > 1000);
+  assert.deepEqual(validateRule(rule), [ungatedLengthError]);
+});
+
+test('ungated rule accepts exactly 1000 rendered characters and rejects 1001', () => {
+  const template = '{{username}}';
+  const overhead = ungatedRender(template, null).length;
+  const rule = makeRule(template + 'a'.repeat(1000 - overhead));
+  assert.equal(ungatedRender(rule.dmMessage, null).length, 1000);
+  assert.deepEqual(validateRule(rule), []);
+  assert.deepEqual(validateRule({ ...rule, dmMessage: rule.dmMessage + 'a' }), [ungatedLengthError]);
+});

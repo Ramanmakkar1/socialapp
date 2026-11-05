@@ -125,12 +125,12 @@ export default function AutomationMessagePreview({
         <p className="text-ink-2">Rendered message: {previewMessage.length.toLocaleString("en-US")} / 1,000 characters</p>
         {previewMessage.length > 1000 && (
           <p className="mt-1 rounded-xl border border-warn bg-surface px-3 py-2 text-ink">
-            Message exceeds 1,000 characters. Shorten it to leave room for usernames and gate instructions.
+            Message exceeds 1,000 characters. Shorten it to leave room for usernames, links and gate instructions.
           </p>
         )}
-        {(emailGate || followGate) && (
-          <p className="mt-1 text-ink-2">Saving reserves 30 characters for each username replacement.</p>
-        )}
+        <p className="mt-1 text-ink-2">
+          Saving reserves 30 characters for each username replacement{emailGate || followGate ? '' : ', and checks the message against the tracked link that replaces your destination URL'}.
+        </p>
       </div>
 
       <div className="mt-4 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
