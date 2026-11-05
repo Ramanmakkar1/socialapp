@@ -99,6 +99,53 @@ export async function getRecentPosts(userId: string): Promise<RecentPost[]> {
   }
 }
 
+export type UpcomingPost = {
+  id: string;
+  caption: string;
+  scheduledAt: string;
+  igFormat: string | null;
+  hasRule: boolean;
+  mediaCount: number;
+};
+
+function upcomingDisplayFormat(igFormat: string | null, mediaCount: number, media: unknown): string | null {
+  if (igFormat === "story") return "story";
+  if (mediaCount >= 2) return igFormat;
+  if (mediaCount === 1 && Array.isArray(media) && (media[0] as { type?: string } | undefined)?.type === "video") {
+    return "reel";
+  }
+  return igFormat;
+}
+
+export async function getUpcomingPosts(userId: string, take = 5): Promise<UpcomingPost[]> {
+  if (!isDbConfigured()) {
+    return [];
+  }
+  try {
+    const rows = await query<UpcomingPost & { media: unknown }>(
+      `select p.id, p.caption,
+        to_json(p.scheduled_at) #>> '{}' as "scheduledAt",
+        p.ig_format as "igFormat",
+        (p.dm_rule_id is not null) as "hasRule",
+        coalesce(jsonb_array_length(p.media), 0) as "mediaCount",
+        p.media
+      from socialapp.scheduled_posts p
+      where p.user_id = $1
+        and p.status = 'scheduled'
+        and p.scheduled_at > now()
+      order by p.scheduled_at asc
+      limit $2`,
+      [userId, take],
+    );
+    return rows.map(({ media, ...post }) => ({
+      ...post,
+      igFormat: upcomingDisplayFormat(post.igFormat, post.mediaCount, media),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export type ActivityCell = { dow: number; block: number; count: number };
 
 // Comment times (auto-DM queue rows) in the last 30 days, grouped by ISO weekday (1=Mon..7=Sun) and 3-hour UTC block (0..7).

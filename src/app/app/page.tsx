@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { connection } from "next/server";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, Calendar } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
-import { EMPTY_STATS, getDashboardStats } from "@/lib/stats";
+import { EMPTY_STATS, getDashboardStats, getUpcomingPosts } from "@/lib/stats";
+import EmptyState from "./EmptyState";
+import UpcomingPosts from "./UpcomingPosts";
 
 export const metadata = { title: "Dashboard" };
 
@@ -19,6 +21,7 @@ export default async function AppHome() {
   await connection();
   const user = await getCurrentUser();
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
+  const upcoming = user ? await getUpcomingPosts(user.id) : [];
   const steps = [
     { done: stats.hasAccount, label: "Connect Instagram", href: "/app/settings" },
     { done: stats.hasRule, label: "Create your first auto-DM rule", href: "/app/auto-dm" },
@@ -45,6 +48,30 @@ export default async function AppHome() {
         {tiles.map(([l, v]) => (
           <div key={l} className="rounded-2xl border border-line bg-surface p-5"><div className="text-sm text-muted">{l}</div><div className="mt-1 text-3xl font-semibold">{v.toLocaleString("en-US")}</div></div>
         ))}
+      </div>
+      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-semibold">Up next</h2>
+          <Link href="/app/calendar" className="inline-flex min-h-11 items-center text-sm font-medium text-brand hover:underline">
+            View calendar
+          </Link>
+        </div>
+        {upcoming.length === 0 ? (
+          <EmptyState
+            icon={Calendar}
+            title="Nothing scheduled yet"
+            text="Your next queued posts will show here with local date and time."
+          >
+            <Link
+              href="/app/calendar#new"
+              className="btn-primary inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2 text-sm font-medium"
+            >
+              Schedule your first post
+            </Link>
+          </EmptyState>
+        ) : (
+          <UpcomingPosts posts={upcoming} />
+        )}
       </div>
       {doneCount < 3 ? (
         <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
