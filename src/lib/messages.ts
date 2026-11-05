@@ -166,6 +166,9 @@ export async function processMessageEvents(
           }
         }
       }
+      if (followCheckFailed) {
+        hadFailure = true;
+      }
       if (emailOk && followOk) {
         let link = contactBefore.link_url;
         try {
