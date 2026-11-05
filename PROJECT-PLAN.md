@@ -1,7 +1,7 @@
 # Postflow (working name) — build plan
 
 One tool: **social media scheduler (like Buffer) + Instagram comment→DM automation (like ManyChat) + AI replies + lead capture.**
-Staging: https://socialapp.splitforms.com (noindex until launch). Name + domain decided later (change `src/lib/brand.ts`).
+Live: https://poskoo.com (Raman 2026-11-05; noindex until Raman says go). Old staging socialapp.splitforms.com points to the same app.
 
 ## Stack
 Next.js 16 (App Router, TypeScript, Tailwind v4) · Postgres on the shared Supabase (own schema `socialapp`) · pg-boss job queue (inside Postgres) · Node workers · official platform APIs only.

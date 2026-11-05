@@ -1,6 +1,6 @@
 // Working name until Raman picks the real name + domain. Change it here only.
 const rawUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://socialapp.splitforms.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://poskoo.com";
 export const BRAND = {
   name: "Poskoo",
   tagline: "Schedule posts. Auto-DM every comment. Grow on autopilot.",

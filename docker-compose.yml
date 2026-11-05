@@ -8,4 +8,4 @@ services:
       - path: .env
         required: false
     environment:
-      NEXT_PUBLIC_SITE_URL: https://socialapp.splitforms.com
+      NEXT_PUBLIC_SITE_URL: https://poskoo.com
