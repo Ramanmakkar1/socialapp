@@ -1,5 +1,5 @@
 // Server only: small Instagram Graph API client for the dashboard (profile, account insights, replies).
-// Retries rate limits with backoff and marks the account "expired" when Meta says the token is invalid.
+// GET retries rate limits / 5xx with backoff; POST is single-attempt. Marks the account "expired" when Meta says the token is invalid.
 import { decryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
 
@@ -40,7 +40,10 @@ export async function markAccountExpired(accountId: string): Promise<void> {
   await query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [accountId]).catch(() => undefined);
 }
 
-// One Graph call with up to 2 retries (1s, 3s) on rate limits / 5xx. Throws GraphError.
+const POST_UNCERTAIN_MSG =
+  "We couldn't confirm whether your message was delivered. Check Instagram before sending again.";
+
+// GET: up to 2 retries (1s, 3s) on rate limits / 5xx / network errors. POST: single attempt (no retry) so replies/DMs are not duplicated. Throws GraphError.
 export async function graphCall<T>(
   account: GraphAccount,
   path: string,
@@ -53,6 +56,8 @@ export async function graphCall<T>(
   } catch {
     throw new GraphError("Stored Instagram token cannot be read", "token", null);
   }
+  const method = init.method ?? "GET";
+  const canRetry = method === "GET";
   const qs = init.params ? `?${new URLSearchParams(init.params).toString()}` : "";
   const delays = [1_000, 3_000];
   for (let attempt = 0; ; attempt++) {
@@ -60,7 +65,7 @@ export async function graphCall<T>(
     let body: unknown = null;
     try {
       const res = await fetch(`${GRAPH_BASE}/${path}${qs}`, {
-        method: init.method ?? "GET",
+        method,
         headers: { Authorization: `Bearer ${token}`, ...(init.body ? { "Content-Type": "application/json" } : {}) },
         body: init.body ? JSON.stringify(init.body) : undefined,
         cache: "no-store",
@@ -70,6 +75,7 @@ export async function graphCall<T>(
       body = await res.json().catch(() => null);
       if (res.ok && !metaError(body).message) return body as T;
     } catch (err) {
+      if (!canRetry) throw new GraphError(POST_UNCERTAIN_MSG, "other", null);
       if (attempt >= delays.length) throw new GraphError(err instanceof Error ? err.message : "network error", "other", null);
       await sleep(delays[attempt]);
       continue;
@@ -80,7 +86,8 @@ export async function graphCall<T>(
       await markAccountExpired(account.id);
       throw new GraphError("Instagram access expired or was removed. Reconnect Instagram in Settings.", "token", code);
     }
-    if ((kind === "rate_limited" || status >= 500) && attempt < delays.length) {
+    if (!canRetry && status >= 500) throw new GraphError(POST_UNCERTAIN_MSG, "other", code);
+    if ((kind === "rate_limited" || status >= 500) && canRetry && attempt < delays.length) {
       await sleep(delays[attempt]);
       continue;
     }
