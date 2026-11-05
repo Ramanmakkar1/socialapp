@@ -14,6 +14,8 @@ import {
 const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const SEND_TIMEOUT_MS = 15_000;
 const RATE_LIMIT_PAUSE_MS = 15 * 60 * 1000;
+/** Namespace for pg_try_advisory_xact_lock per Instagram account in sendDueDms. */
+const DM_SEND_ADVISORY_NS = "socialapp:ig_dm_send";
 /** Max pending rows considered per account per run (must exclude paused rules in SQL). */
 export const DUE_ROW_LIMIT = 500;
 
@@ -155,6 +157,27 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
     const client = await pool.connect();
     try {
       await client.query("begin");
+      const advLock = await client.query<{ locked: boolean }>(
+        "select pg_try_advisory_xact_lock(hashtext($1::text), hashtext($2::text)) as locked",
+        [DM_SEND_ADVISORY_NS, account.id]
+      );
+      if (advLock.rows[0]?.locked !== true) {
+        await client.query("commit");
+        continue;
+      }
+      const freshRes = await client.query<{ status: string; dm_cooldown_until: Date | null }>(
+        "select status, dm_cooldown_until from socialapp.social_accounts where id=$1",
+        [account.id]
+      );
+      const fresh = freshRes.rows[0];
+      if (!fresh || fresh.status !== "active") {
+        await client.query("commit");
+        continue;
+      }
+      if (fresh.dm_cooldown_until != null && fresh.dm_cooldown_until.getTime() > Date.now()) {
+        await client.query("commit");
+        continue;
+      }
       const lockRes = await client.query(
         "select id from socialapp.social_accounts where id=$1 and status='active' for update skip locked",
         [account.id]
