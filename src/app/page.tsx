@@ -214,7 +214,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
         <li><Link href="/instagram-scheduler">Instagram scheduler</Link></li>
         <li><Link href="/instagram-auto-dm">Instagram auto DM</Link></li>
         <li><Link href="/instagram-auto-dm/templates">Auto-DM templates</Link></li>
-        <li><Link href="/#pricing">Pricing</Link></li>
+        <li><Link href="/pricing">Pricing</Link></li>
       </ul>
     </nav>
     <nav aria-label="Free tools">

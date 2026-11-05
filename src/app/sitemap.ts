@@ -27,6 +27,7 @@ const PUBLIC_PATHS = [
   "/help/getting-started",
   "/help/instagram-auto-dm-not-working",
   "/instagram-scheduler",
+  "/pricing",
 ];
 
 const META: Record<string, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
@@ -55,6 +56,7 @@ const META: Record<string, { priority: number; changeFrequency: "weekly" | "year
   "/help/getting-started": { priority: 0.7, changeFrequency: "weekly" },
   "/help/instagram-auto-dm-not-working": { priority: 0.6, changeFrequency: "weekly" },
   "/instagram-scheduler": { priority: 0.8, changeFrequency: "weekly" },
+  "/pricing": { priority: 0.8, changeFrequency: "weekly" },
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
