@@ -160,14 +160,16 @@ export default function PostList({ posts, loadError, initialFilter = "all" }: { 
                   >
                     Duplicate
                   </button>
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    onClick={() => handleDelete(post.id)}
-                    className="min-h-11 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
-                  >
-                    Delete
-                  </button>
+                  {["draft", "scheduled", "failed"].includes(post.status) && (
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => handleDelete(post.id)}
+                      className="min-h-11 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted" suppressHydrationWarning>

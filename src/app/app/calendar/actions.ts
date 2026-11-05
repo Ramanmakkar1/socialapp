@@ -18,10 +18,13 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
 
   const user = await requireUser();
   try {
-    await query(
-      "delete from scheduled_posts where id = $1 and user_id = $2 and status in ('draft','scheduled','failed')",
+    const deleted = await query<{ id: string }>(
+      "delete from scheduled_posts where id = $1 and user_id = $2 and status in ('draft','scheduled','failed') returning id",
       [id, user.id],
     );
+    if (deleted.length === 0) {
+      return { ok: false, error: "Could not delete post." };
+    }
     revalidatePath("/app/calendar");
     revalidatePath("/app");
     return { ok: true };
