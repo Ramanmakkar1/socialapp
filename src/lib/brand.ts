@@ -7,8 +7,8 @@ export const BRAND = {
   description:
     "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI replies and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
-  // Hard-coded false until Raman explicitly approves indexing after the domain move.
-  // SITE_INDEXABLE is ignored here so staging cannot leak into sitemap or robots allow.
+  // Raman must authorize the new-domain launch before this value changes.
+  // Keep staging noindex and its sitemap empty, even when SITE_INDEXABLE=true.
   indexable: false,
   supportEmail: "support@splitforms.com",
   company: "Town Media Labs",
