@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../../EmptyState";
 import ui from "@/components/ui/ui.module.css";
+import { PageHero } from "@/components/ui/kit";
 
 export const metadata = { title: "Auto-DM activity" };
 
@@ -47,22 +48,6 @@ function explainError(error: string | null): string | null {
   return "This message could not be delivered.";
 }
 
-function DeliveryIllustration() {
-  return (
-    <svg viewBox="0 0 120 64" className="h-16 w-28 shrink-0" aria-hidden="true">
-      <circle cx="60" cy="32" r="30" fill="var(--poskoo-violet)" opacity="0.1" />
-      <rect x="8" y="18" width="34" height="24" rx="8" fill="var(--poskoo-card)" stroke="var(--poskoo-line)" strokeWidth="1.5" />
-      <path d="M15 27h20M15 33h13" stroke="var(--poskoo-ink)" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-      <path d="M46 30h22" stroke="var(--poskoo-violet)" strokeWidth="2" strokeDasharray="3 4" strokeLinecap="round" />
-      <path d="M66 25l6 5-6 5" fill="none" stroke="var(--poskoo-violet)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <g className="hero-float">
-        <path d="M80 14h26a6 6 0 0 1 6 6v16a6 6 0 0 1-6 6H94l-8 6v-6h-6a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="var(--poskoo-violet)" />
-        <path d="M86 28l5 5 10-10" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      </g>
-    </svg>
-  );
-}
-
 export default async function AutoDmActivityPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const user = await requireUser();
   const { page: requestedPage = "" } = await searchParams;
@@ -94,18 +79,17 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="min-w-0">
-          <Link href="/app/auto-dm" className={ui.link}>← Back to Auto-DM</Link>
-          <h1 className="mt-2 text-4xl font-semibold text-[var(--poskoo-ink)]" style={{ letterSpacing: "var(--poskoo-type-heading-ls)", lineHeight: "var(--poskoo-type-heading-lh)" }}>
-            Auto-DM activity
-          </h1>
-          <p className="mt-2 max-w-xl text-[.98rem] text-[var(--poskoo-muted)]">
-            The latest DMs your automations tried to send. Pending messages wait while their automation is paused and send after you resume it.
-          </p>
-        </div>
-        <DeliveryIllustration />
-      </div>
+      <p className="m-0 mb-4">
+        <Link href="/app/auto-dm" className={ui.link}>← Back to Auto-DM</Link>
+      </p>
+      <PageHero
+        eyebrow="Delivery log"
+        title="Auto-DM"
+        accent="activity"
+        lede="The latest DMs your automations tried to send. Pending messages wait while their automation is paused and send after you resume it."
+        art="/landing/card-dm.webp"
+        artAlt=""
+      />
 
       {loadError ? (
         <div role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>
@@ -118,6 +102,9 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
             icon={Inbox}
             title={page > 1 ? "No older activity" : "No DMs sent yet"}
             text={page > 1 ? "You've reached the end of your DM activity." : "When someone comments a keyword on your post, the DM shows up here with its delivery status."}
+            art="/illustrations/empty-inbox.webp"
+            artWidth={1536}
+            artHeight={1024}
           />
         </div>
       ) : (

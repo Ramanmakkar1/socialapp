@@ -1,4 +1,6 @@
 import { requireUser } from "@/lib/auth";
+import { BtnA, PageHero } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
 import { query } from "@/lib/db";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
 import { AutoDmView, type DbRuleRow, type InstagramAccountOption, type RuleFormDefaults } from "./RuleForm";
@@ -33,18 +35,25 @@ export default async function AutoDmPage({
     ]);
   } catch {
     return (
-      <section aria-labelledby="auto-dm-heading">
-        <h1 id="auto-dm-heading" className="m-0 text-3xl font-semibold text-[var(--poskoo-ink)]" style={{ letterSpacing: "var(--poskoo-type-heading-ls)" }}>Auto-DM</h1>
-        <div role="alert" className="mt-6 rounded-[var(--poskoo-radius-card)] border border-[var(--poskoo-line)] bg-[var(--poskoo-peach)] p-6 shadow-[var(--poskoo-shadow-card)]">
+      <>
+        <PageHero
+          eyebrow="Automation"
+          title="Auto-DM"
+          accent="on autopilot"
+          lede="Send a DM to everyone who comments a keyword."
+          art="/landing/card-dm.webp"
+          artAlt=""
+        />
+        <div role="alert" className={`${ui.card} ${ui.peach} mt-6 p-6`}>
           <h2 className="m-0 text-lg font-semibold">We couldn&apos;t load your automations</h2>
-          <p className="mt-2 text-sm text-[var(--poskoo-ink)]">
+          <p className="mt-2 text-sm">
             Please try again in a moment. Your existing rules have not changed.
           </p>
-          <a href="/app/auto-dm" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[var(--poskoo-ink)] px-5 py-2.5 text-sm font-semibold text-white">
+          <BtnA href="/app/auto-dm" size="sm" className="mt-5">
             Retry loading automations
-          </a>
+          </BtnA>
         </div>
-      </section>
+      </>
     );
   }
 

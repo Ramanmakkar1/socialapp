@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { Btn } from "@/components/ui/kit";
 
 type Kind = "email" | "phone";
 
@@ -42,29 +43,29 @@ export default function LeadContactActions({ email, phone }: Props) {
     <div className="mt-3 space-y-2">
       <div className="flex flex-wrap gap-2">
         {items.map(({ kind, value, label }) => (
-          <button
+          <Btn
             key={kind}
-            type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => copy(kind, value)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium text-ink hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             {copied === kind ? (
-              <Check className="h-4 w-4 shrink-0 text-ok" aria-hidden="true" />
+              <Check className="h-4 w-4 shrink-0 text-[var(--poskoo-green)]" aria-hidden="true" />
             ) : (
-              <Copy className="h-4 w-4 shrink-0 text-ink-2" aria-hidden="true" />
+              <Copy className="h-4 w-4 shrink-0 text-[var(--poskoo-muted)]" aria-hidden="true" />
             )}
             {label}
-          </button>
+          </Btn>
         ))}
       </div>
       {items.map(({ kind, value }) =>
         fallback === kind ? (
-          <span key={`fallback-${kind}`} className="select-all break-all text-xs text-ink-2">
+          <span key={`fallback-${kind}`} className="select-all break-all text-xs text-[var(--poskoo-ink)]">
             {value}
           </span>
         ) : null
       )}
-      <span role="status" aria-live="polite" aria-atomic="true" className="min-h-[1.25rem] text-xs text-ink-2">
+      <span role="status" aria-live="polite" aria-atomic="true" className="min-h-[1.25rem] text-xs text-[var(--poskoo-muted)]">
         {copied === "email" && "Email copied"}
         {copied === "phone" && "Phone copied"}
         {fallback === "email" && "Copy failed, select and copy manually"}

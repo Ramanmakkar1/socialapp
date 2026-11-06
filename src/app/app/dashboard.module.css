@@ -85,7 +85,7 @@
   height: 10px;
   overflow: hidden;
   border-radius: var(--poskoo-radius-pill);
-  background: rgba(255, 255, 255, .6);
+  background: var(--poskoo-card);
 }
 .progressFill { height: 100%; border-radius: inherit; background: var(--poskoo-violet); }
 .steps { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }

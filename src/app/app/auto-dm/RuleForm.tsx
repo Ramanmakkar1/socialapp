@@ -555,7 +555,7 @@ export function AutoDmView({
       <PageHero
         eyebrow="Automation"
         title="Auto-DM"
-        accent="on autopilot."
+        accent="on autopilot"
         lede="Send a DM to everyone who comments a keyword."
         art="/landing/card-dm.webp"
         artAlt=""
