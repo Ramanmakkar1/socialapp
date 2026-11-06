@@ -1,16 +1,20 @@
 import Link from "next/link";
 import PoskooMark from "./PoskooMark";
 
-// Landing-style header. Must be rendered inside PublicShell (the .landing wrapper)
-// so the landing.module.css global classes (.top, .logo, .links, .btn…) apply.
-const LINKS = [
-  { href: "/#how", label: "How it works" },
-  { href: "/#channels", label: "Channels" },
-  { href: "/#pricing", label: "Pricing" },
-  { href: "/#faq", label: "FAQ" },
+// The one site header, used by the landing page and every public page (via
+// PublicShell). Must be rendered inside a .landing wrapper (landing.module.css)
+// so the global classes (.top, .logo, .links, .navr, .btn, .mobile-nav) apply.
+// On the landing itself the section links are plain hashes (#how); elsewhere they
+// point back to the landing (/#how).
+const SECTIONS = [
+  { hash: "#how", label: "How it works" },
+  { hash: "#channels", label: "Channels" },
+  { hash: "#pricing", label: "Pricing" },
+  { hash: "#faq", label: "FAQ" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ onHome = false }: { onHome?: boolean }) {
+  const links = SECTIONS.map((l) => ({ href: onHome ? l.hash : `/${l.hash}`, label: l.label }));
   return (
     <>
       <nav className="top" aria-label="Main">
@@ -19,7 +23,7 @@ export function SiteHeader() {
           poskoo<b>.</b>
         </Link>
         <div className="links">
-          {LINKS.map((l) => (
+          {links.map((l) => (
             <Link key={l.href} href={l.href}>
               {l.label}
             </Link>
@@ -35,7 +39,7 @@ export function SiteHeader() {
         </div>
       </nav>
       <nav className="mobile-nav" aria-label="Mobile navigation">
-        {LINKS.map((l) => (
+        {links.map((l) => (
           <Link key={l.href} href={l.href}>
             {l.label}
           </Link>

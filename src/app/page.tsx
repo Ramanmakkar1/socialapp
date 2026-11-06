@@ -5,6 +5,8 @@ import { BRAND } from "@/lib/brand";
 import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = "Schedule Instagram posts, auto-DM keyword comments and capture leads with Poskoo. Start free using the official Meta API. No credit card needed.";
 export const metadata: Metadata = {
@@ -60,15 +62,10 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
   <symbol id="ok" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--green)"/><path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></symbol>
   <symbol id="no" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--red)"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/></symbol>
-  <symbol id="mark" viewBox="0 0 40 40"><path d="M20 3c9.4 0 17 6.7 17 15.4S29.4 34 20 34c-1.6 0-3.1-.2-4.6-.5L8 37.5l1.7-6.6C5.6 28.1 3 23.6 3 18.4 3 9.7 10.6 3 20 3z" fill="var(--coral)" stroke="var(--ink)" strokeWidth="2.4"/><circle cx="14.5" cy="18.5" r="2.4" fill="var(--ink)"/><circle cx="25.5" cy="18.5" r="2.4" fill="var(--ink)"/><path d="M16 24c2.4 2 5.6 2 8 0" stroke="var(--ink)" strokeWidth="2.2" fill="none" strokeLinecap="round"/></symbol>
 </defs></svg>
 
 <div className="wrap">
-  <nav className="top" aria-label="Main">
-    <Link className="logo" href="/"><svg width="34" height="34" aria-hidden="true"><use href="#mark"/></svg>poskoo<b>.</b></Link>
-    <div className="links"><Link href="#how">How it works</Link><Link href="#channels">Channels</Link><Link href="#pricing">Pricing</Link><Link href="#faq">FAQ</Link></div>
-    <div className="navr"><Link className="login" href="/login">Log in</Link><Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link></div>
-  </nav><nav className="mobile-nav" aria-label="Mobile navigation"><Link href="#how">How it works</Link><Link href="#channels">Channels</Link><Link href="#pricing">Pricing</Link><Link href="#faq">FAQ</Link><Link href="/login">Log in</Link></nav>
+  <SiteHeader onHome />
 
   <header className="hero" id="top">
     <Link className="pill" href="#channels"><span>NEW</span>Schedule and auto-DM on Instagram. Facebook and Threads coming soon <span aria-hidden="true" style={{"background": "none", "color": "inherit", "padding": "0"}}>→</span></Link>
@@ -209,50 +206,6 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <div><h2>Your next post could fill your inbox <em className="s">with leads.</em></h2><p>Start free. Connect your account in one tap.</p><Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link></div>
     <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
   </div>
-  <footer className="rich">
-    <div className="fbrand">
-      <Link className="logo" href="/"><svg width="30" height="30" aria-hidden="true"><use href="#mark"/></svg>poskoo<b>.</b></Link>
-      <p>Schedule Instagram posts and auto-DM every comment, on the official Meta API.</p>
-    </div>
-    <nav aria-label="Product">
-      <p className="fh">Product</p>
-      <ul>
-        <li><Link href="/instagram-scheduler">Instagram scheduler</Link></li>
-        <li><Link href="/instagram-auto-dm">Instagram auto DM</Link></li>
-        <li><Link href="/instagram-auto-dm/templates">Auto-DM templates</Link></li>
-        <li><Link href="/pricing">Pricing</Link></li>
-      </ul>
-    </nav>
-    <nav aria-label="Free tools">
-      <p className="fh">Free tools</p>
-      <ul>
-        <li><Link href="/tools/instagram-hashtag-generator">Hashtag generator</Link></li>
-        <li><Link href="/tools/instagram-caption-counter">Caption counter</Link></li>
-        <li><Link href="/tools/instagram-font-generator">Font generator</Link></li>
-        <li><Link href="/tools/instagram-bio-generator">Bio generator</Link></li>
-        <li><Link href="/tools/instagram-image-size">Image size guide</Link></li>
-        <li><Link href="/tools">All free tools</Link></li>
-      </ul>
-    </nav>
-    <nav aria-label="Compare">
-      <p className="fh">Compare</p>
-      <ul>
-        <li><Link href="/buffer-alternative">Buffer alternative</Link></li>
-        <li><Link href="/later-alternative">Later alternative</Link></li>
-        <li><Link href="/manychat-alternative">ManyChat alternative</Link></li>
-      </ul>
-    </nav>
-    <nav aria-label="Company">
-      <p className="fh">Company</p>
-      <ul>
-        <li><Link href="/help">Help center</Link></li>
-        <li><Link href="/contact">Contact</Link></li>
-        <li><Link href="/privacy">Privacy</Link></li>
-        <li><Link href="/terms">Terms</Link></li>
-        <li><Link href="/data-deletion">Data deletion</Link></li>
-      </ul>
-    </nav>
-    <div className="legal"><span>© 2026 Poskoo · Town Media Labs</span></div>
-  </footer>
+  <SiteFooter />
 </div>
 </main>; }

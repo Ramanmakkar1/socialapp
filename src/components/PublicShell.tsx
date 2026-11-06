@@ -28,8 +28,8 @@ const tokenBridge = {
 export default function PublicShell({ children }: { children: ReactNode }) {
   return (
     <div
-      className={`${landing.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}
-      style={{ ...tokenBridge, minHeight: "100dvh", display: "flex", flexDirection: "column" }}
+      className={`${landing.landing} ${s.shell} ${instrumentSans.variable} ${instrumentSerif.variable}`}
+      style={tokenBridge}
     >
       <div className="wrap">
         <SiteHeader />

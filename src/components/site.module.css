@@ -1,5 +1,19 @@
 /* Public page helpers, on top of the landing design system (landing.module.css). */
 
+/* PublicShell root: full-height column so the footer sits at the bottom.
+   The landing's .wrap centres itself with margin-inline:auto; inside a flex column
+   that shrinks it to its content width (the header/footer then came out narrower
+   than the landing's 1140px column). width:100% keeps every .wrap at the same
+   1140px column as the landing. */
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.shell > :global(.wrap) {
+  width: 100%;
+}
+
 .main {
   flex: 1 1 auto;
   width: 100%;

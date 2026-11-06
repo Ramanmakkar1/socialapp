@@ -2,7 +2,8 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PoskooMark from "./PoskooMark";
 
-// Landing-style footer. Must be rendered inside PublicShell (the .landing wrapper)
+// The one site footer, used by the landing page and every public page (via
+// PublicShell). Must be rendered inside a .landing wrapper
 // so the landing.module.css global classes (footer.rich, .fh, …) apply.
 function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
