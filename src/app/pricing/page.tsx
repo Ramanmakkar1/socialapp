@@ -73,6 +73,16 @@ const breadcrumbJsonLd = {
 };
 const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
+// The landing's green check (its #ok symbol only exists on the home page, so inline it here).
+function Check() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" style={{ flex: "none", marginTop: 4 }}>
+      <circle cx="9" cy="9" r="9" fill="var(--green)" />
+      <path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function PricingPage() {
   return (
     <PublicShell>
@@ -103,6 +113,7 @@ export default function PricingPage() {
                 <ul>
                   {p.items.map((item) => (
                     <li key={item.text}>
+                      <Check />
                       {item.text}
                       {item.soon ? <small className="soon"> · coming soon</small> : null}
                     </li>
