@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type pg from "pg";
 import {
   extractEmail,
   extractMessageEvents,
   extractPhone,
 } from "./messageParse.ts";
+import { createFakePool, installFakePool } from "../test-utils/fakePool.ts";
+import { createDmWorld, rule, sentPrompt, type WContact } from "../test-utils/dmWorld.ts";
 
 test("extractMessageEvents on valid payload returns 1 event", () => {
   const body = {
@@ -85,667 +86,194 @@ test("extractPhone finds normalized phone", () => {
   assert.equal(extractPhone("order 12"), null);
 });
 
-test("follow verification preserves retries and gated-link deduplication", async (t) => {
-  const { processMessageEvents } = await import("./messages.ts");
+
+// ---- processMessageEvents: gated links, follow checks, idempotency ----
+
+
+type World = ReturnType<typeof createDmWorld>;
+
+async function inWorld(world: World, following: boolean | null | "throw", run: (fetches: string[]) => Promise<void>) {
+  const { pool } = createFakePool(world.handlers);
+  const restore = installFakePool(pool);
   const { encryptToken } = await import("./crypto.ts");
-  for (const scenario of ["missing token", "null verification", "non-follower"] as const) {
-    await t.test(scenario, async () => {
-      const previousPool = globalThis.__socialappPool;
-      const previousUrl = process.env.DATABASE_URL;
-      const previousKey = process.env.TOKEN_ENCRYPTION_KEY;
-      const previousFetch = globalThis.fetch;
-      const previousError = console.error;
-      const queued: { contact: unknown; kind: string; message: unknown }[] = [];
-      const updated: unknown[] = [];
-      const verified: string[] = [];
-      let recovered = false;
-      process.env.DATABASE_URL = "mock";
-      process.env.TOKEN_ENCRYPTION_KEY = Buffer.alloc(32).toString("base64");
-      const token = encryptToken("test-token");
-      const query = async (sql: string, params: unknown[] = []) => {
-        if (sql.includes("select id, user_id")) {
-          return { rows: [{ id: params[0], user_id: "owner" }] };
-        }
-        if (sql.includes("select access_token_enc")) {
-          return { rows: [{ access_token_enc:
-            scenario === "missing token" && !recovered && params[0] === "account"
-              ? null : token }] };
-        }
-        if (sql.includes("from socialapp.contacts c")) {
-          return { rows: [{ id: params[1], email: "lead@example.com",
-            source_rule_id: "rule", link_url: "https://example.com/lead",
-            email_gate: true, follow_gate: true }] };
-        }
-        if (sql.startsWith("insert into socialapp.contacts")) {
-          updated.push(params[1]);
-          return { rows: [{ id: params[1] }] };
-        }
-        if (sql.includes("insert into socialapp.short_links")) {
-          return { rows: [{ code: "abc123" }] };
-        }
-        if (sql.includes("comment_reply")) {
-          return { rows: [{ ok: 1 }] };
-        }
-        if (sql.includes("select 1 as ok")) {
-          return { rows: queued.filter((row) => row.contact === params[0] && row.kind === "gated_link") };
-        }
-        if (sql.includes("select count(*)")) {
-          return { rows: [{ n: queued.filter((row) => row.contact === params[0] && row.kind === "follow_nudge").length }] };
-        }
-        if (sql.includes("insert into socialapp.dm_queue")) {
-          queued.push({ contact: params[3], message: params[5],
-            kind: sql.includes("'gated_link'") ? "gated_link" : "follow_nudge" });
-          return { rows: [] };
-        }
-        assert.ok(["begin", "commit", "rollback"].includes(sql) || sql.includes("pg_advisory_xact_lock"), sql);
-        return { rows: [] };
-      };
-      globalThis.__socialappPool = {
-        query,
-        connect: async () => ({ query, release: () => {} }),
-      } as unknown as pg.Pool;
-      globalThis.fetch = async (input) => {
-        const sender = new URL(String(input)).pathname.split("/").pop()!;
-        verified.push(sender);
-        const following = sender === "healthy" || recovered ? true
-          : scenario === "non-follower" ? false : null;
-        return Response.json({ is_user_follow_business: following });
-      };
-      console.error = () => {};
-      const event = { accountExternalId: "account", senderId: "lead", text: "done", mid: "m1" };
-      try {
-        if (scenario === "non-follower") {
-          assert.equal(await processMessageEvents([event]), 1);
-          assert.deepEqual(queued.map((row) => row.kind), ["follow_nudge"]);
-          assert.deepEqual(verified, ["lead"]);
-        } else {
-          await assert.rejects(processMessageEvents([
-            event,
-            { ...event, accountExternalId: "healthy-account", senderId: "healthy", mid: "m2" },
-          ]), /message event processing incomplete/);
-          assert.deepEqual(updated, ["lead", "healthy"]);
-          assert.deepEqual(queued.map((row) => [row.contact, row.kind]), [["healthy", "gated_link"]]);
-          assert.deepEqual(verified, scenario === "missing token" ? ["healthy"] : ["lead", "healthy"]);
-          recovered = true;
-          assert.equal(await processMessageEvents([event]), 1);
-          assert.equal(await processMessageEvents([event]), 1);
-          const links = queued.filter((row) => row.contact === "lead");
-          assert.equal(links.length, 1);
-          assert.equal(links[0].kind, "gated_link");
-          assert.match(String(links[0].message), /^Thanks! Here's your link: .*\/l\/abc123$/);
-        }
-      } finally {
-        globalThis.__socialappPool = previousPool;
-        globalThis.fetch = previousFetch;
-        console.error = previousError;
-        if (previousUrl === undefined) delete process.env.DATABASE_URL;
-        else process.env.DATABASE_URL = previousUrl;
-        if (previousKey === undefined) delete process.env.TOKEN_ENCRYPTION_KEY;
-        else process.env.TOKEN_ENCRYPTION_KEY = previousKey;
-      }
+  for (const a of world.accounts) if (a.access_token_enc === "") a.access_token_enc = encryptToken("tok");
+  const previousFetch = globalThis.fetch;
+  const previousError = console.error;
+  const fetches: string[] = [];
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    fetches.push(String(input));
+    if (following === "throw") throw new Error("network down");
+    if (following === null) return new Response("{}", { status: 500 });
+    return Response.json({ is_user_follow_business: following });
+  }) as typeof fetch;
+  console.error = () => {};
+  try {
+    await run(fetches);
+  } finally {
+    globalThis.fetch = previousFetch;
+    console.error = previousError;
+    restore();
+  }
+}
+
+const ACCOUNT = { id: "account-1", user_id: "owner", external_id: "ig-acct", status: "active", access_token_enc: "", dm_cooldown_until: null };
+const lead = (extra: Partial<WContact> = {}): WContact => ({
+  id: "contact-lead", user_id: "owner", social_account_id: "account-1", external_id: "lead",
+  username: "lead", email: null, phone: null, source_rule_id: "rule-a", ...extra,
+});
+const reply = (text: string, mid = "m1") => ({ accountExternalId: "ig-acct", senderId: "lead", text, mid });
+const kinds = (world: World) => world.queue.filter((q) => q.kind !== "comment_reply").map((q) => [q.rule_id, q.kind]);
+
+test("follow check that Instagram does not answer queues a durable retry instead of being dropped (g)", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  for (const failure of [null, "throw"] as const) {
+    const world = createDmWorld({
+      accounts: [{ ...ACCOUNT }],
+      rules: [rule({ id: "rule-a", follow_gate: true })],
+      contacts: [lead()],
+      queue: [sentPrompt("p1", "contact-lead", "rule-a", 1000)],
+    });
+    await inWorld(world, failure, async () => {
+      // The webhook is acknowledged (no throw) because the retry is stored durably.
+      assert.equal(await processMessageEvents([reply("done")]), 1);
+      const retry = world.queue.find((q) => q.kind === "follow_check");
+      assert.ok(retry, "follow_check row queued");
+      assert.equal(retry.status, "pending");
+      assert.ok(retry.next_attempt_at > Date.now(), "retry waits (backoff)");
+      assert.match(retry.message, /^Thanks! Here.s your link: /);
+      // Replying again while the check is pending does not queue a second one.
+      assert.equal(await processMessageEvents([reply("done", "m2")]), 0);
+      assert.equal(world.queue.filter((q) => q.kind === "follow_check").length, 1);
     });
   }
 });
 
-test("processMessageEvents blocks ineligible rule context but keeps capture", async (t) => {
+test("follow gate: follower gets the link once, non-follower gets at most two nudges", async () => {
   const { processMessageEvents } = await import("./messages.ts");
-  type RuleJoin = {
-    link_url: string | null;
-    email_gate: boolean | null;
-    follow_gate: boolean | null;
-  };
-  const ineligible: { name: string; rule: RuleJoin; text: string }[] = [
-    {
-      name: "paused rule",
-      rule: { link_url: null, email_gate: null, follow_gate: null },
-      text: "done",
-    },
-    {
-      name: "contact on another account",
-      rule: { link_url: null, email_gate: null, follow_gate: null },
-      text: "done",
-    },
-    {
-      name: "rule scoped to another account",
-      rule: { link_url: null, email_gate: null, follow_gate: null },
-      text: "done",
-    },
+  const following = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-a", follow_gate: true })],
+    contacts: [lead()],
+    queue: [sentPrompt("p1", "contact-lead", "rule-a", 1000)],
+  });
+  await inWorld(following, true, async () => {
+    await processMessageEvents([reply("done")]);
+    await processMessageEvents([reply("done again", "m2")]);
+    assert.deepEqual(kinds(following), [["rule-a", "gated_link"]]);
+  });
+  const notFollowing = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-a", follow_gate: true })],
+    contacts: [lead()],
+    queue: [sentPrompt("p1", "contact-lead", "rule-a", 1000)],
+  });
+  await inWorld(notFollowing, false, async () => {
+    for (let i = 0; i < 4; i++) await processMessageEvents([reply("done", `m${i}`)]);
+    assert.deepEqual(kinds(notFollowing), [["rule-a", "follow_nudge"], ["rule-a", "follow_nudge"]]);
+  });
+});
+
+test("concurrent webhooks for the same reply queue exactly one gated link (h)", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-a", email_gate: true })],
+    contacts: [lead()],
+    queue: [sentPrompt("p1", "contact-lead", "rule-a", 1000)],
+  });
+  // Both deliveries pass the duplicate check before either inserts (lock not modelled):
+  // the insert itself must be idempotent.
+  world.barrier.size = 2;
+  await inWorld(world, true, async () => {
+    const results = await Promise.all([
+      processMessageEvents([reply("me@example.com", "m1")]),
+      processMessageEvents([reply("me@example.com", "m1")]),
+    ]);
+    assert.deepEqual(results, [1, 1]);
+    assert.deepEqual(kinds(world), [["rule-a", "gated_link"]]);
+  });
+});
+
+test("the reply unlocks the automation the contact actually replied to, not their first rule (i)", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-a", email_gate: true }), rule({ id: "rule-b", email_gate: true })],
+    // Contact was first captured by rule A (source_rule_id), then commented on rule B's post.
+    contacts: [lead({ source_rule_id: "rule-a" })],
+    queue: [sentPrompt("pa", "contact-lead", "rule-a", 1000), sentPrompt("pb", "contact-lead", "rule-b", 2000)],
+  });
+  await inWorld(world, true, async () => {
+    await processMessageEvents([reply("here you go: me@example.com")]);
+    assert.deepEqual(kinds(world), [["rule-b", "gated_link"]]);
+    assert.match(world.queue.find((q) => q.kind === "gated_link")!.message, /coderuleb$/);
+    // Answering again then unlocks the older, still-open prompt (A), never B twice.
+    await processMessageEvents([reply("me@example.com", "m2")]);
+    assert.deepEqual(kinds(world), [["rule-b", "gated_link"], ["rule-a", "gated_link"]]);
+  });
+});
+
+test("a returning lead asking for a second automation's link gets it (k)", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-a", email_gate: true }), rule({ id: "rule-b", email_gate: true })],
+    // Already a lead: gave the email for A and got A's link.
+    contacts: [lead({ email: "me@example.com" })],
+    queue: [
+      sentPrompt("pa", "contact-lead", "rule-a", 1000),
+      { ...sentPrompt("la", "contact-lead", "rule-a", 1500), kind: "gated_link", comment_id: null },
+      sentPrompt("pb", "contact-lead", "rule-b", 3000),
+    ],
+  });
+  await inWorld(world, true, async () => {
+    // Email already known, so a plain reply is enough for B.
+    assert.equal(await processMessageEvents([reply("done")]), 1);
+    assert.deepEqual(kinds(world), [["rule-a", "gated_link"], ["rule-b", "gated_link"]]);
+  });
+});
+
+test("no automation without a delivered prompt; paused or other-account rules only capture details", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const cases = [
+    { name: "prompt not sent", rules: [rule({ id: "rule-a", email_gate: true })], prompt: { status: "failed" } },
+    { name: "paused rule", rules: [rule({ id: "rule-a", email_gate: true, status: "paused" })], prompt: {} },
+    { name: "rule scoped to another account", rules: [rule({ id: "rule-a", email_gate: true, social_account_id: "account-2" })], prompt: {} },
+    { name: "ungated rule", rules: [rule({ id: "rule-a" })], prompt: {} },
   ];
-  for (const scenario of ineligible) {
-    await t.test(scenario.name, async () => {
-      const previousPool = globalThis.__socialappPool;
-      const previousUrl = process.env.DATABASE_URL;
-      const previousFetch = globalThis.fetch;
-      const queued: unknown[] = [];
-      const verified: string[] = [];
-      process.env.DATABASE_URL = "mock";
-      const query = async (sql: string, params: unknown[] = []) => {
-        if (sql.includes("select id, user_id")) {
-          return { rows: [{ id: "account-1", user_id: "owner" }] };
-        }
-        if (sql.includes("from socialapp.contacts c")) {
-          return {
-            rows: [
-              {
-                id: "contact-1",
-                email: "lead@example.com",
-                source_rule_id: "rule-1",
-                ...scenario.rule,
-              },
-            ],
-          };
-        }
-        if (sql.startsWith("insert into socialapp.contacts")) {
-          return { rows: [{ id: "contact-1" }] };
-        }
-        if (sql.includes("insert into socialapp.dm_queue")) {
-          queued.push(params);
-          return { rows: [] };
-        }
-        assert.ok(
-          ["begin", "commit", "rollback"].includes(sql) ||
-            sql.includes("pg_advisory_xact_lock"),
-          sql,
-        );
-        return { rows: [] };
-      };
-      globalThis.__socialappPool = {
-        query,
-        connect: async () => ({ query, release: () => {} }),
-      } as unknown as pg.Pool;
-      globalThis.fetch = async (input) => {
-        verified.push(new URL(String(input)).pathname.split("/").pop()!);
-        return Response.json({ is_user_follow_business: true });
-      };
-      try {
-        assert.equal(
-          await processMessageEvents([
-            {
-              accountExternalId: "account-1",
-              senderId: "lead",
-              text: scenario.text,
-              mid: "m1",
-            },
-          ]),
-          0,
-        );
-        assert.deepEqual(queued, []);
-        assert.deepEqual(verified, []);
-        assert.equal(
-          await processMessageEvents([
-            {
-              accountExternalId: "account-1",
-              senderId: "lead",
-              text: "reach me at new@example.com",
-              mid: "m2",
-            },
-          ]),
-          1,
-        );
-        assert.deepEqual(queued, []);
-        assert.deepEqual(verified, []);
-      } finally {
-        globalThis.__socialappPool = previousPool;
-        globalThis.fetch = previousFetch;
-        if (previousUrl === undefined) delete process.env.DATABASE_URL;
-        else process.env.DATABASE_URL = previousUrl;
-      }
+  for (const c of cases) {
+    const world = createDmWorld({
+      accounts: [{ ...ACCOUNT }],
+      rules: c.rules,
+      contacts: [lead()],
+      queue: [sentPrompt("p1", "contact-lead", "rule-a", 1000, c.prompt)],
+    });
+    await inWorld(world, true, async () => {
+      assert.equal(await processMessageEvents([reply("hello")]), 0, c.name);
+      assert.equal(await processMessageEvents([reply("me@example.com")]), 1, c.name);
+      assert.equal(world.contacts[0].email, "me@example.com", c.name);
+      assert.deepEqual(kinds(world), [], c.name);
     });
   }
 });
 
-test("processMessageEvents eligible rules keep gating and dedupe", async (t) => {
+test("unknown sender: details are captured without unsolicited automation; other owners stay separate", async () => {
   const { processMessageEvents } = await import("./messages.ts");
-  const { encryptToken } = await import("./crypto.ts");
-  for (const label of ["all accounts", "matching account"] as const) {
-    await t.test(label, async () => {
-      const previousPool = globalThis.__socialappPool;
-      const previousUrl = process.env.DATABASE_URL;
-      const previousKey = process.env.TOKEN_ENCRYPTION_KEY;
-      const previousFetch = globalThis.fetch;
-      process.env.DATABASE_URL = "mock";
-      process.env.TOKEN_ENCRYPTION_KEY = Buffer.alloc(32).toString("base64");
-      const token = encryptToken("test-token");
-      const queued: { kind: string; contact: unknown }[] = [];
-      const query = async (sql: string, params: unknown[] = []) => {
-        if (sql.includes("select id, user_id")) {
-          return { rows: [{ id: "account-1", user_id: "owner" }] };
-        }
-        if (sql.includes("select access_token_enc")) {
-          return { rows: [{ access_token_enc: token }] };
-        }
-        if (sql.includes("from socialapp.contacts c")) {
-          assert.equal(params[2], "account-1");
-          return {
-            rows: [
-              {
-                id: "contact-1",
-                email: "lead@example.com",
-                source_rule_id: "rule-1",
-                link_url: "https://example.com/lead",
-                email_gate: true,
-                follow_gate: true,
-              },
-            ],
-          };
-        }
-        if (sql.startsWith("insert into socialapp.contacts")) {
-          return { rows: [{ id: "contact-1" }] };
-        }
-        if (sql.includes("insert into socialapp.short_links")) {
-          return { rows: [{ code: "abc123" }] };
-        }
-        if (sql.includes("comment_reply")) {
-          return { rows: [{ ok: 1 }] };
-        }
-        if (sql.includes("select 1 as ok")) {
-          return {
-            rows: queued.filter(
-              (row) => row.kind === "gated_link" && row.contact === params[0],
-            ),
-          };
-        }
-        if (sql.includes("select count(*)")) {
-          return {
-            rows: [
-              {
-                n: queued.filter(
-                  (row) => row.kind === "follow_nudge" && row.contact === params[0],
-                ).length,
-              },
-            ],
-          };
-        }
-        if (sql.includes("insert into socialapp.dm_queue")) {
-          const kind = sql.includes("'gated_link'") ? "gated_link" : "follow_nudge";
-          if (kind === "gated_link") {
-            const dup = queued.some((row) => row.kind === "gated_link");
-            if (dup) return { rows: [] };
-          }
-          queued.push({ kind, contact: params[3] });
-          return { rows: [] };
-        }
-        assert.ok(
-          ["begin", "commit", "rollback"].includes(sql) ||
-            sql.includes("pg_advisory_xact_lock"),
-          sql,
-        );
-        return { rows: [] };
-      };
-      globalThis.__socialappPool = {
-        query,
-        connect: async () => ({ query, release: () => {} }),
-      } as unknown as pg.Pool;
-      globalThis.fetch = async () =>
-        Response.json({ is_user_follow_business: true });
-      const event = {
-        accountExternalId: "account-1",
-        senderId: "lead",
-        text: "done",
-        mid: "m1",
-      };
-      try {
-        assert.equal(await processMessageEvents([event]), 1);
-        assert.equal(await processMessageEvents([event]), 1);
-        assert.deepEqual(
-          queued.filter((row) => row.kind === "gated_link").length,
-          1,
-        );
-      } finally {
-        globalThis.__socialappPool = previousPool;
-        globalThis.fetch = previousFetch;
-        if (previousUrl === undefined) delete process.env.DATABASE_URL;
-        else process.env.DATABASE_URL = previousUrl;
-        if (previousKey === undefined) delete process.env.TOKEN_ENCRYPTION_KEY;
-        else process.env.TOKEN_ENCRYPTION_KEY = previousKey;
-      }
-    });
-  }
-});
-
-
-test("gated link requires a sent prompt and ignores older unsent prompts", async (t) => {
-  const { processMessageEvents } = await import("./messages.ts");
-  const { encryptToken } = await import("./crypto.ts");
-  type Prompt = { account: string; recipient: string; status: string };
-  type Rule = {
-    link_url: string | null;
-    email_gate: boolean | null;
-    follow_gate: boolean | null;
-  };
-  const scenarios: {
-    name: string;
-    prompts: Prompt[];
-    rule: Rule;
-    following: boolean;
-    expectQueued: number;
-    expectNudged: number;
-    expectUpdated: number;
-  }[] = [
-    {
-      name: "sent prompt alongside older failed/skipped and a pending prompt queues once",
-      prompts: [
-        { account: "account-1", recipient: "lead", status: "sent" },
-        { account: "account-1", recipient: "lead", status: "failed" },
-        { account: "account-1", recipient: "lead", status: "skipped" },
-        { account: "account-1", recipient: "lead", status: "pending" },
-      ],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: true,
-      expectQueued: 1,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "unsent-only prompt stays ineligible",
-      prompts: [{ account: "account-1", recipient: "lead", status: "pending" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: true,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "paused rule stays ineligible",
-      prompts: [{ account: "account-1", recipient: "lead", status: "sent" }],
-      rule: { link_url: null, email_gate: null, follow_gate: null },
-      following: true,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 0,
-    },
-    {
-      name: "mismatched account stays ineligible",
-      prompts: [{ account: "other-account", recipient: "lead", status: "sent" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: true,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "absent prompt produces no follow nudge",
-      prompts: [],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "pending prompt produces no follow nudge",
-      prompts: [{ account: "account-1", recipient: "lead", status: "pending" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "failed prompt produces no follow nudge",
-      prompts: [{ account: "account-1", recipient: "lead", status: "failed" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "skipped prompt produces no follow nudge",
-      prompts: [{ account: "account-1", recipient: "lead", status: "skipped" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "sent prompt on another account produces no follow nudge",
-      prompts: [{ account: "other-account", recipient: "lead", status: "sent" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "sent prompt for another recipient produces no follow nudge",
-      prompts: [{ account: "account-1", recipient: "other-lead", status: "sent" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 0,
-      expectUpdated: 1,
-    },
-    {
-      name: "matching sent prompt permits the follow nudge",
-      prompts: [{ account: "account-1", recipient: "lead", status: "sent" }],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 1,
-      expectUpdated: 1,
-    },
-    {
-      name: "matching sent prompt permits the nudge alongside older unsent prompts",
-      prompts: [
-        { account: "account-1", recipient: "lead", status: "sent" },
-        { account: "account-1", recipient: "lead", status: "pending" },
-        { account: "account-1", recipient: "lead", status: "failed" },
-        { account: "account-1", recipient: "lead", status: "skipped" },
-      ],
-      rule: { link_url: "https://example.com/lead", email_gate: true, follow_gate: true },
-      following: false,
-      expectQueued: 0,
-      expectNudged: 1,
-      expectUpdated: 1,
-    },
-  ];
-  for (const scenario of scenarios) {
-    await t.test(scenario.name, async () => {
-      const previousPool = globalThis.__socialappPool;
-      const previousUrl = process.env.DATABASE_URL;
-      const previousKey = process.env.TOKEN_ENCRYPTION_KEY;
-      const previousFetch = globalThis.fetch;
-      process.env.DATABASE_URL = "mock";
-      process.env.TOKEN_ENCRYPTION_KEY = Buffer.alloc(32).toString("base64");
-      const token = encryptToken("test-token");
-      const queued: { kind: string; contact: unknown }[] = [];
-      const query = async (sql: string, params: unknown[] = []) => {
-        if (sql.includes("select id, user_id")) {
-          return { rows: [{ id: "account-1", user_id: "owner" }] };
-        }
-        if (sql.includes("select access_token_enc")) {
-          return { rows: [{ access_token_enc: token }] };
-        }
-        if (sql.includes("from socialapp.contacts c")) {
-          return {
-            rows: [
-              {
-                id: "contact-1",
-                email: "lead@example.com",
-                source_rule_id: "rule-1",
-                ...scenario.rule,
-              },
-            ],
-          };
-        }
-        if (sql.startsWith("insert into socialapp.contacts")) {
-          return { rows: [{ id: "contact-1" }] };
-        }
-        if (sql.includes("insert into socialapp.short_links")) {
-          return { rows: [{ code: "abc123" }] };
-        }
-        if (sql.includes("comment_reply")) {
-          const account = String(params[2]);
-          const recipient = String(params[3]);
-          const hasSent = scenario.prompts.some(
-            (p) =>
-              p.account === account &&
-              p.recipient === recipient &&
-              p.status === "sent",
-          );
-          return { rows: hasSent ? [{ ok: 1 }] : [] };
-        }
-        if (sql.includes("kind='gated_link'")) {
-          return {
-            rows: queued.filter(
-              (row) => row.kind === "gated_link" && row.contact === params[0],
-            ),
-          };
-        }
-        if (sql.includes("select count(*)")) {
-          return {
-            rows: [
-              {
-                n: queued.filter(
-                  (row) => row.kind === "follow_nudge" && row.contact === params[0],
-                ).length,
-              },
-            ],
-          };
-        }
-        if (sql.includes("insert into socialapp.dm_queue")) {
-          const kind = sql.includes("'gated_link'") ? "gated_link" : "follow_nudge";
-          queued.push({ kind, contact: params[3] });
-          return { rows: [] };
-        }
-        assert.ok(
-          ["begin", "commit", "rollback"].includes(sql) ||
-            sql.includes("pg_advisory_xact_lock"),
-          sql,
-        );
-        return { rows: [] };
-      };
-      globalThis.__socialappPool = {
-        query,
-        connect: async () => ({ query, release: () => {} }),
-      } as unknown as pg.Pool;
-      globalThis.fetch = async () =>
-        Response.json({ is_user_follow_business: scenario.following });
-      const event = {
-        accountExternalId: "account-1",
-        senderId: "lead",
-        text: "done",
-        mid: "m1",
-      };
-      try {
-        assert.equal(await processMessageEvents([event]), scenario.expectUpdated);
-        assert.equal(
-          queued.filter((row) => row.kind === "gated_link").length,
-          scenario.expectQueued,
-        );
-        assert.equal(
-          queued.filter((row) => row.kind === "follow_nudge").length,
-          scenario.expectNudged,
-        );
-      } finally {
-        globalThis.__socialappPool = previousPool;
-        globalThis.fetch = previousFetch;
-        if (previousUrl === undefined) delete process.env.DATABASE_URL;
-        else process.env.DATABASE_URL = previousUrl;
-        if (previousKey === undefined) delete process.env.TOKEN_ENCRYPTION_KEY;
-        else process.env.TOKEN_ENCRYPTION_KEY = previousKey;
-      }
-    });
-  }
-});
-
-test("inbound contact details upsert without unsolicited automation", async (t) => {
-  const { processMessageEvents } = await import("./messages.ts");
-  for (const text of ["Email First@Example.com", "Call +1 (416) 555-0199"]) {
-    await t.test(text, async () => {
-      const previousPool = globalThis.__socialappPool;
-      const previousUrl = process.env.DATABASE_URL;
-      type Contact = {
-        id: string; user_id: string; social_account_id: string;
-        platform: string; external_id: string; email: string | null;
-        phone: string | null; source_rule_id: string | null;
-        name: string | null; tags: string[]; last_seen_at: number;
-      };
-      const contacts = new Map<string, Contact>();
-      let writes = 0;
-      let queued = 0;
-      process.env.DATABASE_URL = "mock";
-      const query = async (sql: string, params: unknown[] = []) => {
-        if (sql.includes("select id, user_id")) {
-          const id = String(params[0]);
-          return { rows: [{ id, user_id: id === "other-account" ? "other-owner" : "owner" }] };
-        }
-        const key = JSON.stringify([params[0], "instagram", params[1]]);
-        if (sql.includes("from socialapp.contacts c")) {
-          assert.match(sql, /c.user_id = \$1.*c.platform = 'instagram'.*c.external_id = \$2/);
-          const contact = contacts.get(key);
-          // No rule, or an existing rule ineligible on the receiving account.
-          return { rows: contact ? [{ ...contact, link_url: null,
-            email_gate: null, follow_gate: null }] : [] };
-        }
-        if (sql.startsWith("insert into socialapp.contacts")) {
-          assert.match(sql, /\(user_id, social_account_id, platform, external_id, email, phone\)/);
-          assert.match(sql, /values \(\$1, \$5, 'instagram', \$2, \$3, \$4\)/);
-          assert.match(sql, /on conflict \(user_id, platform, external_id\) do update/);
-          assert.match(sql, /returning id/);
-          const updates = sql.split("do update")[1].split("returning")[0].trim();
-          assert.equal(updates.replace(/\s+/g, " "),
-            "set email = coalesce(excluded.email, socialapp.contacts.email), " +
-            "phone = coalesce(excluded.phone, socialapp.contacts.phone), last_seen_at = now()");
-          writes++;
-          const contact = contacts.get(key) ?? {
-            id: `contact-${contacts.size}`, user_id: String(params[0]),
-            social_account_id: String(params[4]), platform: "instagram",
-            external_id: String(params[1]), email: null, phone: null,
-            source_rule_id: null, name: null, tags: [], last_seen_at: 0,
-          };
-          contact.email = params[2] as string | null ?? contact.email;
-          contact.phone = params[3] as string | null ?? contact.phone;
-          contact.last_seen_at = writes;
-          contacts.set(key, contact);
-          return { rows: [{ id: contact.id }] };
-        }
-        if (sql.includes("insert into socialapp.dm_queue")) queued++;
-        assert.fail(`Unexpected database operation: ${sql}`);
-      };
-      globalThis.__socialappPool = {
-        query,
-        connect: async () => assert.fail("No outbound queue transaction expected"),
-      } as unknown as pg.Pool;
-      const event = { accountExternalId: "account", senderId: "lead", text, mid: "m1" };
-      const ownerKey = JSON.stringify(["owner", "instagram", "lead"]);
-      try {
-        assert.equal(await processMessageEvents([{ ...event, text: "hello" }]), 0);
-        assert.equal(writes, 0);
-        assert.equal(await processMessageEvents([event]), 1);
-        const first = { ...contacts.get(ownerKey)! };
-        assert.equal(first.email, extractEmail(text));
-        assert.equal(first.phone, extractPhone(text));
-        assert.equal(first.social_account_id, "account");
-        assert.equal(first.source_rule_id, null);
-        assert.equal(await processMessageEvents([event]), 1);
-        assert.equal(contacts.size, 1);
-        assert.equal(contacts.get(ownerKey)!.id, first.id);
-        assert.ok(contacts.get(ownerKey)!.last_seen_at > first.last_seen_at);
-        const attributed = { ...contacts.get(ownerKey)!, social_account_id: "original-account",
-          source_rule_id: "original-rule", name: "Original name", tags: ["original-tag"],
-          email: "old@example.com", phone: "+14165550100" };
-        contacts.set(ownerKey, { ...attributed });
-        assert.equal(await processMessageEvents([event]), 1);
-        assert.deepEqual(contacts.get(ownerKey), { ...attributed,
-          email: extractEmail(text) ?? attributed.email,
-          phone: extractPhone(text) ?? attributed.phone, last_seen_at: writes });
-        const ownerSnapshot = { ...contacts.get(ownerKey)! };
-        assert.equal(await processMessageEvents([{ ...event, accountExternalId: "other-account" }]), 1);
-        assert.equal(contacts.size, 2);
-        assert.deepEqual(contacts.get(ownerKey), ownerSnapshot);
-        const other = contacts.get(JSON.stringify(["other-owner", "instagram", "lead"]))!;
-        assert.notEqual(other.id, first.id);
-        assert.equal(other.social_account_id, "other-account");
-        assert.equal(other.source_rule_id, null);
-        assert.equal(queued, 0);
-      } finally {
-        globalThis.__socialappPool = previousPool;
-        if (previousUrl === undefined) delete process.env.DATABASE_URL;
-        else process.env.DATABASE_URL = previousUrl;
-      }
-    });
-  }
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }, { ...ACCOUNT, id: "account-9", user_id: "other-owner", external_id: "ig-other" }],
+    rules: [rule({ id: "rule-a", email_gate: true })],
+  });
+  await inWorld(world, true, async () => {
+    assert.equal(await processMessageEvents([reply("hello")]), 0);
+    assert.equal(world.contacts.length, 0);
+    assert.equal(await processMessageEvents([reply("Email First@Example.com")]), 1);
+    assert.equal(await processMessageEvents([reply("Call +1 (416) 555-0199", "m2")]), 1);
+    assert.equal(world.contacts.length, 1);
+    assert.equal(world.contacts[0].email, "first@example.com");
+    assert.equal(world.contacts[0].phone, "+14165550199");
+    await processMessageEvents([{ ...reply("x@y.com", "m3"), accountExternalId: "ig-other" }]);
+    assert.equal(world.contacts.length, 2);
+    assert.equal(world.contacts[1].user_id, "other-owner");
+    assert.deepEqual(kinds(world), []);
+  });
 });

@@ -7,14 +7,33 @@ import {
   extractPhone,
   type MessageEvent,
 } from "@/lib/messageParse";
+import { nextAttemptDelayMs } from "@/lib/sendPolicy";
 
 export type { MessageEvent };
 export { extractEmail, extractMessageEvents, extractPhone };
 
-type DmEnqueueKind = "gated_link" | "follow_nudge";
+export const FOLLOW_NUDGE_MESSAGE =
+  "Looks like you're not following yet - follow us and reply 'done' again to get the link.";
+export const MAX_FOLLOW_NUDGES = 2;
 
-/** Serializes gated_link / follow_nudge inserts per contact+rule (webhook concurrency). */
-async function enqueueDmIfAllowed(params: {
+export function gatedLinkMessage(link: string): string {
+  return "Thanks! Here's your link: " + link;
+}
+
+/**
+ * gated_link   - the unlocked link (at most one per contact + rule, unique index in migration 015)
+ * follow_check - the link waiting for a follower check Instagram did not answer; the send
+ *                worker re-checks with backoff and then sends the link, a nudge, or gives up
+ * follow_nudge - "follow us first" reminder (at most MAX_FOLLOW_NUDGES per contact + rule)
+ */
+type DmEnqueueKind = "gated_link" | "follow_check" | "follow_nudge";
+
+/**
+ * Idempotent enqueue per contact + rule. Concurrent webhooks are serialized by an advisory
+ * lock, and the insert itself is ON CONFLICT DO NOTHING against the unique index, so two
+ * deliveries of the same reply can never queue two links (bug h).
+ */
+async function enqueueGatedDm(params: {
   userId: string;
   socialAccountId: string;
   ruleId: string;
@@ -22,16 +41,8 @@ async function enqueueDmIfAllowed(params: {
   recipientExternalId: string;
   kind: DmEnqueueKind;
   message: string;
-}): Promise<void> {
-  const {
-    userId,
-    socialAccountId,
-    ruleId,
-    contactId,
-    recipientExternalId,
-    kind,
-    message,
-  } = params;
+}): Promise<boolean> {
+  const { userId, socialAccountId, ruleId, contactId, recipientExternalId, kind, message } = params;
   const client = await getPool().connect();
   try {
     await client.query("begin");
@@ -39,44 +50,34 @@ async function enqueueDmIfAllowed(params: {
       "select pg_advisory_xact_lock(hashtext($1::text), hashtext($2::text))",
       [contactId, ruleId],
     );
-    if (kind === "gated_link") {
-      const dup = await client.query(
-        "select 1 as ok from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and kind='gated_link'",
-        [contactId, ruleId],
-      );
-      if (dup.rows.length === 0) {
-        await client.query(
-          `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind) values ($1,$2,$3,$4,null,$5,$6,'gated_link')`,
-          [
-            userId,
-            socialAccountId,
-            ruleId,
-            contactId,
-            recipientExternalId,
-            message,
-          ],
-        );
-      }
-    } else {
+    if (kind === "follow_nudge") {
       const nudges = await client.query<{ n: number }>(
         "select count(*)::int as n from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and kind='follow_nudge'",
         [contactId, ruleId],
       );
-      if ((nudges.rows[0]?.n ?? 0) < 2) {
-        await client.query(
-          `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind) values ($1,$2,$3,$4,null,$5,$6,'follow_nudge')`,
-          [
-            userId,
-            socialAccountId,
-            ruleId,
-            contactId,
-            recipientExternalId,
-            message,
-          ],
-        );
+      if ((nudges.rows[0]?.n ?? 0) >= MAX_FOLLOW_NUDGES) {
+        await client.query("commit");
+        return false;
+      }
+    } else {
+      const dup = await client.query(
+        "select 1 as ok from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and (kind='gated_link' or (kind='follow_check' and status='pending'))",
+        [contactId, ruleId],
+      );
+      if (dup.rows.length > 0) {
+        await client.query("commit");
+        return false;
       }
     }
+    const delayMs = kind === "follow_check" ? nextAttemptDelayMs(0) : 0;
+    const inserted = await client.query(
+      `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind, next_attempt_at)
+       values ($1,$2,$3,$4,null,$5,$6,$7, now() + ($8::int * interval '1 millisecond'))
+       on conflict do nothing returning id`,
+      [userId, socialAccountId, ruleId, contactId, recipientExternalId, message, kind, delayMs],
+    );
     await client.query("commit");
+    return inserted.rows.length > 0;
   } catch (err) {
     await client.query("rollback").catch(() => undefined);
     throw err;
@@ -85,30 +86,50 @@ async function enqueueDmIfAllowed(params: {
   }
 }
 
-type ContactRuleRow = {
-  id: string;
-  email: string | null;
-  source_rule_id: string | null;
-  link_url: string | null;
-  email_gate: boolean | null;
-  follow_gate: boolean | null;
+type PendingGate = {
+  rule_id: string;
+  link_url: string;
+  email_gate: boolean;
+  follow_gate: boolean;
 };
 
 /**
- * A gate prompt that was actually sent to this contact. Only the absence of a
- * sent prompt blocks the gated link and the follow nudge; older pending,
- * failed or skipped prompts for the same contact/account/rule do not.
+ * The automation this person is answering: the most recent gate prompt that was actually
+ * SENT to them from this account and is not unlocked yet, for a rule that is still active
+ * and allowed on this account. Keyed on the prompts we sent, not on the contact's first
+ * rule, so the reply unlocks the automation they replied to (bug i) and a returning lead
+ * gets a second automation's link (bug k).
  */
-const OUTSTANDING_GATED_RULES_SQL = `
-  select 1 as ok
-  from socialapp.dm_queue
-  where contact_id = $1
-    and rule_id = $2
-    and kind = 'comment_reply'
-    and social_account_id = $3
-    and recipient_external_id = $4
-    and status = 'sent'
+const PENDING_GATE_SQL = `
+  select q.rule_id, r.link_url, r.email_gate, r.follow_gate
+  from socialapp.dm_queue q
+  join socialapp.dm_rules r on r.id = q.rule_id
+    and r.user_id = q.user_id
+    and r.status = 'active'
+    and (r.social_account_id is null or r.social_account_id = q.social_account_id)
+  where q.contact_id = $1
+    and q.social_account_id = $2
+    and q.recipient_external_id = $3
+    and q.kind = 'comment_reply'
+    and q.status = 'sent'
+    and (r.email_gate or r.follow_gate)
+    and r.link_url is not null and r.link_url <> ''
+    and not exists (
+      select 1 from socialapp.dm_queue g
+      where g.contact_id = q.contact_id and g.rule_id = q.rule_id
+        and (g.kind = 'gated_link' or (g.kind = 'follow_check' and g.status = 'pending'))
+    )
+  order by q.sent_at desc nulls last, q.created_at desc
+  limit 1
 `;
+
+async function linkFor(userId: string, ruleId: string, linkUrl: string): Promise<string> {
+  try {
+    return await shortLinkFor(userId, ruleId, linkUrl);
+  } catch {
+    return linkUrl;
+  }
+}
 
 export async function processMessageEvents(
   events: MessageEvent[],
@@ -127,20 +148,15 @@ export async function processMessageEvents(
       }
       const email = extractEmail(event.text);
       const phone = extractPhone(event.text);
-      const existing = await query<ContactRuleRow>(
-        `select c.id, c.email, c.source_rule_id, r.link_url, r.email_gate, r.follow_gate
-         from socialapp.contacts c
-         left join socialapp.dm_rules r on r.id = c.source_rule_id
-           and r.user_id = $1
-           and r.status = 'active'
-           and (r.social_account_id is null or r.social_account_id = $3)
-           and c.social_account_id = $3
-         where c.user_id = $1 and c.platform = 'instagram' and c.external_id = $2`,
-        [account.user_id, event.senderId, account.id],
+      const known = await query<{ id: string; email: string | null }>(
+        "select id, email from socialapp.contacts where user_id=$1 and platform='instagram' and external_id=$2",
+        [account.user_id, event.senderId],
       );
-      const contactBefore = existing[0];
-      const followGate = contactBefore?.follow_gate === true;
-      if (email === null && phone === null && !followGate) {
+      const contactBefore = known[0];
+      const pending = contactBefore
+        ? (await query<PendingGate>(PENDING_GATE_SQL, [contactBefore.id, account.id, event.senderId]))[0]
+        : undefined;
+      if (email === null && phone === null && !pending) {
         continue;
       }
       const rows = await query<{ id: string }>(
@@ -153,97 +169,42 @@ export async function processMessageEvents(
          returning id`,
         [account.user_id, event.senderId, email, phone, account.id],
       );
-      if (rows.length > 0) {
-        updated += rows.length;
-      }
-      if (!contactBefore?.source_rule_id || !contactBefore.link_url) {
+      updated += rows.length;
+      const contactId = rows[0]?.id ?? contactBefore?.id;
+      if (!pending || !contactId) {
         continue;
       }
-      const emailGate = contactBefore.email_gate === true;
-      const ruleFollowGate = contactBefore.follow_gate === true;
-      if (!emailGate && !ruleFollowGate) {
+      const emailOk = !pending.email_gate || Boolean(contactBefore?.email) || email !== null;
+      if (!emailOk) {
+        // Still waiting for the email the prompt asked for.
         continue;
       }
-      const ruleId = contactBefore.source_rule_id;
-      const emailOk =
-        !emailGate || Boolean(contactBefore.email) || email !== null;
-      const outstanding = await query(OUTSTANDING_GATED_RULES_SQL, [
-        contactBefore.id,
-        ruleId,
-        account.id,
-        event.senderId,
-      ]);
-      if (outstanding.length === 0) {
+      const base = {
+        userId: account.user_id,
+        socialAccountId: account.id,
+        ruleId: pending.rule_id,
+        contactId,
+        recipientExternalId: event.senderId,
+      };
+      const linkMessage = gatedLinkMessage(await linkFor(account.user_id, pending.rule_id, pending.link_url));
+      if (!pending.follow_gate) {
+        await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage });
         continue;
       }
-      let followOk = true;
-      let followCheckFailed = false;
-      if (ruleFollowGate) {
-        const token = await accountToken(account.id);
-        if (!token) {
-          console.error(
-            "processMessageEvents: no token for follow check",
-            account.id,
-          );
-          followOk = false;
-          followCheckFailed = true;
-        } else {
-          const following = await isFollower(event.senderId, token);
-          if (following === null) {
-            console.error(
-              "processMessageEvents: is_user_follow_business check failed",
-              event.senderId,
-            );
-            followOk = false;
-            followCheckFailed = true;
-          } else {
-            followOk = following;
-          }
-        }
-      }
-      if (followCheckFailed) {
-        hadFailure = true;
-      }
-      if (emailOk && followOk) {
-        let link = contactBefore.link_url;
-        try {
-          link = await shortLinkFor(
-            account.user_id,
-            ruleId,
-            contactBefore.link_url,
-          );
-        } catch {
-          /* use raw link_url */
-        }
-        const dmMessage = "Thanks! Here's your link: " + link;
-        await enqueueDmIfAllowed({
-          userId: account.user_id,
-          socialAccountId: account.id,
-          ruleId,
-          contactId: contactBefore.id,
-          recipientExternalId: event.senderId,
-          kind: "gated_link",
-          message: dmMessage,
-        });
-      } else if (
-        ruleFollowGate &&
-        !followOk &&
-        emailOk &&
-        !followCheckFailed
-      ) {
-        await enqueueDmIfAllowed({
-          userId: account.user_id,
-          socialAccountId: account.id,
-          ruleId,
-          contactId: contactBefore.id,
-          recipientExternalId: event.senderId,
-          kind: "follow_nudge",
-          message:
-            "Looks like you're not following yet - follow us and reply 'done' again to get the link.",
-        });
+      const token = await accountToken(account.id);
+      const following = token ? await isFollower(event.senderId, token) : null;
+      if (following === true) {
+        await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage });
+      } else if (following === false) {
+        await enqueueGatedDm({ ...base, kind: "follow_nudge", message: FOLLOW_NUDGE_MESSAGE });
+      } else {
+        // Instagram did not answer the follower check: keep a durable retry in the queue
+        // (backoff, then a clear give-up) instead of dropping it or failing the webhook (bug g).
+        console.error("processMessageEvents: follower check unavailable, queued a retry for contact", contactId);
+        await enqueueGatedDm({ ...base, kind: "follow_check", message: linkMessage });
       }
     } catch (err) {
-      console.error("processMessageEvents event failed", err);
+      console.error("processMessageEvents event failed", event.mid ?? event.senderId, err instanceof Error ? err.message : err);
       hadFailure = true;
     }
   }
