@@ -59,9 +59,14 @@
   gap: 22px;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
 }
-@media (max-width: 1100px) {
+/* Two panels side by side only on laptops and up (with the 244px sidebar the
+   content column is too narrow for both below 1280px). */
+@media (max-width: 1279px) {
   .panels { grid-template-columns: 1fr; }
 }
+/* Panels are size containers so the checklist lays out by its own width, not the
+   viewport (it sits in the narrow right column on laptops). */
+.panels > section { container-type: inline-size; }
 
 .panelHead {
   display: flex;
@@ -77,9 +82,12 @@
   gap: 22px;
   padding: 24px;
 }
-@media (min-width: 720px) {
+@container (min-width: 560px) {
   .checklist { grid-template-columns: minmax(0, 1fr) 200px; align-items: center; }
   .checklistArt { order: 2; }
+}
+@container (max-width: 559px) {
+  .checklistArt :global(img) { max-width: 180px; }
 }
 .progress {
   height: 10px;
@@ -108,10 +116,14 @@
 .stepLabelDone { color: var(--poskoo-muted); text-decoration: line-through; font-weight: 500; }
 .checklistArt { display: flex; justify-content: center; }
 
-@media (max-width: 1100px) {
-  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Four stat tiles in a row from tablet-landscape width; two per row below. */
+@media (max-width: 859px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 }
 @media (max-width: 560px) {
+  .page { gap: 20px; }
+  .head h1 { max-width: none; }
+  .tiles { gap: 12px; }
   .tile { padding: 16px 18px; }
   .tile:nth-child(n) { transform: none; }
   .tileValue { font-size: 1.9rem; }
