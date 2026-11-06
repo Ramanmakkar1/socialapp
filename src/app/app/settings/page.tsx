@@ -41,6 +41,8 @@ const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   error: { tone: "warn", text: "We couldn't connect your Instagram account. Please try again." },
   not_configured: { tone: "warn", text: "Instagram connection isn't set up on this server yet." },
   disconnected: { tone: "ok", text: "Instagram account disconnected. Its access token was deleted." },
+  declined: { tone: "warn", text: "You declined the permissions Poskoo needs. Try again and keep all boxes ticked." },
+  no_ig_business: { tone: "warn", text: "We couldn't find an Instagram professional account linked to your Facebook Page. Link one in Instagram settings, then reconnect." },
 };
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[] }> }) {
@@ -68,6 +70,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <h2 className="text-sm font-medium text-ink-2">Connected accounts</h2>
         <a href="/api/instagram/connect" className="btn-primary">Connect Instagram</a>
       </div>
+      <p className="mt-2 text-xs text-muted">
+        Instagram professional account linked to a Facebook Page required.{" "}
+        <a href="/help/getting-started" className="underline hover:text-ink-2">See the setup steps</a>
+      </p>
       {accounts.length === 0 ? (
         <EmptyState icon={Settings} title="No connected accounts" text="Connect your Instagram professional account to schedule posts and auto-DM commenters." />
       ) : (

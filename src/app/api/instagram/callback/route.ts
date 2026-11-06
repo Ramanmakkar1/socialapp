@@ -5,14 +5,58 @@ import { BRAND } from "@/lib/brand";
 import { encryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
 import { IG_SCOPES, exchangeCode, fetchProfile, longLivedToken } from "@/lib/instagram";
+import {
+  exchangeMetaCode,
+  fetchGrantedScopes,
+  fetchPagesWithInstagram,
+  isMetaLoginConfigured,
+  metaLongLivedUserToken,
+  subscribePage,
+  verifyState,
+} from "@/lib/metaLogin";
 
-function back(result: "connected" | "error") {
+type BackResult = "connected" | "error" | "declined" | "no_ig_business";
+
+function back(result: BackResult) {
   return NextResponse.redirect(new URL(`/app/settings?ig=${result}`, BRAND.url));
 }
 
 export async function GET(request: Request) {
   // Outside the try so the /login redirect is not swallowed.
   const user = await requireUser();
+  if (isMetaLoginConfigured()) {
+    try {
+      const url = new URL(request.url);
+      const code = url.searchParams.get("code");
+      const state = url.searchParams.get("state");
+      const errorReason = url.searchParams.get("error_reason");
+      const store = await cookies();
+      const cookieNonce = store.get("ig_oauth_state")?.value;
+      store.delete({ name: "ig_oauth_state", path: "/api/instagram" });
+      if (errorReason === "user_denied" || !code) return back("declined");
+      if (!state || !cookieNonce || !verifyState(state, cookieNonce)) return back("error");
+      const short = await exchangeMetaCode(code);
+      const long = await metaLongLivedUserToken(short);
+      const [pages, scopes] = await Promise.all([fetchPagesWithInstagram(long), fetchGrantedScopes(long)]);
+      if (pages.length === 0) return back("no_ig_business");
+      for (const page of pages) {
+        await query(
+          `insert into socialapp.social_accounts (user_id, platform, external_id, username, access_token_enc, token_expires_at, scopes, status, auth_type, page_id, page_name)
+           values ($1,'instagram',$2,$3,$4, null, $5, 'active', 'facebook_login', $6, $7)
+           on conflict (platform, external_id) do update set user_id=excluded.user_id, username=excluded.username, access_token_enc=excluded.access_token_enc, token_expires_at=excluded.token_expires_at, scopes=excluded.scopes, status='active', auth_type=excluded.auth_type, page_id=excluded.page_id, page_name=excluded.page_name, updated_at=now()`,
+          [user.id, page.igUserId, page.igUsername || null, encryptToken(page.pageToken), scopes, page.pageId, page.pageName]
+        );
+        try {
+          await subscribePage(page.pageId, page.pageToken);
+        } catch {
+          console.error("subscribePage failed", page.pageId);
+        }
+      }
+      return back("connected");
+    } catch {
+      return back("error");
+    }
+  }
   try {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
