@@ -1,0 +1,126 @@
+/* /login and /signup: the landing look (paper, white form card, ink pill button,
+   serif-italic accent, tilted coloured art card). Rendered inside the landing
+   wrapper, so .logo / .btn / em.s come from landing.module.css. */
+
+.page {
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  padding-block: 32px;
+}
+.grid {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  gap: 48px;
+}
+@media (min-width: 860px) {
+  .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+
+/* Form card. */
+.card {
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  padding: 32px;
+}
+.card :global(.logo) { margin-bottom: 26px; display: inline-flex; }
+.title {
+  font-size: clamp(2.1rem, 5vw, 2.7rem);
+}
+.card p.lede {
+  margin-top: 10px;
+  color: var(--poskoo-muted);
+  font-size: 1rem;
+}
+.form { display: grid; gap: 16px; margin-top: 26px; }
+.form :global(.btn) {
+  width: 100%;
+  justify-content: center;
+  min-height: 52px;
+  cursor: pointer;
+}
+.form :global(.btn:disabled) { opacity: .65; cursor: default; transform: none; }
+.forgot { display: flex; justify-content: flex-end; }
+.card a.textLink {
+  color: var(--poskoo-ink);
+  font-size: .92rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.card a.textLink:hover { color: var(--poskoo-violet); }
+.card p.switch {
+  margin-top: 24px;
+  border-top: 1.5px solid var(--poskoo-line);
+  padding-top: 18px;
+  text-align: center;
+  color: var(--poskoo-muted);
+  font-size: .95rem;
+}
+.muted { color: var(--poskoo-muted); font-weight: 500; }
+
+/* Art panel. */
+.side { display: none; }
+@media (min-width: 860px) {
+  .side { display: block; }
+}
+.panel {
+  max-width: 480px;
+  margin-inline: auto;
+  border-radius: var(--poskoo-radius-band);
+  box-shadow: var(--poskoo-shadow-card);
+  padding: 28px 30px 30px;
+  transform: rotate(1.6deg);
+}
+.panelPeach { background: var(--poskoo-peach); }
+.panelLilac { background: var(--poskoo-lilac); transform: rotate(-1.6deg); }
+.art { display: flex; justify-content: center; }
+.art img {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+}
+.panel h2.panelTitle {
+  margin-top: 14px;
+  font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+}
+.points {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #3d3450;
+  font-size: .98rem;
+}
+.points li {
+  display: flex;
+  gap: .6rem;
+  align-items: flex-start;
+}
+.points li::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--poskoo-ink)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.3l2.6 2.5L13 6.4' stroke='%23fff' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 18px no-repeat;
+}
+
+@media (max-width: 480px) {
+  .page { align-items: flex-start; padding-block: 20px; }
+  .card { padding: 24px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel { transform: none; }
+}

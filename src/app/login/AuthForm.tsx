@@ -3,14 +3,17 @@
 import type { CSSProperties } from "react";
 import { useActionState } from "react";
 import Link from "next/link";
-import { instrumentSans } from "@/lib/fonts";
+import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import AuthIllustration from "@/components/AuthIllustration";
 import PoskooMark from "@/components/PoskooMark";
 import { loginAction, signupAction } from "./actions";
 import ui from "@/components/ui/ui.module.css";
+import landing from "@/app/landing.module.css";
+import a from "./auth.module.css";
 
-// Bridge the generic token names to the Poskoo palette (same mapping as PublicShell)
-// so this page matches the landing design without a shared chrome.
+// Bridge the generic token names to the Poskoo palette (same mapping as PublicShell).
+// The page sits inside the landing wrapper, so the logo, pill button and
+// serif-italic accent are the landing's own classes.
 const tokenBridge = {
   "--line": "var(--poskoo-line)",
   "--surface": "var(--poskoo-card)",
@@ -30,30 +33,29 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   return (
     <main
-      className={`${instrumentSans.variable} flex min-h-screen items-center justify-center px-4 py-10`}
-      style={{
-        ...tokenBridge,
-        background: "var(--poskoo-paper)",
-        color: "var(--poskoo-ink)",
-        fontFamily: "var(--font-instrument-sans), 'Segoe UI', system-ui, sans-serif",
-      }}
+      className={`${landing.landing} ${instrumentSans.variable} ${instrumentSerif.variable} ${a.page}`}
+      style={tokenBridge}
     >
-      <div className="mx-auto grid w-full max-w-5xl items-center gap-8 lg:grid-cols-2">
-        <div className={`${ui.card} mx-auto w-full max-w-sm p-8`}>
-          <Link href="/" className="mb-6 inline-flex items-center gap-2 text-xl font-bold tracking-tight" style={{ color: "var(--poskoo-ink)" }}>
-            <PoskooMark size={30} />
-            poskoo<b style={{ color: "var(--poskoo-coral)" }}>.</b>
+      <div className={`wrap ${a.grid}`}>
+        <div className={a.card}>
+          <Link className="logo" href="/">
+            <PoskooMark size={34} />
+            poskoo<b>.</b>
           </Link>
-          <h1 className="text-2xl font-bold" style={{ letterSpacing: "var(--poskoo-type-heading-ls)" }}>
-            {signup ? "Create your account" : "Log in"}
+          <h1 className={a.title}>
+            {signup ? (
+              <>Create your <em className="s">account.</em></>
+            ) : (
+              <>Log in to <em className="s">poskoo.</em></>
+            )}
           </h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--poskoo-muted)" }}>
+          <p className={a.lede}>
             {signup ? "Schedule posts and automate Instagram DMs." : "Welcome back. Log in to your dashboard."}
           </p>
-          <form action={formAction} className="mt-6 grid gap-4">
+          <form action={formAction} className={a.form}>
             {signup && (
               <div>
-                <label htmlFor="name" className={ui.label}>Name <span style={{ color: "var(--poskoo-muted)" }}>(optional)</span></label>
+                <label htmlFor="name" className={ui.label}>Name <span className={a.muted}>(optional)</span></label>
                 <input id="name" name="name" type="text" autoComplete="name" className={INPUT} />
               </div>
             )}
@@ -74,33 +76,33 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
               />
             </div>
             {!signup && (
-              <div className="flex justify-end">
-                <Link href="/contact#password-reset" className="text-sm font-semibold underline underline-offset-2" style={{ color: "var(--poskoo-ink)" }}>
+              <div className={a.forgot}>
+                <Link href="/contact#password-reset" className={a.textLink}>
                   Forgot password?
                 </Link>
               </div>
             )}
             {state?.error && (
-              <p role="alert" className={`${ui.notice} ${ui.noticeWarn} text-sm`}>{state.error}</p>
+              <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>{state.error}</p>
             )}
             <button
               type="submit"
               disabled={pending}
               aria-busy={pending}
-              className={`${ui.btn} ${ui.btnDark} w-full`}
+              className="btn btn-dark"
             >
               {pending ? "Please wait…" : signup ? "Create account" : "Log in"}
             </button>
           </form>
-          <p className="mt-6 text-center text-sm" style={{ color: "var(--poskoo-muted)" }}>
+          <p className={a.switch}>
             {signup ? (
-              <>Already have an account? <Link href="/login" className="font-semibold underline underline-offset-2" style={{ color: "var(--poskoo-ink)" }}>Log in</Link></>
+              <>Already have an account? <Link href="/login" className={a.textLink}>Log in</Link></>
             ) : (
-              <>No account? <Link href="/signup" className="font-semibold underline underline-offset-2" style={{ color: "var(--poskoo-ink)" }}>Create one</Link></>
+              <>No account? <Link href="/signup" className={a.textLink}>Create one</Link></>
             )}
           </p>
         </div>
-        <div className="hidden lg:block">
+        <div className={a.side}>
           <AuthIllustration mode={mode} />
         </div>
       </div>
