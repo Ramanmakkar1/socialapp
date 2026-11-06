@@ -6,7 +6,7 @@ import EmptyState from "../EmptyState";
 import LoadFailed from "../calendar/LoadFailed";
 import LeadContactActions from "./LeadContactActions";
 import LocalTime from "@/components/LocalTime";
-import { BtnLink, PageHero } from "@/components/ui/kit";
+import { BtnA, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./leads.module.css";
 
@@ -135,9 +135,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         artAlt=""
         action={leads.length > 0 ? (
           <div className="flex flex-col items-start gap-2">
-            <BtnLink variant="line" href={exportHref} size="sm">
+            <BtnA variant="line" href={exportHref} size="sm" download>
               {exportCapped ? "Export latest 10,000" : "Export CSV"}
-            </BtnLink>
+            </BtnA>
             {exportCapped ? (
               <p className={`${ui.hint} m-0 max-w-xs`}>
                 CSV downloads are limited to the 10,000 newest matching leads. Narrow with search, rule, or email filters.

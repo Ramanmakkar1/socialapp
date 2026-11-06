@@ -5,7 +5,7 @@ import { isDbConfigured, query } from "@/lib/db";
 import { instrumentSans } from "@/lib/fonts";
 import { logoutAction } from "../login/actions";
 import PoskooMark from "@/components/PoskooMark";
-import { BtnLink } from "@/components/ui/kit";
+import { BtnA } from "@/components/ui/kit";
 import SidebarNav from "./SidebarNav";
 import styles from "./shell.module.css";
 
@@ -67,7 +67,7 @@ async function AppShell({ children }: { children: ReactNode }) {
         {needsReconnect && (
           <div role="alert" className={styles.banner}>
             <span>Instagram access expired or was removed. Posts and auto-DMs are paused until you reconnect.</span>
-            <BtnLink href="/api/instagram/connect" size="sm">Reconnect Instagram</BtnLink>
+            <BtnA href="/api/instagram/connect" size="sm">Reconnect Instagram</BtnA>
           </div>
         )}
         <div className={styles.content}>{children}</div>

@@ -36,6 +36,19 @@ export function BtnLink({
   return <Link {...rest} className={classes(variant, size, className)} />;
 }
 
+/**
+ * Pill button rendered as a plain <a>. Use it for route handlers, file downloads,
+ * /api/* redirects (OAuth) and external URLs: next/link would prefetch or RSC-fetch them.
+ */
+export function BtnA({
+  variant = "dark",
+  size = "md",
+  className,
+  ...rest
+}: ComponentProps<"a"> & { variant?: BtnVariant; size?: "sm" | "md" }) {
+  return <a {...rest} className={classes(variant, size, className)} />;
+}
+
 /** Rounded card in the landing surface style. */
 export function Card({
   tone,
