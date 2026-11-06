@@ -11,6 +11,13 @@ function formatBadge(igFormat: string | null, mediaCount: number): string {
   return "Feed";
 }
 
+const row =
+  "flex min-h-11 flex-col gap-2 rounded-[var(--poskoo-radius-md)] border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-3 transition hover:border-[var(--poskoo-violet)] max-[390px]:flex-col min-[391px]:flex-row min-[391px]:items-center min-[391px]:gap-3";
+const timePill =
+  "inline-flex w-fit shrink-0 items-center rounded-[var(--poskoo-radius-pill)] border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-1 text-xs font-semibold tabular-nums text-[var(--poskoo-ink)]";
+const badge =
+  "rounded-[var(--poskoo-radius-pill)] border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-2.5 py-0.5 text-xs font-semibold text-[var(--poskoo-ink)]";
+
 export default function UpcomingPosts({ posts }: { posts: UpcomingPost[] }) {
   const [timeZone, setTimeZone] = useState("");
   const [whenById, setWhenById] = useState<Record<string, string>>({});
@@ -37,20 +44,18 @@ export default function UpcomingPosts({ posts }: { posts: UpcomingPost[] }) {
       <ul className="space-y-3">
         {posts.map((post) => (
           <li key={post.id}>
-            <Link
-              href="/app/calendar"
-              className="flex min-h-11 flex-col gap-2 rounded-xl border border-line bg-surface-2/50 p-3 transition hover:border-brand/40 max-[390px]:flex-col min-[391px]:flex-row min-[391px]:items-center min-[391px]:gap-3"
-            >
-              <span className="inline-flex w-fit shrink-0 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium tabular-nums text-ink-2">
-                {whenById[post.id] ?? "…"}
-              </span>
-              <p className="min-w-0 flex-1 truncate text-sm text-ink">{post.caption.trim() || "Untitled post"}</p>
+            <Link href="/app/calendar" className={row}>
+              <span className={timePill}>{whenById[post.id] ?? "…"}</span>
+              <p className="min-w-0 flex-1 truncate text-sm text-[var(--poskoo-ink)]">
+                {post.caption.trim() || "Untitled post"}
+              </p>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
-                <span className="rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs font-medium text-ink-2">
-                  {formatBadge(post.igFormat, post.mediaCount)}
-                </span>
+                <span className={badge}>{formatBadge(post.igFormat, post.mediaCount)}</span>
                 {post.hasRule && (
-                  <span className="rounded-full border border-brand/30 bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">
+                  <span
+                    className={badge}
+                    style={{ background: "var(--poskoo-lime)", borderColor: "var(--poskoo-ink)" }}
+                  >
                     Auto-DM on
                   </span>
                 )}
@@ -59,7 +64,9 @@ export default function UpcomingPosts({ posts }: { posts: UpcomingPost[] }) {
           </li>
         ))}
       </ul>
-      {timeZone ? <p className="mt-3 text-xs text-muted">Times shown in {timeZone}</p> : null}
+      {timeZone ? (
+        <p className="mt-3 text-xs text-[var(--poskoo-muted)]">Times shown in {timeZone}</p>
+      ) : null}
     </div>
   );
 }
