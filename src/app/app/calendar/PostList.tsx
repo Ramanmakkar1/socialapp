@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
 import { deletePost } from "./actions";
 import LoadFailed, { type LoadError } from "./LoadFailed";
 import { duplicatePost } from "./duplicateActions";
 import { retryPost } from "./retryActions";
+import EmptyState from "../EmptyState";
+import { Btn, BtnA, BtnLink } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
+import styles from "./calendar.module.css";
 
 export type Post = {
   id: string;
@@ -87,111 +90,104 @@ export default function PostList({ posts, loadError, initialFilter = "all" }: { 
   }
 
   return (
-    <section className="mt-8" aria-labelledby="upcoming-posts-heading">
-      <h2 id="upcoming-posts-heading" className="text-lg font-semibold">Publishing queue</h2>
-      {error && <p role="alert" className="mt-3 text-sm text-brand-2">{error}</p>}
+    <section className={styles.queue} aria-labelledby="upcoming-posts-heading">
+      <h2 id="upcoming-posts-heading" className={styles.sectionTitle}>Publishing queue</h2>
+      {error && <p role="alert" className={`${styles.errorText} ${styles.mt}`}>{error}</p>}
       {loadError ? (
-        <LoadFailed message={loadError.message} reloadHref={loadError.reloadHref} className="mt-3" />
+        <LoadFailed message={loadError.message} reloadHref={loadError.reloadHref} className={styles.mt} />
       ) : (
         <>
-          <p className="mt-1 text-sm text-muted">Counts and search apply to the loaded posts (up to 50).</p>
-          <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filter queue by status">
+          <p className={styles.queueHint}>Counts and search apply to the loaded posts (up to 50).</p>
+          <div className={styles.filters} role="group" aria-label="Filter queue by status">
             {filters.map(({ value, label }) => (
               <button
                 key={value}
                 type="button"
                 aria-pressed={filter === value}
                 onClick={() => selectFilter(value)}
-                className={`min-h-11 rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${filter === value ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink hover:bg-surface-2"}`}
+                className={`${styles.filterBtn} ${filter === value ? styles.filterBtnActive : ""}`}
               >
-                {label} <span className="ml-1">{value === "all" ? posts.length : posts.filter((post) => post.status === value).length}</span>
+                {label} <span>{value === "all" ? posts.length : posts.filter((post) => post.status === value).length}</span>
               </button>
             ))}
           </div>
-          <div className="mt-4">
-            <label htmlFor="queue-search" className="text-sm font-medium text-ink">Search captions</label>
+          <div className={`${ui.field} ${styles.search}`}>
+            <label htmlFor="queue-search" className={ui.label}>Search captions</label>
             <input
               id="queue-search"
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search loaded posts"
-              className="mt-1 block min-h-11 w-full max-w-md rounded-xl border border-line bg-surface px-4 text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              className={ui.input}
             />
           </div>
-          <p className="mt-4 text-sm text-muted" role="status">{visiblePosts.length} {visiblePosts.length === 1 ? "post" : "posts"} shown; scheduled times first, unscheduled posts last</p>
+          <p className={styles.count} role="status">{visiblePosts.length} {visiblePosts.length === 1 ? "post" : "posts"} shown; scheduled times first, unscheduled posts last</p>
           {visiblePosts.length === 0 ? (
-            <div className="mt-3 flex flex-wrap items-center gap-4 rounded-2xl border border-line bg-surface p-5">
-              <svg aria-hidden="true" viewBox="0 0 96 80" className="h-20 w-24 shrink-0">
-                <rect x="15" y="13" width="60" height="54" rx="12" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="2" />
-                <path d="M15 30h60M30 8v10M60 8v10" fill="none" stroke="var(--brand)" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="48" cy="47" r="9" fill="none" stroke="var(--brand)" strokeWidth="3" />
-                <path d="m55 54 8 8M80 14v8M76 18h8" stroke="var(--brand-2)" strokeWidth="3" strokeLinecap="round" />
-              </svg>
-              <div>
-                <p className="font-medium text-ink">{posts.length === 0 ? "Your queue is empty" : "No posts match your filters"}</p>
-                <p className="mt-1 text-sm text-muted">{posts.length === 0 ? "Write your first post above to get started." : "Try another status or caption search."}</p>
-                <button type="button" onClick={clearFilters} className="mt-2 min-h-11 rounded-full border border-line px-4 text-sm font-medium text-ink hover:bg-surface-2">Clear filters</button>
-              </div>
-            </div>
+            posts.length === 0 ? (
+              <EmptyState
+                title="Your queue is empty"
+                text="Write your first post above to get started."
+                art="/illustrations/empty-calendar.webp"
+                artWidth={1536}
+                artHeight={1024}
+              >
+                <BtnA href="#new" size="sm">Write a post</BtnA>
+              </EmptyState>
+            ) : (
+              <EmptyState
+                title="No posts match your filters"
+                text="Try another status or caption search."
+                art="/illustrations/empty-calendar.webp"
+                artWidth={1536}
+                artHeight={1024}
+              >
+                <Btn variant="line" size="sm" onClick={clearFilters}>Clear filters</Btn>
+              </EmptyState>
+            )
           ) : (
-        <div className="mt-3 space-y-3">
-          {visiblePosts.map((post) => (
-            <article key={post.id} className="min-w-0 rounded-2xl border border-line bg-surface p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className={`rounded-full border bg-surface-2 px-3 py-1 text-xs font-medium ${post.status === "failed" ? "border-brand-2 text-brand-2" : "border-line text-ink-2"}`}>
-                  {post.status.replace(/[_-]+/g, " ").replace(/^./, (letter) => letter.toUpperCase())}
-                </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  {post.status === "draft" && (
-                    <Link href={`/app/calendar?draft=${post.id}#new`} className="min-h-11 rounded-full border border-line px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-2">Edit draft</Link>
+            <div className={styles.postList}>
+              {visiblePosts.map((post) => (
+                <article key={post.id} className={styles.postCard}>
+                  <div className={styles.postTop}>
+                    <span className={`${ui.pill} ${post.status === "failed" ? styles.statusFailed : ""}`}>
+                      {post.status.replace(/[_-]+/g, " ").replace(/^./, (letter) => letter.toUpperCase())}
+                    </span>
+                    <div className={styles.postActions}>
+                      {post.status === "draft" && (
+                        <BtnLink href={`/app/calendar?draft=${post.id}#new`} variant="ghost" size="sm">Edit draft</BtnLink>
+                      )}
+                      {post.status === "failed" && (
+                        <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleRetry(post.id)}>
+                          Retry
+                        </Btn>
+                      )}
+                      <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleDuplicate(post.id)}>
+                        Duplicate
+                      </Btn>
+                      {["draft", "scheduled", "failed"].includes(post.status) && (
+                        <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleDelete(post.id)}>
+                          Delete
+                        </Btn>
+                      )}
+                    </div>
+                  </div>
+                  <p className={styles.postMeta} suppressHydrationWarning>
+                    {post.scheduled_at ? new Date(post.scheduled_at).toLocaleString() : "No time set"}
+                  </p>
+                  <p className={styles.postPlatforms}>{post.platforms.join(", ")}</p>
+                  <p className={styles.postCaption}>{post.caption.slice(0, 140)}</p>
+                  {post.first_comment && (
+                    <span className={`${ui.pill} ${styles.mt}`}>First comment</span>
                   )}
                   {post.status === "failed" && (
-                    <button
-                      type="button"
-                      disabled={isPending}
-                      onClick={() => handleRetry(post.id)}
-                      className="min-h-11 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
-                    >
-                      Retry
-                    </button>
+                    <p className={styles.postError} role="status">
+                      Couldn’t publish: {(post.error ?? "Unknown error").slice(0, 200)}
+                    </p>
                   )}
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    onClick={() => handleDuplicate(post.id)}
-                    className="min-h-11 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
-                  >
-                    Duplicate
-                  </button>
-                  {["draft", "scheduled", "failed"].includes(post.status) && (
-                    <button
-                      type="button"
-                      disabled={isPending}
-                      onClick={() => handleDelete(post.id)}
-                      className="min-h-11 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
-                    >
-                      Delete
-                    </button>
-                  )}
-                </div>
-              </div>
-              <p className="mt-3 text-sm text-muted" suppressHydrationWarning>
-                {post.scheduled_at ? new Date(post.scheduled_at).toLocaleString() : "No time set"}
-              </p>
-              <p className="mt-2 text-sm capitalize text-ink-2">{post.platforms.join(", ")}</p>
-              <p className="mt-3 whitespace-pre-wrap break-words text-sm text-ink-2">{post.caption.slice(0, 140)}</p>
-              {post.first_comment && (
-                <span className="mt-3 inline-block rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium text-ink-2">First comment</span>
-              )}
-              {post.status === "failed" && (
-                <p className="mt-3 rounded-xl border border-line bg-surface-2 p-3 text-xs text-brand-2" role="status">
-                  Couldn’t publish: {(post.error ?? "Unknown error").slice(0, 200)}
-                </p>
-              )}
-            </article>
-          ))}
-        </div>
+                </article>
+              ))}
+            </div>
           )}
         </>
       )}

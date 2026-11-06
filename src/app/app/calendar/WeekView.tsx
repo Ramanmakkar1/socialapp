@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
 import RescheduleControl from "./RescheduleControl";
 import LoadFailed, { type LoadError } from "./LoadFailed";
+import { BtnA } from "@/components/ui/kit";
+import styles from "./calendar.module.css";
+
+const TINTS = [styles.dayTint1, styles.dayTint2, styles.dayTint3];
 
 type WeekViewPost = {
   id: string;
@@ -89,9 +93,6 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
     days.push(d);
   }
 
-  const navClass =
-    "rounded-full border border-line px-3 py-1.5 text-sm hover:bg-surface-2";
-
   function handleDrop(e: DragEvent<HTMLDivElement>, key: string, current: WeekViewPost[]) {
     e.preventDefault();
     setDragOverKey(null);
@@ -115,31 +116,31 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className={styles.navRow}>
         <div>
-          <p className="text-sm font-medium text-ink">{formatWeekRange(weekStart)}</p>
-          <p className="text-xs text-muted">
+          <p className={styles.rangeLabel}>{formatWeekRange(weekStart)}</p>
+          <p className={styles.rangeHint}>
             Days and times shown in UTC{tz ? ` (your time zone: ${tz})` : ""}.
-            <span className="hidden sm:inline"> Drag a post to another day to move it.</span>
+            <span className={styles.wideOnly}> Drag a post to another day to move it.</span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <a href={prevHref} className={navClass}>
-            ← Previous
-          </a>
-          <a href={nextHref} className={navClass}>
-            Next →
-          </a>
+        <div className={styles.navBtns}>
+          <BtnA href={prevHref} variant="ghost" size="sm">
+            <span aria-hidden="true">←</span> Previous
+          </BtnA>
+          <BtnA href={nextHref} variant="ghost" size="sm">
+            Next <span aria-hidden="true">→</span>
+          </BtnA>
         </div>
       </div>
       {error && (
-        <p role="alert" className="mb-3 text-sm text-brand-2">
+        <p role="alert" className={styles.errorText}>
           {error}
         </p>
       )}
-      {loadError && <LoadFailed {...loadError} className="mb-3" />}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-7">
-        {days.map((day) => {
+      {loadError && <LoadFailed {...loadError} className={styles.mb} />}
+      <div className={styles.dayGrid}>
+        {days.map((day, index) => {
           const key = utcDateKey(day);
           const dayPosts = byDay.get(key) ?? [];
           const isToday = key === todayKey;
@@ -164,16 +165,14 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
                 if (dragOverKey === key) setDragOverKey(null);
               }}
               onDrop={(e) => handleDrop(e, key, dayPosts)}
-              className={`min-h-28 min-w-0 rounded-2xl border p-3 ${isToday ? "border-brand" : "border-line"} ${
-                dragOverKey === key ? "bg-surface-2 ring-1 ring-line" : "bg-surface"
-              }`}
+              className={[styles.day, TINTS[index % 3], isToday ? styles.dayToday : "", dragOverKey === key ? styles.dayOver : ""].filter(Boolean).join(" ")}
             >
-              <p className="text-xs text-muted">
+              <p className={styles.dayLabel}>
                 {weekday} · {dateLabel}
               </p>
-              <div className="mt-2 space-y-1">
+              <div className={styles.dayPosts}>
                 {dayPosts.length === 0 ? (
-                  loadError ? null : <p className="text-xs text-muted">—</p>
+                  loadError ? null : <p className={styles.dash} aria-label="No posts">—</p>
                 ) : (
                   dayPosts.map((post) => (
                     <div key={`${post.id}-${utcDateKey(new Date(post.scheduled_at!))}`} className="min-w-0">
@@ -187,9 +186,7 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
                               }
                             : undefined
                         }
-                        className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${
-                          post.status === "failed" ? "text-brand-2" : "text-ink-2"
-                        } ${isMovable(post.status) ? "sm:cursor-grab" : ""}`}
+                        className={[styles.chip, post.status === "failed" ? styles.chipFailed : "", isMovable(post.status) ? styles.chipMovable : ""].filter(Boolean).join(" ")}
                         title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
                       >
                         {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}

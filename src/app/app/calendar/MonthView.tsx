@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
 import RescheduleControl from "./RescheduleControl";
 import LoadFailed, { type LoadError } from "./LoadFailed";
+import { BtnA } from "@/components/ui/kit";
+import styles from "./calendar.module.css";
+
+const TINTS = [styles.dayTint1, styles.dayTint2, styles.dayTint3];
 
 type MonthViewPost = {
   id: string;
@@ -55,13 +59,13 @@ function captionPreview(caption: string): string {
 function chipColor(status: string): string {
   switch (status) {
     case "failed":
-      return "text-brand-2";
+      return styles.chipFailed;
     case "published":
-      return "text-ok";
+      return styles.chipPublished;
     case "draft":
-      return "text-muted";
+      return styles.chipDraft;
     default:
-      return "text-ink-2";
+      return "";
   }
 }
 
@@ -112,9 +116,6 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
     timeZone: "UTC",
   });
 
-  const navClass =
-    "rounded-full border border-line px-3 py-1.5 text-sm hover:bg-surface-2";
-
   function handleDrop(e: DragEvent<HTMLDivElement>, key: string, current: MonthViewPost[]) {
     e.preventDefault();
     setDragOverKey(null);
@@ -138,37 +139,37 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className={styles.navRow}>
         <div>
-          <p className="text-sm font-medium text-ink">{monthLabel}</p>
-          <p className="text-xs text-muted">
+          <p className={styles.rangeLabel}>{monthLabel}</p>
+          <p className={styles.rangeHint}>
             Days and times shown in UTC{tz ? ` (your time zone: ${tz})` : ""}.
-            <span className="hidden sm:inline"> Drag a post to another day to move it.</span>
+            <span className={styles.wideOnly}> Drag a post to another day to move it.</span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <a href={prevHref} className={navClass}>
-            ← Previous
-          </a>
-          <a href={nextHref} className={navClass}>
-            Next →
-          </a>
+        <div className={styles.navBtns}>
+          <BtnA href={prevHref} variant="ghost" size="sm">
+            <span aria-hidden="true">←</span> Previous
+          </BtnA>
+          <BtnA href={nextHref} variant="ghost" size="sm">
+            Next <span aria-hidden="true">→</span>
+          </BtnA>
         </div>
       </div>
       {error && (
-        <p role="alert" className="mb-3 text-sm text-brand-2">
+        <p role="alert" className={styles.errorText}>
           {error}
         </p>
       )}
-      {loadError && <LoadFailed {...loadError} className="mb-3" />}
-      <div className="overflow-x-auto">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-7">
+      {loadError && <LoadFailed {...loadError} className={styles.mb} />}
+      <div>
+        <div className={styles.dayGrid}>
           {WEEKDAYS.map((name) => (
-            <p key={name} className="hidden px-1 text-xs font-medium text-muted sm:block">
+            <p key={name} className={styles.weekdayHead}>
               {name}
             </p>
           ))}
-          {days.map((day) => {
+          {days.map((day, index) => {
             const key = utcDateKey(day);
             const dayPosts = byDay.get(key) ?? [];
             const inMonth = day.getUTCMonth() === month;
@@ -186,14 +187,12 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
                   if (dragOverKey === key) setDragOverKey(null);
                 }}
                 onDrop={(e) => handleDrop(e, key, dayPosts)}
-                className={`min-h-24 min-w-0 rounded-2xl border p-2 ${isToday ? "border-brand" : "border-line"} ${inMonth ? "" : "opacity-60"} ${
-                  dragOverKey === key ? "bg-surface-2 ring-1 ring-line" : "bg-surface"
-                }`}
+                className={[styles.day, styles.dayCompact, TINTS[index % 3], isToday ? styles.dayToday : "", inMonth ? "" : styles.dayOut, dragOverKey === key ? styles.dayOver : ""].filter(Boolean).join(" ")}
               >
-                <p className={`text-xs ${inMonth ? "text-ink" : "text-muted"}`}>
-                  <span className="sm:hidden">{day.toLocaleDateString("en-US", { weekday: "short", month: "short", timeZone: "UTC" })} </span>{day.getUTCDate()}
+                <p className={`${styles.dayLabel} ${inMonth ? styles.dayLabelIn : ""}`}>
+                  <span className={styles.phoneOnly}>{day.toLocaleDateString("en-US", { weekday: "short", month: "short", timeZone: "UTC" })} </span>{day.getUTCDate()}
                 </p>
-                <div className="mt-1 space-y-1">
+                <div className={styles.dayPosts}>
                   {dayPosts.slice(0, MAX_CHIPS).map((post) => (
                     <div key={`${post.id}-${utcDateKey(new Date(post.scheduled_at!))}`} className="min-w-0">
                       <span
@@ -206,9 +205,7 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
                               }
                             : undefined
                         }
-                        className={`block truncate rounded-lg bg-surface-2 px-2 py-1 text-xs ${chipColor(post.status)} ${
-                          isMovable(post.status) ? "sm:cursor-grab" : ""
-                        }`}
+                        className={[styles.chip, chipColor(post.status), isMovable(post.status) ? styles.chipMovable : ""].filter(Boolean).join(" ")}
                         title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
                       >
                         {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
@@ -218,7 +215,7 @@ export default function MonthView({ posts, monthStart, prevHref, nextHref, loadE
                       )}
                     </div>
                   ))}
-                  {extra > 0 ? <p className="px-1 text-xs text-muted">+{extra} more</p> : null}
+                  {extra > 0 ? <p className={styles.more}>+{extra} more</p> : null}
                 </div>
               </div>
             );

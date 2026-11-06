@@ -3,6 +3,9 @@
 import { useId, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
+import { Btn } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
+import styles from "./calendar.module.css";
 
 export default function RescheduleControl({ id, scheduledAt, caption }: {
   id: string;
@@ -18,15 +21,15 @@ export default function RescheduleControl({ id, scheduledAt, caption }: {
 
   return (
     <details
-      className="min-w-0 text-xs text-ink-2"
+      className={styles.reschedule}
       draggable={false}
       onDragStart={(event) => { event.preventDefault(); event.stopPropagation(); }}
     >
-      <summary className="min-h-11 cursor-pointer content-center rounded-lg px-2 focus-visible:outline-2 focus-visible:outline-brand">
+      <summary>
         Reschedule<span className="sr-only"> post: {caption}</span>
       </summary>
       <form
-        className="space-y-2 rounded-lg border border-line bg-surface p-2"
+        className={styles.rescheduleForm}
         aria-label={`Reschedule post: ${caption}`}
         aria-busy={pending}
         onSubmit={(event) => {
@@ -47,7 +50,7 @@ export default function RescheduleControl({ id, scheduledAt, caption }: {
           });
         }}
       >
-        <label htmlFor={fieldId} className="block">New date (UTC)</label>
+        <label htmlFor={fieldId}>New date (UTC)</label>
         <input
           id={fieldId}
           type="date"
@@ -57,17 +60,17 @@ export default function RescheduleControl({ id, scheduledAt, caption }: {
           onChange={(event) => { setDate(event.target.value); setError(null); }}
           aria-describedby={`${fieldId}-hint${error ? ` ${fieldId}-error` : ""}`}
           aria-invalid={!!error}
-          className="min-h-11 w-full min-w-0 max-w-full rounded-lg border border-line bg-surface px-1 text-base text-ink"
+          className={ui.input}
         />
         <p id={`${fieldId}-hint`}>Moving preserves the UTC time.</p>
-        <button
+        <Btn
           type="submit"
+          size="sm"
           disabled={pending || !date || date === originalDate}
-          className="min-h-11 w-full rounded-lg bg-brand px-2 text-white disabled:opacity-50"
         >
           {pending ? "Moving…" : "Move"}
-        </button>
-        {error && <p id={`${fieldId}-error`} role="alert" className="break-words text-brand-2">{error}</p>}
+        </Btn>
+        {error && <p id={`${fieldId}-error`} role="alert" className={styles.rescheduleError}>{error}</p>}
       </form>
     </details>
   );

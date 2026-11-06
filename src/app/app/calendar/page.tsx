@@ -7,7 +7,8 @@ import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
-import { instrumentSerif } from "@/lib/fonts";
+import { PageHero } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
 
 export const metadata = { title: "Calendar" };
@@ -186,17 +187,19 @@ export default async function CalendarPage({
   const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
 
   return (
-    <div className={`${styles.calendarPage} ${instrumentSerif.variable}`}>
-      <div>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl">
-          Your <em className="font-[family-name:var(--font-instrument-serif)] font-normal italic text-brand">calendar</em>
-        </h1>
-        <p className="mt-2 text-sm text-muted sm:text-base">Plan and schedule Instagram posts. Facebook and Threads are coming soon.</p>
-      </div>
+    <div className={styles.calendarPage}>
+      <PageHero
+        eyebrow="Plan your posts"
+        title="Your"
+        accent="calendar"
+        lede="Plan and schedule Instagram posts. Facebook and Threads are coming soon."
+        art="/landing/card-schedule.webp"
+        artAlt=""
+      />
       {draftFailed ? (
         <LoadFailed message="We couldn’t load this draft. Your saved post is unchanged." reloadHref={`/app/calendar?draft=${encodeURIComponent(draft ?? "")}#new`} />
       ) : rulesFailed ? (
-        <section className="mt-6" aria-labelledby="composer-unavailable">
+        <section className={styles.viewSection} aria-labelledby="composer-unavailable">
           <h2 id="composer-unavailable" className="sr-only">Composer unavailable</h2>
           <LoadFailed
             message="We couldn’t load your auto-DM rules, so the composer is hidden. Scheduling now could post without the automation you meant to attach."
@@ -206,24 +209,24 @@ export default async function CalendarPage({
       ) : (
         <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} />
       )}
-      <div className="mt-8 inline-flex rounded-[var(--poskoo-radius-pill)] border border-line bg-surface p-1" role="group" aria-label="Calendar view">
+      <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
         <Link
           href="/app/calendar?view=week"
           aria-current={view === "week" ? "page" : undefined}
-          className={`inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm ${view === "week" ? "btn-primary font-medium" : "hover:bg-surface-2"}`}
+          className={`${styles.viewLink} ${view === "week" ? styles.viewLinkActive : ""}`}
         >
           Week
         </Link>
         <Link
           href="/app/calendar?view=month"
           aria-current={view === "month" ? "page" : undefined}
-          className={`inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm ${view === "month" ? "btn-primary font-medium" : "hover:bg-surface-2"}`}
+          className={`${styles.viewLink} ${view === "month" ? styles.viewLinkActive : ""}`}
         >
           Month
         </Link>
       </div>
       {view === "month" ? (
-        <section className="mt-4" aria-label="Month view">
+        <section className={styles.viewSection} aria-label="Month view">
           <MonthView
             posts={weekRows}
             monthStart={monthStart}
@@ -237,7 +240,7 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <section className="mt-4" aria-label="Week view">
+        <section className={styles.viewSection} aria-label="Week view">
           <WeekView
             posts={weekRows}
             weekStart={weekStart}
@@ -261,32 +264,32 @@ export default async function CalendarPage({
         }
       />
       {publishedFailed && (
-        <section className="mt-8" aria-label="Recently published">
-          <h2 className="text-xl font-semibold sm:text-2xl">Recently published</h2>
+        <section className={styles.published} aria-label="Recently published">
+          <h2 className={styles.sectionTitle}>Recently published</h2>
           <LoadFailed
             message="We couldn’t load your publishing history. Your published posts are still there."
             reloadHref={reloadHref}
-            className="mt-3"
+            className={styles.mt}
           />
         </section>
       )}
       {publishedRows.length > 0 && (
-        <section className="mt-8" aria-labelledby="recently-published-heading">
-          <h2 id="recently-published-heading" className="text-xl font-semibold sm:text-2xl">Recently published</h2>
-          <ul className="mt-4 divide-y divide-line rounded-[var(--poskoo-radius-card)] border border-line bg-surface shadow-[var(--poskoo-shadow-card)]">
+        <section className={styles.published} aria-labelledby="recently-published-heading">
+          <h2 id="recently-published-heading" className={styles.sectionTitle}>Recently published</h2>
+          <ul className={styles.publishedList}>
             {publishedRows.map((post) => (
-              <li key={post.id} className="flex min-w-0 flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="min-w-0 break-words text-sm text-ink-2">
+              <li key={post.id} className={styles.publishedRow}>
+                <p className={styles.publishedCaption}>
                   {post.caption.length > 80 ? `${post.caption.slice(0, 80)}…` : post.caption}
                 </p>
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-transparent px-3 py-1 text-xs font-medium text-ink" style={{ background: 'var(--poskoo-mint)' }}>Published</span>
+                <div className={styles.publishedMeta}>
+                  <span className={`${ui.pill} ${styles.pillPublished}`}>Published</span>
                   {post.platforms.map((platform) => (
-                    <span key={platform} className="rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium capitalize text-ink-2">
+                    <span key={platform} className={`${ui.pill} ${styles.capitalize}`}>
                       {platform}
                     </span>
                   ))}
-                  <span className="text-xs text-muted" suppressHydrationWarning>
+                  <span className={styles.publishedTime} suppressHydrationWarning>
                     {post.published_at ? new Date(post.published_at).toLocaleString() : "Time unknown"}
                   </span>
                 </div>

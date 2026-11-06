@@ -1,3 +1,6 @@
+import { BtnA } from "@/components/ui/kit";
+import styles from "./calendar.module.css";
+
 export type LoadError = { message: string; reloadHref: string };
 
 export default function LoadFailed({
@@ -10,16 +13,11 @@ export default function LoadFailed({
   className?: string;
 }) {
   return (
-    <div className={`${className} rounded-2xl border border-line bg-surface-2 p-4`}>
-      <p role="alert" className="text-sm text-brand-2">
-        {message}
-      </p>
-      <a
-        href={reloadHref}
-        className="mt-3 inline-block rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink hover:bg-surface-2"
-      >
+    <div className={`${styles.loadFailed} ${className}`}>
+      <p role="alert">{message}</p>
+      <BtnA href={reloadHref} variant="ghost" size="sm">
         Reload
-      </a>
+      </BtnA>
     </div>
   );
 }
