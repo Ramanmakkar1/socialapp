@@ -63,7 +63,7 @@ const tools = [
   {
     href: "/tools/instagram-image-size",
     title: "Instagram image size guide",
-    description: "Check the right sizes for posts, portraits and Stories, and preview the 1:1, 4:5, 3:4 and 9:16 crops of your photo.",
+    description: "Check the right sizes for posts, portraits and Stories, preview and reposition the 1:1, 4:5, 3:4 and 9:16 crops of your photo, then download a JPG.",
     icon: ImageIcon,
   },
   {

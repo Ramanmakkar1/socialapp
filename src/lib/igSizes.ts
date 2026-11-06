@@ -1,3 +1,41 @@
+/** Clamp a value to the inclusive [min, max] range. */
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+type CropFocusInput =
+  | number
+  | {
+      x?: number;
+      y?: number;
+      focusX?: number;
+      focusY?: number;
+      focalX?: number;
+      focalY?: number;
+      horizontal?: number;
+      vertical?: number;
+    };
+
+function focusFromInput(
+  input: CropFocusInput | undefined,
+  fallbackX: number,
+  fallbackY: number,
+): { x: number; y: number } {
+  if (input === undefined || input === null) {
+    return { x: fallbackX, y: fallbackY };
+  }
+  if (typeof input === "number") {
+    // A single number applies to the horizontal axis; vertical keeps fallback.
+    return { x: input, y: fallbackY };
+  }
+  const o = input;
+  const x =
+    o.focusX ?? o.focalX ?? o.x ?? o.horizontal ?? fallbackX;
+  const y =
+    o.focusY ?? o.focalY ?? o.y ?? o.vertical ?? fallbackY;
+  return { x, y };
+}
+
 export type CropRect = { x: number; y: number; w: number; h: number };
 
 export type IgFormat = {
@@ -13,20 +51,59 @@ export type IgFormat = {
   infoOnly?: boolean;
 };
 
-/** Centered crop that matches `ratio` (width ÷ height). */
-export function cropRect(srcW: number, srcH: number, ratio: number): CropRect {
+/** Crop that matches `ratio` (width ÷ height), optionally focused on a normalized point (0..1). */
+export function cropRect(
+  srcW: number,
+  srcH: number,
+  ratio: number,
+  focusX?: CropFocusInput,
+  focusY?: number,
+): CropRect {
   if (srcW <= 0 || srcH <= 0 || ratio <= 0) {
     return { x: 0, y: 0, w: Math.max(0, srcW), h: Math.max(0, srcH) };
   }
+
+  let fx: unknown;
+  let fy: unknown;
+  if (typeof focusX === "object" && focusX !== null) {
+    const resolved = focusFromInput(focusX, 0.5, 0.5);
+    fx = resolved.x;
+    fy = resolved.y;
+  } else if (typeof focusX === "number") {
+    fx = focusX;
+    fy = focusY === undefined ? 0.5 : focusY;
+  } else if (focusX === undefined) {
+    fx = 0.5;
+    fy = focusY === undefined ? 0.5 : focusY;
+  } else {
+    fx = focusX;
+    fy = focusY === undefined ? 0.5 : focusY;
+  }
+
+  const clampFocus = (v: unknown): number => {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return 0.5;
+    return clamp(n, 0, 1);
+  };
+  const fxn = clampFocus(fx);
+  const fyn = clampFocus(fy);
+
   const srcRatio = srcW / srcH;
   if (srcRatio > ratio) {
     const h = srcH;
     const w = h * ratio;
-    return { x: (srcW - w) / 2, y: 0, w, h };
+    const slack = Math.max(0, srcW - w);
+    const x = clamp(slack * fxn, 0, slack);
+    return { x, y: 0, w, h };
   }
-  const w = srcW;
-  const h = w / ratio;
-  return { x: 0, y: (srcH - h) / 2, w, h };
+  if (srcRatio < ratio) {
+    const w = srcW;
+    const h = w / ratio;
+    const slack = Math.max(0, srcH - h);
+    const y = clamp(slack * fyn, 0, slack);
+    return { x: 0, y, w, h };
+  }
+  return { x: 0, y: 0, w: srcW, h: srcH };
 }
 
 export const IG_FORMATS: IgFormat[] = [

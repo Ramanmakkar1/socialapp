@@ -15,6 +15,8 @@ function drawPreview(
   canvas: HTMLCanvasElement,
   img: HTMLImageElement,
   format: IgFormat,
+  focusX = 0.5,
+  focusY = 0.5,
 ) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -26,7 +28,7 @@ function drawPreview(
   canvas.width = dispW;
   canvas.height = dispH;
 
-  const crop = cropRect(img.naturalWidth, img.naturalHeight, format.ratio);
+  const crop = cropRect(img.naturalWidth, img.naturalHeight, format.ratio, focusX, focusY);
   ctx.clearRect(0, 0, dispW, dispH);
   ctx.save();
   if (format.circlePreview) {
@@ -50,13 +52,13 @@ function drawPreview(
   }
 }
 
-function renderExportCanvas(img: HTMLImageElement, format: IgFormat): HTMLCanvasElement {
+function renderExportCanvas(img: HTMLImageElement, format: IgFormat, focusX = 0.5, focusY = 0.5): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = format.width;
   canvas.height = format.height;
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
-  const crop = cropRect(img.naturalWidth, img.naturalHeight, format.ratio);
+  const crop = cropRect(img.naturalWidth, img.naturalHeight, format.ratio, focusX, focusY);
   ctx.drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, format.width, format.height);
   return canvas;
 }
@@ -65,6 +67,8 @@ export default function CropPreview() {
   const [formatId, setFormatId] = useState(CROP_FORMATS[1]?.id ?? "feed-portrait");
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [focusX, setFocusX] = useState(0.5);
+  const [focusY, setFocusY] = useState(0.5);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileId = useId();
@@ -76,8 +80,8 @@ export default function CropPreview() {
     const canvas = canvasRef.current;
     const img = imgRef.current;
     if (!canvas || !img || !imgLoaded) return;
-    drawPreview(canvas, img, format);
-  }, [format, imgLoaded]);
+    drawPreview(canvas, img, format, focusX, focusY);
+  }, [format, imgLoaded, focusX, focusY]);
 
   useEffect(() => {
     redraw();
@@ -93,6 +97,8 @@ export default function CropPreview() {
     const file = e.target.files?.[0];
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     setImgLoaded(false);
+    setFocusX(0.5);
+    setFocusY(0.5);
     if (!file) {
       setObjectUrl(null);
       return;
@@ -102,13 +108,15 @@ export default function CropPreview() {
   }
 
   function onImageLoad() {
+    setFocusX(0.5);
+    setFocusY(0.5);
     setImgLoaded(true);
   }
 
   function downloadJpg() {
     const img = imgRef.current;
     if (!img || !imgLoaded) return;
-    const exportCanvas = renderExportCanvas(img, format);
+    const exportCanvas = renderExportCanvas(img, format, focusX, focusY);
     exportCanvas.toBlob(
       (blob) => {
         if (!blob) return;
@@ -121,6 +129,11 @@ export default function CropPreview() {
       "image/jpeg",
       0.92,
     );
+  }
+
+  function resetCenter() {
+    setFocusX(0.5);
+    setFocusY(0.5);
   }
 
   return (
@@ -168,6 +181,84 @@ export default function CropPreview() {
           ))}
         </div>
       </fieldset>
+
+      <div className="mt-6 rounded-2xl border border-line bg-bg p-4">
+        <div className="flex items-center gap-3">
+          <svg
+            viewBox="0 0 80 60"
+            className="h-12 w-16 shrink-0 text-brand"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <rect
+              x="22"
+              y="10"
+              width="36"
+              height="40"
+              rx="6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              opacity="0.45"
+            />
+            <circle cx="40" cy="30" r="7" fill="currentColor" className="crop-subject-dot" />
+            <style>{`
+              @media (prefers-reduced-motion: no-preference) {
+                .crop-subject-dot { animation: crop-subject-move 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+              }
+              @keyframes crop-subject-move {
+                0%, 100% { transform: translate(-10px, 0); }
+                50% { transform: translate(10px, 0); }
+              }
+            `}</style>
+          </svg>
+          <div className="min-w-0">
+            <p className="text-sm font-medium">Reposition the subject</p>
+            <p className="mt-1 text-xs text-muted">
+              Drag the sliders to move the crop; the preview and the downloaded JPG stay in sync.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <label className="text-xs font-medium text-ink-2">
+            Horizontal
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={Math.round(focusX * 100)}
+              onChange={(e) => setFocusX(Number(e.target.value) / 100)}
+              disabled={!imgLoaded}
+              className="mt-1 w-full accent-brand"
+              aria-label="Horizontal crop position"
+            />
+          </label>
+          <label className="text-xs font-medium text-ink-2">
+            Vertical
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={Math.round(focusY * 100)}
+              onChange={(e) => setFocusY(Number(e.target.value) / 100)}
+              disabled={!imgLoaded}
+              className="mt-1 w-full accent-brand"
+              aria-label="Vertical crop position"
+            />
+          </label>
+        </div>
+        <button
+          type="button"
+          onClick={resetCenter}
+          disabled={!imgLoaded}
+          className="mt-3 inline-flex items-center rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Center crop
+        </button>
+      </div>
 
       <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
         <div className="w-full max-w-[20rem] shrink-0">

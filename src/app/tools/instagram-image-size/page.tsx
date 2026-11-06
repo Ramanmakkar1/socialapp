@@ -87,8 +87,8 @@ export default function InstagramImageSizePage() {
                 Instagram Image Sizes (2026): Post, Story, Reel &amp; Carousel
               </h1>
               <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Pixel dimensions for every major Instagram format, plus a live crop preview for 1:1, 4:5, 3:4 and 9:16
-                before you schedule.
+                Pixel dimensions for every major Instagram format, plus a live crop preview you can reposition before
+                you download a JPG and schedule.
               </p>
             </div>
             <div className="mt-8">
@@ -108,6 +108,17 @@ export default function InstagramImageSizePage() {
               </Link>
             </p>
           </div>
+        </section>
+
+        <section className="mx-auto max-w-3xl px-4 py-16">
+          <h2 className="text-3xl font-semibold tracking-tight">How to crop and download</h2>
+          <ol className="mt-6 list-decimal space-y-3 pl-5 text-ink-2">
+            <li>Upload a photo from your device (processed locally, nothing is uploaded).</li>
+            <li>Choose an Instagram format: 1:1, 4:5, 3:4, 1.91:1, 9:16 or profile circle.</li>
+            <li>Reposition the subject with the horizontal and vertical sliders, then use Center crop to reset.</li>
+            <li>Download the exact-size JPG for that format.</li>
+            <li>Schedule it on your content calendar with {BRAND.name}.</li>
+          </ol>
         </section>
 
         <section className="border-y border-line bg-surface px-4 py-16">

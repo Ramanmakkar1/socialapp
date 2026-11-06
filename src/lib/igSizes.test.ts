@@ -37,6 +37,38 @@ test("cropRect handles zero dimensions", () => {
   assert.deepEqual(cropRect(0, 100, 1), { x: 0, y: 0, w: 0, h: 100 });
 });
 
+test("cropRect focal x moves crop horizontally", () => {
+  const left = cropRect(2000, 1000, 1, 0, 0.5);
+  assert.equal(left.x, 0);
+  assert.equal(left.w, 1000);
+  const right = cropRect(2000, 1000, 1, 1, 0.5);
+  assert.equal(right.x, 1000);
+  const centered = cropRect(2000, 1000, 1);
+  assert.equal(centered.x, 500);
+});
+
+test("cropRect focal y moves crop vertically", () => {
+  const top = cropRect(1000, 2000, 1, 0.5, 0);
+  assert.equal(top.y, 0);
+  const bottom = cropRect(1000, 2000, 1, 0.5, 1);
+  assert.equal(bottom.y, 1000);
+  const centered = cropRect(1000, 2000, 1);
+  assert.equal(centered.y, 500);
+});
+
+test("cropRect clamps focal positions and coordinates", () => {
+  const r = cropRect(2000, 1000, 1, -5, 10);
+  assert.equal(r.x, 0);
+  assert.ok(r.x >= 0 && r.x + r.w <= 2000);
+  const r2 = cropRect(2000, 1000, 1, 5, -10);
+  assert.equal(r2.x, 1000);
+});
+
+test("cropRect accepts object focal coordinates", () => {
+  const r = cropRect(2000, 1000, 1, { x: 1, y: 0 });
+  assert.equal(r.x, 1000);
+});
+
 test("IG_FORMATS includes expected ids and story safe zone constant", () => {
   const ids = IG_FORMATS.map((f) => f.id);
   assert.ok(ids.includes("feed-square"));
