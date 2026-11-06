@@ -1,40 +1,41 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Btn } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
 
 export default function DashboardError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  const router = useRouter();
   return (
     <main className="mx-auto flex min-h-[70vh] max-w-xl items-center px-4 py-10 sm:px-6">
-      <section className="w-full rounded-2xl border border-line bg-surface p-6 text-center shadow-sm sm:p-8" role="alert">
-        <svg aria-hidden="true" viewBox="0 0 180 120" className="mx-auto mb-5 h-28 w-44 max-w-full">
-          <defs>
-            <linearGradient id="recovery-gradient" x1="0" x2="1" y1="0" y2="1">
-              <stop stopColor="var(--brand)" />
-              <stop offset="1" stopColor="var(--brand-2)" />
-            </linearGradient>
-          </defs>
-          <path d="M18 94h144" stroke="var(--line)" strokeWidth="4" strokeLinecap="round" />
-          <rect x="27" y="23" width="80" height="60" rx="12" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="2" />
-          <path d="M43 42h37M43 53h48" stroke="var(--muted)" strokeWidth="4" strokeLinecap="round" />
-          <circle cx="124" cy="73" r="24" fill="url(#recovery-gradient)" />
-          <path d="M116 73h16m-8-8v16" stroke="white" strokeWidth="4" strokeLinecap="round" />
-          <path d="m132 24 3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="var(--brand-2)" />
-        </svg>
-        <p className="text-sm font-semibold text-brand">A quick pause</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">This dashboard didn’t load</h1>
-        <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-muted">
+      <section className={`${ui.card} w-full p-6 text-center sm:p-8`} role="alert">
+        <Image
+          src="/landing/problem.webp"
+          alt=""
+          width={900}
+          height={900}
+          sizes="200px"
+          className="mx-auto h-36 w-36 object-contain"
+        />
+        <p className={ui.eyebrow}>A quick pause</p>
+        <h1 className="mt-2 text-3xl font-semibold text-[var(--poskoo-ink)]" style={{ letterSpacing: "var(--poskoo-type-heading-ls)", lineHeight: "var(--poskoo-type-heading-lh)" }}>
+          This dashboard didn&apos;t load
+        </h1>
+        <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[var(--poskoo-muted)]">
           Something interrupted this page. Try loading it again, or head back to your dashboard for a fresh start.
         </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <button type="button" onClick={reset} className="btn-primary inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold">
+          <Btn type="button" onClick={reset}>
             Try again
-          </button>
-          <Link href="/app" className="inline-flex min-h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-semibold text-ink hover:bg-surface-2">
+          </Btn>
+          <Btn type="button" variant="line" onClick={() => router.push("/app")}>
             Back to dashboard
-          </Link>
+          </Btn>
         </div>
-        <p className="mt-5 text-sm text-muted">
-          Need a hand? <Link href="/help" className="min-h-11 font-medium text-brand underline-offset-4 hover:underline">Visit help</Link>
+        <p className="mt-5 text-sm text-[var(--poskoo-muted)]">
+          Need a hand? <Link href="/help" className={`min-h-11 inline-flex items-center ${ui.link}`}>Visit help</Link>
         </p>
       </section>
     </main>

@@ -117,8 +117,31 @@ body {
 }
 
 .app-theme .btn-primary {
-  background: var(--ink);
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  border: 1.5px solid transparent;
+  border-radius: var(--poskoo-radius-pill);
+  padding: 0.68rem 1.2rem;
+  background: var(--poskoo-ink);
+  color: #ffffff;
+  font: 600 0.95rem/1 var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.app-theme .btn-primary:hover:not(:disabled) {
+  background: var(--poskoo-violet);
+  transform: translateY(-1px);
+}
+
+.app-theme .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
 }
 
 .app-theme h1,
