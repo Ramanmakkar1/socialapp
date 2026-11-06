@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { instrumentSerif } from "@/lib/fonts";
+import styles from "./calendar.module.css";
 
 export const metadata = { title: "Calendar" };
 
@@ -185,7 +186,7 @@ export default async function CalendarPage({
   const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
 
   return (
-    <div className={instrumentSerif.variable}>
+    <div className={`${styles.calendarPage} ${instrumentSerif.variable}`}>
       <div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl">
           Your <em className="font-[family-name:var(--font-instrument-serif)] font-normal italic text-brand">calendar</em>

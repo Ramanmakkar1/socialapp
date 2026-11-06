@@ -1,0 +1,180 @@
+.calendarPage {
+  color: var(--poskoo-ink);
+  font-family: var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+}
+
+.calendarPage :global(h1),
+.calendarPage :global(h2),
+.calendarPage :global(h3) {
+  letter-spacing: var(--poskoo-type-heading-ls);
+  line-height: var(--poskoo-type-heading-lh);
+}
+
+.calendarPage :global(h1) {
+  font-size: clamp(2.7rem, 6vw, 4.6rem);
+}
+
+.calendarPage :global(h2) {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.calendarPage :global(em) {
+  color: var(--poskoo-violet);
+}
+
+.calendarPage :global(#new) {
+  position: relative;
+  margin-top: 2rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-band);
+  background: var(--poskoo-band);
+  box-shadow: var(--poskoo-shadow-card);
+  scroll-margin-top: 1rem;
+}
+
+.calendarPage :global(#new > div) {
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.calendarPage :global(#new input),
+.calendarPage :global(#new textarea),
+.calendarPage :global(#new select) {
+  border-radius: var(--poskoo-radius-sm);
+  border-color: var(--poskoo-line);
+  background: var(--poskoo-card);
+  color: var(--poskoo-ink);
+}
+
+.calendarPage :global(#new button:not(.btn-primary)),
+.calendarPage :global(#new a) {
+  transition: transform .2s, background .2s, border-color .2s;
+}
+
+.calendarPage :global(#new button:not(:disabled):hover),
+.calendarPage :global(#new a:hover) {
+  transform: translateY(-1px);
+}
+
+.calendarPage :global(#new > div > div:last-child) {
+  padding: 1.25rem;
+  border-radius: var(--poskoo-radius-panel);
+  background: var(--poskoo-card);
+  border: 1.5px solid var(--poskoo-line);
+}
+
+.calendarPage :global(#new article) {
+  border-radius: var(--poskoo-radius-md);
+  background: var(--poskoo-mint);
+  border-color: transparent;
+}
+
+.calendarPage :global(.btn-primary) {
+  background: var(--poskoo-ink);
+  color: #fff;
+  border-radius: var(--poskoo-radius-pill);
+  box-shadow: none;
+}
+
+.calendarPage :global(.btn-primary:hover) {
+  background: var(--poskoo-violet);
+}
+
+.calendarPage :global([aria-label="Calendar view"]) {
+  border-color: var(--poskoo-line);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+}
+
+.calendarPage :global([aria-label="Calendar view"] a) {
+  min-height: 2.75rem;
+  font-weight: 600;
+}
+
+.calendarPage :global([aria-label="Month view"] > div),
+.calendarPage :global([aria-label="Week view"] > div) {
+  background: var(--poskoo-paper);
+}
+
+.calendarPage :global([aria-label="Month view"] .grid > div),
+.calendarPage :global([aria-label="Week view"] .grid > div) {
+  border-color: var(--poskoo-line);
+  border-radius: var(--poskoo-radius-md);
+  background: var(--poskoo-card);
+  box-shadow: 0 1px 0 rgba(30, 22, 49, .04);
+}
+
+.calendarPage :global([aria-label="Month view"] .grid > div:nth-child(3n + 1)),
+.calendarPage :global([aria-label="Week view"] .grid > div:nth-child(3n + 1)) {
+  background: color-mix(in srgb, var(--poskoo-lilac) 28%, var(--poskoo-card));
+}
+
+.calendarPage :global([aria-label="Month view"] .grid > div:nth-child(3n + 2)),
+.calendarPage :global([aria-label="Week view"] .grid > div:nth-child(3n + 2)) {
+  background: color-mix(in srgb, var(--poskoo-peach) 28%, var(--poskoo-card));
+}
+
+.calendarPage :global([aria-label="Month view"] .grid > div:nth-child(3n)),
+.calendarPage :global([aria-label="Week view"] .grid > div:nth-child(3n)) {
+  background: color-mix(in srgb, var(--poskoo-mint) 28%, var(--poskoo-card));
+}
+
+.calendarPage :global([aria-label="Month view"] .grid > div[class*="border-brand"]),
+.calendarPage :global([aria-label="Week view"] .grid > div[class*="border-brand"]) {
+  border-color: var(--poskoo-coral);
+  box-shadow: 0 0 0 2px var(--poskoo-lime);
+}
+
+.calendarPage :global([aria-label="Month view"] span[class*="bg-surface-2"]),
+.calendarPage :global([aria-label="Week view"] span[class*="bg-surface-2"]) {
+  border: 1px solid rgba(30, 22, 49, .08);
+  border-radius: 12px;
+  background: var(--poskoo-card);
+  color: var(--poskoo-ink);
+  padding-block: .45rem;
+}
+
+.calendarPage :global(section[aria-labelledby="upcoming-posts-heading"]) {
+  margin-top: 3.5rem;
+}
+
+.calendarPage :global(section[aria-labelledby="upcoming-posts-heading"] article) {
+  border-color: var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+}
+
+.calendarPage :global(section[aria-labelledby="upcoming-posts-heading"] article:nth-child(3n + 1)) {
+  border-left: 5px solid var(--poskoo-lilac);
+}
+
+.calendarPage :global(section[aria-labelledby="upcoming-posts-heading"] article:nth-child(3n + 2)) {
+  border-left: 5px solid var(--poskoo-peach);
+}
+
+.calendarPage :global(section[aria-labelledby="upcoming-posts-heading"] article:nth-child(3n)) {
+  border-left: 5px solid var(--poskoo-pink);
+}
+
+.calendarPage :global(section[aria-labelledby="recently-published-heading"] ul) {
+  border-color: var(--poskoo-line);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+}
+
+@media (max-width: 640px) {
+  .calendarPage :global(#new) {
+    border-radius: var(--poskoo-radius-card);
+    margin-inline: -0.25rem;
+  }
+
+  .calendarPage :global([aria-label="Month view"] .overflow-x-auto) {
+    overflow-x: visible;
+  }
+
+  .calendarPage :global([aria-label="Month view"] .grid),
+  .calendarPage :global([aria-label="Week view"] .grid) {
+    gap: .7rem;
+  }
+}
