@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { replyInThreadAction } from "./actions";
 import ReplySubmitButton from "./ReplySubmitButton";
+import ui from "@/components/ui/ui.module.css";
 
 const EMPTY = { message: "", available: true };
 
@@ -56,7 +57,7 @@ function ReplyFields({ draft, store }: {
   const { pending } = useFormStatus();
   return (
     <>
-      <label htmlFor={id} className="block text-sm font-medium">Reply</label>
+      <label htmlFor={id} className="block text-sm font-semibold text-[var(--poskoo-ink)]">Reply</label>
       <textarea
         id={id}
         name="message"
@@ -68,15 +69,15 @@ function ReplyFields({ draft, store }: {
         readOnly={pending}
         aria-describedby={`${id}-draft ${id}-count`}
         placeholder="Write a reply…"
-        className="mt-2 block w-full min-w-0 resize-y rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+        className={`${ui.input} mt-2 block resize-y`}
       />
-      <p id={`${id}-draft`} role="status" className={`mt-2 text-xs ${draft.available ? "text-muted" : "text-warn"}`}>
+      <p id={`${id}-draft`} role="status" className={`mt-2 text-xs ${draft.available ? "text-[var(--poskoo-muted)]" : "text-[var(--poskoo-red)]"}`}>
         {draft.available
           ? "Your draft stays in this browser tab until the message is sent."
           : "Draft storage is unavailable. Copy your reply before sending; it may be lost after a redirect."}
       </p>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-        <span id={`${id}-count`} className="text-xs text-muted">{draft.message.length}/1000 characters</span>
+        <span id={`${id}-count`} className="text-xs text-[var(--poskoo-muted)]">{draft.message.length}/1000 characters</span>
         <ReplySubmitButton label="Send" />
       </div>
     </>

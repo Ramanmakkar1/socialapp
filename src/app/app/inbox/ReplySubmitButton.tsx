@@ -1,13 +1,14 @@
-﻿"use client";
+"use client";
 
 import { useFormStatus } from "react-dom";
+import { Btn } from "@/components/ui/kit";
 
 export default function ReplySubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <button type="submit" className="btn-primary" disabled={pending} aria-busy={pending}>
+    <Btn type="submit" variant="dark" size="sm" disabled={pending} aria-busy={pending}>
       {pending ? "Sending…" : label}
-    </button>
+    </Btn>
   );
 }

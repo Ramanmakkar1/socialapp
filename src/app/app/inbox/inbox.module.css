@@ -1,0 +1,109 @@
+/* Inbox — tabs, comment cards, chat bubbles, thread list. */
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 44px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-card);
+  padding: .5rem 1rem;
+  color: var(--poskoo-muted);
+  font-size: .92rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.tabActive { background: var(--poskoo-ink); border-color: var(--poskoo-ink); color: #fff; }
+
+.commentCard {
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  padding: 18px 20px;
+}
+.commentCard:nth-child(3n + 1) { border-left: 5px solid var(--poskoo-lilac); }
+.commentCard:nth-child(3n + 2) { border-left: 5px solid var(--poskoo-peach); }
+.commentCard:nth-child(3n) { border-left: 5px solid var(--poskoo-mint); }
+
+.meta { color: var(--poskoo-muted); font-size: .85rem; }
+.commentText { overflow-wrap: anywhere; color: var(--poskoo-ink); margin-top: 8px; }
+
+.replyToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--poskoo-violet);
+  font: 600 .92rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  cursor: pointer;
+  list-style: none;
+}
+.replyToggle::-webkit-details-marker { display: none; }
+.replyToggle::after { content: "+"; font-size: 1.1rem; line-height: 1; }
+details[open] .replyToggle::after { content: "–"; }
+
+/* Conversation bubbles — outgoing violet like the landing's DM card. */
+.bubbleOut {
+  background: var(--poskoo-violet);
+  color: #fff;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 14px;
+}
+.bubbleOutTime { color: rgba(255, 255, 255, .75); }
+.bubbleIn {
+  background: var(--poskoo-band);
+  color: var(--poskoo-ink);
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 18px 18px 18px 4px;
+  padding: 10px 14px;
+}
+
+.threadList {
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  overflow: hidden;
+}
+.threadRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--poskoo-line);
+  padding: 16px 18px;
+  text-decoration: none;
+}
+.threadRow:last-child { border-bottom: 0; }
+.threadRow:hover { background: var(--poskoo-band); }
+.threadName { color: var(--poskoo-ink); font-weight: 600; margin: 0; }
+.threadPreview {
+  overflow: hidden;
+  color: var(--poskoo-muted);
+  font-size: .9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 2px 0 0;
+}
+.canReply { color: var(--poskoo-green); font-weight: 600; }
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-pill);
+  padding: 2px 9px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--poskoo-muted);
+  background: var(--poskoo-card);
+}
+.statusSent { border-color: var(--poskoo-green); color: var(--poskoo-green); }
+.statusQueued { border-color: var(--poskoo-violet); color: var(--poskoo-violet); }
+.statusFailed { border-color: var(--poskoo-coral); color: var(--poskoo-coral); }
