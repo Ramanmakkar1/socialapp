@@ -1,6 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
+import styles from "../app-page.module.css";
 
 export const metadata = { title: "App review guide", robots: { index: false, follow: false } };
 
@@ -68,33 +70,30 @@ const STEPS: { title: string; permission: string; href: string; cta: string; bod
 export default async function ReviewGuidePage() {
   await requireUser();
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-semibold">App review guide</h1>
-        <p className="text-sm text-muted">
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <div className={styles.heroCopy}><p className={styles.eyebrow}>A clear path through the product</p><h1 className={styles.title}>App review guide</h1><p className={styles.subtitle}>
           A 5-minute walkthrough of every Instagram permission {BRAND.name} uses. See the{" "}
           <Link href="/privacy#instagram" className="text-brand hover:underline">privacy policy</Link> for how this data is stored.
-        </p>
-      </div>
-      <ol className="mt-6 space-y-4">
-        {STEPS.map((s, i) => (
-          <li key={s.title} className="rounded-2xl border border-line bg-surface p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-semibold">
-                <span className="mr-2 inline-grid h-6 w-6 place-items-center rounded-full bg-brand text-xs text-white">{i + 1}</span>
-                {s.title}
-              </h2>
-              <code className="rounded-full border border-line px-2 py-0.5 text-xs text-muted">{s.permission}</code>
+        </p></div>
+        <div className={styles.heroArt}><Image src="/landing/card-dm.webp" width={900} height={900} alt="A creator sending automatic direct messages" /></div>
+      </header>
+      <ol className={styles.steps}>
+        {STEPS.map((s) => (
+          <li key={s.title} className={styles.step}>
+            <div className={styles.stepTop}>
+              <h2 className={styles.stepTitle}>{s.title}</h2>
+              <code className={styles.permission}>{s.permission}</code>
             </div>
-            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-ink-2">
+            <ul className={styles.body}>
               {s.body.map((b) => (
                 <li key={b}>{b}</li>
               ))}
             </ul>
-            <Link href={s.href} className="btn-primary mt-4 inline-block">{s.cta}</Link>
+            <Link href={s.href} className={`btn-primary ${styles.stepAction}`}>{s.cta}</Link>
           </li>
         ))}
       </ol>
-    </>
+    </div>
   );
 }

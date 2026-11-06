@@ -1,10 +1,12 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import { Settings } from "lucide-react";
 import EmptyState from "../EmptyState";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { disconnectAccountAction, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
+import styles from "../app-page.module.css";
 
 export const metadata = { title: "Settings" };
 
@@ -61,29 +63,33 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     : [];
   const voice = voiceRows[0]?.brand_voice ?? null;
   return (
-    <>
-      <div><h1 className="text-2xl font-semibold">Settings</h1><p className="text-sm text-muted">Manage your connected accounts and brand voice.</p></div>
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <div className={styles.heroCopy}><p className={styles.eyebrow}>Your workspace</p><h1 className={styles.title}>Settings</h1><p className={styles.subtitle}>Manage your connected accounts and brand voice.</p></div>
+        <div className={styles.heroArt}><Image src="/landing/card-schedule.webp" width={900} height={900} alt="A creator planning posts on a calendar" /></div>
+      </header>
       {banner && (
-        <p className={`mt-4 rounded-xl border px-4 py-2 text-sm ${banner.tone === "ok" ? "border-ok text-ok" : "border-warn text-warn"}`}>{banner.text}</p>
+        <p className={`${styles.notice} ${banner.tone === "warn" ? styles.noticeWarn : ""}`}>{banner.text}</p>
       )}
-      <div className="mt-6 flex items-center justify-between gap-3">
-        <h2 className="text-sm font-medium text-ink-2">Connected accounts</h2>
+      <section className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Connected accounts</h2>
         <a href="/api/instagram/connect" className="btn-primary">Connect Instagram</a>
       </div>
-      <p className="mt-2 text-xs text-muted">
+      <p className={styles.hint}>
         Instagram professional account linked to a Facebook Page required.{" "}
         <a href="/help/getting-started" className="underline hover:text-ink-2">See the setup steps</a>
       </p>
       {accounts.length === 0 ? (
         <EmptyState icon={Settings} title="No connected accounts" text="Connect your Instagram professional account to schedule posts and auto-DM commenters." />
       ) : (
-        <ul className="mt-4 space-y-3">
+        <ul className={styles.accountList}>
           {accounts.map((a, i) => {
             const state = tokenState(a);
             const pill = TOKEN_PILL[state];
             return (
-              <li key={`${a.platform}-${a.username ?? i}`} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4">
-                <div className="flex min-w-0 items-center gap-2">
+            <li key={`${a.platform}-${a.username ?? i}`} className={styles.accountCard}>
+                <div className={styles.accountIdentity}>
                   {a.platform === "instagram" && a.status === "active" && a.access_token_enc ? (
                     <Suspense fallback={<span className="font-medium">@{a.username ?? "unknown"}</span>}>
                       <AccountProfile account={a} fallbackUsername={a.username} />
@@ -93,8 +99,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   )}
                   <span className="rounded-full border border-line px-2 text-xs capitalize text-muted">{a.platform}</span>
                 </div>
-                <div className="flex flex-col items-end gap-2 text-sm">
-                  <span className={pill.className}>{pill.label}</span>
+                <div className={styles.accountActions}>
+                  <span className={`${styles.status} ${pill.className}`}>{pill.label}</span>
                   {state === "ok" && a.token_expires_at && (
                     <span className="text-muted">Token valid until {new Date(a.token_expires_at).toLocaleDateString()}</span>
                   )}
@@ -122,30 +128,31 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </li>
             );
           })}
-        </ul>
+      </ul>
       )}
-      <section className="mt-10">
-        <h2 className="text-sm font-medium text-ink-2">Brand voice</h2>
-        <p className="mt-1 text-sm text-muted">
+      </section>
+      <section className={`${styles.section} ${styles.voice}`}>
+        <h2 className={styles.sectionTitle}>Brand voice</h2>
+        <p className={styles.hint}>
           Tell the AI how your posts should sound, e.g. &apos;Friendly and short, a bit funny, no slang, we are a yoga studio in Toronto&apos;. Used by Write with AI.
         </p>
         {isDbConfigured() ? (
-          <form action={saveBrandVoice} className="mt-3 space-y-3">
+          <form action={saveBrandVoice} className={styles.voiceForm}>
             <textarea
               name="brand_voice"
               maxLength={500}
               rows={4}
               defaultValue={voice ?? ""}
-              className="w-full resize-y rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+              className={styles.textarea}
               placeholder="Friendly, short sentences, 1-2 emojis…"
             />
             <button type="submit" className="btn-primary">Save brand voice</button>
           </form>
         ) : (
-          <p className="mt-3 text-sm text-muted">Brand voice can be saved once the database is set up on this server.</p>
+          <p className={styles.hint}>Brand voice can be saved once the database is set up on this server.</p>
         )}
         {voiceSaved && <p className="mt-2 text-sm text-ok">Brand voice saved.</p>}
       </section>
-    </>
+    </div>
   );
 }
