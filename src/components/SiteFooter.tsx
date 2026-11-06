@@ -44,6 +44,7 @@ export function SiteFooter() {
               { href: "/tools/instagram-post-preview", label: "Post preview" },
               { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
               { href: "/tools/instagram-utm-builder", label: "UTM link builder" },
+              { href: "/tools/instagram-comment-picker", label: "Comment picker" },
               { href: "/tools", label: "All free tools" },
             ]}
           />

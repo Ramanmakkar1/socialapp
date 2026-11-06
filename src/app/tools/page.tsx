@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowRight, Hash, Image as ImageIcon, Link as LinkIcon, MessageCircle, Percent, ShieldCheck, TextQuote, UserRound,
+  ArrowRight, Gift, Hash, Image as ImageIcon, Link as LinkIcon, MessageCircle, Percent, ShieldCheck, TextQuote, UserRound,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -83,6 +83,12 @@ const tools = [
     title: "Instagram engagement rate calculator",
     description: "Calculate engagement rate by followers or reach from likes, comments, saves and shares.",
     icon: Percent,
+  },
+  {
+    href: "/tools/instagram-comment-picker",
+    title: "Instagram comment picker",
+    description: "Paste giveaway comments, filter by keyword and tagged friends, and pick a random winner. Nothing leaves your browser.",
+    icon: Gift,
   },
 ];
 
