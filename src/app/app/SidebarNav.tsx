@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CalendarDays, MessageCircleHeart, Inbox, Users, BarChart3, Settings, BookOpenCheck } from "lucide-react";
+import styles from "./shell.module.css";
 
 const nav = [
   { href: "/app", icon: LayoutDashboard, label: "Overview" },
@@ -20,12 +21,12 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-// variant "sidebar" = vertical list in the aside; "tabs" = horizontal scrollable bar for mobile.
+// variant "sidebar" = vertical list in the aside; "tabs" = horizontal scrollable pill bar for mobile.
 export default function SidebarNav({ variant = "sidebar" }: { variant?: "sidebar" | "tabs" }) {
   const pathname = usePathname() ?? "";
   const tabs = variant === "tabs";
   return (
-    <nav aria-label="Dashboard" className={tabs ? "flex gap-1 overflow-x-auto px-4 py-2 text-sm" : "space-y-1 text-sm"}>
+    <nav aria-label="Dashboard" className={tabs ? styles.tabs : styles.nav}>
       {nav.map(({ href, icon: Icon, label }) => {
         const active = isActive(pathname, href);
         return (
@@ -33,9 +34,9 @@ export default function SidebarNav({ variant = "sidebar" }: { variant?: "sidebar
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 ${tabs ? "shrink-0 whitespace-nowrap" : ""} ${active ? "bg-surface-2 font-medium" : "text-ink-2 hover:bg-surface-2"}`}
+            className={`${tabs ? styles.tab : styles.navItem} ${active ? (tabs ? styles.tabActive : styles.navItemActive) : ""}`}
           >
-            <Icon className="h-4 w-4" />
+            <Icon width={17} height={17} aria-hidden="true" />
             {label}
           </Link>
         );
