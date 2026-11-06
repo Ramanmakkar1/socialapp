@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { validateRule, type DmRule } from "@/lib/rules";
-import { rewindRule } from "@/lib/rewind";
+import { RewindError, rewindRule } from "@/lib/rewind";
 
 export type RuleTrigger = "comment" | "story_reply";
 
@@ -107,7 +107,12 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
   if (errors.length > 0) {
     return { ok: false, errors };
   }
-  const account = await resolveSocialAccountId(user.id, input.socialAccountId);
+  let account: Awaited<ReturnType<typeof resolveSocialAccountId>>;
+  try {
+    account = await resolveSocialAccountId(user.id, input.socialAccountId);
+  } catch {
+    return { ok: false, errors: ["Could not save automation. Please try again."] };
+  }
   if ("error" in account) {
     return { ok: false, errors: [account.error] };
   }
@@ -148,7 +153,12 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
   if (errors.length > 0) {
     return { ok: false, errors };
   }
-  const account = await resolveSocialAccountId(user.id, input.socialAccountId);
+  let account: Awaited<ReturnType<typeof resolveSocialAccountId>>;
+  try {
+    account = await resolveSocialAccountId(user.id, input.socialAccountId);
+  } catch {
+    return { ok: false, errors: ["Could not save automation. Please try again."] };
+  }
   if ("error" in account) {
     return { ok: false, errors: [account.error] };
   }
@@ -220,8 +230,9 @@ export async function rewindRuleAction(
     revalidatePath("/app/auto-dm");
     return { ok: true, queued: result.queued, scanned: result.scanned, failures: result.failures };
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Could not scan past comments.";
-    return { ok: false, error: message };
+    if (err instanceof RewindError) return { ok: false, error: err.message };
+    console.error("rewindRuleAction failed for rule", id, err instanceof Error ? err.message : err);
+    return { ok: false, error: "Could not scan past comments. Please try again." };
   }
 }
 

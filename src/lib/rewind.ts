@@ -2,6 +2,9 @@ import { decryptToken } from "@/lib/crypto";
 import { commentTime, processCommentEvents, type CommentEvent } from "@/lib/comments";
 import { query } from "@/lib/db";
 
+/** Errors whose message is safe and meant for the user. */
+export class RewindError extends Error {}
+
 const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const FETCH_TIMEOUT_MS = 15_000;
 const MEDIA_LIMIT = 25;
@@ -157,11 +160,11 @@ export async function rewindRule(
     [ruleId, userId],
   );
   if (!rules[0]) {
-    throw new Error("Rule not found or paused");
+    throw new RewindError("Rule not found or paused");
   }
   const rule = rules[0];
   if (!rule.triggers?.includes("comment")) {
-    throw new Error(
+    throw new RewindError(
       "Past comment replay only works when the automation includes a comment trigger. Turn on comments on your posts in this rule, or use a comment-only automation.",
     );
   }
@@ -175,7 +178,7 @@ export async function rewindRule(
   }
   const accounts = await query<AccountRow>(accountSql, accountParams);
   if (accounts.length === 0) {
-    throw new Error("No active Instagram accounts are available for this rule. Connect an account and try again.");
+    throw new RewindError("No active Instagram accounts are available for this rule. Connect an account and try again.");
   }
 
   const sinceMs = Date.now() - WINDOW_MS;
@@ -203,7 +206,7 @@ export async function rewindRule(
   }
 
   if (failures > 0 && completed === 0 && allEvents.length === 0) {
-    throw new Error("Could not scan past comments. Please try again. If this continues, reconnect your Instagram account.");
+    throw new RewindError("Could not scan past comments. Please try again. If this continues, reconnect your Instagram account.");
   }
 
   const queued = await processCommentEvents(allEvents, { userId, ruleId });

@@ -47,6 +47,7 @@ const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   error: { tone: "warn", text: "We couldn't connect your Instagram account. Please try again." },
   not_configured: { tone: "warn", text: "Instagram connection isn't set up on this server yet." },
   disconnected: { tone: "ok", text: "Instagram account disconnected. Its access token was deleted." },
+  disconnect_error: { tone: "warn", text: "We couldn't disconnect that account. Please try again." },
   declined: { tone: "warn", text: "You declined the permissions Poskoo needs. Try again and keep all boxes ticked." },
   no_ig_business: { tone: "warn", text: "We couldn't find an Instagram professional account linked to your Facebook Page. Link one in Instagram settings, then reconnect." },
 };
@@ -55,6 +56,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const user = await requireUser();
   const { ig, voice: voiceParam } = await searchParams;
   const voiceSaved = voiceParam === "saved";
+  const voiceFailed = voiceParam === "error";
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
   const accounts = isDbConfigured()
     ? await query<Account>(
@@ -177,6 +179,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <p className={ui.hint}>Brand voice can be saved once the database is set up on this server.</p>
         )}
         {voiceSaved && <p role="status" className={ui.notice}>Brand voice saved.</p>}
+        {voiceFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your brand voice. Please try again.</p>}
       </section>
     </div>
   );
