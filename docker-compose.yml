@@ -11,3 +11,9 @@ services:
       NEXT_PUBLIC_SITE_URL: https://poskoo.com
       META_APP_ID: "2785977518463252"
       META_LOGIN_CONFIG_ID: "966709382780716"
+    # 2026-11-06: reach the home Supabase database (DATABASE_URL host supabase-db) on its private Docker network
+    networks: [default, supabase]
+networks:
+  supabase:
+    external: true
+    name: supabase-private
