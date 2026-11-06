@@ -5,6 +5,8 @@ import { requireUser } from "@/lib/auth";
 import { hourBars, topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { getCommentActivity, getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
+import { BtnLink, PageHero } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
 import EmptyState from "../EmptyState";
 import AccountInsightsPanel from "../AccountInsights";
 import styles from "./analytics.module.css";
@@ -126,12 +128,15 @@ export default async function AnalyticsPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div>
-          <h1>Analytics</h1>
-          <p className={styles.lede}>See how your posts and DMs perform.</p>
-        </div>
-      </div>
+      <PageHero
+        eyebrow="Your results"
+        title="Analytics"
+        lede="See how your posts and DMs perform."
+        art="/illustrations/analytics.webp"
+        artAlt=""
+        artWidth={1536}
+        artHeight={1024}
+      />
       <div className={styles.statGrid}>
         {tiles.map(([l, v], index) => (
           <div key={l} className={`${styles.statCard} ${statColors[index]}`}>
@@ -140,7 +145,7 @@ export default async function AnalyticsPage() {
           </div>
         ))}
       </div>
-      <Suspense fallback={<div className="mt-6 h-32 animate-pulse rounded-2xl border border-line bg-surface" aria-label="Loading Instagram insights" />}>
+      <Suspense fallback={<div role="status" className={styles.insightsLoading} aria-label="Loading Instagram insights" />}>
         <AccountInsightsPanel userId={user.id} />
       </Suspense>
       <div className={`${styles.panel} ${styles.lilacPanel}`}>
@@ -188,7 +193,7 @@ export default async function AnalyticsPage() {
               </table>
             </div>
             <p className={styles.note}>
-              <span className="font-medium">Best time to post:</span> {DAY_LABELS[activityBest.day]}{" "}
+              <strong>Best time to post:</strong> {DAY_LABELS[activityBest.day]}{" "}
               {blockRange(activityBest.block)} UTC
             </p>
           </>
@@ -259,7 +264,7 @@ export default async function AnalyticsPage() {
                   className={styles.pill}
                 >
                   {slot.label}
-                  <span className="ml-1.5 text-muted tabular-nums">({slot.count.toLocaleString("en-US")})</span>
+                  <span>({slot.count.toLocaleString("en-US")})</span>
                 </span>
               ))}
             </div>
@@ -317,7 +322,7 @@ export default async function AnalyticsPage() {
                 {rules.map((rule) => (
                   <tr key={rule.id} className={styles.tableRow}>
                     <td className="px-4 py-3">
-                      <Link href="/app/auto-dm" className="font-medium text-brand hover:underline">
+                      <Link href="/app/auto-dm" className={ui.link}>
                         {rule.name}
                       </Link>
                     </td>
@@ -340,18 +345,14 @@ export default async function AnalyticsPage() {
           </div>
         </div>
       ) : (
-        <>
-          <EmptyState
-            icon={BarChart3}
-            title="No analytics yet"
-            text="Create your first auto-DM rule to see results here."
-          />
-          <div className={styles.actionRow}>
-            <Link href="/app/auto-dm" className="btn-primary inline-block rounded-full px-5 py-2 text-sm font-medium">
-              Create auto-DM rule
-            </Link>
-          </div>
-        </>
+        <EmptyState
+          icon={BarChart3}
+          title="No analytics yet"
+          text="Create your first auto-DM rule to see results here."
+          art="/landing/card-dm.webp"
+        >
+          <BtnLink href="/app/auto-dm" size="sm">Create auto-DM rule</BtnLink>
+        </EmptyState>
       )}
       {recentPosts.length > 0 ? (
         <div className={styles.section}>
@@ -359,7 +360,7 @@ export default async function AnalyticsPage() {
           {missingInsightsScope ? (
             <p className={styles.subtle}>
               Reconnect Instagram in{" "}
-              <Link href="/app/settings" className="text-brand hover:underline">
+              <Link href="/app/settings" className={ui.link}>
                 Settings
               </Link>{" "}
               to see reach and likes.

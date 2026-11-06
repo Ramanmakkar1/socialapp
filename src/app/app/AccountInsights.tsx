@@ -43,9 +43,9 @@ export default async function AccountInsightsPanel({ userId }: { userId: string 
           <li key={row.id}>
             <p className="font-medium">@{profile?.username || row.username || "instagram"}</p>
             {error ? (
-              <p className="mt-1 text-sm text-warn">
+              <p className="mt-1 text-sm text-[var(--poskoo-coral)]">
                 {error}{" "}
-                <Link href="/app/settings" className="text-brand hover:underline">Settings</Link>
+                <Link href="/app/settings" className="font-semibold text-[var(--poskoo-violet)] hover:underline">Settings</Link>
               </p>
             ) : (
               <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -59,7 +59,7 @@ export default async function AccountInsightsPanel({ userId }: { userId: string 
                   ] as [string, number | null | undefined][]
                 ).map(([label, value]) => (
                   <div key={label} className={`${styles.statCard} ${styles.lilac}`}>
-                    <div className="text-xs text-muted">{label}</div>
+                    <div className="text-xs text-[var(--poskoo-muted)]">{label}</div>
                     <div className="mt-1 text-xl font-semibold tabular-nums">{num(value)}</div>
                   </div>
                 ))}
