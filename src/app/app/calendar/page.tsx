@@ -7,6 +7,7 @@ import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
+import { instrumentSerif } from "@/lib/fonts";
 
 export const metadata = { title: "Calendar" };
 
@@ -184,10 +185,12 @@ export default async function CalendarPage({
   const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
 
   return (
-    <>
+    <div className={instrumentSerif.variable}>
       <div>
-        <h1 className="text-2xl font-semibold">Calendar</h1>
-        <p className="text-sm text-muted">Plan and schedule Instagram posts. Facebook and Threads are coming soon.</p>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl">
+          Your <em className="font-[family-name:var(--font-instrument-serif)] font-normal italic text-brand">calendar</em>
+        </h1>
+        <p className="mt-2 text-sm text-muted sm:text-base">Plan and schedule Instagram posts. Facebook and Threads are coming soon.</p>
       </div>
       {draftFailed ? (
         <LoadFailed message="We couldn’t load this draft. Your saved post is unchanged." reloadHref={`/app/calendar?draft=${encodeURIComponent(draft ?? "")}#new`} />
@@ -202,18 +205,18 @@ export default async function CalendarPage({
       ) : (
         <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} />
       )}
-      <div className="mt-8 flex gap-2" role="group" aria-label="Calendar view">
+      <div className="mt-8 inline-flex rounded-[var(--poskoo-radius-pill)] border border-line bg-surface p-1" role="group" aria-label="Calendar view">
         <Link
           href="/app/calendar?view=week"
           aria-current={view === "week" ? "page" : undefined}
-          className={`rounded-full px-4 py-1.5 text-sm ${view === "week" ? "btn-primary font-medium" : "border border-line hover:bg-surface-2"}`}
+          className={`inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm ${view === "week" ? "btn-primary font-medium" : "hover:bg-surface-2"}`}
         >
           Week
         </Link>
         <Link
           href="/app/calendar?view=month"
           aria-current={view === "month" ? "page" : undefined}
-          className={`rounded-full px-4 py-1.5 text-sm ${view === "month" ? "btn-primary font-medium" : "border border-line hover:bg-surface-2"}`}
+          className={`inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm ${view === "month" ? "btn-primary font-medium" : "hover:bg-surface-2"}`}
         >
           Month
         </Link>
@@ -258,7 +261,7 @@ export default async function CalendarPage({
       />
       {publishedFailed && (
         <section className="mt-8" aria-label="Recently published">
-          <h2 className="text-lg font-semibold">Recently published</h2>
+          <h2 className="text-xl font-semibold sm:text-2xl">Recently published</h2>
           <LoadFailed
             message="We couldn’t load your publishing history. Your published posts are still there."
             reloadHref={reloadHref}
@@ -268,15 +271,15 @@ export default async function CalendarPage({
       )}
       {publishedRows.length > 0 && (
         <section className="mt-8" aria-labelledby="recently-published-heading">
-          <h2 id="recently-published-heading" className="text-lg font-semibold">Recently published</h2>
-          <ul className="mt-4 divide-y divide-line rounded-2xl border border-line bg-surface">
+          <h2 id="recently-published-heading" className="text-xl font-semibold sm:text-2xl">Recently published</h2>
+          <ul className="mt-4 divide-y divide-line rounded-[var(--poskoo-radius-card)] border border-line bg-surface shadow-[var(--poskoo-shadow-card)]">
             {publishedRows.map((post) => (
               <li key={post.id} className="flex min-w-0 flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="min-w-0 break-words text-sm text-ink-2">
                   {post.caption.length > 80 ? `${post.caption.slice(0, 80)}…` : post.caption}
                 </p>
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-ok bg-surface-2 px-3 py-1 text-xs font-medium text-ok">Published</span>
+                  <span className="rounded-full border border-transparent px-3 py-1 text-xs font-medium text-ink" style={{ background: 'var(--poskoo-mint)' }}>Published</span>
                   {post.platforms.map((platform) => (
                     <span key={platform} className="rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium capitalize text-ink-2">
                       {platform}
@@ -291,6 +294,6 @@ export default async function CalendarPage({
           </ul>
         </section>
       )}
-    </>
+    </div>
   );
 }
