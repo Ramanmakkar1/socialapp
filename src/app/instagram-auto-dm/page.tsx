@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight, Check, Minus, MessageCircleHeart, Mail, UserPlus, Film, Sparkles, BarChart3, ShieldCheck,
-} from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import AutoDmDemo from "@/components/AutoDmDemo";
 
 export const metadata: Metadata = {
@@ -22,12 +20,12 @@ const steps = [
 ];
 
 const automations = [
-  { icon: MessageCircleHeart, title: "Keyword replies", text: "Send a different DM for each keyword, on one post or across all of them." },
-  { icon: Mail, title: "Email + phone capture", text: "Ask for an email or phone number before the link is sent, so every comment becomes a lead." },
-  { icon: UserPlus, title: "Follow gate", text: "Only send the freebie once the person follows you, to grow your audience with every post." },
-  { icon: Film, title: "Story replies", text: "Reply automatically when someone answers your story with a keyword." },
-  { icon: Sparkles, title: "AI follow-up replies", text: "When people reply with a question, AI answers in your voice and keeps the chat going." },
-  { icon: BarChart3, title: "Click + lead tracking", text: "See DMs sent, link clicks and leads collected for every post." },
+  { no: "01 / Keywords", title: "Keyword replies", text: "Send a different DM for each keyword, on one post or across all of them." },
+  { no: "02 / Leads", title: "Email + phone capture", text: "Ask for an email or phone number before the link is sent, so every comment becomes a lead." },
+  { no: "03 / Growth", title: "Follow gate", text: "Only send the freebie once the person follows you, to grow your audience with every post." },
+  { no: "04 / Stories", title: "Story replies", text: "Reply automatically when someone answers your story with a keyword." },
+  { no: "05 / AI", title: "AI follow-up replies", text: "When people reply with a question, AI answers in your voice and keeps the chat going." },
+  { no: "06 / Insights", title: "Click + lead tracking", text: "See DMs sent, link clicks and leads collected for every post." },
 ];
 
 const compare: [string, string, string][] = [
@@ -52,139 +50,174 @@ const faqJsonLd = {
 };
 
 function Cell({ v }: { v: string }) {
-  if (v === "Yes") return <Check className="mx-auto h-4 w-4 text-ok" aria-label="Yes" />;
-  if (v === "No") return <Minus className="mx-auto h-4 w-4 text-muted" aria-label="No" />;
+  if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
+  if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
   return <>{v}</>;
 }
 
 export default function InstagramAutoDm() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
-      <SiteHeader />
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden px-4 pt-16 pb-16 sm:pt-24">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-              <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Official Meta API · no password needed
-            </span>
-            <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-6xl">
-              Instagram auto DM <span className="gradient-text">for every comment</span>
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">
-              Someone comments a keyword on your post or reel, and {BRAND.name} sends them your link in a DM within seconds. Capture their email, answer with AI and track every lead.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
-              <a href="#how" className="rounded-full border border-line bg-surface px-6 py-3 font-medium">How it works</a>
-            </div>
-            <p className="mt-4 text-sm text-ink-2">
-              <Link href="/tools/instagram-comment-keyword-tester" className="font-medium text-brand underline underline-offset-2">
-                Test your keywords free
-              </Link>
-            </p>
+      <header className="hero">
+        <span className="pill">Official Meta API · no password needed</span>
+        <p className="eyebrow">Instagram auto DM</p>
+        <h1>
+          They comment. <em className="s mark">You get the lead.</em>
+        </h1>
+        <p className="lede">
+          Someone comments a keyword on your post or reel, and {BRAND.name} sends them your link in a DM within seconds. Capture their email, answer with AI and track every lead.
+        </p>
+        <div className="ctas">
+          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+          <Link className="btn btn-line" href="#how">How it works</Link>
+        </div>
+        <p className="small">
+          <Link href="/tools/instagram-comment-keyword-tester" className={s.vlink}>
+            Test your keywords free
+          </Link>
+        </p>
+        <div className="hero-art" style={{ maxWidth: 640 }}>
+          <Image
+            sizes="(max-width: 960px) 100vw, 640px"
+            src="/landing/card-dm.webp"
+            width={900}
+            height={900}
+            alt="A relaxed creator on a beanbag while DMs fly out of their phone to followers"
+          />
+        </div>
+      </header>
+
+      <section style={{ paddingTop: 40 }}>
+        <div className="wrap">
+          <AutoDmDemo />
+        </div>
+      </section>
+
+      <section id="how" style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">How it works</p>
+            <h2>How comment-to-DM <em className="s">works.</em></h2>
           </div>
-        </section>
-
-        <AutoDmDemo />
-
-        {/* How it works */}
-        <section id="how" className="border-y border-line bg-surface px-4 py-20">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">How comment-to-DM works</h2>
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {steps.map((s) => (
-                <div key={s.n} className="rounded-2xl border border-line bg-bg p-6">
-                  <span className="btn-primary grid h-9 w-9 place-items-center rounded-full font-semibold">{s.n}</span>
-                  <h3 className="mt-4 font-semibold">{s.title}</h3>
-                  <p className="mt-2 text-sm text-ink-2">{s.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Automations */}
-        <section className="mx-auto max-w-6xl px-4 py-20">
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">What you can <span className="gradient-text">automate</span></h2>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {automations.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-2xl border border-line bg-surface p-6">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-brand"><Icon className="h-5 w-5" /></span>
-                <h3 className="mt-4 font-semibold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-ink-2">{text}</p>
-              </div>
+          <div className="cards">
+            {steps.map((st) => (
+              <article key={st.n} className="pcard">
+                <span className="no">Step {st.n}</span>
+                <h3>{st.title}</h3>
+                <p>{st.text}</p>
+              </article>
             ))}
           </div>
-          <p className="mt-8 text-center">
-            <Link href="/instagram-auto-dm/templates" className="inline-flex items-center gap-2 font-medium text-brand hover:underline">Browse DM templates <ArrowRight className="h-4 w-4" /></Link>
-          </p>
-        </section>
+        </div>
+      </section>
 
-        {/* Comparison */}
-        <section className="mx-auto max-w-3xl px-4 pb-20">
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">{BRAND.name} vs ManyChat</h2>
-          <p className="mt-3 text-center text-ink-2">Both send comment-to-DM messages. {BRAND.name} also schedules your posts.</p>
-          <div className="mt-10 overflow-x-auto rounded-2xl border border-line bg-surface">
-            <table className="w-full min-w-[28rem] text-sm">
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Automations</p>
+            <h2>What you can <em className="s mark">automate.</em></h2>
+          </div>
+          <div className="cards">
+            {automations.slice(0, 3).map((a) => (
+              <article key={a.title} className="pcard">
+                <span className="no">{a.no}</span>
+                <h3>{a.title}</h3>
+                <p>{a.text}</p>
+              </article>
+            ))}
+          </div>
+          <div className="cards" style={{ marginTop: 26 }}>
+            {automations.slice(3).map((a) => (
+              <article key={a.title} className="pcard">
+                <span className="no">{a.no}</span>
+                <h3>{a.title}</h3>
+                <p>{a.text}</p>
+              </article>
+            ))}
+          </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link href="/instagram-auto-dm/templates" className={s.vlink}>Browse DM templates →</Link>
+          </p>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <div className="head">
+            <p className="eyebrow">Comparison</p>
+            <h2>{BRAND.name} vs ManyChat</h2>
+            <p>Both send comment-to-DM messages. {BRAND.name} also schedules your posts.</p>
+          </div>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
               <thead>
-                <tr className="border-b border-line text-left">
-                  <th className="p-4 font-medium text-muted">Feature</th>
-                  <th className="p-4 text-center font-semibold">{BRAND.name}</th>
-                  <th className="p-4 text-center font-semibold">ManyChat</th>
+                <tr>
+                  <th className={s.th}>Feature</th>
+                  <th className={`${s.th} ${s.oursCol}`} style={{ color: "var(--poskoo-ink)" }}>{BRAND.name}</th>
+                  <th className={s.th}>ManyChat</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody>
                 {compare.map(([label, ours, theirs]) => (
-                  <tr key={label}>
-                    <td className="p-4">{label}</td>
-                    <td className="p-4 text-center"><Cell v={ours} /></td>
-                    <td className="p-4 text-center text-ink-2"><Cell v={theirs} /></td>
+                  <tr key={label} className={s.tr}>
+                    <td className={s.td}>{label}</td>
+                    <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700 }}><Cell v={ours} /></td>
+                    <td className={s.td} style={{ color: "var(--poskoo-muted)" }}><Cell v={theirs} /></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Safety */}
-        <section className="border-y border-line bg-surface px-4 py-20">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Is Instagram auto DM safe?</h2>
-            <p className="mt-5 leading-7 text-ink-2">
-              Yes, when it runs on the official Meta API. {BRAND.name} connects through Meta&apos;s own login, so we never see or store your Instagram password. We only message people who commented or replied first, we respect Meta&apos;s rate limits, and we follow the 24-hour messaging window: replies are sent while the conversation is open, never as cold spam.
-            </p>
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Safety</p>
+              <h2>Is Instagram auto DM <em className="s">safe?</em></h2>
+              <p>
+                Yes, when it runs on the official Meta API. {BRAND.name} connects through Meta&apos;s own login, so we never see or store your Instagram password. We only message people who commented or replied first, we respect Meta&apos;s rate limits, and we follow the 24-hour messaging window: replies are sent while the conversation is open, never as cold spam.
+              </p>
+            </div>
+            <div className="art">
+              <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/problem.webp" width={900} height={900} loading="lazy" alt="A tired creator at night buried under chat-bubble notifications, before automating replies" />
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FAQ */}
-        <section className="mx-auto max-w-3xl px-4 py-20">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Instagram auto DM questions</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram auto DM questions</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA */}
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Turn your next comment section into leads.</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">Start free. No credit card. Connect Instagram in one tap.</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/" className="font-medium underline underline-offset-4">See the full product</Link>
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Turn your next comment section <em className="s">into leads.</em></h2>
+              <p>Start free. No credit card. Connect Instagram in one tap.</p>
+              <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
+            <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

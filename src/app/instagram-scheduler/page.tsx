@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  ShieldCheck,
-  CalendarDays,
-  Layers,
-  BarChart3,
-  MessageSquare,
-  Sparkles,
-  MessageCircleHeart,
-} from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import SchedulerHeroIllustration from "@/components/SchedulerHeroIllustration";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
@@ -24,32 +14,32 @@ export const metadata: Metadata = {
 
 const benefits = [
   {
-    icon: CalendarDays,
+    no: "01 / Calendar",
     title: "Week and month calendar",
     text: "Drag and drop posts across a week or month view so you can plan your feed at a glance.",
   },
   {
-    icon: Layers,
+    no: "02 / Formats",
     title: "Posts, reels, carousels and stories",
     text: "Schedule feed posts, reels, multi-image carousels and stories from one composer.",
   },
   {
-    icon: BarChart3,
+    no: "03 / Timing",
     title: "Best times to post",
     text: "See suggested publish times based on your own followers' activity, not generic guesses.",
   },
   {
-    icon: MessageSquare,
+    no: "04 / First comment",
     title: "First comment with hashtags",
     text: "Queue a first comment with your hashtags so your caption stays clean while tags still go live.",
   },
   {
-    icon: Sparkles,
+    no: "05 / AI",
     title: "Write with AI",
     text: "Draft captions in your brand voice with AI, then tweak and schedule in the same flow.",
   },
   {
-    icon: MessageCircleHeart,
+    no: "06 / Automation",
     title: "Auto-DM when the post goes live",
     text: "Attach a comment-to-DM rule to a scheduled post so automation switches on the moment it publishes.",
   },
@@ -112,132 +102,136 @@ const faqJsonLd = {
 
 export default function InstagramScheduler() {
   return (
-    <>
+    <PublicShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
-      <SiteHeader />
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden px-4 pt-16 pb-16 sm:pt-24">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-              <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Schedule posts · auto-DM on publish
-            </span>
-            <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-6xl">
-              Instagram scheduler that <span className="gradient-text">turns comments into leads</span>
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">
-              Plan and auto-publish posts, reels, carousels and stories, pick the best time from your own audience data,
-              and attach comment-to-DM automation when each post goes live.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/signup"
-                className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium"
-              >
-                Start free <ArrowRight className="h-4 w-4" />
-              </Link>
-              <a href="#how" className="rounded-full border border-line bg-surface px-6 py-3 font-medium">
-                How it works
-              </a>
-            </div>
-          </div>
-          <SchedulerHeroIllustration />
-        </section>
+      <header className="hero">
+        <span className="pill"><span>NEW</span>Schedule posts · auto-DM on publish</span>
+        <p className="eyebrow">Instagram scheduler</p>
+        <h1>
+          Plan your posts. <em className="s">Auto-DM every comment.</em>
+        </h1>
+        <p className="lede">
+          Plan and auto-publish posts, reels, carousels and stories, pick the best time from your own audience data,
+          and attach comment-to-DM automation when each post goes live.
+        </p>
+        <div className="ctas">
+          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+          <Link className="btn btn-line" href="#how">How it works</Link>
+        </div>
+        <div className="hero-art" style={{ maxWidth: 720 }}>
+          <Image
+            sizes="(max-width: 960px) 100vw, 720px"
+            src="/landing/hero.webp"
+            width={1400}
+            height={933}
+            alt="A big phone shows a scheduled Instagram post while a paper plane carries a DM with a link to a commenter"
+          />
+        </div>
+      </header>
 
-        {/* Benefits */}
-        <section className="mx-auto max-w-6xl px-4 py-20">
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-            Everything you need to <span className="gradient-text">schedule Instagram</span>
-          </h2>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {benefits.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-2xl border border-line bg-surface p-6">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-brand">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <h3 className="mt-4 font-semibold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-ink-2">{text}</p>
-              </div>
+      <section>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Features</p>
+            <h2>Everything you need to <em className="s">schedule Instagram.</em></h2>
+          </div>
+          <div className="cards">
+            {benefits.slice(0, 3).map((b) => (
+              <article key={b.title} className="pcard">
+                <span className="no">{b.no}</span>
+                <h3>{b.title}</h3>
+                <p>{b.text}</p>
+              </article>
             ))}
           </div>
-        </section>
+          <div className="cards" style={{ marginTop: 26 }}>
+            {benefits.slice(3).map((b) => (
+              <article key={b.title} className="pcard">
+                <span className="no">{b.no}</span>
+                <h3>{b.title}</h3>
+                <p>{b.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        {/* How it works */}
-        <section id="how" className="border-y border-line bg-surface px-4 py-20">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">How it works</h2>
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {steps.map((s) => (
-                <div key={s.n} className="rounded-2xl border border-line bg-bg p-6">
-                  <span className="btn-primary grid h-9 w-9 place-items-center rounded-full font-semibold">{s.n}</span>
-                  <h3 className="mt-4 font-semibold">{s.title}</h3>
-                  <p className="mt-2 text-sm text-ink-2">{s.text}</p>
-                </div>
-              ))}
+      <section id="how" style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="band">
+            <div className="copy">
+              <p className="eyebrow">How it works</p>
+              <h2>Three steps to your <em className="s mark">first scheduled post.</em></h2>
+              <div className="pains">
+                {steps.map((st) => (
+                  <div key={st.n} className="pain">
+                    <b>{st.n}. {st.title}</b>
+                    <span>{st.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="art">
+              <Image
+                sizes="(max-width: 960px) 100vw, 50vw"
+                src="/landing/card-schedule.webp"
+                width={900}
+                height={900}
+                loading="lazy"
+                alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
+              />
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Related */}
-        <section className="mx-auto max-w-3xl px-4 py-12">
-          <p className="text-center text-sm leading-7 text-ink-2">
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <p className="small" style={{ textAlign: "center" }}>
             Pair scheduling with{" "}
-            <Link href="/instagram-auto-dm" className="font-medium text-brand hover:underline">
-              Instagram auto DM
-            </Link>
+            <Link href="/instagram-auto-dm" className={s.vlink}>Instagram auto DM</Link>
             , compare us to{" "}
-            <Link href="/buffer-alternative" className="font-medium text-brand hover:underline">
-              Buffer
-            </Link>{" "}
-            and{" "}
-            <Link href="/later-alternative" className="font-medium text-brand hover:underline">
-              Later
-            </Link>
+            <Link href="/buffer-alternative" className={s.vlink}>Buffer</Link>
+            {" "}and{" "}
+            <Link href="/later-alternative" className={s.vlink}>Later</Link>
             , or try free{" "}
-            <Link href="/tools" className="font-medium text-brand hover:underline">
-              Instagram tools
-            </Link>
-            .
+            <Link href="/tools" className={s.vlink}>Instagram tools</Link>.
           </p>
-        </section>
+        </div>
+      </section>
 
-        {/* FAQ */}
-        <section className="mx-auto max-w-3xl px-4 py-20">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Instagram scheduler questions</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram scheduler questions</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA */}
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule your next post in minutes.</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">Start free. No credit card. Connect Instagram in one tap.</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]"
-              >
-                Start free <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/instagram-auto-dm" className="font-medium underline underline-offset-4">
-                Learn about auto DM
-              </Link>
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Schedule your next post <em className="s">in minutes.</em></h2>
+              <p>Start free. No credit card. Connect Instagram in one tap.</p>
+              <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
+            <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+        </div>
+      </section>
+    </PublicShell>
   );
 }
