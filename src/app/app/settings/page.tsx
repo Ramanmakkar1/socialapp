@@ -6,6 +6,8 @@ import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
+import { isIgConfigured } from "@/lib/instagram";
+import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { disconnectAccountAction, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 import styles from "../app-page.module.css";
@@ -64,6 +66,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     ? await query<{ brand_voice: string | null }>("select brand_voice from socialapp.users where id=$1", [user.id])
     : [];
   const voice = voiceRows[0]?.brand_voice ?? null;
+  // Instagram login needs the Meta app keys on the server; until then show a clear "not yet" state.
+  const connectReady = isMetaLoginConfigured() || isIgConfigured();
   return (
     <div className={styles.page}>
       <PageHero
@@ -79,13 +83,18 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       <section className={styles.section} aria-labelledby="accounts-heading">
         <div className={styles.sectionHeader}>
           <h2 id="accounts-heading" className={styles.sectionTitle}>Connected accounts</h2>
-          {accounts.length > 0 ? <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA> : null}
+          {accounts.length > 0 && connectReady ? <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA> : null}
         </div>
         <p className={ui.hint}>
           Instagram professional account linked to a Facebook Page required.{" "}
           <a href="/help/getting-started" className={ui.link}>See the setup steps</a>
         </p>
-        {accounts.length === 0 ? (
+        {!connectReady && (
+          <p role="status" className={`${ui.notice} ${ui.noticeWarn}`}>
+            Connecting Instagram is not switched on yet. You can already write posts, save drafts and set up auto-DM rules; they start working once your account is connected.
+          </p>
+        )}
+        {accounts.length === 0 && !connectReady ? null : accounts.length === 0 ? (
           <EmptyState
             icon={Settings}
             title="No connected accounts"

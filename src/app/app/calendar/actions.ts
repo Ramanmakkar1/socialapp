@@ -210,6 +210,16 @@ export async function savePost(
 
   if (input.mode === "schedule" && scheduledAt) {
     try {
+      const connected = await query(
+        "select 1 from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active' and access_token_enc is not null limit 1",
+        [user.id],
+      );
+      if (connected.length === 0) {
+        return {
+          ok: false,
+          error: "Connect Instagram in Settings before scheduling. You can save this post as a draft for now.",
+        };
+      }
       const limitError = await scheduledPostLimitError(user.id, scheduledAt, input.draftId ?? null);
       if (limitError) return { ok: false, error: limitError };
     } catch (err) {
