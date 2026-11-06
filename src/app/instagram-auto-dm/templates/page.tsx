@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Mail, UserPlus } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import ui from "@/components/ui/ui.module.css";
 import { DM_TEMPLATES, type DmTemplate } from "@/lib/dmTemplates";
 import TemplateChooser from "./TemplateChooser";
 import CopyButton from "./CopyButton";
@@ -40,103 +40,108 @@ const faqJsonLd = {
 
 export default function DmTemplatesPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
-      <SiteHeader />
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden px-4 pt-16 pb-12 sm:pt-24">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-              Instagram Comment-to-DM Templates <span className="gradient-text">(Copy &amp; Paste)</span>
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">
-              {DM_TEMPLATES.length} ready-made auto DM messages for the keywords people actually comment. Copy one, add your link and turn it on in {BRAND.name}.
-            </p>
-            <nav aria-label="Use cases" className="mt-8 flex flex-wrap justify-center gap-2">
-              {groups.map((g) => (
-                <a key={g.useCase} href={`#${anchor(g.useCase)}`} className="rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-ink-2 hover:text-ink">
-                  {g.useCase}
-                </a>
-              ))}
-            </nav>
-          </div>
-        </section>
+      <header className="hero">
+        <span className="pill">Copy &amp; paste · {DM_TEMPLATES.length} templates</span>
+        <p className="eyebrow">Auto-DM templates</p>
+        <h1>
+          Instagram comment-to-DM <em className="s mark">templates.</em>
+        </h1>
+        <p className="lede">
+          {DM_TEMPLATES.length} ready-made auto DM messages for the keywords people actually comment. Copy one, add your link and turn it on in {BRAND.name}.
+        </p>
+        <nav aria-label="Use cases" className="chips">
+          {groups.map((g) => (
+            <a key={g.useCase} href={`#${anchor(g.useCase)}`} className="chip">
+              {g.useCase}
+            </a>
+          ))}
+        </nav>
+      </header>
 
-        {/* Goal-based chooser */}
-        <TemplateChooser />
+      <section style={{ paddingTop: 40 }}>
+        <div className="wrap">
+          <TemplateChooser />
+        </div>
+      </section>
 
-        {/* Templates */}
-        {groups.map((g) => (
-          <section key={g.useCase} id={anchor(g.useCase)} className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-16">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{g.useCase}</h2>
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
+      {groups.map((g, gi) => (
+        <section key={g.useCase} id={anchor(g.useCase)} style={{ paddingTop: 20, scrollMarginTop: 24 }}>
+          <div className="wrap">
+            <div className="head" style={{ marginBottom: 28 }}>
+              <p className="eyebrow">{String(gi + 1).padStart(2, "0")} / Use case</p>
+              <h2>{g.useCase}</h2>
+            </div>
+            <div className="cards">
               {g.items.map((t) => (
-                <article key={t.slug} id={t.slug} className="flex flex-col rounded-2xl border border-line bg-surface p-6">
+                <article key={t.slug} id={t.slug} className="pcard" style={{ scrollMarginTop: 80 }}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <h3 className="font-semibold">{t.title}</h3>
+                    <h3>{t.title}</h3>
                     <CopyButton text={t.dmMessage} />
                   </div>
-                  <p className="mt-3 text-sm text-ink-2">
-                    {t.slug === "story-freebie" ? "Story reply" : "Comment"}:{" "}
+                  <p className="flex flex-wrap items-center gap-1.5 text-sm" style={{ color: "var(--poskoo-muted)" }}>
+                    {t.slug === "story-freebie" ? "Story reply" : "Comment"}:
                     {t.keywords.map((k) => (
-                      <span key={k} className="mr-1.5 inline-block rounded-md bg-surface-2 px-2 py-0.5 font-mono text-xs font-semibold text-brand">{k}</span>
+                      <span key={k} className={`${ui.pill} font-mono text-xs`} style={{ color: "var(--poskoo-violet)" }}>{k}</span>
                     ))}
                   </p>
-                  <pre className="mt-4 whitespace-pre-wrap break-words rounded-xl border border-line bg-bg p-4 font-sans text-sm leading-6">{preview(t.dmMessage)}</pre>
+                  <pre className="whitespace-pre-wrap break-words p-4 font-sans text-sm leading-6" style={{ background: "var(--poskoo-band)", borderRadius: "var(--poskoo-radius-md)", margin: 0 }}>
+                    {preview(t.dmMessage)}
+                  </pre>
                   {t.publicReply && (
-                    <p className="mt-3 text-sm text-ink-2"><span className="font-medium text-ink">Public reply:</span> {t.publicReply}</p>
+                    <p className="text-sm" style={{ color: "var(--poskoo-muted)" }}>
+                      <strong style={{ color: "var(--poskoo-ink)" }}>Public reply:</strong> {t.publicReply}
+                    </p>
                   )}
                   {(t.askEmail || t.requireFollow) && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {t.askEmail && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2"><Mail className="h-3.5 w-3.5 text-brand" /> Email gate</span>
-                      )}
-                      {t.requireFollow && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2"><UserPlus className="h-3.5 w-3.5 text-brand" /> Follow gate</span>
-                      )}
+                    <div className="flex flex-wrap gap-2">
+                      {t.askEmail && <span className={ui.pill}>Email gate</span>}
+                      {t.requireFollow && <span className={ui.pill}>Follow gate</span>}
                     </div>
                   )}
-                  <p className="mt-4 text-sm leading-6 text-muted"><span className="font-medium text-ink-2">Tip:</span> {t.tip}</p>
-                  <Link
-                    href={`/app/auto-dm?template=${t.slug}`}
-                    className="btn-primary mt-4 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-                  >
-                    Use this template
+                  <p className="text-sm leading-6" style={{ color: "var(--poskoo-muted)" }}>
+                    <strong style={{ color: "var(--poskoo-ink)" }}>Tip:</strong> {t.tip}
+                  </p>
+                  <Link href={`/app/auto-dm?template=${t.slug}`} className="go">
+                    Use this template <span aria-hidden="true">→</span>
                   </Link>
                 </article>
               ))}
             </div>
-          </section>
-        ))}
+          </div>
+        </section>
+      ))}
 
-        {/* FAQ */}
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Auto DM template questions</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Auto DM template questions</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA */}
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Put a template to work on your next post.</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">Start free. No credit card. Connect Instagram in one tap.</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/instagram-auto-dm" className="font-medium underline underline-offset-4">How Instagram auto DM works</Link>
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Put a template to work <em className="s">on your next post.</em></h2>
+              <p>Start free. No credit card. Connect Instagram in one tap.</p>
+              <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
+            <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+        </div>
+      </section>
+    </PublicShell>
   );
 }
