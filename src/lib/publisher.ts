@@ -23,7 +23,12 @@ type AccountRow = {
   access_token_enc: string | null;
 };
 
-export type PublishResult = { published: number; failed: number; skipped: number };
+export type PublishResult = { published: number; failed: number; skipped: number; recovered: number };
+
+/** A claim older than this is treated as an interrupted run (worst real publish is ~10 min: video polling / 10-slide carousel). */
+export const STUCK_PUBLISHING_MS = 20 * 60 * 1000;
+export const STUCK_PUBLISHING_ERROR =
+  "Publishing was interrupted before Instagram confirmed this post. Check your Instagram profile first: if the post is not there, press Retry.";
 
 function cleanError(message: string, token: string): string {
   const safe = token ? message.split(token).join("[redacted]") : message;
@@ -243,6 +248,7 @@ async function refreshPostStatus(postId: string): Promise<void> {
     `update socialapp.scheduled_posts p set status = case
       when exists(select 1 from socialapp.post_targets where post_id=p.id and status='failed') then 'failed'
       when not exists(select 1 from socialapp.post_targets where post_id=p.id and status in ('pending','publishing')) then 'published'
+      when not exists(select 1 from socialapp.post_targets where post_id=p.id and status='publishing') then 'scheduled'
       else p.status
     end, updated_at=now() where p.id=$1`,
     [postId],
@@ -352,26 +358,84 @@ async function publishToInstagram(
   }
 }
 
-export async function publishDuePosts(limit = 20): Promise<PublishResult> {
-  const result: PublishResult = { published: 0, failed: 0, skipped: 0 };
+/**
+ * Recovers targets left in 'publishing' by a run that crashed or timed out (bug a).
+ * We cannot know whether Instagram received the post, so we never auto-repost: the
+ * target is failed with a clear reason and the owner decides to Retry.
+ */
+export async function recoverStuckPublishing(staleMs = STUCK_PUBLISHING_MS): Promise<number> {
   const pool = getPool();
-  const claimed = await pool.query<ClaimedRow>(
-    `update socialapp.post_targets t set status='publishing'
+  const res = await pool.query<{ post_id: string }>(
+    `update socialapp.post_targets t set status='failed', error=$1, published_at=null
      from socialapp.scheduled_posts p
-     where t.post_id=p.id and t.platform='instagram' and t.status='pending'
-       and p.status='scheduled' and p.scheduled_at <= now()
-       and t.id in (
-         select t2.id from socialapp.post_targets t2
-         join socialapp.scheduled_posts p2 on p2.id=t2.post_id
-         where t2.platform='instagram' and t2.status='pending'
-           and p2.status='scheduled' and p2.scheduled_at <= now()
-         order by p2.scheduled_at
-         limit $1
-         for update of t2 skip locked
-       )
-     returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment`,
-    [limit],
+     where t.post_id=p.id and t.status='publishing'
+       and ((p.status='publishing' and p.updated_at < now() - ($2::int * interval '1 millisecond'))
+         or (p.status='scheduled' and p.scheduled_at < now() - ($2::int * interval '1 millisecond')))
+     returning t.post_id`,
+    [STUCK_PUBLISHING_ERROR, staleMs],
   );
+  const postIds = [...new Set(res.rows.map((r) => r.post_id))];
+  for (const postId of postIds) {
+    console.error("publisher: recovered interrupted publish, post", postId);
+    await refreshPostStatus(postId);
+  }
+  return res.rows.length;
+}
+
+/**
+ * Claims due posts in one transaction: the post row becomes 'publishing' together with its
+ * Instagram targets, so delete / reschedule (which only touch draft/scheduled/failed rows)
+ * can never race the publisher (bugs b, c). SKIP LOCKED keeps overlapping runs apart.
+ */
+async function claimDueTargets(limit: number): Promise<ClaimedRow[]> {
+  const client = await getPool().connect();
+  try {
+    await client.query("begin");
+    const due = await client.query<{ id: string }>(
+      `select p.id from socialapp.scheduled_posts p
+       where p.status='scheduled' and p.scheduled_at <= now()
+         and exists (select 1 from socialapp.post_targets t
+           where t.post_id=p.id and t.platform='instagram' and t.status='pending')
+       order by p.scheduled_at
+       limit $1
+       for update of p skip locked`,
+      [limit],
+    );
+    const ids = due.rows.map((r) => r.id);
+    if (ids.length === 0) {
+      await client.query("commit");
+      return [];
+    }
+    await client.query(
+      "update socialapp.scheduled_posts set status='publishing', updated_at=now() where id = any($1::uuid[]) and status='scheduled'",
+      [ids],
+    );
+    const claimed = await client.query<ClaimedRow>(
+      `update socialapp.post_targets t set status='publishing'
+       from socialapp.scheduled_posts p
+       where t.post_id=p.id and p.id = any($1::uuid[]) and t.platform='instagram' and t.status='pending'
+       returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment`,
+      [ids],
+    );
+    await client.query("commit");
+    return claimed.rows;
+  } catch (err) {
+    await client.query("rollback").catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function publishDuePosts(limit = 20): Promise<PublishResult> {
+  const result: PublishResult = { published: 0, failed: 0, skipped: 0, recovered: 0 };
+  const pool = getPool();
+  try {
+    result.recovered = await recoverStuckPublishing();
+  } catch (err) {
+    console.error("publisher: stuck-claim recovery failed", err instanceof Error ? err.message : err);
+  }
+  const claimed = { rows: await claimDueTargets(limit) };
 
   for (const row of claimed.rows) {
     let token = "";
