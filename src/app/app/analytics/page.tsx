@@ -7,6 +7,7 @@ import { isDbConfigured, query } from "@/lib/db";
 import { getCommentActivity, getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import EmptyState from "../EmptyState";
 import AccountInsightsPanel from "../AccountInsights";
+import styles from "./analytics.module.css";
 
 export const metadata = { title: "Analytics" };
 
@@ -37,6 +38,7 @@ const INSIGHTS_SCOPE = "instagram_business_manage_insights";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const BLOCK_LABELS = ["12a", "3a", "6a", "9a", "12p", "3p", "6p", "9p"];
+const statColors = [styles.lilac, styles.peach, styles.mint, styles.pink];
 
 function blockRange(block: number): string {
   return `${BLOCK_LABELS[block]}–${BLOCK_LABELS[(block + 1) % 8]}`;
@@ -123,28 +125,30 @@ export default async function AnalyticsPage() {
   ];
 
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-semibold">Analytics</h1>
-        <p className="text-sm text-muted">See how your posts and DMs perform.</p>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div>
+          <h1>Analytics</h1>
+          <p className={styles.lede}>See how your posts and DMs perform.</p>
+        </div>
       </div>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {tiles.map(([l, v]) => (
-          <div key={l} className="rounded-2xl border border-line bg-surface p-5">
-            <div className="text-sm text-muted">{l}</div>
-            <div className="mt-1 text-3xl font-semibold">{v.toLocaleString("en-US")}</div>
+      <div className={styles.statGrid}>
+        {tiles.map(([l, v], index) => (
+          <div key={l} className={`${styles.statCard} ${statColors[index]}`}>
+            <div className={styles.statLabel}>{l}</div>
+            <div className={styles.statValue}>{v.toLocaleString("en-US")}</div>
           </div>
         ))}
       </div>
       <Suspense fallback={<div className="mt-6 h-32 animate-pulse rounded-2xl border border-line bg-surface" aria-label="Loading Instagram insights" />}>
         <AccountInsightsPanel userId={user.id} />
       </Suspense>
-      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
-        <h2 className="text-lg font-semibold">When your audience comments</h2>
-        <p className="mt-1 text-sm text-muted">Last 30 days, times in UTC</p>
+      <div className={`${styles.panel} ${styles.lilacPanel}`}>
+        <h2>When your audience comments</h2>
+        <p className={styles.subtle}>Last 30 days, times in UTC</p>
         {activityTotal > 0 ? (
           <>
-            <div className="mt-4 overflow-x-auto">
+            <div className={styles.heatmapWrap}>
               <table className="border-separate border-spacing-1 text-xs">
                 <thead>
                   <tr>
@@ -152,7 +156,7 @@ export default async function AnalyticsPage() {
                       Day
                     </th>
                     {BLOCK_LABELS.map((label) => (
-                      <th key={label} scope="col" className="px-1 text-center font-medium text-muted">
+                        <th key={label} scope="col" className={styles.axisLabel}>
                         {label}
                       </th>
                     ))}
@@ -161,7 +165,7 @@ export default async function AnalyticsPage() {
                 <tbody>
                   {activityGrid.map((row, day) => (
                     <tr key={DAY_LABELS[day]}>
-                      <th scope="row" className="pr-2 text-left font-medium text-muted">
+                      <th scope="row" className={styles.axisLabel}>
                         {DAY_LABELS[day]}
                       </th>
                       {row.map((count, block) => {
@@ -172,7 +176,7 @@ export default async function AnalyticsPage() {
                               title={text}
                               aria-label={text}
                               role="img"
-                              className="h-7 w-9 rounded-md bg-brand"
+                              className={styles.heatCell}
                               style={{ opacity: count === 0 ? 0.06 : 0.1 + (0.9 * count) / activityMax }}
                             />
                           </td>
@@ -183,54 +187,54 @@ export default async function AnalyticsPage() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-4 text-sm">
+            <p className={styles.note}>
               <span className="font-medium">Best time to post:</span> {DAY_LABELS[activityBest.day]}{" "}
               {blockRange(activityBest.block)} UTC
             </p>
           </>
         ) : (
-          <p className="mt-4 text-sm text-muted">
+          <p className={styles.emptyCopy}>
             No comments yet. Once your auto-DM rules start getting comments, your best posting times show up here.
           </p>
         )}
       </div>
-      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
-        <h2 className="text-lg font-semibold">Last 14 days</h2>
-        <p className="mt-1 text-sm text-muted">DMs sent and leads captured per day (UTC)</p>
+      <div className={`${styles.panel} ${styles.peachPanel}`}>
+        <h2>Last 14 days</h2>
+        <p className={styles.subtle}>DMs sent and leads captured per day (UTC)</p>
         {hasDailyActivity ? (
           <>
-            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+            <div className={styles.legend}>
               <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-4 shrink-0 rounded-sm bg-brand" aria-hidden />
+                <span className={`${styles.legendSwatch} ${styles.violetSwatch}`} aria-hidden />
                 DMs sent
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="h-2 w-4 shrink-0 rounded-sm bg-brand-2" aria-hidden />
+                <span className={`${styles.legendSwatch} ${styles.coralSwatch}`} aria-hidden />
                 Leads
               </span>
             </div>
-            <ul className="mt-4 space-y-3">
+            <ul className={styles.dailyList}>
               {dailyActivity.map((row) => (
                 <li key={row.day} className="flex items-start gap-2 sm:gap-3">
-                  <span className="w-11 shrink-0 pt-0.5 text-sm text-muted sm:w-12">{shortDayUtc(row.day)}</span>
+                  <span className={styles.dayLabel}>{shortDayUtc(row.day)}</span>
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-3 min-w-0 flex-1 rounded bg-bg">
+                      <div className={styles.track}>
                         <div
-                          className="h-full min-w-0 rounded bg-brand"
+                          className={`${styles.fill} ${styles.violetFill}`}
                           style={{ width: dailyMax > 0 ? `${(row.dms / dailyMax) * 100}%` : "0%" }}
                         />
                       </div>
-                      <span className="w-8 shrink-0 text-right text-sm tabular-nums">{row.dms.toLocaleString("en-US")}</span>
+                      <span className={styles.chartValue}>{row.dms.toLocaleString("en-US")}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex h-2 min-w-0 flex-1 rounded bg-bg">
+                      <div className={`${styles.track} ${styles.smallTrack}`}>
                         <div
-                          className="h-full min-w-0 rounded bg-brand-2"
+                          className={`${styles.fill} ${styles.coralFill}`}
                           style={{ width: dailyMax > 0 ? `${(row.leads / dailyMax) * 100}%` : "0%" }}
                         />
                       </div>
-                      <span className="w-8 shrink-0 text-right text-sm tabular-nums">{row.leads.toLocaleString("en-US")}</span>
+                      <span className={styles.chartValue}>{row.leads.toLocaleString("en-US")}</span>
                     </div>
                   </div>
                 </li>
@@ -238,35 +242,35 @@ export default async function AnalyticsPage() {
             </ul>
           </>
         ) : (
-          <p className="mt-4 text-sm text-muted">No activity in the last 14 days yet.</p>
+          <p className={styles.emptyCopy}>No activity in the last 14 days yet.</p>
         )}
       </div>
-      <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
-        <h2 className="text-lg font-semibold">Best time to post</h2>
-        <p className="mt-1 text-sm text-muted">
+      <div className={`${styles.panel} ${styles.mintPanel}`}>
+        <h2>Best time to post</h2>
+        <p className={styles.subtle}>
           Hours (UTC) when people commented on your posts in the last 30 days.
         </p>
         {bestTimes.length > 0 ? (
           <>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className={styles.pills}>
               {bestTimes.map((slot) => (
                 <span
                   key={slot.hour}
-                  className="inline-flex items-center rounded-full border border-line bg-bg px-3 py-1 text-sm font-medium"
+                  className={styles.pill}
                 >
                   {slot.label}
                   <span className="ml-1.5 text-muted tabular-nums">({slot.count.toLocaleString("en-US")})</span>
                 </span>
               ))}
             </div>
-            <div className="mt-5 flex h-24 items-end gap-1" role="img" aria-label="Comment volume by hour UTC">
+            <div className={styles.hourChart} role="img" aria-label="Comment volume by hour UTC">
               {hourBarCounts.map((count, hour) => {
                 const heightPct = maxHourCount > 0 ? (count / maxHourCount) * 100 : 0;
                 return (
                   <div
                     key={hour}
                     title={`${String(hour).padStart(2, "0")}:00 – ${count.toLocaleString("en-US")} comment${count === 1 ? "" : "s"}`}
-                    className="min-h-0 flex-1 rounded-sm bg-brand"
+                    className={styles.hourBar}
                     style={{ height: `${heightPct}%` }}
                   />
                 );
@@ -274,18 +278,18 @@ export default async function AnalyticsPage() {
             </div>
           </>
         ) : (
-          <p className="mt-4 text-sm text-muted">
+          <p className={styles.emptyCopy}>
             Not enough comments yet. This fills in once your auto-DM rules start getting comments.
           </p>
         )}
       </div>
       {rules.length > 0 ? (
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold">Auto-DM rules</h2>
-          <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-surface">
+        <div className={styles.section}>
+          <h2>Auto-DM rules</h2>
+          <div className={styles.tableWrap}>
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead>
-                <tr className="border-b border-line text-muted">
+                <tr className={styles.tableHead}>
                   <th scope="col" className="px-4 py-3 font-medium">
                     Rule
                   </th>
@@ -311,7 +315,7 @@ export default async function AnalyticsPage() {
               </thead>
               <tbody>
                 {rules.map((rule) => (
-                  <tr key={rule.id} className="border-b border-line last:border-b-0">
+                  <tr key={rule.id} className={styles.tableRow}>
                     <td className="px-4 py-3">
                       <Link href="/app/auto-dm" className="font-medium text-brand hover:underline">
                         {rule.name}
@@ -319,9 +323,7 @@ export default async function AnalyticsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-block rounded-full border border-line px-2 py-0.5 text-xs font-medium ${
-                          rule.status === "active" ? "text-brand" : "text-muted"
-                        }`}
+                        className={`${styles.status} ${rule.status === "active" ? styles.activeStatus : ""}`}
                       >
                         {rule.status}
                       </span>
@@ -344,7 +346,7 @@ export default async function AnalyticsPage() {
             title="No analytics yet"
             text="Create your first auto-DM rule to see results here."
           />
-          <div className="mt-4 text-center">
+          <div className={styles.actionRow}>
             <Link href="/app/auto-dm" className="btn-primary inline-block rounded-full px-5 py-2 text-sm font-medium">
               Create auto-DM rule
             </Link>
@@ -352,10 +354,10 @@ export default async function AnalyticsPage() {
         </>
       )}
       {recentPosts.length > 0 ? (
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold">Recent posts</h2>
+        <div className={styles.section}>
+          <h2>Recent posts</h2>
           {missingInsightsScope ? (
-            <p className="mt-2 text-sm text-muted">
+            <p className={styles.subtle}>
               Reconnect Instagram in{" "}
               <Link href="/app/settings" className="text-brand hover:underline">
                 Settings
@@ -363,10 +365,10 @@ export default async function AnalyticsPage() {
               to see reach and likes.
             </p>
           ) : null}
-          <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-surface">
+          <div className={styles.tableWrap}>
             <table className="w-full min-w-[960px] text-left text-sm">
               <thead>
-                <tr className="border-b border-line text-muted">
+                <tr className={styles.tableHead}>
                   <th scope="col" className="px-4 py-3 font-medium">
                     Post
                   </th>
@@ -398,7 +400,7 @@ export default async function AnalyticsPage() {
               </thead>
               <tbody>
                 {recentPosts.map((post) => (
-                  <tr key={post.id} className="border-b border-line last:border-b-0">
+                  <tr key={post.id} className={styles.tableRow}>
                     <td className="px-4 py-3">{shortCaption(post.caption)}</td>
                     <td className="px-4 py-3 tabular-nums">{formatPublished(post.publishedAt)}</td>
                     <td className="px-4 py-3">{formatPlatforms(post.platforms)}</td>
@@ -417,8 +419,8 @@ export default async function AnalyticsPage() {
           </div>
         </div>
       ) : (
-        <p className="mt-8 text-sm text-muted">No posts published in the last 30 days.</p>
+        <p className={`${styles.emptyCopy} ${styles.section}`}>No posts published in the last 30 days.</p>
       )}
-    </>
+    </div>
   );
 }
