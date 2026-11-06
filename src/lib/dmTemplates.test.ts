@@ -12,10 +12,11 @@ test('slugs are unique', () => {
   assert.equal(new Set(slugs).size, slugs.length);
 });
 
-test('every template builds a valid inactive rule', () => {
+test('every template builds a valid inactive rule once the owner adds their link', () => {
   for (const t of DM_TEMPLATES) {
     const rule = toRule(t);
-    assert.deepEqual(validateRule(rule), [], t.slug);
+    // Templates ship without a destination; the rule form asks for one (required for gated rules).
+    assert.deepEqual(validateRule({ ...rule, linkUrl: 'https://example.com/offer' }), [], t.slug);
     assert.equal(rule.active, false, t.slug);
     assert.ok(t.dmMessage.length < 1000, t.slug);
     assert.equal(rule.replyPublicly, Boolean(t.publicReply), t.slug);

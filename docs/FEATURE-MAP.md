@@ -1,0 +1,40 @@
+# Poskoo feature map
+
+Every feature -> pages, server actions / API routes, DB tables (schema `socialapp`), background jobs, tests.
+Tests are colocated as `src/lib/*.test.ts` (plus `src/lib/rewind.test.mjs`) and run with `npm test`
+(`tsx --test`, Node's built-in test runner).
+
+Background jobs are HTTP routes protected by the `x-cron-secret` header (`CRON_SECRET`); see docs/REPORT.md for the schedule.
+
+| Feature | Pages / UI | Actions / routes | Business logic | Tables | Jobs | Tests |
+|---|---|---|---|---|---|---|
+| Sign up / log in / log out / session | `/signup`, `/login` (`src/app/login/AuthForm.tsx`) | `signupAction`, `loginAction`, `logoutAction` (`src/app/login/actions.ts`) | `src/lib/auth.ts` (DB sessions, httpOnly cookie, 30 days), `src/lib/password.ts` (scrypt), `src/lib/reviewer.ts`, `src/lib/rateLimit.ts` | `users`, `sessions` | - | `password.test.ts`, `rateLimit.test.ts` |
+| Forgot password | "Forgot password?" on `/login` -> `/contact#password-reset` (support e-mail, no reset e-mails yet) | - | - | - | - | - |
+| Protected app routes | `src/app/app/layout.tsx` (`requireUser()` -> `/login`), expired-token banner | - | `requireUser`, `getCurrentUser` | `sessions`, `social_accounts` | - | - |
+| Onboarding checklist | `/app` (`src/app/app/page.tsx`) | - | `getDashboardStats` (`src/lib/stats.ts`) | `social_accounts`, `dm_rules`, `scheduled_posts` | - | - |
+| Composer (create / edit draft / schedule) | `/app/calendar#new`, `?draft=<id>` (`Composer.tsx`, `PublishingChecklist.tsx`) | `savePost` (`calendar/actions.ts`), `suggestCaptions`/`aiAvailable` (`aiActions.ts`) | `src/lib/composerDraft.ts`, `captionLimits.ts`, `platforms.ts`, `planLimits.ts`, `postMutations.ts` | `scheduled_posts`, `post_targets`, `dm_rules` | - | `composerDraft.test.ts`, `captionLimits.test.ts`, `planLimits.test.ts` |
+| Calendar week / month, drag + touch move | `/app/calendar?view=week|month` (`WeekView.tsx`, `MonthView.tsx`, `RescheduleControl.tsx`) | `reschedulePost` (`rescheduleActions.ts`) | `postMutations.ts` | `scheduled_posts`, `post_targets` | - | `postMutations.test.ts` |
+| Queue: delete / duplicate / retry failed | `PostList.tsx` | `deletePost`, `duplicatePost`, `retryPost` | `postMutations.ts` | `scheduled_posts`, `post_targets` | - | `postMutations.test.ts` |
+| Publisher | - | `POST /api/jobs/publish-posts` | `src/lib/publisher.ts` (claim -> publish -> record, stuck-claim recovery), `firstComment.ts` | `scheduled_posts`, `post_targets`, `social_accounts`, `dm_rules` | every minute | `publisher.test.ts`, `firstComment.test.ts` |
+| Auto-DM rules (create / edit / pause / delete / templates) | `/app/auto-dm` (`RuleForm.tsx`, `TemplatePicker.tsx`) | `createRule`, `updateRule`, `toggleRule`, `deleteRule` (`auto-dm/actions.ts`) | `rules.ts`, `dmTemplates.ts`, `commentMessage.ts` | `dm_rules`, `social_accounts` | - | `rules.test.ts`, `dmTemplates.test.ts`, `commentMessage.test.ts` |
+| Keyword matching | (also `/tools/instagram-comment-keyword-tester`) | - | `match.ts` | - | - | `match.test.ts` |
+| Comment -> DM (webhook) | - | `POST /api/meta/webhook` (signature verified with `META_APP_SECRET`) | `comments.ts` | `events`, `contacts`, `dm_queue`, `dm_rules`, `short_links` | - | `comments.test.ts` |
+| Story reply -> DM | - | `POST /api/meta/webhook` | `messages.ts` (`processMessageEvents`), `messageParse.ts` | `dm_queue`, `contacts`, `dm_rules` | - | `messages.test.ts` |
+| Email / follow gate, gated link | - | `POST /api/meta/webhook` | `messages.ts`, `followCheck.ts` | `dm_queue`, `contacts`, `short_links` | send-dms (follow re-checks) | `messages.test.ts`, `followCheck.test.ts`, `sender.test.ts` |
+| Past-comment replay ("rewind") | `RewindPastCommentsButton.tsx` | `rewindRuleAction` | `rewind.ts` -> `comments.ts` | `dm_rules`, `dm_queue`, `contacts` | - | `rewind.test.mjs`, `comments.test.ts` |
+| DM send queue, rate limits, cooldown, monthly plan limit | `/app/auto-dm` delivery status (`DmDeliveryStatus.tsx`) | `POST /api/jobs/send-dms` | `sender.ts`, `sendPolicy.ts`, `dmCooldown.ts`, `planLimits.ts` | `dm_queue`, `social_accounts`, `dm_rules` | every minute | `sender.test.ts`, `sendPolicy.test.ts` |
+| Link click tracking | `/l/<code>` | `GET /l/[code]` | `links.ts` | `short_links`, `link_clicks` | - | `links.test.ts` |
+| Activity log | `/app/auto-dm/activity` | - | - | `dm_queue`, `dm_rules` | - | - |
+| Inbox (comments, threads, replies) | `/app/inbox` (`ThreadReplyComposer.tsx` keeps unsent drafts in sessionStorage) | `replyToCommentAction`, `privateReplyAction`, `replyInThreadAction` (`inbox/actions.ts`) | `inbox.ts`, `inboxTime.ts`, `igGraph.ts`, `dmCooldown.ts` | `events`, `dm_queue`, `contacts`, `social_accounts` | - | `inboxTime.test.ts`, `igGraph.test.ts`, `dmCooldown.test.ts` |
+| Leads list + CSV export | `/app/leads` (filters, 50/page) | `GET /app/leads/export` | `leadsCsv.ts` | `contacts`, `dm_rules` | - | `leadsCsv.test.ts` |
+| Analytics | `/app/analytics`, dashboard tiles, `AccountInsights.tsx` | - | `stats.ts`, `insights.ts`, `igGraph.ts` (account insights), `bestTime.ts`, `engagementRate.ts` | `scheduled_posts`, `post_targets`, `dm_queue`, `contacts`, `short_links`, `link_clicks` | refresh-insights | `insights.test.ts`, `bestTime.test.ts` |
+| Settings: accounts, disconnect, brand voice | `/app/settings` (`AccountProfile.tsx`) | `disconnectAccountAction`, `saveBrandVoice` | `accountData.ts` | `social_accounts`, `users`, `dm_queue` | - | - |
+| Instagram connect (Meta, NOT changed here) | Settings / banner "Connect Instagram" | `GET /api/instagram/connect`, `GET /api/instagram/callback` | `instagram.ts`, `metaLogin.ts`, `crypto.ts` | `social_accounts` | refresh-tokens | `metaLogin.test.ts` |
+| Meta deauthorize + data deletion | `/data-deletion`, `/data-deletion/status?code=` | `POST /api/instagram/deauthorize`, `POST /api/instagram/data-deletion` | `signedRequest.ts`, `accountData.ts` | `data_deletion_requests`, all account data | - | `signedRequest.test.ts` |
+| Token refresh | - | `POST /api/jobs/refresh-tokens` | `tokenRefresh.ts` | `social_accounts` | daily | - |
+| Post insights | `/app/analytics` | `POST /api/jobs/refresh-insights` | `insights.ts` | `post_targets` | every 6 h | `insights.test.ts` |
+| Pricing + plan limits | `/pricing`, landing | enforced in `savePost` / `retryPost` / `reschedulePost` and `sendDueDms` | `plans.ts` (display), `planLimits.ts` (numbers) | `scheduled_posts`, `dm_queue` | - | `planLimits.test.ts` |
+| Free tools (13 pages; 12 interactive + image size) | `/tools/*` | none (client-side only) | `bioTemplates.ts`, `captionLimits.ts`, `commentPicker.ts`, `links.ts`, `engagementRate.ts`, `igFonts.ts`, `hashtagSets.ts`, `igSizes.ts`, `lineBreaks.ts`, `safeZones.ts` | - | - | matching `*.test.ts` |
+| Contact, help, legal, 404/500 | `/contact`, `/help/*`, `/privacy`, `/terms`, `not-found.tsx`, `error.tsx`, `global-error.tsx`, `app/app/error.tsx` | - | - | - | - | - |
+| Health | - | `GET /api/health` | `db.ts` `dbHealth()` | - | - | - |
+| E-mails | none: the app sends no e-mails today | - | - | - | - | - |
