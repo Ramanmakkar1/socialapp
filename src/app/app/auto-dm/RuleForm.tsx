@@ -7,6 +7,8 @@ import EmptyState from "../EmptyState";
 import TemplatePicker from "./TemplatePicker";
 import AutomationMessagePreview from "@/components/AutomationMessagePreview";
 import CommentKeywordTester from "@/components/CommentKeywordTester";
+import { Btn, PageHero } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
 import {
   createRule,
   deleteRule,
@@ -16,8 +18,7 @@ import {
   type RuleTrigger,
 } from "./actions";
 
-const INPUT =
-  "mt-1.5 w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none";
+const INPUT = `${ui.input} mt-1.5`;
 
 export type InstagramAccountOption = {
   id: string;
@@ -248,7 +249,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
 
   return (
     <form
-      className="rounded-2xl border border-line bg-surface p-6"
+      className={`${ui.card} p-5 sm:p-6`}
       onSubmit={(e) => {
         e.preventDefault();
         if (pending) return;
@@ -256,20 +257,20 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
       }}
     >
       <div className="flex items-start justify-between gap-3">
-        <h2 className="text-lg font-semibold">{mode === "edit" ? "Edit automation" : "New automation"}</h2>
-        <button type="button" disabled={pending} onClick={onClose} className="rounded-lg p-1 text-muted hover:bg-surface-2 hover:text-ink disabled:opacity-60" aria-label="Close">
+        <h2 className="m-0 text-lg font-semibold text-[var(--poskoo-ink)]">{mode === "edit" ? "Edit automation" : "New automation"}</h2>
+        <button type="button" disabled={pending} onClick={onClose} className="rounded-full p-2 text-[var(--poskoo-muted)] hover:bg-[var(--poskoo-band)] hover:text-[var(--poskoo-ink)] disabled:opacity-60" aria-label="Close">
           <X className="h-5 w-5" />
         </button>
       </div>
       {matchModeNote && (
-        <p className="mt-3 rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm text-ink-2">{matchModeNote}</p>
+        <p className={`${ui.notice} mt-3 text-sm`}>{matchModeNote}</p>
       )}
       <fieldset disabled={pending} className="mt-5 min-w-0 space-y-4 border-0 p-0">
-        <div className="rounded-xl border border-line bg-surface-2 p-4">
+        <div className={`${ui.card} ${ui.band} p-4`}>
           <div className="flex flex-wrap items-start gap-4">
             <MultiAccountRoutingIllustration className="shrink-0" />
             <div className="min-w-0 flex-1">
-              <label htmlFor={accountId} className="text-sm font-medium text-ink-2">
+              <label htmlFor={accountId} className={ui.label}>
                 Instagram account
               </label>
               <select
@@ -288,16 +289,16 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
                   </option>
                 ))}
               </select>
-              <p className="mt-2 text-xs leading-relaxed text-muted">
+              <p className="mt-2 text-xs leading-relaxed text-[var(--poskoo-muted)]">
                 Rules scoped to one profile only run on comments for that account. Choose{" "}
-                <span className="text-ink-2">All connected Instagram accounts</span> to reuse the same keywords and DM
+                <span className="text-[var(--poskoo-ink)]">All connected Instagram accounts</span> to reuse the same keywords and DM
                 on every profile you connect.
               </p>
             </div>
           </div>
         </div>
         <div>
-          <label htmlFor={nameId} className="text-sm font-medium text-ink-2">Name</label>
+          <label htmlFor={nameId} className={ui.label}>Name</label>
           <input
             id={nameId}
             type="text"
@@ -310,7 +311,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           />
         </div>
         <div>
-          <label htmlFor={keywordsId} className="text-sm font-medium text-ink-2">Keywords</label>
+          <label htmlFor={keywordsId} className={ui.label}>Keywords</label>
           <input
             id={keywordsId}
             type="text"
@@ -322,18 +323,18 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           {keywords.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {keywords.map((k) => (
-                <span key={k} className="inline-block rounded-md bg-surface-2 px-2 py-0.5 font-mono text-xs font-semibold text-brand">
+                <span key={k} className={`${ui.pill} font-mono text-xs`} style={{ color: "var(--poskoo-violet)" }}>
                   {k}
                 </span>
               ))}
             </div>
           )}
-          <p className="mt-1 text-xs text-muted">Comma-separated, up to 10 keywords.</p>
+          <p className={`mt-1 text-xs text-[var(--poskoo-muted)]`}>Comma-separated, up to 10 keywords.</p>
         </div>
         <fieldset>
-          <legend className="text-sm font-medium text-ink-2">Match type</legend>
+          <legend className={ui.label}>Match type</legend>
           <div className="mt-2 flex flex-wrap gap-4 text-sm">
-            <label className="flex cursor-pointer items-center gap-2">
+            <label className={ui.checkRow}>
               <input
                 type="radio"
                 name={`match-${nameId}`}
@@ -342,7 +343,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
               />
               Comment contains keyword
             </label>
-            <label className="flex cursor-pointer items-center gap-2">
+            <label className={ui.checkRow}>
               <input
                 type="radio"
                 name={`match-${nameId}`}
@@ -354,8 +355,8 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           </div>
         </fieldset>
         <div className="space-y-2">
-          <p className="text-sm font-medium text-ink-2">When to send</p>
-          <label htmlFor={triggerCommentId} className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+          <p className={ui.label}>When to send</p>
+          <label htmlFor={triggerCommentId} className={ui.checkRow}>
             <input
               id={triggerCommentId}
               type="checkbox"
@@ -364,7 +365,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
             />
             Comments on my posts
           </label>
-          <label htmlFor={triggerStoryId} className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+          <label htmlFor={triggerStoryId} className={ui.checkRow}>
             <input
               id={triggerStoryId}
               type="checkbox"
@@ -378,7 +379,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           <CommentKeywordTester keywords={keywords} matchType={matchType} commentTrigger={triggerComment} />
         </div>
         <div>
-          <label htmlFor={dmId} className="text-sm font-medium text-ink-2">DM message</label>
+          <label htmlFor={dmId} className={ui.label}>DM message</label>
           <textarea
             id={dmId}
             ref={dmRef}
@@ -392,20 +393,20 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           />
           <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => insertToken("{{username}}")} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2 hover:border-brand hover:text-ink">
+              <button type="button" onClick={() => insertToken("{{username}}")} className={`${ui.pill} text-xs hover:border-[var(--poskoo-violet)]`}>
                 {"{{username}}"}
               </button>
-              <button type="button" onClick={() => insertToken("{{link}}")} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2 hover:border-brand hover:text-ink">
+              <button type="button" onClick={() => insertToken("{{link}}")} className={`${ui.pill} text-xs hover:border-[var(--poskoo-violet)]`}>
                 {"{{link}}"}
               </button>
             </div>
-            <span className={`text-xs ${dmText.length > 1000 ? "text-brand-2" : dmText.length >= 900 ? "text-warn" : "text-muted"}`}>
+            <span className={`text-xs ${dmText.length > 1000 ? "text-[var(--poskoo-red)]" : dmText.length >= 900 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-muted)]"}`}>
               {dmText.length}/1000
             </span>
           </div>
         </div>
         <div>
-          <label htmlFor={linkId} className="text-sm font-medium text-ink-2">Link URL <span className="text-muted">({linkRequired ? "required" : "optional"})</span></label>
+          <label htmlFor={linkId} className={ui.label}>Link URL <span className="text-[var(--poskoo-muted)]">({linkRequired ? "required" : "optional"})</span></label>
           <input
             id={linkId}
             type="url"
@@ -417,15 +418,15 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
             placeholder="https://yoursite.com/guide"
           />
           {linkRequired && (
-            <p id={`${linkId}-help`} className="mt-1 text-xs text-muted">The link is delivered after the selected requirements are met.</p>
+            <p id={`${linkId}-help`} className={`mt-1 text-xs text-[var(--poskoo-muted)]`}>The link is delivered after the selected requirements are met.</p>
           )}
         </div>
         <div className="space-y-2">
-          <label htmlFor={emailId} className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+          <label htmlFor={emailId} className={ui.checkRow}>
             <input id={emailId} type="checkbox" checked={emailGate} onChange={(e) => setEmailGate(e.target.checked)} />
             Ask for email first
           </label>
-          <label htmlFor={followId} className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+          <label htmlFor={followId} className={ui.checkRow}>
             <input id={followId} type="checkbox" checked={followGate} onChange={(e) => setFollowGate(e.target.checked)} />
             Require follow
           </label>
@@ -437,19 +438,19 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           followGate={followGate}
         />
         {errors.length > 0 && (
-          <ul role="alert" className="max-w-full space-y-1 break-words text-sm text-warn">
+          <ul role="alert" className="max-w-full space-y-1 break-words text-sm text-[var(--poskoo-red)]">
             {errors.map((err) => (
               <li key={err}>{err}</li>
             ))}
           </ul>
         )}
         <div className="flex flex-wrap gap-2 pt-1">
-          <button type="submit" className="btn-primary rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-60">
+          <Btn type="submit" variant="dark" disabled={pending} aria-busy={pending}>
             {pending ? "Saving…" : mode === "edit" ? "Save changes" : "Create automation"}
-          </button>
-          <button type="button" onClick={onClose} className="rounded-full border border-line px-5 py-2 text-sm font-medium text-ink-2 hover:text-ink disabled:opacity-60">
+          </Btn>
+          <Btn type="button" variant="line" onClick={onClose} disabled={pending}>
             Cancel
-          </button>
+          </Btn>
         </div>
       </fieldset>
     </form>
@@ -551,26 +552,32 @@ export function AutoDmView({
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">Auto-DM</h1>
-          <p className="text-sm text-muted">Send a DM to everyone who comments a keyword.</p>
-          <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <Link href="/app/auto-dm/activity" className="font-medium text-brand hover:underline">Activity</Link>
-            <Link href="/help/instagram-auto-dm-not-working" className="font-medium text-brand hover:underline">DMs not sending?</Link>
+      <PageHero
+        eyebrow="Automation"
+        title="Auto-DM"
+        accent="on autopilot."
+        lede="Send a DM to everyone who comments a keyword."
+        art="/landing/card-dm.webp"
+        artAlt=""
+        action={
+          <p className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            <Link href="/app/auto-dm/activity" className={ui.link}>Activity</Link>
+            <Link href="/help/instagram-auto-dm-not-working" className={ui.link}>DMs not sending?</Link>
           </p>
-          {instagramAccounts.length > 1 && (
-            <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted">
-              Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
-            </p>
-          )}
+        }
+      />
+      {instagramAccounts.length > 1 && (
+        <p className={`${ui.hint} mt-4 max-w-xl`}>
+          Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
+        </p>
+      )}
+      {!formOpen && (
+        <div className="mt-4">
+          <Btn onClick={() => openCreate(true)}>
+            <Plus className="h-4 w-4" aria-hidden="true" /> New automation
+          </Btn>
         </div>
-        {!formOpen && (
-          <button type="button" onClick={() => openCreate(true)} className="btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold">
-            <Plus className="h-4 w-4" /> New automation
-          </button>
-        )}
-      </div>
+      )}
 
       {formOpen && (
         <div className="mt-6">
@@ -590,7 +597,7 @@ export function AutoDmView({
       {!formOpen && <TemplatePicker activeTitle={templateKey} onReopen={() => openCreate()} />}
 
       {actionError && (
-        <p role="alert" className="mt-4 max-w-full break-words rounded-xl border border-warn/30 bg-warn/10 px-3 py-2 text-sm text-warn">
+        <p role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-4 max-w-full break-words`}>
           {actionError}
         </p>
       )}
@@ -603,34 +610,30 @@ export function AutoDmView({
             text="Create a keyword rule to send DMs when someone comments on your posts."
           />
           <div className="mt-4 text-center">
-            <button type="button" onClick={() => openCreate()} className="btn-primary rounded-full px-5 py-2 text-sm font-semibold">
-              Create your first automation
-            </button>
+            <Btn onClick={() => openCreate()}>Create your first automation</Btn>
           </div>
         </div>
       ) : (
         rules.length > 0 && (
-          <ul className="mt-6 space-y-4">
+          <ul className="mt-6 grid gap-4">
             {rules.map((rule) => (
-              <li key={rule.id} className="rounded-2xl border border-line bg-surface p-5">
+              <li key={rule.id} className={`${ui.card} p-5`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h2 className="font-semibold">{rule.name}</h2>
-                    <p className="mt-1 text-xs text-muted">
-                      <span className="font-medium text-ink-2">Account:</span>{" "}
+                  <div className="min-w-0">
+                    <h2 className="m-0 text-lg font-semibold text-[var(--poskoo-ink)]">{rule.name}</h2>
+                    <p className={`mt-1 text-xs text-[var(--poskoo-muted)]`}>
+                      <span className="font-semibold">Account:</span>{" "}
                       {ruleAccountLabel(rule, instagramAccounts)}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {rule.keywords.map((k) => (
-                        <span key={k} className="inline-block rounded-md bg-surface-2 px-2 py-0.5 font-mono text-xs font-semibold text-brand">
+                        <span key={k} className={`${ui.pill} font-mono text-xs`} style={{ color: "var(--poskoo-violet)" }}>
                           {k}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${rule.status === "active" ? "bg-brand/15 text-brand" : "border border-line text-muted"}`}
-                  >
+                  <span className={`${ui.pill} ${rule.status === "active" ? ui.pillMint : ""}`}>
                     {rule.status === "active" ? "Active" : "Paused"}
                   </span>
                 </div>
@@ -638,45 +641,30 @@ export function AutoDmView({
                   {rule.status === "active" && rule.triggers.includes("comment") && RewindButton ? (
                     <RewindButton ruleId={rule.id} />
                   ) : null}
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => onToggle(rule.id)}
-                    className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-2 hover:text-ink disabled:opacity-60"
-                  >
+                  <Btn variant="ghost" size="sm" disabled={pending} onClick={() => onToggle(rule.id)}>
                     {rule.status === "active" ? "Pause" : "Activate"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => openEdit(rule)}
-                    disabled={pending}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-2 hover:text-ink"
-                  >
-                    <Pencil className="h-3.5 w-3.5" /> Edit
-                  </button>
+                  </Btn>
+                  <Btn variant="ghost" size="sm" onClick={() => openEdit(rule)} disabled={pending}>
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit
+                  </Btn>
                   {confirmDeleteId === rule.id ? (
                     <span className="flex flex-wrap items-center gap-2 text-sm">
-                      <span className="text-ink-2">Delete this rule?</span>
-                      <button type="button" disabled={pending} onClick={() => onDelete(rule.id)} className="rounded-full bg-warn/15 px-3 py-1.5 font-medium text-warn disabled:opacity-60">
+                      <span className="text-[var(--poskoo-ink)]">Delete this rule?</span>
+                      <button type="button" disabled={pending} onClick={() => onDelete(rule.id)} className={`${ui.btn} ${ui.btnDanger} ${ui.sm}`}>
                         Yes, delete
                       </button>
-                      <button type="button" disabled={pending} onClick={() => setConfirmDeleteId(null)} className="rounded-full border border-line px-3 py-1.5 text-ink-2 disabled:opacity-60">
+                      <Btn variant="ghost" size="sm" disabled={pending} onClick={() => setConfirmDeleteId(null)}>
                         Cancel
-                      </button>
+                      </Btn>
                     </span>
                   ) : (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() => setConfirmDeleteId(rule.id)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-2 hover:text-warn disabled:opacity-60"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" /> Delete
-                    </button>
+                    <Btn variant="ghost" size="sm" disabled={pending} onClick={() => setConfirmDeleteId(rule.id)}>
+                      <Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Delete
+                    </Btn>
                   )}
                   <Link
                     href={`/app/leads?rule=${encodeURIComponent(rule.id)}`}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-line px-3 py-1.5 text-sm font-medium text-brand hover:border-brand hover:bg-brand/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                    className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}
                   >
                     View captured leads
                   </Link>

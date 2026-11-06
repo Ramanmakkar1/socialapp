@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { query } from "@/lib/db";
+import ui from "@/components/ui/ui.module.css";
 
 export type DmDeliveryRow = {
   id: string;
@@ -70,10 +71,10 @@ function statusLabel(status: string): string {
 }
 
 function statusBadgeClass(status: string): string {
-  if (status === "sent") return "bg-brand/15 text-brand";
-  if (status === "pending") return "border border-brand/30 bg-brand/5 text-brand";
-  if (status === "failed") return "bg-warn/15 text-warn";
-  return "border border-line text-muted";
+  if (status === "sent") return `${ui.pill} ${ui.pillMint}`;
+  if (status === "pending") return `${ui.pill} ${ui.pillInk}`;
+  if (status === "failed") return `${ui.pill} ${ui.pillPeach}`;
+  return ui.pill;
 }
 
 function pendingHoldReason(row: DmDeliveryRow, now: number): string | null {
@@ -89,10 +90,10 @@ function pendingHoldReason(row: DmDeliveryRow, now: number): string | null {
 function DeliveryEmptyIllustration() {
   return (
     <svg viewBox="0 0 120 72" className="mx-auto h-[72px] w-[120px]" aria-hidden="true">
-      <rect x="8" y="12" width="104" height="48" rx="10" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
-      <path d="M20 28h56M20 36h40M20 44h48" stroke="var(--line)" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="92" cy="36" r="14" fill="var(--brand)" opacity="0.15" />
-      <path d="M86 36l4 4 8-8" stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <rect x="8" y="12" width="104" height="48" rx="10" fill="var(--poskoo-band)" stroke="var(--poskoo-line)" strokeWidth="1.5" />
+      <path d="M20 28h56M20 36h40M20 44h48" stroke="var(--poskoo-line)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="92" cy="36" r="14" fill="var(--poskoo-lilac)" />
+      <path d="M86 36l4 4 8-8" stroke="var(--poskoo-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </svg>
   );
 }
@@ -106,43 +107,40 @@ export function DmDeliveryStatus({ rows, loadError, asOf }: Props) {
     <section className="mt-10" aria-labelledby="dm-delivery-heading">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 id="dm-delivery-heading" className="text-lg font-semibold">
+          <h2 id="dm-delivery-heading" className="m-0 text-xl font-semibold text-[var(--poskoo-ink)]">
             DM delivery
           </h2>
-          <p className="text-sm text-muted">Recent send queue activity (latest 20).</p>
+          <p className="text-sm text-[var(--poskoo-muted)]">Recent send queue activity (latest 20).</p>
         </div>
         <div className="flex flex-wrap gap-3 text-sm font-medium">
-          <Link href="/app/settings" className="text-brand hover:underline">
+          <Link href="/app/settings" className={ui.link}>
             Settings
           </Link>
-          <Link href="/app/inbox" className="text-brand hover:underline">
+          <Link href="/app/inbox" className={ui.link}>
             Inbox
           </Link>
         </div>
       </div>
 
       {loadError ? (
-        <div className="mt-4 rounded-2xl border border-line bg-surface-2 p-5 text-center">
-          <p role="alert" className="text-sm text-ink-2">
+        <div role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-4 text-center`}>
+          <p className="m-0 text-sm">
             We couldn&apos;t load delivery status right now. Your automations still work — try refreshing.
           </p>
-          <a
-            href="/app/auto-dm"
-            className="mt-3 inline-block rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink hover:bg-surface-2"
-          >
+          <a href="/app/auto-dm" className={`${ui.btn} ${ui.btnGhost} ${ui.sm} mt-3`}>
             Refresh
           </a>
         </div>
       ) : !rows?.length ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-line bg-surface p-6 text-center">
+        <div className={`${ui.card} mt-4 border-dashed p-6 text-center`}>
           <DeliveryEmptyIllustration />
-          <p className="mt-3 text-sm font-medium">No DMs in the queue yet</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-muted">
+          <p className="mt-3 text-sm font-semibold text-[var(--poskoo-ink)]">No DMs in the queue yet</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-[var(--poskoo-muted)]">
             When comment automations enqueue messages, sent and retry status will show here.
           </p>
         </div>
       ) : (
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-4 grid gap-3">
           {rows.map((row) => {
             const hold = row.status === "pending" ? pendingHoldReason(row, now) : null;
             const failure = row.status === "failed" || row.status === "skipped" ? failureCategory(row.last_error) : null;
@@ -153,61 +151,61 @@ export function DmDeliveryStatus({ rows, loadError, asOf }: Props) {
               row.account_status === "disconnected";
 
             return (
-              <li key={row.id} className="rounded-2xl border border-line bg-surface p-4">
+              <li key={row.id} className={`${ui.card} p-4`}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeClass(row.status)}`}>
+                  <span className={statusBadgeClass(row.status)}>
                     {statusLabel(row.status)}
                   </span>
-                  <span className="text-xs text-muted">
-                    Attempts: <span className="font-medium text-ink-2">{row.attempts}</span>
+                  <span className="text-xs text-[var(--poskoo-muted)]">
+                    Attempts: <span className="font-semibold text-[var(--poskoo-ink)]">{row.attempts}</span>
                   </span>
                 </div>
-                <dl className="mt-3 space-y-1.5 text-sm">
+                <dl className="mt-3 grid gap-1.5 text-sm">
                   <div className="flex flex-wrap gap-x-1">
-                    <dt className="text-muted">Automation:</dt>
-                    <dd className="font-medium text-ink-2">{row.rule_name ?? "—"}</dd>
+                    <dt className="text-[var(--poskoo-muted)]">Automation:</dt>
+                    <dd className="m-0 font-semibold text-[var(--poskoo-ink)]">{row.rule_name ?? "—"}</dd>
                     {row.rule_status && (
-                      <dd className="text-xs text-muted">({row.rule_status === "active" ? "active" : "paused"})</dd>
+                      <dd className="m-0 text-xs text-[var(--poskoo-muted)]">({row.rule_status === "active" ? "active" : "paused"})</dd>
                     )}
                   </div>
                   <div className="flex flex-wrap gap-x-1">
-                    <dt className="text-muted">Account:</dt>
-                    <dd className="font-medium text-ink-2">{row.account_username ? `@${row.account_username}` : "—"}</dd>
+                    <dt className="text-[var(--poskoo-muted)]">Account:</dt>
+                    <dd className="m-0 font-semibold text-[var(--poskoo-ink)]">{row.account_username ? `@${row.account_username}` : "—"}</dd>
                   </div>
                   <div className="flex flex-wrap gap-x-1">
-                    <dt className="text-muted">Queued (UTC):</dt>
-                    <dd className="text-ink-2">{fmtUtc(row.created_at)}</dd>
+                    <dt className="text-[var(--poskoo-muted)]">Queued (UTC):</dt>
+                    <dd className="m-0 text-[var(--poskoo-ink)]">{fmtUtc(row.created_at)}</dd>
                   </div>
                   {row.sent_at && (
                     <div className="flex flex-wrap gap-x-1">
-                      <dt className="text-muted">Sent (UTC):</dt>
-                      <dd className="text-ink-2">{fmtUtc(row.sent_at)}</dd>
+                      <dt className="text-[var(--poskoo-muted)]">Sent (UTC):</dt>
+                      <dd className="m-0 text-[var(--poskoo-ink)]">{fmtUtc(row.sent_at)}</dd>
                     </div>
                   )}
                   {row.status === "pending" && (
                     <div className="flex flex-wrap gap-x-1">
-                      <dt className="text-muted">{hold ? "Hold reason:" : "Next retry (UTC):"}</dt>
-                      <dd className="text-ink-2">{hold ?? fmtUtc(row.next_attempt_at)}</dd>
+                      <dt className="text-[var(--poskoo-muted)]">{hold ? "Hold reason:" : "Next retry (UTC):"}</dt>
+                      <dd className="m-0 text-[var(--poskoo-ink)]">{hold ?? fmtUtc(row.next_attempt_at)}</dd>
                     </div>
                   )}
                   {failure && (
                     <div className="flex flex-wrap gap-x-1">
-                      <dt className="text-muted">Issue:</dt>
-                      <dd className="text-ink-2">{failure}</dd>
+                      <dt className="text-[var(--poskoo-muted)]">Issue:</dt>
+                      <dd className="m-0 text-[var(--poskoo-ink)]">{failure}</dd>
                     </div>
                   )}
                 </dl>
                 {(needsReconnect || row.status !== "sent") && (
-                  <p className="mt-3 text-xs text-muted">
+                  <p className="mt-3 text-xs text-[var(--poskoo-muted)]">
                     {needsReconnect && (
                       <>
-                        <Link href="/app/settings" className="font-medium text-brand hover:underline">
+                        <Link href="/app/settings" className={ui.link}>
                           Settings
                         </Link>
                         {" · "}
                       </>
                     )}
-                    <Link href="/app/inbox" className="font-medium text-brand hover:underline">
+                    <Link href="/app/inbox" className={ui.link}>
                       Inbox
                     </Link>
                     {needsReconnect ? " for reconnection or conversation context." : " for conversation context."}

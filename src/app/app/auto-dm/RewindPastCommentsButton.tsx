@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { rewindRuleAction } from "./actions";
+import ui from "@/components/ui/ui.module.css";
 
 type Props = {
   ruleId: string;
@@ -35,27 +36,27 @@ export function RewindPastCommentsButton({ ruleId }: Props) {
         type="button"
         disabled={pending}
         onClick={run}
-        className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink-2 hover:text-ink disabled:opacity-60"
+        className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}
       >
         {pending ? "Scanning…" : "Send to past comments (7 days)"}
       </button>
-      <span className="text-xs text-ink-2">
+      <span className="text-xs text-[var(--poskoo-ink)]">
         Scans up to 25 latest posts and 50 comments per post; only comments from the past 7 days qualify.
       </span>
       <span role="status" aria-live="polite" aria-atomic="true">
         {pending && <span className="sr-only">Scanning past comments.</span>}
         {result?.kind === "ok" && (
-          <span className="text-sm text-ink-2">
+          <span className="text-sm text-[var(--poskoo-ink)]">
             Queued {result.queued} DMs from {result.scanned} recent comments.
             {result.failures > 0 && (
-              <span className="text-warn">
+              <span className="text-[var(--poskoo-coral)]">
                 {" "}Partial scan: {result.failures} account or post scans failed. Some comments could not be checked. Please try again.
               </span>
             )}
           </span>
         )}
         {result?.kind === "err" && (
-          <span className="text-sm text-warn">
+          <span className="text-sm text-[var(--poskoo-coral)]">
             {result.error}
           </span>
         )}

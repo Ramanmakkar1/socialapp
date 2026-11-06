@@ -32,6 +32,8 @@
 .btnLine:hover:not(:disabled) { background: var(--poskoo-card); transform: translateY(-1px); }
 .btnGhost { border-color: var(--poskoo-line); background: var(--poskoo-card); color: var(--poskoo-ink); }
 .btnGhost:hover:not(:disabled) { border-color: var(--poskoo-ink); transform: translateY(-1px); }
+.btnDanger { background: var(--poskoo-peach); color: var(--poskoo-ink); border-color: var(--poskoo-coral); }
+.btnDanger:hover:not(:disabled) { transform: translateY(-1px); }
 .btnLime { background: var(--poskoo-lime); color: var(--poskoo-ink); }
 .btnLime:hover:not(:disabled) { transform: translateY(-1px); }
 .sm { min-height: 38px; padding: .5rem .95rem; font-size: .88rem; }

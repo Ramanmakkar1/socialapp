@@ -4,6 +4,7 @@ import LocalTime from "@/components/LocalTime";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../../EmptyState";
+import ui from "@/components/ui/ui.module.css";
 
 export const metadata = { title: "Auto-DM activity" };
 
@@ -24,10 +25,10 @@ type ActivityRow = {
 };
 
 const STATUS_STYLE: Record<Status, { label: string; className: string }> = {
-  pending: { label: "Pending", className: "border-line bg-surface-2 text-ink-2" },
-  sent: { label: "Sent", className: "border-ok/30 bg-ok/10 text-ok" },
-  failed: { label: "Failed", className: "border-warn/30 bg-warn/10 text-warn" },
-  skipped: { label: "Skipped", className: "border-line bg-surface-2 text-muted" },
+  pending: { label: "Pending", className: ui.pill },
+  sent: { label: "Sent", className: `${ui.pill} ${ui.pillMint}` },
+  failed: { label: "Failed", className: `${ui.pill} ${ui.pillPeach}` },
+  skipped: { label: "Skipped", className: ui.pill },
 };
 
 // Maps stored errors to safe, fixed wording. Raw API text is never rendered.
@@ -49,14 +50,14 @@ function explainError(error: string | null): string | null {
 function DeliveryIllustration() {
   return (
     <svg viewBox="0 0 120 64" className="h-16 w-28 shrink-0" aria-hidden="true">
-      <circle cx="60" cy="32" r="30" fill="var(--brand)" opacity="0.1" />
-      <rect x="8" y="18" width="34" height="24" rx="8" fill="var(--surface)" stroke="var(--line)" strokeWidth="1.5" />
-      <path d="M15 27h20M15 33h13" stroke="var(--ink-2)" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-      <path d="M46 30h22" stroke="var(--brand)" strokeWidth="2" strokeDasharray="3 4" strokeLinecap="round" />
-      <path d="M66 25l6 5-6 5" fill="none" stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="60" cy="32" r="30" fill="var(--poskoo-violet)" opacity="0.1" />
+      <rect x="8" y="18" width="34" height="24" rx="8" fill="var(--poskoo-card)" stroke="var(--poskoo-line)" strokeWidth="1.5" />
+      <path d="M15 27h20M15 33h13" stroke="var(--poskoo-ink)" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+      <path d="M46 30h22" stroke="var(--poskoo-violet)" strokeWidth="2" strokeDasharray="3 4" strokeLinecap="round" />
+      <path d="M66 25l6 5-6 5" fill="none" stroke="var(--poskoo-violet)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <g className="hero-float">
-        <path d="M80 14h26a6 6 0 0 1 6 6v16a6 6 0 0 1-6 6H94l-8 6v-6h-6a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="var(--brand)" />
-        <path d="M86 28l5 5 10-10" fill="none" stroke="var(--brand-ink)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M80 14h26a6 6 0 0 1 6 6v16a6 6 0 0 1-6 6H94l-8 6v-6h-6a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="var(--poskoo-violet)" />
+        <path d="M86 28l5 5 10-10" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
       </g>
     </svg>
   );
@@ -94,10 +95,12 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <Link href="/app/auto-dm" className="text-sm font-medium text-brand hover:underline">← Back to Auto-DM</Link>
-          <h1 className="mt-2 text-2xl font-semibold">Auto-DM activity</h1>
-          <p className="mt-1 max-w-xl text-sm text-muted">
+        <div className="min-w-0">
+          <Link href="/app/auto-dm" className={ui.link}>← Back to Auto-DM</Link>
+          <h1 className="mt-2 text-4xl font-semibold text-[var(--poskoo-ink)]" style={{ letterSpacing: "var(--poskoo-type-heading-ls)", lineHeight: "var(--poskoo-type-heading-lh)" }}>
+            Auto-DM activity
+          </h1>
+          <p className="mt-2 max-w-xl text-[.98rem] text-[var(--poskoo-muted)]">
             The latest DMs your automations tried to send. Pending messages wait while their automation is paused and send after you resume it.
           </p>
         </div>
@@ -105,39 +108,41 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
       </div>
 
       {loadError ? (
-        <div role="alert" className="mt-6 rounded-2xl border border-warn/30 bg-warn/10 p-5 text-sm text-warn">
-          <p className="font-semibold">We couldn&apos;t load your DM activity.</p>
-          <p className="mt-1">Your automations keep running. Refresh the page in a minute to try again.</p>
+        <div role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>
+          <p className="m-0 font-semibold">We couldn&apos;t load your DM activity.</p>
+          <p className="m-0 mt-1">Your automations keep running. Refresh the page in a minute to try again.</p>
         </div>
       ) : visible.length === 0 ? (
-        <EmptyState
-          icon={Inbox}
-          title={page > 1 ? "No older activity" : "No DMs sent yet"}
-          text={page > 1 ? "You've reached the end of your DM activity." : "When someone comments a keyword on your post, the DM shows up here with its delivery status."}
-        />
+        <div className="mt-6">
+          <EmptyState
+            icon={Inbox}
+            title={page > 1 ? "No older activity" : "No DMs sent yet"}
+            text={page > 1 ? "You've reached the end of your DM activity." : "When someone comments a keyword on your post, the DM shows up here with its delivery status."}
+          />
+        </div>
       ) : (
         <ul className="mt-6 grid gap-3">
           {visible.map((row) => {
             const style = STATUS_STYLE[row.status] ?? STATUS_STYLE.pending;
             const reason = row.status === "sent" ? null : explainError(row.last_error);
             return (
-              <li key={row.id} className="rounded-2xl border border-line bg-surface p-4 shadow-sm sm:flex sm:items-start sm:justify-between sm:gap-4">
+              <li key={row.id} className={`${ui.card} p-4 sm:flex sm:items-start sm:justify-between sm:gap-4`}>
                 <div className="min-w-0">
-                  <p className="truncate font-medium">{row.rule_name ?? "Deleted automation"}</p>
-                  <p className="mt-1 text-xs text-muted">
+                  <p className="truncate font-semibold text-[var(--poskoo-ink)]">{row.rule_name ?? "Deleted automation"}</p>
+                  <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                     {row.status === "sent" && row.sent_at ? <>Sent <LocalTime value={row.sent_at} /></> : <>Queued <LocalTime value={row.created_at} /></>}
                     {" · "}
                     {row.attempts} {row.attempts === 1 ? "attempt" : "attempts"}
                   </p>
                   {row.status === "pending" && row.rule_paused && (
-                    <p className="mt-2 text-sm text-ink-2">Waiting: this automation is paused.</p>
+                    <p className="mt-2 text-sm text-[var(--poskoo-ink)]">Waiting: this automation is paused.</p>
                   )}
                   {row.status === "pending" && !row.rule_paused && row.next_attempt_at && (
-                    <p className="mt-2 text-sm text-ink-2">Next try: <LocalTime value={row.next_attempt_at} /></p>
+                    <p className="mt-2 text-sm text-[var(--poskoo-ink)]">Next try: <LocalTime value={row.next_attempt_at} /></p>
                   )}
-                  {reason && <p className="mt-2 text-sm text-ink-2">{reason}</p>}
+                  {reason && <p className="mt-2 text-sm text-[var(--poskoo-ink)]">{reason}</p>}
                 </div>
-                <span className={`mt-3 inline-flex shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold sm:mt-0 ${style.className}`}>
+                <span className={`mt-3 inline-flex shrink-0 sm:mt-0 ${style.className}`}>
                   {style.label}
                 </span>
               </li>
@@ -149,17 +154,17 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
       {!loadError && (page > 1 || hasMore) && (
         <nav aria-label="Activity pages" className="mt-6 flex items-center justify-between gap-3 text-sm">
           {page > 1 ? (
-            <Link href={page === 2 ? "/app/auto-dm/activity" : `/app/auto-dm/activity?page=${page - 1}`} className="rounded-full border border-line px-4 py-2 font-medium hover:bg-surface-2">Newer</Link>
+            <Link href={page === 2 ? "/app/auto-dm/activity" : `/app/auto-dm/activity?page=${page - 1}`} className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}>Newer</Link>
           ) : <span />}
           {hasMore && (
-            <Link href={`/app/auto-dm/activity?page=${page + 1}`} className="rounded-full border border-line px-4 py-2 font-medium hover:bg-surface-2">Older</Link>
+            <Link href={`/app/auto-dm/activity?page=${page + 1}`} className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}>Older</Link>
           )}
         </nav>
       )}
 
-      <p className="mt-8 text-sm text-muted">
+      <p className="mt-8 text-sm text-[var(--poskoo-muted)]">
         DMs not arriving?{" "}
-        <Link href="/help/instagram-auto-dm-not-working" className="font-medium text-brand hover:underline">Read the troubleshooting guide</Link>.
+        <Link href="/help/instagram-auto-dm-not-working" className={ui.link}>Read the troubleshooting guide</Link>.
       </p>
     </>
   );

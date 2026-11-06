@@ -1,0 +1,30 @@
+/* Auto-DM page specifics — template picker cards in landing colours. */
+
+.pickerCard {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  padding: 14px;
+  text-decoration: none;
+  transition: transform .2s, box-shadow .2s;
+}
+.pickerCard:hover { transform: translateY(-3px); box-shadow: var(--poskoo-shadow-float); }
+.pickerList li:nth-child(1) .pickerCard { background: var(--poskoo-lilac); }
+.pickerList li:nth-child(2) .pickerCard { background: var(--poskoo-peach); }
+.pickerList li:nth-child(3) .pickerCard { background: var(--poskoo-pink); }
+.pickerList li:nth-child(4) .pickerCard { background: var(--poskoo-mint); }
+
+.pickerArt {
+  display: block;
+  border-radius: var(--poskoo-radius-md);
+  background: var(--poskoo-card);
+  padding: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pickerCard { transition: none; }
+}

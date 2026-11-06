@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
@@ -35,15 +34,15 @@ export default async function AutoDmPage({
   } catch {
     return (
       <section aria-labelledby="auto-dm-heading">
-        <h1 id="auto-dm-heading" className="text-2xl font-semibold tracking-tight">Auto-DM</h1>
-        <div role="alert" className="mt-6 rounded-2xl border border-line bg-surface p-6 shadow-sm">
-          <h2 className="text-lg font-semibold">We couldn’t load your automations</h2>
-          <p className="mt-2 text-sm text-ink-2">
+        <h1 id="auto-dm-heading" className="m-0 text-3xl font-semibold text-[var(--poskoo-ink)]" style={{ letterSpacing: "var(--poskoo-type-heading-ls)" }}>Auto-DM</h1>
+        <div role="alert" className="mt-6 rounded-[var(--poskoo-radius-card)] border border-[var(--poskoo-line)] bg-[var(--poskoo-peach)] p-6 shadow-[var(--poskoo-shadow-card)]">
+          <h2 className="m-0 text-lg font-semibold">We couldn&apos;t load your automations</h2>
+          <p className="mt-2 text-sm text-[var(--poskoo-ink)]">
             Please try again in a moment. Your existing rules have not changed.
           </p>
-          <Link href="/app/auto-dm" className="btn-primary mt-5 inline-flex min-h-11 items-center rounded-xl px-5 py-2.5 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+          <a href="/app/auto-dm" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[var(--poskoo-ink)] px-5 py-2.5 text-sm font-semibold text-white">
             Retry loading automations
-          </Link>
+          </a>
         </div>
       </section>
     );
