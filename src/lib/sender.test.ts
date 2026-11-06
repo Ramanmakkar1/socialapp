@@ -891,3 +891,80 @@ test("sendDueDms: inbound lookup failure keeps the DM pending via rollback", asy
     inbound
   );
 });
+
+// ---- follow_check rows: durable follower re-check with backoff, then a clear give-up (bug g) ----
+
+function followCheckRow(attempts: number) {
+  return dmFollowUpRow({ id: "q-follow", social_account_id: "acc-1", kind: "follow_check", attempts, message: "LINK MESSAGE" });
+}
+
+async function runFollowCheck(attempts: number, following: boolean | null) {
+  const updates: { sql: string; params: unknown[] }[] = [];
+  const sentBodies: string[] = [];
+  globalThis.fetch = async (url, init) => {
+    if (String(url).includes("is_user_follow_business")) {
+      if (following === null) return new Response("{}", { status: 500 });
+      return Response.json({ is_user_follow_business: following });
+    }
+    sentBodies.push(String(init?.body));
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const previousError = console.error;
+  console.error = () => {};
+  try {
+    return await withSendDueDmsEnv(
+      [{ id: "acc-1", external_id: "ig-1", status: "active", dm_cooldown_until: null, access_token_enc: "", created_at: 1 }],
+      [followCheckRow(attempts)],
+      [{ id: "rule-active", user_id: "user-1", social_account_id: "acc-1", status: "active" }],
+      async (ctx) => {
+        const connect = ctx.pool.connect.bind(ctx.pool);
+        (ctx.pool as unknown as { connect: () => Promise<unknown> }).connect = async () => {
+          const client = (await connect()) as unknown as { query: (sql: string, params?: unknown[]) => Promise<unknown> };
+          const original = client.query;
+          client.query = async (sql: string, params: unknown[] = []) => {
+            if (sql.startsWith("update socialapp.dm_queue")) updates.push({ sql, params });
+            return original(sql, params);
+          };
+          return client;
+        };
+        const { sendDueDms } = await import("./sender.ts");
+        const result = await sendDueDms(50);
+        return { result, updates, sentBodies, queue: ctx.queue };
+      },
+      new Map<string, InboundMock>([["ig-1:customer-1", new Date(Date.now() - 60_000)]])
+    );
+  } finally {
+    console.error = previousError;
+  }
+}
+
+test("sendDueDms: follow_check retries with backoff while Instagram does not answer", async () => {
+  const { result, updates, sentBodies } = await runFollowCheck(1, null);
+  assert.equal(result.retried, 1);
+  assert.equal(sentBodies.length, 0);
+  const retry = updates.find((u) => /next_attempt_at=now\(\) \+/.test(u.sql));
+  assert.ok(retry, "retry scheduled");
+  assert.equal(retry.params[1], 2);
+  assert.ok(Number(retry.params[3]) > 0);
+});
+
+test("sendDueDms: follow_check gives up clearly after the last attempt", async () => {
+  const { MAX_ATTEMPTS } = await import("./sendPolicy.ts");
+  const { FOLLOW_CHECK_GAVE_UP } = await import("./sender.ts");
+  const { result, updates, sentBodies } = await runFollowCheck(MAX_ATTEMPTS - 1, null);
+  assert.equal(result.failed, 1);
+  assert.equal(sentBodies.length, 0);
+  const failed = updates.find((u) => u.sql.includes("status='failed'"));
+  assert.equal(failed?.params[2], FOLLOW_CHECK_GAVE_UP);
+});
+
+test("sendDueDms: follow_check sends the link to a follower and a nudge to a non-follower", async () => {
+  const yes = await runFollowCheck(2, true);
+  assert.equal(yes.result.sent, 1);
+  assert.match(yes.sentBodies[0], /LINK MESSAGE/);
+  assert.ok(yes.updates.some((u) => u.sql.includes("set kind='gated_link'")));
+  const no = await runFollowCheck(0, false);
+  assert.equal(no.result.sent, 1);
+  assert.match(no.sentBodies[0], /not following yet/);
+  assert.ok(no.updates.some((u) => u.sql.includes("set kind='follow_nudge'")));
+});

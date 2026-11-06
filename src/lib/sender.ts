@@ -2,6 +2,8 @@
 import type pg from "pg";
 import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
+import { isFollower } from "@/lib/followCheck";
+import { FOLLOW_NUDGE_MESSAGE } from "@/lib/messages";
 import { DM_WINDOW_MS, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
 import {
   MAX_ATTEMPTS,
@@ -32,6 +34,9 @@ type QueueRow = {
   kind: string;
   created_at?: Date | null;
 };
+
+export const FOLLOW_CHECK_GAVE_UP =
+  "Gave up: Instagram did not answer the follower check after several tries, so the link was not sent. The person can reply again to retry.";
 
 export type SendResult = { sent: number; retried: number; failed: number; skipped: number };
 
@@ -248,9 +253,21 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           left -= 1;
           continue;
         }
-        const windowError = row.comment_id
-          ? messagingWindowError(row)
-          : await inboundDmWindowError(account.external_id, row.recipient_external_id);
+        let windowError: string | null;
+        try {
+          windowError = row.comment_id
+            ? messagingWindowError(row)
+            : await inboundDmWindowError(account.external_id, row.recipient_external_id);
+        } catch (err) {
+          // Keep this DM pending and carry on: never roll back DMs this run already sent.
+          console.error("sendDueDms: window check failed, will retry row", row.id, err instanceof Error ? err.message : err);
+          await client.query(
+            "update socialapp.dm_queue set last_error=$2, next_attempt_at=now() + interval '1 minute' where id=$1",
+            [row.id, "Could not check Instagram's messaging window; will retry"]
+          );
+          result.retried += 1;
+          continue;
+        }
         if (windowError) {
           await client.query(
             "update socialapp.dm_queue set status='skipped', last_error=$2 where id=$1",
@@ -260,13 +277,47 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           continue;
         }
 
-        const outcome = await sendPrivateReply(account.external_id, token, row);
+        let sendRow = row;
+        if (row.kind === "follow_check") {
+          // Durable follower re-check for a gated link (queued when Instagram did not answer).
+          const following = await isFollower(row.recipient_external_id, token);
+          if (following === null) {
+            const attempts = row.attempts + 1;
+            if (attempts >= MAX_ATTEMPTS) {
+              await client.query(
+                "update socialapp.dm_queue set status='failed', attempts=$2, last_error=$3 where id=$1",
+                [row.id, attempts, FOLLOW_CHECK_GAVE_UP]
+              );
+              console.error("sendDueDms: follower check gave up for row", row.id);
+              result.failed += 1;
+            } else {
+              await client.query(
+                "update socialapp.dm_queue set attempts=$2, last_error=$3, next_attempt_at=now() + ($4::int * interval '1 millisecond') where id=$1",
+                [row.id, attempts, "Instagram did not answer the follower check; retrying", nextAttemptDelayMs(row.attempts)]
+              );
+              result.retried += 1;
+            }
+            continue;
+          }
+          if (following === false) {
+            await client.query(
+              "update socialapp.dm_queue set kind='follow_nudge', message=$2 where id=$1",
+              [row.id, FOLLOW_NUDGE_MESSAGE]
+            );
+            sendRow = { ...row, kind: "follow_nudge", message: FOLLOW_NUDGE_MESSAGE };
+          }
+        }
+
+        const outcome = await sendPrivateReply(account.external_id, token, sendRow);
         left -= 1;
         if (outcome.ok) {
           await client.query(
             "update socialapp.dm_queue set status='sent', sent_at=now(), attempts=attempts+1, last_error=null where id=$1",
             [row.id]
           );
+          if (sendRow.kind === "follow_check") {
+            await client.query("update socialapp.dm_queue set kind='gated_link' where id=$1 and kind='follow_check'", [row.id]);
+          }
           result.sent += 1;
           continue;
         }
