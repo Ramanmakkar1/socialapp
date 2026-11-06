@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { GraphError, graphCall, replyToCommentPublicly, sendDirectMessage, userAccount } from "@/lib/igGraph";
+import { guardedDmSend } from "@/lib/dmCooldown";
 import { DM_WINDOW_MS, PRIVATE_REPLY_WINDOW_MS, commentReceivedAt, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
 
 function field(formData: FormData, key: string, max = 1000): string {
@@ -61,18 +62,25 @@ export async function privateReplyAction(formData: FormData): Promise<void> {
   );
   const rowId = claimed[0]?.id;
   if (!rowId) back({ error: "This comment already got a private reply." });
-  let error = "";
-  try {
+  const sent = await guardedDmSend(account, async () => {
     await graphCall(account, `${encodeURIComponent(account.external_id)}/messages`, {
       method: "POST",
       body: { recipient: { comment_id: commentId }, message: { text: message } },
     });
-    await query("update socialapp.dm_queue set status='sent', sent_at=now(), attempts=1 where id=$1", [rowId]);
+  });
+  try {
+    if (sent.ok) {
+      await query("update socialapp.dm_queue set status='sent', sent_at=now(), attempts=1 where id=$1", [rowId]);
+    } else if (sent.rateLimited) {
+      // Not sent: release the claim so the private reply can be tried again after the cooldown.
+      await query("delete from socialapp.dm_queue where id=$1 and status='skipped' and kind='manual_reply'", [rowId]);
+    } else {
+      await query("update socialapp.dm_queue set status='failed', attempts=1, last_error=$2 where id=$1", [rowId, sent.error]);
+    }
   } catch (err) {
-    error = failMessage(err);
-    await query("update socialapp.dm_queue set status='failed', attempts=1, last_error=$2 where id=$1", [rowId, error]);
+    console.error("privateReplyAction: could not record reply", rowId, err instanceof Error ? err.message : err);
   }
-  back(error ? { error } : { ok: "private" });
+  back(sent.ok ? { ok: "private" } : { error: sent.error });
 }
 
 // Reply inside a DM thread (instagram_business_manage_messages), only within 24 h of their last message.
@@ -89,16 +97,17 @@ export async function replyInThreadAction(formData: FormData): Promise<void> {
   if (!withinWindow(last, DM_WINDOW_MS)) {
     back({ thread, error: "Instagram only allows replies within 24 hours of this person's last message." });
   }
-  let error = "";
+  const sent = await guardedDmSend(account, () => sendDirectMessage(account, senderId, message));
+  if (!sent.ok) back({ thread, error: sent.error });
   try {
-    await sendDirectMessage(account, senderId, message);
+    // Recording is separate from sending: a DB hiccup must not tell the user an already-sent DM failed.
     await query(
       `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, status, kind, attempts, sent_at)
        values ($1,$2,null,null,null,$3,$4,'sent','manual_reply',1,now())`,
       [user.id, account.id, senderId, message]
     );
   } catch (err) {
-    error = failMessage(err);
+    console.error("replyInThreadAction: sent but not recorded, account", account.id, err instanceof Error ? err.message : err);
   }
-  back(error ? { thread, error } : { thread, ok: "dm" });
+  back({ thread, ok: "dm" });
 }
