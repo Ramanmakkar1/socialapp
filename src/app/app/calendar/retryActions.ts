@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { getPool, isDbConfigured } from "@/lib/db";
+import { scheduledPostLimitError } from "@/lib/planLimits";
 
 export async function retryPost(id: string): Promise<{ ok: boolean; error?: string }> {
   if (typeof id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -13,6 +14,14 @@ export async function retryPost(id: string): Promise<{ ok: boolean; error?: stri
   }
 
   const user = await requireUser();
+  try {
+    // A failed post does not count toward the monthly limit; retrying puts it back in the queue.
+    const limitError = await scheduledPostLimitError(user.id, new Date(), id);
+    if (limitError) return { ok: false, error: limitError };
+  } catch (err) {
+    console.error("retryPost: plan limit check failed", id, err instanceof Error ? err.message : err);
+    return { ok: false, error: "Could not retry post." };
+  }
   let client;
   try {
     client = await getPool().connect();
