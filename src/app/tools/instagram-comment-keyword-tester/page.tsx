@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import KeywordTesterTool from "./KeywordTesterTool";
 
 const PATH = "/tools/instagram-comment-keyword-tester";
@@ -17,7 +17,12 @@ export const metadata: Metadata = {
 
 function CommentDmFlowIllustration() {
   return (
-    <svg viewBox="0 0 320 150" aria-hidden="true" focusable="false" className="mx-auto w-full max-w-md">
+    <svg
+      viewBox="0 0 320 150"
+      aria-hidden="true"
+      focusable="false"
+      style={{ width: "100%", maxWidth: 480, display: "block", marginInline: "auto" }}
+    >
       <ellipse cx="160" cy="140" rx="150" ry="8" fill="var(--brand)" opacity=".08" />
       <rect x="10" y="16" width="92" height="116" rx="14" fill="var(--surface)" stroke="var(--line)" />
       <rect x="20" y="26" width="72" height="54" rx="8" fill="var(--brand)" opacity=".18" />
@@ -33,14 +38,7 @@ function CommentDmFlowIllustration() {
       <text x="158" y="68" textAnchor="middle" fill="var(--brand)" fontSize="13" fontWeight="700">
         GUIDE
       </text>
-      <path
-        d="M200 64h24"
-        stroke="var(--brand-2)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeDasharray="4 5"
-        className="motion-safe:animate-pulse motion-reduce:animate-none"
-      />
+      <path d="M200 64h24" stroke="var(--brand-2)" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 5" />
       <path
         d="m222 58 8 6-8 6"
         fill="none"
@@ -101,103 +99,123 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramCommentKeywordTesterPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · runs in your browser · nothing is uploaded
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Instagram comment <span className="gradient-text">keyword tester</span>
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Preview which comments would trigger your auto-DM keyword rules before you publish. Uses the same matching logic as {BRAND.name}&apos;s in-app rule editor.
-              </p>
-            </div>
-            <div className="mt-8 min-w-0">
-              <KeywordTesterTool />
-            </div>
-            <p className="mt-6 text-center text-sm text-ink-2">
-              Ready to automate?{" "}
-              <Link href="/instagram-auto-dm" className="font-medium text-brand underline underline-offset-2">
-                How Instagram auto DM works
-              </Link>
-              {" · "}
-              <Link href="/instagram-auto-dm/templates" className="font-medium text-brand underline underline-offset-2">
-                DM templates
-              </Link>
+      <header className="hero">
+        <span className="pill">Free · runs in your browser · nothing is uploaded</span>
+        <h1>
+          Instagram comment <em className="s mark">keyword tester</em>
+        </h1>
+        <p className="lede">
+          Preview which comments would trigger your auto-DM keyword rules before you publish. Uses the same matching logic as {BRAND.name}&apos;s in-app rule editor.
+        </p>
+        <div className="hero-art" style={{ maxWidth: 520 }}>
+          <Image
+            sizes="(max-width: 520px) 100vw, 520px"
+            src="/landing/card-dm.webp"
+            width={900}
+            height={900}
+            loading="lazy"
+            alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers"
+          />
+        </div>
+      </header>
+
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <KeywordTesterTool />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        Ready to automate?{" "}
+        <Link className={s.vlink} href="/instagram-auto-dm">
+          How Instagram auto DM works
+        </Link>
+        {" · "}
+        <Link className={s.vlink} href="/instagram-auto-dm/templates">
+          DM templates
+        </Link>
+      </p>
+
+      {/* How it works */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">How it works</p>
+            <h2>How comment keywords trigger a DM</h2>
+          </div>
+          <CommentDmFlowIllustration />
+          <div className={s.prose} style={{ marginTop: 28 }}>
+            <p>
+              You ask followers to comment a single keyword on a post or reel. When Instagram sends that comment to{" "}
+              {BRAND.name}, we normalize the text and compare it to the keywords on your active rule—the same steps as the tester above.
             </p>
+            <p>
+              <strong>Tips:</strong> use one short word like <b>GUIDE</b> instead of a sentence. Skip everyday words like{" "}
+              <b>hi</b> or <b>thanks</b> that appear in normal conversation.
+            </p>
+            <ul>
+              <li>
+                <strong>Contains keyword</strong> catches GUIDE inside longer comments (for example
+                &quot;send GUIDE please&quot;) but not GUIDE embedded in another word like guidebook.
+              </li>
+              <li>
+                <strong>Exact match</strong> only fires when the whole comment is that keyword after
+                normalization—great when you want people to comment just GUIDE.
+              </li>
+            </ul>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="border-y border-line bg-surface px-4 py-16">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-center text-3xl font-semibold tracking-tight">How comment keywords trigger a DM</h2>
-            <CommentDmFlowIllustration />
-            <div className="mt-8 space-y-4 text-sm leading-relaxed text-ink-2">
-              <p>
-                You ask followers to comment a single keyword on a post or reel. When Instagram sends that comment to{" "}
-                {BRAND.name}, we normalize the text and compare it to the keywords on your active rule—the same steps as the tester above.
-              </p>
-              <p>
-                <strong className="font-medium text-ink">Tips:</strong> use one short word like{" "}
-                <span className="font-mono text-brand">GUIDE</span> instead of a sentence. Skip everyday words like{" "}
-                <span className="font-mono">hi</span> or <span className="font-mono">thanks</span> that appear in normal conversation.
-              </p>
-              <ul className="list-inside list-disc space-y-2 pl-1">
-                <li>
-                  <span className="font-medium text-ink">Contains keyword</span> catches GUIDE inside longer comments (for example
-                  &quot;send GUIDE please&quot;) but not GUIDE embedded in another word like guidebook.
-                </li>
-                <li>
-                  <span className="font-medium text-ink">Exact match</span> only fires when the whole comment is that keyword after
-                  normalization—great when you want people to comment just GUIDE.
-                </li>
-              </ul>
-            </div>
+      {/* FAQ */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Comment keyword questions</h2>
           </div>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Comment keyword questions</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Turn matching comments into DMs automatically</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]"
-              >
-                Start free <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/instagram-auto-dm" className="font-medium underline underline-offset-4">
-                Instagram auto DM
-              </Link>
-              <Link href="/instagram-auto-dm/templates" className="font-medium underline underline-offset-4">
-                DM templates
+      {/* CTA */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Turn matching comments into DMs automatically</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/signup">
+                Start free <span aria-hidden="true">→</span>
               </Link>
             </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link className={s.vlink} href="/instagram-auto-dm">
+              Instagram auto DM
+            </Link>
+            {" · "}
+            <Link className={s.vlink} href="/instagram-auto-dm/templates">
+              DM templates
+            </Link>
+          </p>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

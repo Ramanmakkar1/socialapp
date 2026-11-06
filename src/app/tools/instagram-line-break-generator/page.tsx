@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import LineBreakTool from "./LineBreakTool";
 
@@ -66,97 +66,128 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramLineBreakGeneratorPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · runs in your browser · nothing is uploaded
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Instagram line break <span className="gradient-text">generator</span>
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Format captions so blank lines and spacing survive in the Instagram app. Copy the result and paste it into
-                your post or scheduler.
-              </p>
+      <header className="hero">
+        <span className="pill">Free · runs in your browser · nothing is uploaded</span>
+        <h1>
+          Instagram line break <em className="s mark">generator</em>
+        </h1>
+        <p className="lede">
+          Format captions so blank lines and spacing survive in the Instagram app. Copy the result and paste it into
+          your post or scheduler.
+        </p>
+        <div className="hero-art" style={{ maxWidth: 520 }}>
+          <Image
+            sizes="(max-width: 520px) 100vw, 520px"
+            src="/landing/card-schedule.webp"
+            width={900}
+            height={900}
+            loading="lazy"
+            alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
+          />
+        </div>
+      </header>
+
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <LineBreakTool />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        More free Instagram tools:{" "}
+        <Link className={s.vlink} href="/tools/instagram-caption-counter">
+          Caption counter
+        </Link>
+        {" · "}
+        <Link className={s.vlink} href="/tools/instagram-image-size">
+          Image size guide
+        </Link>
+      </p>
+
+      {/* How to use this tool */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Step by step</p>
+              <h2>How to use this tool</h2>
             </div>
-            <div className="mt-8">
-              <LineBreakTool />
+            <div className="pains">
+              {steps.map((step, i) => (
+                <div key={step} className="pain">
+                  <b>Step {i + 1}</b>
+                  <span>{step}</span>
+                </div>
+              ))}
             </div>
-            <p className="mt-6 text-center text-sm text-ink-2">
-              More free Instagram tools:{" "}
-              <Link href="/tools/instagram-caption-counter" className="font-medium text-brand underline underline-offset-2">
-                Caption counter
-              </Link>
-              {" · "}
-              <Link href="/tools/instagram-image-size" className="font-medium text-brand underline underline-offset-2">
-                Image size guide
-              </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Instagram removes spacing */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className={s.prose}>
+            <h2>Why Instagram removes spacing</h2>
+            <p>
+              When you edit a caption in the Instagram app, trailing spaces at the end of a line are stripped. If you relied
+              on spaces or completely empty lines to separate paragraphs, those gaps often disappear after you tap Done. The
+              caption still has line breaks, but without a character on the blank line the feed can look like one dense
+              paragraph.
+            </p>
+            <p>
+              This generator normalises line endings, removes trailing spaces that Instagram would drop anyway, and places a
+              Braille blank (U+2800) or a dot on each empty line so your layout matches what you designed in the textarea.
             </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="border-y border-line bg-surface px-4 py-16">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight">How to use this tool</h2>
-            <ol className="mt-8 list-decimal space-y-4 pl-5 text-ink-2">
-              {steps.map((s) => (
-                <li key={s} className="pl-1">
-                  {s}
-                </li>
-              ))}
-            </ol>
+      {/* FAQ */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram line break FAQ</h2>
           </div>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-3xl font-semibold tracking-tight">Why Instagram removes spacing</h2>
-          <p className="mt-4 text-ink-2">
-            When you edit a caption in the Instagram app, trailing spaces at the end of a line are stripped. If you relied
-            on spaces or completely empty lines to separate paragraphs, those gaps often disappear after you tap Done. The
-            caption still has line breaks, but without a character on the blank line the feed can look like one dense
-            paragraph.
-          </p>
-          <p className="mt-4 text-ink-2">
-            This generator normalises line endings, removes trailing spaces that Instagram would drop anyway, and places a
-            Braille blank (U+2800) or a dot on each empty line so your layout matches what you designed in the textarea.
-          </p>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-4 pb-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Instagram line break FAQ</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule this caption and auto-DM everyone who comments</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">
-                Start free <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/tools/instagram-caption-counter" className="font-medium underline underline-offset-4">
-                Caption counter
+      {/* CTA */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Schedule this caption and auto-DM everyone who comments</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/signup">
+                Start free <span aria-hidden="true">→</span>
               </Link>
             </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link className={s.vlink} href="/tools/instagram-caption-counter">
+              Caption counter
+            </Link>
+          </p>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

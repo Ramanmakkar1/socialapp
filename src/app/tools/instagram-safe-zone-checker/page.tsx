@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import { SAFE_ZONES, toPixels } from "@/lib/safeZones";
 import SafeZoneChecker from "./SafeZoneChecker";
 
@@ -26,6 +26,14 @@ const reelsBottom = px("reels", "bottom");
 const reelsRight = px("reels", "right");
 const storyTop = px("story", "top");
 const storyBottom = px("story", "bottom");
+
+const steps = [
+  "Load a 9:16 image or video from your device (it stays in your browser).",
+  "Pick Reels or Story to see the shaded areas Instagram covers in that format.",
+  "Raise the overlay opacity or turn on the grid to line up text and faces.",
+  "Move anything important out of the shaded areas in your editor and check again.",
+  "Download the blank template to design inside the safe area next time.",
+];
 
 const zoneGuide = [
   {
@@ -101,113 +109,142 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramSafeZoneCheckerPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · runs in your browser · nothing is uploaded
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Instagram Reels &amp; Story Safe Zone Checker
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Load a cover, Story or video frame and see exactly what the caption, buttons and profile bar will hide.
-                Switch between Reels and Story, then download a free 1080×1920 template.
-              </p>
-            </div>
-            <div className="mt-8">
-              <SafeZoneChecker />
-            </div>
-            <p className="mt-6 text-center text-sm text-ink-2">
-              More free Instagram tools:{" "}
-              <Link href="/tools/instagram-image-size" className="font-medium text-brand underline underline-offset-2">
-                Image size guide
-              </Link>
-              {" · "}
-              <Link href="/tools/instagram-post-preview" className="font-medium text-brand underline underline-offset-2">
-                Post preview
-              </Link>
-            </p>
-          </div>
-        </section>
+      <header className="hero">
+        <span className="pill">Free · runs in your browser · nothing is uploaded</span>
+        <h1>
+          Instagram Reels &amp; Story <em className="s mark">Safe Zone Checker</em>
+        </h1>
+        <p className="lede">
+          Load a cover, Story or video frame and see exactly what the caption, buttons and profile bar will hide.
+          Switch between Reels and Story, then download a free 1080×1920 template.
+        </p>
+        <div className="hero-art">
+          <Image
+            sizes="(max-width: 1140px) 100vw, 1060px"
+            src="/landing/multichannel.webp"
+            width={1400}
+            height={933}
+            loading="lazy"
+            alt="A creator at a laptop sends one post that splits to several phones and screens"
+          />
+        </div>
+      </header>
 
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-3xl font-semibold tracking-tight">How to check your safe zones</h2>
-          <ol className="mt-6 list-decimal space-y-3 pl-5 text-ink-2">
-            <li>Load a 9:16 image or video from your device (it stays in your browser).</li>
-            <li>Pick Reels or Story to see the shaded areas Instagram covers in that format.</li>
-            <li>Raise the overlay opacity or turn on the grid to line up text and faces.</li>
-            <li>Move anything important out of the shaded areas in your editor and check again.</li>
-            <li>Download the blank template to design inside the safe area next time.</li>
-          </ol>
-        </section>
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <SafeZoneChecker />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        More free Instagram tools:{" "}
+        <Link className={s.vlink} href="/tools/instagram-image-size">
+          Image size guide
+        </Link>
+        {" · "}
+        <Link className={s.vlink} href="/tools/instagram-post-preview">
+          Post preview
+        </Link>
+      </p>
 
-        <section className="border-y border-line bg-surface px-4 py-16">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight">What each zone hides (1080×1920)</h2>
-            <p className="mt-4 text-ink-2">
-              These sizes are approximate guides, since Instagram&apos;s interface varies by device and caption length.
-            </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              {zoneGuide.map((z) => (
-                <div key={z.title} className="rounded-2xl border border-line bg-bg p-5">
-                  <h3 className="font-medium">{z.title}</h3>
-                  <p className="mt-1 text-xs font-medium text-brand">{z.size}</p>
-                  <p className="mt-2 text-sm text-ink-2">{z.text}</p>
+      {/* How to check your safe zones */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Step by step</p>
+              <h2>How to check your safe zones</h2>
+            </div>
+            <div className="pains">
+              {steps.map((step, i) => (
+                <div key={step} className="pain">
+                  <b>Step {i + 1}</b>
+                  <span>{step}</span>
                 </div>
               ))}
             </div>
-            <p className="mt-6 text-sm text-ink-2">
-              Need the frame size itself? See the{" "}
-              <Link href="/tools/instagram-image-size" className="font-medium text-brand underline underline-offset-2">
-                Instagram image size guide
-              </Link>{" "}
-              for Reel, Story, feed and carousel dimensions, or check a feed post in the{" "}
-              <Link href="/tools/instagram-post-preview" className="font-medium text-brand underline underline-offset-2">
-                Instagram post preview
-              </Link>
-              .
-            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Safe zone FAQ</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      {/* What each zone hides */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">The zones</p>
+            <h2>What each zone hides (1080×1920)</h2>
+            <p>These sizes are approximate guides, since Instagram&apos;s interface varies by device and caption length.</p>
+          </div>
+          <div className="pains" style={{ maxWidth: 760, marginInline: "auto" }}>
+            {zoneGuide.map((z) => (
+              <div key={z.title} className="pain">
+                <b style={{ whiteSpace: "normal" }}>{z.title}</b>
+                <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <b style={{ color: "var(--violet)", fontWeight: 600, fontSize: ".88rem" }}>{z.size}</b>
+                  {z.text}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+            Need the frame size itself? See the{" "}
+            <Link className={s.vlink} href="/tools/instagram-image-size">
+              Instagram image size guide
+            </Link>{" "}
+            for Reel, Story, feed and carousel dimensions, or check a feed post in the{" "}
+            <Link className={s.vlink} href="/tools/instagram-post-preview">
+              Instagram post preview
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Safe zone FAQ</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Plan and schedule your Reels and Stories</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]"
-              >
-                Start free <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/instagram-scheduler" className="font-medium underline underline-offset-4">
-                Instagram scheduler
+      {/* CTA */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Plan and schedule your Reels and Stories</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/signup">
+                Start free <span aria-hidden="true">→</span>
               </Link>
             </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link className={s.vlink} href="/instagram-scheduler">
+              Instagram scheduler
+            </Link>
+          </p>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

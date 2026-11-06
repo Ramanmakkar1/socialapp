@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import { IG_FORMATS } from "@/lib/igSizes";
 import CropPreview from "./CropPreview";
 
@@ -24,6 +24,14 @@ const ratioLabel = (w: number, h: number) => {
   if (w === 1080 && h === 1920) return "9:16";
   return `${w}:${h}`;
 };
+
+const steps = [
+  "Upload a photo from your device (processed locally, nothing is uploaded).",
+  "Choose an Instagram format: 1:1, 4:5, 3:4, 1.91:1, 9:16 or profile circle.",
+  "Reposition the subject with the horizontal and vertical sliders, then use Center crop to reset.",
+  "Download the exact-size JPG for that format.",
+  `Schedule it on your content calendar with ${BRAND.name}.`,
+];
 
 const faqs = [
   {
@@ -71,162 +79,174 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramImageSizePage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · runs in your browser · nothing is uploaded
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Instagram Image Sizes (2026): Post, Story, Reel &amp; Carousel
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Pixel dimensions for every major Instagram format, plus a live crop preview you can reposition before
-                you download a JPG and schedule.
-              </p>
+      <header className="hero">
+        <span className="pill">Free · runs in your browser · nothing is uploaded</span>
+        <h1>
+          Instagram <em className="s mark">Image Sizes</em> (2026): Post, Story, Reel &amp; Carousel
+        </h1>
+        <p className="lede">
+          Pixel dimensions for every major Instagram format, plus a live crop preview you can reposition before
+          you download a JPG and schedule.
+        </p>
+        <div className="hero-art" style={{ maxWidth: 520 }}>
+          <Image
+            sizes="(max-width: 520px) 100vw, 520px"
+            src="/landing/card-schedule.webp"
+            width={900}
+            height={900}
+            loading="lazy"
+            alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
+          />
+        </div>
+      </header>
+
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <CropPreview />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        More free Instagram tools:{" "}
+        <Link className={s.vlink} href="/tools/instagram-caption-counter">
+          Caption counter
+        </Link>
+        {" · "}
+        <Link className={s.vlink} href="/tools/instagram-line-break-generator">
+          Line break generator
+        </Link>
+      </p>
+
+      {/* How to crop and download */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Step by step</p>
+              <h2>How to crop and download</h2>
             </div>
-            <div className="mt-8">
-              <CropPreview />
+            <div className="pains">
+              {steps.map((step, i) => (
+                <div key={step} className="pain">
+                  <b>Step {i + 1}</b>
+                  <span>{step}</span>
+                </div>
+              ))}
             </div>
-            <p className="mt-6 text-center text-sm text-ink-2">
-              More free Instagram tools:{" "}
-              <Link href="/tools/instagram-caption-counter" className="font-medium text-brand underline underline-offset-2">
-                Caption counter
-              </Link>
-              {" · "}
-              <Link
-                href="/tools/instagram-line-break-generator"
-                className="font-medium text-brand underline underline-offset-2"
-              >
-                Line break generator
-              </Link>
-            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-3xl font-semibold tracking-tight">How to crop and download</h2>
-          <ol className="mt-6 list-decimal space-y-3 pl-5 text-ink-2">
-            <li>Upload a photo from your device (processed locally, nothing is uploaded).</li>
-            <li>Choose an Instagram format: 1:1, 4:5, 3:4, 1.91:1, 9:16 or profile circle.</li>
-            <li>Reposition the subject with the horizontal and vertical sliders, then use Center crop to reset.</li>
-            <li>Download the exact-size JPG for that format.</li>
-            <li>Schedule it on your content calendar with {BRAND.name}.</li>
-          </ol>
-        </section>
-
-        <section className="border-y border-line bg-surface px-4 py-16">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight">Instagram image sizes at a glance (2026)</h2>
-            <div className="mt-8 overflow-x-auto rounded-2xl border border-line bg-bg">
-              <table className="w-full min-w-[28rem] text-sm">
-                <thead>
-                  <tr className="border-b border-line text-left">
-                    <th scope="col" className="p-4 font-medium">
-                      Format
-                    </th>
-                    <th scope="col" className="p-4 font-medium">
-                      Pixels
-                    </th>
-                    <th scope="col" className="p-4 font-medium">
-                      Ratio
-                    </th>
+      {/* Sizes table */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Sizes</p>
+            <h2>Instagram image sizes at a glance (2026)</h2>
+          </div>
+          <div className={s.tableWrap} style={{ maxWidth: 760, marginInline: "auto" }}>
+            <table className={s.table}>
+              <thead>
+                <tr className={s.tr}>
+                  <th scope="col" className={s.th}>Format</th>
+                  <th scope="col" className={s.th}>Pixels</th>
+                  <th scope="col" className={s.th}>Ratio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {IG_FORMATS.map((f) => (
+                  <tr key={f.id} className={s.tr}>
+                    <th scope="row" className={s.th} style={{ textAlign: "left" }}>{f.label}</th>
+                    <td className={s.td}>{f.infoOnly ? "Same as first slide" : `${f.width}×${f.height}`}</td>
+                    <td className={s.td}>{f.infoOnly ? "—" : ratioLabel(f.width, f.height)}</td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {IG_FORMATS.map((f) => (
-                    <tr key={f.id}>
-                      <th scope="row" className="p-4 text-left font-medium">
-                        {f.label}
-                      </th>
-                      <td className="p-4 text-ink-2">
-                        {f.infoOnly ? "Same as first slide" : `${f.width}×${f.height}`}
-                      </td>
-                      <td className="p-4 text-ink-2">{f.infoOnly ? "—" : ratioLabel(f.width, f.height)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-4 text-sm text-ink-2">
-              Posting a Reel or Story at 1080×1920?{" "}
-              <Link
-                href="/tools/instagram-safe-zone-checker"
-                className="font-medium text-brand underline underline-offset-2"
-              >
-                Check Reels safe zones
-              </Link>{" "}
-              to see what the caption, buttons and profile bar cover.
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 16 }}>
+            Posting a Reel or Story at 1080×1920?{" "}
+            <Link className={s.vlink} href="/tools/instagram-safe-zone-checker">
+              Check Reels safe zones
+            </Link>{" "}
+            to see what the caption, buttons and profile bar cover.
+          </p>
+        </div>
+      </section>
+
+      {/* Format notes */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className={s.prose}>
+            <h2>Why 4:5 or 3:4 beats square in the feed</h2>
+            <p>
+              Square 1:1 posts still look sharp on the grid, but portrait 4:5 and tall 3:4 formats occupy more height in
+              the home feed scroll. That extra space helps product shots, people and text overlays stand out without
+              changing how Instagram compresses your file. Many creators default to 4:5; use 3:4 when you want the maximum
+              vertical tile Instagram allows in the updated grid.
+            </p>
+            <h2>Reel and Story cover crop</h2>
+            <p>
+              Reels and Stories publish at 1080×1920 (9:16). If you export a landscape or square photo, Instagram will
+              center-crop or letterbox it. Use the preview above on your still frame so faces stay in frame, and treat the
+              top and bottom safe zones seriously — usernames, music labels and reply buttons cover roughly 250 px on each
+              end at full resolution.
+            </p>
+            <h2>Carousel aspect ratio rule</h2>
+            <p>
+              When you add multiple images to one post, Instagram locks every slide to the aspect ratio of the first
+              image. Plan your shoot or export batch around one size (for example all 4:5 at 1080×1350). The crop tool
+              helps you match that ratio before you upload or schedule.
             </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-3xl font-semibold tracking-tight">Why 4:5 or 3:4 beats square in the feed</h2>
-          <p className="mt-4 text-ink-2">
-            Square 1:1 posts still look sharp on the grid, but portrait 4:5 and tall 3:4 formats occupy more height in
-            the home feed scroll. That extra space helps product shots, people and text overlays stand out without
-            changing how Instagram compresses your file. Many creators default to 4:5; use 3:4 when you want the maximum
-            vertical tile Instagram allows in the updated grid.
-          </p>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-4 pb-8">
-          <h2 className="text-3xl font-semibold tracking-tight">Reel and Story cover crop</h2>
-          <p className="mt-4 text-ink-2">
-            Reels and Stories publish at 1080×1920 (9:16). If you export a landscape or square photo, Instagram will
-            center-crop or letterbox it. Use the preview above on your still frame so faces stay in frame, and treat the
-            top and bottom safe zones seriously — usernames, music labels and reply buttons cover roughly 250 px on each
-            end at full resolution.
-          </p>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-4 pb-16">
-          <h2 className="text-3xl font-semibold tracking-tight">Carousel aspect ratio rule</h2>
-          <p className="mt-4 text-ink-2">
-            When you add multiple images to one post, Instagram locks every slide to the aspect ratio of the first
-            image. Plan your shoot or export batch around one size (for example all 4:5 at 1080×1350). The crop tool
-            helps you match that ratio before you upload or schedule.
-          </p>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-4 pb-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Instagram image size FAQ</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      {/* FAQ */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram image size FAQ</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule this post on your content calendar</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/app/calendar"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]"
-              >
-                Open calendar <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/instagram-auto-dm" className="font-medium underline underline-offset-4">
-                Instagram auto DM
+      {/* CTA */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Schedule this post on your content calendar</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/app/calendar">
+                Open calendar <span aria-hidden="true">→</span>
               </Link>
             </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link className={s.vlink} href="/instagram-auto-dm">
+              Instagram auto DM
+            </Link>
+          </p>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

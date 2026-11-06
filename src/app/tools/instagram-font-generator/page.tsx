@@ -1,9 +1,9 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import FontTool from "./FontTool";
 
 const PATH = "/tools/instagram-font-generator";
@@ -25,29 +25,98 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramFontGeneratorPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2"><ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free / runs in your browser / nothing is uploaded</span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">Instagram font <span className="gradient-text">generator</span></h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">Turn your text into bold, italic, script and more. Copy a style for your Instagram bio or caption.</p>
+      <header className="hero">
+        <span className="pill">Free / runs in your browser / nothing is uploaded</span>
+        <h1>
+          Instagram font <em className="s mark">generator</em>
+        </h1>
+        <p className="lede">Turn your text into bold, italic, script and more. Copy a style for your Instagram bio or caption.</p>
+        <div className="hero-art">
+          <Image
+            sizes="(max-width: 1140px) 100vw, 1060px"
+            src="/landing/multichannel.webp"
+            width={1400}
+            height={933}
+            loading="lazy"
+            alt="A creator at a laptop sends one post that splits to several phones and screens"
+          />
+        </div>
+      </header>
+
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <FontTool />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        More free Instagram tools:{" "}
+        <Link className={s.vlink} href="/tools/instagram-caption-counter">
+          Caption counter
+        </Link>
+        {" / "}
+        <Link className={s.vlink} href="/tools/instagram-line-break-generator">
+          Line break generator
+        </Link>
+      </p>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Step by step</p>
+              <h2>How to use this tool</h2>
             </div>
-            <div className="mt-8"><FontTool /></div>
-            <p className="mt-6 text-center text-sm text-ink-2">More free Instagram tools: <Link href="/tools/instagram-caption-counter" className="font-medium text-brand underline underline-offset-2">Caption counter</Link>{" / "}<Link href="/tools/instagram-line-break-generator" className="font-medium text-brand underline underline-offset-2">Line break generator</Link></p>
+            <div className="pains">
+              {steps.map((step, i) => (
+                <div key={step} className="pain">
+                  <b>Step {i + 1}</b>
+                  <span>{step}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </section>
-        <section className="border-y border-line bg-surface px-4 py-16"><div className="mx-auto max-w-3xl"><h2 className="text-3xl font-semibold tracking-tight">How to use this tool</h2><ol className="mt-8 list-decimal space-y-4 pl-5 text-ink-2">{steps.map((step) => <li key={step} className="pl-1">{step}</li>)}</ol></div></section>
-        <section className="mx-auto max-w-3xl px-4 py-16"><h2 className="text-center text-3xl font-semibold tracking-tight">Instagram font FAQ</h2><div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">{faqs.map((f) => <details key={f.q} className="group p-5"><summary className="cursor-pointer list-none font-medium">{f.q}</summary><p className="mt-2 text-sm text-ink-2">{f.a}</p></details>)}</div></section>
-        <section className="px-4 pb-24"><div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center"><h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule posts and auto-DM everyone who comments</h2><p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p><Link href="/signup" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link></div></section>
-      </main>
-      <SiteFooter />
-    </>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram font FAQ</h2>
+          </div>
+          <div className="faq">
+            {faqs.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Schedule posts and auto-DM everyone who comments</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/signup">
+                Start free <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
+          </div>
+        </div>
+      </section>
+    </PublicShell>
   );
 }
-

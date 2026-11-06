@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ClipboardPaste, Filter, ShieldCheck, Trophy } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import CommentPicker from "./CommentPicker";
 
 const PATH = "/tools/instagram-comment-picker";
@@ -17,17 +17,14 @@ export const metadata: Metadata = {
 
 const steps = [
   {
-    icon: ClipboardPaste,
     title: "Write clear rules and copy the comments",
     body: "Say in the caption what counts as an entry (for example: comment WIN and tag two friends) and when the giveaway ends. After it closes, copy the comments and paste them here, one per line.",
   },
   {
-    icon: Filter,
     title: "Apply the same filters to everyone",
     body: "Set the keyword and the minimum number of tagged friends from your rules, and tick one entry per person so people who commented many times get no extra chances.",
   },
   {
-    icon: Trophy,
     title: "Pick, record and announce",
     body: "Press Pick winner, copy the result and keep it with a screen recording of the draw. Announce the winner in the post or Stories and contact them from your own account.",
   },
@@ -79,108 +76,124 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramCommentPickerPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · no login · comments never leave your browser
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Instagram comment <span className="gradient-text">picker</span>
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Paste the comments from your giveaway post, filter by keyword and tagged friends, and pick a random winner
-                in seconds.
-              </p>
-            </div>
-            <div className="mt-8">
-              <CommentPicker />
-            </div>
-            <p className="mx-auto mt-4 max-w-2xl text-center text-xs text-muted">
-              You paste the comments yourself. This tool does not use the Instagram API, does not scrape Instagram and makes
-              no network calls with your comments: everything runs in your browser.
-            </p>
-            <p className="mt-6 text-center text-sm text-ink-2">
-              More free Instagram tools:{" "}
-              <Link href="/tools/instagram-comment-keyword-tester" className="font-medium text-brand underline underline-offset-2">
-                Comment keyword tester
-              </Link>
-              {" · "}
-              <Link href="/tools/instagram-engagement-rate-calculator" className="font-medium text-brand underline underline-offset-2">
-                Engagement rate calculator
-              </Link>
-            </p>
-          </div>
-        </section>
+      <header className="hero">
+        <span className="pill">Free · no login · comments never leave your browser</span>
+        <h1>
+          Instagram comment <em className="s mark">picker</em>
+        </h1>
+        <p className="lede">
+          Paste the comments from your giveaway post, filter by keyword and tagged friends, and pick a random winner
+          in seconds.
+        </p>
+        <div className="hero-art" style={{ maxWidth: 520 }}>
+          <Image
+            sizes="(max-width: 520px) 100vw, 520px"
+            src="/landing/problem.webp"
+            width={900}
+            height={900}
+            loading="lazy"
+            alt="A tired creator at night buried under phones and chat-bubble notifications"
+          />
+        </div>
+      </header>
 
-        <section className="border-y border-line bg-surface px-4 py-16">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="text-center text-3xl font-semibold tracking-tight">How to run a fair giveaway</h2>
-            <ol className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-              {steps.map((s, i) => (
-                <li key={s.title} className="rounded-2xl border border-line bg-bg p-6">
-                  <div className="flex items-center gap-3">
-                    <span className="btn-primary inline-flex h-10 w-10 items-center justify-center rounded-xl">
-                      <s.icon className="h-5 w-5" />
-                    </span>
-                    <span className="text-sm font-medium text-muted">Step {i + 1}</span>
-                  </div>
-                  <h3 className="mt-4 font-semibold">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-2">{s.body}</p>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-6 text-center text-xs text-muted">
-              Instagram requires that promotions follow its{" "}
-              <a
-                href="https://help.instagram.com/179379842258600"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline underline-offset-2 hover:text-ink"
-              >
-                promotion guidelines
-              </a>
-              , including official rules and a note that Instagram does not sponsor the giveaway.
-            </p>
-          </div>
-        </section>
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <CommentPicker />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 16 }}>
+        You paste the comments yourself. This tool does not use the Instagram API, does not scrape Instagram and makes
+        no network calls with your comments: everything runs in your browser.
+      </p>
+      <p className="small" style={{ textAlign: "center", marginTop: 12 }}>
+        More free Instagram tools:{" "}
+        <Link className={s.vlink} href="/tools/instagram-comment-keyword-tester">
+          Comment keyword tester
+        </Link>
+        {" · "}
+        <Link className={s.vlink} href="/tools/instagram-engagement-rate-calculator">
+          Engagement rate calculator
+        </Link>
+      </p>
 
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Instagram comment picker questions</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      {/* How to run a fair giveaway */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Giveaways</p>
+            <h2>How to run a fair giveaway</h2>
+          </div>
+          <div className="cards">
+            {steps.map((st, i) => (
+              <article key={st.title} className="pcard">
+                <span className="no">Step {i + 1}</span>
+                <h3>{st.title}</h3>
+                <p>{st.body}</p>
+              </article>
+            ))}
+          </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            Instagram requires that promotions follow its{" "}
+            <a
+              href="https://help.instagram.com/179379842258600"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={s.vlink}
+            >
+              promotion guidelines
+            </a>
+            , including official rules and a note that Instagram does not sponsor the giveaway.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram comment picker questions</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Auto-DM everyone who comments your giveaway keyword
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">
-                Start free <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/instagram-auto-dm" className="font-medium underline underline-offset-4">
-                How Instagram auto DM works
+      {/* CTA */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Auto-DM everyone who comments your giveaway keyword</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/signup">
+                Start free <span aria-hidden="true">→</span>
               </Link>
             </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link className={s.vlink} href="/instagram-auto-dm">
+              How Instagram auto DM works
+            </Link>
+          </p>
+        </div>
+      </section>
+    </PublicShell>
   );
 }
