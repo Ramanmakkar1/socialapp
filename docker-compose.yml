@@ -9,3 +9,5 @@ services:
         required: false
     environment:
       NEXT_PUBLIC_SITE_URL: https://poskoo.com
+      META_APP_ID: "2785977518463252"
+      META_LOGIN_CONFIG_ID: "966709382780716"
