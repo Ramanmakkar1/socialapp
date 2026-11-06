@@ -136,43 +136,6 @@
   min-width: 0;
 }
 
-/* Tool widgets keep their own inner card (.glow ...); inside a tile that would be a
-   card in a card, so the inner one goes flat. */
-.tile > :global(.glow) {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  padding: 0;
-}
-
-/* Older shared widgets (tools, demos, template chooser) still use the generic
-   .btn-primary / .gradient-text / .glow helpers from globals.css. Inside the public
-   shell they must look like the landing: ink pill buttons, serif-italic accents,
-   soft card shadow (no violet-pink gradients). */
-.main :global(.btn-primary) {
-  background: var(--poskoo-ink);
-  color: #fff;
-  border: 1.5px solid var(--poskoo-ink);
-  font-weight: 600;
-  transition: transform .2s, background .2s;
-}
-.main :global(.btn-primary:hover:not(:disabled)) {
-  background: var(--poskoo-violet);
-  border-color: var(--poskoo-violet);
-}
-.main :global(.gradient-text) {
-  background: none;
-  color: inherit;
-  font-family: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -.01em;
-}
-.main :global(.glow) {
-  box-shadow: var(--poskoo-shadow-card);
-}
-
 /* Comparison tables (alternative pages). */
 .tableWrap {
   border: 1.5px solid var(--poskoo-line);

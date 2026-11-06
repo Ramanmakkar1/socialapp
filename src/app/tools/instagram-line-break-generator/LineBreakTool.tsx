@@ -34,7 +34,7 @@ export default function LineBreakTool() {
   }
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
+    <div className="text-left">
       <fieldset className="border-0 p-0">
         <legend id={styleId} className="text-sm font-medium">
           Blank line style
@@ -46,7 +46,7 @@ export default function LineBreakTool() {
               name="blankLine"
               checked={blankLine === "invisible"}
               onChange={() => setBlankLine("invisible")}
-              className="accent-[var(--brand)]"
+              className="accent-[var(--poskoo-violet)]"
             />
             Invisible (Braille blank)
           </label>
@@ -56,7 +56,7 @@ export default function LineBreakTool() {
               name="blankLine"
               checked={blankLine === "dot"}
               onChange={() => setBlankLine("dot")}
-              className="accent-[var(--brand)]"
+              className="accent-[var(--poskoo-violet)]"
             />
             Dot (.)
           </label>
@@ -74,24 +74,24 @@ export default function LineBreakTool() {
             onChange={(e) => setText(e.target.value)}
             rows={9}
             placeholder="Paste or type your caption with blank lines…"
-            className="mt-2 w-full resize-y rounded-xl border border-line bg-bg p-3 text-base leading-6 outline-none focus:border-brand"
+            className="mt-2 w-full resize-y rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3 text-base leading-6 outline-none focus:border-[var(--poskoo-violet)]"
           />
-          <div className="mt-3 rounded-xl border border-line bg-bg p-3 text-sm">
+          <div className="mt-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3 text-sm">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-ink-2">Characters (formatted)</span>
-              <span className={`font-semibold tabular-nums ${overBy > 0 ? "text-brand-2" : "text-ok"}`}>
+              <span className="text-[#3d3450]">Characters (formatted)</span>
+              <span className={`font-semibold tabular-nums ${overBy > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-green)]"}`}>
                 {chars.toLocaleString("en-US")}
-                {igMax !== null && <span className="font-normal text-muted"> / {igMax.toLocaleString("en-US")}</span>}
+                {igMax !== null && <span className="font-normal text-[var(--poskoo-muted)]"> / {igMax.toLocaleString("en-US")}</span>}
               </span>
             </div>
             {overBy > 0 && (
-              <p className="mt-2 text-sm font-medium text-brand-2">
+              <p className="mt-2 text-sm font-medium text-[var(--poskoo-coral)]">
                 {overBy.toLocaleString("en-US")} characters over the Instagram limit.
               </p>
             )}
           </div>
           {needsFix && (
-            <p className="mt-3 text-sm text-warn">
+            <p className="mt-3 text-sm text-[var(--poskoo-coral)]">
               This caption has blank lines or trailing spaces that Instagram may collapse. Copy the formatted output into
               Instagram.
             </p>
@@ -105,24 +105,24 @@ export default function LineBreakTool() {
               type="button"
               onClick={copy}
               disabled={!formatted}
-              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-bg px-3 py-1 text-xs font-medium hover:text-brand disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-1 text-xs font-medium hover:text-[var(--poskoo-violet)] disabled:opacity-50"
             >
-              {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" /> : <Copy className="h-3.5 w-3.5" />}
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
-          <div className="mt-2 overflow-hidden rounded-2xl border border-line bg-bg">
+          <div className="mt-2 overflow-hidden rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)]">
             <div className="flex items-center gap-2 p-3">
-              <span className="h-8 w-8 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-2))]" />
+              <span className="h-8 w-8 rounded-full bg-[linear-gradient(135deg,var(--poskoo-violet),var(--poskoo-coral))]" />
               <span className="text-sm font-semibold">yourbrand</span>
             </div>
-            <div className="aspect-[4/3] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--brand)_25%,transparent),color-mix(in_srgb,var(--brand-2)_25%,transparent))]" />
+            <div className="aspect-[4/3] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--poskoo-violet)_25%,transparent),color-mix(in_srgb,var(--poskoo-coral)_25%,transparent))]" />
             <p className="whitespace-pre-wrap break-words p-3 text-sm leading-5" aria-live="polite">
               <span className="font-semibold">yourbrand</span>{" "}
-              {formatted || <span className="text-muted">Your formatted caption appears here</span>}
+              {formatted || <span className="text-[var(--poskoo-muted)]">Your formatted caption appears here</span>}
             </p>
           </div>
-          <p className="mt-2 text-xs text-muted">
+          <p className="mt-2 text-xs text-[var(--poskoo-muted)]">
             Paste the copied text into the Instagram caption field. Blank lines use an invisible character or a dot so
             spacing stays visible in the app.
           </p>

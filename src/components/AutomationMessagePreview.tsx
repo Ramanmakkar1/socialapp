@@ -91,19 +91,19 @@ export default function AutomationMessagePreview({
   return (
     <section
       aria-labelledby={`${id}-title`}
-      className="min-w-0 rounded-2xl border border-line bg-surface-2 p-4"
+      className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-4"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 id={`${id}-title`} className="text-sm font-semibold text-ink">
+        <h3 id={`${id}-title`} className="text-sm font-semibold text-[var(--poskoo-ink)]">
           What your recipient receives
         </h3>
-        <span className="rounded-full bg-surface px-2.5 py-1 text-xs font-medium text-ink-2">
+        <span className="rounded-full bg-[var(--poskoo-card)] px-2.5 py-1 text-xs font-medium text-[#3d3450]">
           Local preview — nothing is sent
         </span>
       </div>
 
       <div className="mt-3">
-        <label htmlFor={usernameFieldId} className="text-sm font-medium text-ink-2">
+        <label htmlFor={usernameFieldId} className="text-sm font-medium text-[#3d3450]">
           Example commenter username
         </label>
         <input
@@ -114,22 +114,22 @@ export default function AutomationMessagePreview({
           autoComplete="off"
           spellCheck={false}
           placeholder={`Leave blank for “${COMMENT_USERNAME_FALLBACK}”`}
-          className="mt-1.5 w-full min-w-0 rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+          className="mt-1.5 w-full min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]/30"
         />
-        <p className="mt-1 text-xs text-muted">
+        <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
           Replaces {"{{username}}"} in your template. Blank uses the production fallback “
           {COMMENT_USERNAME_FALLBACK}”.
         </p>
       </div>
 
       <div role="status" aria-live="polite" aria-atomic="true" className="mt-3 min-w-0 text-xs leading-relaxed [overflow-wrap:anywhere]">
-        <p className="text-ink-2">Rendered message: {previewMessage.length.toLocaleString("en-US")} / 1,000 characters</p>
+        <p className="text-[#3d3450]">Rendered message: {previewMessage.length.toLocaleString("en-US")} / 1,000 characters</p>
         {previewMessage.length > 1000 && (
-          <p className="mt-1 rounded-xl border border-warn bg-surface px-3 py-2 text-ink">
+          <p className="mt-1 rounded-xl border border-[var(--poskoo-coral)] bg-[var(--poskoo-card)] px-3 py-2 text-[var(--poskoo-ink)]">
             Message exceeds 1,000 characters. Shorten it to leave room for usernames, links and gate instructions.
           </p>
         )}
-        <p className="mt-1 text-ink-2">
+        <p className="mt-1 text-[#3d3450]">
           Saving reserves 30 characters for each username replacement{emailGate || followGate ? '' : ', and checks the message against the tracked link that replaces your destination URL'}.
         </p>
       </div>
@@ -141,30 +141,30 @@ export default function AutomationMessagePreview({
           focusable="false"
           className="mx-auto h-24 w-20 shrink-0 sm:mx-0 motion-safe:transition-transform motion-safe:duration-700 motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none"
         >
-          <ellipse cx="44" cy="112" rx="32" ry="5" fill="var(--brand)" opacity=".12" />
-          <circle cx="44" cy="38" r="22" fill="var(--brand-2)" />
+          <ellipse cx="44" cy="112" rx="32" ry="5" fill="var(--poskoo-violet)" opacity=".12" />
+          <circle cx="44" cy="38" r="22" fill="var(--poskoo-coral)" />
           <path
             d="M26 36c-4-18 32-20 28 2l-8-8-20 6Z"
-            fill="var(--ink)"
+            fill="var(--poskoo-ink)"
           />
-          <circle cx="36" cy="40" r="2.5" fill="var(--surface)" />
-          <circle cx="52" cy="40" r="2.5" fill="var(--surface)" />
+          <circle cx="36" cy="40" r="2.5" fill="var(--poskoo-card)" />
+          <circle cx="52" cy="40" r="2.5" fill="var(--poskoo-card)" />
           <path
             d="M36 48q8 6 16 0"
             fill="none"
-            stroke="var(--surface)"
+            stroke="var(--poskoo-card)"
             strokeWidth="2"
             strokeLinecap="round"
           />
           <path
             d="M28 72c0-8 32-8 32 0v28H28V72Z"
-            fill="var(--brand)"
+            fill="var(--poskoo-violet)"
             opacity=".85"
           />
           <path
             d="m58 88 10 6 8-12"
             fill="none"
-            stroke="var(--brand-2)"
+            stroke="var(--poskoo-coral)"
             strokeWidth="6"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -173,13 +173,13 @@ export default function AutomationMessagePreview({
 
         <div className="min-w-0 flex-1">
           <div
-            className="mx-auto w-full max-w-[390px] rounded-[1.75rem] border-2 border-line bg-ink p-2 shadow-sm sm:mx-0"
+            className="mx-auto w-full max-w-[390px] rounded-[1.75rem] border-2 border-[var(--poskoo-line)] bg-[var(--poskoo-ink)] p-2 shadow-sm sm:mx-0"
             role="img"
             aria-label="Phone mockup showing the outgoing DM"
           >
-            <div className="rounded-[1.35rem] bg-surface px-3 pb-4 pt-8">
-              <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-line" aria-hidden="true" />
-              <p className="text-center text-[10px] font-semibold uppercase tracking-wide text-muted">
+            <div className="rounded-[1.35rem] bg-[var(--poskoo-card)] px-3 pb-4 pt-8">
+              <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-[var(--poskoo-line)]" aria-hidden="true" />
+              <p className="text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
                 Messages
               </p>
               <div
@@ -187,22 +187,22 @@ export default function AutomationMessagePreview({
                 role="status"
                 aria-live="polite"
                 aria-atomic="true"
-                className="mt-3 rounded-2xl rounded-bl-md border border-line bg-surface-2 px-3 py-2.5 text-sm leading-relaxed text-ink [overflow-wrap:anywhere] whitespace-pre-wrap"
+                className="mt-3 rounded-2xl rounded-bl-md border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-2.5 text-sm leading-relaxed text-[var(--poskoo-ink)] [overflow-wrap:anywhere] whitespace-pre-wrap"
               >
                 {messageBody}
               </div>
-              <p className="mt-2 text-center text-[10px] text-muted">Initial automated DM only</p>
+              <p className="mt-2 text-center text-[10px] text-[var(--poskoo-muted)]">Initial automated DM only</p>
             </div>
           </div>
         </div>
       </div>
 
       {requirementLines.length > 0 && (
-        <div className="mt-4 rounded-xl border border-line bg-surface px-3 py-2.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-2">
+        <div className="mt-4 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#3d3450]">
             Before the link is delivered
           </p>
-          <ul className="mt-2 list-inside list-disc space-y-1 text-xs leading-relaxed text-ink-2">
+          <ul className="mt-2 list-inside list-disc space-y-1 text-xs leading-relaxed text-[#3d3450]">
             {requirementLines.map((line) => (
               <li key={line}>{line}</li>
             ))}
@@ -210,7 +210,7 @@ export default function AutomationMessagePreview({
         </div>
       )}
 
-      <p className="mt-3 text-xs leading-relaxed text-ink-2">
+      <p className="mt-3 text-xs leading-relaxed text-[#3d3450]">
         This preview uses your destination URL as written. Use the optional rehearsal below to
         simulate sample replies and a follow result locally—nothing is checked on Instagram.
       </p>

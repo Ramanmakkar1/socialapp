@@ -78,7 +78,7 @@ function ChecklistIllustration() {
   return (
     <svg
       viewBox="0 0 120 72"
-      className="h-16 w-auto shrink-0 text-brand motion-safe:animate-[checklist-float_4s_ease-in-out_infinite]"
+      className="h-16 w-auto shrink-0 text-[var(--poskoo-violet)] motion-safe:animate-[checklist-float_4s_ease-in-out_infinite]"
       aria-hidden
       role="presentation"
     >
@@ -93,31 +93,31 @@ function ChecklistIllustration() {
           }
         }
       `}</style>
-      <rect x="8" y="10" width="48" height="52" rx="8" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
-      <rect x="16" y="18" width="32" height="6" rx="3" fill="var(--brand)" opacity="0.35" />
+      <rect x="8" y="10" width="48" height="52" rx="8" fill="var(--poskoo-band)" stroke="var(--poskoo-line)" strokeWidth="1.5" />
+      <rect x="16" y="18" width="32" height="6" rx="3" fill="var(--poskoo-violet)" opacity="0.35" />
       {[0, 1, 2].map((row) => (
         <g key={row}>
-          <rect x="16" y={30 + row * 12} width="8" height="8" rx="2" fill="var(--line)" />
-          <rect x="28" y={31 + row * 12} width="20" height="6" rx="2" fill="var(--line)" />
+          <rect x="16" y={30 + row * 12} width="8" height="8" rx="2" fill="var(--poskoo-line)" />
+          <rect x="28" y={31 + row * 12} width="20" height="6" rx="2" fill="var(--poskoo-line)" />
         </g>
       ))}
-      <circle cx="88" cy="28" r="14" fill="var(--brand)" opacity="0.15" />
-      <circle cx="88" cy="24" r="6" fill="var(--brand)" opacity="0.5" />
+      <circle cx="88" cy="28" r="14" fill="var(--poskoo-violet)" opacity="0.15" />
+      <circle cx="88" cy="24" r="6" fill="var(--poskoo-violet)" opacity="0.5" />
       <path
         d="M78 48c4-8 12-12 20-10 4 1 8 5 10 10-6 2-12 2-18 0-4-1-8-3-12-6z"
-        fill="var(--brand-2)"
+        fill="var(--poskoo-coral)"
         opacity="0.25"
       />
       <path
         d="M72 52h32v4H72z"
-        fill="var(--surface-2)"
-        stroke="var(--line)"
+        fill="var(--poskoo-band)"
+        stroke="var(--poskoo-line)"
         strokeWidth="1"
         rx="2"
       />
       <path
         d="M76 44l3 3 6-7"
-        stroke="var(--ok)"
+        stroke="var(--poskoo-green)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -142,13 +142,13 @@ function Row({
 }) {
   const statusId = label.replace(/\s+/g, "-").toLowerCase();
   return (
-    <li className="rounded-xl border border-line bg-bg px-3 py-2.5">
+    <li className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2.5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 text-sm font-medium text-ink">
+          <div className="flex items-center gap-2 text-sm font-medium text-[var(--poskoo-ink)]">
             <span
               className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
-                complete ? "bg-ok/15 text-ok" : "bg-surface-2 text-muted"
+                complete ? "bg-[var(--poskoo-green)]/15 text-[var(--poskoo-green)]" : "bg-[var(--poskoo-band)] text-[var(--poskoo-muted)]"
               }`}
               aria-hidden
             >
@@ -156,13 +156,13 @@ function Row({
             </span>
             <span id={`check-${statusId}`}>{label}</span>
           </div>
-          <p className="mt-1 pl-7 text-xs leading-relaxed text-muted">{detail}</p>
+          <p className="mt-1 pl-7 text-xs leading-relaxed text-[var(--poskoo-muted)]">{detail}</p>
         </div>
         {!complete && fixTarget && (
           <button
             type="button"
             onClick={() => onFix(fixTarget)}
-            className="shrink-0 rounded-lg border border-brand/40 px-2.5 py-1 text-xs font-medium text-brand transition-colors hover:bg-brand/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className="shrink-0 rounded-lg border border-[var(--poskoo-violet)]/40 px-2.5 py-1 text-xs font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
             aria-describedby={`check-${statusId}`}
           >
             Fix
@@ -323,20 +323,20 @@ export default function PublishingChecklist({
 
   return (
     <aside
-      className="rounded-2xl border border-line bg-surface p-4"
+      className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4"
       aria-labelledby="publishing-checklist-heading"
     >
       <div className="flex items-start gap-3">
         <ChecklistIllustration />
         <div className="min-w-0 flex-1">
-          <h3 id="publishing-checklist-heading" className="text-sm font-semibold text-ink">
+          <h3 id="publishing-checklist-heading" className="text-sm font-semibold text-[var(--poskoo-ink)]">
             Input readiness
           </h3>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-[var(--poskoo-muted)]">
             Checks what you entered in the composer. Does not verify that media URLs load remotely or that
             platforms will accept delivery.
           </p>
-          <p className="mt-1 text-xs font-medium text-ink-2" aria-live="polite">
+          <p className="mt-1 text-xs font-medium text-[#3d3450]" aria-live="polite">
             {readyCount} of {totalCount} ready to schedule
           </p>
         </div>

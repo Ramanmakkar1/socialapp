@@ -23,36 +23,36 @@ function CommentDmFlowIllustration() {
       focusable="false"
       style={{ width: "100%", maxWidth: 480, display: "block", marginInline: "auto" }}
     >
-      <ellipse cx="160" cy="140" rx="150" ry="8" fill="var(--brand)" opacity=".08" />
-      <rect x="10" y="16" width="92" height="116" rx="14" fill="var(--surface)" stroke="var(--line)" />
-      <rect x="20" y="26" width="72" height="54" rx="8" fill="var(--brand)" opacity=".18" />
-      <circle cx="56" cy="48" r="11" fill="var(--brand-2)" />
-      <path d="M40 80c0-14 32-14 32 0Z" fill="var(--brand)" />
-      <rect x="20" y="90" width="52" height="6" rx="3" fill="var(--ink-2)" opacity=".4" />
-      <rect x="20" y="102" width="36" height="6" rx="3" fill="var(--ink-2)" opacity=".25" />
+      <ellipse cx="160" cy="140" rx="150" ry="8" fill="var(--poskoo-violet)" opacity=".08" />
+      <rect x="10" y="16" width="92" height="116" rx="14" fill="var(--poskoo-card)" stroke="var(--poskoo-line)" />
+      <rect x="20" y="26" width="72" height="54" rx="8" fill="var(--poskoo-violet)" opacity=".18" />
+      <circle cx="56" cy="48" r="11" fill="var(--poskoo-coral)" />
+      <path d="M40 80c0-14 32-14 32 0Z" fill="var(--poskoo-violet)" />
+      <rect x="20" y="90" width="52" height="6" rx="3" fill="#3d3450" opacity=".4" />
+      <rect x="20" y="102" width="36" height="6" rx="3" fill="#3d3450" opacity=".25" />
       <path
         d="M122 46h62a10 10 0 0 1 10 10v14a10 10 0 0 1-10 10h-44l-12 9v-9a10 10 0 0 1-6-10V56a10 10 0 0 1 10-10Z"
-        fill="var(--surface)"
-        stroke="var(--line)"
+        fill="var(--poskoo-card)"
+        stroke="var(--poskoo-line)"
       />
-      <text x="158" y="68" textAnchor="middle" fill="var(--brand)" fontSize="13" fontWeight="700">
+      <text x="158" y="68" textAnchor="middle" fill="var(--poskoo-violet)" fontSize="13" fontWeight="700">
         GUIDE
       </text>
-      <path d="M200 64h24" stroke="var(--brand-2)" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 5" />
+      <path d="M200 64h24" stroke="var(--poskoo-coral)" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 5" />
       <path
         d="m222 58 8 6-8 6"
         fill="none"
-        stroke="var(--brand-2)"
+        stroke="var(--poskoo-coral)"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <rect x="236" y="16" width="74" height="116" rx="14" fill="var(--ink)" />
-      <rect x="242" y="26" width="62" height="96" rx="10" fill="var(--surface)" />
-      <rect x="248" y="40" width="50" height="30" rx="8" fill="var(--brand)" opacity=".2" />
-      <rect x="254" y="48" width="36" height="5" rx="2.5" fill="var(--brand)" />
-      <rect x="254" y="58" width="24" height="5" rx="2.5" fill="var(--brand)" opacity=".6" />
-      <path d="m292 92 2 6 6 2-6 2-2 6-2-6-6-2 6-2Z" fill="var(--brand-2)" />
+      <rect x="236" y="16" width="74" height="116" rx="14" fill="var(--poskoo-ink)" />
+      <rect x="242" y="26" width="62" height="96" rx="10" fill="var(--poskoo-card)" />
+      <rect x="248" y="40" width="50" height="30" rx="8" fill="var(--poskoo-violet)" opacity=".2" />
+      <rect x="254" y="48" width="36" height="5" rx="2.5" fill="var(--poskoo-violet)" />
+      <rect x="254" y="58" width="24" height="5" rx="2.5" fill="var(--poskoo-violet)" opacity=".6" />
+      <path d="m292 92 2 6 6 2-6 2-2 6-2-6-6-2 6-2Z" fill="var(--poskoo-coral)" />
     </svg>
   );
 }

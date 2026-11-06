@@ -49,7 +49,7 @@ export default function BioTool() {
   }
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
+    <div className="text-left">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor={nameId} className="text-sm font-medium">
@@ -61,7 +61,7 @@ export default function BioTool() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
-            className="mt-2 w-full rounded-xl border border-line bg-bg px-3 py-2 text-base outline-none focus:border-brand"
+            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
           />
         </div>
         <div>
@@ -74,7 +74,7 @@ export default function BioTool() {
             value={what}
             onChange={(e) => setWhat(e.target.value)}
             placeholder="Content creator, bakery, trainer…"
-            className="mt-2 w-full rounded-xl border border-line bg-bg px-3 py-2 text-base outline-none focus:border-brand"
+            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
           />
         </div>
         <div className="sm:col-span-2">
@@ -86,7 +86,7 @@ export default function BioTool() {
             type="text"
             value={cta}
             onChange={(e) => setCta(e.target.value)}
-            className="mt-2 w-full rounded-xl border border-line bg-bg px-3 py-2 text-base outline-none focus:border-brand"
+            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
           />
         </div>
         <div>
@@ -97,7 +97,7 @@ export default function BioTool() {
             id={nicheIdSelect}
             value={nicheId}
             onChange={(e) => setNicheId(e.target.value as NicheId)}
-            className="mt-2 w-full rounded-xl border border-line bg-bg px-3 py-2 text-base outline-none focus:border-brand"
+            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
           >
             {NICHES.map((n) => (
               <option key={n.id} value={n.id}>
@@ -114,7 +114,7 @@ export default function BioTool() {
             id={styleId}
             value={nameStyle}
             onChange={(e) => setNameStyle(e.target.value)}
-            className="mt-2 w-full rounded-xl border border-line bg-bg px-3 py-2 text-base outline-none focus:border-brand"
+            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
           >
             <option value="">Plain text</option>
             {FONT_STYLES.map((style) => (
@@ -135,16 +135,16 @@ export default function BioTool() {
           return (
             <div
               key={cardId}
-              className="flex flex-col rounded-2xl border border-line bg-bg p-4"
+              className="flex flex-col rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4"
             >
-              <p className="min-h-[4.5rem] flex-1 whitespace-pre-line break-words text-ink-2">
+              <p className="min-h-[4.5rem] flex-1 whitespace-pre-line break-words text-[#3d3450]">
                 {filled || (
-                  <span className="text-muted">Fill in the fields above</span>
+                  <span className="text-[var(--poskoo-muted)]">Fill in the fields above</span>
                 )}
               </p>
               <div className="mt-3 flex items-center justify-between gap-2">
                 <span
-                  className={`text-xs font-medium tabular-nums ${over ? "text-brand-2" : "text-ink-2"}`}
+                  className={`text-xs font-medium tabular-nums ${over ? "text-[var(--poskoo-coral)]" : "text-[#3d3450]"}`}
                 >
                   {len}/{BIO_LIMIT}
                 </span>
@@ -153,10 +153,10 @@ export default function BioTool() {
                   onClick={() => copy(cardId, filled)}
                   disabled={!filled}
                   aria-label={`${copied === cardId ? "Copied" : "Copy"} bio ${index + 1}`}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium hover:text-brand disabled:opacity-50"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-1 text-xs font-medium hover:text-[var(--poskoo-violet)] disabled:opacity-50"
                 >
                   {copied === cardId ? (
-                    <Check className="h-3.5 w-3.5 text-ok" />
+                    <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" />
                   ) : (
                     <Copy className="h-3.5 w-3.5" />
                   )}

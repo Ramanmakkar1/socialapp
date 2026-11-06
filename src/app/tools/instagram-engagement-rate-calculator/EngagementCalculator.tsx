@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useId, useMemo, useState } from "react";
 import { engagementRate } from "@/lib/engagementRate";
+import ui from "@/components/ui/ui.module.css";
 
 type Mode = "followers" | "reach";
 
@@ -33,7 +34,7 @@ function Field({
     <div>
       <label htmlFor={id} className="text-sm font-medium">
         {label}
-        {optional ? <span className="font-normal text-muted"> (optional)</span> : null}
+        {optional ? <span className="font-normal text-[var(--poskoo-muted)]"> (optional)</span> : null}
       </label>
       <input
         id={id}
@@ -41,7 +42,7 @@ function Field({
         inputMode="numeric"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-2 w-full rounded-xl border border-line bg-bg px-3 py-2.5 text-base tabular-nums outline-none focus:border-brand"
+        className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2.5 text-base tabular-nums outline-none focus:border-[var(--poskoo-violet)]"
         placeholder="0"
       />
     </div>
@@ -77,14 +78,14 @@ export default function EngagementCalculator() {
   }
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
-      <div role="tablist" aria-label="Engagement rate basis" className="flex gap-1 rounded-full bg-surface-2 p-1">
+    <div className="text-left">
+      <div role="tablist" aria-label="Engagement rate basis" className="flex gap-1 rounded-full bg-[var(--poskoo-band)] p-1">
         <button
           type="button"
           role="tab"
           aria-selected={mode === "followers"}
           onClick={() => setMode("followers")}
-          className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition ${mode === "followers" ? "btn-primary" : "text-ink-2 hover:text-ink"}`}
+          className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition ${mode === "followers" ? ui.inkFill : "text-[#3d3450] hover:text-[var(--poskoo-ink)]"}`}
         >
           By followers
         </button>
@@ -93,7 +94,7 @@ export default function EngagementCalculator() {
           role="tab"
           aria-selected={mode === "reach"}
           onClick={() => setMode("reach")}
-          className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition ${mode === "reach" ? "btn-primary" : "text-ink-2 hover:text-ink"}`}
+          className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition ${mode === "reach" ? ui.inkFill : "text-[#3d3450] hover:text-[var(--poskoo-ink)]"}`}
         >
           By reach
         </button>
@@ -107,16 +108,16 @@ export default function EngagementCalculator() {
         <Field id={`${uid}-base`} label={baseLabel} value={values.base} onChange={(v) => set("base", v)} />
       </div>
 
-      <div className="mt-8 rounded-2xl border border-line bg-bg p-6 text-center" aria-live="polite">
-        <p className="text-sm text-ink-2">Engagement rate</p>
+      <div className="mt-8 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-6 text-center" aria-live="polite">
+        <p className="text-sm text-[#3d3450]">Engagement rate</p>
         <p className="mt-2 text-4xl font-semibold tabular-nums tracking-tight sm:text-5xl">
           {rate === null ? "—" : `${rate.toFixed(2)}%`}
         </p>
-        <p className="mt-3 text-sm text-muted">{formula}</p>
+        <p className="mt-3 text-sm text-[var(--poskoo-muted)]">{formula}</p>
       </div>
 
       <p className="mt-6 text-center text-sm">
-        <Link href="/signup" className="font-medium text-brand underline underline-offset-2">
+        <Link href="/signup" className="font-medium text-[var(--poskoo-violet)] underline underline-offset-2">
           Turn those comments into leads with auto-DMs
         </Link>
       </p>

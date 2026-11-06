@@ -84,14 +84,14 @@ export default function UtmBuilder() {
         placeholder={placeholder}
         aria-describedby={`${id}-${key}-hint`}
         onChange={(e) => { set(e.target.value); setCopyState("idle"); }}
-        className="mt-2 min-h-11 w-full rounded-xl border border-line bg-bg px-4 py-3 text-sm outline-none ring-brand focus:ring-2"
+        className="mt-2 min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-4 py-3 text-sm outline-none ring-[var(--poskoo-violet)] focus:ring-2"
       />
-      <p id={`${id}-${key}-hint`} className="mt-1 text-xs text-muted">{hint}</p>
+      <p id={`${id}-${key}-hint`} className="mt-1 text-xs text-[var(--poskoo-muted)]">{hint}</p>
     </div>
   );
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
+    <div className="text-left">
       <fieldset>
         <legend className="text-sm font-medium">Where will this link go on Instagram?</legend>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -101,7 +101,7 @@ export default function UtmBuilder() {
               type="button"
               aria-pressed={content === p.content}
               onClick={() => { setSource("instagram"); setMedium("social"); setContent(p.content); setCopyState("idle"); }}
-              className="min-h-11 rounded-full border border-line bg-bg px-4 text-sm font-medium hover:text-ink aria-pressed:border-brand aria-pressed:text-brand"
+              className="min-h-11 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-4 text-sm font-medium hover:text-[var(--poskoo-ink)] aria-pressed:border-[var(--poskoo-violet)] aria-pressed:text-[var(--poskoo-violet)]"
             >
               {p.label}
             </button>
@@ -117,9 +117,9 @@ export default function UtmBuilder() {
         {field("campaign", "Campaign name (utm_campaign) *", campaign, setCampaign, "Required. Keep it short and consistent, e.g. spring_sale.", "spring_sale")}
         {field("content", "Content (utm_content, optional)", content, setContent, "Tells placements apart, e.g. bio_link or story_link_sticker.")}
       </div>
-      {error ? <p className="mt-4 text-sm text-brand-2" role="alert">{error}</p> : null}
-      <div className="mt-6 rounded-xl border border-line bg-bg p-4">
-        <label htmlFor={`${id}-out`} className="text-xs font-medium uppercase tracking-wide text-muted">Your campaign link</label>
+      {error ? <p className="mt-4 text-sm text-[var(--poskoo-coral)]" role="alert">{error}</p> : null}
+      <div className="mt-6 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
+        <label htmlFor={`${id}-out`} className="text-xs font-medium uppercase tracking-wide text-[var(--poskoo-muted)]">Your campaign link</label>
         <textarea
           id={`${id}-out`}
           ref={outRef}
@@ -128,25 +128,25 @@ export default function UtmBuilder() {
           value={url}
           placeholder="Fill in a destination and campaign name to build the link."
           onFocus={(e) => e.currentTarget.select()}
-          className="mt-2 w-full resize-none break-all rounded-lg border border-line bg-surface p-3 font-mono text-xs text-brand outline-none ring-brand focus:ring-2"
+          className="mt-2 w-full resize-none break-all rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 font-mono text-xs text-[var(--poskoo-violet)] outline-none ring-[var(--poskoo-violet)] focus:ring-2"
         />
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={copy}
             disabled={!url}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-medium text-white disabled:opacity-40"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[var(--poskoo-violet)] px-4 text-sm font-medium text-white disabled:opacity-40"
           >
             {copyState === "ok" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copyState === "ok" ? "Copied" : "Copy link"}
           </button>
-          <p aria-live="polite" className="text-xs text-ink-2">
+          <p aria-live="polite" className="text-xs text-[#3d3450]">
             {copyState === "ok" ? "Link copied to your clipboard." : null}
             {copyState === "fail" ? "Your browser blocked copying. The link is selected above: press Ctrl+C (⌘C on Mac) or long-press and choose Copy." : null}
           </p>
         </div>
       </div>
-      <p className="mt-3 text-xs text-muted">Runs only in your browser. Nothing is shortened, saved or sent anywhere.</p>
+      <p className="mt-3 text-xs text-[var(--poskoo-muted)]">Runs only in your browser. Nothing is shortened, saved or sent anywhere.</p>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Check, Copy, Smartphone } from "lucide-react";
 import { PLATFORMS, PLATFORM_LIMITS, analyzeCaption, type Platform } from "@/lib/captionLimits";
 import { writeCaptionHandoff } from "@/lib/captionHandoff";
+import ui from "@/components/ui/ui.module.css";
 
 const SAMPLE =
   "New drop is live ✨ Comment GUIDE and we'll DM you the full styling guide.\nThanks @studio.north for the shoot!\n\n#fashion #ootd #smallbusiness";
@@ -19,24 +20,24 @@ function level(value: number, max: number | null): Level {
   return "ok";
 }
 
-const TEXT: Record<Level, string> = { ok: "text-ok", warn: "text-warn", over: "text-brand-2" };
-const BAR: Record<Level, string> = { ok: "bg-ok", warn: "bg-warn", over: "bg-brand-2" };
+const TEXT: Record<Level, string> = { ok: "text-[var(--poskoo-green)]", warn: "text-[var(--poskoo-coral)]", over: "text-[var(--poskoo-coral)]" };
+const BAR: Record<Level, string> = { ok: "bg-[var(--poskoo-green)]", warn: "bg-[var(--poskoo-coral)]", over: "bg-[var(--poskoo-coral)]" };
 
 function Meter({ label, value, max }: { label: string; value: number; max: number | null }) {
   const lv = level(value, max);
   const pct = max === null ? 0 : Math.min(100, (value / max) * 100);
   return (
-    <div className="rounded-xl border border-line bg-bg p-3">
+    <div className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3">
       <div className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="text-ink-2">{label}</span>
+        <span className="text-[#3d3450]">{label}</span>
         <span className={`font-semibold tabular-nums ${TEXT[lv]}`}>
           {value.toLocaleString("en-US")}
-          {max !== null && <span className="font-normal text-muted"> / {max.toLocaleString("en-US")}</span>}
+          {max !== null && <span className="font-normal text-[var(--poskoo-muted)]"> / {max.toLocaleString("en-US")}</span>}
         </span>
       </div>
       {max !== null ? (
         <div
-          className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2"
+          className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-band)]"
           role="progressbar"
           aria-label={`${label} used`}
           aria-valuemin={0}
@@ -46,18 +47,18 @@ function Meter({ label, value, max }: { label: string; value: number; max: numbe
           <div className={`h-full rounded-full transition-all ${BAR[lv]}`} style={{ width: `${pct}%` }} />
         </div>
       ) : (
-        <p className="mt-2 text-xs text-muted">No published limit</p>
+        <p className="mt-2 text-xs text-[var(--poskoo-muted)]">No published limit</p>
       )}
     </div>
   );
 }
 
 function Chips({ items, empty }: { items: string[]; empty: string }) {
-  if (items.length === 0) return <p className="text-xs text-muted">{empty}</p>;
+  if (items.length === 0) return <p className="text-xs text-[var(--poskoo-muted)]">{empty}</p>;
   return (
     <ul className="flex flex-wrap gap-1.5">
       {items.map((t, i) => (
-        <li key={`${t}-${i}`} className="max-w-full truncate rounded-full border border-line bg-surface-2 px-2.5 py-0.5 text-xs text-ink-2">
+        <li key={`${t}-${i}`} className="max-w-full truncate rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-2.5 py-0.5 text-xs text-[#3d3450]">
           {t}
         </li>
       ))}
@@ -101,8 +102,8 @@ export default function CaptionCounter() {
   }
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
-      <div role="tablist" aria-label="Platform" className="flex gap-1 rounded-full bg-surface-2 p-1">
+    <div className="text-left">
+      <div role="tablist" aria-label="Platform" className="flex gap-1 rounded-full bg-[var(--poskoo-band)] p-1">
         {PLATFORMS.map((p) => (
           <button
             key={p}
@@ -110,7 +111,7 @@ export default function CaptionCounter() {
             role="tab"
             aria-selected={platform === p}
             onClick={() => setPlatform(p)}
-            className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition ${platform === p ? "btn-primary" : "text-ink-2 hover:text-ink"}`}
+            className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition ${platform === p ? ui.inkFill : "text-[#3d3450] hover:text-[var(--poskoo-ink)]"}`}
           >
             {PLATFORM_LIMITS[p].label}
           </button>
@@ -125,9 +126,9 @@ export default function CaptionCounter() {
               <button
                 type="button"
                 onClick={copy}
-                className="inline-flex items-center gap-1.5 rounded-full border border-line bg-bg px-3 py-1 text-xs font-medium hover:text-brand"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-1 text-xs font-medium hover:text-[var(--poskoo-violet)]"
               >
-                {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? "Copied" : "Copy"}
               </button>
               {platform === "instagram" && (
@@ -135,7 +136,7 @@ export default function CaptionCounter() {
                   type="button"
                   onClick={previewCaption}
                   disabled={storageFailed}
-                  className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-medium disabled:opacity-50 hover:text-brand"
+                  className="inline-flex items-center gap-2 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-1 text-xs font-medium disabled:opacity-50 hover:text-[var(--poskoo-violet)]"
                 >
                   <Smartphone className="h-3.5 w-3.5" /> Preview this caption
                 </button>
@@ -143,21 +144,21 @@ export default function CaptionCounter() {
             </div>
           </div>
           {storageFailed && (
-            <div className="mt-3 rounded-xl border border-line bg-brand/10 p-3 text-sm">
-              <p className="font-medium text-ink">Storage is unavailable in this tab.</p>
-              <p className="mt-1 text-xs text-ink-2">
+            <div className="mt-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-violet)]/10 p-3 text-sm">
+              <p className="font-medium text-[var(--poskoo-ink)]">Storage is unavailable in this tab.</p>
+              <p className="mt-1 text-xs text-[#3d3450]">
                 Copy your caption below, then open the feed preview and paste it in.
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   onClick={copy}
-                  className="btn-primary min-h-11 rounded-full px-5 py-3 text-sm font-medium"
+                  className={`${ui.inkFill} min-h-11 rounded-full px-5 py-3 text-sm font-medium`}
                 >
                   Copy caption
                 </button>
                 <Link
                   href="/tools/instagram-post-preview?from=caption-counter"
-                  className="min-h-11 rounded-full border border-line px-5 py-3 text-sm font-medium text-ink-2 underline"
+                  className="min-h-11 rounded-full border border-[var(--poskoo-line)] px-5 py-3 text-sm font-medium text-[#3d3450] underline"
                 >
                   Open post preview
                 </Link>
@@ -170,7 +171,7 @@ export default function CaptionCounter() {
             onChange={(e) => setText(e.target.value)}
             rows={9}
             placeholder="Paste or type your caption…"
-            className="mt-2 w-full resize-y rounded-xl border border-line bg-bg p-3 text-base leading-6 outline-none focus:border-brand"
+            className="mt-2 w-full resize-y rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3 text-base leading-6 outline-none focus:border-[var(--poskoo-violet)]"
           />
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
             <Meter label="Characters" value={a.chars} max={limit.max} />
@@ -179,20 +180,20 @@ export default function CaptionCounter() {
           </div>
           <div aria-live="polite" className="mt-3">
             {warnings.length > 0 ? (
-              <ul className="space-y-1 text-sm font-medium text-brand-2">
+              <ul className="space-y-1 text-sm font-medium text-[var(--poskoo-coral)]">
                 {warnings.map((w) => <li key={w}>{w}</li>)}
               </ul>
             ) : (
-              <p className="text-sm text-ok">Within the {limit.label} limits.</p>
+              <p className="text-sm text-[var(--poskoo-green)]">Within the {limit.label} limits.</p>
             )}
           </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Hashtags</h3>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">Hashtags</h3>
               <Chips items={a.hashtags} empty="No hashtags yet" />
             </div>
             <div>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Mentions</h3>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">Mentions</h3>
               <Chips items={a.mentions} empty="No mentions yet" />
             </div>
           </div>
@@ -200,19 +201,19 @@ export default function CaptionCounter() {
 
         <div className="min-w-0">
           <h3 className="mb-2 text-sm font-medium">Feed preview</h3>
-          <div className="overflow-hidden rounded-2xl border border-line bg-bg">
+          <div className="overflow-hidden rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)]">
             <div className="flex items-center gap-2 p-3">
-              <span className="h-8 w-8 rounded-full bg-[linear-gradient(135deg,var(--brand),var(--brand-2))]" />
+              <span className="h-8 w-8 rounded-full bg-[linear-gradient(135deg,var(--poskoo-violet),var(--poskoo-coral))]" />
               <span className="text-sm font-semibold">yourbrand</span>
             </div>
-            <div className="aspect-[4/3] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--brand)_25%,transparent),color-mix(in_srgb,var(--brand-2)_25%,transparent))]" />
+            <div className="aspect-[4/3] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--poskoo-violet)_25%,transparent),color-mix(in_srgb,var(--poskoo-coral)_25%,transparent))]" />
             <p className="whitespace-pre-wrap break-words p-3 text-sm leading-5">
               <span className="font-semibold">yourbrand</span>{" "}
-              {a.foldPreview || <span className="text-muted">Your caption appears here</span>}
-              {a.folded && <span className="text-muted">… more</span>}
+              {a.foldPreview || <span className="text-[var(--poskoo-muted)]">Your caption appears here</span>}
+              {a.folded && <span className="text-[var(--poskoo-muted)]">… more</span>}
             </p>
           </div>
-          <p className="mt-2 text-xs text-muted">
+          <p className="mt-2 text-xs text-[var(--poskoo-muted)]">
             {limit.foldAt !== null
               ? `The feed shows about the first ${limit.foldAt} characters or two lines, then "more". The exact cut varies by device.`
               : `${limit.label} preview shows the full text here.`}

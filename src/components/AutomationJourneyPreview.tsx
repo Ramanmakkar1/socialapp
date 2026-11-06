@@ -78,9 +78,9 @@ export default function AutomationJourneyPreview({
   }
 
   const toneClass = {
-    ok: "border-brand bg-brand/10 text-ink",
-    wait: "border-line bg-surface text-ink-2",
-    warn: "border-warn bg-surface text-ink",
+    ok: "border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 text-[var(--poskoo-ink)]",
+    wait: "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[#3d3450]",
+    warn: "border-[var(--poskoo-coral)] bg-[var(--poskoo-card)] text-[var(--poskoo-ink)]",
   }[delivery.tone];
 
   return (
@@ -90,9 +90,9 @@ export default function AutomationJourneyPreview({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold text-ink hover:border-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 motion-safe:transition-colors"
+        className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-2 text-sm font-semibold text-[var(--poskoo-ink)] hover:border-[var(--poskoo-violet)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]/40 motion-safe:transition-colors"
       >
-        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false" className="h-4 w-4 text-brand">
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false" className="h-4 w-4 text-[var(--poskoo-violet)]">
           <path d="M3 4h10a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H8l-4 3v-3H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".35" />
           <path d="M7 8h12v6a2 2 0 0 1-2 2h-1v3l-4-3H9a2 2 0 0 1-2-2V8Z" fill="currentColor" />
         </svg>
@@ -100,27 +100,27 @@ export default function AutomationJourneyPreview({
       </button>
 
       {open && (
-        <div id={panelId} className="mt-3 min-w-0 rounded-2xl border border-line bg-surface p-3 sm:p-4">
-          <p className="rounded-xl bg-surface-2 px-3 py-2 text-xs leading-relaxed text-ink-2">
+        <div id={panelId} className="mt-3 min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 sm:p-4">
+          <p className="rounded-xl bg-[var(--poskoo-band)] px-3 py-2 text-xs leading-relaxed text-[#3d3450]">
             Simulation only: replies stay on this page, nothing is sent or saved, and the follow result is
             chosen by you—no real Instagram check happens.
           </p>
 
-          <ol className="mt-4 space-y-3 border-l-2 border-line pl-4" aria-label="Simulated conversation timeline">
+          <ol className="mt-4 space-y-3 border-l-2 border-[var(--poskoo-line)] pl-4" aria-label="Simulated conversation timeline">
             <li className="relative">
-              <span aria-hidden="true" className="absolute -left-[1.4rem] top-2 h-3 w-3 rounded-full bg-brand" />
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">1 · Your automated DM</p>
-              <div className="mt-1 max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-bl-md border border-line bg-surface-2 px-3 py-2 text-sm text-ink [overflow-wrap:anywhere]">
+              <span aria-hidden="true" className="absolute -left-[1.4rem] top-2 h-3 w-3 rounded-full bg-[var(--poskoo-violet)]" />
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">1 · Your automated DM</p>
+              <div className="mt-1 max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-bl-md border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-2 text-sm text-[var(--poskoo-ink)] [overflow-wrap:anywhere]">
                 {initialMessage}
               </div>
             </li>
             {replies.map((reply, index) => (
               <li key={`${index}-${reply}`} className="relative">
-                <span aria-hidden="true" className="absolute -left-[1.4rem] top-2 h-3 w-3 rounded-full bg-brand-2" />
-                <p className="text-right text-[11px] font-semibold uppercase tracking-wide text-muted">
+                <span aria-hidden="true" className="absolute -left-[1.4rem] top-2 h-3 w-3 rounded-full bg-[var(--poskoo-coral)]" />
+                <p className="text-right text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
                   Sample recipient reply
                 </p>
-                <div className="ml-auto mt-1 w-fit max-w-[85%] rounded-2xl rounded-br-md bg-brand px-3 py-2 text-sm text-white [overflow-wrap:anywhere]">
+                <div className="ml-auto mt-1 w-fit max-w-[85%] rounded-2xl rounded-br-md bg-[var(--poskoo-violet)] px-3 py-2 text-sm text-white [overflow-wrap:anywhere]">
                   {reply}
                 </div>
               </li>
@@ -128,15 +128,15 @@ export default function AutomationJourneyPreview({
             <li className="relative">
               <span
                 aria-hidden="true"
-                className={`absolute -left-[1.4rem] top-2 h-3 w-3 rounded-full ${delivery.tone === "ok" ? "bg-brand" : "bg-line"}`}
+                className={`absolute -left-[1.4rem] top-2 h-3 w-3 rounded-full ${delivery.tone === "ok" ? "bg-[var(--poskoo-violet)]" : "bg-[var(--poskoo-line)]"}`}
               />
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
                 {gated ? "Next · Link delivery (illustrative)" : "Link delivery (illustrative)"}
               </p>
               <div role="status" aria-live="polite" className={`mt-1 rounded-xl border px-3 py-2 text-sm [overflow-wrap:anywhere] ${toneClass}`}>
                 {delivery.text}
                 {delivery.tone === "ok" && linkUrl && gated && (
-                  <span className="mt-1 block text-xs text-ink-2">Example link message: {linkUrl}</span>
+                  <span className="mt-1 block text-xs text-[#3d3450]">Example link message: {linkUrl}</span>
                 )}
               </div>
             </li>
@@ -155,12 +155,12 @@ export default function AutomationJourneyPreview({
                   onChange={(event) => setDraft(event.target.value)}
                   autoComplete="off"
                   placeholder={emailGate ? "e.g. jane@example.com" : "e.g. done"}
-                  className="min-h-11 w-full min-w-0 flex-1 rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+                  className="min-h-11 w-full min-w-0 flex-1 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]/30"
                 />
                 <button
                   type="submit"
                   disabled={!draft.trim()}
-                  className="min-h-11 rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                  className="min-h-11 rounded-xl bg-[var(--poskoo-violet)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]/40"
                 >
                   Add sample reply
                 </button>
@@ -168,7 +168,7 @@ export default function AutomationJourneyPreview({
 
               {followGate && (
                 <fieldset className="mt-4 min-w-0">
-                  <legend className="text-xs font-semibold uppercase tracking-wide text-ink-2">
+                  <legend className="text-xs font-semibold uppercase tracking-wide text-[#3d3450]">
                     Simulated follow result (not a real check)
                   </legend>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -180,7 +180,7 @@ export default function AutomationJourneyPreview({
                     ).map(([value, label]) => (
                       <label
                         key={value}
-                        className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-line bg-surface-2 px-3 py-2 text-sm text-ink has-[:checked]:border-brand has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand/40"
+                        className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-2 text-sm text-[var(--poskoo-ink)] has-[:checked]:border-[var(--poskoo-violet)] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--poskoo-violet)]/40"
                       >
                         <input
                           type="radio"
@@ -188,7 +188,7 @@ export default function AutomationJourneyPreview({
                           value={value}
                           checked={follow === value}
                           onChange={() => setFollow(value)}
-                          className="accent-[var(--brand)]"
+                          className="accent-[var(--poskoo-violet)]"
                         />
                         {label}
                       </label>
@@ -197,12 +197,12 @@ export default function AutomationJourneyPreview({
                 </fieldset>
               )}
 
-              <div className="mt-4 rounded-xl border border-line bg-surface-2 px-3 py-2.5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-ink-2">Outstanding requirements</p>
+              <div className="mt-4 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-2.5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#3d3450]">Outstanding requirements</p>
                 <ul className="mt-2 space-y-1 text-sm">
                   {requirements.map((r) => (
-                    <li key={r.label} className="flex items-start gap-2 text-ink [overflow-wrap:anywhere]">
-                      <span aria-hidden="true" className={r.met ? "text-brand" : "text-muted"}>
+                    <li key={r.label} className="flex items-start gap-2 text-[var(--poskoo-ink)] [overflow-wrap:anywhere]">
+                      <span aria-hidden="true" className={r.met ? "text-[var(--poskoo-violet)]" : "text-[var(--poskoo-muted)]"}>
                         {r.met ? "✓" : "○"}
                       </span>
                       <span>
@@ -213,14 +213,14 @@ export default function AutomationJourneyPreview({
                   ))}
                 </ul>
                 {emailGate && replies.length > 0 && !email && (
-                  <p className="mt-2 text-xs text-ink-2">No valid email found in the sample replies yet.</p>
+                  <p className="mt-2 text-xs text-[#3d3450]">No valid email found in the sample replies yet.</p>
                 )}
               </div>
 
               <button
                 type="button"
                 onClick={reset}
-                className="mt-3 min-h-11 rounded-xl px-3 py-2 text-sm font-medium text-ink-2 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                className="mt-3 min-h-11 rounded-xl px-3 py-2 text-sm font-medium text-[#3d3450] underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]/40"
               >
                 Reset rehearsal
               </button>

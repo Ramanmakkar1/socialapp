@@ -60,9 +60,9 @@ function CopyChip({ text, label }: { text: string; label: string }) {
       type="button"
       onClick={copy}
       disabled={!text}
-      className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-bg px-3 text-xs font-medium hover:text-ink disabled:opacity-40"
+      className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 text-xs font-medium hover:text-[var(--poskoo-ink)] disabled:opacity-40"
     >
-      {copied ? <Check className="h-3.5 w-3.5 text-ok" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" /> : <Copy className="h-3.5 w-3.5" />}
       <span aria-live="polite">{copied ? "Copied" : label}</span>
     </button>
   );
@@ -86,7 +86,7 @@ export default function DmLinkGenerator() {
     : "";
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
+    <div className="text-left">
       <label htmlFor={inputId} className="text-sm font-medium">
         Instagram username
       </label>
@@ -99,20 +99,20 @@ export default function DmLinkGenerator() {
         placeholder="@my.brand or instagram.com/my.brand"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        className="mt-2 min-h-11 w-full rounded-xl border border-line bg-bg px-4 py-3 text-sm outline-none ring-brand focus:ring-2"
+        className="mt-2 min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-4 py-3 text-sm outline-none ring-[var(--poskoo-violet)] focus:ring-2"
       />
       {error ? (
-        <p className="mt-2 text-sm text-brand-2" role="alert">
+        <p className="mt-2 text-sm text-[var(--poskoo-coral)]" role="alert">
           {error}
         </p>
       ) : (
-        <p className="mt-2 text-xs text-muted">Paste @handle, a profile URL, or type the username. Nothing leaves your browser.</p>
+        <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Paste @handle, a profile URL, or type the username. Nothing leaves your browser.</p>
       )}
 
-      <div className="mt-6 rounded-xl border border-line bg-bg p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted">Your DM link</p>
+      <div className="mt-6 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
+        <p className="text-xs font-medium uppercase tracking-wide text-[var(--poskoo-muted)]">Your DM link</p>
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <code className="break-all text-sm font-medium text-brand">{valid ? dmUrl : "https://ig.me/m/yourname"}</code>
+          <code className="break-all text-sm font-medium text-[var(--poskoo-violet)]">{valid ? dmUrl : "https://ig.me/m/yourname"}</code>
           <div className="flex flex-wrap items-center gap-2">
             <CopyChip text={dmUrl} label="Copy link" />
             {valid ? (
@@ -120,7 +120,7 @@ export default function DmLinkGenerator() {
                 href={dmUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-xs font-medium hover:text-ink"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-xs font-medium hover:text-[var(--poskoo-ink)]"
               >
                 Open link <ExternalLink className="h-3.5 w-3.5" />
               </a>
@@ -150,12 +150,12 @@ function SnippetBlock({
   mono?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-line bg-bg p-4">
+    <div className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-medium">{title}</p>
         <CopyChip text={text} label={copyLabel} />
       </div>
-      <p className={`mt-2 text-sm text-ink-2 ${mono ? "font-mono text-xs break-all" : ""}`}>
+      <p className={`mt-2 text-sm text-[#3d3450] ${mono ? "font-mono text-xs break-all" : ""}`}>
         {text || "Enter a valid username above to generate this snippet."}
       </p>
     </div>

@@ -5,7 +5,7 @@ import CommentKeywordTester from "@/components/CommentKeywordTester";
 import type { MatchableRule } from "@/lib/match";
 
 const INPUT =
-  "mt-1.5 w-full min-w-0 rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30";
+  "mt-1.5 w-full min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]/30";
 
 function parseKeywords(raw: string): string[] {
   return raw
@@ -34,10 +34,10 @@ export default function KeywordTesterTool() {
   const keywords = useMemo(() => parseKeywords(keywordText), [keywordText]);
 
   return (
-    <div className="min-w-0 rounded-2xl border border-line bg-surface p-4 sm:p-6">
+    <div className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 sm:p-6">
       <div className="grid min-w-0 gap-5 sm:grid-cols-2">
         <div className="min-w-0">
-          <label htmlFor={keywordsId} className="text-sm font-medium text-ink-2">
+          <label htmlFor={keywordsId} className="text-sm font-medium text-[#3d3450]">
             Keywords
           </label>
           <input
@@ -54,17 +54,17 @@ export default function KeywordTesterTool() {
               {keywords.map((k) => (
                 <span
                   key={k}
-                  className="inline-block max-w-full break-words rounded-md bg-surface-2 px-2 py-0.5 font-mono text-xs font-semibold text-brand"
+                  className="inline-block max-w-full break-words rounded-md bg-[var(--poskoo-band)] px-2 py-0.5 font-mono text-xs font-semibold text-[var(--poskoo-violet)]"
                 >
                   {k}
                 </span>
               ))}
             </div>
           )}
-          <p className="mt-1 text-xs text-muted">Comma-separated, same parsing as auto-DM rules in the app.</p>
+          <p className="mt-1 text-xs text-[var(--poskoo-muted)]">Comma-separated, same parsing as auto-DM rules in the app.</p>
         </div>
         <div className="min-w-0">
-          <label htmlFor={matchId} className="text-sm font-medium text-ink-2">
+          <label htmlFor={matchId} className="text-sm font-medium text-[#3d3450]">
             Match type
           </label>
           <select
@@ -84,8 +84,8 @@ export default function KeywordTesterTool() {
       <div className="mt-5 min-w-0">
         <CommentKeywordTester keywords={keywords} matchType={matchType} commentTrigger />
       </div>
-      <p className="mt-4 text-xs leading-relaxed text-ink-2">{MATCH_TYPE_HELP.contains}</p>
-      <p className="mt-2 text-xs leading-relaxed text-ink-2">{MATCH_TYPE_HELP.exact}</p>
+      <p className="mt-4 text-xs leading-relaxed text-[#3d3450]">{MATCH_TYPE_HELP.contains}</p>
+      <p className="mt-2 text-xs leading-relaxed text-[#3d3450]">{MATCH_TYPE_HELP.exact}</p>
     </div>
   );
 }

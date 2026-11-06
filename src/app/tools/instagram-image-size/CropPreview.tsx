@@ -8,6 +8,7 @@ import {
   cropRect,
   type IgFormat,
 } from "@/lib/igSizes";
+import ui from "@/components/ui/ui.module.css";
 
 const PREVIEW_MAX_W = 320;
 
@@ -137,7 +138,7 @@ export default function CropPreview() {
   }
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
+    <div className="text-left">
       <div>
         <label htmlFor={fileId} className="text-sm font-medium">
           Upload a photo
@@ -147,9 +148,9 @@ export default function CropPreview() {
           type="file"
           accept="image/*"
           onChange={onFileChange}
-          className="mt-2 block w-full max-w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
+          className="mt-2 block w-full max-w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--poskoo-violet)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
         />
-        <p className="mt-1 text-xs text-muted">Processed locally in your browser; nothing is uploaded.</p>
+        <p className="mt-1 text-xs text-[var(--poskoo-muted)]">Processed locally in your browser; nothing is uploaded.</p>
       </div>
 
       <fieldset className="mt-6 border-0 p-0">
@@ -165,7 +166,7 @@ export default function CropPreview() {
             <label
               key={f.id}
               className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium sm:text-sm ${
-                formatId === f.id ? "border-brand bg-brand/10 text-brand" : "border-line bg-bg text-ink-2"
+                formatId === f.id ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 text-[var(--poskoo-violet)]" : "border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] text-[#3d3450]"
               }`}
             >
               <input
@@ -182,11 +183,11 @@ export default function CropPreview() {
         </div>
       </fieldset>
 
-      <div className="mt-6 rounded-2xl border border-line bg-bg p-4">
+      <div className="mt-6 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
         <div className="flex items-center gap-3">
           <svg
             viewBox="0 0 80 60"
-            className="h-12 w-16 shrink-0 text-brand"
+            className="h-12 w-16 shrink-0 text-[var(--poskoo-violet)]"
             aria-hidden="true"
             focusable="false"
           >
@@ -214,14 +215,14 @@ export default function CropPreview() {
           </svg>
           <div className="min-w-0">
             <p className="text-sm font-medium">Reposition the subject</p>
-            <p className="mt-1 text-xs text-muted">
+            <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
               Drag the sliders to move the crop; the preview and the downloaded JPG stay in sync.
             </p>
           </div>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="text-xs font-medium text-ink-2">
+          <label className="text-xs font-medium text-[#3d3450]">
             Horizontal
             <input
               type="range"
@@ -231,11 +232,11 @@ export default function CropPreview() {
               value={Math.round(focusX * 100)}
               onChange={(e) => setFocusX(Number(e.target.value) / 100)}
               disabled={!imgLoaded}
-              className="mt-1 w-full accent-brand"
+              className="mt-1 w-full accent-[var(--poskoo-violet)]"
               aria-label="Horizontal crop position"
             />
           </label>
-          <label className="text-xs font-medium text-ink-2">
+          <label className="text-xs font-medium text-[#3d3450]">
             Vertical
             <input
               type="range"
@@ -245,7 +246,7 @@ export default function CropPreview() {
               value={Math.round(focusY * 100)}
               onChange={(e) => setFocusY(Number(e.target.value) / 100)}
               disabled={!imgLoaded}
-              className="mt-1 w-full accent-brand"
+              className="mt-1 w-full accent-[var(--poskoo-violet)]"
               aria-label="Vertical crop position"
             />
           </label>
@@ -254,7 +255,7 @@ export default function CropPreview() {
           type="button"
           onClick={resetCenter}
           disabled={!imgLoaded}
-          className="mt-3 inline-flex items-center rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-3 inline-flex items-center rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-1.5 text-xs font-medium text-[#3d3450] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Center crop
         </button>
@@ -263,9 +264,9 @@ export default function CropPreview() {
       <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
         <div className="w-full max-w-[20rem] shrink-0">
           <p className="text-sm font-medium">Crop preview</p>
-          <div className="mt-2 flex min-h-[12rem] items-center justify-center rounded-2xl border border-line bg-bg p-3">
+          <div className="mt-2 flex min-h-[12rem] items-center justify-center rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3">
             {!objectUrl ? (
-              <p className="text-center text-sm text-muted">Upload an image to see the crop.</p>
+              <p className="text-center text-sm text-[var(--poskoo-muted)]">Upload an image to see the crop.</p>
             ) : (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -285,21 +286,21 @@ export default function CropPreview() {
             )}
           </div>
           {format.id === "story-reel" && objectUrl ? (
-            <p className="mt-2 text-xs text-muted">
+            <p className="mt-2 text-xs text-[var(--poskoo-muted)]">
               Shaded areas: keep text and logos outside the top and bottom ~{STORY_SAFE_ZONE_PX} px at 1080×1920.
             </p>
           ) : null}
         </div>
-        <div className="min-w-0 flex-1 text-sm text-ink-2">
+        <div className="min-w-0 flex-1 text-sm text-[#3d3450]">
           <p>
-            <span className="font-medium text-ink">Output size:</span> {format.width}×{format.height} px
+            <span className="font-medium text-[var(--poskoo-ink)]">Output size:</span> {format.width}×{format.height} px
           </p>
           <p className="mt-2">{format.note}</p>
           <button
             type="button"
             onClick={downloadJpg}
             disabled={!imgLoaded}
-            className="btn-primary mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className={`${ui.inkFill} mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto`}
           >
             <Download className="h-4 w-4" />
             Download {format.width}px JPG

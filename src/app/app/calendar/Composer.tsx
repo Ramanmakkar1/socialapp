@@ -11,6 +11,7 @@ import { BRAND } from "@/lib/brand";
 import type { CaptionIdea } from "@/lib/ai";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
+import ui from "@/components/ui/ui.module.css";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
 const LIVE_PLATFORMS: PlatformId[] = ["instagram"];
@@ -23,9 +24,9 @@ const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
 };
 
 function counterClass(length: number, max: number): string {
-  if (length > max) return "text-brand-2";
-  if (length >= max * 0.9) return "text-warn";
-  return "text-muted";
+  if (length > max) return "text-[var(--poskoo-coral)]";
+  if (length >= max * 0.9) return "text-[var(--poskoo-coral)]";
+  return "text-[var(--poskoo-muted)]";
 }
 
 function previewCaption(platform: PlatformId, text: string): string {
@@ -333,18 +334,18 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
         {draftId ? "Edit draft" : "New post composer"}
       </h2>
       {draftId && (
-        <Link href={calendarHrefWithoutDraft()} className="mb-4 inline-block text-sm text-brand">
+        <Link href={calendarHrefWithoutDraft()} className="mb-4 inline-block text-sm text-[var(--poskoo-violet)]">
           Cancel editing · New post
         </Link>
       )}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div className="space-y-6">
           <div>
-            <span className="text-sm font-medium text-ink-2">Platforms</span>
+            <span className="text-sm font-medium text-[#3d3450]">Platforms</span>
             <div
               id={platformsFocusId}
               tabIndex={-1}
-              className="mt-2 flex flex-wrap gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              className="mt-2 flex flex-wrap gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]"
             >
               {PLATFORM_ORDER.map((platform) => {
                 const Icon = PLATFORM_ICON[platform];
@@ -366,15 +367,15 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                       live
                         ? on
-                          ? "border-brand bg-brand/10 text-brand"
-                          : "border-line bg-surface text-muted"
-                        : "cursor-not-allowed border-line bg-surface text-muted opacity-60"
+                          ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 text-[var(--poskoo-violet)]"
+                          : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[var(--poskoo-muted)]"
+                        : "cursor-not-allowed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[var(--poskoo-muted)] opacity-60"
                     }`}
                   >
                     <Icon className="h-4 w-4" aria-hidden />
                     {PLATFORMS[platform].label}
                     {!live && (
-                      <span className="rounded-full bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted">
+                      <span className="rounded-full bg-[var(--poskoo-band)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--poskoo-muted)]">
                         Soon
                       </span>
                     )}
@@ -385,7 +386,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
           </div>
 
           <div>
-            <label htmlFor={mainId} className="text-sm font-medium text-ink-2">
+            <label htmlFor={mainId} className="text-sm font-medium text-[#3d3450]">
               Caption
             </label>
             <textarea
@@ -394,22 +395,22 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
               onChange={(e) => setMainCaption(e.target.value)}
               rows={6}
               placeholder="Write once — customize per platform below if you need to."
-              className="mt-2 w-full resize-y rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+              className="mt-2 w-full resize-y rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
             />
             <button
               type="button"
               disabled={aiOn === false}
               onClick={() => setAiOpen((open) => !open)}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Sparkles className="h-4 w-4" aria-hidden />
               {aiOn === false ? "AI captions are not switched on" : "Write with AI"}
             </button>
             {aiOpen && aiOn && (
-              <div className="mt-3 rounded-xl border border-line bg-surface p-4">
+              <div className="mt-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="min-w-0 flex-1">
-                    <label htmlFor={aiTopicId} className="text-sm font-medium text-ink-2">
+                    <label htmlFor={aiTopicId} className="text-sm font-medium text-[#3d3450]">
                       What is this post about?
                     </label>
                     <input
@@ -418,18 +419,18 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                       maxLength={300}
                       value={aiTopic}
                       onChange={(e) => setAiTopic(e.target.value)}
-                      className="mt-1 w-full rounded-xl border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)] focus:outline-none"
                     />
                   </div>
                   <div className="sm:w-44">
-                    <label htmlFor={aiToneId} className="text-sm font-medium text-ink-2">
+                    <label htmlFor={aiToneId} className="text-sm font-medium text-[#3d3450]">
                       Tone
                     </label>
                     <select
                       id={aiToneId}
                       value={aiTone}
                       onChange={(e) => setAiTone(e.target.value)}
-                      className="mt-1 w-full rounded-xl border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)] focus:outline-none"
                     >
                       {(["friendly", "professional", "playful", "bold"] as const).map((tone) => (
                         <option key={tone} value={tone}>{tone[0].toUpperCase() + tone.slice(1)}</option>
@@ -453,18 +454,18 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                       }
                     });
                   }}
-                  className="mt-3 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-60"
+                  className="mt-3 rounded-full border border-[var(--poskoo-line)] px-3 py-1.5 text-sm font-medium text-[var(--poskoo-ink)] disabled:opacity-60"
                 >
                   {aiPending ? "Thinking…" : "Get ideas"}
                 </button>
-                {aiError && <p className="mt-2 text-sm text-brand-2" aria-live="polite">{aiError}</p>}
+                {aiError && <p className="mt-2 text-sm text-[var(--poskoo-coral)]" aria-live="polite">{aiError}</p>}
                 {aiIdeas.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {aiIdeas.map((idea, index) => (
-                      <article key={`${index}-${idea.caption}`} className="rounded-xl border border-line bg-bg p-3">
-                        <p className="whitespace-pre-wrap text-sm text-ink-2">{idea.caption}</p>
+                      <article key={`${index}-${idea.caption}`} className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3">
+                        <p className="whitespace-pre-wrap text-sm text-[#3d3450]">{idea.caption}</p>
                         {idea.hashtags.length > 0 && (
-                          <p className="mt-2 text-sm text-muted">{idea.hashtags.join(" ")}</p>
+                          <p className="mt-2 text-sm text-[var(--poskoo-muted)]">{idea.hashtags.join(" ")}</p>
                         )}
                         <button
                           type="button"
@@ -472,7 +473,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                             setMainCaption(idea.hashtags.length > 0 ? `${idea.caption}\n\n${idea.hashtags.join(" ")}` : idea.caption);
                             setAiOpen(false);
                           }}
-                          className="mt-2 text-sm font-medium text-brand"
+                          className="mt-2 text-sm font-medium text-[var(--poskoo-violet)]"
                         >
                           Use this
                         </button>
@@ -486,7 +487,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
 
           {igFormat !== "story" && (
             <div>
-              <label htmlFor={firstCommentId} className="text-sm font-medium text-ink-2">
+              <label htmlFor={firstCommentId} className="text-sm font-medium text-[#3d3450]">
                 First comment (Instagram) (optional)
               </label>
               <textarea
@@ -495,9 +496,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                 onChange={(e) => setFirstComment(e.target.value)}
                 rows={3}
                 aria-describedby={`${firstCommentId}-help`}
-                className="mt-2 w-full resize-y rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+                className="mt-2 w-full resize-y rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
               />
-              <p id={`${firstCommentId}-help`} className="mt-1 text-xs text-muted">
+              <p id={`${firstCommentId}-help`} className="mt-1 text-xs text-[var(--poskoo-muted)]">
                 Posted from your account right after the post goes live. Good for hashtags.
               </p>
               <p className={`mt-1 text-xs ${counterClass(countChars(firstComment), PLATFORM_LIMITS.instagram.max ?? 2200)}`}>
@@ -507,7 +508,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
           )}
 
           <div>
-            <span className="text-sm font-medium text-ink-2">
+            <span className="text-sm font-medium text-[#3d3450]">
               Image or video link (https, .jpg, .png or .mp4)
             </span>
             <div className="mt-2 space-y-2">
@@ -525,7 +526,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                         )
                       }
                       placeholder="https://…/photo.jpg"
-                      className="min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
+                      className="min-w-0 flex-1 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
                     />
                     {mediaUrls.length > 1 && (
                       <button
@@ -535,7 +536,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                             prev.length <= 1 ? prev : prev.filter((_, i) => i !== index),
                           )
                         }
-                        className="shrink-0 rounded-lg border border-line px-2 py-2 text-xs font-medium text-muted transition-colors hover:bg-surface-2"
+                        className="shrink-0 rounded-lg border border-[var(--poskoo-line)] px-2 py-2 text-xs font-medium text-[var(--poskoo-muted)] transition-colors hover:bg-[var(--poskoo-band)]"
                       >
                         Remove
                       </button>
@@ -545,18 +546,18 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
               })}
             </div>
             {enabled.instagram && (
-              <fieldset id={igFormatLegendId} tabIndex={-1} className="mt-3 border-0 p-0 outline-none focus-visible:ring-2 focus-visible:ring-brand">
-                <legend className="text-sm font-medium text-ink-2">
+              <fieldset id={igFormatLegendId} tabIndex={-1} className="mt-3 border-0 p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]">
+                <legend className="text-sm font-medium text-[#3d3450]">
                   Instagram format:
                 </legend>
                 <div
-                  className="mt-2 inline-flex rounded-xl border border-line bg-surface p-0.5 text-sm"
+                  className="mt-2 inline-flex rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-0.5 text-sm"
                   role="radiogroup"
                   aria-label="Instagram format"
                 >
                   <label
                     className={`cursor-pointer rounded-lg px-3 py-1.5 font-medium transition-colors ${
-                      igFormat === "feed" ? "bg-brand/10 text-brand" : "text-muted"
+                      igFormat === "feed" ? "bg-[var(--poskoo-violet)]/10 text-[var(--poskoo-violet)]" : "text-[var(--poskoo-muted)]"
                     }`}
                   >
                     <input
@@ -571,7 +572,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                   </label>
                   <label
                     className={`cursor-pointer rounded-lg px-3 py-1.5 font-medium transition-colors ${
-                      igFormat === "story" ? "bg-brand/10 text-brand" : "text-muted"
+                      igFormat === "story" ? "bg-[var(--poskoo-violet)]/10 text-[var(--poskoo-violet)]" : "text-[var(--poskoo-muted)]"
                     }`}
                   >
                     <input
@@ -589,7 +590,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                   </label>
                 </div>
                 {igFormat === "story" && (
-                  <p className="mt-1 text-xs text-muted">
+                  <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                     Stories show the image or video only. The caption is not shown on Instagram.
                   </p>
                 )}
@@ -601,7 +602,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                 onClick={() =>
                   setMediaUrls((prev) => (prev.length >= 10 ? prev : [...prev, ""]))
                 }
-                className="mt-2 text-sm font-medium text-brand hover:underline"
+                className="mt-2 text-sm font-medium text-[var(--poskoo-violet)] hover:underline"
               >
                 + Add another image
               </button>
@@ -621,9 +622,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                     <img
                       src={parsed.href}
                       alt="Post image preview"
-                      className="mt-2 h-32 w-auto rounded-xl border border-line object-cover"
+                      className="mt-2 h-32 w-auto rounded-xl border border-[var(--poskoo-line)] object-cover"
                     />
-                    <p className="mt-1 text-xs text-muted">
+                    <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                       Paste a public https link (for example from your website or cloud storage); a .mp4 link is posted as a Reel. 2–10 image links =
                       carousel post.
                     </p>
@@ -631,14 +632,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                 );
               }
               return (
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                   Paste a public https link (for example from your website or cloud storage); a .mp4 link is posted as a Reel. 2–10 image links =
                   carousel post.
                 </p>
               );
             })()}
             {storyMediaError && (
-              <p className="mt-2 text-sm text-brand-2" aria-live="polite">
+              <p className="mt-2 text-sm text-[var(--poskoo-coral)]" aria-live="polite">
                 A Story takes one image or video.
               </p>
             )}
@@ -647,14 +648,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
           <div>
             {rules.length > 0 ? (
               <>
-                <label htmlFor={dmRuleId} className="text-sm font-medium text-ink-2">
+                <label htmlFor={dmRuleId} className="text-sm font-medium text-[#3d3450]">
                   Auto-DM rule (optional)
                 </label>
                 <select
                   id={dmRuleId}
                   value={selectedRuleId}
                   onChange={(e) => setSelectedRuleId(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none"
+                  className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)] focus:outline-none"
                 >
                   <option value="">None</option>
                   {rules.map((rule) => (
@@ -664,15 +665,15 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                   We switch this rule on when the post goes live, so you can keep it paused until then.
                 </p>
               </>
             ) : (
               <>
-                <span className="text-sm font-medium text-ink-2">Auto-DM rule (optional)</span>
-                <p className="mt-1 text-xs text-muted">
-                  <Link href="/app/auto-dm" className="text-brand hover:underline">
+                <span className="text-sm font-medium text-[#3d3450]">Auto-DM rule (optional)</span>
+                <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
+                  <Link href="/app/auto-dm" className="text-[var(--poskoo-violet)] hover:underline">
                     Create an auto-DM rule
                   </Link>
                 </p>
@@ -682,7 +683,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
 
           {selected.length > 0 && (
             <div>
-              <div className="flex flex-wrap gap-1 border-b border-line">
+              <div className="flex flex-wrap gap-1 border-b border-[var(--poskoo-line)]">
                 {selected.map((platform) => (
                   <button
                     key={platform}
@@ -691,14 +692,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                     aria-selected={activeTab === platform}
                     onClick={() => setActiveTab(platform)}
                     className={`rounded-t-lg px-3 py-2 text-sm font-medium ${
-                      activeTab === platform ? "border border-b-0 border-line bg-surface text-ink" : "text-muted"
+                      activeTab === platform ? "border border-b-0 border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[var(--poskoo-ink)]" : "text-[var(--poskoo-muted)]"
                     }`}
                   >
                     {PLATFORMS[platform].label}
                   </button>
                 ))}
               </div>
-              <div className="rounded-b-xl rounded-tr-xl border border-line bg-surface p-4">
+              <div className="rounded-b-xl rounded-tr-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
                 {(() => {
                   const platform = activeTab;
                   if (!enabled[platform]) return null;
@@ -707,14 +708,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                   const check = checkCaption(platform, text);
                   return (
                     <>
-                      <label className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[#3d3450]">
                         <input
                           type="checkbox"
                           checked={customize[platform]}
                           onChange={(e) =>
                             setCustomize((c) => ({ ...c, [platform]: e.target.checked }))
                           }
-                          className="rounded border-line text-brand focus:ring-brand"
+                          className="rounded border-[var(--poskoo-line)] text-[var(--poskoo-violet)] focus:ring-[var(--poskoo-violet)]"
                         />
                         Customize for {config.label}
                       </label>
@@ -727,21 +728,21 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                             setCustomCaption((c) => ({ ...c, [platform]: e.target.value }))
                           }
                           rows={4}
-                          className="mt-3 w-full resize-y rounded-lg border border-line bg-bg px-3 py-2 text-sm focus:border-brand focus:outline-none"
+                          className="mt-3 w-full resize-y rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm focus:border-[var(--poskoo-violet)] focus:outline-none"
                         />
                       )}
                       <p className={`mt-3 text-sm tabular-nums ${counterClass(check.length, config.captionMax)}`}>
                         {check.length.toLocaleString("en-US")} / {config.captionMax.toLocaleString("en-US")}
                       </p>
                       {check.errors.length > 0 && (
-                        <ul className="mt-2 space-y-1 text-sm text-brand-2" aria-live="polite">
+                        <ul className="mt-2 space-y-1 text-sm text-[var(--poskoo-coral)]" aria-live="polite">
                           {check.errors.map((msg) => (
                             <li key={msg}>{msg}</li>
                           ))}
                         </ul>
                       )}
                       {check.warnings.length > 0 && (
-                        <ul className="mt-2 space-y-1 text-sm text-warn" aria-live="polite">
+                        <ul className="mt-2 space-y-1 text-sm text-[var(--poskoo-coral)]" aria-live="polite">
                           {check.warnings.map((msg) => (
                             <li key={msg}>{msg}</li>
                           ))}
@@ -756,7 +757,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor={scheduleId} className="text-sm font-medium text-ink-2">
+              <label htmlFor={scheduleId} className="text-sm font-medium text-[#3d3450]">
                 Schedule
               </label>
               <input
@@ -764,11 +765,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none"
+                className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm focus:border-[var(--poskoo-violet)] focus:outline-none"
               />
               {timeZone && bestHoursUtc.length > 0 && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-muted">Best times:</span>
+                  <span className="text-xs text-[var(--poskoo-muted)]">Best times:</span>
                   {bestHoursUtc.map((h) => {
                     const label = nextSlotLocal(h).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" });
                     return (
@@ -777,7 +778,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                         type="button"
                         aria-label={`Schedule for ${label}`}
                         onClick={() => setScheduledAt(toLocalInputValue(nextSlotLocal(h)))}
-                        className="rounded-full border border-line px-3 py-1 text-xs text-ink-2 hover:border-brand hover:text-brand"
+                        className="rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs text-[#3d3450] hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)]"
                       >
                         {label}
                       </button>
@@ -785,7 +786,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                   })}
                 </div>
               )}
-              <p className="mt-1 text-xs text-muted">Timezone: {timeZone || "…"}</p>
+              <p className="mt-1 text-xs text-[var(--poskoo-muted)]">Timezone: {timeZone || "…"}</p>
             </div>
           </div>
 
@@ -794,7 +795,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
               type="button"
               disabled={isPending || storyMediaError}
               onClick={() => handleSave("draft")}
-              className="rounded-full border border-line px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-2 disabled:opacity-60"
+              className="rounded-full border border-[var(--poskoo-line)] px-4 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:bg-[var(--poskoo-band)] disabled:opacity-60"
             >
               {isPending ? "Saving…" : "Save draft"}
             </button>
@@ -802,14 +803,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
               type="button"
               disabled={isPending || !scheduledAt || storyMediaError}
               onClick={() => handleSave("schedule")}
-              className="btn-primary rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60"
+              className={`${ui.inkFill} rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60`}
             >
               {isPending ? "Saving…" : "Schedule"}
             </button>
           </div>
           {feedback && (
             <p
-              className={`text-sm ${feedback.kind === "ok" ? "text-ok" : "text-brand-2"}`}
+              className={`text-sm ${feedback.kind === "ok" ? "text-[var(--poskoo-green)]" : "text-[var(--poskoo-coral)]"}`}
               role={feedback.kind === "err" ? "alert" : "status"}
             >
               {feedback.text}
@@ -831,7 +832,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
             timeZone={timeZone}
             onFix={focusChecklistTarget}
           />
-          <span className="text-sm font-medium text-ink-2">Preview</span>
+          <span className="text-sm font-medium text-[#3d3450]">Preview</span>
           {selected.map((platform) => {
             const text = effectiveCaption(platform, mainCaption, customize, customCaption);
             const Icon = PLATFORM_ICON[platform];
@@ -839,28 +840,28 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
               <article
                 key={platform}
                 aria-label={`${PLATFORMS[platform].label} preview`}
-                className="rounded-2xl border border-line bg-surface p-4"
+                className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4"
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className="h-10 w-10 shrink-0 rounded-full bg-surface-2"
+                    className="h-10 w-10 shrink-0 rounded-full bg-[var(--poskoo-band)]"
                     aria-hidden
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 text-sm font-semibold">
-                      <Icon className="h-3.5 w-3.5 text-brand" aria-hidden />
+                      <Icon className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden />
                       {BRAND.name}
                     </div>
-                    <div className="truncate text-xs text-muted">{HANDLE}</div>
+                    <div className="truncate text-xs text-[var(--poskoo-muted)]">{HANDLE}</div>
                   </div>
                 </div>
                 <div
-                  className="mt-3 aspect-square w-full rounded-lg bg-surface-2"
+                  className="mt-3 aspect-square w-full rounded-lg bg-[var(--poskoo-band)]"
                   aria-hidden
                 />
-                <p className="mt-3 whitespace-pre-wrap text-sm text-ink-2">
+                <p className="mt-3 whitespace-pre-wrap text-sm text-[#3d3450]">
                   {previewCaption(platform, text) || (
-                    <span className="text-muted">Your caption appears here.</span>
+                    <span className="text-[var(--poskoo-muted)]">Your caption appears here.</span>
                   )}
                 </p>
               </article>

@@ -10,6 +10,7 @@ import {
   toPixels,
   type SafeZoneMode,
 } from "@/lib/safeZones";
+import ui from "@/components/ui/ui.module.css";
 
 type Media = { url: string; kind: "image" | "video"; name: string };
 
@@ -83,17 +84,17 @@ function PlaceholderArt() {
     <svg viewBox="0 0 180 320" className="h-full w-full" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="sz-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--brand)" stopOpacity="0.28" />
-          <stop offset="1" stopColor="var(--brand)" stopOpacity="0.06" />
+          <stop offset="0" stopColor="var(--poskoo-violet)" stopOpacity="0.28" />
+          <stop offset="1" stopColor="var(--poskoo-violet)" stopOpacity="0.06" />
         </linearGradient>
       </defs>
       <rect width="180" height="320" fill="url(#sz-bg)" />
-      <circle cx="140" cy="70" r="26" fill="var(--brand)" opacity="0.18" />
-      <circle cx="40" cy="250" r="34" fill="var(--brand)" opacity="0.12" />
-      <path d="M0 230 L55 170 L95 210 L130 175 L180 225 L180 320 L0 320 Z" fill="var(--brand)" opacity="0.22" />
+      <circle cx="140" cy="70" r="26" fill="var(--poskoo-violet)" opacity="0.18" />
+      <circle cx="40" cy="250" r="34" fill="var(--poskoo-violet)" opacity="0.12" />
+      <path d="M0 230 L55 170 L95 210 L130 175 L180 225 L180 320 L0 320 Z" fill="var(--poskoo-violet)" opacity="0.22" />
       <circle cx="90" cy="130" r="22" fill="#fff" opacity="0.9" />
       <rect x="58" y="160" width="64" height="44" rx="18" fill="#fff" opacity="0.9" />
-      <rect x="44" y="104" width="92" height="4" rx="2" fill="var(--brand)" opacity="0.35" className="sz-sparkle" />
+      <rect x="44" y="104" width="92" height="4" rx="2" fill="var(--poskoo-violet)" opacity="0.35" className="sz-sparkle" />
       <path d="M150 120 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#fff" className="sz-sparkle" />
       <path d="M30 140 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff" className="sz-sparkle" />
       <style>{`
@@ -156,12 +157,12 @@ export default function SafeZoneChecker() {
   const alpha = opacity / 100;
 
   return (
-    <div className="glow rounded-3xl border border-line bg-surface p-4 text-left sm:p-6">
+    <div className="text-left">
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:items-start">
         <div className="flex justify-center">
-          <div className="w-full max-w-[17rem] rounded-[2.25rem] border border-line bg-[#0d0d14] p-2.5 shadow-xl">
+          <div className="w-full max-w-[17rem] rounded-[2.25rem] border border-[var(--poskoo-line)] bg-[#0d0d14] p-2.5 shadow-xl">
             <div
-              className="relative aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] bg-bg"
+              className="relative aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] bg-[var(--poskoo-paper)]"
               aria-label={`${mode === "reels" ? "Reels" : "Story"} safe zone preview`}
               role="img"
             >
@@ -232,9 +233,9 @@ export default function SafeZoneChecker() {
               type="file"
               accept="image/*,video/*"
               onChange={onFileChange}
-              className="mt-2 block w-full max-w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
+              className="mt-2 block w-full max-w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--poskoo-violet)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
             />
-            <p className="mt-1 text-xs text-muted">
+            <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
               {media ? `Showing ${media.name}. ` : ""}Opened locally in your browser; nothing is uploaded.
             </p>
           </div>
@@ -243,12 +244,12 @@ export default function SafeZoneChecker() {
             <legend id={modeLegendId} className="text-sm font-medium">
               Format
             </legend>
-            <div className="mt-2 inline-flex rounded-full border border-line bg-bg p-1" role="radiogroup" aria-labelledby={modeLegendId}>
+            <div className="mt-2 inline-flex rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-1" role="radiogroup" aria-labelledby={modeLegendId}>
               {SAFE_ZONE_MODES.map((m) => (
                 <label
                   key={m.id}
                   className={`min-h-10 cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition ${
-                    mode === m.id ? "bg-brand text-white" : "text-ink-2 hover:text-ink"
+                    mode === m.id ? "bg-[var(--poskoo-violet)] text-white" : "text-[#3d3450] hover:text-[var(--poskoo-ink)]"
                   }`}
                 >
                   <input
@@ -274,7 +275,7 @@ export default function SafeZoneChecker() {
               step={5}
               value={opacity}
               onChange={(e) => setOpacity(Number(e.target.value))}
-              className="mt-2 w-full accent-brand"
+              className="mt-2 w-full accent-[var(--poskoo-violet)]"
             />
           </label>
 
@@ -283,19 +284,19 @@ export default function SafeZoneChecker() {
               type="checkbox"
               checked={showGrid}
               onChange={(e) => setShowGrid(e.target.checked)}
-              className="h-4 w-4 accent-brand"
+              className="h-4 w-4 accent-[var(--poskoo-violet)]"
             />
             Show grid (rule of thirds)
           </label>
 
-          <ul className="space-y-1.5 text-xs text-ink-2">
+          <ul className="space-y-1.5 text-xs text-[#3d3450]">
             {zones.map((z) => {
               const px = toPixels(z);
               return (
                 <li key={z.id} className="flex items-start gap-2">
                   <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-sm" style={{ backgroundColor: `rgb(${ZONE_RGB})` }} />
                   <span>
-                    <span className="font-medium text-ink">{z.label}</span>: about {px.w}×{px.h} px
+                    <span className="font-medium text-[var(--poskoo-ink)]">{z.label}</span>: about {px.w}×{px.h} px
                   </span>
                 </li>
               );
@@ -305,12 +306,12 @@ export default function SafeZoneChecker() {
           <button
             type="button"
             onClick={downloadTemplate}
-            className="btn-primary inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium"
+            className={`${ui.inkFill} inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium`}
           >
             <Download className="h-4 w-4" />
             Download blank safe-zone template
           </button>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-[var(--poskoo-muted)]">
             A 1080×1920 PNG of the {mode === "reels" ? "Reels" : "Story"} guides to use as a layer in Canva, Figma or
             CapCut. Zones are approximate; Instagram&apos;s layout varies by device.
           </p>

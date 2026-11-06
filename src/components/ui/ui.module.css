@@ -38,6 +38,31 @@
 .btnLime:hover:not(:disabled) { transform: translateY(-1px); }
 .sm { min-height: 38px; padding: .5rem .95rem; font-size: .88rem; }
 
+/* Ink fill: the landing's dark pill colour for buttons, toggles and avatar dots
+   that keep their own size/shape utilities (replaces the old violet-pink
+   .btn-primary gradient). */
+.inkFill {
+  border-color: var(--poskoo-ink);
+  background: var(--poskoo-ink);
+  color: #fff;
+  font-weight: 600;
+  transition: transform .2s, background .2s;
+}
+button.inkFill:hover:not(:disabled),
+a.inkFill:hover {
+  background: var(--poskoo-violet);
+  transform: translateY(-1px);
+}
+button.inkFill:disabled { transform: none; }
+
+/* Serif-italic accent word, like the landing's em.s (replaces .gradient-text). */
+.accent {
+  font-family: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -.01em;
+}
+
 /* Cards — landing surfaces. */
 .card {
   border: 1.5px solid var(--poskoo-line);
@@ -177,5 +202,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn { transition: none; }
+  .btn, .inkFill { transition: none; }
 }
