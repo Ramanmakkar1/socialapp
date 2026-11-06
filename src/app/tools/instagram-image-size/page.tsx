@@ -154,6 +154,16 @@ export default function InstagramImageSizePage() {
                 </tbody>
               </table>
             </div>
+            <p className="mt-4 text-sm text-ink-2">
+              Posting a Reel or Story at 1080×1920?{" "}
+              <Link
+                href="/tools/instagram-safe-zone-checker"
+                className="font-medium text-brand underline underline-offset-2"
+              >
+                Check Reels safe zones
+              </Link>{" "}
+              to see what the caption, buttons and profile bar cover.
+            </p>
           </div>
         </section>
 

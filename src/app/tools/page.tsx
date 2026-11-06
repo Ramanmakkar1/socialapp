@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowRight, Gift, Hash, Image as ImageIcon, Link as LinkIcon, MessageCircle, Percent, ShieldCheck, TextQuote, UserRound,
+  ArrowRight, Gift, Hash, Image as ImageIcon, Link as LinkIcon, MessageCircle, Percent, ShieldCheck, Smartphone, TextQuote, UserRound,
 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -89,6 +89,12 @@ const tools = [
     title: "Instagram comment picker",
     description: "Paste giveaway comments, filter by keyword and tagged friends, and pick a random winner. Nothing leaves your browser.",
     icon: Gift,
+  },
+  {
+    href: "/tools/instagram-safe-zone-checker",
+    title: "Instagram Reels & Story safe zone checker",
+    description: "Load an image or video frame and see what the Reels caption, buttons and Story bars cover. Download a free 1080×1920 template.",
+    icon: Smartphone,
   },
 ];
 
