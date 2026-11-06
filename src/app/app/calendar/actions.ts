@@ -5,11 +5,12 @@ import { requireUser } from "@/lib/auth";
 import { getPool, isDbConfigured, query } from "@/lib/db";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { checkCaption, type PlatformId } from "@/lib/platforms";
+import { deletePostForUser, UUID_RE } from "@/lib/postMutations";
 
 const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads"];
 
 export async function deletePost(id: string): Promise<{ ok: boolean; error?: string }> {
-  if (typeof id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+  if (typeof id !== "string" || !UUID_RE.test(id)) {
     return { ok: false, error: "Invalid post." };
   }
   if (!isDbConfigured()) {
@@ -18,17 +19,13 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
 
   const user = await requireUser();
   try {
-    const deleted = await query<{ id: string }>(
-      "delete from scheduled_posts where id = $1 and user_id = $2 and status in ('draft','scheduled','failed') returning id",
-      [id, user.id],
-    );
-    if (deleted.length === 0) {
-      return { ok: false, error: "Could not delete post." };
-    }
+    const result = await deletePostForUser(id, user.id);
+    if (!result.ok) return result;
     revalidatePath("/app/calendar");
     revalidatePath("/app");
     return { ok: true };
-  } catch {
+  } catch (err) {
+    console.error("deletePost failed", id, err instanceof Error ? err.message : err);
     return { ok: false, error: "Could not delete post." };
   }
 }
