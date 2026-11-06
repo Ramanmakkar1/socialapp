@@ -99,7 +99,7 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
       reply: (p) => {
         const hits = queue
           .filter((q) => q.contact_id === p[0] && q.social_account_id === p[1] && q.recipient_external_id === p[2] &&
-            q.kind === "comment_reply" && q.status === "sent")
+            ["comment_reply", "story_reply"].includes(q.kind) && q.status === "sent")
           .filter((q) => {
             const r = rules.find((x) => x.id === q.rule_id);
             return ruleOk(r, q) && (r!.email_gate || r!.follow_gate) && !!r!.link_url && !unlocked(q.contact_id, q.rule_id);
@@ -145,6 +145,10 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
     },
     { match: /^insert into socialapp\.short_links/, reply: (p) => [{ code: `code${String(p[2]).replace(/\W/g, "")}` }] },
     { match: /pg_advisory_xact_lock/, reply: () => [] },
+    {
+      match: /^select 1 as recent from socialapp\.dm_queue where kind='story_reply'/,
+      reply: (p) => queue.filter((q) => q.kind === "story_reply" && q.contact_id === p[0] && q.rule_id === p[1] && q.created_at > Date.now() - 86_400_000).map(() => ({ recent: 1 })),
+    },
     {
       match: /^select 1 as ok from socialapp\.dm_queue where contact_id=\$1 and rule_id=\$2/,
       reply: async (p) => {

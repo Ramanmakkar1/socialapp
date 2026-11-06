@@ -277,3 +277,53 @@ test("unknown sender: details are captured without unsolicited automation; other
     assert.deepEqual(kinds(world), []);
   });
 });
+
+test("extractMessageEvents flags replies to a story", () => {
+  const events = extractMessageEvents({
+    entry: [{ id: "acc", messaging: [{ sender: { id: "u" }, message: { mid: "m", text: "FREE", reply_to: { story: { id: "s1", url: "https://x" } } } }] }],
+  });
+  assert.equal(events[0].storyReply, true);
+  assert.equal(extractMessageEvents({ entry: [{ id: "acc", messaging: [{ sender: { id: "u" }, message: { text: "hi" } }] }] })[0].storyReply, undefined);
+});
+
+test("story replies trigger story_reply automations once per day; other replies do not", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [
+      rule({ id: "rule-story", keywords: ["free"], triggers: ["story_reply"], dm_text: "Here you go {{link}}" }),
+      rule({ id: "rule-comment", keywords: ["free"], triggers: ["comment"] }),
+    ],
+  });
+  await inWorld(world, true, async () => {
+    const story = { ...reply("FREE 🔥", "s1"), storyReply: true };
+    assert.equal(await processMessageEvents([story]), 1);
+    assert.equal(await processMessageEvents([{ ...story, mid: "s2" }]), 1);
+    // Not a story reply: no automation (comment rules only react to comments).
+    assert.equal(await processMessageEvents([reply("free", "m9")]), 0);
+    // Story reply that matches nothing: ignored.
+    assert.equal(await processMessageEvents([{ ...reply("nice story", "s3"), storyReply: true }]), 0);
+  });
+  const sent = world.queue.filter((q) => q.kind === "story_reply");
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].rule_id, "rule-story");
+  assert.equal(sent[0].comment_id, null);
+  assert.match(sent[0].message, /^Here you go .*coderulestory$/);
+});
+
+test("an email-gated story automation asks first, then the reply unlocks its link", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-story", keywords: ["guide"], triggers: ["story_reply"], email_gate: true })],
+  });
+  await inWorld(world, true, async () => {
+    await processMessageEvents([{ ...reply("guide", "s1"), storyReply: true }]);
+    const prompt = world.queue.find((q) => q.kind === "story_reply")!;
+    assert.match(prompt.message, /email/i);
+    prompt.status = "sent";
+    prompt.sent_at = Date.now();
+    await processMessageEvents([reply("me@example.com", "m2")]);
+  });
+  assert.deepEqual(kinds(world), [["rule-story", "story_reply"], ["rule-story", "gated_link"]]);
+});

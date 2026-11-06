@@ -1,6 +1,8 @@
+import { buildCommentDmMessage } from "@/lib/commentMessage";
 import { getPool, query } from "@/lib/db";
 import { accountToken, isFollower } from "@/lib/followCheck";
 import { shortLinkFor } from "@/lib/links";
+import { matchComment, type MatchableRule } from "@/lib/match";
 import {
   extractEmail,
   extractMessageEvents,
@@ -26,7 +28,7 @@ export function gatedLinkMessage(link: string): string {
  *                worker re-checks with backoff and then sends the link, a nudge, or gives up
  * follow_nudge - "follow us first" reminder (at most MAX_FOLLOW_NUDGES per contact + rule)
  */
-type DmEnqueueKind = "gated_link" | "follow_check" | "follow_nudge";
+type DmEnqueueKind = "gated_link" | "follow_check" | "follow_nudge" | "story_reply";
 
 /**
  * Idempotent enqueue per contact + rule. Concurrent webhooks are serialized by an advisory
@@ -50,7 +52,17 @@ async function enqueueGatedDm(params: {
       "select pg_advisory_xact_lock(hashtext($1::text), hashtext($2::text))",
       [contactId, ruleId],
     );
-    if (kind === "follow_nudge") {
+    if (kind === "story_reply") {
+      // One automated answer per person and automation per day, however often they reply.
+      const recent = await client.query(
+        "select 1 as recent from socialapp.dm_queue where kind='story_reply' and contact_id=$1 and rule_id=$2 and created_at > now() - interval '24 hours'",
+        [contactId, ruleId],
+      );
+      if (recent.rows.length > 0) {
+        await client.query("commit");
+        return false;
+      }
+    } else if (kind === "follow_nudge") {
       const nudges = await client.query<{ n: number }>(
         "select count(*)::int as n from socialapp.dm_queue where contact_id=$1 and rule_id=$2 and kind='follow_nudge'",
         [contactId, ruleId],
@@ -110,7 +122,7 @@ const PENDING_GATE_SQL = `
   where q.contact_id = $1
     and q.social_account_id = $2
     and q.recipient_external_id = $3
-    and q.kind = 'comment_reply'
+    and q.kind in ('comment_reply', 'story_reply')
     and q.status = 'sent'
     and (r.email_gate or r.follow_gate)
     and r.link_url is not null and r.link_url <> ''
@@ -131,6 +143,55 @@ async function linkFor(userId: string, ruleId: string, linkUrl: string): Promise
   }
 }
 
+type StoryRuleRow = MatchableRule & {
+  dm_text: string;
+  link_url: string | null;
+  email_gate: boolean;
+  follow_gate: boolean;
+};
+
+/**
+ * Story reply automation: a reply to one of the account's stories that matches an active
+ * rule with the "story_reply" trigger gets the rule's DM (gates work like comment rules:
+ * the person answers the prompt in the same chat). Returns true when a rule matched.
+ */
+async function handleStoryReply(account: { id: string; user_id: string }, event: MessageEvent): Promise<boolean> {
+  const rules = await query<StoryRuleRow>(
+    "select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp.dm_rules where user_id=$1 and status='active' and (social_account_id is null or social_account_id=$2) and 'story_reply' = any(triggers) order by created_at",
+    [account.user_id, account.id],
+  );
+  const hit = matchComment(event.text, rules);
+  if (!hit) return false;
+  const rule = hit.rule;
+  const contacts = await query<{ id: string; email: string | null }>(
+    `insert into socialapp.contacts(user_id, social_account_id, platform, external_id, username, source_rule_id) values ($1,$2,'instagram',$3,$4,$5) on conflict (user_id, platform, external_id) do update set last_seen_at=now(), username=coalesce(excluded.username, socialapp.contacts.username) returning id, email`,
+    [account.user_id, account.id, event.senderId, null, rule.id],
+  );
+  const contact = contacts[0];
+  if (!contact) return true;
+  const emailGate = rule.email_gate && !contact.email;
+  const gated = emailGate || rule.follow_gate;
+  const resolvedLink = !gated && rule.link_url ? await linkFor(account.user_id, rule.id, rule.link_url) : null;
+  const message = buildCommentDmMessage({
+    dmText: rule.dm_text,
+    fromUsername: null,
+    linkUrl: rule.link_url,
+    emailGate,
+    followGate: rule.follow_gate,
+    resolvedLink,
+  });
+  await enqueueGatedDm({
+    userId: account.user_id,
+    socialAccountId: account.id,
+    ruleId: rule.id,
+    contactId: contact.id,
+    recipientExternalId: event.senderId,
+    kind: "story_reply",
+    message,
+  });
+  return true;
+}
+
 export async function processMessageEvents(
   events: MessageEvent[],
 ): Promise<number> {
@@ -144,6 +205,10 @@ export async function processMessageEvents(
       );
       const account = accounts[0];
       if (!account) {
+        continue;
+      }
+      if (event.storyReply && (await handleStoryReply(account, event))) {
+        updated += 1;
         continue;
       }
       const email = extractEmail(event.text);

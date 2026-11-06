@@ -3,6 +3,8 @@ export type MessageEvent = {
   senderId: string;
   text: string;
   mid: string | null;
+  /** True when the message is a reply to one of the account's stories (message.reply_to.story). */
+  storyReply?: boolean;
 };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -49,11 +51,14 @@ export function extractMessageEvents(body: unknown): MessageEvent[] {
         if (message.mid != null) {
           mid = String(message.mid);
         }
+        const replyTo = message.reply_to;
+        const storyReply = isRecord(replyTo) && isRecord(replyTo.story);
         out.push({
           accountExternalId,
           senderId,
           text: message.text,
           mid,
+          ...(storyReply ? { storyReply: true } : {}),
         });
       }
     }
