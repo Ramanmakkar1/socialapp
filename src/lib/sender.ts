@@ -4,6 +4,7 @@ import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
 import { isFollower } from "@/lib/followCheck";
 import { FOLLOW_NUDGE_MESSAGE } from "@/lib/messages";
+import { PLAN_LIMITS, autoDmLimitMessage, planForUser } from "@/lib/planLimits";
 import { DM_WINDOW_MS, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
 import {
   MAX_ATTEMPTS,
@@ -163,6 +164,8 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
   );
 
   let left = Math.max(0, Math.floor(limit));
+  // Automated DMs sent this UTC month per user (plan limit), counted once per run.
+  const monthlyByUser = new Map<string, number>();
   for (const account of accounts.rows) {
     if (left <= 0) break;
     if (!account.access_token_enc) continue;
@@ -253,6 +256,30 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           left -= 1;
           continue;
         }
+        const automated = row.kind !== "manual_reply";
+        if (automated) {
+          let used = monthlyByUser.get(row.user_id);
+          if (used === undefined) {
+            const usedRes = await client.query<{ n: number }>(
+              `select count(*)::int as n from socialapp.dm_queue
+               where user_id=$1 and status='sent' and kind <> 'manual_reply'
+                 and sent_at >= (date_trunc('month', now() at time zone 'UTC') at time zone 'UTC')`,
+              [row.user_id]
+            );
+            used = usedRes.rows[0]?.n ?? 0;
+            monthlyByUser.set(row.user_id, used);
+          }
+          const plan = planForUser();
+          const monthlyLimit = PLAN_LIMITS[plan].autoDmsPerMonth;
+          if (used >= monthlyLimit) {
+            await client.query(
+              "update socialapp.dm_queue set status='skipped', last_error=$2 where id=$1",
+              [row.id, autoDmLimitMessage(monthlyLimit, plan)]
+            );
+            result.skipped += 1;
+            continue;
+          }
+        }
         let windowError: string | null;
         try {
           windowError = row.comment_id
@@ -315,6 +342,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
             "update socialapp.dm_queue set status='sent', sent_at=now(), attempts=attempts+1, last_error=null where id=$1",
             [row.id]
           );
+          if (automated) monthlyByUser.set(row.user_id, (monthlyByUser.get(row.user_id) ?? 0) + 1);
           if (sendRow.kind === "follow_check") {
             await client.query("update socialapp.dm_queue set kind='gated_link' where id=$1 and kind='follow_check'", [row.id]);
           }

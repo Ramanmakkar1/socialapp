@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { getPool, isDbConfigured, query } from "@/lib/db";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { checkCaption, type PlatformId } from "@/lib/platforms";
+import { scheduledPostLimitError } from "@/lib/planLimits";
 import { deletePostForUser, UUID_RE } from "@/lib/postMutations";
 
 const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads"];
@@ -204,6 +205,16 @@ export async function savePost(
     }
     if (scheduledAt.getTime() <= Date.now() + 60_000) {
       return { ok: false, error: "Schedule time must be more than one minute from now." };
+    }
+  }
+
+  if (input.mode === "schedule" && scheduledAt) {
+    try {
+      const limitError = await scheduledPostLimitError(user.id, scheduledAt, input.draftId ?? null);
+      if (limitError) return { ok: false, error: limitError };
+    } catch (err) {
+      console.error("savePost: plan limit check failed", user.id, err instanceof Error ? err.message : err);
+      return { ok: false, error: "Could not save post. Please try again." };
     }
   }
 

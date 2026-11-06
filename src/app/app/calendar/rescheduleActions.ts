@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
+import { scheduledPostLimitError } from "@/lib/planLimits";
 import { reschedulePostForUser, UUID_RE } from "@/lib/postMutations";
 
 export async function reschedulePost(
@@ -21,7 +22,9 @@ export async function reschedulePost(
 
   const user = await requireUser();
   try {
-    const result = await reschedulePostForUser(id, user.id, dateKey);
+    // Moving a scheduled post into another month must respect that month's plan limit.
+    const result = await reschedulePostForUser(id, user.id, dateKey, (next, state) =>
+      state.status === "scheduled" ? scheduledPostLimitError(user.id, next, id) : Promise.resolve(null));
     if (!result.ok) return result;
     revalidatePath("/app/calendar");
     revalidatePath("/app");

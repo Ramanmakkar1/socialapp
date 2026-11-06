@@ -968,3 +968,32 @@ test("sendDueDms: follow_check sends the link to a follower and a nudge to a non
   assert.match(no.sentBodies[0], /not following yet/);
   assert.ok(no.updates.some((u) => u.sql.includes("set kind='follow_nudge'")));
 });
+
+test("sendDueDms: the monthly auto-DM plan limit is enforced on the server", async () => {
+  let sends = 0;
+  globalThis.fetch = async () => {
+    sends += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  await withSendDueDmsEnv(
+    [{ id: "acc-1", external_id: "ig-1", status: "active", dm_cooldown_until: null, access_token_enc: "", created_at: 1 }],
+    [baseQueueRow({ id: "q-over", social_account_id: "acc-1" })],
+    [{ id: "rule-active", user_id: "user-1", social_account_id: "acc-1", status: "active" }],
+    async (ctx) => {
+      const connect = ctx.pool.connect.bind(ctx.pool);
+      (ctx.pool as unknown as { connect: () => Promise<unknown> }).connect = async () => {
+        const client = (await connect()) as unknown as { query: (sql: string, params?: unknown[]) => Promise<unknown> };
+        const original = client.query;
+        client.query = async (sql: string, params: unknown[] = []) =>
+          sql.includes("kind <> 'manual_reply'") ? { rows: [{ n: 500 }] } : original(sql, params);
+        return client;
+      };
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(sends, 0);
+      assert.equal(result.skipped, 1);
+      assert.equal(ctx.queue[0]?.status, "skipped");
+      assert.match(ctx.queue[0]?.last_error ?? "", /Monthly auto-DM limit reached \(500 on the Free plan\)/);
+    }
+  );
+});
