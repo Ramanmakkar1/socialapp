@@ -11,6 +11,15 @@ import { BRAND } from "@/lib/brand";
 import type { CaptionIdea } from "@/lib/ai";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
+import {
+  blankComposerState,
+  composerStateFromDraft,
+  scheduleInstantForSave,
+  scheduleOrigin,
+  toLocalInputValue,
+  type ComposerDraftInitial,
+  type ScheduleOrigin,
+} from "@/lib/composerDraft";
 import ui from "@/components/ui/ui.module.css";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
@@ -45,17 +54,7 @@ function effectiveCaption(
 }
 
 type RuleOption = { id: string; name: string; status: string };
-export type ComposerDraftInitial = {
-  id: string;
-  caption: string;
-  firstComment: string;
-  platforms: string[];
-  overrides: Partial<Record<PlatformId, string>>;
-  mediaUrls: string[];
-  igFormat: "feed" | "story";
-  dmRuleId: string | null;
-  scheduledAt: string | null;
-};
+export type { ComposerDraftInitial };
 
 function nextSlotLocal(hourUtc: number): Date {
   const now = new Date();
@@ -64,16 +63,15 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-function toLocalInputValue(d: Date): string {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-
 export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [draftId, setDraftId] = useState(initialDraft?.id);
-  const lastDraftIdRef = useRef<string | undefined>(undefined);
+  // Lazy initial state from the draft: the page keys this component by draft id, so a draft
+  // opened by URL is filled in on the first render and switching drafts remounts cleanly.
+  const [init] = useState(() => composerStateFromDraft(initialDraft));
+  const [draftId, setDraftId] = useState(init.draftId);
+  // The stored instant of the draft's schedule, so an untouched time saves exactly unchanged.
+  const scheduleOriginRef = useRef<ScheduleOrigin | null>(null);
   const mainId = useId();
   const platformsFocusId = useId();
   const customCaptionId = useId();
@@ -85,27 +83,15 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
   const aiTopicId = useId();
   const aiToneId = useId();
 
-  const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>({
-    instagram: true,
-    facebook: false,
-    threads: false,
-  });
+  const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>(init.enabled);
   const [activeTab, setActiveTab] = useState<PlatformId>("instagram");
-  const [mainCaption, setMainCaption] = useState("");
-  const [firstComment, setFirstComment] = useState("");
-  const [customize, setCustomize] = useState<Record<PlatformId, boolean>>({
-    instagram: false,
-    facebook: false,
-    threads: false,
-  });
-  const [customCaption, setCustomCaption] = useState<Record<PlatformId, string>>({
-    instagram: "",
-    facebook: "",
-    threads: "",
-  });
-  const [mediaUrls, setMediaUrls] = useState<string[]>([""]);
-  const [igFormat, setIgFormat] = useState<"feed" | "story">("feed");
-  const [selectedRuleId, setSelectedRuleId] = useState("");
+  const [mainCaption, setMainCaption] = useState(init.mainCaption);
+  const [firstComment, setFirstComment] = useState(init.firstComment);
+  const [customize, setCustomize] = useState<Record<PlatformId, boolean>>(init.customize);
+  const [customCaption, setCustomCaption] = useState<Record<PlatformId, string>>(init.customCaption);
+  const [mediaUrls, setMediaUrls] = useState<string[]>(init.mediaUrls);
+  const [igFormat, setIgFormat] = useState<"feed" | "story">(init.igFormat);
+  const [selectedRuleId, setSelectedRuleId] = useState(init.selectedRuleId);
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
@@ -129,14 +115,15 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
   );
 
   const resetComposerForNewPost = useCallback(() => {
-    setMainCaption("");
-    setFirstComment("");
-    setCustomCaption({ instagram: "", facebook: "", threads: "" });
-    setMediaUrls([""]);
-    setIgFormat("feed");
-    setSelectedRuleId("");
-    setCustomize({ instagram: false, facebook: false, threads: false });
-    setEnabled({ instagram: true, facebook: false, threads: false });
+    const blank = blankComposerState();
+    setMainCaption(blank.mainCaption);
+    setFirstComment(blank.firstComment);
+    setCustomCaption(blank.customCaption);
+    setMediaUrls(blank.mediaUrls);
+    setIgFormat(blank.igFormat);
+    setSelectedRuleId(blank.selectedRuleId);
+    setCustomize(blank.customize);
+    setEnabled(blank.enabled);
     setActiveTab("instagram");
     setScheduledAt("");
     setDraftId(undefined);
@@ -145,41 +132,17 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
     setAiTone("friendly");
     setAiIdeas([]);
     setAiError("");
-    lastDraftIdRef.current = undefined;
+    scheduleOriginRef.current = null;
   }, []);
 
+  const draftScheduledAt = initialDraft?.scheduledAt ?? null;
   useEffect(() => {
-    // Queue direct-load initialization until after hydration; cancel stale loads.
-    let active = true;
-    queueMicrotask(() => {
-      if (!active) return;
-      if (!initialDraft) {
-        // Only leaving an initialized draft should discard composer edits.
-        if (lastDraftIdRef.current !== undefined) {
-          resetComposerForNewPost();
-          setFeedback(null);
-        }
-        return;
-      }
-      // A refresh of the same draft must preserve unsaved edits.
-      if (lastDraftIdRef.current === initialDraft.id) return;
-      lastDraftIdRef.current = initialDraft.id;
-      setDraftId(initialDraft.id);
-      setFeedback(null);
-      const overrides = initialDraft.overrides;
-      const hasOverride = (platform: PlatformId) => LIVE_PLATFORMS.includes(platform) && Object.prototype.hasOwnProperty.call(overrides, platform);
-      setMainCaption(initialDraft.caption);
-      setFirstComment(initialDraft.firstComment);
-      setEnabled({ instagram: initialDraft.platforms.includes("instagram"), facebook: false, threads: false });
-      setCustomize({ instagram: hasOverride("instagram"), facebook: hasOverride("facebook"), threads: hasOverride("threads") });
-      setCustomCaption({ instagram: overrides.instagram ?? "", facebook: "", threads: "" });
-      setMediaUrls(initialDraft.mediaUrls.length ? initialDraft.mediaUrls : [""]);
-      setIgFormat(initialDraft.igFormat);
-      setSelectedRuleId(initialDraft.dmRuleId ?? "");
-      setScheduledAt(initialDraft.scheduledAt ? toLocalInputValue(new Date(initialDraft.scheduledAt)) : "");
-    });
-    return () => { active = false; };
-  }, [initialDraft, resetComposerForNewPost]);
+    // Client-only: the local wall time depends on the browser time zone (server renders UTC).
+    const origin = scheduleOrigin(draftScheduledAt);
+    scheduleOriginRef.current = origin;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser time zone is only known after hydration
+    if (origin) setScheduledAt(origin.local);
+  }, [draftScheduledAt]);
 
   useEffect(() => {
     // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.
@@ -217,12 +180,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
   const selected = PLATFORM_ORDER.filter((p) => enabled[p]);
 
   function buildSaveInput(mode: "draft" | "schedule") {
-    const scheduleDate = scheduledAt ? new Date(scheduledAt) : null;
-    if (
-      (scheduleDate && Number.isNaN(scheduleDate.getTime())) ||
-      (scheduleDate && toLocalInputValue(scheduleDate) !== scheduledAt) ||
-      (mode === "schedule" && !scheduleDate)
-    ) {
+    const schedule = scheduleInstantForSave(scheduledAt, scheduleOriginRef.current);
+    if (!schedule.ok || (mode === "schedule" && !schedule.iso)) {
       return null;
     }
     const platforms = PLATFORM_ORDER.filter((p) => enabled[p]);
@@ -238,7 +197,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
       firstComment,
       platforms,
       overrides,
-      scheduledAt: scheduleDate?.toISOString() ?? null,
+      scheduledAt: schedule.iso,
       mode,
       imageUrl: mediaUrls[0]?.trim() !== "" ? mediaUrls[0].trim() : null,
       mediaUrls,

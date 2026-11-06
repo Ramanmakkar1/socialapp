@@ -1,5 +1,6 @@
 import Link from "next/link";
-import Composer, { type ComposerDraftInitial } from "./Composer";
+import Composer from "./Composer";
+import type { ComposerDraftInitial } from "@/lib/composerDraft";
 import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
@@ -140,7 +141,7 @@ export default async function CalendarPage({
         if (row) {
           initialDraft = {
             id: row.id, caption: row.caption, platforms: row.platforms, overrides: row.overrides,
-            firstComment: row.first_comment ?? "", mediaUrls: row.media.map((item) => item.url),
+            firstComment: row.first_comment ?? "", mediaUrls: Array.isArray(row.media) ? row.media.map((item) => item?.url).filter((url): url is string => typeof url === "string") : [],
             scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
             dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
           };
