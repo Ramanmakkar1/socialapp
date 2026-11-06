@@ -135,6 +135,14 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
         return [{ id: c.id, email: c.email }];
       },
     },
+    {
+      match: /^select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp\.dm_rules/,
+      reply: (p, sql) => rules
+        .filter((r) => r.user_id === p[0] && r.status === "active" && (r.social_account_id === null || r.social_account_id === p[1]))
+        .filter((r) => r.triggers.includes(sql.includes("'story_reply' = any(triggers)") ? "story_reply" : "comment"))
+        .filter((r) => p[2] === undefined || r.id === p[2])
+        .sort((a, b) => a.created_at - b.created_at),
+    },
     { match: /^insert into socialapp\.short_links/, reply: (p) => [{ code: `code${String(p[2]).replace(/\W/g, "")}` }] },
     { match: /pg_advisory_xact_lock/, reply: () => [] },
     {
@@ -171,13 +179,13 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
     },
     {
       // comment reply enqueue (comments.ts)
-      match: /^insert into socialapp\.dm_queue \(user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, created_at\)/,
+      match: /^insert into socialapp\.dm_queue \(user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, created_at, kind\)/,
       reply: (p) => {
         if (queue.some((q) => q.comment_id === p[4])) return [];
         const created = p[7] ? new Date(String(p[7])).getTime() : Date.now();
         const row: WQueue = {
           id: `q-${++seq}`, user_id: String(p[0]), social_account_id: String(p[1]), rule_id: String(p[2]), contact_id: String(p[3]),
-          comment_id: String(p[4]), recipient_external_id: String(p[5]), message: String(p[6]), status: "pending", kind: "comment_reply",
+          comment_id: String(p[4]), recipient_external_id: String(p[5]), message: String(p[6]), status: "pending", kind: String(p[8] ?? "comment_reply"),
           attempts: 0, last_error: null, created_at: created, sent_at: null, next_attempt_at: Date.now(),
         };
         queue.push(row);

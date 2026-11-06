@@ -1,5 +1,5 @@
 import { decryptToken } from "@/lib/crypto";
-import { processCommentEvents, type CommentEvent } from "@/lib/comments";
+import { commentTime, processCommentEvents, type CommentEvent } from "@/lib/comments";
 import { query } from "@/lib/db";
 
 const GRAPH_BASE = "https://graph.instagram.com/v21.0";
@@ -141,6 +141,7 @@ async function collectCommentsForAccount(
         fromId: String(c.from?.id),
         fromUsername: c.from?.username ?? null,
         mediaId,
+        createdAt: commentTime(c.timestamp),
       });
     }
   }

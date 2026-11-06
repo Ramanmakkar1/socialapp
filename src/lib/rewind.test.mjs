@@ -18,7 +18,7 @@ function harness({ mediaPages, commentPages, fail, triggers = ["comment"] } = {}
     if (id === "@/lib/comments") return { processCommentEvents: async (events, scope) => {
       processed.push({ events, scope });
       return events.length;
-    } };
+    }, commentTime: (raw) => (typeof raw === "string" && raw ? new Date(raw).toISOString() : null) };
     if (id === "@/lib/db") return { query: async (sql, params) => {
       if (sql.includes("dm_rules")) {
         assert.deepEqual(params, ["rule", "owner"]);
@@ -91,7 +91,11 @@ test("recent comments on older posts reach replay; expired comments and excess p
   assert.deepEqual(await scan.run(), { queued: 1, scanned: 1, failures: 0 });
   assert.equal(scan.requests.length, 26);
   assert.equal(scan.requests.at(-1).pathname, "/v21.0/old-24/comments");
-  assert.deepEqual(scan.processed, [{ events: [{ accountExternalId: "instagram", commentId: "recent", text: "info", fromId: "viewer", fromUsername: null, mediaId: "old-0" }], scope: { userId: "owner", ruleId: "rule" } }]);
+  // Replay keeps the comment's original time (bug j), not the time of the replay.
+  const createdAt = scan.processed[0]?.events[0]?.createdAt;
+  assert.equal(typeof createdAt, "string");
+  assert.ok(Date.now() - Date.parse(createdAt) > 60 * 60 * 1000, "original comment time, not now");
+  assert.deepEqual(scan.processed, [{ events: [{ accountExternalId: "instagram", commentId: "recent", text: "info", fromId: "viewer", fromUsername: null, mediaId: "old-0", createdAt }], scope: { userId: "owner", ruleId: "rule" } }]);
 });
 
 test("media paging follows the after cursor across short pages until exhausted", async () => {

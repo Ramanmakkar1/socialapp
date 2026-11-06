@@ -10,7 +10,23 @@ export type CommentEvent = {
   fromId: string;
   fromUsername: string | null;
   mediaId: string | null;
+  /** When the person wrote the comment (ISO). Replayed comments keep their original time (bug j). */
+  createdAt?: string | null;
 };
+
+/** ISO time from a Graph/webhook timestamp: ISO string, or unix seconds / milliseconds. */
+export function commentTime(raw: unknown): string | null {
+  let ms: number | null = null;
+  if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) {
+    ms = raw < 1e12 ? raw * 1000 : raw;
+  } else if (typeof raw === "string" && raw.trim() !== "") {
+    const parsed = /^\d+$/.test(raw.trim()) ? Number(raw.trim()) * 1000 : Date.parse(raw);
+    ms = Number.isFinite(parsed) ? parsed : null;
+  }
+  if (ms === null) return null;
+  // Never in the future (clock skew): that would stretch Instagram's 7-day reply window.
+  return new Date(Math.min(ms, Date.now())).toISOString();
+}
 
 type DmRuleRow = MatchableRule & {
   dm_text: string;
@@ -42,6 +58,7 @@ export function extractCommentEvents(body: unknown): CommentEvent[] {
         continue;
       }
       const accountExternalId = String(entry.id);
+      const entryTime = commentTime(entry.time);
       for (const change of entry.changes) {
         if (!isRecord(change) || change.field !== "comments") {
           continue;
@@ -78,6 +95,7 @@ export function extractCommentEvents(body: unknown): CommentEvent[] {
           fromId,
           fromUsername,
           mediaId,
+          createdAt: commentTime(value.timestamp) ?? commentTime(value.created_time) ?? entryTime,
         });
       }
     }
@@ -131,8 +149,8 @@ export async function processCommentEvents(
       if (!rule) {
         continue;
       }
-      const contacts = await query<{ id: string }>(
-        `insert into socialapp.contacts(user_id, social_account_id, platform, external_id, username, source_rule_id) values ($1,$2,'instagram',$3,$4,$5) on conflict (user_id, platform, external_id) do update set last_seen_at=now(), username=coalesce(excluded.username, socialapp.contacts.username) returning id`,
+      const contacts = await query<{ id: string; email: string | null }>(
+        `insert into socialapp.contacts(user_id, social_account_id, platform, external_id, username, source_rule_id) values ($1,$2,'instagram',$3,$4,$5) on conflict (user_id, platform, external_id) do update set last_seen_at=now(), username=coalesce(excluded.username, socialapp.contacts.username) returning id, email`,
         [
           account.user_id,
           account.id,
@@ -145,7 +163,10 @@ export async function processCommentEvents(
       if (!contactId) {
         continue;
       }
-      const gated = rule.email_gate || rule.follow_gate;
+      // A returning lead whose email we already have is not asked again for an email-only gate.
+      const knownEmail = Boolean(contacts[0]?.email);
+      const emailGate = rule.email_gate && !knownEmail;
+      const gated = emailGate || rule.follow_gate;
       let resolvedLink: string | null = null;
       if (!gated && rule.link_url) {
         resolvedLink = rule.link_url;
@@ -163,12 +184,12 @@ export async function processCommentEvents(
         dmText: rule.dm_text,
         fromUsername: event.fromUsername,
         linkUrl: rule.link_url,
-        emailGate: rule.email_gate,
+        emailGate,
         followGate: rule.follow_gate,
         resolvedLink,
       });
       const rows = await query<{ id: string }>(
-        `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message) values ($1,$2,$3,$4,$5,$6,$7) on conflict (comment_id) do nothing returning id`,
+        `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, created_at, kind) values ($1,$2,$3,$4,$5,$6,$7, coalesce($8::timestamptz, now()), $9) on conflict (comment_id) do nothing returning id`,
         [
           account.user_id,
           account.id,
@@ -177,13 +198,17 @@ export async function processCommentEvents(
           event.commentId,
           event.fromId,
           message,
+          event.createdAt ?? null,
+          // 'comment_link': the gate was skipped (known email), so this reply already carries
+          // the link and must not count as an open gate prompt later.
+          rule.email_gate && !emailGate && !rule.follow_gate ? "comment_link" : "comment_reply",
         ],
       );
       if (rows.length > 0) {
         inserted += 1;
       }
     } catch (err) {
-      console.error("processCommentEvents event failed", err);
+      console.error("processCommentEvents event failed", event.commentId, err instanceof Error ? err.message : err);
       hadFailure = true;
     }
   }
