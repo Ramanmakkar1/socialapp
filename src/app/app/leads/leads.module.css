@@ -1,0 +1,12 @@
+/* Leads page specifics. */
+
+.mobileDl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+.mobileDl dd {
+  text-align: right;
+  overflow-wrap: anywhere;
+}

@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Users } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
@@ -6,6 +6,9 @@ import EmptyState from "../EmptyState";
 import LoadFailed from "../calendar/LoadFailed";
 import LeadContactActions from "./LeadContactActions";
 import LocalTime from "@/components/LocalTime";
+import { BtnLink, PageHero } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
+import styles from "./leads.module.css";
 
 export const metadata = { title: "Leads" };
 
@@ -23,46 +26,6 @@ function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }
 
-function ChatToContactIllustration({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      viewBox="0 0 56 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect x="2" y="6" width="26" height="20" rx="8" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
-      <path d="M8 14h14M8 19h10" stroke="var(--brand)" strokeWidth="1.5" strokeLinecap="round" />
-      <path
-        d="M28 16h6l4 4v6a2 2 0 01-2 2H28"
-        stroke="var(--brand-2)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeDasharray="2 2"
-      />
-      <rect x="34" y="10" width="20" height="24" rx="10" fill="color-mix(in srgb, var(--brand) 12%, transparent)" stroke="var(--brand)" strokeWidth="1.5" />
-      <circle cx="44" cy="18" r="4" fill="var(--brand)" opacity="0.35" />
-      <path d="M40 26h8M40 30h5" stroke="var(--ink-2)" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
-    </svg>
-  );
-}
-
-function LeadsContactIllustration() {
-  return (
-    <svg aria-hidden="true" className="h-11 w-11 shrink-0" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="8" width="36" height="28" rx="8" fill="var(--surface-2)" stroke="var(--line)" strokeWidth="1.5" />
-      <circle cx="16" cy="20" r="5" fill="var(--brand)" opacity="0.25" />
-      <rect x="24" y="17" width="12" height="3" rx="1.5" fill="var(--brand)" />
-      <rect x="24" y="23" width="8" height="3" rx="1.5" fill="var(--ink-2)" opacity="0.35" />
-      <path d="M12 32h20" stroke="var(--brand-2)" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="32" cy="32" r="6" fill="var(--brand-2)" opacity="0.2" />
-      <path d="M30 32l1.5 1.5L34 31" stroke="var(--brand-2)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ q?: string; email?: string; rule?: string; page?: string }> }) {
   const { q = '', email = '', rule = '', page: requestedPage = '' } = await searchParams;
   const user = await requireUser();
@@ -74,7 +37,13 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   const reloadQuery = reloadParams.toString();
   const loadFailure = (
     <>
-      <h1 className="text-2xl font-semibold">Leads</h1>
+      <PageHero
+        eyebrow="Captured leads"
+        title="Leads"
+        lede="Emails and phone numbers your auto-DMs collect, ready to export."
+        art="/landing/card-leads.webp"
+        artAlt=""
+      />
       <LoadFailed
         className="mt-6"
         message="Leads could not be loaded. Your saved contacts may still exist. Reload to try again."
@@ -158,108 +127,108 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <LeadsContactIllustration />
-          <div className="min-w-0">
-            <h1 className="text-2xl font-semibold">Leads</h1>
-            <p className="text-sm text-muted">{total > 0 ? `${total} leads | ${offset + 1}-${offset + leads.length} shown` : "0 leads"}</p>
-          </div>
-        </div>
-        {leads.length > 0 && (
-          <div className="flex max-w-xs flex-col items-end gap-1.5 text-right">
-            <a href={exportHref} className="rounded-full border border-line px-4 py-2 text-sm">
+      <PageHero
+        eyebrow="Captured leads"
+        title="Leads"
+        lede={total > 0 ? `${total} ${total === 1 ? "lead" : "leads"} · showing ${offset + 1}-${offset + leads.length}` : "Emails and phone numbers your auto-DMs collect, ready to export."}
+        art="/landing/card-leads.webp"
+        artAlt=""
+        action={leads.length > 0 ? (
+          <div className="flex flex-col items-start gap-2">
+            <BtnLink variant="line" href={exportHref} size="sm">
               {exportCapped ? "Export latest 10,000" : "Export CSV"}
-            </a>
+            </BtnLink>
             {exportCapped ? (
-              <p className="text-xs text-muted">CSV downloads are limited to the 10,000 newest matching leads. Narrow with search, rule, or email filters.</p>
+              <p className={`${ui.hint} m-0 max-w-xs`}>
+                CSV downloads are limited to the 10,000 newest matching leads. Narrow with search, rule, or email filters.
+              </p>
             ) : null}
           </div>
-        )}
-      </div>
-      <form method="get" className="mt-6 flex flex-wrap items-center gap-3">
-        <label htmlFor="leads-search" className="sr-only">Search leads</label>
-        <input
-          id="leads-search"
-          type="search"
-          name="q"
-          placeholder="Search username, name, email or phone"
-          defaultValue={search}
-          className="w-full min-w-0 rounded-full border border-line bg-surface px-4 py-2 text-sm sm:w-auto"
-        />
-        <label htmlFor="leads-rule" className="sr-only">From rule</label>
-        <select id="leads-rule" name="rule" defaultValue={selectedRule} className="rounded-full border border-line bg-surface px-4 py-2 text-sm">
-          <option value="">All rules</option>
-          {rules.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select>
-        <label htmlFor="leads-email" className="flex cursor-pointer items-center gap-2 text-sm text-ink-2">
+        ) : undefined}
+      />
+      <form method="get" className="mt-6 flex flex-wrap items-end gap-3">
+        <div className={ui.field} style={{ minWidth: "min(100%, 260px)" }}>
+          <label htmlFor="leads-search" className={ui.label}>Search</label>
+          <input
+            id="leads-search"
+            type="search"
+            name="q"
+            placeholder="Username, name, email or phone"
+            defaultValue={search}
+            className={ui.input}
+          />
+        </div>
+        <div className={ui.field}>
+          <label htmlFor="leads-rule" className={ui.label}>From rule</label>
+          <select id="leads-rule" name="rule" defaultValue={selectedRule} className={ui.input}>
+            <option value="">All rules</option>
+            {rules.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+          </select>
+        </div>
+        <label htmlFor="leads-email" className={ui.checkRow}>
           <input id="leads-email" type="checkbox" name="email" value="1" defaultChecked={onlyWithEmail} />
           Only with email
         </label>
-        <button type="submit" className="btn-primary rounded-full px-4 py-2 text-sm">Search</button>
-        {filterActive && !selectedRuleName && <a href="/app/leads" className="text-sm text-muted underline">Clear</a>}
+        <button type="submit" className={`${ui.btn} ${ui.btnDark} ${ui.sm}`}>Search</button>
+        {filterActive && !selectedRuleName && <Link href="/app/leads" className={`${ui.hint} underline`}>Clear</Link>}
       </form>
       {selectedRuleName ? (
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-brand/25 bg-brand/5 px-4 py-3">
-          <ChatToContactIllustration className="h-10 w-14 shrink-0" />
+        <div className={`${ui.card} ${ui.band} mt-4 flex flex-wrap items-center gap-4 p-4`}>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">Campaign</p>
-            <p className="truncate text-sm font-semibold text-ink">{selectedRuleName}</p>
+            <p className={`${ui.eyebrow} m-0`}>Campaign</p>
+            <p className="m-0 truncate font-semibold text-[var(--poskoo-ink)]">{selectedRuleName}</p>
           </div>
           <div className="flex w-full flex-wrap gap-x-4 gap-y-2 sm:w-auto sm:justify-end">
-            <Link href="/app/auto-dm" className="text-sm font-medium text-brand underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
-              Manage automations
-            </Link>
-            <Link href={showAllLeadsHref} className="text-sm font-medium text-brand underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
-              Show all leads
-            </Link>
+            <Link href="/app/auto-dm" className={ui.link}>Manage automations</Link>
+            <Link href={showAllLeadsHref} className={ui.link}>Show all leads</Link>
           </div>
         </div>
       ) : null}
       {leads.length === 0 ? (
         selectedRuleName ? (
-          <div className="mt-6 rounded-2xl border border-line bg-surface px-4 py-5 text-sm text-ink-2">
-            <p>
-              No leads captured for{" "}
-              <span className="font-semibold text-ink">{selectedRuleName}</span>
+          <div className={`${ui.card} ${ui.mint} mt-6 p-5 text-[.95rem]`}>
+            <p className="m-0 text-[var(--poskoo-ink)]">
+              No leads captured for <strong>{selectedRuleName}</strong>
               {search || onlyWithEmail ? " with your current filters" : " yet"}.
             </p>
-            <p className="mt-2 text-muted">
+            <p className="mt-2 text-[var(--poskoo-muted)]">
               Turn on email capture or run the automation on Instagram comments — contacts appear here as people complete your DM flow.
             </p>
-            <Link href="/app/auto-dm" className="mt-3 inline-flex min-h-[44px] items-center font-medium text-brand underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+            <Link href="/app/auto-dm" className={`${ui.link} mt-3 inline-flex min-h-[44px] items-center`}>
               Back to this automation
             </Link>
           </div>
         ) : filterActive ? (
-          <p className="mt-6 text-sm text-muted">No leads match your search.</p>
+          <p className={`${ui.hint} mt-6`}>No leads match your search.</p>
         ) : (
-          <EmptyState icon={Users} title="No leads yet" text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting leads."} />
+          <div className="mt-6">
+            <EmptyState icon={Users} title="No leads yet" text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting leads."} />
+          </div>
         )
       ) : (
         <>
-          <ul className="mt-6 space-y-3 md:hidden">
+          <ul className={`mt-6 grid gap-4 md:hidden`}>
             {leads.map((lead) => (
               <li key={lead.id}>
-                <article className="rounded-2xl border border-line bg-surface p-4">
-                  <p className="break-all font-semibold text-ink">{lead.username ? `@${lead.username}` : "—"}</p>
-                  {lead.name ? <p className="mt-1 break-all text-sm text-ink-2">{lead.name}</p> : null}
-                  <dl className="mt-3 space-y-2 text-sm">
+                <article className={`${ui.card} p-4`}>
+                  <p className={`m-0 break-all font-semibold text-[var(--poskoo-ink)]`}>{lead.username ? `@${lead.username}` : "—"}</p>
+                  {lead.name ? <p className="mt-1 break-all text-sm text-[var(--poskoo-muted)]">{lead.name}</p> : null}
+                  <dl className={`mt-3 grid gap-2 text-sm ${styles.mobileDl}`}>
                     <div>
-                      <dt className="text-xs text-muted">Email</dt>
-                      <dd className="break-all">{lead.email || "—"}</dd>
+                      <dt className={`text-xs ${ui.hint}`}>Email</dt>
+                      <dd className="m-0 break-all">{lead.email || "—"}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs text-muted">Phone</dt>
-                      <dd className="break-all">{lead.phone || "—"}</dd>
+                      <dt className={`text-xs ${ui.hint}`}>Phone</dt>
+                      <dd className="m-0 break-all">{lead.phone || "—"}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs text-muted">From rule</dt>
-                      <dd className="break-all">{lead.rule_name || "—"}</dd>
+                      <dt className={`text-xs ${ui.hint}`}>From rule</dt>
+                      <dd className="m-0 break-all">{lead.rule_name || "—"}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs text-muted">Captured</dt>
-                      <dd><LocalTime value={lead.created_at} style="medium" fallback="-" /></dd>
+                      <dt className={`text-xs ${ui.hint}`}>Captured</dt>
+                      <dd className="m-0"><LocalTime value={lead.created_at} style="medium" fallback="-" /></dd>
                     </div>
                   </dl>
                   <LeadContactActions email={lead.email} phone={lead.phone} />
@@ -267,17 +236,19 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
               </li>
             ))}
           </ul>
-          <div className="mt-6 hidden overflow-x-auto rounded-2xl border border-line bg-surface md:block">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-line text-muted"><tr>{["Instagram", "Name", "Email", "Phone", "From rule", "Date"].map((heading) => <th key={heading} scope="col" className="px-4 py-3 font-medium">{heading}</th>)}</tr></thead>
+          <div className={`mt-6 hidden md:block ${ui.tableWrap}`}>
+            <table className={ui.table}>
+              <thead>
+                <tr>{["Instagram", "Name", "Email", "Phone", "From rule", "Date"].map((heading) => <th key={heading} scope="col" className={ui.th}>{heading}</th>)}</tr>
+              </thead>
               <tbody>{leads.map((lead) => (
-                <tr key={lead.id} className="border-b border-line last:border-0">
-                  <td className="px-4 py-3">{lead.username ? `@${lead.username}` : "—"}</td>
-                  <td className="px-4 py-3">{lead.name || "—"}</td>
-                  <td className="px-4 py-3">{lead.email || "—"}</td>
-                  <td className="px-4 py-3">{lead.phone || "—"}</td>
-                  <td className="px-4 py-3">{lead.rule_name || "—"}</td>
-                  <td className="px-4 py-3"><LocalTime value={lead.created_at} style="medium" fallback="-" /></td>
+                <tr key={lead.id} className={ui.tr}>
+                  <td className={ui.td}>{lead.username ? `@${lead.username}` : "—"}</td>
+                  <td className={ui.td}>{lead.name || "—"}</td>
+                  <td className={ui.td}>{lead.email || "—"}</td>
+                  <td className={ui.td}>{lead.phone || "—"}</td>
+                  <td className={ui.td}>{lead.rule_name || "—"}</td>
+                  <td className={ui.td}><LocalTime value={lead.created_at} style="medium" fallback="-" /></td>
                 </tr>
               ))}</tbody>
             </table>
@@ -286,9 +257,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
       )}
       {total > pageSize && (
         <nav aria-label="Leads pagination" className="mt-6 flex flex-wrap items-center gap-3 text-sm">
-          {page > 1 && <a href={pageHref(page - 1)} className="rounded-full border border-line px-4 py-2">Previous</a>}
-          <span className="text-muted">Page {page} of {Math.ceil(total / pageSize)}</span>
-          {page < Math.ceil(total / pageSize) && <a href={pageHref(page + 1)} className="rounded-full border border-line px-4 py-2">Next</a>}
+          {page > 1 && <Link href={pageHref(page - 1)} className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}>Previous</Link>}
+          <span className={ui.hint}>Page {page} of {Math.ceil(total / pageSize)}</span>
+          {page < Math.ceil(total / pageSize) && <Link href={pageHref(page + 1)} className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}>Next</Link>}
         </nav>
       )}
     </>
