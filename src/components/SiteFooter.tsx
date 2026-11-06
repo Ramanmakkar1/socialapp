@@ -1,82 +1,78 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import PoskooMark from "./PoskooMark";
 
-const linkClass =
-  "flex min-h-10 items-center text-sm text-muted transition hover:text-ink";
-
+// Landing-style footer. Must be rendered inside PublicShell (the .landing wrapper)
+// so the landing.module.css global classes (footer.rich, .fh, …) apply.
 function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
-    <div>
-      <p className="text-sm font-medium text-ink">{title}</p>
-      <ul className="mt-3 space-y-0">
+    <nav aria-label={title}>
+      <p className="fh">{title}</p>
+      <ul>
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className={linkClass}>
-              {l.label}
-            </Link>
+            <Link href={l.href}>{l.label}</Link>
           </li>
         ))}
       </ul>
-    </div>
+    </nav>
   );
 }
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line bg-surface px-4 py-12 text-sm">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          <FooterColumn
-            title="Product"
-            links={[
-              { href: "/instagram-scheduler", label: "Instagram scheduler" },
-              { href: "/instagram-auto-dm", label: "Instagram auto DM" },
-              { href: "/instagram-auto-dm/templates", label: "DM templates" },
-            ]}
-          />
-          <FooterColumn
-            title="Free tools"
-            links={[
-              { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
-              { href: "/tools/instagram-caption-counter", label: "Caption counter" },
-              { href: "/tools/instagram-font-generator", label: "Font generator" },
-              { href: "/tools/instagram-image-size", label: "Image size guide" },
-              { href: "/tools/instagram-post-preview", label: "Post preview" },
-              { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
-              { href: "/tools/instagram-utm-builder", label: "UTM link builder" },
-              { href: "/tools/instagram-comment-picker", label: "Comment picker" },
-              { href: "/tools/instagram-safe-zone-checker", label: "Reels safe zone checker" },
-              { href: "/tools", label: "All free tools" },
-            ]}
-          />
-          <FooterColumn
-            title="Compare"
-            links={[
-              { href: "/buffer-alternative", label: "Buffer alternative" },
-              { href: "/later-alternative", label: "Later alternative" },
-              { href: "/manychat-alternative", label: "ManyChat alternative" },
-              { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
-            ]}
-          />
-          <FooterColumn
-            title="Company"
-            links={[
-              { href: "/help", label: "Help" },
-              { href: "/contact", label: "Contact" },
-              { href: "/privacy", label: "Privacy" },
-              { href: "/terms", label: "Terms" },
-              { href: "/data-deletion", label: "Data deletion" },
-            ]}
-          />
-        </div>
-        <div className="mt-10 flex flex-col gap-3 border-t border-line pt-8 text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © 2026 {BRAND.name} · {BRAND.company}
-          </p>
-          <a href={`mailto:${BRAND.supportEmail}`} className={`${linkClass} sm:min-h-0 sm:py-0`}>
-            {BRAND.supportEmail}
-          </a>
-        </div>
+    <footer className="rich">
+      <div className="fbrand">
+        <Link className="logo" href="/">
+          <PoskooMark size={30} />
+          poskoo<b>.</b>
+        </Link>
+        <p>Schedule Instagram posts and auto-DM every comment, on the official Meta API.</p>
+      </div>
+      <FooterColumn
+        title="Product"
+        links={[
+          { href: "/instagram-scheduler", label: "Instagram scheduler" },
+          { href: "/instagram-auto-dm", label: "Instagram auto DM" },
+          { href: "/instagram-auto-dm/templates", label: "Auto-DM templates" },
+          { href: "/pricing", label: "Pricing" },
+        ]}
+      />
+      <FooterColumn
+        title="Free tools"
+        links={[
+          { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
+          { href: "/tools/instagram-caption-counter", label: "Caption counter" },
+          { href: "/tools/instagram-font-generator", label: "Font generator" },
+          { href: "/tools/instagram-bio-generator", label: "Bio generator" },
+          { href: "/tools/instagram-image-size", label: "Image size guide" },
+          { href: "/tools", label: "All free tools" },
+        ]}
+      />
+      <FooterColumn
+        title="Compare"
+        links={[
+          { href: "/buffer-alternative", label: "Buffer alternative" },
+          { href: "/later-alternative", label: "Later alternative" },
+          { href: "/manychat-alternative", label: "ManyChat alternative" },
+          { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
+        ]}
+      />
+      <FooterColumn
+        title="Company"
+        links={[
+          { href: "/help", label: "Help center" },
+          { href: "/contact", label: "Contact" },
+          { href: "/privacy", label: "Privacy" },
+          { href: "/terms", label: "Terms" },
+          { href: "/data-deletion", label: "Data deletion" },
+        ]}
+      />
+      <div className="legal">
+        <span>
+          © 2026 {BRAND.name} · {BRAND.company} ·{" "}
+        </span>
+        <a href={`mailto:${BRAND.supportEmail}`}>{BRAND.supportEmail}</a>
       </div>
     </footer>
   );

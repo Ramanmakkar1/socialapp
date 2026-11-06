@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import BioTool from "./BioTool";
 
 const PATH = "/tools/instagram-bio-generator";
@@ -61,85 +61,100 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramBioGeneratorPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free / runs in your browser / nothing is uploaded
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Instagram bio <span className="gradient-text">generator</span>
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Get niche bio templates with emojis and line breaks, optional styled names, and a live 150-character counter.
-              </p>
+      <header className="hero">
+        <span className="pill">Free / runs in your browser / nothing is uploaded</span>
+        <h1>
+          Instagram bio <em className="s mark">generator</em>
+        </h1>
+        <p className="lede">
+          Get niche bio templates with emojis and line breaks, optional styled names, and a live 150-character counter.
+        </p>
+        <div className="hero-art" style={{ maxWidth: 520 }}>
+          <Image
+            sizes="(max-width: 520px) 100vw, 520px"
+            src="/landing/card-leads.webp"
+            width={900}
+            height={900}
+            loading="lazy"
+            alt="Two friends high-five next to a board of contacts with check marks and a rising chart"
+          />
+        </div>
+      </header>
+
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <BioTool />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        More free Instagram tools:{" "}
+        <Link className={s.vlink} href="/tools/instagram-font-generator">
+          Font generator
+        </Link>
+        {" / "}
+        <Link className={s.vlink} href="/tools/instagram-line-break-generator">
+          Line break generator
+        </Link>
+      </p>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Step by step</p>
+              <h2>How to use this tool</h2>
             </div>
-            <div className="mt-8">
-              <BioTool />
-            </div>
-            <p className="mt-6 text-center text-sm text-ink-2">
-              More free Instagram tools:{" "}
-              <Link
-                href="/tools/instagram-font-generator"
-                className="font-medium text-brand underline underline-offset-2"
-              >
-                Font generator
-              </Link>
-              {" / "}
-              <Link
-                href="/tools/instagram-line-break-generator"
-                className="font-medium text-brand underline underline-offset-2"
-              >
-                Line break generator
-              </Link>
-            </p>
-          </div>
-        </section>
-        <section className="border-y border-line bg-surface px-4 py-16">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight">How to use this tool</h2>
-            <ol className="mt-8 list-decimal space-y-4 pl-5 text-ink-2">
-              {steps.map((step) => (
-                <li key={step} className="pl-1">
-                  {step}
-                </li>
+            <div className="pains">
+              {steps.map((step, i) => (
+                <div key={step} className="pain">
+                  <b>Step {i + 1}</b>
+                  <span>{step}</span>
+                </div>
               ))}
-            </ol>
+            </div>
           </div>
-        </section>
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Instagram bio FAQ</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram bio FAQ</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Schedule posts and auto-DM everyone who comments
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <Link
-              href="/signup"
-              className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]"
-            >
-              Start free <ArrowRight className="h-4 w-4" />
-            </Link>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Schedule posts and auto-DM everyone who comments</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/signup">
+                Start free <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

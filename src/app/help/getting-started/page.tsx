@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
   title: "Getting started in 3 minutes",
@@ -32,101 +32,113 @@ const articleJsonLd = {
 
 export default function GettingStartedHelpPage() {
   return (
-    <>
+    <PublicShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
       />
-      <SiteHeader />
-      <main className="flex-1 px-4 py-12 sm:py-16">
-        <div className="mx-auto max-w-2xl">
-          <Link href="/help" className="inline-flex items-center gap-1 text-sm text-brand hover:underline">
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Help center
-          </Link>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Getting started in 3 minutes</h1>
-          <p className="mt-3 text-ink-2">
-            These three steps match the checklist on your {BRAND.name} dashboard after you sign in.
-          </p>
+      <nav aria-label="Breadcrumb" className={s.crumbs}>
+        <Link href="/help">Help center</Link> / Getting started
+      </nav>
+      <header className="hero">
+        <p className="eyebrow">Guide</p>
+        <h1>
+          Getting started in <em className="s">3 minutes</em>
+        </h1>
+        <p className="lede">
+          These three steps match the checklist on your {BRAND.name} dashboard after you sign in.
+        </p>
+      </header>
 
-          <ol className="mt-10 space-y-10">
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <span className="btn-primary inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold">
-                1
-              </span>
-              <h2 className="mt-4 text-xl font-semibold">Connect Instagram</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                Use a free Instagram Business or Creator account. In {BRAND.name}, open{" "}
-                <Link href="/app/settings" className="font-medium text-brand hover:underline">
-                  Settings
-                </Link>{" "}
-                and tap <strong className="font-medium text-ink">Connect Instagram</strong>. You sign in through Meta&apos;s
-                official login — we never ask for your Instagram password.
-              </p>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <span className="btn-primary inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold">
-                2
-              </span>
-              <h2 className="mt-4 text-xl font-semibold">Create your first auto-DM rule from a template</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                Pick a template below. It opens{" "}
-                <Link href="/app/auto-dm" className="font-medium text-brand hover:underline">
-                  Auto-DM
-                </Link>{" "}
-                with keywords and message text filled in. Add your link, set the rule to Active, and put the same keyword in
-                your post caption so commenters know what to type.
-              </p>
-              <ul className="mt-4 space-y-2 text-sm">
-                {starterTemplates.map((t) => (
-                  <li key={t.slug}>
-                    <Link
-                      href={`/app/auto-dm?template=${t.slug}`}
-                      className="font-medium text-brand hover:underline"
-                    >
-                      {t.title}
-                    </Link>
-                    <span className="text-ink-2"> — keyword example: {t.keywords.join(", ")}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/instagram-auto-dm/templates"
-                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
-              >
-                Browse all templates <ArrowRight className="h-4 w-4" />
-              </Link>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <span className="btn-primary inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold">
-                3
-              </span>
-              <h2 className="mt-4 text-xl font-semibold">Schedule your first post in the calendar</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                Open the{" "}
-                <Link href="/app/calendar#new" className="font-medium text-brand hover:underline">
-                  calendar
-                </Link>
-                , write your caption (include your keyword), add media, and choose a time. Optionally attach an auto-DM rule
-                to the post — when the post publishes, {BRAND.name} can switch that rule on automatically if you kept it
-                paused until launch.
-              </p>
-            </li>
-          </ol>
-
-          <div className="mt-10 rounded-2xl border border-line bg-surface-2 p-5 text-sm text-ink-2">
-            <p>
-              Need a fix-it checklist? See{" "}
-              <Link href="/help/instagram-auto-dm-not-working" className="font-medium text-brand hover:underline">
-                Instagram auto DM not working
-              </Link>
-              .
-            </p>
+      <section style={{ paddingTop: 40 }}>
+        <div className="wrap">
+          <div className="band">
+            <div className="copy">
+              <p className="eyebrow">The three steps</p>
+              <h2>Connect, automate, schedule.</h2>
+              <div className="pains">
+                <div className="pain"><b>Step 1</b><span>Connect Instagram</span></div>
+                <div className="pain"><b>Step 2</b><span>Create your first auto-DM rule from a template</span></div>
+                <div className="pain"><b>Step 3</b><span>Schedule your first post in the calendar</span></div>
+              </div>
+            </div>
+            <div className="art">
+              <Image
+                sizes="(max-width: 960px) 100vw, 50vw"
+                src="/landing/card-schedule.webp"
+                width={900}
+                height={900}
+                loading="lazy"
+                alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
+              />
+            </div>
           </div>
         </div>
-      </main>
-      <SiteFooter />
-    </>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className={s.prose}>
+            <h2>Connect Instagram</h2>
+            <p>
+              Use a free Instagram Business or Creator account. In {BRAND.name}, open{" "}
+              <Link className={s.vlink} href="/app/settings">
+                Settings
+              </Link>{" "}
+              and tap <strong>Connect Instagram</strong>. You sign in through Meta&apos;s official login — we never ask for
+              your Instagram password.
+            </p>
+
+            <h2>Create your first auto-DM rule from a template</h2>
+            <p>
+              Pick a template below. It opens{" "}
+              <Link className={s.vlink} href="/app/auto-dm">
+                Auto-DM
+              </Link>{" "}
+              with keywords and message text filled in. Add your link, set the rule to Active, and put the same keyword in
+              your post caption so commenters know what to type.
+            </p>
+            <ul>
+              {starterTemplates.map((t) => (
+                <li key={t.slug}>
+                  <Link className={s.vlink} href={`/app/auto-dm?template=${t.slug}`}>
+                    {t.title}
+                  </Link>
+                  {" "}— keyword example: {t.keywords.join(", ")}
+                </li>
+              ))}
+            </ul>
+            <p>
+              <Link className={s.vlink} href="/instagram-auto-dm/templates">
+                Browse all templates <span aria-hidden="true">→</span>
+              </Link>
+            </p>
+
+            <h2>Schedule your first post in the calendar</h2>
+            <p>
+              Open the{" "}
+              <Link className={s.vlink} href="/app/calendar#new">
+                calendar
+              </Link>
+              , write your caption (include your keyword), add media, and choose a time. Optionally attach an auto-DM rule
+              to the post — when the post publishes, {BRAND.name} can switch that rule on automatically if you kept it
+              paused until launch.
+            </p>
+          </div>
+          <div className="pains" style={{ maxWidth: 760, margin: "32px auto 0" }}>
+            <div className="pain">
+              <b>Stuck?</b>
+              <span>
+                Need a fix-it checklist? See{" "}
+                <Link className={s.vlink} href="/help/instagram-auto-dm-not-working">
+                  Instagram auto DM not working
+                </Link>
+                .
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

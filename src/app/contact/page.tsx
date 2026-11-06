@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { KeyRound, LifeBuoy, Mail, MessageCircleQuestion } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import SupportIllustration from "@/components/SupportIllustration";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
   title: `${BRAND.name} support: help with scheduling and auto-DM`,
@@ -12,82 +11,109 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
 };
 
-const cards = [
-  {
-    icon: Mail,
-    title: "Email us",
-    content: (
-      <>
-        <a className="font-medium text-brand underline-offset-4 hover:underline" href={`mailto:${BRAND.supportEmail}`}>
-          {BRAND.supportEmail}
-        </a>
-        <p className="mt-2 text-sm text-ink-2">We reply within one business day</p>
-      </>
-    ),
-  },
-  {
-    icon: LifeBuoy,
-    title: "Help center",
-    content: (
-      <p className="text-sm leading-6 text-ink-2">
-        Browse <Link className="text-brand underline-offset-4 hover:underline" href="/help">step-by-step help guides</Link> or follow the <Link className="text-brand underline-offset-4 hover:underline" href="/help/getting-started">getting started guide</Link>.
-      </p>
-    ),
-  },
-  {
-    icon: MessageCircleQuestion,
-    title: "Auto-DM not working?",
-    content: (
-      <p className="text-sm leading-6 text-ink-2">
-        <Link className="text-brand underline-offset-4 hover:underline" href="/help/instagram-auto-dm-not-working">Troubleshoot Instagram auto-DMs</Link> with our step-by-step checklist.
-      </p>
-    ),
-  },
-];
-
 export default function ContactPage() {
   return (
-    <>
-      <SiteHeader />
-      <main className="flex-1 px-4 py-12 sm:py-16">
-        <div className="mx-auto flex max-w-3xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Contact support</h1>
-            <p className="mt-3 text-ink-2">Need a hand with scheduling, Instagram auto-DM or your account? Choose the support option that fits.</p>
-          </div>
-          <SupportIllustration className="w-40 shrink-0 sm:w-56" />
-        </div>
-        <section aria-label="Support options" className="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-3">
-          {cards.map(({ icon: Icon, title, content }) => (
-            <article key={title} className="rounded-2xl border border-line bg-surface p-6">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-brand"><Icon className="h-5 w-5" aria-hidden="true" /></span>
-              <h2 className="mt-4 font-semibold">{title}</h2>
-              <div className="mt-2">{content}</div>
-            </article>
-          ))}
-          <article id="password-reset" className="rounded-2xl border border-line bg-surface p-6">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-brand">
-              <KeyRound className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <h2 className="mt-4 font-semibold">Forgot your password?</h2>
-            <div className="mt-2">
-              <p className="text-sm leading-6 text-ink-2">
-                Email us from the address you signed up with and we will help you get back into your account.
-              </p>
-              <a
-                className="btn-primary mt-4 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
-                href={`mailto:${BRAND.supportEmail}?subject=${encodeURIComponent("Password reset")}`}
-              >
-                Email support
-              </a>
-            </div>
-          </article>
-        </section>
-        <p className="mx-auto mt-10 max-w-3xl text-center text-sm leading-6 text-ink-2">
-          For details about how {BRAND.company} handles your information, see our <Link className="text-brand underline-offset-4 hover:underline" href="/privacy">Privacy Policy</Link>, <Link className="text-brand underline-offset-4 hover:underline" href="/terms">Terms of Service</Link> and <Link className="text-brand underline-offset-4 hover:underline" href="/data-deletion">data deletion instructions</Link>.
+    <PublicShell>
+      <header className="hero">
+        <span className="pill">We reply within one business day</span>
+        <h1>
+          Contact <em className="s">support</em>
+        </h1>
+        <p className="lede">
+          Need a hand with scheduling, Instagram auto-DM or your account? Choose the support option that fits.
         </p>
-      </main>
-      <SiteFooter />
-    </>
+        <div className="ctas">
+          <a className="btn btn-dark" href={`mailto:${BRAND.supportEmail}`}>
+            Email us <span aria-hidden="true">→</span>
+          </a>
+          <Link className="btn btn-line" href="/help">
+            Help center
+          </Link>
+        </div>
+      </header>
+
+      <section style={{ paddingTop: 40 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Support options</p>
+              <h2>Need a hand?</h2>
+              <div className="pains">
+                <div className="pain">
+                  <b>Email us</b>
+                  <span>
+                    <a className={s.vlink} href={`mailto:${BRAND.supportEmail}`}>
+                      {BRAND.supportEmail}
+                    </a>{" "}
+                    · We reply within one business day
+                  </span>
+                </div>
+                <div className="pain">
+                  <b>Help center</b>
+                  <span>
+                    Browse{" "}
+                    <Link className={s.vlink} href="/help">
+                      step-by-step help guides
+                    </Link>{" "}
+                    or follow the{" "}
+                    <Link className={s.vlink} href="/help/getting-started">
+                      getting started guide
+                    </Link>
+                    .
+                  </span>
+                </div>
+                <div className="pain">
+                  <b>Auto-DM not working?</b>
+                  <span>
+                    <Link className={s.vlink} href="/help/instagram-auto-dm-not-working">
+                      Troubleshoot Instagram auto-DMs
+                    </Link>{" "}
+                    with our step-by-step checklist.
+                  </span>
+                </div>
+                <div className="pain" id="password-reset">
+                  <b>Forgot your password?</b>
+                  <span>
+                    Email us from the address you signed up with and we will help you get back into your account.{" "}
+                    <a
+                      className={s.vlink}
+                      href={`mailto:${BRAND.supportEmail}?subject=${encodeURIComponent("Password reset")}`}
+                    >
+                      Email support
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="art">
+              <Image
+                sizes="(max-width: 960px) 100vw, 50vw"
+                src="/landing/card-dm.webp"
+                width={900}
+                height={900}
+                loading="lazy"
+                alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>
+        For details about how {BRAND.company} handles your information, see our{" "}
+        <Link className={s.vlink} href="/privacy">
+          Privacy Policy
+        </Link>
+        ,{" "}
+        <Link className={s.vlink} href="/terms">
+          Terms of Service
+        </Link>{" "}
+        and{" "}
+        <Link className={s.vlink} href="/data-deletion">
+          data deletion instructions
+        </Link>
+        .
+      </p>
+    </PublicShell>
   );
 }

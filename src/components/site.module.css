@@ -1,0 +1,168 @@
+/* Public page helpers, on top of the landing design system (landing.module.css). */
+
+.main {
+  flex: 1 1 auto;
+  width: 100%;
+  padding-block: 8px 32px;
+}
+
+/* Accent links that must stay violet inside the landing wrapper
+   (.landing a sets color:inherit — this has higher specificity). */
+.main a.vlink,
+.main a.vlink:hover {
+  color: var(--poskoo-violet);
+}
+.main a.vlink {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Breadcrumbs. */
+.crumbs {
+  color: var(--poskoo-muted);
+  font-size: .9rem;
+  margin: 0 0 20px;
+}
+.crumbs a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.crumbs a:hover { color: var(--poskoo-ink); }
+
+/* Article / legal prose. */
+.prose {
+  max-width: 760px;
+  margin-inline: auto;
+  color: var(--poskoo-ink);
+}
+.prose h2 {
+  margin: 40px 0 12px;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+.prose h3 {
+  margin: 28px 0 8px;
+  font-size: 1.25rem;
+}
+.prose p {
+  margin: 0 0 14px;
+}
+.prose ul,
+.prose ol {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding-left: 1.3rem;
+}
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose a.vlink,
+.prose a.vlink:hover {
+  color: var(--poskoo-violet);
+}
+.prose hr {
+  border: 0;
+  border-top: 1.5px solid var(--poskoo-line);
+  margin: 32px 0;
+}
+.prose blockquote {
+  margin: 0 0 14px;
+  border-left: 4px solid var(--poskoo-lime);
+  border-radius: 4px 14px 14px 4px;
+  background: var(--poskoo-card);
+  padding: 8px 16px;
+}
+.prose small {
+  color: var(--poskoo-muted);
+}
+
+/* Neutral white tile used for tool grids and generic cards. */
+.tile {
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  min-width: 0;
+}
+
+/* Comparison tables (alternative pages). */
+.tableWrap {
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: .95rem;
+}
+.th {
+  border-bottom: 1.5px solid var(--poskoo-line);
+  padding: 14px 16px;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--poskoo-muted);
+}
+.td {
+  border-bottom: 1px solid var(--poskoo-line);
+  padding: 14px 16px;
+}
+.td:last-child, .th:last-child { text-align: center; }
+.tr:last-child .td { border-bottom: 0; }
+.oursCol { background: var(--poskoo-band); }
+
+/* Chip row for CompareAlternativesNav — pill chips like the landing .chips,
+   but self-contained (no landing.module.css import). Higher specificity than
+   `.landing a { color: inherit }` so chip colours hold inside the shell. */
+.chipRow {
+  margin: 28px auto 0;
+  text-align: center;
+}
+.chipRow > p {
+  margin: 0 0 12px;
+  font-size: .88rem;
+  color: var(--poskoo-muted);
+}
+.chipRow > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.chipRow a.chip,
+.chipRow span.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: .4rem 1.1rem;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 999px;
+  background: var(--poskoo-card);
+  color: var(--poskoo-ink);
+  font-size: .92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .2s, border-color .2s;
+}
+.chipRow a.chip:hover {
+  border-color: var(--poskoo-ink);
+}
+.chipRow .chipActive,
+.chipRow a.chipActive:hover {
+  background: var(--poskoo-ink);
+  border-color: var(--poskoo-ink);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .main { padding-block: 0 24px; }
+}

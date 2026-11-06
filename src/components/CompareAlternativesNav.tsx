@@ -1,4 +1,5 @@
 import Link from "next/link";
+import s from "./site.module.css";
 
 type ComparePage = "buffer" | "manychat" | "later" | "hootsuite";
 
@@ -11,20 +12,21 @@ const LINKS: { href: string; label: string; key: ComparePage }[] = [
 
 export function CompareAlternativesNav({ current }: { current: ComparePage }) {
   return (
-    <nav aria-label="Compare alternatives" className="mx-auto mt-10 max-w-5xl text-center text-sm">
-      <p className="text-muted">Compare</p>
-      <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-        {LINKS.map((l, i) => (
-          <span key={l.key} className="inline-flex items-center gap-2">
-            {i > 0 && <span className="text-muted" aria-hidden>·</span>}
-            {l.key === current ? (
-              <span className="font-medium text-ink">{l.label}</span>
-            ) : (
-              <Link href={l.href} className="font-medium text-brand hover:underline">{l.label}</Link>
-            )}
-          </span>
-        ))}
-      </p>
+    <nav aria-label="Compare alternatives" className={s.chipRow}>
+      <p>Compare</p>
+      <div>
+        {LINKS.map((l) =>
+          l.key === current ? (
+            <span key={l.key} className={`${s.chip} ${s.chipActive}`} aria-current="page">
+              {l.label}
+            </span>
+          ) : (
+            <Link key={l.key} href={l.href} className={s.chip}>
+              {l.label}
+            </Link>
+          ),
+        )}
+      </div>
     </nav>
   );
 }

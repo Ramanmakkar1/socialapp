@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight, Check, Minus, Layers, Mail, ShieldCheck, CalendarClock, MessageCircleHeart, KeyRound,
-} from "lucide-react";
 import { BRAND } from "@/lib/brand";
+import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
   title: { absolute: "ManyChat Alternative: Instagram Comment-to-DM + Scheduler" },
@@ -16,9 +14,9 @@ export const metadata: Metadata = {
 };
 
 const whySwitch = [
-  { icon: Layers, title: "Chat automation + scheduler in one", text: "ManyChat automates DMs, but you still need a separate tool to plan and publish posts. Here both live in one place." },
-  { icon: CalendarClock, title: "Posts that carry their own DM rule", text: "Attach a comment-to-DM rule to a scheduled post. It switches on when the post goes live, so early commenters get the link right away." },
-  { icon: Mail, title: "Email before the link", text: "Turn on the email gate and the DM asks for an email address before it sends your link, so comments become leads." },
+  { no: "01 / One tool", title: "Chat automation + scheduler in one", text: "ManyChat automates DMs, but you still need a separate tool to plan and publish posts. Here both live in one place." },
+  { no: "02 / Automation", title: "Posts that carry their own DM rule", text: "Attach a comment-to-DM rule to a scheduled post. It switches on when the post goes live, so early commenters get the link right away." },
+  { no: "03 / Leads", title: "Email before the link", text: "Turn on the email gate and the DM asks for an email address before it sends your link, so comments become leads." },
 ];
 
 const compare: [string, string, string][] = [
@@ -53,148 +51,144 @@ const faqJsonLd = {
 };
 
 function Cell({ v }: { v: string }) {
-  if (v === "Yes") return <Check className="mx-auto h-4 w-4 text-ok" aria-label="Yes" />;
-  if (v === "No") return <Minus className="mx-auto h-4 w-4 text-muted" aria-label="No" />;
+  if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
+  if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
   return <>{v}</>;
 }
 
 export default function ManyChatAlternative() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
-      <SiteHeader />
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden px-4 pt-16 pb-16 sm:pt-24">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-              <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Official Instagram API · no password needed
-            </span>
-            <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-6xl">
-              The ManyChat alternative that also <span className="gradient-text">schedules your posts</span>
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-ink-2">
-              DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/signup" className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium">Start free <ArrowRight className="h-4 w-4" /></Link>
-              <a href="#compare" className="rounded-full border border-line bg-surface px-6 py-3 font-medium">Compare features</a>
-            </div>
-          </div>
-        </section>
 
-        {/* Why people switch */}
-        <section className="border-y border-line bg-surface px-4 py-20">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">Why people switch</h2>
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {whySwitch.map(({ icon: Icon, title, text }) => (
-                <div key={title} className="rounded-2xl border border-line bg-bg p-6">
-                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-brand"><Icon className="h-5 w-5" /></span>
-                  <h3 className="mt-4 font-semibold">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-ink-2">{text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+      {/* Hero */}
+      <header className="hero">
+        <span className="pill">Official Instagram API · no password needed</span>
+        <h1>
+          The ManyChat alternative that also <em className="s">schedules your posts</em>
+        </h1>
+        <p className="lede">
+          DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
+        </p>
+        <div className="ctas">
+          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+          <a className="btn btn-line" href="#compare">Compare features</a>
+        </div>
+        <div className="hero-art" style={{ maxWidth: 720 }}>
+          <Image sizes="(max-width: 720px) 100vw, 720px" src="/landing/card-dm.webp" width={900} height={900} alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers" />
+        </div>
+      </header>
 
-        {/* Comparison */}
-        <section id="compare" className="mx-auto max-w-4xl scroll-mt-20 px-4 py-20">
-          <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">{BRAND.name} vs ManyChat</h2>
-          <p className="mt-3 text-center text-ink-2">ManyChat is a mature chat automation tool with more channels. {BRAND.name} focuses on Instagram comment-to-DM and adds post scheduling. Here is an honest side-by-side.</p>
-          <div className="mt-10 overflow-x-auto rounded-2xl border border-line bg-surface">
-            <table className="w-full min-w-[30rem] text-sm">
+      {/* Why people switch */}
+      <section>
+        <div className="wrap">
+          <div className="head">
+            <h2>Why people switch</h2>
+          </div>
+          <div className="cards">
+            {whySwitch.map((c) => (
+              <article key={c.title} className="pcard">
+                <span className="no">{c.no}</span>
+                <h3>{c.title}</h3>
+                <p>{c.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison */}
+      <section id="compare" style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Comparison</p>
+            <h2>{BRAND.name} vs ManyChat</h2>
+            <p>ManyChat is a mature chat automation tool with more channels. {BRAND.name} focuses on Instagram comment-to-DM and adds post scheduling. Here is an honest side-by-side.</p>
+          </div>
+          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+            <table className={s.table}>
               <thead>
-                <tr className="border-b border-line text-left">
-                  <th className="p-4 font-medium text-muted">Feature</th>
-                  <th className="p-4 text-center font-semibold">{BRAND.name}</th>
-                  <th className="p-4 text-center font-semibold">ManyChat</th>
+                <tr className={s.tr}>
+                  <th scope="col" className={s.th}>Feature</th>
+                  <th scope="col" className={`${s.th} ${s.oursCol}`}>{BRAND.name}</th>
+                  <th scope="col" className={s.th}>ManyChat</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody>
                 {compare.map(([label, ours, theirs]) => (
-                  <tr key={label}>
-                    <td className="p-4">{label}</td>
-                    <td className="p-4 text-center"><Cell v={ours} /></td>
-                    <td className="p-4 text-center text-ink-2"><Cell v={theirs} /></td>
+                  <tr key={label} className={s.tr}>
+                    <td className={s.td}>{label}</td>
+                    <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
+                    <td className={s.td} style={{ textAlign: "center" }}><Cell v={theirs} /></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="mt-4 text-center text-xs text-muted">ManyChat features and pricing change over time. Check their site for current details.</p>
-        </section>
+          <p className="small" style={{ textAlign: "center", marginTop: 16 }}>ManyChat features and pricing change over time. Check their site for current details.</p>
+        </div>
+      </section>
 
-        {/* How it works */}
-        <section className="border-y border-line bg-surface px-4 py-20">
-          <div className="mx-auto grid max-w-5xl items-center gap-10 md:grid-cols-2">
-            <div>
-              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule the post, the DM rule comes with it</h2>
-              <p className="mt-5 leading-7 text-ink-2">
+      {/* How it works */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <h2>Schedule the post, the <em className="s">DM rule</em> comes with it</h2>
+              <p>
                 With ManyChat you set up the automation in one app and plan the post in another. In {BRAND.name} you write the post, pick the time and attach the keyword rule in one step.
               </p>
-              <Link href="/instagram-auto-dm/templates" className="mt-6 inline-flex items-center gap-2 font-medium text-brand hover:underline">Browse ready-made DM templates <ArrowRight className="h-4 w-4" /></Link>
+              <Link className={s.vlink} href="/instagram-auto-dm/templates">Browse ready-made DM templates</Link>
             </div>
-            <div className="grid gap-4">
-              <div className="flex items-start gap-4 rounded-2xl border border-line bg-bg p-5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-brand"><CalendarClock className="h-5 w-5" /></span>
-                <div>
-                  <h3 className="font-semibold">1. Schedule the post</h3>
-                  <p className="mt-1 text-sm text-ink-2">Write a caption that asks people to comment a keyword such as GUIDE.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 rounded-2xl border border-line bg-bg p-5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-brand"><KeyRound className="h-5 w-5" /></span>
-                <div>
-                  <h3 className="font-semibold">2. Set the keyword and link</h3>
-                  <p className="mt-1 text-sm text-ink-2">Choose the keyword, write the DM and add your link. Turn on the email gate if you want leads.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 rounded-2xl border border-line bg-bg p-5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-brand"><MessageCircleHeart className="h-5 w-5" /></span>
-                <div>
-                  <h3 className="font-semibold">3. Commenters get the DM</h3>
-                  <p className="mt-1 text-sm text-ink-2">The rule switches on when the post goes live and replies to every matching comment.</p>
-                </div>
-              </div>
+            <div className="pains">
+              <div className="pain"><b>1. Schedule the post</b><span>Write a caption that asks people to comment a keyword such as GUIDE.</span></div>
+              <div className="pain"><b>2. Set the keyword and link</b><span>Choose the keyword, write the DM and add your link. Turn on the email gate if you want leads.</span></div>
+              <div className="pain"><b>3. Commenters get the DM</b><span>The rule switches on when the post goes live and replies to every matching comment.</span></div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FAQ */}
-        <section className="mx-auto max-w-3xl px-4 py-20">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">ManyChat alternative questions</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      {/* FAQ */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <h2>ManyChat alternative questions</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA */}
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Auto-DM your commenters and schedule your posts in one place.</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">Start free. No credit card. Connect Instagram in one tap.</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/" className="font-medium underline underline-offset-4">See the full product</Link>
+      {/* CTA */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Auto-DM your commenters and <em className="s">schedule your posts</em> in one place.</h2>
+              <p>Start free. No credit card. Connect Instagram in one tap.</p>
+              <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
+            <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
           </div>
-          <div className="mx-auto mt-8 flex max-w-5xl flex-wrap justify-center gap-6 text-sm">
-            <Link href="/instagram-auto-dm" className="inline-flex items-center gap-1 font-medium text-brand hover:underline">Instagram auto DM <ArrowRight className="h-4 w-4" /></Link>
-            <Link href="/instagram-auto-dm/templates" className="inline-flex items-center gap-1 font-medium text-brand hover:underline">DM templates <ArrowRight className="h-4 w-4" /></Link>
-            <Link href="/buffer-alternative" className="inline-flex items-center gap-1 font-medium text-brand hover:underline">Buffer alternative <ArrowRight className="h-4 w-4" /></Link>
-          </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link className={s.vlink} href="/instagram-auto-dm">Instagram auto DM</Link>
+            {" · "}
+            <Link className={s.vlink} href="/instagram-auto-dm/templates">DM templates</Link>
+            {" · "}
+            <Link className={s.vlink} href="/buffer-alternative">Buffer alternative</Link>
+            {" · "}
+            <Link className={s.vlink} href="/">See the full product</Link>
+          </p>
           <CompareAlternativesNav current="manychat" />
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+        </div>
+      </section>
+    </PublicShell>
   );
 }

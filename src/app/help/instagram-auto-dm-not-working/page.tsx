@@ -1,9 +1,10 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
   title: "Instagram auto DM not working? Fix it step by step",
@@ -60,9 +61,26 @@ const articleJsonLd = {
   mainEntityOfPage: `${BRAND.url}/help/instagram-auto-dm-not-working`,
 };
 
+const checks = [
+  "Instagram Business or Creator, connected in Settings",
+  "Allow access to messages in Instagram",
+  "Make sure the rule is Active",
+  "Match type: exact vs contains",
+  "Follow gate and email gate",
+  "Queue timing and per-contact limits",
+  "Expired token → Reconnect needed",
+];
+
+const codeStyle: CSSProperties = {
+  background: "var(--poskoo-band)",
+  borderRadius: "8px",
+  padding: "0.12em 0.45em",
+  fontSize: "0.9em",
+};
+
 export default function InstagramAutoDmNotWorkingPage() {
   return (
-    <>
+    <PublicShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
@@ -71,131 +89,149 @@ export default function InstagramAutoDmNotWorkingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
       />
-      <SiteHeader />
-      <main className="flex-1 px-4 py-12 sm:py-16">
-        <div className="mx-auto max-w-2xl">
-          <Link href="/help" className="inline-flex items-center gap-1 text-sm text-brand hover:underline">
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Help center
-          </Link>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Instagram auto DM not working?
-          </h1>
-          <p className="mt-3 text-ink-2">
-            Walk through this checklist in order. Each step reflects how {BRAND.name} actually processes comments, gates,
-            and the send queue.
-          </p>
+      <nav aria-label="Breadcrumb" className={s.crumbs}>
+        <Link href="/help">Help center</Link> / Instagram auto DM not working
+      </nav>
+      <header className="hero">
+        <p className="eyebrow">Troubleshooting guide</p>
+        <h1>
+          Instagram auto DM <em className="s">not working?</em>
+        </h1>
+        <p className="lede">
+          Walk through this checklist in order. Each step reflects how {BRAND.name} actually processes comments, gates,
+          and the send queue.
+        </p>
+      </header>
 
-          <ol className="mt-10 list-none space-y-8">
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-lg font-semibold">1. Instagram Business or Creator, connected in Settings</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                Auto-DM only runs for a professional Instagram account linked to your user. In{" "}
-                <Link href="/app/settings" className="font-medium text-brand hover:underline">
-                  Settings
-                </Link>
-                , use <strong className="font-medium text-ink">Connect Instagram</strong> and finish Meta&apos;s login. The
-                account row should show Connected, not Reconnect needed.
-              </p>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-lg font-semibold">2. Allow access to messages in Instagram</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                In the Instagram app, open your professional account settings, then message controls (Connected tools). Turn
-                on <strong className="font-medium text-ink">Allow access to messages</strong> for the connected app so
-                Meta can deliver comment and DM webhooks and send replies.
-              </p>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-lg font-semibold">3. Make sure the rule is Active</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                In{" "}
-                <Link href="/app/auto-dm" className="font-medium text-brand hover:underline">
-                  Auto-DM
-                </Link>
-                , the rule status must be <strong className="font-medium text-ink">Active</strong> (paused rules are
-                skipped). Comment must be selected as a trigger. If you paused a rule and attached it to a scheduled post in
-                the calendar, it switches on automatically when that post publishes.
-              </p>
-              <p className="mt-2 text-sm text-ink-2">
-                Put the keyword in that post&apos;s caption so people comment the word you are listening for. If several
-                active rules share keywords, the oldest rule wins — use distinct keywords when you run multiple automations.
-              </p>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-lg font-semibold">4. Match type: exact vs contains</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                <strong className="font-medium text-ink">Exact</strong> — the whole comment (after normalizing mentions and
-                punctuation) must equal the keyword. Example: keyword <code className="rounded bg-surface-2 px-1">GUIDE</code>{" "}
-                matches a comment that is only <code className="rounded bg-surface-2 px-1">guide</code>, not{" "}
-                <code className="rounded bg-surface-2 px-1">send me the guide</code>.
-              </p>
-              <p className="mt-2 text-sm text-ink-2">
-                <strong className="font-medium text-ink">Contains</strong> — the keyword must appear as its own word.
-                Example: <code className="rounded bg-surface-2 px-1">GUIDE</code> matches{" "}
-                <code className="rounded bg-surface-2 px-1">Need the GUIDE please</code> but not{" "}
-                <code className="rounded bg-surface-2 px-1">GUIDE123</code>.
-              </p>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-lg font-semibold">5. Follow gate and email gate</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                With <strong className="font-medium text-ink">follow gate</strong>, the first DM explains that they should
-                follow you and reply <code className="rounded bg-surface-2 px-1">done</code> (or reply with email if both
-                gates are on). The link is queued only after {BRAND.name} confirms they follow your account.
-              </p>
-              <p className="mt-2 text-sm text-ink-2">
-                With <strong className="font-medium text-ink">email gate</strong>, they must reply in the DM thread with an
-                email address. {BRAND.name} extracts it from their message and then queues the link DM.
-              </p>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-lg font-semibold">6. Queue timing and per-contact limits</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                Matching comments enqueue a send job immediately, but delivery runs in the background with retries and
-                per-account send budgeting. Expect most messages within a few minutes, not the second the comment is posted.
-              </p>
-              <p className="mt-2 text-sm text-ink-2">
-                Each comment is sent at most once. Gated links send once per contact and rule; follow reminders send at most
-                twice per contact and rule when someone still has not followed.
-              </p>
-            </li>
-
-            <li className="rounded-2xl border border-line bg-surface p-6">
-              <h2 className="text-lg font-semibold">7. Expired token → Reconnect needed</h2>
-              <p className="mt-2 text-sm text-ink-2">
-                If Settings shows <strong className="font-medium text-ink">Reconnect needed</strong>, Instagram stopped
-                accepting the stored token. Tap Reconnect and sign in through Meta before testing again.
-              </p>
-            </li>
-          </ol>
-
-          <section className="mt-12">
-            <h2 className="text-xl font-semibold">FAQ</h2>
-            <div className="mt-6 divide-y divide-line rounded-2xl border border-line bg-surface">
-              {faqs.map((f) => (
-                <details key={f.q} className="group p-5">
-                  <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                  <p className="mt-2 text-sm text-ink-2">{f.a}</p>
-                </details>
-              ))}
+      <section style={{ paddingTop: 40 }}>
+        <div className="wrap">
+          <div className="band">
+            <div className="copy">
+              <p className="eyebrow">The checklist</p>
+              <h2>Seven checks, in order.</h2>
+              <div className="pains">
+                {checks.map((c, i) => (
+                  <div key={c} className="pain">
+                    <b>Check {i + 1}</b>
+                    <span>{c}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </section>
+            <div className="art">
+              <Image
+                sizes="(max-width: 960px) 100vw, 50vw"
+                src="/landing/card-dm.webp"
+                width={900}
+                height={900}
+                loading="lazy"
+                alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <p className="mt-10 text-sm text-ink-2">
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className={s.prose}>
+            <h2>1. Instagram Business or Creator, connected in Settings</h2>
+            <p>
+              Auto-DM only runs for a professional Instagram account linked to your user. In{" "}
+              <Link className={s.vlink} href="/app/settings">
+                Settings
+              </Link>
+              , use <strong>Connect Instagram</strong> and finish Meta&apos;s login. The account row should show Connected,
+              not Reconnect needed.
+            </p>
+
+            <h2>2. Allow access to messages in Instagram</h2>
+            <p>
+              In the Instagram app, open your professional account settings, then message controls (Connected tools). Turn
+              on <strong>Allow access to messages</strong> for the connected app so Meta can deliver comment and DM
+              webhooks and send replies.
+            </p>
+
+            <h2>3. Make sure the rule is Active</h2>
+            <p>
+              In{" "}
+              <Link className={s.vlink} href="/app/auto-dm">
+                Auto-DM
+              </Link>
+              , the rule status must be <strong>Active</strong> (paused rules are skipped). Comment must be selected as a
+              trigger. If you paused a rule and attached it to a scheduled post in the calendar, it switches on
+              automatically when that post publishes.
+            </p>
+            <p>
+              Put the keyword in that post&apos;s caption so people comment the word you are listening for. If several
+              active rules share keywords, the oldest rule wins — use distinct keywords when you run multiple automations.
+            </p>
+
+            <h2>4. Match type: exact vs contains</h2>
+            <p>
+              <strong>Exact</strong> — the whole comment (after normalizing mentions and punctuation) must equal the
+              keyword. Example: keyword <code style={codeStyle}>GUIDE</code> matches a comment that is only{" "}
+              <code style={codeStyle}>guide</code>, not <code style={codeStyle}>send me the guide</code>.
+            </p>
+            <p>
+              <strong>Contains</strong> — the keyword must appear as its own word. Example:{" "}
+              <code style={codeStyle}>GUIDE</code> matches <code style={codeStyle}>Need the GUIDE please</code> but not{" "}
+              <code style={codeStyle}>GUIDE123</code>.
+            </p>
+
+            <h2>5. Follow gate and email gate</h2>
+            <p>
+              With <strong>follow gate</strong>, the first DM explains that they should follow you and reply{" "}
+              <code style={codeStyle}>done</code> (or reply with email if both gates are on). The link is queued only after{" "}
+              {BRAND.name} confirms they follow your account.
+            </p>
+            <p>
+              With <strong>email gate</strong>, they must reply in the DM thread with an email address. {BRAND.name}{" "}
+              extracts it from their message and then queues the link DM.
+            </p>
+
+            <h2>6. Queue timing and per-contact limits</h2>
+            <p>
+              Matching comments enqueue a send job immediately, but delivery runs in the background with retries and
+              per-account send budgeting. Expect most messages within a few minutes, not the second the comment is posted.
+            </p>
+            <p>
+              Each comment is sent at most once. Gated links send once per contact and rule; follow reminders send at most
+              twice per contact and rule when someone still has not followed.
+            </p>
+
+            <h2>7. Expired token → Reconnect needed</h2>
+            <p>
+              If Settings shows <strong>Reconnect needed</strong>, Instagram stopped accepting the stored token. Tap
+              Reconnect and sign in through Meta before testing again.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>FAQ</h2>
+          </div>
+          <div className="faq">
+            {faqs.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>
             Still stuck?{" "}
-            <Link href="/app" className="font-medium text-brand hover:underline">
+            <Link className={s.vlink} href="/app">
               Open your dashboard
             </Link>{" "}
             to review rules, the calendar, and Settings.
           </p>
         </div>
-      </main>
-      <SiteFooter />
-    </>
+      </section>
+    </PublicShell>
   );
 }

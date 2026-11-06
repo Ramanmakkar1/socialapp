@@ -1,7 +1,10 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured, query } from "@/lib/db";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 
 export const metadata = { title: "Data deletion status", robots: { index: false, follow: false } };
 
@@ -21,11 +24,30 @@ type StatusPageProps = { searchParams: Promise<{ code?: string | string[] }> };
 
 export default function Page({ searchParams }: StatusPageProps) {
   return (
-    <Suspense fallback={<p role="status" className="mx-auto max-w-3xl px-4 py-16 text-muted">Loading deletion status…</p>}>
-      <DeletionStatus searchParams={searchParams} />
-    </Suspense>
+    <PublicShell>
+      <Suspense fallback={<p role="status" className="small" style={{ padding: "48px 0" }}>Loading deletion status…</p>}>
+        <DeletionStatus searchParams={searchParams} />
+      </Suspense>
+    </PublicShell>
   );
 }
+
+const noticeCard: CSSProperties = {
+  borderRadius: "var(--poskoo-radius-card)",
+  boxShadow: "var(--poskoo-shadow-card)",
+  padding: "22px 24px",
+};
+
+const inputStyle: CSSProperties = {
+  flex: "1 1 220px",
+  minWidth: 0,
+  border: "1.5px solid var(--poskoo-line)",
+  borderRadius: "var(--poskoo-radius-sm)",
+  background: "var(--poskoo-card)",
+  color: "var(--poskoo-ink)",
+  padding: "12px 16px",
+  font: "inherit",
+};
 
 async function DeletionStatus({ searchParams }: StatusPageProps) {
   const { code: raw } = await searchParams;
@@ -44,36 +66,51 @@ async function DeletionStatus({ searchParams }: StatusPageProps) {
     }
   }
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16 leading-7 text-ink-2">
-      <h1 className="mb-6 text-3xl font-semibold text-ink">Data deletion status</h1>
-      <form method="get" className="mb-6 flex flex-wrap gap-2">
-        <label htmlFor="code" className="sr-only">Confirmation code</label>
-        <input
-          id="code"
-          name="code"
-          defaultValue={code}
-          placeholder="Confirmation code"
-          className="min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink focus:border-brand focus:outline-none"
-        />
-        <button type="submit" className="btn-primary">Check status</button>
-      </form>
-      {!code ? (
-        <p>Enter the confirmation code you received when you removed {BRAND.name} from Instagram.</p>
-      ) : row ? (
-        <div className="rounded-2xl border border-line bg-surface p-5">
-          <p className="text-sm text-muted">Confirmation code</p>
-          <p className="font-mono text-ink">{code}</p>
-          <p className="mt-4 font-medium text-ink">{LABELS[row.status] ?? row.status}</p>
-          <p className="mt-2 text-sm text-muted">Requested: {fmt(row.requested_at)} · Finished: {fmt(row.completed_at)}</p>
+    <>
+      <nav aria-label="Breadcrumb" className={s.crumbs}>
+        <Link href="/">Home</Link> / <Link href="/data-deletion">Data deletion</Link> / Status
+      </nav>
+      <header className="hero">
+        <p className="eyebrow">Data deletion</p>
+        <h1>Data deletion status</h1>
+      </header>
+      <section style={{ paddingTop: 40 }}>
+        <div className={s.prose}>
+          <form method="get" style={{ marginBottom: "28px" }}>
+            <label htmlFor="code" style={{ display: "block", fontWeight: 600, marginBottom: "8px" }}>
+              Confirmation code
+            </label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              <input
+                id="code"
+                name="code"
+                defaultValue={code}
+                placeholder="Confirmation code"
+                style={inputStyle}
+                className="focus:border-[var(--poskoo-violet)] focus:outline-none"
+              />
+              <button type="submit" className="btn btn-dark">Check status</button>
+            </div>
+          </form>
+          {!code ? (
+            <p>Enter the confirmation code you received when you removed {BRAND.name} from Instagram.</p>
+          ) : row ? (
+            <div style={{ ...noticeCard, background: "var(--poskoo-mint)" }}>
+              <p className="small">Confirmation code</p>
+              <p style={{ fontFamily: "monospace", fontWeight: 600, color: "var(--poskoo-ink)" }}>{code}</p>
+              <p style={{ fontWeight: 600, marginTop: "14px" }}>{LABELS[row.status] ?? row.status}</p>
+              <p className="small" style={{ marginTop: "6px" }}>Requested: {fmt(row.requested_at)} · Finished: {fmt(row.completed_at)}</p>
+            </div>
+          ) : (
+            <p style={{ ...noticeCard, background: "var(--poskoo-peach)" }}>
+              {lookupFailed ? "We couldn't look up this code right now. Please try again later." : "We couldn't find a request with this code."} Email {BRAND.supportEmail} with the code and we will confirm the status.
+            </p>
+          )}
+          <p className="small" style={{ marginTop: "28px" }}>
+            <Link className={s.vlink} href="/data-deletion">How to delete your data</Link> · <Link className={s.vlink} href="/privacy">Privacy policy</Link>
+          </p>
         </div>
-      ) : (
-        <p className="rounded-2xl border border-warn p-5 text-warn">
-          {lookupFailed ? "We couldn't look up this code right now. Please try again later." : "We couldn't find a request with this code."} Email {BRAND.supportEmail} with the code and we will confirm the status.
-        </p>
-      )}
-      <p className="mt-8 text-sm">
-        <Link className="underline" href="/data-deletion">How to delete your data</Link> · <Link className="underline" href="/privacy">Privacy policy</Link>
-      </p>
-    </main>
+      </section>
+    </>
   );
 }

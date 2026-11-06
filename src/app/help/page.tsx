@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpen, LifeBuoy, Rocket, Wrench } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import SupportIllustration from "@/components/SupportIllustration";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
   title: "Help center",
@@ -16,34 +15,40 @@ export const metadata: Metadata = {
 const guides = [
   {
     href: "/help/getting-started",
-    icon: Rocket,
+    no: "01 / Start here",
     title: "Getting started in 3 minutes",
     text: "Connect Instagram, create your first auto-DM rule from a template, and schedule a post in the calendar.",
+    go: "Read guide",
   },
   {
     href: "/help/instagram-auto-dm-not-working",
-    icon: Wrench,
+    no: "02 / Troubleshooting",
     title: "Instagram auto DM not working?",
     text: "A step-by-step checklist: connection, message access, active rules, keywords, gates, and the send queue.",
+    go: "Read guide",
+  },
+  {
+    href: "/contact",
+    no: "03 / Contact",
+    title: "Contact support",
+    text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
+    go: "Contact us",
   },
 ];
 
 const resources = [
   {
     href: "/instagram-auto-dm",
-    icon: BookOpen,
     title: "Instagram auto DM overview",
     text: "How comment-to-DM works and what you can automate.",
   },
   {
     href: "/instagram-auto-dm/templates",
-    icon: LifeBuoy,
     title: "DM message templates",
     text: "Copy-ready keywords and messages for guides, shops, webinars, and more.",
   },
   {
     href: "/tools",
-    icon: Wrench,
     title: "Free Instagram tools",
     text: "Caption counter, image sizes, engagement rate, and other helpers.",
   },
@@ -51,69 +56,78 @@ const resources = [
 
 export default function HelpHubPage() {
   return (
-    <>
-      <SiteHeader />
-      <main className="flex-1 px-4 py-12 sm:py-16">
-        <div className="mx-auto grid w-full max-w-[1140px] grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]">
-          <div className="max-w-prose">
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Help center</h1>
-            <p className="mt-3 text-ink-2">
-              Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
-            </p>
-          </div>
-          <SupportIllustration className="w-40 shrink-0 sm:w-56 lg:w-full lg:justify-self-end" />
-        </div>
-
-        <section className="mx-auto mt-12 w-full max-w-[1140px]">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Guides</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {guides.map((g) => (
-              <Link
-                key={g.href}
-                href={g.href}
-                className="group min-w-0 rounded-2xl border border-line bg-surface p-6 transition hover:border-brand/40"
-              >
-                <g.icon className="h-6 w-6 text-brand" aria-hidden="true" />
-                <h3 className="mt-3 font-semibold group-hover:text-brand">{g.title}</h3>
-                <p className="mt-2 text-sm text-ink-2">{g.text}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand">
-                  Read guide <ArrowRight className="h-4 w-4" />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="mx-auto mt-12 w-full max-w-[1140px]">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Product resources</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {resources.map((r) => (
-              <Link
-                key={r.href}
-                href={r.href}
-                className="min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40"
-              >
-                <r.icon className="h-5 w-5 text-brand" aria-hidden="true" />
-                <h3 className="mt-2 font-medium">{r.title}</h3>
-                <p className="mt-1 text-sm text-ink-2">{r.text}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <p className="mx-auto mt-12 max-w-xl text-center text-sm text-muted">
-          Still stuck?{" "}
-          <Link href="/app" className="font-medium text-brand hover:underline">
-            Open your dashboard
-          </Link>{" "}
-          or email{" "}
-          <a href={`mailto:${BRAND.supportEmail}`} className="font-medium text-brand hover:underline">
-            {BRAND.supportEmail}
-          </a>
-          .
+    <PublicShell>
+      <header className="hero">
+        <span className="pill">Guides · troubleshooting · free tools</span>
+        <h1>
+          Help <em className="s">center</em>
+        </h1>
+        <p className="lede">
+          Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
         </p>
-      </main>
-      <SiteFooter />
-    </>
+      </header>
+
+      <section style={{ paddingTop: 40 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Step by step</p>
+            <h2>Guides</h2>
+          </div>
+          <div className="cards">
+            {guides.map((g) => (
+              <article key={g.href} className="pcard">
+                <span className="no">{g.no}</span>
+                <h3>{g.title}</h3>
+                <p>{g.text}</p>
+                <Link className="go" href={g.href}>
+                  {g.go} <span aria-hidden="true">→</span>
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Keep exploring</p>
+              <h2>Product resources</h2>
+              <div className="pains">
+                {resources.map((r) => (
+                  <Link key={r.href} className="pain" href={r.href}>
+                    <b>{r.title}</b>
+                    <span>{r.text}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="art">
+              <Image
+                sizes="(max-width: 960px) 100vw, 50vw"
+                src="/landing/card-dm.webp"
+                width={900}
+                height={900}
+                loading="lazy"
+                alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>
+        Still stuck?{" "}
+        <Link className={s.vlink} href="/app">
+          Open your dashboard
+        </Link>{" "}
+        or email{" "}
+        <a className={s.vlink} href={`mailto:${BRAND.supportEmail}`}>
+          {BRAND.supportEmail}
+        </a>
+        .
+      </p>
+    </PublicShell>
   );
 }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ExternalLink, ShieldCheck } from "lucide-react";
 import { BRAND } from "@/lib/brand";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import CaptionCounter from "./CaptionCounter";
 
@@ -69,94 +69,117 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramCaptionCounterPage() {
   return (
-    <>
+    <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
-      <SiteHeader />
-      <main className="flex-1 overflow-x-hidden">
-        {/* Hero + tool */}
-        <section className="relative px-4 pt-10 pb-16 sm:pt-16">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 mx-auto h-96 max-w-3xl rounded-full bg-[radial-gradient(closest-side,var(--brand),transparent)] opacity-20 blur-3xl" />
-          <div className="relative mx-auto max-w-5xl">
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Free · runs in your browser · nothing is uploaded
-              </span>
-              <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-                Instagram caption <span className="gradient-text">character counter</span>
-              </h1>
-              <p className="mx-auto mt-4 max-w-xl text-ink-2">
-                Count characters, hashtags and @mentions as you type, check the {n(ig.max)}-character limit and see where Instagram cuts your caption with &quot;more&quot;.
-              </p>
-            </div>
-            <div className="mt-8">
-              <CaptionCounter />
-            </div>
-            <p className="mt-6 text-center text-sm text-ink-2">
-              More free Instagram tools:{" "}
-              <Link href="/tools/instagram-line-break-generator" className="font-medium text-brand underline underline-offset-2">
-                Line break generator
-              </Link>
-              {" · "}
-              <Link href="/tools/instagram-image-size" className="font-medium text-brand underline underline-offset-2">
-                Image size guide
-              </Link>
-            </p>
-          </div>
-        </section>
+      <header className="hero">
+        <span className="pill">Free · runs in your browser · nothing is uploaded</span>
+        <h1>
+          Instagram caption <em className="s mark">character counter</em>
+        </h1>
+        <p className="lede">
+          Count characters, hashtags and @mentions as you type, check the {n(ig.max)}-character limit and see where Instagram cuts your caption with &quot;more&quot;.
+        </p>
+        <div className="hero-art">
+          <Image
+            sizes="(max-width: 1140px) 100vw, 1060px"
+            src="/landing/multichannel.webp"
+            width={1400}
+            height={933}
+            loading="lazy"
+            alt="A creator at a laptop sends one post that splits to several phones and screens"
+          />
+        </div>
+      </header>
 
-        {/* Limits table */}
-        <section className="border-y border-line bg-surface px-4 py-16">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight">Instagram caption limits</h2>
-            <div className="mt-8 overflow-hidden rounded-2xl border border-line bg-bg">
-              <table className="w-full text-sm">
-                <tbody className="divide-y divide-line">
-                  {limitRows.map(([label, value]) => (
-                    <tr key={label}>
-                      <th scope="row" className="p-4 text-left font-medium">{label}</th>
-                      <td className="p-4 text-right text-ink-2">{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-3 text-xs text-muted">
-              Length, hashtag and mention limits:{" "}
-              <a href={ig.source} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-ink">
-                Meta Instagram API docs <ExternalLink className="h-3 w-3" />
-              </a>
-              . The feed cut-off is an estimate and varies by device.
-            </p>
-          </div>
-        </section>
+      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
+        <CaptionCounter />
+      </div>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        More free Instagram tools:{" "}
+        <Link className={s.vlink} href="/tools/instagram-line-break-generator">
+          Line break generator
+        </Link>
+        {" · "}
+        <Link className={s.vlink} href="/tools/instagram-image-size">
+          Image size guide
+        </Link>
+      </p>
 
-        {/* FAQ */}
-        <section className="mx-auto max-w-3xl px-4 py-16">
-          <h2 className="text-center text-3xl font-semibold tracking-tight">Instagram caption questions</h2>
-          <div className="mt-10 divide-y divide-line rounded-2xl border border-line bg-surface">
+      {/* Limits table */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">The limits</p>
+            <h2>Instagram caption limits</h2>
+          </div>
+          <div className={s.tableWrap} style={{ maxWidth: 760, marginInline: "auto" }}>
+            <table className={s.table}>
+              <tbody>
+                {limitRows.map(([label, value]) => (
+                  <tr key={label} className={s.tr}>
+                    <th scope="row" className={s.th}>{label}</th>
+                    <td className={s.td}>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 16 }}>
+            Length, hashtag and mention limits:{" "}
+            <a href={ig.source} target="_blank" rel="noopener noreferrer" className={s.vlink}>
+              Meta Instagram API docs
+            </a>
+            . The feed cut-off is an estimate and varies by device.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Instagram caption questions</h2>
+          </div>
+          <div className="faq">
             {faqs.map((f) => (
-              <details key={f.q} className="group p-5">
-                <summary className="cursor-pointer list-none font-medium">{f.q}</summary>
-                <p className="mt-2 text-sm text-ink-2">{f.a}</p>
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA */}
-        <section className="px-4 pb-24">
-          <div className="btn-primary mx-auto max-w-5xl rounded-3xl px-6 py-14 text-center">
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Schedule this caption and auto-DM everyone who comments</h2>
-            <p className="mx-auto mt-3 max-w-xl opacity-90">{BRAND.tagline}</p>
-            <div className="mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-[#0d0d14]">Start free <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/instagram-auto-dm" className="font-medium underline underline-offset-4">How Instagram auto DM works</Link>
+      {/* CTA */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="cta">
+            <div>
+              <h2>Schedule this caption and auto-DM everyone who comments</h2>
+              <p>{BRAND.tagline}</p>
+              <Link className="btn" href="/signup">
+                Start free <span aria-hidden="true">→</span>
+              </Link>
             </div>
+            <Image
+              sizes="(max-width: 960px) 100vw, 50vw"
+              src="/landing/card-leads.webp"
+              width={900}
+              height={900}
+              loading="lazy"
+              alt="Two friends high-five next to a board of new leads"
+            />
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
+            <Link className={s.vlink} href="/instagram-auto-dm">
+              How Instagram auto DM works
+            </Link>
+          </p>
+        </div>
+      </section>
+    </PublicShell>
   );
 }
