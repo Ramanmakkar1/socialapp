@@ -273,8 +273,24 @@
 }
 .loadFailed p { margin: 0 0 10px; color: var(--poskoo-ink); font-size: .95rem; }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .calendarPage :global(#new) { margin-inline: -0.25rem; border-radius: var(--poskoo-radius-card); }
+  /* Phones get the days as a list: no tall empty boxes, and the month view
+     skips the greyed days of the previous/next month. */
+  .day, .dayCompact { min-height: 0; }
+  .dayOut { display: none; }
+  .day .dayPosts:empty { display: none; }
+  .viewSwitch { display: flex; width: 100%; }
+  .viewLink { flex: 1; }
+  .navBtns { width: 100%; }
+  .navBtns > * { flex: 1 1 auto; }
+}
+/* Tablets: seven narrow columns, so tighter cells and smaller day labels. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .day { min-height: 6rem; padding: 6px; }
+  .dayCompact { min-height: 5rem; }
+  .chip { padding: .3rem .4rem; font-size: .72rem; }
+  .weekdayHead { padding: 0 2px; font-size: .7rem; letter-spacing: .03em; }
 }
 
 @media (prefers-reduced-motion: reduce) {

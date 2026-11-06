@@ -9,6 +9,9 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  /* Safety net: nothing may push the page sideways on a phone. clip (not hidden)
+     keeps position:sticky working. */
+  overflow-x: clip;
 }
 .shell > :global(.wrap) {
   width: 100%;
@@ -17,7 +20,39 @@
 .main {
   flex: 1 1 auto;
   width: 100%;
+  min-width: 0;
   padding-block: 8px 32px;
+  /* Long URLs, hashtags and e-mail addresses wrap instead of widening the page. */
+  overflow-wrap: break-word;
+}
+.main :global(img),
+.main :global(video),
+.main :global(svg) {
+  max-width: 100%;
+}
+.main :global(pre),
+.main :global(code) {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Tablets (641–960px): the landing stacks .cards and .plans into one narrow
+   column below 960px, which leaves big empty sides on a tablet. On the public
+   pages (tools hub, pricing, feature pages) use two columns there; an odd last
+   card is centred under the pair. The landing itself is unchanged. */
+@media (min-width: 641px) and (max-width: 960px) {
+  .shell :global(.wrap .cards),
+  .shell :global(.wrap .plans) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+  }
+  .shell :global(.wrap .cards > .pcard:last-child:nth-child(odd)),
+  .shell :global(.wrap .plans > .plan:last-child:nth-child(odd)) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 100%;
+    max-width: calc(50% - 13px);
+  }
 }
 
 /* Accent links that must stay violet inside the landing wrapper
