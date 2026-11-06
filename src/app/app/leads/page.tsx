@@ -6,7 +6,7 @@ import EmptyState from "../EmptyState";
 import LoadFailed from "../calendar/LoadFailed";
 import LeadContactActions from "./LeadContactActions";
 import LocalTime from "@/components/LocalTime";
-import { BtnA, PageHero } from "@/components/ui/kit";
+import { BtnA, BtnLink, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./leads.module.css";
 
@@ -202,7 +202,18 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           <p className={`${ui.hint} mt-6`}>No leads match your search.</p>
         ) : (
           <div className="mt-6">
-            <EmptyState icon={Users} title="No leads yet" text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting leads."} />
+            <EmptyState
+              icon={Users}
+              title="No leads yet"
+              text={configured ? "Emails and phones collected by your auto-DMs will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting leads."}
+              art="/illustrations/empty-leads.webp"
+              artWidth={1536}
+              artHeight={1024}
+            >
+              <BtnLink href={configured ? "/app/auto-dm" : "/app/settings"} size="sm">
+                {configured ? "Create an auto-DM rule" : "Go to Settings"}
+              </BtnLink>
+            </EmptyState>
           </div>
         )
       ) : (

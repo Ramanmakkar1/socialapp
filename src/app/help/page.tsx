@@ -65,6 +65,16 @@ export default function HelpHubPage() {
         <p className="lede">
           Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
         </p>
+        <div className="hero-art" style={{ maxWidth: 760 }}>
+          <Image
+            sizes="(max-width: 800px) 100vw, 760px"
+            src="/illustrations/help-support.webp"
+            width={1536}
+            height={1024}
+            priority
+            alt="A smiling creator waves and holds out a map next to a life ring, while a happy dog looks up at a speech bubble."
+          />
+        </div>
       </header>
 
       <section style={{ paddingTop: 40 }}>

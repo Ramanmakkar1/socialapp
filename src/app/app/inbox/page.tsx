@@ -101,13 +101,25 @@ export default async function InboxPage({
             icon={Inbox}
             title="Connect Instagram to see comments and DMs"
             text="New comments and messages show up here as soon as they arrive."
+            art="/illustrations/connect-account.webp"
+            artWidth={1536}
+            artHeight={1024}
           >
             <BtnLink href="/app/settings" size="sm">Connect Instagram</BtnLink>
           </EmptyState>
         </div>
       ) : tab === "comments" ? (
         data.comments.length === 0 ? (
-          <p className={`${ui.hint} mt-6`}>No comments in the last 30 days yet. They appear here as soon as someone comments on your posts.</p>
+          <EmptyState
+            icon={MessageCircle}
+            title="No comments yet"
+            text="No comments in the last 30 days yet. They appear here as soon as someone comments on your posts."
+            art="/illustrations/empty-inbox.webp"
+            artWidth={1536}
+            artHeight={1024}
+          >
+            <BtnLink href="/app/auto-dm" size="sm" variant="line">Set up a comment rule</BtnLink>
+          </EmptyState>
         ) : (
           <ul className="mt-6 grid gap-4">
             {data.comments.map((c) => {
@@ -186,7 +198,14 @@ export default async function InboxPage({
           )}
         </div>
       ) : data.threads.length === 0 ? (
-        <p className={`${ui.hint} mt-6`}>No DMs in the last 30 days yet. Messages people send your Instagram account show up here.</p>
+        <EmptyState
+          icon={MessagesSquare}
+          title="No messages yet"
+          text="No DMs in the last 30 days yet. Messages people send your Instagram account show up here."
+          art="/illustrations/empty-inbox.webp"
+          artWidth={1536}
+          artHeight={1024}
+        />
       ) : (
         <ul className={`${styles.threadList} mt-6`}>
           {data.threads.map((t) => (

@@ -20,13 +20,13 @@ export default function NotFound() {
           <Link className="btn btn-line" href="/help">Visit help</Link>
           <Link className="btn btn-line" href="/contact">Contact support</Link>
         </div>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
+        <div className="hero-art" style={{ maxWidth: 620 }}>
           <Image
-            sizes="(max-width: 960px) 100vw, 520px"
-            src="/landing/problem.webp"
-            width={900}
-            height={900}
-            alt="A tired creator at night buried under phones and chat-bubble notifications"
+            sizes="(max-width: 660px) 100vw, 620px"
+            src="/illustrations/not-found.webp"
+            width={1536}
+            height={1024}
+            alt="A puzzled hiker checks a map while a dog sniffs out the path with a magnifying glass."
           />
         </div>
       </header>

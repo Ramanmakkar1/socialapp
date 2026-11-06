@@ -112,14 +112,14 @@ export default function ToolsPage() {
           Small, fast tools for getting a post ready: check your caption length and hashtags, keep the spacing you
           typed, and pick the right image size before you post or schedule with {BRAND.name}.
         </p>
-        <div className="hero-art">
+        <div className="hero-art" style={{ maxWidth: 820 }}>
           <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/hero.webp"
-            width={1400}
-            height={933}
+            sizes="(max-width: 860px) 100vw, 820px"
+            src="/illustrations/free-tools.webp"
+            width={1536}
+            height={1024}
             priority
-            alt="A big phone shows a post; a comment saying GUIDE pops out and a paper plane carries a DM with a link. A creator sits on a calendar block and a friend waves with a coffee, with a happy dog and plants below."
+            alt="A creator lifts a paintbrush out of an open toolbox full of a ruler, scissors, a hashtag, a magnifying glass and photos, with a happy dog in the flowers."
           />
         </div>
       </header>

@@ -84,6 +84,9 @@ export default async function AppHome() {
               icon={Plus}
               title="Nothing scheduled yet"
               text="Your next queued posts will show here with local date and time."
+              art="/illustrations/empty-calendar.webp"
+              artWidth={1536}
+              artHeight={1024}
             >
               <BtnLink href="/app/calendar#new" size="sm">Schedule your first post</BtnLink>
             </EmptyState>
@@ -132,14 +135,25 @@ export default async function AppHome() {
                 </ol>
               </div>
               <div className={`${styles.checklistArt} min-w-0`}>
-                <Image
-                  src="/landing/card-schedule.webp"
-                  alt=""
-                  width={1024}
-                  height={1024}
-                  sizes="200px"
-                  className="h-auto w-full max-w-[200px] object-contain"
-                />
+                {stats.hasAccount ? (
+                  <Image
+                    src="/landing/card-schedule.webp"
+                    alt=""
+                    width={1024}
+                    height={1024}
+                    sizes="200px"
+                    className="h-auto w-full max-w-[200px] object-contain"
+                  />
+                ) : (
+                  <Image
+                    src="/illustrations/connect-account.webp"
+                    alt=""
+                    width={1536}
+                    height={1024}
+                    sizes="(max-width: 720px) 260px, 200px"
+                    className="h-auto w-full max-w-[260px] object-contain"
+                  />
+                )}
               </div>
             </div>
           </section>
