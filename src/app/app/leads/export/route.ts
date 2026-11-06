@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
-import { query } from "@/lib/db";
+import { isDbConfigured, query } from "@/lib/db";
+import { leadsCsv } from "@/lib/leadsCsv";
 
 type Lead = {
   username: string | null;
@@ -13,12 +14,6 @@ type Lead = {
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function csvField(value: string | null): string {
-  let field = value ?? "";
-  if (/^[\s\u0000-\u001F]*[=+\-@]/.test(field)) field = `'${field}`;
-  return `"${field.replace(/"/g, '""')}"`;
-}
-
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }
@@ -26,6 +21,17 @@ function escapeLike(value: string): string {
 export async function GET(request: Request) {
   const user = await getCurrentUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
+  if (!isDbConfigured()) return new Response("Leads are not available right now.", { status: 503 });
+  try {
+    return await exportLeads(request, user.id);
+  } catch (err) {
+    console.error("leads export failed for user", user.id, err instanceof Error ? err.message : err);
+    return new Response("Could not export leads. Please try again.", { status: 500 });
+  }
+}
+
+async function exportLeads(request: Request, userId: string): Promise<Response> {
+  const user = { id: userId };
 
   const url = new URL(request.url);
   const search = (url.searchParams.get("q") ?? "").trim().slice(0, 100);
@@ -62,15 +68,12 @@ export async function GET(request: Request) {
     `select c.id, c.username, c.name, c.email, c.phone, c.created_at, r.name as rule_name from socialapp.contacts c left join socialapp.dm_rules r on r.id = c.source_rule_id where ${conditions.join(" and ")} order by c.created_at desc, c.id desc limit 10000`,
     params
   );
-  const rows = [
-    ["username", "name", "email", "phone", "rule", "created_at"],
-    ...leads.map((lead) => [lead.username, lead.name, lead.email, lead.phone, lead.rule_name, lead.created_at ? new Date(lead.created_at).toISOString() : null]),
-  ];
-  const csv = rows.map((row) => row.map(csvField).join(",")).join("\r\n");
+  const csv = leadsCsv(leads, url.searchParams.get("tz"));
   return new Response(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": 'attachment; filename="leads.csv"',
+      "Cache-Control": "no-store",
     },
   });
 }
