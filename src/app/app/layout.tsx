@@ -9,6 +9,9 @@ import { BtnA } from "@/components/ui/kit";
 import SidebarNav from "./SidebarNav";
 import styles from "./shell.module.css";
 
+// Every /app page is per-user: never prerender or cache it at build time.
+export const dynamic = "force-dynamic";
+
 // Shared dashboard shell. Guests are sent to /login by requireUser().
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (

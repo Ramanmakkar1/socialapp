@@ -60,11 +60,14 @@ export async function startSession(userId: string, userAgent?: string): Promise<
 
 // The logged-in user, or null. Never throws.
 export async function getCurrentUser(): Promise<CurrentUser | null> {
+  // Read the cookie FIRST: it marks the page as per-request (dynamic). Checking the DB config first let the
+  // Docker build (which has no DATABASE_URL) prerender /app/settings and /app/auto-dm as a permanent
+  // redirect to /login for every visitor (found 2026-11-06).
+  const jar = await cookies();
   if (!isDbConfigured()) {
     return null;
   }
   try {
-    const jar = await cookies();
     const token = jar.get(COOKIE)?.value;
     if (!token) {
       return null;
