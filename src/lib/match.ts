@@ -11,7 +11,11 @@ export type MatchableRule = {
 const DIACRITICS = /[̀-ͯ]/g;
 const LEADING_MENTIONS = /^(?:\s*@[\w.]+)+/;
 // Built with the constructor so the ES2017 TS target accepts the `u` flag.
-const NON_WORD = new RegExp('[^\\p{L}\\p{N}\\s]', 'gu');
+const NON_WORD = new RegExp('[^\\p{L}\\p{N}\\p{Extended_Pictographic}\\s]', 'gu');
+// Emoji become their own words, without variation selectors / skin tones / joiners,
+// so "🔥🔥" matches the keyword "🔥" and "link🔥" still matches "link".
+const EMOJI = new RegExp('\\p{Extended_Pictographic}', 'gu');
+const EMOJI_MODIFIERS = new RegExp('[\\u{FE0E}\\u{FE0F}\\u{200D}\\u{1F3FB}-\\u{1F3FF}]', 'gu');
 
 export function normalize(text: string): string {
   return String(text ?? '')
@@ -19,7 +23,9 @@ export function normalize(text: string): string {
     .normalize('NFKD')
     .replace(DIACRITICS, '')
     .replace(LEADING_MENTIONS, ' ')
+    .replace(EMOJI_MODIFIERS, '')
     .replace(NON_WORD, ' ')
+    .replace(EMOJI, (e) => ` ${e} `)
     .replace(/\s+/g, ' ')
     .trim();
 }

@@ -89,3 +89,25 @@ test('extractComments returns [] for garbage input', () => {
     assert.deepEqual(extractComments(input), []);
   }
 });
+
+test('emoji keywords match emoji comments (variation selectors and skin tones ignored)', () => {
+  const rules: MatchableRule[] = [
+    { id: 'fire', keywords: ['🔥'], match_type: 'contains', status: 'active' },
+    { id: 'heart', keywords: ['❤️'], match_type: 'exact', status: 'active' },
+  ];
+  assert.equal(matchComment('🔥🔥🔥', rules)?.rule.id, 'fire');
+  assert.equal(matchComment('love this🔥', rules)?.rule.id, 'fire');
+  assert.equal(matchComment('❤', rules)?.rule.id, 'heart');
+  assert.equal(matchComment('❤️', rules)?.rule.id, 'heart');
+  assert.equal(matchComment('nice', rules), null);
+  const thumbs: MatchableRule[] = [{ id: 'ok', keywords: ['👍'], match_type: 'contains', status: 'active' }];
+  assert.equal(matchComment('👍🏽 yes', thumbs)?.rule.id, 'ok');
+});
+
+test('emoji next to words still lets the word keyword match; punctuation and case are ignored', () => {
+  const rules: MatchableRule[] = [{ id: 'link', keywords: ['LINK'], match_type: 'contains', status: 'active' }];
+  assert.equal(matchComment('link🔥', rules)?.rule.id, 'link');
+  assert.equal(matchComment('Link!!!', rules)?.rule.id, 'link');
+  assert.equal(matchComment('@brand link please', rules)?.rule.id, 'link');
+  assert.equal(matchComment('linked', rules), null);
+});
