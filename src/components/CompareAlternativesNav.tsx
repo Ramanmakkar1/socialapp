@@ -1,11 +1,12 @@
 import Link from "next/link";
 
-type ComparePage = "buffer" | "manychat" | "later";
+type ComparePage = "buffer" | "manychat" | "later" | "hootsuite";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
   { href: "/manychat-alternative", label: "ManyChat alternative", key: "manychat" },
   { href: "/later-alternative", label: "Later alternative", key: "later" },
+  { href: "/hootsuite-alternative", label: "Hootsuite alternative", key: "hootsuite" },
 ];
 
 export function CompareAlternativesNav({ current }: { current: ComparePage }) {

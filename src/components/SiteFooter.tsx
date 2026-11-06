@@ -53,6 +53,7 @@ export function SiteFooter() {
               { href: "/buffer-alternative", label: "Buffer alternative" },
               { href: "/later-alternative", label: "Later alternative" },
               { href: "/manychat-alternative", label: "ManyChat alternative" },
+              { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
             ]}
           />
           <FooterColumn
