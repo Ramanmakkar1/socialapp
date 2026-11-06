@@ -4,62 +4,6 @@
   gap: 28px;
 }
 
-.hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  align-items: end;
-  gap: 28px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid var(--poskoo-line);
-}
-
-.heroCopy { min-width: 0; }
-
-.eyebrow {
-  margin: 0 0 10px;
-  color: var(--poskoo-muted);
-  font-size: .76rem;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
-
-.title {
-  max-width: 15ch;
-  color: var(--poskoo-ink);
-  font-size: clamp(2.35rem, 5vw, 4.25rem);
-  letter-spacing: var(--poskoo-type-heading-ls);
-  line-height: var(--poskoo-type-heading-lh);
-}
-
-.subtitle {
-  max-width: 62ch;
-  margin-top: 14px;
-  color: var(--poskoo-muted);
-  font-size: 1rem;
-}
-
-.heroArt {
-  width: 100%;
-  transform: rotate(3deg);
-  border-radius: var(--poskoo-radius-card);
-  background: var(--poskoo-peach);
-  box-shadow: var(--poskoo-shadow-card);
-}
-
-.heroArt img { display: block; width: 100%; height: auto; }
-
-.notice {
-  border: 1.5px solid var(--poskoo-line);
-  border-radius: var(--poskoo-radius-sm);
-  padding: 13px 16px;
-  background: var(--poskoo-mint);
-  color: var(--poskoo-ink);
-  font-size: .92rem;
-}
-
-.noticeWarn { background: var(--poskoo-peach); }
-
 .section {
   display: flex;
   flex-direction: column;
@@ -78,8 +22,6 @@
   font-size: 1.45rem;
   letter-spacing: -.025em;
 }
-
-.hint { color: var(--poskoo-muted); font-size: .86rem; }
 
 .accountList { display: grid; gap: 14px; }
 
@@ -106,7 +48,9 @@
 .accountIdentity { display: flex; min-width: 0; align-items: center; gap: 12px; }
 .accountIdentity > div { min-width: 0; }
 .accountActions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
-.status { border: 1.5px solid currentColor; border-radius: var(--poskoo-radius-pill); padding: 3px 10px; font-size: .75rem; font-weight: 700; }
+.username { color: var(--poskoo-ink); font-weight: 600; overflow-wrap: anywhere; }
+.platform { text-transform: capitalize; }
+.accountNote { max-width: 32ch; margin: 0; }
 
 .voice {
   border-top: 1px solid var(--poskoo-line);
@@ -114,8 +58,7 @@
 }
 
 .voiceForm { display: flex; flex-direction: column; gap: 12px; }
-.textarea { width: 100%; min-height: 120px; resize: vertical; border: 1.5px solid var(--poskoo-line); border-radius: var(--poskoo-radius-md); background: var(--poskoo-card); padding: 14px 16px; color: var(--poskoo-ink); font: inherit; }
-.textarea:focus { border-color: var(--poskoo-violet); outline: 2px solid var(--poskoo-pill-border); }
+.textarea { min-height: 120px; resize: vertical; }
 
 .steps { display: grid; gap: 16px; counter-reset: guide; }
 
@@ -136,13 +79,11 @@
 .stepTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
 .stepTitle { display: flex; align-items: center; gap: 11px; color: var(--poskoo-ink); font-size: 1.2rem; }
 .stepTitle::before { content: counter(guide, decimal-leading-zero); display: inline-grid; width: 34px; height: 34px; flex: 0 0 34px; place-items: center; border-radius: 50%; background: var(--poskoo-coral); color: var(--poskoo-ink); font-size: .78rem; font-weight: 800; }
-.permission { max-width: 45%; overflow-wrap: anywhere; border: 1.5px solid var(--poskoo-line); border-radius: var(--poskoo-radius-pill); padding: 4px 10px; background: rgba(255,255,255,.48); color: var(--poskoo-muted); font: .74rem/1.3 ui-monospace, SFMono-Regular, Consolas, monospace; text-align: right; }
+.permission { max-width: 45%; overflow-wrap: anywhere; border: 1.5px solid var(--poskoo-line); border-radius: var(--poskoo-radius-pill); padding: 4px 10px; background: var(--poskoo-card); color: var(--poskoo-muted); font: .74rem/1.3 ui-monospace, SFMono-Regular, Consolas, monospace; text-align: right; }
 .body { display: grid; gap: 8px; margin: 18px 0 0; padding-left: 45px; color: var(--poskoo-ink); font-size: .95rem; }
 .stepAction { margin: 18px 0 0 45px; }
 
 @media (max-width: 640px) {
-  .hero { grid-template-columns: 1fr; gap: 20px; }
-  .heroArt { width: min(180px, 48vw); justify-self: end; }
   .accountCard, .sectionHeader { align-items: flex-start; flex-direction: column; }
   .accountActions { width: 100%; align-items: flex-start; text-align: left; }
   .stepTop { flex-direction: column; }

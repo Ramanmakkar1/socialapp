@@ -1,7 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
+import { BtnLink, PageHero } from "@/components/ui/kit";
+import ui from "@/components/ui/ui.module.css";
 import styles from "../app-page.module.css";
 
 export const metadata = { title: "App review guide", robots: { index: false, follow: false } };
@@ -71,13 +72,20 @@ export default async function ReviewGuidePage() {
   await requireUser();
   return (
     <div className={styles.page}>
-      <header className={styles.hero}>
-        <div className={styles.heroCopy}><p className={styles.eyebrow}>A clear path through the product</p><h1 className={styles.title}>App review guide</h1><p className={styles.subtitle}>
-          A 5-minute walkthrough of every Instagram permission {BRAND.name} uses. See the{" "}
-          <Link href="/privacy#instagram" className="text-brand hover:underline">privacy policy</Link> for how this data is stored.
-        </p></div>
-        <div className={styles.heroArt}><Image src="/landing/card-dm.webp" width={900} height={900} alt="A creator sending automatic direct messages" /></div>
-      </header>
+      <PageHero
+        eyebrow="A clear path through the product"
+        title="App review"
+        accent="guide"
+        accentAfter="."
+        lede={
+          <>
+            A 5-minute walkthrough of every Instagram permission {BRAND.name} uses. See the{" "}
+            <Link href="/privacy#instagram" className={ui.link}>privacy policy</Link> for how this data is stored.
+          </>
+        }
+        art="/landing/card-dm.webp"
+        artAlt=""
+      />
       <ol className={styles.steps}>
         {STEPS.map((s) => (
           <li key={s.title} className={styles.step}>
@@ -90,7 +98,7 @@ export default async function ReviewGuidePage() {
                 <li key={b}>{b}</li>
               ))}
             </ul>
-            <Link href={s.href} className={`btn-primary ${styles.stepAction}`}>{s.cta}</Link>
+            <BtnLink href={s.href} size="sm" className={styles.stepAction}>{s.cta}</BtnLink>
           </li>
         ))}
       </ol>

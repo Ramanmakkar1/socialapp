@@ -1,29 +1,54 @@
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import styles from "./empty-state.module.css";
 
-export default function EmptyState({ icon: Icon, title, text, children }: { icon: LucideIcon; title: string; text: string; children?: ReactNode }) {
+/**
+ * Designed empty state: landing illustration, short heading, one line of help and one next action.
+ * `art` defaults to the square leads card; pass a wide /illustrations/*.webp with artWidth/artHeight.
+ */
+export default function EmptyState({
+  icon: Icon,
+  title,
+  text,
+  children,
+  art = "/landing/card-leads.webp",
+  artAlt = "",
+  artWidth = 1024,
+  artHeight = 1024,
+  className,
+}: {
+  icon?: LucideIcon;
+  title: string;
+  text: string;
+  children?: ReactNode;
+  art?: string;
+  artAlt?: string;
+  artWidth?: number;
+  artHeight?: number;
+  className?: string;
+}) {
+  const wide = artWidth > artHeight;
   return (
-    <div className="mt-6 rounded-[var(--poskoo-radius-card)] border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-6 text-center shadow-[var(--poskoo-shadow-card)] transition-transform sm:p-10 motion-safe:hover:-translate-y-0.5">
-      <div className="relative mx-auto w-full max-w-[220px]">
+    <div className={[styles.empty, className].filter(Boolean).join(" ")}>
+      <div className={`${styles.art} ${wide ? styles.artWide : ""}`}>
         <Image
-          src="/landing/card-leads.webp"
-          alt=""
-          width={1024}
-          height={1024}
-          sizes="220px"
-          className="h-auto w-full object-contain"
+          src={art}
+          alt={artAlt}
+          width={artWidth}
+          height={artHeight}
+          loading="lazy"
+          sizes={wide ? "(max-width: 480px) 80vw, 340px" : "220px"}
         />
-        <span
-          aria-hidden="true"
-          className="absolute -left-2 -top-2 flex h-10 w-10 items-center justify-center rounded-[var(--poskoo-radius-pill)] border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] shadow-[var(--poskoo-shadow-card)]"
-        >
-          <Icon className="h-5 w-5 text-[var(--poskoo-violet)]" aria-hidden="true" />
-        </span>
+        {Icon ? (
+          <span aria-hidden="true" className={styles.icon}>
+            <Icon aria-hidden="true" />
+          </span>
+        ) : null}
       </div>
-      <h2 className="mt-4 font-semibold text-[var(--poskoo-ink)]">{title}</h2>
-      <p className="mx-auto mt-1 max-w-sm text-sm text-[var(--poskoo-muted)]">{text}</p>
-      {children && <div className="mt-4">{children}</div>}
+      <h2 className={styles.title}>{title}</h2>
+      <p className={styles.text}>{text}</p>
+      {children ? <div className={styles.actions}>{children}</div> : null}
     </div>
   );
 }

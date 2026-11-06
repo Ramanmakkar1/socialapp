@@ -1,7 +1,9 @@
 import { Suspense } from "react";
-import Image from "next/image";
 import { Settings } from "lucide-react";
 import EmptyState from "../EmptyState";
+import { BtnA, PageHero } from "@/components/ui/kit";
+import SubmitButton from "@/components/ui/SubmitButton";
+import ui from "@/components/ui/ui.module.css";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { disconnectAccountAction, saveBrandVoice } from "./actions";
@@ -33,9 +35,9 @@ function tokenState(a: Account): "ok" | "expiring" | "expired" {
 }
 
 const TOKEN_PILL: Record<ReturnType<typeof tokenState>, { label: string; className: string }> = {
-  ok: { label: "Connected", className: "rounded-full border border-ok px-2.5 py-0.5 text-xs font-medium text-ok" },
-  expiring: { label: "Expires soon", className: "rounded-full border border-warn px-2.5 py-0.5 text-xs font-medium text-warn" },
-  expired: { label: "Reconnect needed", className: "rounded-full border border-warn px-2.5 py-0.5 text-xs font-medium text-warn" },
+  ok: { label: "Connected", className: `${ui.pill} ${ui.pillMint}` },
+  expiring: { label: "Expires soon", className: `${ui.pill} ${ui.pillPeach}` },
+  expired: { label: "Reconnect needed", className: `${ui.pill} ${ui.pillPeach}` },
 };
 
 const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
@@ -64,94 +66,108 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const voice = voiceRows[0]?.brand_voice ?? null;
   return (
     <div className={styles.page}>
-      <header className={styles.hero}>
-        <div className={styles.heroCopy}><p className={styles.eyebrow}>Your workspace</p><h1 className={styles.title}>Settings</h1><p className={styles.subtitle}>Manage your connected accounts and brand voice.</p></div>
-        <div className={styles.heroArt}><Image src="/landing/card-schedule.webp" width={900} height={900} alt="A creator planning posts on a calendar" /></div>
-      </header>
+      <PageHero
+        eyebrow="Your workspace"
+        title="Settings"
+        lede="Manage your connected accounts and brand voice."
+        art="/landing/card-schedule.webp"
+        artAlt=""
+      />
       {banner && (
-        <p className={`${styles.notice} ${banner.tone === "warn" ? styles.noticeWarn : ""}`}>{banner.text}</p>
+        <p role="status" className={`${ui.notice} ${banner.tone === "warn" ? ui.noticeWarn : ""}`}>{banner.text}</p>
       )}
-      <section className={styles.section}>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Connected accounts</h2>
-        <a href="/api/instagram/connect" className="btn-primary">Connect Instagram</a>
-      </div>
-      <p className={styles.hint}>
-        Instagram professional account linked to a Facebook Page required.{" "}
-        <a href="/help/getting-started" className="underline hover:text-ink-2">See the setup steps</a>
-      </p>
-      {accounts.length === 0 ? (
-        <EmptyState icon={Settings} title="No connected accounts" text="Connect your Instagram professional account to schedule posts and auto-DM commenters." />
-      ) : (
-        <ul className={styles.accountList}>
-          {accounts.map((a, i) => {
-            const state = tokenState(a);
-            const pill = TOKEN_PILL[state];
-            return (
-            <li key={`${a.platform}-${a.username ?? i}`} className={styles.accountCard}>
-                <div className={styles.accountIdentity}>
-                  {a.platform === "instagram" && a.status === "active" && a.access_token_enc ? (
-                    <Suspense fallback={<span className="font-medium">@{a.username ?? "unknown"}</span>}>
-                      <AccountProfile account={a} fallbackUsername={a.username} />
-                    </Suspense>
-                  ) : (
-                    <span className="font-medium">@{a.username ?? "unknown"}</span>
-                  )}
-                  <span className="rounded-full border border-line px-2 text-xs capitalize text-muted">{a.platform}</span>
-                </div>
-                <div className={styles.accountActions}>
-                  <span className={`${styles.status} ${pill.className}`}>{pill.label}</span>
-                  {state === "ok" && a.token_expires_at && (
-                    <span className="text-muted">Token valid until {new Date(a.token_expires_at).toLocaleDateString()}</span>
-                  )}
-                  {(state === "expiring" || state === "expired") && (
-                    <>
-                      <p className="max-w-xs text-right text-xs text-muted">
-                        {a.status === "disconnected"
-                          ? "Disconnected. Connect again to schedule posts and send auto-DMs."
-                          : state === "expired"
-                            ? "Instagram access expired or was removed. Reconnect so posts publish and auto-DMs keep sending."
-                            : "Instagram needs you to reconnect so auto-DMs keep sending."}
-                      </p>
-                      <a href="/api/instagram/connect" className="btn-primary">
-                        Reconnect
-                      </a>
-                    </>
-                  )}
-                  {a.status !== "disconnected" && (
-                    <form action={disconnectAccountAction}>
-                      <input type="hidden" name="account_id" value={a.id} />
-                      <button type="submit" className="text-xs font-medium text-ink-2 hover:underline">Disconnect</button>
-                    </form>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-      </ul>
-      )}
+      <section className={styles.section} aria-labelledby="accounts-heading">
+        <div className={styles.sectionHeader}>
+          <h2 id="accounts-heading" className={styles.sectionTitle}>Connected accounts</h2>
+          {accounts.length > 0 ? <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA> : null}
+        </div>
+        <p className={ui.hint}>
+          Instagram professional account linked to a Facebook Page required.{" "}
+          <a href="/help/getting-started" className={ui.link}>See the setup steps</a>
+        </p>
+        {accounts.length === 0 ? (
+          <EmptyState
+            icon={Settings}
+            title="No connected accounts"
+            text="Connect your Instagram professional account to schedule posts and auto-DM commenters."
+            art="/illustrations/connect-account.webp"
+            artWidth={1536}
+            artHeight={1024}
+          >
+            <BtnA href="/api/instagram/connect">Connect Instagram</BtnA>
+          </EmptyState>
+        ) : (
+          <ul className={styles.accountList}>
+            {accounts.map((a, i) => {
+              const state = tokenState(a);
+              const pill = TOKEN_PILL[state];
+              return (
+                <li key={`${a.platform}-${a.username ?? i}`} className={styles.accountCard}>
+                  <div className={styles.accountIdentity}>
+                    {a.platform === "instagram" && a.status === "active" && a.access_token_enc ? (
+                      <Suspense fallback={<span className={styles.username}>@{a.username ?? "unknown"}</span>}>
+                        <AccountProfile account={a} fallbackUsername={a.username} />
+                      </Suspense>
+                    ) : (
+                      <span className={styles.username}>@{a.username ?? "unknown"}</span>
+                    )}
+                    <span className={`${ui.pill} ${styles.platform}`}>{a.platform}</span>
+                  </div>
+                  <div className={styles.accountActions}>
+                    <span className={pill.className}>{pill.label}</span>
+                    {state === "ok" && a.token_expires_at && (
+                      <span className={ui.hint}>Token valid until {new Date(a.token_expires_at).toLocaleDateString()}</span>
+                    )}
+                    {(state === "expiring" || state === "expired") && (
+                      <>
+                        <p className={`${ui.hint} ${styles.accountNote}`}>
+                          {a.status === "disconnected"
+                            ? "Disconnected. Connect again to schedule posts and send auto-DMs."
+                            : state === "expired"
+                              ? "Instagram access expired or was removed. Reconnect so posts publish and auto-DMs keep sending."
+                              : "Instagram needs you to reconnect so auto-DMs keep sending."}
+                        </p>
+                        <BtnA href="/api/instagram/connect" size="sm">Reconnect</BtnA>
+                      </>
+                    )}
+                    {a.status !== "disconnected" && (
+                      <form action={disconnectAccountAction}>
+                        <input type="hidden" name="account_id" value={a.id} />
+                        <SubmitButton label="Disconnect" pendingLabel="Disconnecting…" variant="ghost" size="sm" />
+                      </form>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
-      <section className={`${styles.section} ${styles.voice}`}>
-        <h2 className={styles.sectionTitle}>Brand voice</h2>
-        <p className={styles.hint}>
+      <section className={`${styles.section} ${styles.voice}`} aria-labelledby="voice-heading">
+        <h2 id="voice-heading" className={styles.sectionTitle}>Brand voice</h2>
+        <p className={ui.hint}>
           Tell the AI how your posts should sound, e.g. &apos;Friendly and short, a bit funny, no slang, we are a yoga studio in Toronto&apos;. Used by Write with AI.
         </p>
         {isDbConfigured() ? (
           <form action={saveBrandVoice} className={styles.voiceForm}>
+            <label htmlFor="brand-voice" className={ui.label}>Your brand voice</label>
             <textarea
+              id="brand-voice"
               name="brand_voice"
               maxLength={500}
               rows={4}
               defaultValue={voice ?? ""}
-              className={styles.textarea}
+              className={`${ui.input} ${styles.textarea}`}
               placeholder="Friendly, short sentences, 1-2 emojis…"
             />
-            <button type="submit" className="btn-primary">Save brand voice</button>
+            <div>
+              <SubmitButton label="Save brand voice" />
+            </div>
           </form>
         ) : (
-          <p className={styles.hint}>Brand voice can be saved once the database is set up on this server.</p>
+          <p className={ui.hint}>Brand voice can be saved once the database is set up on this server.</p>
         )}
-        {voiceSaved && <p className="mt-2 text-sm text-ok">Brand voice saved.</p>}
+        {voiceSaved && <p role="status" className={ui.notice}>Brand voice saved.</p>}
       </section>
     </div>
   );

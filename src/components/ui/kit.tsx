@@ -73,6 +73,8 @@ export function PageHero({
   lede,
   art = "/landing/card-schedule.webp",
   artAlt = "",
+  artWidth = 900,
+  artHeight = 900,
   action,
 }: {
   eyebrow: string;
@@ -81,9 +83,12 @@ export function PageHero({
   accent?: string;
   /** Text shown after the serif accent (defaults to "."). */
   accentAfter?: string;
-  lede?: string;
+  lede?: ReactNode;
   art?: string;
   artAlt?: string;
+  /** Intrinsic size of the art file (square landing cards by default; the wide illustrations are 1536x1024). */
+  artWidth?: number;
+  artHeight?: number;
   action?: ReactNode;
 }) {
   return (
@@ -104,7 +109,7 @@ export function PageHero({
         {action ? <div style={{ marginTop: 16 }}>{action}</div> : null}
       </div>
       <div className={ui.heroArt}>
-        <Image src={art} alt={artAlt} width={900} height={900} sizes="200px" />
+        <Image src={art} alt={artAlt} width={artWidth} height={artHeight} sizes="(max-width: 640px) 44vw, 200px" />
       </div>
     </header>
   );

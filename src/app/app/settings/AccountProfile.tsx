@@ -15,20 +15,20 @@ export default async function AccountProfile({ account, fallbackUsername }: { ac
       {profile?.profilePictureUrl ? (
         // Instagram CDN URLs expire, so a plain <img> (no Next image cache) is used on purpose.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={profile.profilePictureUrl} alt={`@${username} profile picture`} width={44} height={44} className="h-11 w-11 shrink-0 rounded-full border border-line object-cover" />
+        <img src={profile.profilePictureUrl} alt={`@${username} profile picture`} width={44} height={44} className="h-11 w-11 shrink-0 rounded-full border border-[var(--poskoo-line)] object-cover" />
       ) : (
-        <span aria-hidden className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-2 font-semibold text-brand">
+        <span aria-hidden className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--poskoo-band)] font-semibold text-[var(--poskoo-violet)]">
           {username.charAt(0).toUpperCase()}
         </span>
       )}
       <div className="min-w-0">
-        <p className="truncate font-medium">@{username}{profile?.name ? <span className="ml-2 font-normal text-muted">{profile.name}</span> : null}</p>
+        <p className="truncate font-semibold text-[var(--poskoo-ink)]">@{username}{profile?.name ? <span className="ml-2 font-normal text-[var(--poskoo-muted)]">{profile.name}</span> : null}</p>
         {profile ? (
-          <p className="text-xs text-muted">
+          <p className="text-xs text-[var(--poskoo-muted)]">
             {(profile.followers ?? 0).toLocaleString("en-US")} followers · {(profile.mediaCount ?? 0).toLocaleString("en-US")} posts
           </p>
         ) : (
-          <p className="text-xs text-warn">{error}</p>
+          <p className="text-xs text-[var(--poskoo-coral)]">{error}</p>
         )}
       </div>
     </div>
