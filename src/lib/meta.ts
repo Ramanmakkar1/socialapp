@@ -3,11 +3,22 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 export function metaConfig(): {
   verifyToken: string;
   appSecret: string;
+  /** Secrets Meta may sign with: the Meta app (Facebook Login for Business) and, for accounts
+   *  connected with the older Instagram Login, the Instagram app secret. */
+  appSecrets: string[];
 } {
+  const appSecret = process.env.META_APP_SECRET ?? "";
+  const igSecret = process.env.INSTAGRAM_APP_SECRET ?? "";
   return {
     verifyToken: process.env.META_WEBHOOK_VERIFY_TOKEN ?? "",
-    appSecret: process.env.META_APP_SECRET ?? "",
+    appSecret,
+    appSecrets: [appSecret, igSecret].filter((s, i, all) => s !== "" && all.indexOf(s) === i),
   };
+}
+
+/** X-Hub-Signature-256 check against any of the app secrets. */
+export function verifyAnySignature(rawBody: string, signatureHeader: string | null, appSecrets: string[]): boolean {
+  return appSecrets.some((secret) => verifySignature(rawBody, signatureHeader, secret));
 }
 
 export function verifySignature(

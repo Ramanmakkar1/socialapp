@@ -22,6 +22,8 @@ type Account = {
   username: string | null;
   status: string;
   token_expires_at: Date | null;
+  auth_type: string | null;
+  page_name: string | null;
 };
 
 function tokenState(a: Account): "ok" | "expiring" | "expired" {
@@ -48,8 +50,14 @@ const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   not_configured: { tone: "warn", text: "Instagram connection isn't set up on this server yet." },
   disconnected: { tone: "ok", text: "Instagram account disconnected. Its access token was deleted." },
   disconnect_error: { tone: "warn", text: "We couldn't disconnect that account. Please try again." },
+  connected_no_webhooks: { tone: "warn", text: "Instagram account connected, but Facebook did not let us switch on comment and DM alerts for its Page. Posting works; reconnect and allow \"Manage your Page\" so auto-DMs can start." },
   declined: { tone: "warn", text: "You declined the permissions Poskoo needs. Try again and keep all boxes ticked." },
+  missing_permissions: { tone: "warn", text: "Some permissions were turned off in the Facebook window (Pages, Instagram messages, comments or publishing). Connect again and keep every option switched on." },
+  no_pages: { tone: "warn", text: "You didn't share any Facebook Page with Poskoo. Connect again and select the Page your Instagram professional account is linked to." },
   no_ig_business: { tone: "warn", text: "We couldn't find an Instagram professional account linked to your Facebook Page. Link one in Instagram settings, then reconnect." },
+  expired_code: { tone: "warn", text: "Your Facebook login expired before we could finish. Please connect again." },
+  state_error: { tone: "warn", text: "The Facebook login link expired or was opened in another browser. Please connect again from this page." },
+  pick_expired: { tone: "warn", text: "Choosing an account took too long. Please connect again." },
 };
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[] }> }) {
@@ -60,7 +68,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
   const accounts = isDbConfigured()
     ? await query<Account>(
-        "select id, external_id, access_token_enc, platform, username, status, token_expires_at from socialapp.social_accounts where user_id=$1 order by created_at",
+        "select id, external_id, access_token_enc, platform, username, status, token_expires_at, auth_type, page_name from socialapp.social_accounts where user_id=$1 order by created_at",
         [user.id]
       )
     : [];
@@ -126,6 +134,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   </div>
                   <div className={styles.accountActions}>
                     <span className={pill.className}>{pill.label}</span>
+                    {state === "ok" && a.page_name && <span className={ui.hint}>Via Facebook Page {a.page_name}</span>}
                     {state === "ok" && a.token_expires_at && (
                       <span className={ui.hint}>Token valid until {new Date(a.token_expires_at).toLocaleDateString()}</span>
                     )}

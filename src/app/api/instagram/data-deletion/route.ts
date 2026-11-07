@@ -2,11 +2,11 @@
 import { deleteAccountData, findAccountIdsByMetaUser, hashExternalId } from "@/lib/accountData";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured, query } from "@/lib/db";
-import { igConfig } from "@/lib/instagram";
-import { newConfirmationCode, parseSignedRequest, readSignedRequest } from "@/lib/signedRequest";
+import { metaConfig } from "@/lib/meta";
+import { newConfirmationCode, parseSignedRequestAny, readSignedRequest } from "@/lib/signedRequest";
 
 export async function POST(request: Request) {
-  const payload = parseSignedRequest(await readSignedRequest(request), igConfig().appSecret);
+  const payload = parseSignedRequestAny(await readSignedRequest(request), metaConfig().appSecrets);
   if (!payload) {
     return Response.json({ error: "invalid signed_request" }, { status: 400 });
   }

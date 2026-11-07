@@ -7,7 +7,7 @@ import {
   processMessageEvents,
 } from "@/lib/messages";
 import { isDbConfigured, query } from "@/lib/db";
-import { metaConfig, verifySignature } from "@/lib/meta";
+import { metaConfig, verifyAnySignature } from "@/lib/meta";
 
 function serviceUnavailable(): Response {
   return Response.json({ error: "Service unavailable" }, { status: 503 });
@@ -37,8 +37,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const raw = await request.text();
   const sig = request.headers.get("x-hub-signature-256");
-  const { appSecret } = metaConfig();
-  if (!verifySignature(raw, sig, appSecret)) {
+  const { appSecrets } = metaConfig();
+  if (!verifyAnySignature(raw, sig, appSecrets)) {
     return new Response("Invalid signature", { status: 403 });
   }
 

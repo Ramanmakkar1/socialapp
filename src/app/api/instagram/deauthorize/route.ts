@@ -1,11 +1,11 @@
 // Meta "Deauthorize callback URL": called when a user removes the app from Instagram.
 import { disconnectAccounts, findAccountIdsByMetaUser } from "@/lib/accountData";
 import { isDbConfigured } from "@/lib/db";
-import { igConfig } from "@/lib/instagram";
-import { parseSignedRequest, readSignedRequest } from "@/lib/signedRequest";
+import { metaConfig } from "@/lib/meta";
+import { parseSignedRequestAny, readSignedRequest } from "@/lib/signedRequest";
 
 export async function POST(request: Request) {
-  const payload = parseSignedRequest(await readSignedRequest(request), igConfig().appSecret);
+  const payload = parseSignedRequestAny(await readSignedRequest(request), metaConfig().appSecrets);
   if (!payload) {
     return Response.json({ error: "invalid signed_request" }, { status: 400 });
   }

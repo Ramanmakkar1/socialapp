@@ -61,3 +61,12 @@ export function signRequest(payload: Record<string, unknown>, appSecret: string)
   const sig = createHmac("sha256", appSecret).update(body, "utf8").digest("base64url");
   return `${sig}.${body}`;
 }
+
+// Tries each app secret (Meta app for Facebook Login for Business, Instagram app for older connections).
+export function parseSignedRequestAny(signedRequest: string, appSecrets: string[]): SignedRequestPayload | null {
+  for (const secret of appSecrets) {
+    const payload = parseSignedRequest(signedRequest, secret);
+    if (payload) return payload;
+  }
+  return null;
+}
