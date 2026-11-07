@@ -7,9 +7,9 @@ import PublicShell from "@/components/PublicShell";
 const PATH = "/tools";
 
 export const metadata: Metadata = {
-  title: { absolute: "Free Instagram Tools: Captions, Bios, Fonts & Image Sizes" },
+  title: { absolute: "Free Instagram Tools: Captions, Hashtags, Grids & Fonts" },
   description:
-    "Free Instagram tools: count caption characters, keep line breaks, write a bio, make fonts, check image sizes and work out your engagement rate.",
+    "Free Instagram tools: caption and hashtag generators, grid and carousel splitter, comment picker, font maker and image size guide. No signup needed.",
   alternates: { canonical: PATH },
 };
 
@@ -114,8 +114,8 @@ export default function ToolsPage() {
           Free <em className="s mark">Instagram tools</em>
         </h1>
         <p className="lede">
-          Small, fast tools for getting a post ready: check your caption length and hashtags, keep the spacing you
-          typed, and pick the right image size before you post or schedule with {BRAND.name}.
+          Small, fast tools for getting a post ready: generate a caption and its hashtags, split a photo into a grid
+          or carousel, pick a giveaway winner and check image sizes — all free, before you post or schedule with {BRAND.name}.
         </p>
         <div className="hero-art" style={{ maxWidth: 820 }}>
           <Image
