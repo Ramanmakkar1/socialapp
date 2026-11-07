@@ -39,7 +39,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   const loadFailure = (
     <>
       <PageHero
-        eyebrow="Captured leads"
+        eyebrow="Captured from your auto-DMs"
         title="Leads"
         lede="Emails and phone numbers your auto-DMs collect, ready to export."
         art="/landing/card-leads.webp"
@@ -129,9 +129,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHero
-        eyebrow="Captured leads"
+        eyebrow="Captured from your auto-DMs"
         title="Leads"
-        lede={total > 0 ? `${total} ${total === 1 ? "lead" : "leads"} · showing ${offset + 1}-${offset + leads.length}` : "Emails and phone numbers your auto-DMs collect, ready to export."}
+        lede={total > 0 ? `${total} ${total === 1 ? "lead" : "leads"} · showing ${offset + 1}-${offset + leads.length}` : "0 leads"}
         art="/landing/card-leads.webp"
         artAlt=""
         action={leads.length > 0 ? (
