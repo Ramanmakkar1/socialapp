@@ -166,6 +166,40 @@ export async function lastInboundMessageAt(accountExternalId: string, senderId: 
   return latest;
 }
 
+// The person's earlier messages to this account (for AI reply context), oldest first.
+export async function recentInboundMessages(
+  accountExternalId: string,
+  senderId: string,
+  limit = 10
+): Promise<{ text: string; at: Date; mid: string | null }[]> {
+  const rows = await query<EventRow>(
+    `select payload, received_at from socialapp.events
+     where source='meta' and received_at > now() - interval '2 days'
+       and exists (
+         select 1 from jsonb_array_elements(case when jsonb_typeof(payload->'entry')='array' then payload->'entry' else '[]'::jsonb end) e,
+           jsonb_array_elements(case when jsonb_typeof(e->'messaging')='array' then e->'messaging' else '[]'::jsonb end) m
+         where e->>'id' = $1 and m->'sender'->>'id' = $2 and m ? 'message'
+       )
+     order by received_at desc limit 50`,
+    [accountExternalId, senderId]
+  );
+  const out: { text: string; at: Date; mid: string | null }[] = [];
+  const seenMids = new Set<string>();
+  for (const row of rows) {
+    for (const m of extractTimedMessageEvents(row.payload, row.received_at)) {
+      if (m.accountExternalId !== accountExternalId || m.senderId !== senderId) continue;
+      if (!m.text.trim()) continue;
+      if (m.mid !== null) {
+        if (seenMids.has(m.mid)) continue;
+        seenMids.add(m.mid);
+      }
+      out.push({ text: m.text, at: m.eventAt ?? row.received_at, mid: m.mid });
+    }
+  }
+  out.sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
+  return out.slice(-limit);
+}
+
 // Time the comment webhook arrived (for the 7-day private-reply rule), plus the commenter's id.
 export async function commentReceivedAt(accountExternalId: string, commentId: string): Promise<{ at: Date; fromId: string } | null> {
   const rows = await query<{ payload: unknown; received_at: Date }>(

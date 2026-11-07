@@ -22,6 +22,7 @@ function handlers(opts: { enabled: boolean; repliesToday: number }): FakeHandler
     },
     { match: /count\(\*\)::int as n from socialapp\.dm_queue/, reply: () => [{ n: opts.repliesToday }] },
     { match: /select message, coalesce\(sent_at, created_at\) as at/, reply: () => [] },
+    { match: /order by received_at desc limit 50/, reply: () => [] },
     { match: /^select pg_advisory_xact_lock/, reply: () => [{}] },
     { match: /^select 1 from socialapp\.dm_queue where contact_id=\$1 and kind='ai_reply'/, reply: () => [] },
     { match: /^insert into socialapp\.dm_queue/, reply: () => [] },
@@ -76,6 +77,82 @@ test("maybeQueueAiReply: happy path queues one ai_reply row", async () => {
   assert.equal(inserts.length, 1);
   assert.match(inserts[0].sql, /'ai_reply'/);
   assert.deepEqual(inserts[0].params, ["u1", "a1", "c1", "s1", "Thanks! A session is listed on our site."]);
+});
+
+function metaPayload(messages: { mid: string | null; text: string; timestamp: number }[]) {
+  return {
+    entry: [
+      {
+        id: "ig1",
+        messaging: messages.map((m) => ({
+          sender: { id: "s1" },
+          message: { mid: m.mid, text: m.text },
+          timestamp: m.timestamp,
+        })),
+      },
+    ],
+  };
+}
+
+// Runs the full flow with the given stored inbound events and sent replies, and
+// returns the messages array the AI request was built with.
+async function runWithInbound(
+  inbound: { mid: string | null; text: string; timestamp: number }[],
+  sent: { message: string; at: Date }[]
+) {
+  const { pool } = createFakePool([
+    {
+      match: /order by received_at desc limit 50/,
+      reply: () => (inbound.length ? [{ payload: metaPayload(inbound), received_at: new Date("2026-11-07T10:00:00Z") }] : []),
+    },
+    { match: /select message, coalesce\(sent_at, created_at\) as at/, reply: () => sent },
+    ...handlers({ enabled: true, repliesToday: 0 }),
+  ]);
+  const restore = installFakePool(pool);
+  const prevFetch = globalThis.fetch;
+  const prevKey = process.env.ANTHROPIC_API_KEY;
+  let body: { messages?: { role: string; content: string }[] } | null = null;
+  globalThis.fetch = (async (_url: unknown, init?: { body?: string }) => {
+    if (init?.body) body = JSON.parse(init.body) as { messages?: { role: string; content: string }[] };
+    return new Response(JSON.stringify({ content: [{ type: "text", text: "Thanks! A session is listed on our site." }] }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  }) as typeof fetch;
+  process.env.ANTHROPIC_API_KEY = "test-key";
+  try {
+    const { maybeQueueAiReply } = await import("./aiReplyQueue.ts");
+    const result = await maybeQueueAiReply(params);
+    return { result, messages: body?.messages ?? [] };
+  } finally {
+    globalThis.fetch = prevFetch;
+    if (prevKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = prevKey;
+    restore();
+  }
+}
+
+test("maybeQueueAiReply: history includes the person's earlier messages, not just our sent replies", async () => {
+  const at = (h: number, m: number) => new Date(Date.UTC(2026, 10, 7, h, m)).getTime();
+  const { result, messages } = await runWithInbound(
+    [{ mid: "m1", text: "I'm Sam, do you do weddings?", timestamp: at(9, 59) }],
+    [{ message: "We do! What date are you thinking?", at: new Date(Date.UTC(2026, 10, 7, 10, 5)) }],
+  );
+  assert.equal(result, true);
+  assert.deepEqual(messages, [
+    { role: "user", content: "I'm Sam, do you do weddings?" },
+    { role: "assistant", content: "We do! What date are you thinking?" },
+    { role: "user", content: params.text },
+  ]);
+});
+
+test("maybeQueueAiReply: current message is not duplicated when it is already stored", async () => {
+  const { result, messages } = await runWithInbound(
+    [{ mid: "m2", text: params.text, timestamp: new Date("2026-11-07T10:00:00Z").getTime() }],
+    [],
+  );
+  assert.equal(result, true);
+  assert.equal(messages.map((m) => m.content).join("\n").split(params.text).length - 1, 1);
 });
 
 test("maybeQueueAiReply: echo of our own message returns false without any query", async () => {

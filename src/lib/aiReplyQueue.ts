@@ -2,6 +2,7 @@
 // AI replies switched on. Never throws, so a failed AI reply can't make the webhook fail.
 import { generateAiDmReply, shouldAiReply, type AiReplySettings, type ChatTurn } from "@/lib/aiReply";
 import { getPool, query } from "@/lib/db";
+import { recentInboundMessages } from "@/lib/inbox";
 
 export async function maybeQueueAiReply(params: {
   userId: string;
@@ -56,11 +57,27 @@ export async function maybeQueueAiReply(params: {
       "select message, coalesce(sent_at, created_at) as at from socialapp.dm_queue where contact_id=$1 and status='sent' order by at desc limit 10",
       [params.contactId],
     );
-    const history: ChatTurn[] = sent
-      .slice()
-      .reverse()
-      .map((r) => ({ direction: "out" as const, text: r.message }));
-    history.push({ direction: "in", text: params.text });
+    let inbound: { direction: "in"; text: string; at: Date }[] = [];
+    try {
+      inbound = (await recentInboundMessages(params.accountExternalId, params.senderId, 10)).map((m) => ({
+        direction: "in" as const,
+        text: m.text,
+        at: m.at,
+      }));
+    } catch {
+      // If the inbound lookup fails, the AI reply still works from our sent replies only.
+      inbound = [];
+    }
+    const merged: { direction: "in" | "out"; text: string; at: Date }[] = [
+      ...sent.map((r) => ({ direction: "out" as const, text: r.message, at: r.at })),
+      ...inbound,
+    ];
+    merged.sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
+    const history: ChatTurn[] = merged.map((m) => ({ direction: m.direction, text: m.text }));
+    const last = history[history.length - 1];
+    if (!last || last.direction !== "in" || last.text.trim() !== params.text.trim()) {
+      history.push({ direction: "in", text: params.text });
+    }
 
     // Meta expects the webhook to answer fast, so keep the AI call short.
     const res = await generateAiDmReply(settings, history, { timeoutMs: 8000 });
