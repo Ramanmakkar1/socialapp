@@ -86,6 +86,7 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
         eyebrow="Delivery log"
         title="Auto-DM"
         accent="activity"
+        accentAfter=""
         lede="The latest DMs your automations tried to send. Pending messages wait while their automation is paused and send after you resume it."
         art="/landing/card-dm.webp"
         artAlt=""
