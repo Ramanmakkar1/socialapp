@@ -22,6 +22,8 @@ function handlers(opts: { enabled: boolean; repliesToday: number }): FakeHandler
     },
     { match: /count\(\*\)::int as n from socialapp\.dm_queue/, reply: () => [{ n: opts.repliesToday }] },
     { match: /select message, coalesce\(sent_at, created_at\) as at/, reply: () => [] },
+    { match: /^select pg_advisory_xact_lock/, reply: () => [{}] },
+    { match: /^select 1 from socialapp\.dm_queue where contact_id=\$1 and kind='ai_reply'/, reply: () => [] },
     { match: /^insert into socialapp\.dm_queue/, reply: () => [] },
   ];
 }
@@ -74,4 +76,16 @@ test("maybeQueueAiReply: happy path queues one ai_reply row", async () => {
   assert.equal(inserts.length, 1);
   assert.match(inserts[0].sql, /'ai_reply'/);
   assert.deepEqual(inserts[0].params, ["u1", "a1", "c1", "s1", "Thanks! A session is listed on our site."]);
+});
+
+test("maybeQueueAiReply: echo of our own message returns false without any query", async () => {
+  const { pool, calls } = createFakePool([]);
+  const restore = installFakePool(pool);
+  try {
+    const { maybeQueueAiReply } = await import("./aiReplyQueue.ts");
+    assert.equal(await maybeQueueAiReply({ ...params, senderId: params.accountExternalId }), false);
+    assert.equal(calls.length, 0);
+  } finally {
+    restore();
+  }
 });

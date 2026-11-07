@@ -240,7 +240,8 @@ export async function processMessageEvents(
         );
         const plainContactId = plain[0]?.id ?? contactBefore?.id;
         if (plainContactId) {
-          await maybeQueueAiReply({
+          // Not awaited so the webhook still answers Meta quickly; maybeQueueAiReply never throws.
+          void maybeQueueAiReply({
             userId: account.user_id,
             socialAccountId: account.id,
             accountExternalId: event.accountExternalId,
@@ -265,7 +266,7 @@ export async function processMessageEvents(
       updated += rows.length;
       const contactId = rows[0]?.id ?? contactBefore?.id;
       if (!pending && contactId && aiEligible) {
-        await maybeQueueAiReply({
+        void maybeQueueAiReply({
           userId: account.user_id,
           socialAccountId: account.id,
           accountExternalId: event.accountExternalId,

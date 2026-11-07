@@ -1,7 +1,7 @@
 // Server-only: queues an AI-written reply to an incoming Instagram DM when the account has
 // AI replies switched on. Never throws, so a failed AI reply can't make the webhook fail.
 import { generateAiDmReply, shouldAiReply, type AiReplySettings, type ChatTurn } from "@/lib/aiReply";
-import { query } from "@/lib/db";
+import { getPool, query } from "@/lib/db";
 
 export async function maybeQueueAiReply(params: {
   userId: string;
@@ -12,6 +12,8 @@ export async function maybeQueueAiReply(params: {
   text: string;
   hasPendingGate: boolean;
 }): Promise<boolean> {
+  // Empty text or an echo of our own outgoing message: never answer.
+  if (!params.text?.trim() || params.senderId === params.accountExternalId) return false;
   try {
     const rows = await query<{
       ai_reply_enabled: boolean;
@@ -67,12 +69,32 @@ export async function maybeQueueAiReply(params: {
       return false;
     }
 
-    await query(
-      `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind, next_attempt_at)
-       values ($1, $2, null, $3, null, $4, $5, 'ai_reply', now())`,
-      [params.userId, params.socialAccountId, params.contactId, params.senderId, res.reply],
-    );
-    return true;
+    // Meta can deliver the same webhook twice: lock per contact and skip if an AI reply was just queued.
+    const client = await getPool().connect();
+    try {
+      await client.query("begin");
+      await client.query("select pg_advisory_xact_lock(hashtext($1::text), hashtext('ai_reply'))", [params.contactId]);
+      const recent = await client.query(
+        "select 1 from socialapp.dm_queue where contact_id=$1 and kind='ai_reply' and created_at > now() - interval '30 seconds' limit 1",
+        [params.contactId],
+      );
+      let inserted = false;
+      if (recent.rows.length === 0) {
+        await client.query(
+          `insert into socialapp.dm_queue (user_id, social_account_id, rule_id, contact_id, comment_id, recipient_external_id, message, kind, next_attempt_at)
+           values ($1, $2, null, $3, null, $4, $5, 'ai_reply', now())`,
+          [params.userId, params.socialAccountId, params.contactId, params.senderId, res.reply],
+        );
+        inserted = true;
+      }
+      await client.query("commit");
+      return inserted;
+    } catch (err) {
+      await client.query("rollback").catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (err) {
     console.error("maybeQueueAiReply failed", err instanceof Error ? err.message : String(err));
     return false;
