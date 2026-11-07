@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
+import CompareHeroIllustration from "@/components/CompareHeroIllustration";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
@@ -73,6 +74,7 @@ export default function LaterAlternative() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
+        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
         <div className="hero-art">
           <Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/multichannel.webp" width={1400} height={933} alt="A creator at a laptop sends one post that splits to several phones and screens" />
         </div>

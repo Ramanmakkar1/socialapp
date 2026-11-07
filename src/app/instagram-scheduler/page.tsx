@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
+import CompareHeroIllustration from "@/components/CompareHeroIllustration";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
@@ -121,6 +122,7 @@ export default function InstagramScheduler() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <Link className="btn btn-line" href="#how">How it works</Link>
         </div>
+        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
         <div className="hero-art" style={{ maxWidth: 720 }}>
           <Image
             sizes="(max-width: 960px) 100vw, 720px"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
+import CompareHeroIllustration from "@/components/CompareHeroIllustration";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
@@ -74,6 +75,7 @@ export default function ManyChatAlternative() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
+        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
         <div className="hero-art" style={{ maxWidth: 720 }}>
           <Image sizes="(max-width: 720px) 100vw, 720px" src="/landing/card-dm.webp" width={900} height={900} alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers" />
         </div>
