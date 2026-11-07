@@ -32,7 +32,7 @@ const compare: [string, string, string][] = [
   ["Price from", "$19 / month", "Varies with contacts"],
   ["Post scheduling included", "Yes", "No"],
   ["Comment-to-DM automation", "Yes", "Yes"],
-  ["AI replies", "Included in Pro", "Paid add-on"],
+  ["AI-written DM messages", "Yes", "Paid add-on"],
   ["Official Meta API", "Yes", "Yes"],
 ];
 
