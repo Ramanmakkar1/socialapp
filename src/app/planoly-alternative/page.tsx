@@ -10,7 +10,7 @@ import s from "@/components/site.module.css";
 export const metadata: Metadata = {
   title: { absolute: `Planoly Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
-    "A Planoly alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export. Facebook and Threads coming soon.",
+    "A Planoly alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export. Facebook Pages and Threads too.",
   alternates: { canonical: "/planoly-alternative" },
 };
 
@@ -27,7 +27,7 @@ const compare: [string, string, string][] = [
   ["AI replies", "Yes", "No"],
   ["Email capture in DMs", "Yes", "No"],
   ["Lead CSV export", "Yes", "No"],
-  ["Facebook / Threads publishing", "Coming soon", "Varies by plan"],
+  ["Facebook / Threads publishing", "Yes", "Varies by plan"],
 ];
 
 const switchSteps = [
@@ -37,10 +37,10 @@ const switchSteps = [
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Planoly alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram scheduling and publishing today, Facebook Pages and Threads coming soon, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
+  { q: `Is ${BRAND.name} a Planoly alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram, Facebook Pages and Threads scheduling and publishing today, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
   { q: "Does Planoly send automatic DMs when someone comments?", a: "Planoly is built for planning and publishing visual content. Comment-to-DM automation is not part of Planoly itself; teams usually add a tool like ManyChat for that." },
   { q: "Can I import my Planoly media library or schedule?", a: `There is no Planoly import yet. Download assets from Planoly if needed, then upload them when you create posts in ${BRAND.name}. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
-  { q: "Which platforms does each tool support?", a: "Instagram scheduling and auto-DMs work today on Poskoo. Facebook Pages and Threads publishing are coming soon, then more networks. Planoly supports additional networks; see their site for the current list." },
+  { q: "Which platforms does each tool support?", a: `Instagram, Facebook Pages and Threads scheduling and Instagram auto-DMs work today on ${BRAND.name}, with more networks later. Planoly supports additional networks; see their site for the current list.` },
   { q: "Is there a free plan?", a: `Yes. The Free plan is $0 forever and includes 2 social accounts, 10 scheduled posts per month, 500 auto-DMs per month, and a link in bio page. Every account starts on it.` },
 ];
 
@@ -68,7 +68,7 @@ export default function PlanolyAlternative() {
           Planoly alternative with Instagram <em className="s">auto-DM</em> built in
         </h1>
         <p className="lede">
-          Keep a visual calendar with Instagram scheduling today (Facebook Pages and Threads coming soon), and auto-DM everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads without a second subscription.
+          Keep a visual calendar for Instagram, Facebook Pages and Threads, and auto-DM everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads without a second subscription.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>

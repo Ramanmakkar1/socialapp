@@ -24,8 +24,8 @@ const compare: [string, string, string, string][] = [
   ["Post scheduling", "Yes", "Yes", "Yes"],
   ["Calendar view", "Yes", "Yes", "Yes"],
   ["Instagram publishing", "Yes", "Yes", "Yes"],
-  ["Facebook publishing", "Coming soon", "Yes", "Yes"],
-  ["Threads publishing", "Coming soon", "Yes", "Yes"],
+  ["Facebook publishing", "Yes", "Yes", "Yes"],
+  ["Threads publishing", "Yes", "Yes", "Yes"],
   ["Comment-to-DM automation", "Yes", "No", "Yes"],
   ["Email capture in DMs", "Yes", "No", "Yes"],
   ["AI DM replies", "Yes", "No", "Yes"],
@@ -35,7 +35,7 @@ const compare: [string, string, string, string][] = [
 const faqs = [
   { q: `Is ${BRAND.name} a Buffer alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts like Buffer does, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in.` },
   { q: "Can I import my existing Buffer schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
-  { q: "Which platforms are supported?", a: "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads publishing are coming soon, then YouTube, LinkedIn, Pinterest, TikTok and WhatsApp." },
+  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs. YouTube, LinkedIn, Pinterest, TikTok and WhatsApp come later." },
   { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
@@ -63,7 +63,7 @@ export default function BufferAlternative() {
           The Buffer alternative that also <em className="s">turns comments into leads</em>
         </h1>
         <p className="lede">
-          Schedule your Instagram posts (Facebook and Threads coming soon), and let {BRAND.name} DM everyone who comments a keyword. Capture their email, answer with AI and track every lead.
+          Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, answer with AI and track every lead.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>

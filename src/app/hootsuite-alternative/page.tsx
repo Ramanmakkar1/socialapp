@@ -24,8 +24,8 @@ const compare: [string, string, string, string][] = [
   ["Post scheduling", "Yes", "Yes", "No"],
   ["Calendar view", "Yes", "Yes", "No"],
   ["Instagram publishing", "Yes", "Yes", "No"],
-  ["Facebook publishing", "Coming soon", "Yes", "No"],
-  ["Threads publishing", "Coming soon", "Yes", "No"],
+  ["Facebook publishing", "Yes", "Yes", "No"],
+  ["Threads publishing", "Yes", "Yes", "No"],
   ["Comment-to-DM automation", "Yes", "Check their plans", "Yes"],
   ["Email capture in DMs", "Yes", "Check their plans", "Yes"],
   ["AI DM replies", "Yes", "Check their plans", "Yes"],
@@ -33,9 +33,9 @@ const compare: [string, string, string, string][] = [
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram. ${BRAND.name} schedules and publishes your Instagram posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in. Hootsuite covers more networks and team features today.` },
+  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram, Facebook Pages and Threads. ${BRAND.name} schedules and publishes your Instagram, Facebook Page and Threads posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in. Hootsuite covers more networks and team features today.` },
   { q: "Can I import my Hootsuite schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your schedule there.` },
-  { q: "Which platforms are supported?", a: "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads publishing are coming soon, then YouTube, LinkedIn, Pinterest, TikTok and WhatsApp." },
+  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs. YouTube, LinkedIn, Pinterest, TikTok and WhatsApp come later." },
   { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
@@ -63,7 +63,7 @@ export default function HootsuiteAlternative() {
           The Hootsuite alternative for Instagram that <em className="s">turns comments into leads</em>
         </h1>
         <p className="lede">
-          Schedule your Instagram posts (Facebook and Threads coming soon), and let {BRAND.name} DM everyone who comments a keyword. Capture their email, answer with AI and track every lead, from $19 / month.
+          Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, answer with AI and track every lead, from $19 / month.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>

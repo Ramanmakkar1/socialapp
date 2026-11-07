@@ -10,7 +10,7 @@ import s from "@/components/site.module.css";
 export const metadata: Metadata = {
   title: { absolute: `Later Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
-    "A Later alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export. Facebook and Threads coming soon.",
+    "A Later alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export. Facebook Pages and Threads too.",
   alternates: { canonical: "/later-alternative" },
 };
 
@@ -37,10 +37,10 @@ const switchSteps = [
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Later alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram scheduling and publishing today, Facebook Pages and Threads coming soon, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
+  { q: `Is ${BRAND.name} a Later alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram, Facebook Pages and Threads scheduling and publishing today, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
   { q: "Does Later send automatic DMs when someone comments?", a: "Later is built for planning and publishing social content. Comment-to-DM automation is not part of Later itself; teams usually add a tool like ManyChat for that." },
   { q: "Can I import my Later media library or schedule?", a: `There is no Later import yet. Download assets from Later if needed, then upload them when you create posts in ${BRAND.name}. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
-  { q: "Which platforms does each tool support?", a: `Instagram scheduling and auto-DMs work today on ${BRAND.name}. Facebook Pages and Threads publishing are coming soon, then more networks. Later supports additional networks such as Pinterest and TikTok; see their site for the current list.` },
+  { q: "Which platforms does each tool support?", a: `Instagram, Facebook Pages and Threads scheduling and Instagram auto-DMs work today on ${BRAND.name}, with more networks later. Later supports additional networks such as Pinterest and TikTok; see their site for the current list.` },
   { q: "Is comment-to-DM allowed on Instagram?", a: `Yes, through the official Instagram API. ${BRAND.name} only messages people who commented first, uses Meta login, and never asks for your password.` },
 ];
 
@@ -68,7 +68,7 @@ export default function LaterAlternative() {
           Later alternative with Instagram <em className="s">auto-DM</em> built in
         </h1>
         <p className="lede">
-          Keep a visual calendar with Instagram scheduling today (Facebook Pages and Threads coming soon), and auto-DM everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads without a second subscription.
+          Keep a visual calendar for Instagram, Facebook Pages and Threads, and auto-DM everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads without a second subscription.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
