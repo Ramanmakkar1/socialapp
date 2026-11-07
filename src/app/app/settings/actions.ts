@@ -43,6 +43,38 @@ export async function saveBrandVoice(formData: FormData): Promise<void> {
   redirect("/app/settings?voice=saved");
 }
 
+export async function saveAiReplySettings(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const rawId = formData.get("account_id");
+  const accountId = typeof rawId === "string" ? rawId.trim().slice(0, 64) : "";
+  const enabled = formData.get("ai_reply_enabled") === "on";
+  const rawInstructions = formData.get("ai_reply_instructions");
+  const instructions = typeof rawInstructions === "string" ? rawInstructions.trim().slice(0, 1500) : "";
+  const rawLink = formData.get("ai_booking_link");
+  const link = typeof rawLink === "string" ? rawLink.trim() : "";
+  if (!isDbConfigured() || !accountId) return;
+  if (link !== "") {
+    let valid = false;
+    try {
+      valid = new URL(link).protocol === "https:";
+    } catch {
+      valid = false;
+    }
+    if (!valid) redirect("/app/settings?ai_reply=error");
+  }
+  try {
+    await query(
+      "update socialapp.social_accounts set ai_reply_enabled=$3, ai_reply_instructions=$4, ai_booking_link=$5 where id=$2 and user_id=$1 and platform='instagram'",
+      [user.id, accountId, enabled, instructions === "" ? null : instructions, link === "" ? null : link]
+    );
+  } catch (err) {
+    console.error("saveAiReplySettings failed for account", accountId, err instanceof Error ? err.message : err);
+    redirect("/app/settings?ai_reply=error");
+  }
+  revalidatePath("/app/settings");
+  redirect("/app/settings?ai_reply=saved");
+}
+
 // Self-serve account deletion: wipes every table row that belongs to the user, then the user row itself
 // (sessions, dm_rules, contacts, scheduled_posts, dm_queue and short_links cascade off it).
 export async function deleteMyAccountAction(formData: FormData): Promise<void> {

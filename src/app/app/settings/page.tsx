@@ -4,13 +4,14 @@ import EmptyState from "../EmptyState";
 import { BtnA, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
+import { isAiConfigured } from "@/lib/ai";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured, query } from "@/lib/db";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
-import { deleteMyAccountAction, disconnectAccountAction, saveBrandVoice } from "./actions";
+import { deleteMyAccountAction, disconnectAccountAction, saveAiReplySettings, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 import DeleteAccountForm from "./DeleteAccountForm";
 import styles from "../app-page.module.css";
@@ -76,11 +77,13 @@ const THREADS_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   not_configured: { tone: "warn", text: "Threads connection isn't set up on this server yet." },
 };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[] }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[] }> }) {
   const user = await requireUser();
-  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam } = await searchParams;
+  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam } = await searchParams;
   const voiceSaved = voiceParam === "saved";
   const voiceFailed = voiceParam === "error";
+  const aiReplySaved = aiReplyParam === "saved";
+  const aiReplyFailed = aiReplyParam === "error";
   const account = typeof accountParam === "string" ? accountParam : null;
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
   const threadsBanner = typeof threadsParam === "string" && Object.hasOwn(THREADS_BANNERS, threadsParam) ? THREADS_BANNERS[threadsParam] : null;
@@ -94,6 +97,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     ? await query<{ brand_voice: string | null }>("select brand_voice from socialapp.users where id=$1", [user.id])
     : [];
   const voice = voiceRows[0]?.brand_voice ?? null;
+  const aiAccounts = isDbConfigured()
+    ? await query<{ id: string; username: string | null; ai_reply_enabled: boolean; ai_reply_instructions: string | null; ai_booking_link: string | null }>(
+        "select id, username, ai_reply_enabled, ai_reply_instructions, ai_booking_link from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active' order by created_at",
+        [user.id]
+      )
+    : [];
+  const aiConfigured = isAiConfigured();
   // Instagram login needs the Meta app keys on the server; until then show a clear "not yet" state.
   const connectReady = isMetaLoginConfigured() || isIgConfigured();
   return (
@@ -211,6 +221,65 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )}
         {voiceSaved && <p role="status" className={ui.notice}>Brand voice saved.</p>}
         {voiceFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your brand voice. Please try again.</p>}
+      </section>
+      <section className={styles.section} aria-labelledby="ai-reply-heading">
+        <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies</h2>
+        {aiAccounts.length === 0 ? (
+          <p className={ui.hint}>
+            Connect an Instagram account first, then switch on AI replies.{" "}
+            <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA>
+          </p>
+        ) : (
+          <ul className={styles.accountList}>
+            {aiAccounts.map((a) => (
+              <li key={a.id} className={styles.accountCard}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%", minWidth: 0 }}>
+                  <span className={styles.username}>@{a.username ?? "unknown"}</span>
+                  <form action={saveAiReplySettings}>
+                    <input type="hidden" name="account_id" value={a.id} />
+                    <label htmlFor={`ai-reply-${a.id}`} className={ui.checkRow}>
+                      <input
+                        id={`ai-reply-${a.id}`}
+                        type="checkbox"
+                        name="ai_reply_enabled"
+                        value="on"
+                        defaultChecked={a.ai_reply_enabled}
+                        disabled={!aiConfigured}
+                      />
+                      Reply to new DMs with AI
+                    </label>
+                    <label htmlFor={`ai-instructions-${a.id}`} className={ui.label}>What should the AI know? (services, hours, tone)</label>
+                    <textarea
+                      id={`ai-instructions-${a.id}`}
+                      name="ai_reply_instructions"
+                      maxLength={1500}
+                      rows={4}
+                      defaultValue={a.ai_reply_instructions ?? ""}
+                      className={`${ui.input} ${styles.textarea}`}
+                      placeholder="We are a yoga studio in Toronto, open 9-6, friendly and short…"
+                    />
+                    <label htmlFor={`ai-booking-${a.id}`} className={ui.label}>Booking link (optional)</label>
+                    <input
+                      id={`ai-booking-${a.id}`}
+                      name="ai_booking_link"
+                      type="url"
+                      defaultValue={a.ai_booking_link ?? ""}
+                      className={ui.input}
+                      placeholder="https://cal.com/you"
+                    />
+                    {!aiConfigured && <p className={ui.hint}>AI is not set up on this server yet.</p>}
+                    <p className={ui.hint}>AI answers people who message you, asks for their name and email, and shares your booking link. It never replies more than 5 times a day to one person and only within Instagram&apos;s 24-hour window.</p>
+                    <div>
+                      <SubmitButton label="Save AI reply settings" />
+                    </div>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {aiReplySaved && <p role="status" className={ui.notice}>AI reply settings saved.</p>}
+        {aiReplyFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your AI reply settings. Please try again.</p>}
       </section>
       <section className={styles.section} aria-labelledby="danger-heading">
         <h2 id="danger-heading" className={styles.sectionTitle}>Delete account</h2>
