@@ -24,7 +24,7 @@ const compare: [string, string, string][] = [
   ["Instagram scheduling", "Yes", "Yes"],
   ["Calendar view", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "No"],
-  ["AI replies", "Yes", "No"],
+  ["AI-written DM messages", "Yes", "No"],
   ["Email capture in DMs", "Yes", "No"],
   ["Lead CSV export", "Yes", "No"],
   ["Facebook / Threads publishing", "Yes", "Varies by plan"],

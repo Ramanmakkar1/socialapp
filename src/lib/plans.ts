@@ -23,7 +23,7 @@ export const PLANS: Plan[] = [
       { text: "5 social accounts" },
       { text: "Unlimited scheduling" },
       { text: "10,000 auto-DMs / month" },
-      { text: "AI caption ideas (AI DM replies coming soon)" },
+      { text: "AI caption and DM message ideas" },
       { text: "Email & phone capture" },
       { text: "Click + lead analytics" },
     ],

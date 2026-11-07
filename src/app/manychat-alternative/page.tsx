@@ -27,7 +27,7 @@ const compare: [string, string, string][] = [
   ["Post scheduling and calendar", "Yes", "No"],
   ["DM rule attached to a scheduled post", "Yes", "No"],
   ["Leads list with CSV export", "Yes", "Yes"],
-  ["AI replies", "Coming soon", "Yes"],
+  ["AI-written DM messages", "Yes", "Yes"],
   ["Visual flow builder", "Coming later", "Yes"],
   ["WhatsApp", "Coming later", "Yes"],
   ["Facebook Messenger", "Coming later", "Yes"],
