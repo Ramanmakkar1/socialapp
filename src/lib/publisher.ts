@@ -1,8 +1,9 @@
-// Server only: publishes due scheduled posts through the official Instagram API.
+// Server only: publishes due scheduled posts through the official Instagram and Facebook Page APIs.
 import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
 import { shouldPostFirstComment } from "@/lib/firstComment";
 import { graphBaseFor } from "@/lib/graphHost";
+import { canPublishToFacebook, publishToFacebookPage } from "@/lib/facebookPublish";
 
 const PUBLISH_TIMEOUT_MS = 20_000;
 
@@ -397,7 +398,7 @@ export async function recoverStuckPublishing(staleMs = STUCK_PUBLISHING_MS): Pro
  * Instagram targets, so delete / reschedule (which only touch draft/scheduled/failed rows)
  * can never race the publisher (bugs b, c). SKIP LOCKED keeps overlapping runs apart.
  */
-async function claimDueTargets(limit: number): Promise<ClaimedRow[]> {
+async function claimDueTargets(limit: number, platform: "instagram" | "facebook"): Promise<ClaimedRow[]> {
   const client = await getPool().connect();
   try {
     await client.query("begin");
@@ -405,11 +406,11 @@ async function claimDueTargets(limit: number): Promise<ClaimedRow[]> {
       `select p.id from socialapp.scheduled_posts p
        where p.status='scheduled' and p.scheduled_at <= now()
          and exists (select 1 from socialapp.post_targets t
-           where t.post_id=p.id and t.platform='instagram' and t.status='pending')
+           where t.post_id=p.id and t.platform=$2 and t.status='pending')
        order by p.scheduled_at
        limit $1
        for update of p skip locked`,
-      [limit],
+      [limit, platform],
     );
     const ids = due.rows.map((r) => r.id);
     if (ids.length === 0) {
@@ -423,9 +424,9 @@ async function claimDueTargets(limit: number): Promise<ClaimedRow[]> {
     const claimed = await client.query<ClaimedRow>(
       `update socialapp.post_targets t set status='publishing'
        from socialapp.scheduled_posts p
-       where t.post_id=p.id and p.id = any($1::uuid[]) and t.platform='instagram' and t.status='pending'
+       where t.post_id=p.id and p.id = any($1::uuid[]) and t.platform=$2 and t.status='pending'
        returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment`,
-      [ids],
+      [ids, platform],
     );
     await client.query("commit");
     return claimed.rows;
@@ -445,7 +446,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   } catch (err) {
     console.error("publisher: stuck-claim recovery failed", err instanceof Error ? err.message : err);
   }
-  const claimed = { rows: await claimDueTargets(limit) };
+  const claimed = { rows: await claimDueTargets(limit, "instagram") };
 
   for (const row of claimed.rows) {
     let token = "";
@@ -538,16 +539,97 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
+  const fbRows = await claimDueTargets(limit, "facebook");
+  for (const row of fbRows) {
+    let token = "";
+    const accounts = await pool.query<{
+      id: string;
+      page_id: string;
+      scopes: string[] | null;
+      access_token_enc: string | null;
+      auth_type: string | null;
+    }>(
+      `select id, page_id, scopes, access_token_enc, auth_type from socialapp.social_accounts
+       where user_id=$1 and platform='instagram' and auth_type='facebook_login' and status='active' and page_id is not null
+       order by created_at limit 1`,
+      [row.user_id],
+    );
+    const account = accounts.rows[0];
+    if (!account?.access_token_enc) {
+      await markTargetFailed(
+        row.id,
+        row.post_id,
+        "No Facebook Page connected. Connect Instagram with Facebook login in Settings, then retry.",
+        token,
+      );
+      result.failed += 1;
+      continue;
+    }
+
+    if (!canPublishToFacebook(account.scopes, account.auth_type)) {
+      await markTargetFailed(
+        row.id,
+        row.post_id,
+        'Posting to your Facebook Page needs the "Manage Page posts" permission. Reconnect in Settings and allow it, then retry.',
+        token,
+      );
+      result.failed += 1;
+      continue;
+    }
+
+    try {
+      token = decryptToken(account.access_token_enc);
+    } catch {
+      await markTargetFailed(
+        row.id,
+        row.post_id,
+        "No Facebook Page connected. Connect Instagram with Facebook login in Settings, then retry.",
+        token,
+      );
+      result.failed += 1;
+      continue;
+    }
+
+    const outcome = await publishToFacebookPage(
+      account.page_id,
+      token,
+      row.caption_override ?? row.caption,
+      row.media,
+    );
+
+    if (outcome.ok) {
+      await pool.query(
+        `update socialapp.post_targets set status='published', external_post_id=$2,
+         published_at=now(), error=null, social_account_id=$3 where id=$1`,
+        [row.id, outcome.postId, account.id],
+      );
+      await refreshPostStatus(row.post_id);
+      result.published += 1;
+    } else {
+      // Expired or revoked Page token: flag the account so Settings shows a clear Reconnect prompt.
+      if (outcome.tokenDead) {
+        await pool
+          .query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [account.id])
+          .catch(() => undefined);
+      }
+      const error = outcome.tokenDead
+        ? `Facebook access expired or was removed. Reconnect in Settings, then retry. (${outcome.error})`
+        : outcome.error;
+      await markTargetFailed(row.id, row.post_id, error, token);
+      result.failed += 1;
+    }
+  }
+
   try {
     const unsupported = await pool.query<{ post_id: string }>(
       `update socialapp.post_targets t set status='failed',
-         error='Facebook and Threads publishing is coming soon. Remove this platform from the post (or duplicate it for Instagram only).',
+         error='Threads publishing is coming soon. Remove Threads from this post, then retry.',
          published_at=null, external_post_id=null
        from socialapp.scheduled_posts p
-       where t.post_id=p.id and t.platform <> 'instagram' and t.status='pending'
+       where t.post_id=p.id and t.platform = 'threads' and t.status='pending'
          and p.status='scheduled' and p.scheduled_at <= now()
          and not exists (select 1 from socialapp.post_targets i
-           where i.post_id=p.id and i.platform='instagram' and i.status in ('pending','publishing'))
+           where i.post_id=p.id and i.platform in ('instagram','facebook') and i.status in ('pending','publishing'))
        returning t.post_id`,
     );
     const postIds = [...new Set(unsupported.rows.map((r) => r.post_id))];

@@ -44,10 +44,10 @@ function publisherDb(posts: Post[], targets: Target[]) {
     { match: /update socialapp\.scheduled_posts p set status = case/, reply: (params) => { refresh(String(params[0])); return []; } },
     {
       match: /select p\.id from socialapp\.scheduled_posts p .*for update of p skip locked/,
-      reply: () =>
+      reply: (params) =>
         posts
           .filter((p) => p.status === "scheduled" && p.scheduled_at <= Date.now() &&
-            targets.some((t) => t.post_id === p.id && t.platform === "instagram" && t.status === "pending"))
+            targets.some((t) => t.post_id === p.id && t.platform === String(params[1]) && t.status === "pending"))
           .map((p) => ({ id: p.id })),
     },
     {
@@ -64,8 +64,9 @@ function publisherDb(posts: Post[], targets: Target[]) {
       match: /update socialapp\.post_targets t set status='publishing'/,
       reply: (params) => {
         const ids = params[0] as string[];
+        const platform = String(params[1]);
         return targets
-          .filter((t) => ids.includes(t.post_id) && t.platform === "instagram" && t.status === "pending")
+          .filter((t) => ids.includes(t.post_id) && t.platform === platform && t.status === "pending")
           .map((t) => {
             t.status = "publishing";
             const p = postOf(t.post_id);
@@ -82,7 +83,7 @@ function publisherDb(posts: Post[], targets: Target[]) {
         return [];
       },
     },
-    { match: /update socialapp\.post_targets t set status='failed', error='Facebook/, reply: () => [] },
+    { match: /update socialapp\.post_targets t set status='failed', error='Threads/, reply: () => [] },
   ];
   return handlers;
 }
@@ -138,6 +139,26 @@ test("publisher: claiming a due post marks the post itself 'publishing' before a
     assert.equal(calls[claimPost].client, calls[claimTarget].client, "claim runs in one transaction");
     // No connected account in this fixture, so it fails cleanly instead of staying stuck.
     assert.equal(targets[0].status, "failed");
+    assert.equal(posts[0].status, "failed");
+  } finally {
+    restore();
+  }
+});
+
+test("publisher: a due Facebook target with no facebook_login account fails cleanly, no throw", async () => {
+  const posts: Post[] = [
+    { id: "fb-due", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [{ id: "t-fb", post_id: "fb-due", platform: "facebook", status: "pending", error: null }];
+  const { pool } = createFakePool(publisherDb(posts, targets));
+  const restore = installFakePool(pool);
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    const result = await publishDuePosts();
+    assert.equal(result.failed, 1);
+    assert.equal(result.published, 0);
+    assert.equal(targets[0].status, "failed");
+    assert.match(targets[0].error ?? "", /No Facebook Page connected/);
     assert.equal(posts[0].status, "failed");
   } finally {
     restore();
