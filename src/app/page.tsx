@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  openGraph: { title, description, url: BRAND.url, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
-const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
+const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs. More networks come later."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -68,7 +68,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
   <SiteHeader onHome />
 
   <header className="hero" id="top">
-    <Link className="pill" href="#channels"><span>NEW</span>Schedule and auto-DM on Instagram. Facebook and Threads coming soon <span aria-hidden="true" style={{"background": "none", "color": "inherit", "padding": "0"}}>→</span></Link>
+    <Link className="pill" href="#channels"><span>NEW</span>Schedule on Instagram, Facebook and Threads, and auto-DM on Instagram <span aria-hidden="true" style={{"background": "none", "color": "inherit", "padding": "0"}}>→</span></Link>
     <p className="eyebrow">For creators who&apos;d rather create</p>
     <h1>Schedule posts. Auto-DM every comment. <em className="s mark">Grow on autopilot.</em></h1>
     <p className="lede">Poskoo plans your posts on one calendar, then sends your link to everyone who comments, within seconds. One app, one plan, no copy-paste.</p>
@@ -76,7 +76,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <p className="small">Free plan. No credit card.</p>
     <div className="hero-art"><Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/hero.webp" priority width={1400} height={933} alt="A big phone shows a post; a comment saying GUIDE pops out and a paper plane carries a DM with a link. A creator sits on a calendar block and a friend waves with a coffee, with a happy dog and plants below." /></div>
   </header>
-  <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook <small>Coming soon</small></b><b><i style={{"background": "var(--ink)"}}></i>Threads <small>Coming soon</small></b><span>· Built on the official Meta API</span></div>
+  <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><span>· Built on the official Meta API</span></div>
 </div>
 
 <section id="how"><div className="wrap">
@@ -140,11 +140,11 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <div className="copy">
       <p className="eyebrow">Multi-channel scheduling</p>
       <h2>Write once. <em className="s">Post everywhere.</em></h2>
-      <p>Schedule Instagram posts from one calendar today. Facebook Pages and Threads scheduling are coming soon.</p>
+      <p>Schedule Instagram, Facebook Pages and Threads posts from one calendar.</p>
       <div className="pains">
         <div className="pain"><b>Instagram</b><span>Feed posts, carousels, Reels and Stories</span></div>
-        <div className="pain"><b>Facebook</b><span>Coming soon</span></div>
-        <div className="pain"><b>Threads</b><span>Coming soon</span></div>
+        <div className="pain"><b>Facebook</b><span>Live</span></div>
+        <div className="pain"><b>Threads</b><span>Live</span></div>
       </div>
     </div>
     <div className="art"><Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/multichannel.webp" width={1400} height={933} loading="lazy" alt="A creator at a laptop sends one post that splits to several phones and screens" /></div>

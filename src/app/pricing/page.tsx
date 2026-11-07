@@ -36,7 +36,7 @@ const faqs = [
   },
   {
     q: "Which platforms are included?",
-    a: "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon.",
+    a: "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs.",
   },
 ];
 
@@ -45,7 +45,7 @@ const includes = [
   "Instagram scheduling calendar",
   "Comment keyword auto-DMs",
   "Lead capture from your DMs",
-  "Facebook Pages and Threads scheduling (coming soon)",
+  "Facebook Pages and Threads scheduling",
 ];
 
 const faqJsonLd = {
