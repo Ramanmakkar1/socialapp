@@ -4,6 +4,7 @@ import { getPool } from "@/lib/db";
 import { shouldPostFirstComment } from "@/lib/firstComment";
 import { graphBaseFor } from "@/lib/graphHost";
 import { canPublishToFacebook, publishToFacebookPage } from "@/lib/facebookPublish";
+import { RECONNECT_MESSAGE, publishToThreads } from "@/lib/threadsPublish";
 
 const PUBLISH_TIMEOUT_MS = 20_000;
 
@@ -398,7 +399,7 @@ export async function recoverStuckPublishing(staleMs = STUCK_PUBLISHING_MS): Pro
  * Instagram targets, so delete / reschedule (which only touch draft/scheduled/failed rows)
  * can never race the publisher (bugs b, c). SKIP LOCKED keeps overlapping runs apart.
  */
-async function claimDueTargets(limit: number, platform: "instagram" | "facebook"): Promise<ClaimedRow[]> {
+async function claimDueTargets(limit: number, platform: "instagram" | "facebook" | "threads"): Promise<ClaimedRow[]> {
   const client = await getPool().connect();
   try {
     await client.query("begin");
@@ -620,23 +621,85 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
-  try {
-    const unsupported = await pool.query<{ post_id: string }>(
-      `update socialapp.post_targets t set status='failed',
-         error='Threads publishing is coming soon. Remove Threads from this post, then retry.',
-         published_at=null, external_post_id=null
-       from socialapp.scheduled_posts p
-       where t.post_id=p.id and t.platform = 'threads' and t.status='pending'
-         and p.status='scheduled' and p.scheduled_at <= now()
-         and not exists (select 1 from socialapp.post_targets i
-           where i.post_id=p.id and i.platform in ('instagram','facebook') and i.status in ('pending','publishing'))
-       returning t.post_id`,
-    );
-    const postIds = [...new Set(unsupported.rows.map((r) => r.post_id))];
-    for (const postId of postIds) await refreshPostStatus(postId);
-    result.failed += unsupported.rows.length;
-  } catch {
-    // Never fail the publish pass because unsupported platforms could not be marked failed.
+  const thRows = await claimDueTargets(limit, "threads");
+  for (const row of thRows) {
+    let token = "";
+    let counted = false;
+    try {
+      const accounts = await pool.query<AccountRow>(
+        `select id, external_id, access_token_enc from socialapp.social_accounts
+         where user_id=$1 and platform='threads' and status='active'
+         order by created_at limit 1`,
+        [row.user_id],
+      );
+      const account = accounts.rows[0];
+      if (!account?.access_token_enc) {
+        await markTargetFailed(
+          row.id,
+          row.post_id,
+          "No Threads account connected. Connect Threads in Settings, then retry.",
+          token,
+        );
+        result.failed += 1;
+        counted = true;
+        continue;
+      }
+
+      try {
+        token = decryptToken(account.access_token_enc);
+      } catch {
+        await markTargetFailed(
+          row.id,
+          row.post_id,
+          "No Threads account connected. Connect Threads in Settings, then retry.",
+          token,
+        );
+        result.failed += 1;
+        counted = true;
+        continue;
+      }
+
+      const media = firstMedia(row.media);
+      const outcome = await publishToThreads({
+        threadsUserId: account.external_id,
+        accessToken: token,
+        text: row.caption_override ?? row.caption,
+        imageUrl: media?.type === "image" ? media.url : undefined,
+        videoUrl: media?.type === "video" ? media.url : undefined,
+      });
+
+      if (outcome.ok) {
+        await pool.query(
+          `update socialapp.post_targets set status='published', external_post_id=$2,
+           published_at=now(), error=null, social_account_id=$3 where id=$1`,
+          [row.id, outcome.id, account.id],
+        );
+        await refreshPostStatus(row.post_id);
+        result.published += 1;
+      } else {
+        // Expired or revoked Threads token: flag the account so Settings shows a clear Reconnect prompt.
+        const tokenDead = outcome.error === RECONNECT_MESSAGE;
+        if (tokenDead) {
+          await pool
+            .query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [account.id])
+            .catch(() => undefined);
+        }
+        const error = tokenDead
+          ? `Threads access expired or was removed. Reconnect Threads in Settings, then retry. (${outcome.error})`
+          : outcome.error;
+        await markTargetFailed(row.id, row.post_id, error, token);
+        result.failed += 1;
+        counted = true;
+      }
+    } catch (err) {
+      if (!counted) {
+        const message = err instanceof Error ? err.message : String(err);
+        await markTargetFailed(row.id, row.post_id, `Threads publishing failed: ${message}`, token).catch(
+          () => undefined,
+        );
+        result.failed += 1;
+      }
+    }
   }
 
   return result;

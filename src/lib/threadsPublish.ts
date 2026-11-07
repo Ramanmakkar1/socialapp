@@ -10,7 +10,7 @@ export type ThreadsPublishOutcome =
   | { ok: true; id: string }
   | { ok: false; error: string; retryable: boolean };
 
-const RECONNECT_MESSAGE = "Threads connection expired, reconnect Threads in Settings";
+export const RECONNECT_MESSAGE = "Threads connection expired, reconnect Threads in Settings";
 const PERMISSION_MESSAGE =
   "This Threads account does not have permission to publish. Reconnect Threads in Settings.";
 

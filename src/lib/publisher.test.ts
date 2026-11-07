@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { encryptToken } from "./crypto.ts";
 import { createFakePool, installFakePool, type FakeHandler } from "../test-utils/fakePool.ts";
 
 type Post = { id: string; user_id: string; status: string; scheduled_at: number; updated_at: number };
 type Target = { id: string; post_id: string; platform: string; status: string; error: string | null };
+type Account = { id: string; external_id: string; access_token_enc: string; status: string };
 
 const MIN = 60_000;
 
 // In-memory emulation of the publisher's SQL (claim, recovery, status refresh).
-function publisherDb(posts: Post[], targets: Target[]) {
+function publisherDb(posts: Post[], targets: Target[], accounts: Account[] = []) {
   const postOf = (id: string) => posts.find((p) => p.id === id)!;
   const refresh = (postId: string) => {
     const p = postOf(postId);
@@ -74,7 +76,18 @@ function publisherDb(posts: Post[], targets: Target[]) {
           });
       },
     },
-    { match: /from socialapp\.social_accounts/, reply: () => [] },
+    {
+      match: /update socialapp\.social_accounts set status='expired'/,
+      reply: (params) => {
+        const a = accounts.find((x) => x.id === String(params[0]));
+        if (a) a.status = "expired";
+        return [];
+      },
+    },
+    {
+      match: /from socialapp\.social_accounts/,
+      reply: (_params, sql) => (sql.includes("platform='threads'") ? accounts : []),
+    },
     {
       match: /update socialapp\.post_targets set status='failed', error=\$2/,
       reply: (params) => {
@@ -83,7 +96,14 @@ function publisherDb(posts: Post[], targets: Target[]) {
         return [];
       },
     },
-    { match: /update socialapp\.post_targets t set status='failed', error='Threads/, reply: () => [] },
+    {
+      match: /update socialapp\.post_targets set status='published'/,
+      reply: (params) => {
+        const t = targets.find((x) => x.id === params[0]);
+        if (t) { t.status = "published"; t.error = null; }
+        return [];
+      },
+    },
   ];
   return handlers;
 }
@@ -161,6 +181,79 @@ test("publisher: a due Facebook target with no facebook_login account fails clea
     assert.match(targets[0].error ?? "", /No Facebook Page connected/);
     assert.equal(posts[0].status, "failed");
   } finally {
+    restore();
+  }
+});
+
+test("publisher: a due Threads target with an active account is published", async () => {
+  const posts: Post[] = [
+    { id: "th-due", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [{ id: "t-th", post_id: "th-due", platform: "threads", status: "pending", error: null }];
+  const accounts: Account[] = [];
+  const { pool } = createFakePool(publisherDb(posts, targets, accounts));
+  const restore = installFakePool(pool);
+  accounts.push({ id: "acc-th", external_id: "12345", access_token_enc: encryptToken("th-token"), status: "active" });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => {
+    if (String(url).endsWith("/threads")) return new Response(JSON.stringify({ id: "container-1" }));
+    return new Response(JSON.stringify({ id: "thread-post-1" }));
+  }) as typeof fetch;
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    const result = await publishDuePosts();
+    assert.equal(result.published, 1);
+    assert.equal(result.failed, 0);
+    assert.equal(targets[0].status, "published");
+    assert.equal(posts[0].status, "published");
+  } finally {
+    globalThis.fetch = realFetch;
+    restore();
+  }
+});
+
+test("publisher: a due Threads target with no Threads account fails with a clear message", async () => {
+  const posts: Post[] = [
+    { id: "th-none", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [{ id: "t-th-none", post_id: "th-none", platform: "threads", status: "pending", error: null }];
+  const { pool } = createFakePool(publisherDb(posts, targets));
+  const restore = installFakePool(pool);
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    const result = await publishDuePosts();
+    assert.equal(result.failed, 1);
+    assert.equal(result.published, 0);
+    assert.equal(targets[0].status, "failed");
+    assert.match(targets[0].error ?? "", /No Threads account connected/);
+    assert.equal(posts[0].status, "failed");
+  } finally {
+    restore();
+  }
+});
+
+test("publisher: a dead Threads token marks the account expired and fails the target", async () => {
+  const posts: Post[] = [
+    { id: "th-dead", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [{ id: "t-th-dead", post_id: "th-dead", platform: "threads", status: "pending", error: null }];
+  const accounts: Account[] = [];
+  const { pool } = createFakePool(publisherDb(posts, targets, accounts));
+  const restore = installFakePool(pool);
+  accounts.push({ id: "acc-dead", external_id: "999", access_token_enc: encryptToken("dead-token"), status: "active" });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async () =>
+    new Response(JSON.stringify({ error: { message: "Invalid OAuth access token", code: 190 } }), { status: 400 })) as typeof fetch;
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    const result = await publishDuePosts();
+    assert.equal(result.failed, 1);
+    assert.equal(accounts[0].status, "expired");
+    assert.equal(targets[0].status, "failed");
+    assert.match(targets[0].error ?? "", /Threads access expired or was removed/);
+    assert.equal(posts[0].status, "failed");
+  } finally {
+    globalThis.fetch = realFetch;
     restore();
   }
 });
