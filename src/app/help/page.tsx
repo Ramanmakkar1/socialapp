@@ -6,7 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
-  title: "Help center",
+  title: { absolute: `Instagram Scheduling & Auto-DM Help Guides | ${BRAND.name}` },
   description:
     `Step-by-step guides for ${BRAND.name}: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`,
   alternates: { canonical: "/help" },

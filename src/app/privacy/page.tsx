@@ -5,7 +5,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Privacy policy: how Poskoo handles your data",
+  title: { absolute: `Privacy Policy: How ${BRAND.name} Handles Your Instagram Data` },
   description: "Read how Poskoo stores your Instagram, Facebook and Threads data, which cookies we use, and how to export or delete your account at any time.",
   alternates: { canonical: "/privacy" },
 };

@@ -5,7 +5,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Delete your Poskoo data and accounts",
+  title: { absolute: `Delete Your ${BRAND.name} Account Data and Disconnect Instagram` },
   description: "Learn how to disconnect Instagram or Facebook from Poskoo and request deletion of all stored account data, including posts and messages.",
   alternates: { canonical: "/data-deletion" },
 };

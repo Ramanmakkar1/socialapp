@@ -6,7 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
-  title: `${BRAND.name} support: help with scheduling and auto-DM`,
+  title: { absolute: `Contact ${BRAND.name} Support: Help With Scheduling and Auto-DMs` },
   description: `Questions about scheduling posts, Instagram auto-DM rules or your ${BRAND.name} account? Email the support team or browse step-by-step help guides.`,
   alternates: { canonical: "/contact" },
 };
