@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useRef, useState, useTransition, type ComponentType } from "react";
+import { useEffect, useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
 import TemplatePicker from "./TemplatePicker";
@@ -17,6 +17,7 @@ import {
   type RuleFormInput,
   type RuleTrigger,
 } from "./actions";
+import { dmAiAvailable, suggestDmMessages } from "./aiActions";
 
 const INPUT = `${ui.input} mt-1.5`;
 
@@ -187,6 +188,29 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   const [socialAccountId, setSocialAccountId] = useState<string | null>(initialAccount);
   const [errors, setErrors] = useState<string[]>([]);
   const [pending, startTransition] = useTransition();
+  const [aiOn, setAiOn] = useState<boolean | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiGoal, setAiGoal] = useState("");
+  const [aiTone, setAiTone] = useState("friendly");
+  const [aiIdeas, setAiIdeas] = useState<string[]>([]);
+  const [aiError, setAiError] = useState("");
+  const [aiPending, startAiTransition] = useTransition();
+  const aiGoalId = useId();
+  const aiToneId = useId();
+
+  useEffect(() => {
+    let active = true;
+    dmAiAvailable()
+      .then((available) => {
+        if (active) setAiOn(available);
+      })
+      .catch(() => {
+        if (active) setAiOn(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const keywords = parseKeywords(keywordText);
   const linkRequired = emailGate || followGate;
@@ -404,6 +428,101 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
               {dmText.length}/1000
             </span>
           </div>
+          {aiOn && (
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={() => setAiOpen((open) => !open)}
+                aria-expanded={aiOpen}
+                className={`${ui.pill} text-xs hover:border-[var(--poskoo-violet)]`}
+              >
+                ✨ Write with AI
+              </button>
+              {aiOpen && (
+                <div className="mt-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <div className="min-w-0 flex-1">
+                      <label htmlFor={aiGoalId} className={ui.label}>What is this DM for?</label>
+                      <input
+                        id={aiGoalId}
+                        type="text"
+                        maxLength={300}
+                        value={aiGoal}
+                        onChange={(e) => setAiGoal(e.target.value)}
+                        className={INPUT}
+                        placeholder="Send my free pricing guide to people who comment GUIDE"
+                      />
+                    </div>
+                    <div className="sm:w-44">
+                      <label htmlFor={aiToneId} className={ui.label}>Tone</label>
+                      <select
+                        id={aiToneId}
+                        value={aiTone}
+                        onChange={(e) => setAiTone(e.target.value)}
+                        className={INPUT}
+                      >
+                        {(["friendly", "professional", "playful", "excited"] as const).map((tone) => (
+                          <option key={tone} value={tone}>
+                            {tone[0].toUpperCase() + tone.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={aiPending || aiGoal.trim() === ""}
+                    onClick={() => {
+                      setAiError("");
+                      setAiIdeas([]);
+                      startAiTransition(async () => {
+                        try {
+                          const r = await suggestDmMessages({
+                            goal: aiGoal,
+                            keyword: keywords[0],
+                            hasLink: linkUrl.trim() !== "",
+                            emailGate,
+                            tone: aiTone,
+                          });
+                          if (r.ok) setAiIdeas(r.ideas);
+                          else setAiError(r.error);
+                        } catch {
+                          setAiError("AI request failed. Try again.");
+                        }
+                      });
+                    }}
+                    className={`${ui.pill} mt-3 min-h-10`}
+                  >
+                    {aiPending ? "Writing…" : "Get 3 ideas"}
+                  </button>
+                  {aiError && (
+                    <p role="alert" className="mt-2 text-sm text-[var(--poskoo-red)]">
+                      {aiError}
+                    </p>
+                  )}
+                  {aiIdeas.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {aiIdeas.map((idea, index) => (
+                        <article key={`${index}-${idea.slice(0, 40)}`} className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3">
+                          <p className="whitespace-pre-wrap text-sm text-[var(--poskoo-ink)]">{idea}</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDmText(idea.slice(0, 1000));
+                              setAiOpen(false);
+                            }}
+                            className={`${ui.pill} mt-2 min-h-10`}
+                          >
+                            Use this
+                          </button>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <div>
           <label htmlFor={linkId} className={ui.label}>Link URL <span className="text-[var(--poskoo-muted)]">({linkRequired ? "required" : "optional"})</span></label>
