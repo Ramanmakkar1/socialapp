@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
+import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import CompareHeroIllustration from "@/components/CompareHeroIllustration";
 import s from "@/components/site.module.css";
 
@@ -186,6 +187,7 @@ export default function MetaBusinessSuiteAlternative() {
           <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
             <Link className={s.vlink} href="/">See the full product</Link>
           </p>
+          <CompareAlternativesNav current="meta" />
         </div>
       </section>
     </PublicShell>

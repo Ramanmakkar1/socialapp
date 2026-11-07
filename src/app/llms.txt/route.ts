@@ -70,6 +70,7 @@ export function GET() {
     "/metricool-alternative",
     "/manychat-alternative",
     "/hootsuite-alternative",
+    "/meta-business-suite-alternative",
   ];
   for (const path of comparisonPaths) {
     if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;

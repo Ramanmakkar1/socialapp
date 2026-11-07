@@ -70,6 +70,7 @@ export function SiteFooter() {
           { href: "/metricool-alternative", label: "Metricool alternative" },
           { href: "/manychat-alternative", label: "ManyChat alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
+          { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative" },
         ]}
       />
       <FooterColumn
