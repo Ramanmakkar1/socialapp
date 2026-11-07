@@ -53,7 +53,7 @@ function Cell({ v }: { v: string }) {
 
 export default function BufferAlternative() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Buffer alternative", path: "/buffer-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}

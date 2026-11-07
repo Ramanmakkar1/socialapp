@@ -58,7 +58,7 @@ function Cell({ v }: { v: string }) {
 
 export default function PlanolyAlternative() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Planoly alternative", path: "/planoly-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}

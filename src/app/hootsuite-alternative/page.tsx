@@ -53,7 +53,7 @@ function Cell({ v }: { v: string }) {
 
 export default function HootsuiteAlternative() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Hootsuite alternative", path: "/hootsuite-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}

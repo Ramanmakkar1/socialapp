@@ -58,7 +58,7 @@ function Cell({ v }: { v: string }) {
 
 export default function LaterAlternative() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Later alternative", path: "/later-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}

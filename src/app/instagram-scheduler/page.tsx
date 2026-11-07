@@ -103,7 +103,7 @@ const faqJsonLd = {
 
 export default function InstagramScheduler() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Instagram scheduler", path: "/instagram-scheduler" }]}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}

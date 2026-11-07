@@ -59,7 +59,7 @@ function Cell({ v }: { v: string }) {
 
 export default function ManyChatAlternative() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "ManyChat alternative", path: "/manychat-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}

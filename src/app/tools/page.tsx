@@ -108,7 +108,7 @@ const groups = [tools.slice(0, 3), tools.slice(3, 6), tools.slice(6, 9), tools.s
 
 export default function ToolsPage() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Free Instagram tools", path: "/tools" }]}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd).replace(/</g, "\\u003c") }}

@@ -57,7 +57,7 @@ function Cell({ v }: { v: string }) {
 
 export default function InstagramAutoDm() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Instagram auto-DM", path: "/instagram-auto-dm" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
       <header className="hero">
         <span className="pill">Official Meta API · no password needed</span>

@@ -60,7 +60,7 @@ function Cell({ v }: { v: string }) {
 
 export default function SproutSocialAlternative() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Sprout Social alternative", path: "/sprout-social-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}

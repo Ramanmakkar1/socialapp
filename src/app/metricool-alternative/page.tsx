@@ -72,7 +72,7 @@ function Cell({ v }: { v: string }) {
 
 export default function MetricoolAlternative() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Metricool alternative", path: "/metricool-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
