@@ -154,8 +154,10 @@ export default function PostList({ posts, loadError, initialFilter = "all" }: { 
                       {post.status.replace(/[_-]+/g, " ").replace(/^./, (letter) => letter.toUpperCase())}
                     </span>
                     <div className={styles.postActions}>
-                      {post.status === "draft" && (
-                        <BtnLink href={`/app/calendar?draft=${post.id}#new`} variant="ghost" size="sm">Edit draft</BtnLink>
+                      {(post.status === "draft" || post.status === "scheduled") && (
+                        <BtnLink href={`/app/calendar?draft=${post.id}#new`} variant="ghost" size="sm">
+                          {post.status === "draft" ? "Edit draft" : "Edit"}
+                        </BtnLink>
                       )}
                       {post.status === "failed" && (
                         <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleRetry(post.id)}>

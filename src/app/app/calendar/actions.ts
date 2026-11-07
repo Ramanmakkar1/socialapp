@@ -264,8 +264,8 @@ export async function savePost(
     await client.query("begin");
 
     if (input.draftId) {
-      const locked = await client.query<{ status: string }>(
-        "select status from scheduled_posts where id = $1 and user_id = $2 for update",
+      const locked = await client.query<{ status: string; scheduled_at: Date | string | null }>(
+        "select status, scheduled_at from scheduled_posts where id = $1 and user_id = $2 for update",
         [input.draftId, user.id],
       );
       if (locked.rows.length === 0) {
@@ -275,12 +275,25 @@ export async function savePost(
           error: "That draft wasn't found. It may have been deleted or belongs to another account.",
         };
       }
-      if (locked.rows[0].status !== "draft") {
+      const lockedStatus = locked.rows[0].status;
+      if (lockedStatus !== "draft" && lockedStatus !== "scheduled") {
         await client.query("rollback");
         return {
           ok: false,
-          error: "This post is no longer a draft. Manage it from your queue instead of the composer.",
+          error: "This post can no longer be edited here. Manage it from your queue.",
         };
+      }
+      if (lockedStatus === "scheduled") {
+        // The publisher claims due posts (`status='scheduled' and scheduled_at <= now() ... for update`);
+        // refuse to edit one that is about to be claimed so the two never race.
+        const storedAt = locked.rows[0].scheduled_at ? new Date(locked.rows[0].scheduled_at).getTime() : NaN;
+        if (storedAt <= Date.now() + 60_000) {
+          await client.query("rollback");
+          return {
+            ok: false,
+            error: "This post is about to publish and can no longer be edited.",
+          };
+        }
       }
       const strayTargets = await client.query(
         "select 1 from post_targets where post_id = $1 and status <> 'pending' limit 1",

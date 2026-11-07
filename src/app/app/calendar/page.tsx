@@ -31,6 +31,7 @@ type PublishedPost = {
 
 type RuleOption = { id: string; name: string; status: string };
 type DraftRow = Omit<ComposerDraftInitial, "scheduledAt" | "firstComment" | "mediaUrls" | "dmRuleId" | "igFormat"> & {
+  status: "draft" | "scheduled";
   scheduled_at: Date | string | null;
   first_comment: string | null;
   media: { url: string }[];
@@ -118,6 +119,7 @@ export default async function CalendarPage({
   let publishedFailed = false;
   let initialDraft: ComposerDraftInitial | undefined;
   let draftFailed = Boolean(draft);
+  let draftPublishingSoon = false;
 
   const reloadHref =
     view === "month"
@@ -131,21 +133,31 @@ export default async function CalendarPage({
     if (draft && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(draft)) {
       try {
         const [row] = await query<DraftRow>(
-          `select p.id, p.caption, p.first_comment, p.scheduled_at, p.media, p.dm_rule_id, p.ig_format,
+          `select p.id, p.caption, p.first_comment, p.scheduled_at, p.status, p.media, p.dm_rule_id, p.ig_format,
            coalesce(array_agg(t.platform) filter (where t.platform is not null), '{}') as platforms,
            coalesce(jsonb_object_agg(t.platform, t.caption_override) filter (where t.caption_override is not null), '{}'::jsonb) as overrides
            from scheduled_posts p left join post_targets t on t.post_id = p.id
-           where p.id = $1 and p.user_id = $2 and p.status = 'draft' group by p.id`,
+           where p.id = $1 and p.user_id = $2 and p.status in ('draft','scheduled') group by p.id`,
           [draft, user.id],
         );
         if (row) {
-          initialDraft = {
-            id: row.id, caption: row.caption, platforms: row.platforms, overrides: row.overrides,
-            firstComment: row.first_comment ?? "", mediaUrls: Array.isArray(row.media) ? row.media.map((item) => item?.url).filter((url): url is string => typeof url === "string") : [],
-            scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
-            dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
-          };
-          draftFailed = false;
+          const dueSoon =
+            row.status === "scheduled" &&
+            row.scheduled_at !== null &&
+            new Date(row.scheduled_at).getTime() <= Date.now() + 2 * 60_000;
+          if (dueSoon) {
+            // A post about to publish is claimed by the publisher; keep it out of the composer.
+            draftPublishingSoon = true;
+          } else {
+            initialDraft = {
+              id: row.id, caption: row.caption, platforms: row.platforms, overrides: row.overrides,
+              firstComment: row.first_comment ?? "", mediaUrls: Array.isArray(row.media) ? row.media.map((item) => item?.url).filter((url): url is string => typeof url === "string") : [],
+              scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
+              dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
+              status: row.status,
+            };
+            draftFailed = false;
+          }
         }
       } catch { /* Keep the composer hidden rather than overwrite an unloaded draft. */ }
     }
@@ -198,7 +210,10 @@ export default async function CalendarPage({
         artAlt=""
       />
       {draftFailed ? (
-        <LoadFailed message="We couldn’t load this draft. Your saved post is unchanged." reloadHref={`/app/calendar?draft=${encodeURIComponent(draft ?? "")}#new`} />
+        <LoadFailed
+          message={draftPublishingSoon ? "This post is about to publish and can no longer be edited." : "We couldn’t load this draft. Your saved post is unchanged."}
+          reloadHref={`/app/calendar?draft=${encodeURIComponent(draft ?? "")}#new`}
+        />
       ) : rulesFailed ? (
         <section className={styles.viewSection} aria-labelledby="composer-unavailable">
           <h2 id="composer-unavailable" className="sr-only">Composer unavailable</h2>

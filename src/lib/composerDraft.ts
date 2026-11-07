@@ -13,6 +13,8 @@ export type ComposerDraftInitial = {
   dmRuleId: string | null;
   /** Exact UTC instant (ISO string) or null. */
   scheduledAt: string | null;
+  /** The post's status; scheduled posts open in the composer for editing too. */
+  status?: "draft" | "scheduled";
 };
 
 export type ComposerState = {

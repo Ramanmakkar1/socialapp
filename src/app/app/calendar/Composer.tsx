@@ -290,7 +290,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
   return (
     <section id="new" className="mt-6 scroll-mt-20" aria-labelledby={`${mainId}-heading`}>
       <h2 id={`${mainId}-heading`} className="sr-only">
-        {draftId ? "Edit draft" : "New post composer"}
+        {draftId ? (initialDraft?.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "New post composer"}
       </h2>
       {draftId && (
         <Link href={calendarHrefWithoutDraft()} className="mb-4 inline-block text-sm text-[var(--poskoo-violet)]">
