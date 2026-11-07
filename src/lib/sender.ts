@@ -1,7 +1,7 @@
 // Server only: sends queued DMs through the official Instagram API.
 import type pg from "pg";
 import { decryptToken } from "@/lib/crypto";
-import { getPool } from "@/lib/db";
+import { getPool, query } from "@/lib/db";
 import { isFollower } from "@/lib/followCheck";
 import { FOLLOW_NUDGE_MESSAGE } from "@/lib/messages";
 import { PLAN_LIMITS, autoDmLimitMessage, planForUser } from "@/lib/planLimits";
@@ -15,6 +15,7 @@ import {
   remainingBudget,
 } from "@/lib/sendPolicy";
 import { graphBaseFor } from "@/lib/graphHost";
+import { cleanPublicReply, sendPublicCommentReply, shouldPublicReply } from "@/lib/publicReply";
 
 const SEND_TIMEOUT_MS = 15_000;
 const RATE_LIMIT_PAUSE_MS = 15 * 60 * 1000;
@@ -351,6 +352,18 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           if (automated) monthlyByUser.set(row.user_id, (monthlyByUser.get(row.user_id) ?? 0) + 1);
           if (sendRow.kind === "follow_check") {
             await client.query("update socialapp.dm_queue set kind='gated_link' where id=$1 and kind='follow_check'", [row.id]);
+          }
+          if (shouldPublicReply(sendRow)) {
+            try {
+              const r = await query<{ public_reply: string | null }>("select public_reply from socialapp.dm_rules where id=$1 and user_id=$2", [row.rule_id, row.user_id]);
+              const text = cleanPublicReply(r[0]?.public_reply);
+              if (text) {
+                const pr = await sendPublicCommentReply(graphBaseFor(account.auth_type), row.comment_id!, token, text);
+                if (!pr.ok) console.error("public comment reply failed for row", row.id, pr.error);
+              }
+            } catch (err) {
+              console.error("public reply lookup failed (run db:migrate?)", err instanceof Error ? err.message : err);
+            }
           }
           result.sent += 1;
           continue;
