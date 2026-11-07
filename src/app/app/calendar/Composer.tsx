@@ -62,10 +62,12 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false, threadsReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean; threadsReady?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const livePlatforms: PlatformId[] = facebookReady ? ["instagram", "facebook"] : ["instagram"];
+  const livePlatforms: PlatformId[] = ["instagram"];
+  if (facebookReady) livePlatforms.push("facebook");
+  if (threadsReady) livePlatforms.push("threads");
   // Lazy initial state from the draft: the page keys this component by draft id, so a draft
   // opened by URL is filled in on the first render and switching drafts remounts cleanly.
   const [init] = useState(() => composerStateFromDraft(initialDraft));
@@ -313,7 +315,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 const disabledLabel = !live
                   ? platform === "facebook"
                     ? "Facebook: reconnect in Settings and allow Page posting to enable"
-                    : `${PLATFORMS[platform].label} publishing is not available yet`
+                    : platform === "threads"
+                      ? "Threads: connect your Threads account in Settings to enable"
+                      : `${PLATFORMS[platform].label} publishing is not available yet`
                   : undefined;
                 return (
                   <button

@@ -112,12 +112,6 @@ export async function savePost(
     if (!ALLOWED_PLATFORMS.includes(p)) {
       return { ok: false, error: "Invalid platform." };
     }
-    if (p === "threads") {
-      return {
-        ok: false,
-        error: "Threads publishing is coming soon. Remove Threads to schedule this post.",
-      };
-    }
     platforms.push(p);
   }
 
@@ -232,6 +226,18 @@ export async function savePost(
             ok: false,
             error:
               "To post to Facebook, reconnect Instagram with Facebook login in Settings and allow Page posting.",
+          };
+        }
+      }
+      if (platforms.includes("threads")) {
+        const threadsRows = await query(
+          "select 1 from socialapp.social_accounts where user_id=$1 and platform='threads' and status='active' and access_token_enc is not null limit 1",
+          [user.id],
+        );
+        if (threadsRows.length === 0) {
+          return {
+            ok: false,
+            error: "Connect your Threads account in Settings before scheduling to Threads.",
           };
         }
       }

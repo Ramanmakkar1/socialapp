@@ -122,6 +122,7 @@ export default async function CalendarPage({
   let draftFailed = Boolean(draft);
   let draftPublishingSoon = false;
   let facebookReady = false;
+  let threadsReady = false;
 
   const reloadHref =
     view === "month"
@@ -173,6 +174,15 @@ export default async function CalendarPage({
       facebookReady = false;
     }
     try {
+      const rows = await query<{ 1: unknown }>(
+        "select 1 from socialapp.social_accounts where user_id=$1 and platform='threads' and status='active' and access_token_enc is not null limit 1",
+        [user.id],
+      );
+      threadsReady = rows.length > 0;
+    } catch {
+      threadsReady = false;
+    }
+    try {
       commentHourRows = await query<{ hour: number; count: number }>(
         `select extract(hour from created_at at time zone 'UTC')::int as hour, count(*)::int as count from socialapp.dm_queue where user_id=$1 and created_at > now() - interval '30 days' group by 1`,
         [user.id],
@@ -216,7 +226,7 @@ export default async function CalendarPage({
         eyebrow="Plan your posts"
         title="Your"
         accent="calendar"
-        lede="Plan and schedule Instagram posts. Facebook and Threads are coming soon."
+        lede="Plan and schedule posts for Instagram, Facebook and Threads."
         art="/landing/card-schedule.webp"
         artAlt=""
       />
@@ -234,7 +244,7 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} />
+        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} />
       )}
       <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
         <Link
