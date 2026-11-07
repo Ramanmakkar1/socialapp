@@ -28,8 +28,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/auto-dm-instagram-comments",
+    no: "03 / Auto-DM",
+    title: "Auto-DM everyone who comments",
+    text: "Set up a keyword comment-to-DM rule with a link, email capture or follow gate.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "03 / Contact",
+    no: "04 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",
