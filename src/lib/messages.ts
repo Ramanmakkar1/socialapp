@@ -1,3 +1,4 @@
+import { maybeQueueAiReply } from "@/lib/aiReplyQueue";
 import { buildCommentDmMessage } from "@/lib/commentMessage";
 import { getPool, query } from "@/lib/db";
 import { accountToken, isFollower } from "@/lib/followCheck";
@@ -221,7 +222,34 @@ export async function processMessageEvents(
       const pending = contactBefore
         ? (await query<PendingGate>(PENDING_GATE_SQL, [contactBefore.id, account.id, event.senderId]))[0]
         : undefined;
+      const aiEligible = !event.storyReply && Boolean(event.text?.trim());
       if (email === null && phone === null && !pending) {
+        if (!aiEligible) {
+          continue;
+        }
+        // Plain message: make sure a contact row exists, then try an AI reply.
+        const plain = await query<{ id: string }>(
+          `insert into socialapp.contacts (user_id, social_account_id, platform, external_id, email, phone)
+           values ($1, $5, 'instagram', $2, $3, $4)
+           on conflict (user_id, platform, external_id) do update
+           set email = coalesce(excluded.email, socialapp.contacts.email),
+               phone = coalesce(excluded.phone, socialapp.contacts.phone),
+               last_seen_at = now()
+           returning id`,
+          [account.user_id, event.senderId, null, null, account.id],
+        );
+        const plainContactId = plain[0]?.id ?? contactBefore?.id;
+        if (plainContactId) {
+          await maybeQueueAiReply({
+            userId: account.user_id,
+            socialAccountId: account.id,
+            accountExternalId: event.accountExternalId,
+            contactId: plainContactId,
+            senderId: event.senderId,
+            text: event.text,
+            hasPendingGate: false,
+          });
+        }
         continue;
       }
       const rows = await query<{ id: string }>(
@@ -236,6 +264,17 @@ export async function processMessageEvents(
       );
       updated += rows.length;
       const contactId = rows[0]?.id ?? contactBefore?.id;
+      if (!pending && contactId && aiEligible) {
+        await maybeQueueAiReply({
+          userId: account.user_id,
+          socialAccountId: account.id,
+          accountExternalId: event.accountExternalId,
+          contactId,
+          senderId: event.senderId,
+          text: event.text,
+          hasPendingGate: false,
+        });
+      }
       if (!pending || !contactId) {
         continue;
       }

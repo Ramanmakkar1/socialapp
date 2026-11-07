@@ -265,7 +265,10 @@ test("unknown sender: details are captured without unsolicited automation; other
   });
   await inWorld(world, true, async () => {
     assert.equal(await processMessageEvents([reply("hello")]), 0);
-    assert.equal(world.contacts.length, 0);
+    // A plain DM now saves a bare contact row (needed for AI replies); no details, no DM queued.
+    assert.equal(world.contacts.length, 1);
+    assert.equal(world.contacts[0].email, null);
+    assert.deepEqual(kinds(world), []);
     assert.equal(await processMessageEvents([reply("Email First@Example.com")]), 1);
     assert.equal(await processMessageEvents([reply("Call +1 (416) 555-0199", "m2")]), 1);
     assert.equal(world.contacts.length, 1);

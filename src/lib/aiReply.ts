@@ -82,7 +82,8 @@ export type AiDmReplyResult = { ok: true; reply: string } | { ok: false; error: 
 
 export async function generateAiDmReply(
   settings: AiReplySettings,
-  history: ChatTurn[]
+  history: ChatTurn[],
+  opts: { timeoutMs?: number } = {}
 ): Promise<AiDmReplyResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return { ok: false, error: "AI is not set up yet." };
@@ -105,7 +106,7 @@ export async function generateAiDmReply(
         system,
         messages,
       }),
-      signal: AbortSignal.timeout(20000),
+      signal: AbortSignal.timeout(opts.timeoutMs ?? 20000),
     });
     if (!res.ok) return { ok: false, error: "AI request failed. Try again." };
     const data = (await res.json()) as { content?: { type?: string; text?: unknown }[] };
