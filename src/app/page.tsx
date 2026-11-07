@@ -10,9 +10,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = "Schedule Instagram posts, auto-DM keyword comments and capture leads with Poskoo. Start free using the official Meta API. No credit card needed.";
 export const metadata: Metadata = {
- title: { absolute: title }, description, alternates: { canonical: "/" },
- openGraph: { title, description, url: "/", siteName: BRAND.name, images: [{ url: "/landing/hero.webp", width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
- twitter: { card: "summary_large_image", title, description, images: ["/landing/hero.webp"] },
+ title: { absolute: title }, description, alternates: { canonical: BRAND.url },
+ openGraph: { title, description, url: BRAND.url, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
+ twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
 const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}];
 const jsonLd = {
