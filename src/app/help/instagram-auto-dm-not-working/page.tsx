@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -62,6 +63,12 @@ const articleJsonLd = {
   mainEntityOfPage: `${BRAND.url}/help/instagram-auto-dm-not-working`,
 };
 
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: `${BRAND.url}/` },
+  { name: "Help", url: `${BRAND.url}/help` },
+  { name: "Instagram auto DM not working", url: `${BRAND.url}/help/instagram-auto-dm-not-working` },
+]);
+
 const checks = [
   "Instagram Business or Creator, connected in Settings",
   "Allow access to messages in Instagram",
@@ -89,6 +96,10 @@ export default function InstagramAutoDmNotWorkingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/help">Help center</Link> / Instagram auto DM not working

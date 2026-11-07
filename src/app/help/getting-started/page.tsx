@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
@@ -31,12 +32,22 @@ const articleJsonLd = {
   mainEntityOfPage: `${BRAND.url}/help/getting-started`,
 };
 
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: `${BRAND.url}/` },
+  { name: "Help", url: `${BRAND.url}/help` },
+  { name: "Getting started", url: `${BRAND.url}/help/getting-started` },
+]);
+
 export default function GettingStartedHelpPage() {
   return (
     <PublicShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/help">Help center</Link> / Getting started
