@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { query } from "@/lib/db";
 import ui from "@/components/ui/ui.module.css";
+import LocalTime from "@/components/LocalTime";
 
 export type DmDeliveryRow = {
   id: string;
@@ -173,19 +174,19 @@ export function DmDeliveryStatus({ rows, loadError, asOf }: Props) {
                     <dd className="m-0 font-semibold text-[var(--poskoo-ink)]">{row.account_username ? `@${row.account_username}` : "—"}</dd>
                   </div>
                   <div className="flex flex-wrap gap-x-1">
-                    <dt className="text-[var(--poskoo-muted)]">Queued (UTC):</dt>
-                    <dd className="m-0 text-[var(--poskoo-ink)]">{fmtUtc(row.created_at)}</dd>
+                    <dt className="text-[var(--poskoo-muted)]">Queued:</dt>
+                    <dd className="m-0 text-[var(--poskoo-ink)]"><LocalTime value={row.created_at} style="medium" fallback="—" /></dd>
                   </div>
                   {row.sent_at && (
                     <div className="flex flex-wrap gap-x-1">
-                      <dt className="text-[var(--poskoo-muted)]">Sent (UTC):</dt>
-                      <dd className="m-0 text-[var(--poskoo-ink)]">{fmtUtc(row.sent_at)}</dd>
+                      <dt className="text-[var(--poskoo-muted)]">Sent:</dt>
+                      <dd className="m-0 text-[var(--poskoo-ink)]"><LocalTime value={row.sent_at} style="medium" fallback="—" /></dd>
                     </div>
                   )}
                   {row.status === "pending" && (
                     <div className="flex flex-wrap gap-x-1">
-                      <dt className="text-[var(--poskoo-muted)]">{hold ? "Hold reason:" : "Next retry (UTC):"}</dt>
-                      <dd className="m-0 text-[var(--poskoo-ink)]">{hold ?? fmtUtc(row.next_attempt_at)}</dd>
+                      <dt className="text-[var(--poskoo-muted)]">{hold ? "Hold reason:" : "Next retry:"}</dt>
+                      <dd className="m-0 text-[var(--poskoo-ink)]">{hold ?? <LocalTime value={row.next_attempt_at} style="medium" fallback="—" />}</dd>
                     </div>
                   )}
                   {failure && (
