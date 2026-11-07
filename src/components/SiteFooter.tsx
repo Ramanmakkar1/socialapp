@@ -47,6 +47,14 @@ export function SiteFooter() {
           { href: "/tools/instagram-font-generator", label: "Font generator" },
           { href: "/tools/instagram-bio-generator", label: "Bio generator" },
           { href: "/tools/instagram-image-size", label: "Image size guide" },
+          { href: "/tools/instagram-engagement-rate-calculator", label: "Engagement rate calculator" },
+          { href: "/tools/instagram-line-break-generator", label: "Line break generator" },
+          { href: "/tools/instagram-comment-keyword-tester", label: "Comment keyword tester" },
+          { href: "/tools/instagram-comment-picker", label: "Comment picker" },
+          { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
+          { href: "/tools/instagram-post-preview", label: "Post preview" },
+          { href: "/tools/instagram-safe-zone-checker", label: "Safe zone checker" },
+          { href: "/tools/instagram-utm-builder", label: "UTM builder" },
           { href: "/tools", label: "All free tools" },
         ]}
       />

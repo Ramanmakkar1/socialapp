@@ -9,12 +9,12 @@ import PoskooMark from "./PoskooMark";
 const SECTIONS = [
   { hash: "#how", label: "How it works" },
   { hash: "#channels", label: "Channels" },
-  { hash: "#pricing", label: "Pricing" },
+  { hash: "/pricing", label: "Pricing" },
   { hash: "#faq", label: "FAQ" },
 ];
 
 export function SiteHeader({ onHome = false }: { onHome?: boolean }) {
-  const links = SECTIONS.map((l) => ({ href: onHome ? l.hash : `/${l.hash}`, label: l.label }));
+  const links = SECTIONS.map((l) => ({ href: l.hash.startsWith("/") ? l.hash : onHome ? l.hash : `/${l.hash}`, label: l.label }));
   return (
     <>
       <nav className="top" aria-label="Main">
