@@ -22,13 +22,14 @@ function isActive(pathname: string, href: string) {
 }
 
 // variant "sidebar" = vertical list in the aside; "tabs" = horizontal scrollable pill bar for mobile.
-export default function SidebarNav({ variant = "sidebar" }: { variant?: "sidebar" | "tabs" }) {
+export default function SidebarNav({ variant = "sidebar", failedPosts = 0 }: { variant?: "sidebar" | "tabs"; failedPosts?: number }) {
   const pathname = usePathname() ?? "";
   const tabs = variant === "tabs";
   return (
     <nav aria-label="Dashboard" className={tabs ? styles.tabs : styles.nav}>
       {nav.map(({ href, icon: Icon, label }) => {
         const active = isActive(pathname, href);
+        const showBadge = href === "/app/calendar" && failedPosts > 0;
         return (
           <Link
             key={href}
@@ -38,6 +39,14 @@ export default function SidebarNav({ variant = "sidebar" }: { variant?: "sidebar
           >
             <Icon width={17} height={17} aria-hidden="true" />
             {label}
+            {showBadge && (
+              <span
+                className={styles.navBadge}
+                aria-label={`${failedPosts} failed ${failedPosts === 1 ? "post" : "posts"}`}
+              >
+                {failedPosts > 99 ? "99+" : failedPosts}
+              </span>
+            )}
           </Link>
         );
       })}

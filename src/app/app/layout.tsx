@@ -33,22 +33,25 @@ function Logo() {
 async function AppShell({ children }: { children: ReactNode }) {
   const user = await requireUser();
   let needsReconnect = false;
+  let failedPosts = 0;
   if (isDbConfigured()) {
     try {
-      const rows = await query<{ n: number }>(
-        "select count(*)::int as n from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='expired'",
+      const rows = await query<{ expired: number; failed: number }>(
+        "select (select count(*)::int from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='expired') as expired, (select count(*)::int from socialapp.scheduled_posts where user_id=$1 and status='failed') as failed",
         [user.id]
       );
-      needsReconnect = (rows[0]?.n ?? 0) > 0;
+      needsReconnect = (rows[0]?.expired ?? 0) > 0;
+      failedPosts = rows[0]?.failed ?? 0;
     } catch {
       needsReconnect = false;
+      failedPosts = 0;
     }
   }
   return (
     <div className={`app-theme ${instrumentSans.variable} ${styles.shell}`}>
       <aside className={styles.sidebar}>
         <Logo />
-        <SidebarNav />
+        <SidebarNav failedPosts={failedPosts} />
         <div className={styles.userBox}>
           <p className={styles.userEmail} title={user.email}>{user.email}</p>
           <form action={logoutAction}>
@@ -65,7 +68,7 @@ async function AppShell({ children }: { children: ReactNode }) {
               <button type="submit" className={styles.logoutBtn}>Log out</button>
             </form>
           </div>
-          <SidebarNav variant="tabs" />
+          <SidebarNav variant="tabs" failedPosts={failedPosts} />
         </div>
         {needsReconnect && (
           <div role="alert" className={styles.banner}>
