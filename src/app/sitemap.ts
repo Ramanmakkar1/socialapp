@@ -2,18 +2,19 @@ import type { MetadataRoute } from "next";
 import { BRAND } from "@/lib/brand";
 import { PUBLIC_PATHS, META } from "@/lib/public-pages";
 
-// Paths whose page metadata sets robots index:false — must never appear in the sitemap.
-const NOINDEX_PATHS = ["/login", "/signup", "/data-deletion/status", "/app/review-guide"];
+// Always-noindex pages (auth + app). PUBLIC_PATHS already excludes them, so this is
+// a safety net: if one is ever added to PUBLIC_PATHS it must not leak into the sitemap.
+const NOINDEX_PATHS = new Set(["/login", "/signup", "/data-deletion/status", "/app/review-guide"]);
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Root layout applies robots noindex to every page when BRAND.indexable is false,
-  // so a noindex site must have an empty sitemap.
+  // While BRAND.indexable is false the root layout applies robots noindex to every
+  // page (staging), so the sitemap must be empty — no page, including the root, is listed.
   if (!BRAND.indexable) {
     return [];
   }
   const lastModified = new Date();
   return PUBLIC_PATHS
-    .filter((path) => !NOINDEX_PATHS.includes(path))
+    .filter((path) => !NOINDEX_PATHS.has(path))
     .map((path) => ({
       url: `${BRAND.url}${path}`,
       lastModified,
