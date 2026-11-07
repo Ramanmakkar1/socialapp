@@ -5,11 +5,14 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import FontTool from "./FontTool";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-font-generator";
+const description =
+  "Create Instagram bio fonts and captions in bold, italic, script and more. Copy and paste Unicode text for free in your browser.";
 export const metadata: Metadata = {
-  title: { absolute: "Instagram Font Generator: Copy & Paste Bio Fonts" },
-  description: "Create Instagram bio fonts and captions in bold, italic, script and more. Copy and paste Unicode text for free in your browser.",
+  title: { absolute: "Instagram Font Generator: Copy & Paste Bio Fonts (Free)" },
+  description,
   alternates: { canonical: PATH },
 };
 const steps = ["Type or paste your text into the box.", "Choose a font style from the previews and click Copy.", "Paste the text into your Instagram bio or caption."];
@@ -19,15 +22,13 @@ const faqs = [
   { q: "Do fonts count toward the 150-character bio limit?", a: "Yes. Styled characters count toward the limit, and some count as two characters." },
   { q: "Are these fonts safe?", a: "Yes. They are plain Unicode characters that you can copy and paste." },
 ];
-const faqJsonLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
-const appJsonLd = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Instagram Font Generator", url: `${BRAND.url}${PATH}`, applicationCategory: "UtilitiesApplication", operatingSystem: "Any", browserRequirements: "Requires JavaScript", isAccessibleForFree: true, offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }, publisher: { "@type": "Organization", name: BRAND.company } };
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram Font Generator", description, url: `${BRAND.url}${PATH}` });
 
 export default function InstagramFontGeneratorPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free / runs in your browser / nothing is uploaded</span>
         <h1>

@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import HashtagGenerator from "./HashtagGenerator";
+import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-hashtag-generator";
 const title = "Instagram Hashtag Generator: Free Niche Hashtag Sets";
@@ -41,39 +42,19 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
-const appJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "Instagram Hashtag Generator",
-  url: `${BRAND.url}${PATH}`,
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  browserRequirements: "Requires JavaScript",
-  isAccessibleForFree: true,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  publisher: { "@type": "Organization", name: BRAND.company },
-};
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Free Instagram tools", item: `${BRAND.url}/tools` },
-    { "@type": "ListItem", position: 2, name: "Instagram hashtag generator", item: `${BRAND.url}${PATH}` },
-  ],
-};
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram Hashtag Generator", description, url: `${BRAND.url}${PATH}` });
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: BRAND.url },
+  { name: "Free tools", url: `${BRAND.url}/tools` },
+  { name: "Hashtag generator", url: `${BRAND.url}${PATH}` },
+]);
 
 export default function InstagramHashtagGeneratorPage() {
   return (
     <PublicShell>
-      {[faqJsonLd, appJsonLd, breadcrumbJsonLd].map((data) => (
-        <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/tools">Free Instagram tools</Link> / Hashtag generator
       </nav>

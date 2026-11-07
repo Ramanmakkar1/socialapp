@@ -5,11 +5,14 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import PostPreviewTool from "./PostPreviewTool";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-post-preview";
+const description =
+  "Preview your Instagram post with a local photo, display handle and caption. Compare square and portrait crops, check line breaks and copy your caption.";
 export const metadata: Metadata = {
   title: { absolute: `Instagram Post Preview: Free Feed Mockup Tool | ${BRAND.name}` },
-  description: "Preview your Instagram post with a local photo, display handle and caption. Compare square and portrait crops, check line breaks and copy your caption.",
+  description,
   alternates: { canonical: `${BRAND.url}${PATH}` },
 };
 
@@ -23,18 +26,13 @@ const faqs = [
   { q: "How accurate is the Instagram preview?", a: "This is a feed mockup, not an official Instagram renderer. Centered cropping and caption truncation are approximations; fonts, spacing and the fold can vary by device and app version. Check the final post in Instagram." },
   { q: "Can I schedule or publish from this tool?", a: "This free tool only previews a single image and copies captions. It does not publish, schedule or carry your draft into signup. Copy your caption before leaving, then explore the scheduler or create an account separately." },
 ];
-const app = {
-  "@context": "https://schema.org", "@type": "WebApplication", name: "Instagram post preview",
-  url: `${BRAND.url}${PATH}`, applicationCategory: "UtilitiesApplication", operatingSystem: "Any",
-  browserRequirements: "Requires JavaScript", isAccessibleForFree: true,
-  description: "Preview a local image, display handle and expandable caption with approximate square or portrait cropping. Copy the caption to your clipboard.",
-  featureList: ["Local image preview", "Square and portrait crop previews", "Expandable multiline caption", "Caption character count", "Copy caption"],
-};
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram Post Preview", description, url: `${BRAND.url}${PATH}` });
 
 export default function InstagramPostPreviewPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(app).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/tools">Free Instagram tools</Link> / Post preview
       </nav>

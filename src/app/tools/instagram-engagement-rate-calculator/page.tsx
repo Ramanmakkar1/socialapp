@@ -5,13 +5,15 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import EngagementCalculator from "./EngagementCalculator";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-engagement-rate-calculator";
+const description =
+  "Free Instagram engagement rate calculator: enter likes, comments, saves and shares, then divide by followers or reach to get your rate in seconds.";
 
 export const metadata: Metadata = {
   title: { absolute: `Free Instagram Engagement Rate Calculator | ${BRAND.name}` },
-  description:
-    "Free Instagram engagement rate calculator: enter likes, comments, saves and shares, then divide by followers or reach to get your rate in seconds.",
+  description,
   alternates: { canonical: PATH },
 };
 
@@ -35,39 +37,17 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
-    "@type": "Question",
-    name: f.q,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: "linked" in f && f.linked ? `${f.a} ${BRAND.url}${f.linked.href}` : f.a,
-    },
-  })),
-};
-
-const appJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "Instagram Engagement Rate Calculator",
-  url: `${BRAND.url}${PATH}`,
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  browserRequirements: "Requires JavaScript",
-  isAccessibleForFree: true,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  publisher: { "@type": "Organization", name: BRAND.company },
-};
-
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+const faqItems = faqs.map((f) => ({
+  q: f.q,
+  a: "linked" in f && f.linked ? `${f.a} ${BRAND.url}${f.linked.href}` : f.a,
+}));
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram Engagement Rate Calculator", description, url: `${BRAND.url}${PATH}` });
 
 export default function InstagramEngagementRateCalculatorPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqItems)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free · runs in your browser · nothing is uploaded</span>
         <h1>

@@ -5,13 +5,15 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import DmLinkGenerator from "./DmLinkGenerator";
+import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-dm-link-generator";
+const description =
+  "Free Instagram DM link generator: turn @username into an ig.me link that opens a DM with your account. Copy for bio, Stories and email.";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram DM Link Generator: Free ig.me Link Maker" },
-  description:
-    "Free Instagram DM link generator: turn @username into an ig.me link that opens a DM with your account. Copy for bio, Stories and email.",
+  description,
   alternates: { canonical: PATH },
 };
 
@@ -34,45 +36,21 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
-
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: BRAND.url },
-    { "@type": "ListItem", position: 2, name: "Free tools", item: `${BRAND.url}/tools` },
-    { "@type": "ListItem", position: 3, name: "DM link generator", item: `${BRAND.url}${PATH}` },
-  ],
-};
-
-const appJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "Instagram DM Link Generator",
-  url: `${BRAND.url}${PATH}`,
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  browserRequirements: "Requires JavaScript",
-  isAccessibleForFree: true,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  publisher: { "@type": "Organization", name: BRAND.company },
-};
-
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram DM Link Generator", description, url: `${BRAND.url}${PATH}` });
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: BRAND.url },
+  { name: "Free tools", url: `${BRAND.url}/tools` },
+  { name: "DM link generator", url: `${BRAND.url}${PATH}` },
+]);
 
 const codeStyle = { background: "var(--poskoo-band)", borderRadius: 8, padding: "2px 6px", fontSize: ".92em" } as const;
 
 export default function InstagramDmLinkGeneratorPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free · runs in your browser · nothing is uploaded</span>
         <h1>

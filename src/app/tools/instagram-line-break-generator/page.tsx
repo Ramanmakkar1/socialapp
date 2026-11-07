@@ -6,15 +6,17 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import LineBreakTool from "./LineBreakTool";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-line-break-generator";
 const ig = PLATFORM_LIMITS.instagram;
 const n = (v: number | null) => (v === null ? "No published limit" : v.toLocaleString("en-US"));
+const description =
+  "Free Instagram line break generator: keep blank lines and paragraph spacing in captions. Runs in your browser; nothing is uploaded.";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram Line Break Generator: Add Spaces to Captions" },
-  description:
-    "Free Instagram line break generator: keep blank lines and paragraph spacing in captions. Runs in your browser; nothing is uploaded.",
+  description,
   alternates: { canonical: PATH },
 };
 
@@ -43,32 +45,13 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
-
-const appJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "Instagram Line Break Generator",
-  url: `${BRAND.url}${PATH}`,
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  browserRequirements: "Requires JavaScript",
-  isAccessibleForFree: true,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  publisher: { "@type": "Organization", name: BRAND.company },
-};
-
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram Line Break Generator", description, url: `${BRAND.url}${PATH}` });
 
 export default function InstagramLineBreakGeneratorPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free · runs in your browser · nothing is uploaded</span>
         <h1>

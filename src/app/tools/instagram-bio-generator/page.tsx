@@ -5,12 +5,14 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import BioTool from "./BioTool";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-bio-generator";
+const description =
+  "Free Instagram bio generator with niche templates, optional styled names, and a live 150-character counter. Copy ideas for creators, coaches, and brands.";
 export const metadata: Metadata = {
   title: { absolute: "Instagram Bio Generator: Free Bio Ideas You Can Copy" },
-  description:
-    "Free Instagram bio generator with niche templates, optional styled names, and a live 150-character counter. Copy ideas for creators, coaches, and brands.",
+  description,
   alternates: { canonical: PATH },
 };
 const steps = [
@@ -36,34 +38,13 @@ const faqs = [
     a: "Tell people the one action you want: DM a keyword, tap the link, book a call, or shop. Keep it short and match what you actually offer.",
   },
 ];
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
-    "@type": "Question",
-    name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
-  })),
-};
-const appJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "Instagram Bio Generator",
-  url: `${BRAND.url}${PATH}`,
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  browserRequirements: "Requires JavaScript",
-  isAccessibleForFree: true,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  publisher: { "@type": "Organization", name: BRAND.company },
-};
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram Bio Generator", description, url: `${BRAND.url}${PATH}` });
 
 export default function InstagramBioGeneratorPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free / runs in your browser / nothing is uploaded</span>
         <h1>

@@ -6,17 +6,18 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import CaptionCounter from "./CaptionCounter";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-caption-counter";
 const ig = PLATFORM_LIMITS.instagram;
 const threads = PLATFORM_LIMITS.threads;
 const n = (v: number | null) => (v === null ? "No published limit" : v.toLocaleString("en-US"));
+const description = `Free Instagram caption counter: count characters, hashtags and @mentions as you type, check the ${n(ig.max)} limit and preview the feed cut-off.`;
 
 export const metadata: Metadata = {
   // Absolute so the layout's "| brand" suffix does not push it past 60 characters.
   title: { absolute: `Instagram Caption Counter (${n(ig.max)} Limit) + Hashtag Checker` },
-  description:
-    `Free Instagram caption counter: count characters, hashtags and @mentions as you type, check the ${n(ig.max)} limit and preview the feed cut-off.`,
+  description,
   alternates: { canonical: PATH },
 };
 
@@ -46,32 +47,17 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
-
-const appJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
+const toolJsonLd = toolSoftwareJsonLd({
   name: "Instagram Caption Character Counter",
+  description,
   url: `${BRAND.url}${PATH}`,
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  browserRequirements: "Requires JavaScript",
-  isAccessibleForFree: true,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  publisher: { "@type": "Organization", name: BRAND.company },
-};
-
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+});
 
 export default function InstagramCaptionCounterPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free · runs in your browser · nothing is uploaded</span>
         <h1>

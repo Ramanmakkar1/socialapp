@@ -5,13 +5,15 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import UtmBuilder from "./UtmBuilder";
+import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-utm-builder";
+const description =
+  "Free Instagram UTM builder: tag links for your bio, Stories and auto-DMs with source, medium and campaign. Runs in your browser; nothing is saved.";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram UTM Builder: Free Campaign URL Link Generator" },
-  description:
-    "Free Instagram UTM builder: tag links for your bio, Stories and auto-DMs with source, medium and campaign. Runs in your browser; nothing is saved.",
+  description,
   alternates: { canonical: PATH },
 };
 
@@ -30,24 +32,21 @@ const faqs = [
   },
 ];
 
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: BRAND.url },
-    { "@type": "ListItem", position: 2, name: "Free tools", item: `${BRAND.url}/tools` },
-    { "@type": "ListItem", position: 3, name: "Instagram UTM builder", item: `${BRAND.url}${PATH}` },
-  ],
-};
-
-const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram UTM Builder", description, url: `${BRAND.url}${PATH}` });
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: BRAND.url },
+  { name: "Free tools", url: `${BRAND.url}/tools` },
+  { name: "Instagram UTM builder", url: `${BRAND.url}${PATH}` },
+]);
 
 const codeStyle = { background: "var(--poskoo-band)", borderRadius: 8, padding: "2px 6px", fontSize: ".92em" } as const;
 
 export default function InstagramUtmBuilderPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free · runs in your browser · nothing is saved</span>
         <h1>
