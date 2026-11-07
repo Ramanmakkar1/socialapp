@@ -5,11 +5,13 @@ import { BtnA, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
 import { requireUser } from "@/lib/auth";
+import { BRAND } from "@/lib/brand";
 import { isDbConfigured, query } from "@/lib/db";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
-import { disconnectAccountAction, saveBrandVoice } from "./actions";
+import { deleteMyAccountAction, disconnectAccountAction, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
+import DeleteAccountForm from "./DeleteAccountForm";
 import styles from "../app-page.module.css";
 
 export const metadata = { title: "Settings" };
@@ -60,11 +62,12 @@ const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   pick_expired: { tone: "warn", text: "Choosing an account took too long. Please connect again." },
 };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[] }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[] }> }) {
   const user = await requireUser();
-  const { ig, voice: voiceParam } = await searchParams;
+  const { ig, voice: voiceParam, account: accountParam } = await searchParams;
   const voiceSaved = voiceParam === "saved";
   const voiceFailed = voiceParam === "error";
+  const account = typeof accountParam === "string" ? accountParam : null;
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
   const accounts = isDbConfigured()
     ? await query<Account>(
@@ -189,6 +192,25 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )}
         {voiceSaved && <p role="status" className={ui.notice}>Brand voice saved.</p>}
         {voiceFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your brand voice. Please try again.</p>}
+      </section>
+      <section className={styles.section} aria-labelledby="danger-heading">
+        <h2 id="danger-heading" className={styles.sectionTitle}>Delete account</h2>
+        {isDbConfigured() ? (
+          <DeleteAccountForm action={deleteMyAccountAction} />
+        ) : (
+          <p className={ui.hint}>
+            You can delete your account yourself once the database is set up on this server. Until then, email {BRAND.supportEmail} from your account email.
+          </p>
+        )}
+        {account === "confirm_needed" && (
+          <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>Type DELETE in capitals to confirm.</p>
+        )}
+        {account === "delete_error" && (
+          <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t delete your account. Please try again or email support.</p>
+        )}
+        {account === "reviewer_locked" && (
+          <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>The demo review account can&apos;t be deleted.</p>
+        )}
       </section>
     </div>
   );

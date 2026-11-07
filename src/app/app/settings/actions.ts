@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { disconnectAccounts } from "@/lib/accountData";
-import { requireUser } from "@/lib/auth";
+import { deleteAccountData, disconnectAccounts } from "@/lib/accountData";
+import { endSession, requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 
 // Disconnect: wipes the stored Instagram token right away (history and rules stay).
@@ -41,4 +41,31 @@ export async function saveBrandVoice(formData: FormData): Promise<void> {
   }
   revalidatePath("/app/settings");
   redirect("/app/settings?voice=saved");
+}
+
+// Self-serve account deletion: wipes every table row that belongs to the user, then the user row itself
+// (sessions, dm_rules, contacts, scheduled_posts, dm_queue and short_links cascade off it).
+export async function deleteMyAccountAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  if (formData.get("confirm") !== "DELETE") redirect("/app/settings?account=confirm_needed#danger-heading");
+  if (!isDbConfigured()) redirect("/app/settings?account=delete_error#danger-heading");
+  const reviewer = process.env.REVIEWER_EMAIL;
+  if (reviewer && reviewer.trim().toLowerCase() === user.email.trim().toLowerCase()) {
+    redirect("/app/settings?account=reviewer_locked#danger-heading");
+  }
+  try {
+    const accs = await query<{ id: string }>("select id from socialapp.social_accounts where user_id=$1", [user.id]);
+    await deleteAccountData(accs.map((a) => a.id));
+    await query("delete from socialapp.events where user_id=$1", [user.id]);
+    await query("delete from socialapp.users where id=$1", [user.id]);
+  } catch (err) {
+    console.error("deleteMyAccountAction failed", err instanceof Error ? err.message : err);
+    redirect("/app/settings?account=delete_error#danger-heading");
+  }
+  try {
+    await endSession();
+  } catch {
+    // The session row is already gone via cascade; we only need the cookie removed.
+  }
+  redirect("/?account=deleted");
 }
