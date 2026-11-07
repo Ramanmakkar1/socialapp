@@ -61,6 +61,7 @@ export async function GET() {
     "/buffer-alternative",
     "/manychat-alternative",
     "/later-alternative",
+    "/sprout-social-alternative",
     "/hootsuite-alternative",
   ];
 

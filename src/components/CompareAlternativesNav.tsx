@@ -1,12 +1,13 @@
 import Link from "next/link";
 import s from "./site.module.css";
 
-type ComparePage = "buffer" | "manychat" | "later" | "hootsuite";
+type ComparePage = "buffer" | "manychat" | "later" | "sprout" | "hootsuite";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
   { href: "/manychat-alternative", label: "ManyChat alternative", key: "manychat" },
   { href: "/later-alternative", label: "Later alternative", key: "later" },
+  { href: "/sprout-social-alternative", label: "Sprout Social alternative", key: "sprout" },
   { href: "/hootsuite-alternative", label: "Hootsuite alternative", key: "hootsuite" },
 ];
 

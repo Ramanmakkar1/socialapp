@@ -55,6 +55,7 @@ export function SiteFooter() {
         links={[
           { href: "/buffer-alternative", label: "Buffer alternative" },
           { href: "/later-alternative", label: "Later alternative" },
+          { href: "/sprout-social-alternative", label: "Sprout Social alternative" },
           { href: "/manychat-alternative", label: "ManyChat alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
         ]}
