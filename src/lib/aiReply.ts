@@ -12,6 +12,9 @@ export type ChatTurn = { direction: "in" | "out"; text: string };
 // Per-contact cap on AI-sent DM replies within a rolling 24 h window.
 export const MAX_AI_REPLIES_PER_DAY = 5;
 
+// After a team member replies by hand, the AI stays quiet with that person for this long.
+export const HUMAN_TAKEOVER_MS = 12 * 60 * 60 * 1000;
+
 // Instagram allows a DM reply only within 24 h of the person's last message.
 // (Inlined from sendPolicy.DM_WINDOW_MS: inbox.ts re-exports it but also imports the DB.)
 const DM_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -22,15 +25,23 @@ export function shouldAiReply(input: {
   lastInboundAt: Date | null;
   aiRepliesLast24h: number;
   hasPendingGate: boolean;
+  lastHumanReplyAt?: Date | null;
   now?: number;
 }): boolean {
-  const { settings, text, lastInboundAt, aiRepliesLast24h, hasPendingGate } = input;
+  const { settings, text, lastInboundAt, aiRepliesLast24h, hasPendingGate, lastHumanReplyAt } = input;
   if (!settings.enabled) return false;
   if (text.trim() === "") return false;
   if (hasPendingGate) return false;
+  const now = input.now ?? Date.now();
+  if (
+    lastHumanReplyAt instanceof Date &&
+    Number.isFinite(lastHumanReplyAt.getTime()) &&
+    now - lastHumanReplyAt.getTime() < HUMAN_TAKEOVER_MS
+  ) {
+    return false;
+  }
   if (aiRepliesLast24h >= MAX_AI_REPLIES_PER_DAY) return false;
   if (!lastInboundAt) return false;
-  const now = input.now ?? Date.now();
   const t = lastInboundAt.getTime();
   return Number.isFinite(t) && now - t >= -60_000 && now - t < DM_WINDOW_MS;
 }

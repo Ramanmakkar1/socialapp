@@ -96,6 +96,65 @@ test('shouldAiReply: last inbound 25 h ago', () => {
   );
 });
 
+test('shouldAiReply: human reply 1 h ago pauses the AI for that person', () => {
+  const now = Date.now();
+  assert.equal(
+    shouldAiReply({
+      settings,
+      text: 'hi',
+      lastInboundAt: new Date(now - 60_000),
+      aiRepliesLast24h: 0,
+      hasPendingGate: false,
+      lastHumanReplyAt: new Date(now - 60 * 60 * 1000),
+      now,
+    }),
+    false
+  );
+});
+
+test('shouldAiReply: human reply 13 h ago no longer pauses the AI', () => {
+  const now = Date.now();
+  assert.equal(
+    shouldAiReply({
+      settings,
+      text: 'hi',
+      lastInboundAt: new Date(now - 60_000),
+      aiRepliesLast24h: 0,
+      hasPendingGate: false,
+      lastHumanReplyAt: new Date(now - 13 * 60 * 60 * 1000),
+      now,
+    }),
+    true
+  );
+});
+
+test('shouldAiReply: no human reply (null or undefined) does not pause the AI', () => {
+  const now = Date.now();
+  assert.equal(
+    shouldAiReply({
+      settings,
+      text: 'hi',
+      lastInboundAt: new Date(now - 60_000),
+      aiRepliesLast24h: 0,
+      hasPendingGate: false,
+      lastHumanReplyAt: null,
+      now,
+    }),
+    true
+  );
+  assert.equal(
+    shouldAiReply({
+      settings,
+      text: 'hi',
+      lastInboundAt: new Date(now - 60_000),
+      aiRepliesLast24h: 0,
+      hasPendingGate: false,
+      now,
+    }),
+    true
+  );
+});
+
 test('buildAiReplyPrompt: booking link / instructions / brand voice only when set', () => {
   const plain = buildAiReplyPrompt(settings, [{ direction: 'in', text: 'hi' }]);
   assert.ok(!plain.system.includes('Booking link:'));

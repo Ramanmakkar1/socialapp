@@ -21,6 +21,7 @@ function handlers(opts: { enabled: boolean; repliesToday: number }): FakeHandler
       ],
     },
     { match: /count\(\*\)::int as n from socialapp\.dm_queue/, reply: () => [{ n: opts.repliesToday }] },
+    { match: /kind='manual_reply' and status='sent'/, reply: () => [] },
     { match: /select message, coalesce\(sent_at, created_at\) as at/, reply: () => [] },
     { match: /order by received_at desc limit 50/, reply: () => [] },
     { match: /^select pg_advisory_xact_lock/, reply: () => [{}] },

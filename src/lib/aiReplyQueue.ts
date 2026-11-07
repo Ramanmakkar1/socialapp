@@ -41,6 +41,11 @@ export async function maybeQueueAiReply(params: {
     );
     const aiRepliesLast24h = Number(counted[0]?.n ?? 0);
 
+    const human = await query<{ at: Date | null }>(
+      "select max(coalesce(sent_at, created_at)) as at from socialapp.dm_queue where social_account_id=$1 and recipient_external_id=$2 and kind='manual_reply' and status='sent'",
+      [params.socialAccountId, params.senderId],
+    );
+
     if (
       !shouldAiReply({
         settings,
@@ -48,6 +53,7 @@ export async function maybeQueueAiReply(params: {
         lastInboundAt: new Date(),
         aiRepliesLast24h,
         hasPendingGate: params.hasPendingGate,
+        lastHumanReplyAt: human[0]?.at ? new Date(human[0].at) : null,
       })
     ) {
       return false;

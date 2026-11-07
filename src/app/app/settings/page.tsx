@@ -268,7 +268,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                       placeholder="https://cal.com/you"
                     />
                     {!aiConfigured && <p className={ui.hint}>AI is not set up on this server yet.</p>}
-                    <p className={ui.hint}>AI answers people who message you, asks for their name and email, and shares your booking link. It never replies more than 5 times a day to one person and only within Instagram&apos;s 24-hour window.</p>
+                    <p className={ui.hint}>AI answers people who message you, asks for their name and email, and shares your booking link. It never replies more than 5 times a day to one person and only within Instagram&apos;s 24-hour window. If you reply to someone yourself from the Inbox, the AI stays quiet with that person for 12 hours.</p>
                     <div>
                       <SubmitButton label="Save AI reply settings" />
                     </div>
