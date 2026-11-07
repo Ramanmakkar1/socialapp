@@ -151,6 +151,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.chipLocal {
+  display: block;
+  font-size: 11px;
+  opacity: .75;
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .chipFailed { border-color: var(--poskoo-coral); color: var(--poskoo-red); }
 .chipPublished { border-color: var(--poskoo-green); }
 .chipDraft { border-style: dashed; color: var(--poskoo-muted); }

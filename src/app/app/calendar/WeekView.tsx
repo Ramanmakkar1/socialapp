@@ -57,6 +57,10 @@ function formatLocal(at: Date | string): string {
   });
 }
 
+function formatLocalTime(at: Date | string): string {
+  return new Date(at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+}
+
 function captionPreview(caption: string): string {
   return caption.trim().slice(0, 40);
 }
@@ -120,7 +124,7 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
         <div>
           <p className={styles.rangeLabel}>{formatWeekRange(weekStart)}</p>
           <p className={styles.rangeHint}>
-            Days and times shown in UTC{tz ? ` (your time zone: ${tz})` : ""}.
+            Days are grouped in UTC{tz ? `; each post also shows your time (${tz})` : ""}.
             <span className={styles.wideOnly}> Drag a post to another day to move it.</span>
           </p>
         </div>
@@ -190,6 +194,7 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
                         title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
                       >
                         {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
+                        {tz && <span className={styles.chipLocal}>{formatLocalTime(post.scheduled_at!)} your time</span>}
                       </span>
                       {isMovable(post.status) && (
                         <RescheduleControl id={post.id} scheduledAt={post.scheduled_at!} caption={post.caption} />
