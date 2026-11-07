@@ -23,7 +23,6 @@ import {
 import ui from "@/components/ui/ui.module.css";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
-const LIVE_PLATFORMS: PlatformId[] = ["instagram"];
 const HANDLE = `@${BRAND.name.toLowerCase()}`;
 
 const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
@@ -63,9 +62,10 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const livePlatforms: PlatformId[] = facebookReady ? ["instagram", "facebook"] : ["instagram"];
   // Lazy initial state from the draft: the page keys this component by draft id, so a draft
   // opened by URL is filled in on the first render and switching drafts remounts cleanly.
   const [init] = useState(() => composerStateFromDraft(initialDraft));
@@ -165,7 +165,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
   }, []);
 
   function togglePlatform(platform: PlatformId) {
-    if (!LIVE_PLATFORMS.includes(platform)) return;
+    if (!livePlatforms.includes(platform)) return;
     const next = { ...enabled, [platform]: !enabled[platform] };
     setEnabled(next);
     if (platform === "instagram" && !next.instagram) {
@@ -308,8 +308,13 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
             >
               {PLATFORM_ORDER.map((platform) => {
                 const Icon = PLATFORM_ICON[platform];
-                const live = LIVE_PLATFORMS.includes(platform);
+                const live = livePlatforms.includes(platform);
                 const on = enabled[platform];
+                const disabledLabel = !live
+                  ? platform === "facebook"
+                    ? "Facebook: reconnect in Settings and allow Page posting to enable"
+                    : `${PLATFORMS[platform].label} publishing is not available yet`
+                  : undefined;
                 return (
                   <button
                     key={platform}
@@ -317,11 +322,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft }
                     disabled={!live}
                     aria-disabled={!live || undefined}
                     aria-pressed={live ? on : undefined}
-                    aria-label={
-                      live
-                        ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}`
-                        : `${PLATFORMS[platform].label} publishing is not available yet`
-                    }
+                    aria-label={live ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}` : disabledLabel}
+                    title={disabledLabel}
                     onClick={() => togglePlatform(platform)}
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                       live

@@ -8,6 +8,7 @@ import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
+import { canPublishToFacebook } from "@/lib/facebookPublish";
 import { PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
@@ -120,6 +121,7 @@ export default async function CalendarPage({
   let initialDraft: ComposerDraftInitial | undefined;
   let draftFailed = Boolean(draft);
   let draftPublishingSoon = false;
+  let facebookReady = false;
 
   const reloadHref =
     view === "month"
@@ -160,6 +162,15 @@ export default async function CalendarPage({
           }
         }
       } catch { /* Keep the composer hidden rather than overwrite an unloaded draft. */ }
+    }
+    try {
+      const [fbRow] = await query<{ scopes: string[] | null; auth_type: string | null }>(
+        "select scopes, auth_type from socialapp.social_accounts where user_id=$1 and platform='instagram' and auth_type='facebook_login' and status='active' and page_id is not null and access_token_enc is not null limit 1",
+        [user.id],
+      );
+      facebookReady = fbRow ? canPublishToFacebook(fbRow.scopes, fbRow.auth_type) : false;
+    } catch {
+      facebookReady = false;
     }
     try {
       commentHourRows = await query<{ hour: number; count: number }>(
@@ -223,7 +234,7 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} />
+        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} />
       )}
       <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
         <Link

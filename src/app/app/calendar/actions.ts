@@ -7,6 +7,7 @@ import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { checkCaption, type PlatformId } from "@/lib/platforms";
 import { scheduledPostLimitError } from "@/lib/planLimits";
 import { deletePostForUser, UUID_RE } from "@/lib/postMutations";
+import { canPublishToFacebook } from "@/lib/facebookPublish";
 
 const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads"];
 
@@ -111,11 +112,10 @@ export async function savePost(
     if (!ALLOWED_PLATFORMS.includes(p)) {
       return { ok: false, error: "Invalid platform." };
     }
-    if (p !== "instagram") {
+    if (p === "threads") {
       return {
         ok: false,
-        error:
-          "Facebook and Threads publishing is coming soon. For now, schedule this post for Instagram only.",
+        error: "Threads publishing is coming soon. Remove Threads to schedule this post.",
       };
     }
     platforms.push(p);
@@ -210,15 +210,30 @@ export async function savePost(
 
   if (input.mode === "schedule" && scheduledAt) {
     try {
-      const connected = await query(
-        "select 1 from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active' and access_token_enc is not null limit 1",
-        [user.id],
-      );
-      if (connected.length === 0) {
-        return {
-          ok: false,
-          error: "Connect Instagram in Settings before scheduling. You can save this post as a draft for now.",
-        };
+      if (platforms.includes("instagram")) {
+        const connected = await query(
+          "select 1 from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active' and access_token_enc is not null limit 1",
+          [user.id],
+        );
+        if (connected.length === 0) {
+          return {
+            ok: false,
+            error: "Connect Instagram in Settings before scheduling. You can save this post as a draft for now.",
+          };
+        }
+      }
+      if (platforms.includes("facebook")) {
+        const [fbRow] = await query<{ scopes: string[] | null; auth_type: string | null }>(
+          "select scopes, auth_type from socialapp.social_accounts where user_id=$1 and platform='instagram' and auth_type='facebook_login' and status='active' and page_id is not null and access_token_enc is not null limit 1",
+          [user.id],
+        );
+        if (!fbRow || !canPublishToFacebook(fbRow.scopes, fbRow.auth_type)) {
+          return {
+            ok: false,
+            error:
+              "To post to Facebook, reconnect Instagram with Facebook login in Settings and allow Page posting.",
+          };
+        }
       }
       const limitError = await scheduledPostLimitError(user.id, scheduledAt, input.draftId ?? null);
       if (limitError) return { ok: false, error: limitError };
