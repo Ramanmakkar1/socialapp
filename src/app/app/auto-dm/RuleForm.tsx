@@ -18,6 +18,7 @@ import {
   type RuleTrigger,
 } from "./actions";
 import { dmAiAvailable, suggestDmMessages } from "./aiActions";
+import { PUBLIC_REPLY_MAX } from "@/lib/publicReply";
 
 const INPUT = `${ui.input} mt-1.5`;
 
@@ -39,6 +40,7 @@ export type DbRuleRow = {
   status: "active" | "paused";
   triggers: string[];
   social_account_id: string | null;
+  public_reply: string | null;
 };
 
 export type RuleFormDefaults = {
@@ -52,6 +54,7 @@ export type RuleFormDefaults = {
   triggers?: RuleTrigger[];
   matchModeNote?: string;
   socialAccountId?: string | null;
+  publicReply?: string | null;
 };
 
 const ALL_ACCOUNTS_VALUE = "";
@@ -143,6 +146,7 @@ function defaultsToInput(defaults: RuleFormDefaults | undefined): Partial<RuleFo
     followGate: defaults.followGate,
     triggers: defaults.triggers ? normalizeTriggers(defaults.triggers) : undefined,
     socialAccountId: defaults.socialAccountId,
+    publicReply: defaults.publicReply ?? "",
   };
 }
 
@@ -161,6 +165,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   const accountId = useId();
   const keywordsId = useId();
   const dmId = useId();
+  const publicReplyId = useId();
   const linkId = useId();
   const emailId = useId();
   const followId = useId();
@@ -174,6 +179,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   const [keywordText, setKeywordText] = useState((base.keywords ?? []).join(", "));
   const [matchType, setMatchType] = useState<"contains" | "exact">(base.matchType ?? "contains");
   const [dmText, setDmText] = useState(base.dmText ?? "");
+  const [publicReply, setPublicReply] = useState(base.publicReply ?? "");
   const [linkUrl, setLinkUrl] = useState(base.linkUrl ?? "");
   const [emailGate, setEmailGate] = useState(base.emailGate ?? false);
   const [followGate, setFollowGate] = useState(base.followGate ?? false);
@@ -241,6 +247,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
       keywords: parseKeywords(keywordText),
       matchType,
       dmText,
+      publicReply,
       linkUrl,
       emailGate,
       followGate,
@@ -524,6 +531,21 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
             </div>
           )}
         </div>
+        {triggerComment && (
+          <div>
+            <label htmlFor={publicReplyId} className={ui.label}>Public reply under the comment (optional)</label>
+            <textarea
+              id={publicReplyId}
+              rows={2}
+              maxLength={PUBLIC_REPLY_MAX}
+              value={publicReply}
+              onChange={(e) => setPublicReply(e.target.value)}
+              className={`${INPUT} resize-y`}
+              placeholder="Sent it to your DMs! 📩"
+            />
+            <p className={`mt-1 text-xs text-[var(--poskoo-muted)]`}>Posted as a reply to the comment after the DM is sent, so others see it worked. Leave empty to skip.</p>
+          </div>
+        )}
         <div>
           <label htmlFor={linkId} className={ui.label}>Link URL <span className="text-[var(--poskoo-muted)]">({linkRequired ? "required" : "optional"})</span></label>
           <input
@@ -659,6 +681,7 @@ export function AutoDmView({
         keywords: editing.keywords,
         matchType: editing.match_type,
         dmText: editing.dm_text,
+        publicReply: editing.public_reply ?? "",
         linkUrl: editing.link_url ?? "",
         emailGate: editing.email_gate,
         followGate: editing.follow_gate,

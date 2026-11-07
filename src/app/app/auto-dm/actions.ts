@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { validateRule, type DmRule } from "@/lib/rules";
 import { RewindError, rewindRule } from "@/lib/rewind";
+import { cleanPublicReply } from "@/lib/publicReply";
 
 export type RuleTrigger = "comment" | "story_reply";
 
@@ -19,6 +20,7 @@ export type RuleFormInput = {
   triggers: RuleTrigger[];
   /** null = all connected Instagram accounts */
   socialAccountId: string | null;
+  publicReply: string;
 };
 
 export type RuleActionResult = { ok: true } | { ok: false; errors: string[] };
@@ -118,9 +120,9 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
   }
   const link = input.linkUrl.trim() || null;
   try {
-    await query(
+    const rows = await query<{ id: string }>(
       `insert into socialapp.dm_rules (user_id, social_account_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, triggers, status)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active')`,
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active') returning id`,
       [
         user.id,
         account.id,
@@ -134,6 +136,14 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
         input.triggers,
       ],
     );
+    try {
+      await query(
+        `update socialapp.dm_rules set public_reply=$3 where id=$1 and user_id=$2`,
+        [rows[0].id, user.id, cleanPublicReply(input.publicReply)],
+      );
+    } catch (err) {
+      console.error("Could not save public reply for rule", rows[0].id, err);
+    }
     revalidatePath("/app/auto-dm");
     return { ok: true };
   } catch {
@@ -183,6 +193,14 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
     );
     if (!rows[0]) {
       return { ok: false, errors: ["Automation not found."] };
+    }
+    try {
+      await query(
+        `update socialapp.dm_rules set public_reply=$3 where id=$1 and user_id=$2`,
+        [id, user.id, cleanPublicReply(input.publicReply)],
+      );
+    } catch (err) {
+      console.error("Could not save public reply for rule", id, err);
     }
     revalidatePath("/app/auto-dm");
     return { ok: true };

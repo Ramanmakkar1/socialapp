@@ -33,6 +33,16 @@ export default async function AutoDmPage({
         [user.id],
       ),
     ]);
+    try {
+      const replyRows = await query<{ id: string; public_reply: string | null }>(
+        `select id, public_reply from socialapp.dm_rules where user_id = $1`,
+        [user.id],
+      );
+      const replies = new Map(replyRows.map((r) => [r.id, r.public_reply]));
+      rules = rules.map((r) => ({ ...r, public_reply: replies.get(r.id) ?? null }));
+    } catch {
+      rules = rules.map((r) => ({ ...r, public_reply: null }));
+    }
   } catch {
     return (
       <>
@@ -67,6 +77,7 @@ export default async function AutoDmPage({
         name: tpl.title,
         keywords: tpl.keywords,
         dmText: tpl.dmMessage,
+        publicReply: tpl.publicReply,
         emailGate: tpl.askEmail,
         followGate: tpl.requireFollow,
         matchType: tpl.matchMode === "any" ? "contains" : tpl.matchMode,
