@@ -180,6 +180,7 @@ test("token job: an invalidated Page token marks the Facebook-login account 'exp
         { id: "a-dead", access_token_enc: encryptToken("dead") },
       ],
     },
+    { match: /platform='threads'/, reply: () => [] },
     { match: /^update socialapp\.social_accounts/, reply: (params, sql) => { updates.push({ sql, params }); return []; } },
   ]);
   const restore = installFakePool(pool);
