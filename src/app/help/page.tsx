@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
+const description = `Step-by-step guides for ${BRAND.name}: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`;
+
 export const metadata: Metadata = {
   title: { absolute: `Instagram Scheduling & Auto-DM Help Guides | ${BRAND.name}` },
-  description:
-    `Step-by-step guides for ${BRAND.name}: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`,
+  description,
   alternates: { canonical: "/help" },
 };
 
@@ -61,9 +63,41 @@ const resources = [
   },
 ];
 
+const collectionJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Help center",
+  url: `${BRAND.url}/help`,
+  description,
+  mainEntity: {
+    "@type": "ItemList",
+    itemListElement: guides
+      .filter((g) => g.href.startsWith("/help/"))
+      .map((g, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: g.title,
+        url: `${BRAND.url}${g.href}`,
+      })),
+  },
+};
+
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: BRAND.url },
+  { name: "Help", url: `${BRAND.url}/help` },
+]);
+
 export default function HelpHubPage() {
   return (
     <PublicShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
+      />
       <header className="hero">
         <span className="pill">Guides · troubleshooting · free tools</span>
         <h1>

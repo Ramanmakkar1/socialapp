@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
@@ -11,9 +12,35 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
 };
 
+const contactJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: `Contact ${BRAND.name} support`,
+  url: `${BRAND.url}/contact`,
+  mainEntity: {
+    "@type": "Organization",
+    name: BRAND.company,
+    url: BRAND.url,
+    email: BRAND.supportEmail,
+  },
+};
+
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: BRAND.url },
+  { name: "Contact", url: `${BRAND.url}/contact` },
+]);
+
 export default function ContactPage() {
   return (
     <PublicShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(contactJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
+      />
       <header className="hero">
         <span className="pill">We reply within one business day</span>
         <h1>
