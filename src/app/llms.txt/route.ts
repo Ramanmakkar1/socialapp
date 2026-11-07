@@ -1,32 +1,45 @@
 import { BRAND } from "@/lib/brand";
 import { PUBLIC_PATHS, PAGE_TITLES, PAGE_DESCRIPTIONS, PublicPath } from "@/lib/public-pages";
 
-export async function GET() {
-  // Return 404 if site is not indexable
+export const dynamic = "force-static";
+
+export function GET() {
+  // Served only when the site is indexable; staging/noindex returns 404.
   if (!BRAND.indexable) {
-    return new Response("Not Found", {
-      status: 404,
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
+    return new Response("Not found", { status: 404 });
   }
 
   const baseUrl = BRAND.url;
 
-  let content = `# ${BRAND.name}
+  // Build a link line from a page's own metadata, using the brand constant
+  // (never a hard-coded brand name) in the body text.
+  const line = (path: PublicPath) => {
+    const title = PAGE_TITLES[path];
+    const desc = PAGE_DESCRIPTIONS[path].replace(/Poskoo/g, BRAND.name);
+    return `- [${title}](${baseUrl}${path}): ${desc}`;
+  };
 
-`;
+  let content = `# ${BRAND.name}\n\n`;
+  content += `> ${BRAND.description}\n\n`;
+  content +=
+    `${BRAND.name} uses the official Meta Instagram API and never asks for your password. ` +
+    `A Free plan is available. Built by ${BRAND.company}. Support: ${BRAND.supportEmail}.\n\n`;
 
-  // Product summary (from landing page facts)
-  content += `${BRAND.name} is a social media scheduler for Instagram with comment-to-DM automation, AI replies and lead capture. Plan a month of posts on one calendar, and send your link to everyone who comments a keyword within seconds. Free to start on the official Meta API.
+  content += `## Product\n\n`;
+  const productPaths: PublicPath[] = [
+    "/",
+    "/instagram-scheduler",
+    "/instagram-auto-dm",
+    "/instagram-auto-dm/templates",
+    "/pricing",
+  ];
+  for (const path of productPaths) {
+    if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;
+  }
+  content += "\n";
 
-`;
-
-  // Free tools section
-  content += `## Free tools
-
-`;
-
-  const toolsPaths: PublicPath[] = [
+  content += `## Free Instagram tools\n\n`;
+  const toolPaths: PublicPath[] = [
     "/tools/instagram-caption-counter",
     "/tools/instagram-comment-keyword-tester",
     "/tools/instagram-hashtag-generator",
@@ -40,70 +53,40 @@ export async function GET() {
     "/tools/instagram-utm-builder",
     "/tools/instagram-comment-picker",
     "/tools/instagram-safe-zone-checker",
-    "/tools",
   ];
-
-  for (const path of toolsPaths) {
-    if (PUBLIC_PATHS.includes(path)) {
-      const title = PAGE_TITLES[path] || path;
-      const desc = PAGE_DESCRIPTIONS[path] || "";
-      content += `- [${title}](${baseUrl}${path}): ${desc}\n`;
-    }
+  for (const path of toolPaths) {
+    if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;
   }
+  content += "\n";
 
-  // Comparisons section
-  content += `
-## Comparisons
-
-`;
-
+  content += `## Comparisons\n\n`;
   const comparisonPaths: PublicPath[] = [
     "/buffer-alternative",
-    "/manychat-alternative",
     "/later-alternative",
-    "/sprout-social-alternative",
+    "/manychat-alternative",
     "/hootsuite-alternative",
   ];
-
   for (const path of comparisonPaths) {
-    if (PUBLIC_PATHS.includes(path)) {
-      const title = PAGE_TITLES[path] || path;
-      const desc = PAGE_DESCRIPTIONS[path] || "";
-      content += `- [${title}](${baseUrl}${path}): ${desc}\n`;
-    }
+    if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;
   }
+  content += "\n";
 
-  // Guides section
-  content += `
-## Guides
-
-`;
-
-  const guidePaths: PublicPath[] = [
+  content += `## Help\n\n`;
+  const helpPaths: PublicPath[] = [
+    "/help",
     "/help/getting-started",
     "/help/instagram-auto-dm-not-working",
-    "/instagram-scheduler",
-    "/instagram-auto-dm",
-    "/instagram-auto-dm/templates",
-    "/pricing",
     "/contact",
     "/privacy",
     "/terms",
-    "/data-deletion",
   ];
-
-  for (const path of guidePaths) {
-    if (PUBLIC_PATHS.includes(path)) {
-      const title = PAGE_TITLES[path] || path;
-      const desc = PAGE_DESCRIPTIONS[path] || "";
-      content += `- [${title}](${baseUrl}${path}): ${desc}\n`;
-    }
+  for (const path of helpPaths) {
+    if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;
   }
 
   return new Response(content, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=3600",
     },
   });
 }
