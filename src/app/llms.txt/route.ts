@@ -48,11 +48,13 @@ export function GET() {
     "/tools/instagram-image-size",
     "/tools/instagram-font-generator",
     "/tools/instagram-bio-generator",
+    "/tools/instagram-caption-generator",
     "/tools/instagram-engagement-rate-calculator",
     "/tools/instagram-post-preview",
     "/tools/instagram-utm-builder",
     "/tools/instagram-comment-picker",
     "/tools/instagram-safe-zone-checker",
+    "/tools/instagram-grid-maker",
   ];
   for (const path of toolPaths) {
     if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;
@@ -64,6 +66,7 @@ export function GET() {
     "/buffer-alternative",
     "/later-alternative",
     "/planoly-alternative",
+    "/sprout-social-alternative",
     "/manychat-alternative",
     "/hootsuite-alternative",
   ];
