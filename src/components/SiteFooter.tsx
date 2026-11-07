@@ -46,6 +46,7 @@ export function SiteFooter() {
           { href: "/tools/instagram-caption-counter", label: "Caption counter" },
           { href: "/tools/instagram-font-generator", label: "Font generator" },
           { href: "/tools/instagram-bio-generator", label: "Bio generator" },
+          { href: "/tools/instagram-username-generator", label: "Username generator" },
           { href: "/tools/instagram-caption-generator", label: "Caption generator" },
           { href: "/tools/instagram-image-size", label: "Image size guide" },
           { href: "/tools/instagram-engagement-rate-calculator", label: "Engagement rate calculator" },

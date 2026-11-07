@@ -48,6 +48,7 @@ export function GET() {
     "/tools/instagram-image-size",
     "/tools/instagram-font-generator",
     "/tools/instagram-bio-generator",
+    "/tools/instagram-username-generator",
     "/tools/instagram-caption-generator",
     "/tools/instagram-engagement-rate-calculator",
     "/tools/instagram-post-preview",

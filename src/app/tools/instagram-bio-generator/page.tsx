@@ -77,6 +77,10 @@ export default function InstagramBioGeneratorPage() {
         <Link className={s.vlink} href="/tools/instagram-line-break-generator">
           Line break generator
         </Link>
+        {" / "}
+        <Link className={s.vlink} href="/tools/instagram-username-generator">
+          Instagram username generator
+        </Link>
       </p>
 
       <section style={{ paddingTop: 20 }}>
