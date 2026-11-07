@@ -67,6 +67,7 @@ export function GET() {
     "/later-alternative",
     "/planoly-alternative",
     "/sprout-social-alternative",
+    "/metricool-alternative",
     "/manychat-alternative",
     "/hootsuite-alternative",
   ];

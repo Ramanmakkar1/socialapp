@@ -67,6 +67,7 @@ export function SiteFooter() {
           { href: "/later-alternative", label: "Later alternative" },
           { href: "/planoly-alternative", label: "Planoly alternative" },
           { href: "/sprout-social-alternative", label: "Sprout Social alternative" },
+          { href: "/metricool-alternative", label: "Metricool alternative" },
           { href: "/manychat-alternative", label: "ManyChat alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
         ]}
