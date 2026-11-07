@@ -558,26 +558,28 @@ export function AutoDmView({
         accent="on autopilot"
         lede="Send a DM to everyone who comments a keyword."
         art="/landing/card-dm.webp"
-        artAlt=""
+        artAlt="A creator sending automatic Instagram direct messages"
         action={
-          <p className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <Link href="/app/auto-dm/activity" className={ui.link}>Activity</Link>
-            <Link href="/help/instagram-auto-dm-not-working" className={ui.link}>DMs not sending?</Link>
-          </p>
+          <>
+            <p className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              <Link href="/app/auto-dm/activity" className={ui.link}>Activity</Link>
+              <Link href="/help/instagram-auto-dm-not-working" className={ui.link}>DMs not sending?</Link>
+            </p>
+            {instagramAccounts.length > 1 && (
+              <p className={`${ui.hint} mt-4 max-w-xl`}>
+                Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
+              </p>
+            )}
+            {!formOpen && (
+              <div className="mt-4">
+                <Btn onClick={() => openCreate(true)}>
+                  <Plus className="h-4 w-4" aria-hidden="true" /> New automation
+                </Btn>
+              </div>
+            )}
+          </>
         }
       />
-      {instagramAccounts.length > 1 && (
-        <p className={`${ui.hint} mt-4 max-w-xl`}>
-          Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
-        </p>
-      )}
-      {!formOpen && (
-        <div className="mt-4">
-          <Btn onClick={() => openCreate(true)}>
-            <Plus className="h-4 w-4" aria-hidden="true" /> New automation
-          </Btn>
-        </div>
-      )}
 
       {formOpen && (
         <div className="mt-6">
