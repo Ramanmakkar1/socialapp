@@ -124,7 +124,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
       <p className="eyebrow">How a comment becomes a lead</p>
       <h2>They comment <em className="s mark">LINK.</em> Poskoo does the rest.</h2>
       <p>Choose the keyword, write the message once, and decide what to ask before sending the link.</p>
-      <div className="chips"><span className="chip">Keyword triggers</span><span className="chip">Follow-to-unlock</span><span className="chip">Email capture</span><span className="chip">Public reply</span><span className="chip">AI answers</span></div>
+      <div className="chips"><span className="chip">Keyword triggers</span><span className="chip">Follow-to-unlock</span><span className="chip">Email capture</span><span className="chip">Public reply</span><span className="chip">Email gate</span></div>
     </div>
     <div className="demo" aria-label="Example: a comment, the automatic DM, and the saved lead">
       <div className="ui c1"><div className="who"><span className="av" style={{"background": "var(--peach)"}}></span>riya.makes <span className="t">2m</span></div><p style={{"marginTop": "6px"}}>LINK please! 😍</p></div>

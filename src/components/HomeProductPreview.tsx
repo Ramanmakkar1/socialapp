@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, type KeyboardEvent } from "react";
-import { CalendarDays, MessageCircleHeart, Instagram, Facebook, Sparkles, Check } from "lucide-react";
+import { CalendarDays, MessageCircleHeart, Instagram, Facebook, Check } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 
 const tabs = ["Calendar", "Comment-to-DM"];
@@ -97,7 +97,7 @@ export default function HomeProductPreview() {
           </li>
           <li className="min-w-0 rounded-xl border border-line p-3">
             <h3 className="mb-3 font-medium text-brand">Lead capture</h3>
-            <div className="rounded-xl border border-brand-2/30 bg-brand-2/10 p-3 leading-6"><Sparkles aria-hidden="true" className="mr-1 inline h-3.5 w-3.5 text-brand" />AI: Sure! What’s the best email to send it to?</div>
+            <div className="rounded-xl border border-brand-2/30 bg-brand-2/10 p-3 leading-6">Sure! What’s the best email to send it to?</div>
             <p className="mt-3 flex items-start gap-2 text-xs text-ink-2"><Check aria-hidden="true" className="h-4 w-4 shrink-0 text-brand" />Next: save their email to your lead list.</p>
           </li>
         </ol>

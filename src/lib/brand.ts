@@ -5,7 +5,7 @@ export const BRAND = {
   name: "Poskoo",
   tagline: "Schedule posts. Auto-DM every comment. Grow on autopilot.",
   description:
-    "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI replies and lead capture built in.",
+    "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
   // Raman must authorize the new-domain launch before this value changes.
   // Keep staging noindex and its sitemap empty, even when SITE_INDEXABLE=true.
