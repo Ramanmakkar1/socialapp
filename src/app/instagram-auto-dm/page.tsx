@@ -139,6 +139,19 @@ export default function InstagramAutoDm() {
           <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
             <Link href="/instagram-auto-dm/templates" className={s.vlink}>Browse DM templates →</Link>
           </p>
+          <div className="mt-8">
+            <p className="eyebrow" style={{ textAlign: "center" }}>Learn how to set it up</p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Link href="/help/instagram-auto-dm-not-working" className="group min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40">
+                <span className="font-medium">Instagram auto DM not working?</span>
+                <p className="text-sm text-ink-2">A checklist to find why a DM did not send.</p>
+              </Link>
+              <Link href="/tools/instagram-comment-keyword-tester" className="group min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40">
+                <span className="font-medium">Free comment keyword tester</span>
+                <p className="text-sm text-ink-2">See which comments your keywords will match.</p>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
