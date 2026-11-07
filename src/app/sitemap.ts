@@ -6,6 +6,10 @@ import { PUBLIC_PATHS, META } from "@/lib/public-pages";
 // a safety net: if one is ever added to PUBLIC_PATHS it must not leak into the sitemap.
 const NOINDEX_PATHS = new Set(["/login", "/signup", "/data-deletion/status", "/app/review-guide"]);
 
+// A path is noindex if it is in the safety-net set or lives under /app/ (app pages
+// are never indexable). The sitemap must never list a noindex page.
+const isNoindex = (path: string) => NOINDEX_PATHS.has(path) || path.startsWith("/app/");
+
 export default function sitemap(): MetadataRoute.Sitemap {
   // While BRAND.indexable is false the root layout applies robots noindex to every
   // page (staging), so the sitemap must be empty — no page, including the root, is listed.
@@ -14,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
   const lastModified = new Date();
   return PUBLIC_PATHS
-    .filter((path) => !NOINDEX_PATHS.has(path))
+    .filter((path) => !isNoindex(path))
     .map((path) => ({
       url: `${BRAND.url}${path}`,
       lastModified,
