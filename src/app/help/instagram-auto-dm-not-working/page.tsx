@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
@@ -94,9 +95,12 @@ export default function InstagramAutoDmNotWorkingPage() {
       </nav>
       <header className="hero">
         <p className="eyebrow">Troubleshooting guide</p>
-        <h1>
-          Instagram auto DM <em className="s">not working?</em>
-        </h1>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <h1>
+            Instagram auto DM <em className="s">not working?</em>
+          </h1>
+          <HelpGuideIllustration variant="troubleshoot" className="w-36 shrink-0 sm:w-48" />
+        </div>
         <p className="lede">
           Walk through this checklist in order. Each step reflects how {BRAND.name} actually processes comments, gates,
           and the send queue.
