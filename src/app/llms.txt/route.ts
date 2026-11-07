@@ -63,6 +63,7 @@ export function GET() {
   const comparisonPaths: PublicPath[] = [
     "/buffer-alternative",
     "/later-alternative",
+    "/planoly-alternative",
     "/manychat-alternative",
     "/hootsuite-alternative",
   ];
