@@ -64,6 +64,7 @@ export function SiteFooter() {
         title="Compare"
         links={[
           { href: "/buffer-alternative", label: "Buffer alternative" },
+          { href: "/publer-alternative", label: "Publer alternative" },
           { href: "/later-alternative", label: "Later alternative" },
           { href: "/planoly-alternative", label: "Planoly alternative" },
           { href: "/sprout-social-alternative", label: "Sprout Social alternative" },

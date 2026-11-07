@@ -1,10 +1,11 @@
 import Link from "next/link";
 import s from "./site.module.css";
 
-type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta";
+type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
+  { href: "/publer-alternative", label: "Publer alternative", key: "publer" },
   { href: "/manychat-alternative", label: "ManyChat alternative", key: "manychat" },
   { href: "/later-alternative", label: "Later alternative", key: "later" },
   { href: "/planoly-alternative", label: "Planoly alternative", key: "planoly" },

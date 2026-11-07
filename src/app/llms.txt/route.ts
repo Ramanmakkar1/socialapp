@@ -64,6 +64,7 @@ export function GET() {
   content += `## Comparisons\n\n`;
   const comparisonPaths: PublicPath[] = [
     "/buffer-alternative",
+    "/publer-alternative",
     "/later-alternative",
     "/planoly-alternative",
     "/sprout-social-alternative",
