@@ -179,8 +179,13 @@ export default async function InboxPage({
                 <div className={`max-w-[80%] text-sm ${m.direction === "out" ? styles.bubbleOut : styles.bubbleIn}`}>
                   <p className="m-0 whitespace-pre-wrap break-words">{m.text}</p>
                   <p className={`mt-1 text-[11px] ${m.direction === "out" ? styles.bubbleOutTime : styles.meta}`}>
-                    {m.ai && (
-                      <span className="mr-1 rounded-full px-1.5 py-px text-[10px] font-semibold" style={{ background: "var(--brand-soft, rgba(255,255,255,.2))" }} aria-label="Written by AI">AI</span>
+                    {m.direction === "out" && m.ai && (
+                      <span
+                        className="mr-1.5 inline-block rounded-full bg-[var(--poskoo-band)] px-1.5 py-0.5 text-xs font-semibold text-[var(--poskoo-violet)]"
+                        aria-label="Sent by AI reply"
+                      >
+                        AI
+                      </span>
                     )}
                     <LocalTime value={m.at} style="medium" />
                   </p>
