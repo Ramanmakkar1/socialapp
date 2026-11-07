@@ -553,7 +553,7 @@ export function AutoDmView({
   return (
     <>
       <PageHero
-        eyebrow="Automation"
+        eyebrow="Comment-to-DM automation"
         title="Auto-DM"
         accent="on autopilot"
         lede="Send a DM to everyone who comments a keyword."
