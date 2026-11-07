@@ -37,8 +37,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-instagram-stories",
+    no: "04 / Scheduling",
+    title: "Schedule Instagram Stories",
+    text: "Pick the Story format, paste one image or video link, choose a time and see what Stories can and cannot include.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "04 / Contact",
+    no: "05 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",

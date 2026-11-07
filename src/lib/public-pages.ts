@@ -35,6 +35,7 @@ export const PUBLIC_PATHS = [
   "/help/getting-started",
   "/help/instagram-auto-dm-not-working",
   "/help/auto-dm-instagram-comments",
+  "/help/schedule-instagram-stories",
   "/instagram-scheduler",
   "/pricing",
 ] as const;
@@ -76,6 +77,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
   "/help/getting-started": { priority: 0.7, changeFrequency: "weekly" },
   "/help/instagram-auto-dm-not-working": { priority: 0.6, changeFrequency: "weekly" },
   "/help/auto-dm-instagram-comments": { priority: 0.6, changeFrequency: "yearly" },
+  "/help/schedule-instagram-stories": { priority: 0.6, changeFrequency: "yearly" },
   "/instagram-scheduler": { priority: 0.8, changeFrequency: "weekly" },
   "/pricing": { priority: 0.8, changeFrequency: "weekly" },
 };
@@ -96,6 +98,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
   "/tools/instagram-safe-zone-checker": "Safe Zone Checker", "/tools": "Free Tools",
   "/help": "Help Center", "/contact": "Contact", "/help/getting-started": "Getting Started",
   "/help/instagram-auto-dm-not-working": "Auto-DM Troubleshooting", "/help/auto-dm-instagram-comments": "Auto-DM Setup Guide",
+  "/help/schedule-instagram-stories": "Schedule Instagram Stories",
   "/instagram-scheduler": "Instagram Scheduler",
   "/pricing": "Pricing",
 };
@@ -134,6 +137,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/help/getting-started": "Start using Poskoo - connect Instagram, schedule posts, set up auto-DMs.",
   "/help/instagram-auto-dm-not-working": "Troubleshoot why Instagram auto-DM rules aren't sending messages.",
   "/help/auto-dm-instagram-comments": "Step-by-step guide to auto-DM everyone who comments a keyword on your Instagram posts.",
+  "/help/schedule-instagram-stories": "Schedule Instagram Stories: paste one image or video link, pick a time and Poskoo publishes it for you.",
   "/instagram-scheduler": "Schedule Instagram posts with drag-and-drop calendar, feed, Reels and carousel support.",
   "/pricing": "Compare Poskoo Free, Pro and Agency plans.",
 };

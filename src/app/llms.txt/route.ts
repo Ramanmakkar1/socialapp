@@ -81,6 +81,7 @@ export function GET() {
     "/help",
     "/help/getting-started",
     "/help/instagram-auto-dm-not-working",
+    "/help/schedule-instagram-stories",
     "/contact",
     "/privacy",
     "/terms",
