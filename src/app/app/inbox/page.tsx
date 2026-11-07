@@ -69,11 +69,11 @@ export default async function InboxPage({
   return (
     <>
       <PageHero
-        eyebrow="One inbox"
-        title="Comments & DMs"
+        eyebrow="Comments and DMs"
+        title="Inbox"
         lede="Comments on your posts and Instagram DMs, in one place. Auto-DM rules answer most of them for you."
         art="/landing/card-dm.webp"
-        artAlt=""
+        artAlt="A creator replying to Instagram comments and messages"
       />
       {ok && <p className={ui.notice} role="status">{ok}</p>}
       {error && <p className={`${ui.notice} ${ui.noticeWarn}`}>{error}</p>}
