@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  openGraph: { title, description, url: BRAND.url, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
-const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}];
+const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -194,10 +194,9 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <section id="faq" style={{"paddingTop": "20px"}}><div className="wrap">
   <div className="head"><p className="eyebrow">Questions</p><h2>Good to know</h2></div>
   <div className="faq">
-    <details open><summary>Is it safe for my Instagram account?</summary><p>Yes. Poskoo uses Meta&apos;s official Instagram API. You log in on Instagram&apos;s own screen, we never see your password, and you can disconnect any time.</p></details>
-    <details><summary>Which platforms are supported?</summary><p>Instagram scheduling and auto-DMs work today. Facebook Pages and Threads are coming soon.</p></details>
-    <details><summary>Do I need a business account?</summary><p>For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app.</p></details>
-    <details><summary>Can I cancel any time?</summary><p>Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel.</p></details>
+    {faqs.map((f, i) => (
+      <details key={f.q} open={i === 0}><summary>{f.q}</summary><p>{f.a}</p></details>
+    ))}
   </div>
 </div></section>
 
