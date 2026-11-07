@@ -256,8 +256,8 @@ export async function processMessageEvents(
         await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage });
         continue;
       }
-      const token = await accountToken(account.id);
-      const following = token ? await isFollower(event.senderId, token) : null;
+      const creds = await accountToken(account.id);
+      const following = creds ? await isFollower(event.senderId, creds.token, creds.authType) : null;
       if (following === true) {
         await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage });
       } else if (following === false) {

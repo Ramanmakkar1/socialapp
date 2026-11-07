@@ -2,14 +2,15 @@
 // GET retries rate limits / 5xx with backoff; POST is single-attempt. Marks the account "expired" when Meta says the token is invalid.
 import { decryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
+import { graphBaseFor, isFacebookLogin } from "@/lib/graphHost";
 
-const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const TIMEOUT_MS = 6_000;
 const RATE_LIMIT_CODES = new Set([4, 17, 32, 613]);
 // 190 = invalid/expired OAuth token; 102 = session expired; 463/467 = token subcodes.
 const TOKEN_CODES = new Set([102, 190]);
 
-export type GraphAccount = { id: string; external_id: string; access_token_enc: string | null };
+/** auth_type picks the host: facebook_login = graph.facebook.com + Page token, else graph.instagram.com. */
+export type GraphAccount = { id: string; external_id: string; access_token_enc: string | null; auth_type?: string | null };
 
 export class GraphError extends Error {
   readonly kind: "token" | "rate_limited" | "other";
@@ -64,7 +65,7 @@ export async function graphCall<T>(
     let status = 0;
     let body: unknown = null;
     try {
-      const res = await fetch(`${GRAPH_BASE}/${path}${qs}`, {
+      const res = await fetch(`${graphBaseFor(account.auth_type)}/${path}${qs}`, {
         method,
         headers: { Authorization: `Bearer ${token}`, ...(init.body ? { "Content-Type": "application/json" } : {}) },
         body: init.body ? JSON.stringify(init.body) : undefined,
@@ -110,8 +111,15 @@ export type IgProfile = {
 export async function fetchIgProfile(account: GraphAccount): Promise<IgProfile> {
   const json = await graphCall<{ username?: string; name?: string; profile_picture_url?: string; followers_count?: number; media_count?: number }>(
     account,
-    "me",
-    { params: { fields: "user_id,username,name,profile_picture_url,followers_count,media_count" } }
+    // With a Page token "me" is the Page, so Facebook-login accounts ask for the IG user id directly.
+    isFacebookLogin(account.auth_type) ? encodeURIComponent(account.external_id) : "me",
+    {
+      params: {
+        fields: isFacebookLogin(account.auth_type)
+          ? "username,name,profile_picture_url,followers_count,media_count"
+          : "user_id,username,name,profile_picture_url,followers_count,media_count",
+      },
+    }
   );
   return {
     username: json.username ?? "",
@@ -171,7 +179,7 @@ export async function sendDirectMessage(account: GraphAccount, recipientId: stri
 
 export async function userAccount(userId: string, accountId: string): Promise<GraphAccount | null> {
   const rows = await query<GraphAccount>(
-    "select id, external_id, access_token_enc from socialapp.social_accounts where id=$1 and user_id=$2 and platform='instagram' and status='active'",
+    "select id, external_id, access_token_enc, auth_type from socialapp.social_accounts where id=$1 and user_id=$2 and platform='instagram' and status='active'",
     [accountId, userId]
   );
   return rows[0] ?? null;

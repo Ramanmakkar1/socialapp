@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as graphHost from "./graphHost.ts";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import ts from "typescript";
@@ -21,6 +22,7 @@ function loadIgGraph(fetchImpl: typeof fetch, queryImpl?: (sql: string) => Promi
   let expiredMarked = false;
   const exports = {} as typeof import("./igGraph.ts");
   const imports = (id: string) => {
+    if (id === "@/lib/graphHost") return graphHost;
     if (id === "@/lib/crypto") return { decryptToken: () => TOKEN };
     if (id === "@/lib/db") {
       return {

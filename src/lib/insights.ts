@@ -1,5 +1,6 @@
 import { decryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
+import { graphBaseFor } from "@/lib/graphHost";
 
 export type MediaInsights = {
   reach: number | null;
@@ -40,12 +41,12 @@ export function parseInsights(json: unknown): MediaInsights {
   return out;
 }
 
-export async function fetchMediaInsights(mediaId: string, token: string): Promise<MediaInsights> {
+export async function fetchMediaInsights(mediaId: string, token: string, authType?: string | null): Promise<MediaInsights> {
   const params = new URLSearchParams({
     metric: "reach,likes,comments,saved,shares",
     access_token: token,
   });
-  const res = await fetch(`https://graph.instagram.com/v21.0/${encodeURIComponent(mediaId)}/insights?${params.toString()}`, {
+  const res = await fetch(`${graphBaseFor(authType)}/${encodeURIComponent(mediaId)}/insights?${params.toString()}`, {
     cache: "no-store",
   });
   const json = (await res.json()) as GraphInsightsResponse;
@@ -79,11 +80,12 @@ type TargetRow = {
   id: string;
   external_post_id: string;
   access_token_enc: string;
+  auth_type?: string | null;
 };
 
 export async function refreshRecentInsights(limit = 50): Promise<{ updated: number }> {
   const rows = await query<TargetRow>(
-    `select t.id, t.external_post_id, a.access_token_enc
+    `select t.id, t.external_post_id, a.access_token_enc, a.auth_type
      from socialapp.post_targets t
      join socialapp.social_accounts a on a.id = t.social_account_id
      where t.platform = 'instagram'
@@ -110,7 +112,7 @@ export async function refreshRecentInsights(limit = 50): Promise<{ updated: numb
     }
 
     try {
-      const insights = await fetchMediaInsights(row.external_post_id, token);
+      const insights = await fetchMediaInsights(row.external_post_id, token, row.auth_type);
       await query(`update socialapp.post_targets set insights=$2::jsonb, insights_at=now() where id=$1`, [
         row.id,
         JSON.stringify(insights),

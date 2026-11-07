@@ -2,8 +2,8 @@
 import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
 import { shouldPostFirstComment } from "@/lib/firstComment";
+import { graphBaseFor } from "@/lib/graphHost";
 
-const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const PUBLISH_TIMEOUT_MS = 20_000;
 
 type ClaimedRow = {
@@ -21,6 +21,7 @@ type AccountRow = {
   id: string;
   external_id: string;
   access_token_enc: string | null;
+  auth_type?: string | null;
 };
 
 export type PublishResult = { published: number; failed: number; skipped: number; recovered: number };
@@ -86,12 +87,13 @@ function allImages(media: unknown): string[] {
 }
 
 async function postForId(
+  base: string,
   path: string,
   token: string,
   body: Record<string, unknown>,
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   try {
-    const mediaRes = await fetch(`${GRAPH_BASE}/${path}`, {
+    const mediaRes = await fetch(`${base}/${path}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -128,12 +130,13 @@ async function postForId(
 }
 
 async function publishCreationId(
+  base: string,
   igUserId: string,
   token: string,
   creationId: string,
 ): Promise<{ ok: true; externalPostId: string } | { ok: false; error: string }> {
   const publishRes = await fetch(
-    `${GRAPH_BASE}/${encodeURIComponent(igUserId)}/media_publish`,
+    `${base}/${encodeURIComponent(igUserId)}/media_publish`,
     {
       method: "POST",
       headers: {
@@ -171,13 +174,14 @@ async function publishCreationId(
 }
 
 async function waitForVideoContainerReady(
+  base: string,
   creationId: string,
   token: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const maxTries = 24;
   for (let attempt = 0; attempt < maxTries; attempt += 1) {
     const statusRes = await fetch(
-      `${GRAPH_BASE}/${encodeURIComponent(creationId)}?fields=status_code`,
+      `${base}/${encodeURIComponent(creationId)}?fields=status_code`,
       {
         headers: { Authorization: `Bearer ${token}` },
         signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
@@ -255,7 +259,13 @@ async function refreshPostStatus(postId: string): Promise<void> {
   );
 }
 
-async function publishToInstagram(
+/**
+ * Content publishing: POST {ig-user-id}/media (container), wait for video containers, then
+ * POST {ig-user-id}/media_publish. `base` is graph.facebook.com for Facebook-login accounts
+ * (Page token) and graph.instagram.com for older Instagram-login accounts.
+ */
+export async function publishToInstagram(
+  base: string,
   igUserId: string,
   token: string,
   mediaRaw: unknown,
@@ -275,20 +285,20 @@ async function publishToInstagram(
           ? { media_type: "STORIES", video_url: media.url }
           : { media_type: "STORIES", image_url: media.url };
 
-      const created = await postForId(igPath, token, createBody);
+      const created = await postForId(base, igPath, token, createBody);
       if (!created.ok) {
         return created;
       }
       const creationId = created.id;
 
       if (media.type === "video") {
-        const ready = await waitForVideoContainerReady(creationId, token);
+        const ready = await waitForVideoContainerReady(base, creationId, token);
         if (!ready.ok) {
           return ready;
         }
       }
 
-      return publishCreationId(igUserId, token, creationId);
+      return publishCreationId(base, igUserId, token, creationId);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return { ok: false, error: cleanError(`network: ${message}`, token) };
@@ -300,7 +310,7 @@ async function publishToInstagram(
     try {
       const childIds: string[] = [];
       for (const imageUrl of carouselImages) {
-        const child = await postForId(igPath, token, {
+        const child = await postForId(base, igPath, token, {
           image_url: imageUrl,
           is_carousel_item: true,
         });
@@ -312,7 +322,7 @@ async function publishToInstagram(
         }
         childIds.push(child.id);
       }
-      const carousel = await postForId(igPath, token, {
+      const carousel = await postForId(base, igPath, token, {
         media_type: "CAROUSEL",
         children: childIds.join(","),
         caption,
@@ -320,7 +330,7 @@ async function publishToInstagram(
       if (!carousel.ok) {
         return carousel;
       }
-      return publishCreationId(igUserId, token, carousel.id);
+      return publishCreationId(base, igUserId, token, carousel.id);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return { ok: false, error: cleanError(`network: ${message}`, token) };
@@ -338,20 +348,20 @@ async function publishToInstagram(
         ? { media_type: "REELS", video_url: media.url, caption }
         : { image_url: media.url, caption };
 
-    const created = await postForId(igPath, token, createBody);
+    const created = await postForId(base, igPath, token, createBody);
     if (!created.ok) {
       return created;
     }
     const creationId = created.id;
 
     if (media.type === "video") {
-      const ready = await waitForVideoContainerReady(creationId, token);
+      const ready = await waitForVideoContainerReady(base, creationId, token);
       if (!ready.ok) {
         return ready;
       }
     }
 
-    return publishCreationId(igUserId, token, creationId);
+    return publishCreationId(base, igUserId, token, creationId);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { ok: false, error: cleanError(`network: ${message}`, token) };
@@ -440,7 +450,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   for (const row of claimed.rows) {
     let token = "";
     const accounts = await pool.query<AccountRow>(
-      `select id, external_id, access_token_enc from socialapp.social_accounts
+      `select id, external_id, access_token_enc, auth_type from socialapp.social_accounts
        where user_id=$1 and platform='instagram' and status='active'
        order by created_at limit 1`,
       [row.user_id],
@@ -469,7 +479,9 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
 
     const caption = row.caption_override ?? row.caption;
     const igFormat = row.ig_format === "story" ? "story" : "feed";
+    const base = graphBaseFor(account.auth_type);
     const outcome = await publishToInstagram(
+      base,
       account.external_id,
       token,
       row.media,
@@ -486,6 +498,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
       if (shouldPostFirstComment(igFormat, row.first_comment)) {
         try {
           const comment = await postForId(
+            base,
             `${encodeURIComponent(outcome.externalPostId)}/comments`, token,
             { message: row.first_comment },
           );

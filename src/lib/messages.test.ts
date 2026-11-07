@@ -327,3 +327,56 @@ test("an email-gated story automation asks first, then the reply unlocks its lin
   });
   assert.deepEqual(kinds(world), [["rule-story", "story_reply"], ["rule-story", "gated_link"]]);
 });
+
+// Facebook Login for Business: the same webhook payloads (object "instagram", entry.id = IG account id).
+const FB_ACCOUNT = { ...ACCOUNT, auth_type: "facebook_login" };
+
+test("facebook login: a comment webhook with an emoji keyword queues one private reply for the commenter", async () => {
+  const { extractCommentEvents, processCommentEvents } = await import("./comments.ts");
+  const world = createDmWorld({ accounts: [{ ...FB_ACCOUNT }], rules: [rule({ id: "rule-a", keywords: ["🔥"] })] });
+  const body = {
+    object: "instagram",
+    entry: [{ id: "ig-acct", time: Math.floor(Date.now() / 1000), changes: [{ field: "comments", value: { id: "c-1", text: "🔥🔥", from: { id: "fan", username: "fan" }, media: { id: "m1" } } }] }],
+  };
+  await inWorld(world, true, async () => {
+    assert.equal(await processCommentEvents(extractCommentEvents(body)), 1);
+    // Meta retries the same delivery: still exactly one private reply.
+    assert.equal(await processCommentEvents(extractCommentEvents(body)), 0);
+  });
+  assert.equal(world.queue.length, 1);
+  assert.equal(world.queue[0].comment_id, "c-1");
+  assert.equal(world.queue[0].recipient_external_id, "fan");
+  assert.equal(world.queue[0].kind, "comment_reply");
+});
+
+test("facebook login: a DM reply with an email is captured as a lead and unlocks the gated link", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...FB_ACCOUNT }],
+    rules: [rule({ id: "rule-a", email_gate: true })],
+    contacts: [lead()],
+    queue: [sentPrompt("p1", "contact-lead", "rule-a", 1000)],
+  });
+  await inWorld(world, true, async (fetches) => {
+    assert.equal(await processMessageEvents([reply("sure, it's Jane@Example.com")]), 1);
+    assert.equal(fetches.length, 0);
+  });
+  assert.equal(world.contacts[0].email, "jane@example.com");
+  assert.deepEqual(kinds(world), [["rule-a", "gated_link"]]);
+});
+
+test("facebook login: the follower check for a follow-gated link asks graph.facebook.com", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...FB_ACCOUNT }],
+    rules: [rule({ id: "rule-a", follow_gate: true })],
+    contacts: [lead()],
+    queue: [sentPrompt("p1", "contact-lead", "rule-a", 1000)],
+  });
+  await inWorld(world, true, async (fetches) => {
+    await processMessageEvents([reply("done")]);
+    assert.equal(fetches.length, 1);
+    assert.match(fetches[0], /^https:\/\/graph\.facebook\.com\/v23\.0\/lead\?fields=is_user_follow_business$/);
+  });
+  assert.deepEqual(kinds(world), [["rule-a", "gated_link"]]);
+});

@@ -1,11 +1,11 @@
 import { decryptToken } from "@/lib/crypto";
 import { commentTime, processCommentEvents, type CommentEvent } from "@/lib/comments";
 import { query } from "@/lib/db";
+import { graphBaseFor } from "@/lib/graphHost";
 
 /** Errors whose message is safe and meant for the user. */
 export class RewindError extends Error {}
 
-const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const FETCH_TIMEOUT_MS = 15_000;
 const MEDIA_LIMIT = 25;
 const COMMENTS_LIMIT = 50;
@@ -21,6 +21,7 @@ type AccountRow = {
   id: string;
   external_id: string;
   access_token_enc: string | null;
+  auth_type?: string | null;
 };
 
 type GraphPaging = {
@@ -100,6 +101,7 @@ async function fetchPaged<T>(
 }
 
 async function collectCommentsForAccount(
+  base: string,
   externalId: string,
   token: string,
   sinceMs: number,
@@ -111,7 +113,7 @@ async function collectCommentsForAccount(
     (after) => {
       const params = new URLSearchParams({ fields: "id,timestamp", limit: String(MEDIA_LIMIT) });
       if (after) params.set("after", after);
-      return `${GRAPH_BASE}/${encodeURIComponent(externalId)}/media?${params.toString()}`;
+      return `${base}/${encodeURIComponent(externalId)}/media?${params.toString()}`;
     },
     token,
     MEDIA_LIMIT,
@@ -127,7 +129,7 @@ async function collectCommentsForAccount(
       (after) => {
         const params = new URLSearchParams({ fields: "id,text,timestamp,from", limit: String(COMMENTS_LIMIT) });
         if (after) params.set("after", after);
-        return `${GRAPH_BASE}/${encodeURIComponent(mediaId)}/comments?${params.toString()}`;
+        return `${base}/${encodeURIComponent(mediaId)}/comments?${params.toString()}`;
       },
       token,
       COMMENTS_LIMIT,
@@ -170,7 +172,7 @@ export async function rewindRule(
   }
 
   let accountSql =
-    "select id, external_id, access_token_enc from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active'";
+    "select id, external_id, access_token_enc, auth_type from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active'";
   const accountParams: string[] = [userId];
   if (rule.social_account_id) {
     accountSql += " and id=$2";
@@ -199,7 +201,7 @@ export async function rewindRule(
       failures += 1;
       continue;
     }
-    const result = await collectCommentsForAccount(account.external_id, token, sinceMs);
+    const result = await collectCommentsForAccount(graphBaseFor(account.auth_type), account.external_id, token, sinceMs);
     allEvents.push(...result.events);
     failures += result.failures;
     completed += result.completed;

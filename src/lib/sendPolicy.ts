@@ -22,10 +22,18 @@ function metaErrorCode(body: unknown): number | null {
   return Number.isFinite(code) ? code : null;
 }
 
+function metaErrorMessage(body: unknown): string {
+  if (typeof body !== "object" || body === null) return "";
+  const err = (body as { error?: unknown }).error;
+  if (typeof err !== "object" || err === null) return "";
+  const msg = (err as { message?: unknown }).message;
+  return typeof msg === "string" ? msg : "";
+}
+
 // status 0 (or any non-HTTP value) means a network error.
 export function classifyMetaError(status: number, body: unknown): MetaErrorClass {
   const code = metaErrorCode(body);
-  if (status === 429 || (code !== null && RATE_LIMIT_CODES.has(code))) {
+  if (status === 429 || (code !== null && RATE_LIMIT_CODES.has(code)) || /too many|rate limit|limit reached/i.test(metaErrorMessage(body))) {
     return "rate_limited";
   }
   if (!Number.isFinite(status) || status <= 0 || status >= 500) {

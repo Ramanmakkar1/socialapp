@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import ts from "typescript";
+import * as graphHost from "./graphHost.ts";
 
 const source = readFileSync(new URL("./rewind.ts", import.meta.url), "utf8");
 const compiled = ts.transpileModule(source, {
@@ -14,6 +15,7 @@ function harness({ mediaPages, commentPages, fail, triggers = ["comment"] } = {}
   let accountQueries = 0;
   const timestamp = (days) => new Date(Date.now() - days * 86_400_000).toISOString();
   const imports = (id) => {
+    if (id === "@/lib/graphHost") return graphHost;
     if (id === "@/lib/crypto") return { decryptToken: () => "token" };
     if (id === "@/lib/comments") return { processCommentEvents: async (events, scope) => {
       processed.push({ events, scope });
@@ -90,7 +92,7 @@ test("recent comments on older posts reach replay; expired comments and excess p
   const scan = harness();
   assert.deepEqual(await scan.run(), { queued: 1, scanned: 1, failures: 0 });
   assert.equal(scan.requests.length, 26);
-  assert.equal(scan.requests.at(-1).pathname, "/v21.0/old-24/comments");
+  assert.equal(scan.requests.at(-1).pathname, "/v23.0/old-24/comments");
   // Replay keeps the comment's original time (bug j), not the time of the replay.
   const createdAt = scan.processed[0]?.events[0]?.createdAt;
   assert.equal(typeof createdAt, "string");
@@ -129,7 +131,7 @@ test("media and comment caps stop paging at 25 posts and 50 comments", async () 
   const scan = harness({ mediaPages, commentPages });
   assert.deepEqual(await scan.run(), { queued: 50, scanned: 50, failures: 0 });
   assert.equal(scan.requests.filter((r) => r.pathname.endsWith("/media")).length, 2);
-  assert.equal(scan.requests.filter((r) => r.pathname === "/v21.0/m0/comments").length, 2);
+  assert.equal(scan.requests.filter((r) => r.pathname === "/v23.0/m0/comments").length, 2);
   assert.equal(scan.requests.length, 28);
 });
 
@@ -147,7 +149,7 @@ test("duplicate IDs across pages are counted once against the caps", async () =>
   const scan = harness({ mediaPages, commentPages });
   assert.deepEqual(await scan.run(), { queued: 3, scanned: 3, failures: 0 });
   assert.deepEqual(scan.processed[0].events.map((e) => e.commentId), ["x", "y", "z"]);
-  assert.equal(scan.requests.filter((r) => r.pathname === "/v21.0/a/comments").length, 2);
+  assert.equal(scan.requests.filter((r) => r.pathname === "/v23.0/a/comments").length, 2);
 });
 
 test("a repeated cursor stops paging", async () => {
@@ -171,7 +173,7 @@ test("a later-page failure preserves earlier results and counts as a failure", a
     if (after === null) return { data: [recent("x")], paging: { cursors: { after: "p1" } } };
     return { data: [recent("y")] };
   };
-  const fail = (path, after) => (path.pathname === "/v21.0/a/comments" && after === "p1" ? "throw" : null);
+  const fail = (path, after) => (path.pathname === "/v23.0/a/comments" && after === "p1" ? "throw" : null);
   const scan = harness({ mediaPages, commentPages, fail });
   assert.deepEqual(await scan.run(), { queued: 1, scanned: 1, failures: 1 });
   assert.deepEqual(scan.processed[0].events.map((e) => e.commentId), ["x"]);

@@ -17,7 +17,7 @@ export default async function AccountInsightsPanel({ userId }: { userId: string 
   let rows: Row[] = [];
   try {
     rows = await query<Row>(
-      "select id, external_id, access_token_enc, username from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active' order by created_at limit 5",
+      "select id, external_id, access_token_enc, auth_type, username from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active' order by created_at limit 5",
       [userId]
     );
   } catch {

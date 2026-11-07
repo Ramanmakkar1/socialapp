@@ -14,8 +14,8 @@ import {
   nextAttemptDelayMs,
   remainingBudget,
 } from "@/lib/sendPolicy";
+import { graphBaseFor } from "@/lib/graphHost";
 
-const GRAPH_BASE = "https://graph.instagram.com/v21.0";
 const SEND_TIMEOUT_MS = 15_000;
 const RATE_LIMIT_PAUSE_MS = 15 * 60 * 1000;
 /** Namespace for pg_try_advisory_xact_lock per Instagram account in sendDueDms. */
@@ -23,7 +23,7 @@ const DM_SEND_ADVISORY_NS = "socialapp:ig_dm_send";
 /** Max pending rows considered per account per run (must exclude paused rules in SQL). */
 export const DUE_ROW_LIMIT = 500;
 
-type AccountRow = { id: string; external_id: string; access_token_enc: string | null };
+type AccountRow = { id: string; external_id: string; access_token_enc: string | null; auth_type?: string | null };
 type QueueRow = {
   id: string;
   user_id: string;
@@ -113,13 +113,19 @@ async function inboundDmWindowError(
   return "Outside Instagram's 24-hour messaging window";
 }
 
-async function sendPrivateReply(
+/**
+ * Instagram messaging: POST {ig-user-id}/messages. A comment reply goes to {comment_id} (one private
+ * reply per comment, within 7 days); every other DM goes to the person's IGSID (24 h window).
+ * Facebook-login accounts use graph.facebook.com with the Page token.
+ */
+export async function sendPrivateReply(
+  base: string,
   igUserId: string,
   token: string,
   row: QueueRow
 ): Promise<SendOutcome> {
   try {
-    const res = await fetch(`${GRAPH_BASE}/${encodeURIComponent(igUserId)}/messages`, {
+    const res = await fetch(`${base}/${encodeURIComponent(igUserId)}/messages`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -160,7 +166,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
   const result: SendResult = { sent: 0, retried: 0, failed: 0, skipped: 0 };
   const pool = getPool();
   const accounts = await pool.query<AccountRow>(
-    "select id, external_id, access_token_enc from socialapp.social_accounts where platform='instagram' and status='active' order by created_at"
+    "select id, external_id, access_token_enc, auth_type from socialapp.social_accounts where platform='instagram' and status='active' order by created_at"
   );
 
   let left = Math.max(0, Math.floor(limit));
@@ -307,7 +313,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
         let sendRow = row;
         if (row.kind === "follow_check") {
           // Durable follower re-check for a gated link (queued when Instagram did not answer).
-          const following = await isFollower(row.recipient_external_id, token);
+          const following = await isFollower(row.recipient_external_id, token, account.auth_type);
           if (following === null) {
             const attempts = row.attempts + 1;
             if (attempts >= MAX_ATTEMPTS) {
@@ -335,7 +341,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           }
         }
 
-        const outcome = await sendPrivateReply(account.external_id, token, sendRow);
+        const outcome = await sendPrivateReply(graphBaseFor(account.auth_type), account.external_id, token, sendRow);
         left -= 1;
         if (outcome.ok) {
           await client.query(

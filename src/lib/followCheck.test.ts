@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, mock, test } from "node:test";
 import ts from "typescript";
+import * as graphHost from "./graphHost.ts";
 
 // Use the same isolated TypeScript execution approach as rewind.test.mjs.
 const compiled = ts.transpileModule(
@@ -11,7 +12,7 @@ const compiled = ts.transpileModule(
 const exports = {} as {
   isFollower: (igsid: string, token: string) => Promise<boolean | null>;
 };
-new Function("require", "exports", compiled)(() => ({}), exports);
+new Function("require", "exports", compiled)((id: string) => (id === "@/lib/graphHost" ? graphHost : {}), exports);
 const { isFollower } = exports;
 const nativeTimeout = AbortSignal.timeout.bind(AbortSignal);
 

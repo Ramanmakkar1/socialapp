@@ -193,6 +193,7 @@ type MockSocialAccount = {
   dm_cooldown_until: Date | null;
   access_token_enc: string;
   created_at: number;
+  auth_type?: string;
 };
 
 type MockDmQueueRow = QueueRow & { next_attempt_at?: number; sent_at?: number | null; last_error?: string | null };
@@ -239,6 +240,7 @@ function installSendDueDmsHarness(
             id: a.id,
             external_id: a.external_id,
             access_token_enc: a.access_token_enc,
+            auth_type: a.auth_type,
           })),
       };
     }
@@ -994,6 +996,92 @@ test("sendDueDms: the monthly auto-DM plan limit is enforced on the server", asy
       assert.equal(result.skipped, 1);
       assert.equal(ctx.queue[0]?.status, "skipped");
       assert.match(ctx.queue[0]?.last_error ?? "", /Monthly auto-DM limit reached \(500 on the Free plan\)/);
+    }
+  );
+});
+
+// Facebook Login for Business accounts: same queue, Graph host = graph.facebook.com with the Page token.
+function fbAccount(): MockSocialAccount {
+  return { id: "acc-fb", external_id: "ig-fb", status: "active", dm_cooldown_until: null, access_token_enc: "", created_at: 1, auth_type: "facebook_login" };
+}
+const fbRules: RuleRow[] = [{ id: "rule-active", user_id: "user-1", social_account_id: "acc-fb", status: "active" }];
+
+test("sendDueDms (facebook login): a matched comment gets one private reply via graph.facebook.com/{ig-id}/messages", async () => {
+  const calls: { url: string; init?: RequestInit }[] = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), init });
+    return { ok: true, text: async () => "" } as Response;
+  };
+  await withSendDueDmsEnv(
+    [fbAccount()],
+    [baseQueueRow({ id: "q-comment", social_account_id: "acc-fb", comment_id: "17890001", recipient_external_id: "igsid-1", message: "Here is the link" })],
+    fbRules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.sent, 1);
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].url, "https://graph.facebook.com/v23.0/ig-fb/messages");
+      assert.equal(calls[0].init?.method, "POST");
+      assert.equal((calls[0].init?.headers as Record<string, string>).Authorization, "Bearer test-token");
+      assert.deepEqual(JSON.parse(String(calls[0].init?.body)), {
+        recipient: { comment_id: "17890001" },
+        message: { text: "Here is the link" },
+      });
+      assert.equal(ctx.queue[0]?.status, "sent");
+      // A second run never sends the same private reply again.
+      const again = await sendDueDms(50);
+      assert.equal(again.sent, 0);
+      assert.equal(calls.length, 1);
+    }
+  );
+});
+
+test("sendDueDms (facebook login): a gated follow-up DM goes to the IGSID only inside the 24-hour window", async () => {
+  const calls: { url: string; init?: RequestInit }[] = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), init });
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const inbound = new Map<string, InboundMock>([
+    ["ig-fb:customer-in", new Date(Date.now() - 2 * HOUR_MS)],
+    ["ig-fb:customer-out", new Date(Date.now() - 30 * HOUR_MS)],
+  ]);
+  await withSendDueDmsEnv(
+    [fbAccount()],
+    [
+      dmFollowUpRow({ id: "q-in", social_account_id: "acc-fb", recipient_external_id: "customer-in", kind: "gated_link", message: "Thanks! Here's your link" }),
+      dmFollowUpRow({ id: "q-out", social_account_id: "acc-fb", recipient_external_id: "customer-out", kind: "gated_link", message: "Thanks! Here's your link" }),
+    ],
+    fbRules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.sent, 1);
+      assert.equal(result.skipped, 1);
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].url, "https://graph.facebook.com/v23.0/ig-fb/messages");
+      assert.deepEqual(JSON.parse(String(calls[0].init?.body)).recipient, { id: "customer-in" });
+      assert.equal(ctx.queue.find((q) => q.id === "q-out")?.status, "skipped");
+      assert.match(ctx.queue.find((q) => q.id === "q-out")?.last_error ?? "", /24-hour/);
+    },
+    inbound
+  );
+});
+
+test("sendDueDms (facebook login): 'too many' / code 613 puts the account on cooldown and keeps the DM", async () => {
+  globalThis.fetch = async () =>
+    ({ ok: false, status: 400, text: async () => JSON.stringify({ error: { code: 613, message: "Calls to this api have exceeded the rate limit." } }) }) as Response;
+  await withSendDueDmsEnv(
+    [fbAccount()],
+    [baseQueueRow({ id: "q-rl", social_account_id: "acc-fb", comment_id: "c-rl" })],
+    fbRules,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.retried, 1);
+      assert.equal(ctx.queue[0]?.status, "pending");
+      assert.ok(ctx.accounts[0].dm_cooldown_until && ctx.accounts[0].dm_cooldown_until.getTime() > Date.now());
     }
   );
 });

@@ -46,7 +46,7 @@ export type WQueue = {
   next_attempt_at: number;
 };
 
-export type WAccount = { id: string; user_id: string; external_id: string; status: string; access_token_enc: string | null; dm_cooldown_until: Date | null };
+export type WAccount = { id: string; user_id: string; external_id: string; status: string; access_token_enc: string | null; dm_cooldown_until: Date | null; auth_type?: string };
 
 export function rule(overrides: Partial<WRule> & Pick<WRule, "id">): WRule {
   return {
@@ -87,8 +87,8 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
       reply: (p) => accounts.filter((a) => a.external_id === p[0] && a.status === "active").map((a) => ({ id: a.id, user_id: a.user_id })),
     },
     {
-      match: /^select access_token_enc from socialapp\.social_accounts where id=\$1/,
-      reply: (p) => accounts.filter((a) => a.id === p[0]).map((a) => ({ access_token_enc: a.access_token_enc })),
+      match: /^select access_token_enc, auth_type from socialapp\.social_accounts where id=\$1/,
+      reply: (p) => accounts.filter((a) => a.id === p[0]).map((a) => ({ access_token_enc: a.access_token_enc, auth_type: a.auth_type ?? "instagram_login" })),
     },
     {
       match: /^select id, email from socialapp\.contacts/,
