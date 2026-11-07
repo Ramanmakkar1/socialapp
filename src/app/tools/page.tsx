@@ -65,6 +65,11 @@ const tools = [
     description: "Get ready-to-copy Instagram bio ideas for your niche, with emojis, line breaks and a clear call to action.",
   },
   {
+    href: "/tools/instagram-caption-generator",
+    title: "Instagram caption generator",
+    description: "Generate engaging Instagram post captions with hooks, clean line breaks, and comment CTAs for any niche.",
+  },
+  {
     href: "/tools/instagram-engagement-rate-calculator",
     title: "Instagram engagement rate calculator",
     description: "Calculate engagement rate by followers or reach from likes, comments, saves and shares.",
