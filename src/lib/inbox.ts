@@ -28,7 +28,7 @@ export type InboxComment = {
   dmStatus: string | null;
 };
 
-export type ThreadMessage = { direction: "in" | "out"; text: string; at: Date };
+export type ThreadMessage = { direction: "in" | "out"; text: string; at: Date; ai?: boolean };
 
 export type Thread = {
   accountId: string;
@@ -102,8 +102,8 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
 
   const accountIds = accounts.map((a) => a.id);
   if (accountIds.length > 0) {
-    const sent = await query<{ social_account_id: string; recipient_external_id: string; comment_id: string | null; message: string; status: string; sent_at: Date | null; created_at: Date }>(
-      `select social_account_id, recipient_external_id, comment_id, message, status, sent_at, created_at from socialapp.dm_queue
+    const sent = await query<{ social_account_id: string; recipient_external_id: string; comment_id: string | null; message: string; status: string; sent_at: Date | null; created_at: Date; kind: string }>(
+      `select social_account_id, recipient_external_id, comment_id, message, status, sent_at, created_at, kind from socialapp.dm_queue
        where user_id=$1 and social_account_id = any($2::uuid[]) and created_at > now() - interval '30 days'
        order by created_at desc limit 500`,
       [userId, accountIds]
@@ -119,7 +119,7 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
         t = { accountId: s.social_account_id, senderId: s.recipient_external_id, username: null, lastInboundAt: null, lastAt: at, lastText: s.message, messages: [] };
         threads.set(key, t);
       }
-      t.messages.push({ direction: "out", text: s.message, at });
+      t.messages.push({ direction: "out", text: s.message, at, ai: s.kind === "ai_reply" });
     }
     for (const c of comments) c.dmStatus = dmByComment.get(c.commentId) ?? null;
 
