@@ -9,6 +9,7 @@ import { BRAND } from "@/lib/brand";
 import { isDbConfigured, query } from "@/lib/db";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
+import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { deleteMyAccountAction, disconnectAccountAction, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 import DeleteAccountForm from "./DeleteAccountForm";
@@ -46,6 +47,11 @@ const TOKEN_PILL: Record<ReturnType<typeof tokenState>, { label: string; classNa
   expired: { label: "Reconnect needed", className: `${ui.pill} ${ui.pillPeach}` },
 };
 
+function platformLabel(p: string): string {
+  if (p === "threads") return "Threads";
+  return p;
+}
+
 const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   connected: { tone: "ok", text: "Instagram account connected." },
   error: { tone: "warn", text: "We couldn't connect your Instagram account. Please try again." },
@@ -62,13 +68,22 @@ const BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   pick_expired: { tone: "warn", text: "Choosing an account took too long. Please connect again." },
 };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[] }> }) {
+const THREADS_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
+  connected: { tone: "ok", text: "Threads connected. You can now pick Threads when you schedule a post." },
+  declined: { tone: "warn", text: "You declined the permissions Poskoo needs for Threads. Try again and keep all boxes ticked." },
+  state_error: { tone: "warn", text: "The Threads login link expired or was opened in another browser. Please connect again from this page." },
+  error: { tone: "warn", text: "We couldn't connect your Threads account. Please try again." },
+  not_configured: { tone: "warn", text: "Threads connection isn't set up on this server yet." },
+};
+
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[] }> }) {
   const user = await requireUser();
-  const { ig, voice: voiceParam, account: accountParam } = await searchParams;
+  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam } = await searchParams;
   const voiceSaved = voiceParam === "saved";
   const voiceFailed = voiceParam === "error";
   const account = typeof accountParam === "string" ? accountParam : null;
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
+  const threadsBanner = typeof threadsParam === "string" && Object.hasOwn(THREADS_BANNERS, threadsParam) ? THREADS_BANNERS[threadsParam] : null;
   const accounts = isDbConfigured()
     ? await query<Account>(
         "select id, external_id, access_token_enc, platform, username, status, token_expires_at, auth_type, page_name from socialapp.social_accounts where user_id=$1 order by created_at",
@@ -93,10 +108,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {banner && (
         <p role="status" className={`${ui.notice} ${banner.tone === "warn" ? ui.noticeWarn : ""}`}>{banner.text}</p>
       )}
+      {threadsBanner && (
+        <p role="status" className={`${ui.notice} ${threadsBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{threadsBanner.text}</p>
+      )}
       <section className={styles.section} aria-labelledby="accounts-heading">
         <div className={styles.sectionHeader}>
           <h2 id="accounts-heading" className={styles.sectionTitle}>Connected accounts</h2>
           {accounts.length > 0 && connectReady ? <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA> : null}
+          {isThreadsConfigured() ? <BtnA href="/api/threads/connect" size="sm">Connect Threads</BtnA> : null}
         </div>
         <p className={ui.hint}>
           Instagram professional account linked to a Facebook Page required.{" "}
@@ -133,7 +152,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                     ) : (
                       <span className={styles.username}>@{a.username ?? "unknown"}</span>
                     )}
-                    <span className={`${ui.pill} ${styles.platform}`}>{a.platform}</span>
+                    <span className={`${ui.pill} ${styles.platform}`}>{platformLabel(a.platform)}</span>
                   </div>
                   <div className={styles.accountActions}>
                     <span className={pill.className}>{pill.label}</span>
