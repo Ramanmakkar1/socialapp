@@ -6,6 +6,7 @@ import { hourBars, topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { getCommentActivity, getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import { BtnLink, PageHero } from "@/components/ui/kit";
+import LocalTime from "@/components/LocalTime";
 import ui from "@/components/ui/ui.module.css";
 import EmptyState from "../EmptyState";
 import AccountInsightsPanel from "../AccountInsights";
@@ -22,13 +23,6 @@ function shortCaption(caption: string): string {
   const text = caption.trim();
   if (!text) return "(no caption)";
   return text.length > 60 ? `${text.slice(0, 60).trimEnd()}…` : text;
-}
-
-function formatPublished(value: string | null): string {
-  if (!value) return "—";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 }
 
 function formatInsightMetric(value: number | null | undefined): string {
@@ -403,7 +397,7 @@ export default async function AnalyticsPage() {
                 {recentPosts.map((post) => (
                   <tr key={post.id} className={styles.tableRow}>
                     <td className="px-4 py-3">{shortCaption(post.caption)}</td>
-                    <td className="px-4 py-3 tabular-nums">{formatPublished(post.publishedAt)}</td>
+                    <td className="px-4 py-3 tabular-nums"><LocalTime value={post.publishedAt} style="medium" fallback="—" /></td>
                     <td className="px-4 py-3">{formatPlatforms(post.platforms)}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{formatInsightMetric(post.insights?.reach)}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{formatInsightMetric(post.insights?.likes)}</td>
