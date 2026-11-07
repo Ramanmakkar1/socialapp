@@ -24,9 +24,10 @@ export async function createUser(email: string, password: string, name?: string)
   return rows[0] ?? null;
 }
 
-// Returns the user when the email and password match, otherwise null.
-export async function verifyLogin(email: string, password: string): Promise<CurrentUser | null> {
-  const rows = await query<CurrentUser & { password_hash: string }>(
+// Returns the user when the email and password match, "google_only" for an account created with
+// Google that has no password (migration 016), otherwise null.
+export async function verifyLogin(email: string, password: string): Promise<CurrentUser | "google_only" | null> {
+  const rows = await query<CurrentUser & { password_hash: string | null }>(
     "select id, email, name, password_hash from users where email = $1",
     [normalizeEmail(email)]
   );
@@ -34,6 +35,10 @@ export async function verifyLogin(email: string, password: string): Promise<Curr
   if (!row) {
     await verifyPassword(password, DUMMY_HASH);
     return null;
+  }
+  if (!row.password_hash) {
+    await verifyPassword(password, DUMMY_HASH);
+    return "google_only";
   }
   if (!(await verifyPassword(password, row.password_hash))) {
     return null;

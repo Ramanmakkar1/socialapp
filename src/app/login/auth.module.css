@@ -124,3 +124,30 @@
 @media (prefers-reduced-motion: reduce) {
   .panel { transform: none; }
 }
+
+/* "or" divider + Continue with Google (landing line pill, full width like the form button). */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  color: var(--poskoo-muted);
+  font-size: .9rem;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1.5px solid var(--poskoo-line);
+}
+.card a.google {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin-top: 14px;
+  color: var(--poskoo-ink);
+}
+.googleNotice { margin-top: 16px; }

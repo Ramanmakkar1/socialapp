@@ -53,6 +53,9 @@ export async function loginAction(_prev: AuthState, formData: FormData): Promise
   }
   try {
     const user = (await reviewerLogin(email, password)) ?? (await verifyLogin(email, password));
+    if (user === "google_only") {
+      return { error: "This account uses Google sign-in. Press \"Continue with Google\" below." };
+    }
     if (!user) {
       return { error: "Wrong email or password." };
     }
