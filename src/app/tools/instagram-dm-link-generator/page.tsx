@@ -5,7 +5,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import DmLinkGenerator from "./DmLinkGenerator";
-import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 
 const PATH = "/tools/instagram-dm-link-generator";
 const description =
@@ -37,11 +37,6 @@ const faqs = [
 ];
 
 const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram DM Link Generator", description, url: `${BRAND.url}${PATH}` });
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: BRAND.url },
-  { name: "Free tools", url: `${BRAND.url}/tools` },
-  { name: "DM link generator", url: `${BRAND.url}${PATH}` },
-]);
 
 const codeStyle = { background: "var(--poskoo-band)", borderRadius: 8, padding: "2px 6px", fontSize: ".92em" } as const;
 
@@ -49,7 +44,6 @@ export default function InstagramDmLinkGeneratorPage() {
   return (
     <PublicShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
         <span className="pill">Free · runs in your browser · nothing is uploaded</span>
