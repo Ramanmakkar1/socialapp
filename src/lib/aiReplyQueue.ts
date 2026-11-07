@@ -79,8 +79,20 @@ export async function maybeQueueAiReply(params: {
       history.push({ direction: "in", text: params.text });
     }
 
+    let known: { email: string | null; phone: string | null } | undefined;
+    try {
+      const contactRows = await query<{ email: string | null; phone: string | null }>(
+        "select email, phone from socialapp.contacts where id=$1 and user_id=$2",
+        [params.contactId, params.userId],
+      );
+      const contactRow = contactRows[0];
+      known = { email: contactRow?.email ?? null, phone: contactRow?.phone ?? null };
+    } catch {
+      // If this query fails, carry on without known.
+    }
+
     // Meta expects the webhook to answer fast, so keep the AI call short.
-    const res = await generateAiDmReply(settings, history, { timeoutMs: 8000 });
+    const res = await generateAiDmReply(settings, history, { timeoutMs: 8000, known });
     if (!res.ok) {
       console.error("ai reply skipped", res.error);
       return false;

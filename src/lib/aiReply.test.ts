@@ -116,6 +116,41 @@ test('buildAiReplyPrompt: booking link / instructions / brand voice only when se
   assert.ok(full.system.includes('Brand voice: warm and calm'));
 });
 
+test('buildAiReplyPrompt: known contact details inform AI without leaking email/phone', () => {
+  const emailOnly = buildAiReplyPrompt(
+    settings,
+    [{ direction: 'in', text: 'hi' }],
+    { email: 'lead@example.com' }
+  );
+  assert.ok(emailOnly.system.includes('Contact details already collected: email on file. Do not ask for them again.'));
+  assert.ok(!emailOnly.system.includes('lead@example.com'));
+
+  const phoneOnly = buildAiReplyPrompt(
+    settings,
+    [{ direction: 'in', text: 'hi' }],
+    { phone: '+15551234567' }
+  );
+  assert.ok(phoneOnly.system.includes('Contact details already collected: phone on file. Do not ask for them again.'));
+  assert.ok(!phoneOnly.system.includes('+15551234567'));
+
+  const both = buildAiReplyPrompt(
+    settings,
+    [{ direction: 'in', text: 'hi' }],
+    { email: 'lead@example.com', phone: '+15551234567' }
+  );
+  assert.ok(both.system.includes('Contact details already collected: email and phone on file. Do not ask for them again.'));
+  assert.ok(!both.system.includes('lead@example.com'));
+  assert.ok(!both.system.includes('+15551234567'));
+
+  const none = buildAiReplyPrompt(
+    settings,
+    [{ direction: 'in', text: 'hi' }],
+    { email: null, phone: null }
+  );
+  assert.ok(!none.system.includes('Contact details already collected'));
+  assert.ok(!none.system.includes('Do not ask for them again'));
+});
+
 test('buildAiReplyPrompt: keeps 10 turns max and starts with a user turn', () => {
   const history: ChatTurn[] = [];
   for (let i = 0; i < 12; i++) {
