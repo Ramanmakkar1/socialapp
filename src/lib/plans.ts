@@ -24,6 +24,7 @@ export const PLANS: Plan[] = [
       { text: "Unlimited scheduling" },
       { text: "10,000 auto-DMs / month" },
       { text: "AI caption and DM message ideas" },
+      { text: "AI replies to DMs (collects contact details + booking link)" },
       { text: "Email & phone capture" },
       { text: "Click + lead analytics" },
     ],

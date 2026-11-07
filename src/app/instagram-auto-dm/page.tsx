@@ -39,7 +39,7 @@ const compare: [string, string, string][] = [
 const faqs = [
   { q: "How do I auto DM people who comment on Instagram?", a: `Connect your Instagram Business or Creator account to ${BRAND.name}, pick a post, set a keyword and write your message. Everyone who comments that keyword gets the DM automatically.` },
   { q: "Will auto DMs get my Instagram account banned?", a: "Not when you use the official Meta API. We never ask for your password, we respect Meta's rate limits and we only message people who commented first." },
-  { q: `Is ${BRAND.name} a ManyChat alternative?`, a: `Yes. ${BRAND.name} does comment-to-DM automation, email capture and AI replies, and also schedules your posts, so you can use one tool instead of two.` },
+  { q: `Is ${BRAND.name} a ManyChat alternative?`, a: `Yes. ${BRAND.name} does comment-to-DM automation, email capture and AI replies, and also schedules your posts, so you can use one tool instead of two. It can also answer DMs with AI replies that collect contact details and share your booking link.` },
   { q: "Do I need an Instagram business account?", a: "Yes, Meta only allows DM automation on Business or Creator accounts. Switching is free and takes about a minute in the Instagram app." },
 ];
 

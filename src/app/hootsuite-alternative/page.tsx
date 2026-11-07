@@ -33,7 +33,7 @@ const compare: [string, string, string, string][] = [
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram, Facebook Pages and Threads. ${BRAND.name} schedules and publishes your Instagram, Facebook Page and Threads posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in. Hootsuite covers more networks and team features today.` },
+  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram, Facebook Pages and Threads. ${BRAND.name} schedules and publishes your Instagram, Facebook Page and Threads posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in. It can also answer DMs with AI replies that collect contact details and share your booking link. Hootsuite covers more networks and team features today.` },
   { q: "Can I import my Hootsuite schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your schedule there.` },
   { q: "Which platforms are supported?", a: "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs. YouTube, LinkedIn, Pinterest, TikTok and WhatsApp come later." },
   { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
