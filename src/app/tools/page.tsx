@@ -100,6 +100,11 @@ const tools = [
     description: "Make 1080x1920 Reel covers with a title that stays inside the profile-grid crop.",
   },
   {
+    href: "/tools/instagram-story-maker",
+    title: "Instagram Story maker",
+    description: "Design a 1080×1920 Story with a photo, text and gradient background, then download the PNG. Safe zone guides keep text clear.",
+  },
+  {
     href: "/tools/instagram-post-ideas-generator",
     title: "Instagram post ideas generator",
     description: "Get 6 ready-to-use post ideas for your niche — Reels, carousels and Stories with hooks and caption starters.",
