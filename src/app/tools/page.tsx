@@ -89,6 +89,11 @@ const tools = [
     title: "Instagram Reels & Story safe zone checker",
     description: "Load an image or video frame and see what the Reels caption, buttons and Story bars cover. Download a free 1080×1920 template.",
   },
+  {
+    href: "/tools/instagram-post-ideas-generator",
+    title: "Instagram post ideas generator",
+    description: "Get 6 ready-to-use post ideas for your niche — Reels, carousels and Stories with hooks and caption starters.",
+  },
 ];
 
 const itemListJsonLd = {

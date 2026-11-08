@@ -55,6 +55,7 @@ export function GET() {
     "/tools/instagram-utm-builder",
     "/tools/instagram-comment-picker",
     "/tools/instagram-safe-zone-checker",
+    "/tools/instagram-post-ideas-generator",
   ];
   for (const path of toolPaths) {
     if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;
