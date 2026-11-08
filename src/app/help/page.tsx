@@ -51,8 +51,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/instagram-story-reply-auto-dm",
+    no: "06 / Auto-DM",
+    title: "Auto-DM Instagram Story replies",
+    text: "Send a DM with your link to everyone who replies to your Story with a keyword like FREE.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "06 / Contact",
+    no: "07 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",

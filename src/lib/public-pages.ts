@@ -39,6 +39,7 @@ export const PUBLIC_PATHS = [
   "/help/auto-dm-instagram-comments",
   "/help/schedule-instagram-stories",
   "/help/schedule-instagram-reels",
+  "/help/instagram-story-reply-auto-dm",
   "/instagram-scheduler",
   "/pricing",
 ] as const;
@@ -84,6 +85,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
   "/help/auto-dm-instagram-comments": { priority: 0.6, changeFrequency: "yearly" },
   "/help/schedule-instagram-stories": { priority: 0.6, changeFrequency: "yearly" },
   "/help/schedule-instagram-reels": { priority: 0.6, changeFrequency: "yearly" },
+  "/help/instagram-story-reply-auto-dm": { priority: 0.6, changeFrequency: "yearly" },
   "/instagram-scheduler": { priority: 0.8, changeFrequency: "weekly" },
   "/pricing": { priority: 0.8, changeFrequency: "weekly" },
 };
@@ -107,6 +109,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
   "/help/instagram-auto-dm-not-working": "Auto-DM Troubleshooting", "/help/auto-dm-instagram-comments": "Auto-DM Setup Guide",
   "/help/schedule-instagram-stories": "Schedule Instagram Stories",
   "/help/schedule-instagram-reels": "Schedule Instagram Reels",
+  "/help/instagram-story-reply-auto-dm": "Story Reply Auto-DM Guide",
   "/instagram-scheduler": "Instagram Scheduler",
   "/pricing": "Pricing",
 };
@@ -149,6 +152,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/help/auto-dm-instagram-comments": "Step-by-step guide to auto-DM everyone who comments a keyword on your Instagram posts.",
   "/help/schedule-instagram-stories": "Schedule Instagram Stories: paste one image or video link, pick a time and Poskoo publishes it for you.",
   "/help/schedule-instagram-reels": "Schedule Instagram Reels: paste one public .mp4 link, write a caption, pick a time and Poskoo publishes it for you.",
+  "/help/instagram-story-reply-auto-dm": "Step-by-step guide to auto-DM everyone who replies to your Instagram Story with a keyword.",
   "/instagram-scheduler": "Schedule Instagram posts with drag-and-drop calendar, feed, Reels and carousel support.",
   "/pricing": "Compare Poskoo Free, Pro and Agency plans.",
 };

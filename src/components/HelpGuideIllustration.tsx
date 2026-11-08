@@ -1,4 +1,4 @@
-type HelpGuideVariant = "start" | "troubleshoot" | "schedule" | "connect" | "autodm";
+type HelpGuideVariant = "start" | "troubleshoot" | "schedule" | "connect" | "autodm" | "story";
 
 const LABELS: Record<HelpGuideVariant, string> = {
   start: "Help guide checklist with a launch rocket",
@@ -6,6 +6,7 @@ const LABELS: Record<HelpGuideVariant, string> = {
   schedule: "Help guide checklist with a calendar and clock",
   connect: "Help guide checklist with two linked account circles",
   autodm: "Help guide checklist with a comment turning into a direct message",
+  story: "Help guide checklist with a story ring and a reply turning into a direct message",
 };
 
 function VariantIcon({ variant }: { variant: HelpGuideVariant }) {
@@ -56,6 +57,16 @@ function VariantIcon({ variant }: { variant: HelpGuideVariant }) {
           <path d="M264 70h8m-3-4 4 4-4 4" stroke="var(--line)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M276 56h20a8 8 0 0 1 8 8v10a8 8 0 0 1-8 8h-8l-6 5v-5h-6a8 8 0 0 1-8-8V64a8 8 0 0 1 8-8Z" fill="var(--brand-2)" />
           <path d="m282 66 4 4 7-8" fill="none" stroke="var(--surface)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        </g>
+      );
+    case "story":
+      return (
+        <g>
+          <circle cx="244" cy="70" r="18" fill="none" stroke="var(--brand)" strokeWidth="3" strokeDasharray="6 4" />
+          <circle cx="244" cy="70" r="10" fill="var(--brand-2)" opacity="0.35" />
+          <path d="M258 78c7 0 11-4 11-10" fill="none" stroke="var(--line)" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M266 50h20a7 7 0 0 1 7 7v8a7 7 0 0 1-7 7h-7l-6 5v-5h-7a7 7 0 0 1-7-7v-8a7 7 0 0 1 7-7Z" fill="var(--brand)" />
+          <path d="M270 60h12M270 66h8" stroke="var(--surface)" strokeWidth="2" strokeLinecap="round" />
         </g>
       );
   }
