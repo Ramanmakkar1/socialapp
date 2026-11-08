@@ -35,7 +35,7 @@ const ALL_SCOPES = [
   "instagram_basic",
   "instagram_manage_comments",
   "instagram_manage_messages",
-  "instagram_content_publishing",
+  "instagram_content_publish",
   "pages_show_list",
   "pages_manage_metadata",
   "pages_read_engagement",

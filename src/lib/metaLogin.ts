@@ -15,11 +15,12 @@ export const REQUIRED_META_SCOPES = [
   "instagram_basic",
   "instagram_manage_comments",
   "instagram_manage_messages",
-  "instagram_content_publishing",
+  "instagram_content_publish",
   "pages_show_list",
-  "pages_manage_metadata",
   "pages_read_engagement",
 ] as const;
+// 2026-11-07: pages_manage_metadata is NOT required. The Meta app's Instagram use case cannot grant it, and
+// subscribePage() failing without it is already handled (account is saved, subscribed=false).
 
 export type MetaLoginConfig = {
   appId: string;
