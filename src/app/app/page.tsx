@@ -5,7 +5,7 @@ import { Check, Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { instrumentSans } from "@/lib/fonts";
 import { EMPTY_STATS, getDashboardStats, getUpcomingPosts } from "@/lib/stats";
-import { BtnLink } from "@/components/ui/kit";
+import { BtnA, BtnLink } from "@/components/ui/kit";
 import uiKit from "@/components/ui/ui.module.css";
 import EmptyState from "./EmptyState";
 import UpcomingPosts from "./UpcomingPosts";
@@ -28,7 +28,7 @@ export default async function AppHome() {
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
   const upcoming = user ? await getUpcomingPosts(user.id) : [];
   const steps = [
-    { done: stats.hasAccount, label: "Connect Instagram", href: "/app/settings" },
+    { done: stats.hasAccount, label: "Connect Instagram", href: "/api/instagram/connect" },
     { done: stats.hasRule, label: "Create your first auto-DM rule", href: "/app/auto-dm" },
     { done: stats.hasPost, label: "Schedule your first post", href: "/app/calendar#new" },
   ];
@@ -49,6 +49,9 @@ export default async function AppHome() {
             {greeting()}, <em>creator.</em>
           </h1>
           <p className={styles.lede}>Here&apos;s what your Instagram automation did for you.</p>
+          {!stats.hasAccount && (
+            <BtnA href="/api/instagram/connect">Connect Instagram</BtnA>
+          )}
         </div>
         <BtnLink href="/app/calendar#new">
           <Plus width={16} height={16} aria-hidden="true" />
