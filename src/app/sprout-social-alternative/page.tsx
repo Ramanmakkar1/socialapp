@@ -23,7 +23,7 @@ const whyLook = [
 const compare: [string, string, string][] = [
   ["Instagram scheduling", "Yes", "Yes"],
   ["Visual calendar", "Yes", "Yes"],
-  ["Facebook & Threads publishing", "Coming soon", "Yes"],
+  ["Facebook & Threads publishing", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "No"],
   ["Email capture in the DM", "Yes", "No"],
   ["AI-written DM messages", "Yes", "See their site"],
@@ -41,7 +41,7 @@ const faqs = [
   { q: `Is ${BRAND.name} a Sprout Social alternative?`, a: `Yes, for Instagram. Sprout Social is an enterprise social media suite priced per seat, and it does not include built-in comment-to-DM keyword automation. ${BRAND.name} schedules and publishes your Instagram posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in. It can also answer DMs with AI replies that collect contact details and share your booking link.` },
   { q: "Why do teams switch from Sprout Social?", a: `Per-seat pricing adds up as the team grows, and comment-to-DM automation is not built in, so teams pay for a second tool on top. ${BRAND.name} combines Instagram scheduling, comment-to-DM, AI replies and lead capture in one flat plan. It can also answer DMs with AI replies that collect contact details and share your booking link.` },
   { q: "Can I import my Sprout Social schedule?", a: `There is no Sprout Social import yet. Add your upcoming posts to the ${BRAND.name} calendar. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
-  { q: "Which platforms are supported?", a: "Instagram scheduling and auto-DMs work today. Facebook Pages and Threads publishing are coming soon, then YouTube, LinkedIn, Pinterest, TikTok and WhatsApp." },
+  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages and Threads scheduling and auto-DMs work today. YouTube, LinkedIn, Pinterest, TikTok and WhatsApp are coming next." },
   { q: "Is there a free plan?", a: `Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and you can upgrade to Pro or Agency when you grow.` },
   { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
@@ -70,7 +70,7 @@ export default function SproutSocialAlternative() {
           Sprout Social alternative with Instagram <em className="s">auto-DM</em> built in
         </h1>
         <p className="lede">
-          Sprout Social is an enterprise suite priced per seat, with no built-in comment-to-DM keyword automation. {BRAND.name} schedules your Instagram posts (Facebook Pages and Threads coming soon) and auto-DMs every keyword commenter — capture emails, answer with AI and export leads in one flat plan.
+          Sprout Social is an enterprise suite priced per seat, with no built-in comment-to-DM keyword automation. {BRAND.name} schedules your Instagram, Facebook Page and Threads posts and auto-DMs every keyword commenter — capture emails, answer with AI and export leads in one flat plan.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
