@@ -81,8 +81,12 @@ export default async function AutoDmPage({
         emailGate: tpl.askEmail,
         followGate: tpl.requireFollow,
         matchType: tpl.matchMode === "any" ? "contains" : tpl.matchMode,
-        triggers: tpl.slug === "story-freebie" ? ["story_reply"] : ["comment"],
+        triggers: tpl.slug === "story-freebie" || tpl.slug === "dm-auto-reply" ? ["story_reply"] : ["comment"],
       };
+      if (tpl.slug === "dm-auto-reply") {
+        templateNote =
+          "This template replies to DMs that contain your keyword. It fires on story replies, which arrive as DMs — put the keyword on your story so people know what to reply with.";
+      }
       if (tpl.matchMode === "any") {
         templateNote =
           "This template uses “match any comment” in the library. Saved rules use “contains keyword” instead, because automations only support contains or exact match.";

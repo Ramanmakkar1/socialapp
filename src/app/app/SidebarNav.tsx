@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, MessageCircleHeart, Inbox, Users, BarChart3, Settings, BookOpenCheck } from "lucide-react";
+import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck } from "lucide-react";
 import styles from "./shell.module.css";
 
 const nav = [
   { href: "/app", icon: LayoutDashboard, label: "Overview" },
   { href: "/app/calendar", icon: CalendarDays, label: "Calendar" },
   { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Auto-DM" },
+  { href: "/app/templates", icon: LayoutTemplate, label: "Templates" },
   { href: "/app/inbox", icon: Inbox, label: "Inbox" },
   { href: "/app/leads", icon: Users, label: "Leads" },
   { href: "/app/analytics", icon: BarChart3, label: "Analytics" },

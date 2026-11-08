@@ -3,8 +3,30 @@ import assert from 'node:assert/strict';
 import { DM_TEMPLATES, toRule } from './dmTemplates';
 import { matchRule, validateRule } from './rules';
 
-test('there are 10 to 12 templates', () => {
-  assert.ok(DM_TEMPLATES.length >= 10 && DM_TEMPLATES.length <= 12);
+test('there are 10 to 20 templates', () => {
+  assert.ok(DM_TEMPLATES.length >= 10 && DM_TEMPLATES.length <= 20);
+});
+
+test('the templates gallery has every required template', () => {
+  const required = [
+    'send-link',
+    'story-freebie',
+    'follow-bonus',
+    'dm-auto-reply',
+    'affiliate-links',
+    'discount-code',
+    'product-link',
+    'price-request',
+    'thank-commenters',
+    'free-guide',
+    'email-checklist',
+    'course-waitlist',
+    'book-a-call',
+    'portfolio',
+    'webinar-signup',
+  ];
+  const slugs = new Set(DM_TEMPLATES.map((t) => t.slug));
+  for (const slug of required) assert.ok(slugs.has(slug), `missing template ${slug}`);
 });
 
 test('slugs are unique', () => {

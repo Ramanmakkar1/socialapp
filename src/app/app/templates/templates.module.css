@@ -1,0 +1,192 @@
+/* Templates gallery: category tabs + template cards with a chat mock. */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-card);
+  padding: 8px 16px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--poskoo-muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.tab:hover {
+  border-color: var(--poskoo-violet);
+  color: var(--poskoo-violet);
+  transform: translateY(-1px);
+}
+
+.tabActive {
+  border-color: var(--poskoo-violet);
+  background: var(--poskoo-violet);
+  color: #fff;
+}
+
+.tabActive:hover {
+  color: #fff;
+}
+
+.tabCount {
+  font-size: 0.78rem;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+@media (min-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  padding: 18px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--poskoo-shadow-float);
+  border-color: var(--poskoo-lilac);
+}
+
+/* Chat mock: a comment bubble becomes a DM bubble with a button. */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: var(--poskoo-radius-sm);
+  background: var(--poskoo-band);
+  padding: 12px;
+}
+
+.commentRow {
+  display: flex;
+}
+
+.commentBubble {
+  max-width: 85%;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--poskoo-card);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--poskoo-ink);
+}
+
+.arrow {
+  align-self: center;
+  color: var(--poskoo-violet);
+  margin: 2px 0 2px 22px;
+}
+
+.dmRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dmBubble {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 92%;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--poskoo-violet);
+  padding: 10px 12px;
+  color: #fff;
+}
+
+.dmText {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.dmButton {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--poskoo-radius-pill);
+  background: #fff;
+  color: var(--poskoo-violet);
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.title {
+  margin: 14px 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--poskoo-ink);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.use {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.useLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-ink);
+  color: #fff;
+  padding: 9px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.useLink:hover {
+  background: var(--poskoo-violet);
+  transform: translateY(-1px);
+}
