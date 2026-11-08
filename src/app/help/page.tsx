@@ -44,8 +44,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-instagram-reels",
+    no: "05 / Scheduling",
+    title: "Schedule Instagram Reels",
+    text: "Paste one public .mp4 link, write a caption, pick a time and see what a scheduled Reel needs, step by step.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "05 / Contact",
+    no: "06 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",
