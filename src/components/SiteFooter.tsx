@@ -56,6 +56,7 @@ export function SiteFooter() {
           { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
           { href: "/tools/instagram-post-preview", label: "Post preview" },
           { href: "/tools/instagram-safe-zone-checker", label: "Safe zone checker" },
+          { href: "/tools/instagram-highlight-cover-maker", label: "Highlight cover maker" },
           { href: "/tools/instagram-post-ideas-generator", label: "Post ideas" },
           { href: "/tools/instagram-utm-builder", label: "UTM builder" },
           { href: "/tools", label: "All free tools" },

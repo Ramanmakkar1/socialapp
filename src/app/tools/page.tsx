@@ -90,6 +90,11 @@ const tools = [
     description: "Load an image or video frame and see what the Reels caption, buttons and Story bars cover. Download a free 1080×1920 template.",
   },
   {
+    href: "/tools/instagram-highlight-cover-maker",
+    title: "Highlight Cover Maker",
+    description: "Make matching Instagram highlight covers with icons and brand colours, then download PNGs.",
+  },
+  {
     href: "/tools/instagram-post-ideas-generator",
     title: "Instagram post ideas generator",
     description: "Get 6 ready-to-use post ideas for your niche — Reels, carousels and Stories with hooks and caption starters.",
