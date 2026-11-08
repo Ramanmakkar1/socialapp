@@ -6,6 +6,7 @@ import { deleteAccountData, disconnectAccounts } from "@/lib/accountData";
 import { endSession, requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { TIMEZONES } from "@/lib/postingSchedule";
+import { disconnectYouTubeChannel } from "@/lib/youtubeAccounts";
 
 const SCHEDULE_PLATFORMS = ["instagram", "facebook", "threads"] as const;
 
@@ -38,6 +39,20 @@ export async function disconnectAccountAction(formData: FormData): Promise<void>
   }
   revalidatePath("/app/settings");
   redirect("/app/settings?ig=disconnected");
+}
+
+// Disconnect YouTube: marks the stored channel disconnected and clears the encrypted refresh token.
+export async function disconnectYouTubeAction(): Promise<void> {
+  const user = await requireUser();
+  if (!isDbConfigured()) return;
+  try {
+    await disconnectYouTubeChannel(user.id);
+  } catch (err) {
+    console.error("disconnectYouTubeAction failed for user", user.id, err instanceof Error ? err.message : err);
+    redirect("/app/settings?yt=disconnect_error");
+  }
+  revalidatePath("/app/settings");
+  redirect("/app/settings?yt=disconnected");
 }
 
 export async function saveBrandVoice(formData: FormData): Promise<void> {

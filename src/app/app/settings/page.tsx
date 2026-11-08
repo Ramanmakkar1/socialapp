@@ -11,7 +11,8 @@ import { isDbConfigured, query } from "@/lib/db";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
-import { deleteMyAccountAction, disconnectAccountAction, saveAiReplySettings, saveBrandVoice } from "./actions";
+import { isYouTubeConfigured } from "@/lib/youtubeAuth";
+import { deleteMyAccountAction, disconnectAccountAction, disconnectYouTubeAction, saveAiReplySettings, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 import ChannelSchedules, { type ChannelScheduleInput } from "./ChannelSchedules";
 import DeleteAccountForm from "./DeleteAccountForm";
@@ -78,9 +79,22 @@ const THREADS_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   not_configured: { tone: "warn", text: "Threads connection isn't set up on this server yet." },
 };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[] }> }) {
+const YOUTUBE_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
+  connected: { tone: "ok", text: "YouTube channel connected. You can now pick YouTube when you schedule a video." },
+  declined: { tone: "warn", text: "You declined the permissions Poskoo needs for YouTube. Try again and choose “Allow”." },
+  state_error: { tone: "warn", text: "The YouTube link expired or was opened in another browser. Please connect again from this page." },
+  no_refresh_token: { tone: "warn", text: "YouTube didn't grant upload access. Connect again and choose “Allow” so Poskoo can upload your videos." },
+  channel_not_found: { tone: "warn", text: "We couldn't find your YouTube channel. Please connect again." },
+  disconnected: { tone: "ok", text: "YouTube channel disconnected. New videos will no longer upload to it." },
+  disconnect_error: { tone: "warn", text: "We couldn't disconnect your YouTube channel. Please try again." },
+  not_configured: { tone: "warn", text: "YouTube connection isn't set up on this server yet." },
+  needs_reconnect: { tone: "warn", text: "YouTube needs you to reconnect so videos keep uploading. Connect again and choose “Allow”." },
+  error: { tone: "warn", text: "We couldn't connect your YouTube channel. Please try again." },
+};
+
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[]; yt?: string | string[] }> }) {
   const user = await requireUser();
-  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam } = await searchParams;
+  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam } = await searchParams;
   const voiceSaved = voiceParam === "saved";
   const voiceFailed = voiceParam === "error";
   const aiReplySaved = aiReplyParam === "saved";
@@ -90,6 +104,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const account = typeof accountParam === "string" ? accountParam : null;
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
   const threadsBanner = typeof threadsParam === "string" && Object.hasOwn(THREADS_BANNERS, threadsParam) ? THREADS_BANNERS[threadsParam] : null;
+  const youtubeBanner = typeof ytParam === "string" && Object.hasOwn(YOUTUBE_BANNERS, ytParam) ? YOUTUBE_BANNERS[ytParam] : null;
   const accounts = isDbConfigured()
     ? await query<Account>(
         "select id, external_id, access_token_enc, platform, username, status, token_expires_at, auth_type, page_name from socialapp.social_accounts where user_id=$1 order by created_at",
@@ -128,6 +143,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     }
   }
   channelSchedules.sort((a, b) => a.platform.localeCompare(b.platform));
+  const youtubeChannel = isDbConfigured()
+    ? (
+        await query<{ id: string; channel_id: string; title: string; avatar_url: string | null; status: string }>(
+          "select id, channel_id, title, avatar_url, status from socialapp.youtube_channels where user_id=$1 order by updated_at desc limit 1",
+          [user.id],
+        )
+      )[0] ?? null
+    : null;
   return (
     <div className={styles.page}>
       <PageHero
@@ -143,11 +166,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {threadsBanner && (
         <p role="status" className={`${ui.notice} ${threadsBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{threadsBanner.text}</p>
       )}
+      {youtubeBanner && (
+        <p role="status" className={`${ui.notice} ${youtubeBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{youtubeBanner.text}</p>
+      )}
       <section className={styles.section} aria-labelledby="accounts-heading">
         <div className={styles.sectionHeader}>
           <h2 id="accounts-heading" className={styles.sectionTitle}>Connected accounts</h2>
           {accounts.length > 0 && connectReady ? <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA> : null}
           {isThreadsConfigured() ? <BtnA href="/api/threads/connect" size="sm">Connect Threads</BtnA> : null}
+          {isYouTubeConfigured() ? <BtnA href="/api/youtube/connect" size="sm">Connect YouTube</BtnA> : null}
         </div>
         <p className={ui.hint}>
           Instagram professional account linked to a Facebook Page required.{" "}
@@ -215,6 +242,48 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               );
             })}
           </ul>
+        )}
+      </section>
+      <section className={styles.section} aria-labelledby="youtube-heading">
+        <div className={styles.sectionHeader}>
+          <h2 id="youtube-heading" className={styles.sectionTitle}>YouTube</h2>
+          {isYouTubeConfigured() && !youtubeChannel ? <BtnA href="/api/youtube/connect" size="sm">Connect YouTube</BtnA> : null}
+        </div>
+        {youtubeChannel ? (
+          <ul className={styles.accountList}>
+            <li className={styles.accountCard}>
+              <div className={styles.accountIdentity}>
+                {youtubeChannel.avatar_url ? (
+                  // YouTube CDN URLs expire, so a plain <img> (no Next image cache) is used on purpose.
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={youtubeChannel.avatar_url} alt="" width={44} height={44} className="h-11 w-11 shrink-0 rounded-full border border-[var(--poskoo-line)] object-cover" />
+                ) : null}
+                <span className={styles.username}>{youtubeChannel.title || "YouTube channel"}</span>
+                <span className={`${ui.pill} ${styles.platform}`}>YouTube</span>
+              </div>
+              <div className={styles.accountActions}>
+                {youtubeChannel.status === "active" ? (
+                  <>
+                    <span className={`${ui.pill} ${ui.pillMint}`}>Connected</span>
+                    <p className={`${ui.hint} ${styles.accountNote}`}>Videos you schedule upload to this channel at the set time.</p>
+                    <form action={disconnectYouTubeAction}>
+                      <SubmitButton label="Disconnect" pendingLabel="Disconnecting…" variant="ghost" size="sm" />
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <span className={`${ui.pill} ${ui.pillPeach}`}>Reconnect needed</span>
+                    <p className={`${ui.hint} ${styles.accountNote}`}>This channel stopped working. Connect again so scheduled videos keep uploading.</p>
+                    <BtnA href="/api/youtube/connect" size="sm">Reconnect</BtnA>
+                  </>
+                )}
+              </div>
+            </li>
+          </ul>
+        ) : (
+          <p className={ui.hint}>
+            Connect a YouTube channel to schedule video uploads. Poskoo asks for permission to upload videos and read your channel details; you can revoke access any time in your Google account settings.
+          </p>
         )}
       </section>
       <section className={`${styles.section} ${styles.voice}`} aria-labelledby="voice-heading">

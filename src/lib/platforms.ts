@@ -14,6 +14,10 @@ export const PLATFORMS = {
     captionMax: 500,
     hashtagMax: 1,
   },
+  youtube: {
+    label: "YouTube",
+    captionMax: 5000,
+  },
 } as const;
 
 export type PlatformId = keyof typeof PLATFORMS;

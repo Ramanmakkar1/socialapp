@@ -6,7 +6,7 @@ import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: { absolute: `Privacy Policy: How ${BRAND.name} Handles Your Instagram Data` },
-  description: "Read how Poskoo stores your Instagram, Facebook and Threads data, which cookies we use, and how to export or delete your account at any time.",
+  description: "Read how Poskoo stores your Instagram, Facebook, Threads and YouTube data, which cookies we use, and how to export or delete your account at any time.",
   alternates: { canonical: "/privacy" },
 };
 export default function Page() {
@@ -39,6 +39,15 @@ export default function Page() {
           <p><strong>Retention.</strong> We keep this data while your account is connected. When you disconnect, we delete your tokens straight away. When you ask for deletion (or remove the app in Instagram), we delete your connected-account tokens, posts, messages and contacts within 30 days.</p>
           <p><strong>No selling or sharing.</strong> We never sell Instagram or Meta data, never use it for advertising and never share it with third parties, except service providers that host the service for us.</p>
           <p><strong>Disconnect and delete.</strong> Disconnect any time in Settings → Connected accounts, or remove {BRAND.name} in Instagram (Settings → Website permissions → Apps and websites). See the <a href="/data-deletion">data deletion page</a> for every option.</p>
+          <h2 id="youtube">YouTube API Services</h2>
+          <p>When you connect a YouTube channel through Google&apos;s official sign-in, you choose to give {BRAND.name} these permissions. We only use them for the features you turn on:</p>
+          <ul>
+            <li><strong>Upload</strong> (youtube.upload): to upload the videos you schedule to your channel, at the time you pick, with the title, description, tags and visibility you set.</li>
+            <li><strong>Read</strong> (youtube.readonly): to show your channel name and avatar in Settings so you know which channel is connected.</li>
+          </ul>
+          <p><strong>Storage.</strong> Your YouTube refresh token is encrypted (AES-256-GCM) before it is stored and is never shown to anyone. We do not store your videos; YouTube keeps them on your channel.</p>
+          <p><strong>Revoking access.</strong> Disconnect any time in Settings → Connected accounts. You can also revoke {BRAND.name} from Google directly: go to <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer" target="_blank">myaccount.google.com/permissions</a>, find our app under &ldquo;Third-party apps &amp; add-ons&rdquo; and remove it. When you disconnect, we delete your token straight away.</p>
+          <p><strong>Google&apos;s policies.</strong> When you sign in, Google&apos;s <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Privacy Policy</a> and <a href="https://www.youtube.com/intl/en_US/Terms" rel="noopener noreferrer" target="_blank">YouTube Terms of Service</a> apply to how Google and YouTube handle your data. Google does not share your personal data with us except your channel name and avatar and the access you grant above.</p>
           <h2>Deleting your data</h2>
           <p>You can disconnect an account or delete everything at any time — see our <a href="/data-deletion">data deletion page</a>.</p>
           <h2 id="cookies">Cookies</h2>
@@ -46,7 +55,9 @@ export default function Page() {
             We use only essential cookies — no advertising or cross-site tracking cookies. Specifically:{" "}
             <strong>pf_session</strong> (httpOnly, about 30 days) keeps you logged in after sign-in; and{" "}
             <strong>ig_oauth_state</strong> (httpOnly, up to about 10 minutes, only while you connect Instagram)
-            protects the Instagram OAuth flow by matching the state parameter when Meta redirects back to us. Both are set by our server when you log in or start
+            protects the Instagram OAuth flow by matching the state parameter when Meta redirects back to us; and{" "}
+            <strong>yt_oauth</strong> (httpOnly, up to about 10 minutes, only while you connect YouTube)
+            protects the YouTube OAuth flow the same way when Google redirects back to us. All three are set by our server when you log in or start
             connecting an account.
           </p>
           <p>

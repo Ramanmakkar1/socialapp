@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AtSign, Facebook, Instagram, Sparkles } from "lucide-react";
+import { AtSign, Facebook, Instagram, Sparkles, Youtube as YouTube } from "lucide-react";
 import { nextAvailableSlot, savePost } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import { aiAvailable, suggestCaptions } from "./aiActions";
@@ -22,13 +22,14 @@ import {
 } from "@/lib/composerDraft";
 import ui from "@/components/ui/ui.module.css";
 
-const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
+const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
 const HANDLE = `@${BRAND.name.toLowerCase()}`;
 
 const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
   instagram: Instagram,
   facebook: Facebook,
   threads: AtSign,
+  youtube: YouTube,
 };
 
 function counterClass(length: number, max: number): string {
@@ -62,12 +63,13 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false, threadsReady = false, schedulePlatforms = [] }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[] }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const livePlatforms: PlatformId[] = ["instagram"];
   if (facebookReady) livePlatforms.push("facebook");
   if (threadsReady) livePlatforms.push("threads");
+  if (youtubeReady) livePlatforms.push("youtube");
   // Lazy initial state from the draft: the page keys this component by draft id, so a draft
   // opened by URL is filled in on the first render and switching drafts remounts cleanly.
   const [init] = useState(() => composerStateFromDraft(initialDraft));
@@ -84,6 +86,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const igFormatLegendId = useId();
   const aiTopicId = useId();
   const aiToneId = useId();
+  const ytTitleId = useId();
+  const ytTagsId = useId();
+  const ytPrivacyId = useId();
 
   const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>(init.enabled);
   const [activeTab, setActiveTab] = useState<PlatformId>("instagram");
@@ -96,6 +101,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [selectedRuleId, setSelectedRuleId] = useState(init.selectedRuleId);
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
+  const [ytTitle, setYtTitle] = useState("");
+  const [ytTags, setYtTags] = useState("");
+  const [ytPrivacy, setYtPrivacy] = useState<"public" | "unlisted" | "private">("public");
+  const [ytShorts, setYtShorts] = useState(false);
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [isPending, startTransition] = useTransition();
   const [aiOn, setAiOn] = useState<boolean | null>(null);
@@ -129,6 +138,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     setActiveTab("instagram");
     setScheduledAt("");
     setDraftId(undefined);
+    setYtTitle("");
+    setYtTags("");
+    setYtPrivacy("public");
+    setYtShorts(false);
     setAiOpen(false);
     setAiTopic("");
     setAiTone("friendly");
@@ -207,6 +220,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       mediaUrls,
       dmRuleId: selectedRuleId || null,
       igFormat: enabled.instagram ? igFormat : "feed",
+      ytTitle: enabled.youtube ? ytTitle : undefined,
+      ytTags: enabled.youtube ? ytTags.split(",").map((t) => t.trim()).filter((t) => t !== "") : undefined,
+      ytPrivacy: enabled.youtube ? ytPrivacy : undefined,
+      ytShorts: enabled.youtube ? ytShorts : undefined,
     };
   }
 
@@ -340,7 +357,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     ? "Facebook: reconnect in Settings and allow Page posting to enable"
                     : platform === "threads"
                       ? "Threads: connect your Threads account in Settings to enable"
-                      : `${PLATFORMS[platform].label} publishing is not available yet`
+                      : platform === "youtube"
+                        ? "YouTube: connect a channel in Settings to enable"
+                        : `${PLATFORMS[platform].label} publishing is not available yet`
                   : undefined;
                 return (
                   <button
@@ -632,6 +651,71 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               </p>
             )}
           </div>
+
+          {enabled.youtube && (
+            <div>
+              <span className="text-sm font-medium text-[#3d3450]">YouTube video details</span>
+              <div className="mt-2 space-y-3">
+                <div>
+                  <label htmlFor={ytTitleId} className="text-sm font-medium text-[#3d3450]">
+                    Video title
+                  </label>
+                  <input
+                    id={ytTitleId}
+                    type="text"
+                    maxLength={100}
+                    value={ytTitle}
+                    onChange={(e) => setYtTitle(e.target.value)}
+                    placeholder="Your video title"
+                    className="mt-1 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
+                  />
+                  <p className={`mt-1 text-xs ${counterClass(ytTitle.length, 100)}`}>
+                    {ytTitle.length} / 100 characters
+                  </p>
+                </div>
+                <div>
+                  <label htmlFor={ytTagsId} className="text-sm font-medium text-[#3d3450]">
+                    Tags (comma separated, optional)
+                  </label>
+                  <input
+                    id={ytTagsId}
+                    type="text"
+                    value={ytTags}
+                    onChange={(e) => setYtTags(e.target.value)}
+                    placeholder="e.g. garage, sale, tips"
+                    className="mt-1 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor={ytPrivacyId} className="text-sm font-medium text-[#3d3450]">
+                    Visibility
+                  </label>
+                  <select
+                    id={ytPrivacyId}
+                    value={ytPrivacy}
+                    onChange={(e) => setYtPrivacy(e.target.value as "public" | "unlisted" | "private")}
+                    className="mt-1 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)] focus:outline-none"
+                  >
+                    <option value="public">Public</option>
+                    <option value="unlisted">Unlisted</option>
+                    <option value="private">Private</option>
+                  </select>
+                </div>
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-[#3d3450]">
+                  <input
+                    type="checkbox"
+                    checked={ytShorts}
+                    onChange={(e) => setYtShorts(e.target.checked)}
+                    className="rounded border-[var(--poskoo-line)] text-[var(--poskoo-violet)] focus:ring-[var(--poskoo-violet)]"
+                  />
+                  This is a Short (vertical, under 60 seconds)
+                </label>
+                <p className="text-xs text-[var(--poskoo-muted)]">
+                  The caption above is used as the video description. Add a .mp4 video link above for the upload.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div>
             {rules.length > 0 ? (

@@ -29,16 +29,16 @@ export type ComposerState = {
   selectedRuleId: string;
 };
 
-const LIVE: PlatformId[] = ["instagram"];
+const LIVE: PlatformId[] = ["instagram", "youtube"];
 
 export function blankComposerState(): ComposerState {
   return {
     draftId: undefined,
     mainCaption: "",
     firstComment: "",
-    enabled: { instagram: true, facebook: false, threads: false },
-    customize: { instagram: false, facebook: false, threads: false },
-    customCaption: { instagram: "", facebook: "", threads: "" },
+    enabled: { instagram: true, facebook: false, threads: false, youtube: false },
+    customize: { instagram: false, facebook: false, threads: false, youtube: false },
+    customCaption: { instagram: "", facebook: "", threads: "", youtube: "" },
     mediaUrls: [""],
     igFormat: "feed",
     selectedRuleId: "",
@@ -59,9 +59,14 @@ export function composerStateFromDraft(draft?: ComposerDraftInitial | null): Com
     mainCaption: draft.caption ?? "",
     firstComment: draft.firstComment ?? "",
     // A draft saved with no platform (or only "coming soon" ones) still opens with Instagram on.
-    enabled: { instagram: draft.platforms.includes("instagram") || draft.platforms.length === 0, facebook: false, threads: false },
-    customize: { instagram: hasOverride("instagram"), facebook: false, threads: false },
-    customCaption: { instagram: overrides.instagram ?? "", facebook: "", threads: "" },
+    enabled: {
+      instagram: draft.platforms.includes("instagram") || draft.platforms.length === 0,
+      facebook: false,
+      threads: false,
+      youtube: draft.platforms.includes("youtube"),
+    },
+    customize: { instagram: hasOverride("instagram"), facebook: false, threads: false, youtube: hasOverride("youtube") },
+    customCaption: { instagram: overrides.instagram ?? "", facebook: "", threads: "", youtube: overrides.youtube ?? "" },
     mediaUrls: draft.mediaUrls.length ? [...draft.mediaUrls] : [""],
     igFormat: draft.igFormat === "story" ? "story" : "feed",
     selectedRuleId: draft.dmRuleId ?? "",

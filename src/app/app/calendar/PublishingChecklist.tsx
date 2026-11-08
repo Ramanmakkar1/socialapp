@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { checkCaption, PLATFORMS, type PlatformId } from "@/lib/platforms";
 
-const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads"];
+const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
 
 export type ChecklistFixTarget =
   | { kind: "platforms" }
@@ -232,6 +232,8 @@ export default function PublishingChecklist({
 
   const needsMediaForSchedule =
     instagramOn && igFormat === "story" ? mediaItems.length !== 1 : instagramOn && mediaItems.length === 0;
+  const youtubeOn = enabled.youtube;
+  const youtubeNeedsVideo = youtubeOn && mediaItems.filter((m) => m.type === "video").length === 0;
 
   let mediaDetail = formatExplainer(
     instagramOn ? igFormat : "feed",
@@ -244,6 +246,8 @@ export default function PublishingChecklist({
       igFormat === "story"
         ? "Story scheduling needs exactly one valid https media link."
         : "Instagram scheduling needs at least one valid https media link.";
+  } else if (youtubeNeedsVideo) {
+    mediaDetail = "YouTube scheduling needs a .mp4 video link.";
   } else if (urlList.length === 0) {
     mediaDetail = "No media added yet — optional for drafts; required to schedule on Instagram.";
   }
@@ -251,6 +255,7 @@ export default function PublishingChecklist({
   const mediaComplete =
     !mediaError &&
     !(instagramOn && needsMediaForSchedule) &&
+    !youtubeNeedsVideo &&
     (urlList.length === 0 || mediaItems.length === urlList.length);
 
   const captionRows = selected.map((platform) => {

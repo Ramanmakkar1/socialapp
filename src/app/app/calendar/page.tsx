@@ -125,6 +125,7 @@ export default async function CalendarPage({
   let facebookReady = false;
   let threadsReady = false;
   let schedulePlatforms: string[] = [];
+  let youtubeReady = false;
 
   const reloadHref =
     view === "month"
@@ -185,6 +186,15 @@ export default async function CalendarPage({
       threadsReady = false;
     }
     try {
+      const ytRows = await query<{ 1: unknown }>(
+        "select 1 from socialapp.youtube_channels where user_id=$1 and status='active' limit 1",
+        [user.id],
+      );
+      youtubeReady = ytRows.length > 0;
+    } catch {
+      youtubeReady = false;
+    }
+    try {
       commentHourRows = await query<{ hour: number; count: number }>(
         `select extract(hour from created_at at time zone 'UTC')::int as hour, count(*)::int as count from socialapp.dm_queue where user_id=$1 and created_at > now() - interval '30 days' group by 1`,
         [user.id],
@@ -239,7 +249,7 @@ export default async function CalendarPage({
         eyebrow="Plan your posts"
         title="Your"
         accent="calendar"
-        lede="Plan and schedule posts for Instagram, Facebook and Threads."
+        lede="Plan and schedule posts for Instagram, Facebook, Threads and YouTube."
         art="/landing/card-schedule.webp"
         artAlt=""
       />
@@ -257,7 +267,7 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} />
+        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} />
       )}
       <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
         <Link

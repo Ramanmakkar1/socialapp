@@ -10,7 +10,7 @@ import { deletePostForUser, reorderQueueForUser, sharePostNow, UUID_RE } from "@
 import { canPublishToFacebook } from "@/lib/facebookPublish";
 import { nextSlot } from "@/lib/postingSchedule";
 
-const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads"];
+const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
 
 export async function deletePost(id: string): Promise<{ ok: boolean; error?: string }> {
   if (typeof id !== "string" || !UUID_RE.test(id)) {
@@ -37,7 +37,7 @@ type SavePostInput = {
   draftId?: string;
   caption: string;
   firstComment?: string;
-  platforms: ("instagram" | "facebook" | "threads")[];
+  platforms: PlatformId[];
   overrides: Partial<Record<string, string>>;
   scheduledAt: string | null;
   mode: "draft" | "schedule" | "queue";
@@ -45,6 +45,10 @@ type SavePostInput = {
   mediaUrls?: string[];
   dmRuleId?: string | null;
   igFormat?: "feed" | "story";
+  ytTitle?: string;
+  ytTags?: string[];
+  ytPrivacy?: "public" | "unlisted" | "private";
+  ytShorts?: boolean;
 };
 
 type MediaItem = { type: "image" | "video"; url: string };
@@ -204,6 +208,20 @@ export async function savePost(
     };
   }
 
+  const youtubeSelected = platforms.includes("youtube");
+  if (youtubeSelected) {
+    const ytTitle = typeof input.ytTitle === "string" ? input.ytTitle.trim() : "";
+    if (ytTitle.length === 0) {
+      return { ok: false, error: "Add a title for the YouTube video." };
+    }
+    if (ytTitle.length > 100) {
+      return { ok: false, error: "The YouTube title must be 100 characters or fewer." };
+    }
+    if (input.mode === "schedule" && mediaItems.filter((m) => m.type === "video").length === 0) {
+      return { ok: false, error: "YouTube posts need a video link (.mp4). Add one or untick YouTube." };
+    }
+  }
+
   let scheduledAt: Date | null = null;
   if (input.scheduledAt) {
     const parsed = new Date(input.scheduledAt);
@@ -267,6 +285,18 @@ export async function savePost(
           return {
             ok: false,
             error: "Connect your Threads account in Settings before scheduling to Threads.",
+          };
+        }
+      }
+      if (platforms.includes("youtube")) {
+        const ytRows = await query(
+          "select 1 from socialapp.youtube_channels where user_id=$1 and status='active' limit 1",
+          [user.id],
+        );
+        if (ytRows.length === 0) {
+          return {
+            ok: false,
+            error: "Connect a YouTube channel in Settings before scheduling. You can save this post as a draft for now.",
           };
         }
       }
@@ -398,14 +428,23 @@ export async function savePost(
       }
     }
 
+    const ytMetadata = youtubeSelected
+      ? JSON.stringify({
+          title: typeof input.ytTitle === "string" ? input.ytTitle.trim() : "",
+          tags: Array.isArray(input.ytTags) ? input.ytTags.filter((t) => typeof t === "string") : [],
+          privacy: input.ytPrivacy === "unlisted" || input.ytPrivacy === "private" ? input.ytPrivacy : "public",
+          shorts: input.ytShorts === true,
+        })
+      : null;
+
     for (const platform of platforms) {
       const customized = Object.prototype.hasOwnProperty.call(input.overrides, platform);
       const raw = customized ? input.overrides[platform] : undefined;
       const captionOverride = customized ? raw ?? "" : null;
 
       await client.query(
-        "insert into post_targets (post_id, platform, caption_override) values ($1, $2, $3)",
-        [id, platform, captionOverride],
+        "insert into post_targets (post_id, platform, caption_override, yt_metadata) values ($1, $2, $3, $4)",
+        [id, platform, captionOverride, platform === "youtube" ? ytMetadata : null],
       );
     }
 

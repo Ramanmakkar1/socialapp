@@ -1,12 +1,15 @@
-// Server only: publishes due scheduled posts through the official Instagram and Facebook Page APIs.
+// Server only: publishes due scheduled posts through the official Instagram, Facebook Page and YouTube APIs.
 import { decryptToken } from "@/lib/crypto";
 import { getPool } from "@/lib/db";
 import { shouldPostFirstComment } from "@/lib/firstComment";
 import { graphBaseFor } from "@/lib/graphHost";
 import { canPublishToFacebook, publishToFacebookPage } from "@/lib/facebookPublish";
 import { RECONNECT_MESSAGE, publishToThreads } from "@/lib/threadsPublish";
+import { refreshYouTubeToken } from "@/lib/youtubeAuth";
 
 const PUBLISH_TIMEOUT_MS = 20_000;
+const YT_VIDEO_FETCH_TIMEOUT_MS = 5 * 60_000;
+const YT_UPLOAD_TIMEOUT_MS = 10 * 60_000;
 
 type ClaimedRow = {
   id: string;
@@ -17,6 +20,7 @@ type ClaimedRow = {
   user_id: string;
   ig_format: string;
   first_comment: string | null;
+  yt_metadata: unknown;
 };
 
 type AccountRow = {
@@ -370,6 +374,240 @@ export async function publishToInstagram(
   }
 }
 
+const YT_UPLOAD_BASE = "https://www.googleapis.com/upload/youtube/v3/videos";
+
+export type YouTubeVideoMeta = {
+  title: string;
+  description: string;
+  tags: string[];
+  privacy: "public" | "unlisted" | "private";
+  shorts: boolean;
+};
+
+export type YtUploadResult =
+  | { ok: true; videoId: string; videoUrl: string }
+  | { ok: false; error: string; tokenDead?: boolean };
+
+function ytMessage(body: string, fallback: string): string {
+  try {
+    const json = JSON.parse(body) as { error?: { message?: unknown } };
+    if (typeof json?.error?.message === "string") return json.error.message;
+  } catch {
+    // keep the raw text
+  }
+  return body !== "" ? body.slice(0, 200) : fallback;
+}
+
+// A 403 only kills the token when Google says it is an auth failure (insufficientPermissions,
+// forbidden-auth, authError). Quota/rate-limit 403s (quotaExceeded, uploadLimitExceeded,
+// rateLimitExceeded, …) keep the channel connected: the post stays queued and retries later.
+const YT_AUTH_REASONS = new Set(["insufficientPermissions", "forbidden-auth", "authError"]);
+
+function ytAuthReason(body: string): string {
+  try {
+    const json = JSON.parse(body) as { error?: { errors?: { reason?: unknown }[] } };
+    const list = json?.error?.errors;
+    if (Array.isArray(list)) {
+      for (const item of list) {
+        if (item && typeof item.reason === "string") return item.reason;
+      }
+    }
+  } catch {
+    // not JSON
+  }
+  return "";
+}
+
+function ytTokenDead(status: number, body: string): boolean {
+  if (status === 401) return true;
+  if (status === 403) return YT_AUTH_REASONS.has(ytAuthReason(body));
+  return false;
+}
+
+function ytResource(meta: YouTubeVideoMeta): Record<string, unknown> {
+  const description =
+    meta.shorts && !/#short\b/i.test(meta.description)
+      ? `${meta.description}\n\n#Short`.trim()
+      : meta.description;
+  return {
+    snippet: {
+      title: meta.title.slice(0, 100),
+      description,
+      ...(meta.tags.length > 0 ? { tags: meta.tags.slice(0, 30) } : {}),
+      categoryId: "22",
+    },
+    status: {
+      privacyStatus: meta.privacy,
+      selfDeclaredMadeForKids: false,
+    },
+  };
+}
+
+/** videos.insert with uploadType=resumable -> the Location header is the upload session URL. */
+async function startYtResumableSession(
+  accessToken: string,
+  resource: Record<string, unknown>,
+): Promise<{ ok: true; sessionUrl: string } | { ok: false; error: string; tokenDead?: boolean }> {
+  try {
+    const res = await fetch(`${YT_UPLOAD_BASE}?part=snippet,status&uploadType=resumable`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify(resource),
+      signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      const tokenDead = ytTokenDead(res.status, text);
+      return {
+        ok: false,
+        error: cleanError(`YouTube session start HTTP ${res.status}: ${ytMessage(text, "no message")}`, accessToken),
+        tokenDead,
+      };
+    }
+    const location = res.headers.get("location");
+    if (!location) {
+      return { ok: false, error: cleanError("YouTube session start returned no session URL", accessToken) };
+    }
+    return { ok: true, sessionUrl: location };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: cleanError(`network: ${message}`, accessToken) };
+  }
+}
+
+/** PUT the bytes to a session URL. 404/410/400 = the session expired or was rejected (sessionDead). */
+async function putYtSession(
+  sessionUrl: string,
+  accessToken: string,
+  bytes: Buffer,
+): Promise<{ ok: true; videoId: string } | { ok: false; error: string; sessionDead?: boolean; tokenDead?: boolean }> {
+  try {
+    const res = await fetch(sessionUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "video/mp4",
+        "Content-Length": String(bytes.length),
+      },
+      body: new Uint8Array(bytes),
+      signal: AbortSignal.timeout(YT_UPLOAD_TIMEOUT_MS),
+    });
+    if (res.ok) {
+      const json = (await res.json().catch(() => null)) as { id?: unknown } | null;
+      if (json && typeof json.id === "string" && json.id !== "") {
+        return { ok: true, videoId: json.id };
+      }
+      return { ok: false, error: "YouTube upload finished but returned no video id", sessionDead: true };
+    }
+    const text = await res.text().catch(() => "");
+    const sessionDead = res.status === 400 || res.status === 404 || res.status === 410;
+    const tokenDead = ytTokenDead(res.status, text);
+    return {
+      ok: false,
+      error: cleanError(`YouTube upload HTTP ${res.status}: ${ytMessage(text, "no message")}`, accessToken),
+      sessionDead,
+      tokenDead,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: cleanError(`network: ${message}`, accessToken), sessionDead: true };
+  }
+}
+
+/**
+ * Uploads a video to YouTube via resumable upload (videos.insert, uploadType=resumable).
+ * An expired or rejected session (404/410/400, or a dropped connection) is DISCARDED and a
+ * fresh session is created on the next attempt — a dead session URL is never reused. Two
+ * attempts max, and the target is only marked published after the video id is recorded, so
+ * a video is never double-uploaded within one run.
+ */
+export async function publishToYouTube(opts: {
+  channelId: string;
+  refreshToken: string;
+  videoUrl: string;
+  meta: YouTubeVideoMeta;
+}): Promise<YtUploadResult> {
+  let accessToken: string;
+  try {
+    accessToken = await refreshYouTubeToken(opts.refreshToken);
+  } catch {
+    return { ok: false, error: "YouTube access expired. Reconnect YouTube in Settings, then retry.", tokenDead: true };
+  }
+
+  let bytes: Buffer;
+  try {
+    // The timeout covers the connection/headers only; reading the body is unbounded so large
+    // videos can download at any speed (a whole-fetch timeout would kill big uploads).
+    const connect = new AbortController();
+    const connectTimer = setTimeout(() => connect.abort(), YT_VIDEO_FETCH_TIMEOUT_MS);
+    let videoRes: Response;
+    try {
+      videoRes = await fetch(opts.videoUrl, { signal: connect.signal });
+    } finally {
+      clearTimeout(connectTimer);
+    }
+    if (!videoRes.ok) {
+      return { ok: false, error: `Could not download the video (HTTP ${videoRes.status})` };
+    }
+    bytes = Buffer.from(await videoRes.arrayBuffer());
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `Could not download the video: ${message}` };
+  }
+  if (bytes.length === 0) {
+    return { ok: false, error: "The video file is empty" };
+  }
+
+  const resource = ytResource(opts.meta);
+  let lastError: string | undefined;
+  let tokenDead = false;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const session = await startYtResumableSession(accessToken, resource);
+    if (!session.ok) {
+      if (session.tokenDead) tokenDead = true;
+      lastError = session.error;
+      continue; // no session was created; the next attempt starts a new one
+    }
+    const put = await putYtSession(session.sessionUrl, accessToken, bytes);
+    if (put.ok) {
+      return { ok: true, videoId: put.videoId, videoUrl: `https://www.youtube.com/watch?v=${put.videoId}` };
+    }
+    lastError = put.error;
+    if (put.tokenDead) tokenDead = true;
+    // sessionDead (or network drop): this session URL is dead — the next loop iteration
+    // creates a brand-new session instead of reusing it.
+  }
+  return { ok: false, error: lastError ?? "YouTube upload failed", tokenDead };
+}
+
+/** The per-target yt_metadata jsonb column (title, tags, privacy, shorts hint). */
+export function parseYtMetadata(raw: unknown): YouTubeVideoMeta {
+  const meta: YouTubeVideoMeta = { title: "", description: "", tags: [], privacy: "public", shorts: false };
+  if (typeof raw === "string") {
+    try {
+      return parseYtMetadata(JSON.parse(raw));
+    } catch {
+      return meta;
+    }
+  }
+  if (typeof raw === "object" && raw !== null) {
+    const obj = raw as Record<string, unknown>;
+    if (typeof obj.title === "string") meta.title = obj.title.slice(0, 100);
+    if (typeof obj.description === "string") meta.description = obj.description;
+    if (Array.isArray(obj.tags)) {
+      meta.tags = obj.tags.filter((t): t is string => typeof t === "string").slice(0, 30);
+    }
+    if (obj.privacy === "public" || obj.privacy === "unlisted" || obj.privacy === "private") {
+      meta.privacy = obj.privacy;
+    }
+    if (obj.shorts === true) meta.shorts = true;
+  }
+  return meta;
+}
+
 /**
  * Recovers targets left in 'publishing' by a run that crashed or timed out (bug a).
  * We cannot know whether Instagram received the post, so we never auto-repost: the
@@ -399,7 +637,10 @@ export async function recoverStuckPublishing(staleMs = STUCK_PUBLISHING_MS): Pro
  * Instagram targets, so delete / reschedule (which only touch draft/scheduled/failed rows)
  * can never race the publisher (bugs b, c). SKIP LOCKED keeps overlapping runs apart.
  */
-async function claimDueTargets(limit: number, platform: "instagram" | "facebook" | "threads"): Promise<ClaimedRow[]> {
+async function claimDueTargets(
+  limit: number,
+  platform: "instagram" | "facebook" | "threads" | "youtube",
+): Promise<ClaimedRow[]> {
   const client = await getPool().connect();
   try {
     await client.query("begin");
@@ -426,7 +667,7 @@ async function claimDueTargets(limit: number, platform: "instagram" | "facebook"
       `update socialapp.post_targets t set status='publishing'
        from socialapp.scheduled_posts p
        where t.post_id=p.id and p.id = any($1::uuid[]) and t.platform=$2 and t.status='pending'
-       returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment`,
+       returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment, t.yt_metadata`,
       [ids, platform],
     );
     await client.query("commit");
@@ -699,6 +940,97 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
         );
         result.failed += 1;
       }
+    }
+  }
+
+  const ytRows = await claimDueTargets(limit, "youtube");
+  for (const row of ytRows) {
+    let token = "";
+    try {
+      const channels = await pool.query<{
+        id: string;
+        channel_id: string;
+        refresh_token_enc: string;
+      }>(
+        `select id, channel_id, refresh_token_enc from socialapp.youtube_channels
+         where user_id=$1 and status='active' order by updated_at desc limit 1`,
+        [row.user_id],
+      );
+      const channel = channels.rows[0];
+      if (!channel?.refresh_token_enc) {
+        await markTargetFailed(
+          row.id,
+          row.post_id,
+          "No YouTube channel connected. Connect YouTube in Settings, then retry.",
+          token,
+        );
+        result.failed += 1;
+        continue;
+      }
+
+      let refreshToken = "";
+      try {
+        refreshToken = decryptToken(channel.refresh_token_enc);
+      } catch {
+        await markTargetFailed(
+          row.id,
+          row.post_id,
+          "No YouTube channel connected. Connect YouTube in Settings, then retry.",
+          token,
+        );
+        result.failed += 1;
+        continue;
+      }
+      token = refreshToken; // so cleanError can redact it from API messages
+
+      const media = firstMedia(row.media);
+      if (!media || media.type !== "video") {
+        await markTargetFailed(row.id, row.post_id, "YouTube posts need a video link (.mp4)", token);
+        result.failed += 1;
+        continue;
+      }
+
+      const meta = parseYtMetadata(row.yt_metadata);
+      if (meta.description === "") meta.description = row.caption_override ?? row.caption;
+      const outcome = await publishToYouTube({
+        channelId: channel.channel_id,
+        refreshToken,
+        videoUrl: media.url,
+        meta,
+      });
+
+      if (outcome.ok) {
+        // external_post_id holds the watch URL; social_account_id is a FK to social_accounts, so it stays null.
+        await pool.query(
+          `update socialapp.post_targets set status='published', external_post_id=$2,
+           published_at=now(), error=null where id=$1`,
+          [row.id, outcome.videoUrl],
+        );
+        await refreshPostStatus(row.post_id);
+        result.published += 1;
+      } else {
+        // Expired or revoked refresh token: mark the channel disconnected (and clear the dead
+        // token) so Settings shows a reconnect prompt.
+        if (outcome.tokenDead) {
+          await pool
+            .query(
+              "update socialapp.youtube_channels set status='disconnected', refresh_token_enc='', updated_at=now() where id=$1 and status='active'",
+              [channel.id],
+            )
+            .catch(() => undefined);
+        }
+        const error = outcome.tokenDead
+          ? `YouTube access expired or was removed. Reconnect YouTube in Settings, then retry. (${outcome.error})`
+          : outcome.error;
+        await markTargetFailed(row.id, row.post_id, error, token);
+        result.failed += 1;
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      await markTargetFailed(row.id, row.post_id, `YouTube publishing failed: ${message}`, token).catch(
+        () => undefined,
+      );
+      result.failed += 1;
     }
   }
 
