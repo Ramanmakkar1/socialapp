@@ -60,6 +60,7 @@ export function SiteFooter() {
           { href: "/tools/instagram-reel-cover-maker", label: "Reel cover maker" },
           { href: "/tools/instagram-story-maker", label: "Story maker" },
           { href: "/tools/instagram-post-ideas-generator", label: "Post ideas" },
+          { href: "/tools/instagram-hook-generator", label: "Hook generator" },
           { href: "/tools/instagram-utm-builder", label: "UTM builder" },
           { href: "/tools", label: "All free tools" },
         ]}

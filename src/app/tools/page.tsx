@@ -109,6 +109,11 @@ const tools = [
     title: "Instagram post ideas generator",
     description: "Get 6 ready-to-use post ideas for your niche — Reels, carousels and Stories with hooks and caption starters.",
   },
+  {
+    href: "/tools/instagram-hook-generator",
+    title: "Instagram hook generator",
+    description: "Get ready-to-copy Reel hooks for any topic across eight styles — curiosity, mistake, how-to, myth, story, list, contrarian and result.",
+  },
 ];
 
 const itemListJsonLd = {
@@ -124,7 +129,8 @@ const itemListJsonLd = {
 };
 
 // One .cards grid per 3 tools so the pcard tilt/colors (nth-child 1-3) work.
-const groups = [tools.slice(0, 3), tools.slice(3, 6), tools.slice(6, 9), tools.slice(9, 12), tools.slice(12)];
+const groups: (typeof tools)[] = [];
+for (let i = 0; i < tools.length; i += 3) groups.push(tools.slice(i, i + 3));
 
 export default function ToolsPage() {
   return (

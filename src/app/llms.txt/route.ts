@@ -59,6 +59,7 @@ export function GET() {
     "/tools/instagram-reel-cover-maker",
     "/tools/instagram-story-maker",
     "/tools/instagram-post-ideas-generator",
+    "/tools/instagram-hook-generator",
   ];
   for (const path of toolPaths) {
     if (PUBLIC_PATHS.includes(path)) content += `${line(path)}\n`;
