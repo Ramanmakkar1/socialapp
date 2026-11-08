@@ -124,7 +124,8 @@ async function runWithInbound(
   try {
     const { maybeQueueAiReply } = await import("./aiReplyQueue.ts");
     const result = await maybeQueueAiReply(params);
-    return { result, messages: body?.messages ?? [] };
+    const sentBody = body as { messages?: { role: string; content: string }[] } | null;
+    return { result, messages: sentBody?.messages ?? [] };
   } finally {
     globalThis.fetch = prevFetch;
     if (prevKey === undefined) delete process.env.ANTHROPIC_API_KEY;
