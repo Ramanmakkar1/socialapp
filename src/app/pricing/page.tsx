@@ -124,6 +124,10 @@ export default function PricingPage() {
             ))}
           </div>
           <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{PLANS_NOTE}</p>
+          <p className="small" style={{ textAlign: "center", marginTop: "10px" }}>
+            Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}
+            by accounts, scheduled posts and auto-DMs.
+          </p>
         </div>
       </section>
 

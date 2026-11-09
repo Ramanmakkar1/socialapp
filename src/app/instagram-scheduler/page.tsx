@@ -338,6 +338,7 @@ export default function InstagramScheduler() {
             <Link href="/buffer-alternative" className={s.vlink}>Buffer</Link>
             {" "}and{" "}
             <Link href="/later-alternative" className={s.vlink}>Later</Link>
+            , check <Link href="/instagram-scheduler/pricing" className={s.vlink}>Instagram scheduler pricing and plan limits</Link>
             , or try free{" "}
             <Link href="/tools" className={s.vlink}>Instagram tools</Link>.
           </p>
