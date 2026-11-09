@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import AutoDmDemo from "@/components/AutoDmDemo";
+import FlowDemo from "./FlowDemo";
 
 export const metadata: Metadata = {
   title: "Instagram Auto DM: Send a DM to Everyone Who Comments",
@@ -108,6 +109,30 @@ export default function InstagramAutoDm() {
                 <p>{st.text}</p>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <FlowDemo />
+          <div
+            style={{
+              marginTop: 22,
+              display: "grid",
+              gap: 14,
+              justifyItems: "center",
+              textAlign: "center",
+            }}
+          >
+            <p className="small">
+              The preview above is a local simulation. Your live rules run on your own connected account, day and night.
+            </p>
+            <div className="ctas">
+              <Link className="btn btn-dark" href="/signup">
+                Start free — connect Instagram <span aria-hidden="true">→</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
