@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState, useTransition } from "
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AtSign, Facebook, Instagram, Sparkles } from "lucide-react";
-import { savePost } from "./actions";
+import { nextAvailableSlot, savePost } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import { aiAvailable, suggestCaptions } from "./aiActions";
 import { BRAND } from "@/lib/brand";
@@ -62,7 +62,7 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false, threadsReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean; threadsReady?: boolean }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false, threadsReady = false, schedulePlatforms = [] }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const livePlatforms: PlatformId[] = ["instagram"];
@@ -180,12 +180,13 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   }
 
   const selected = PLATFORM_ORDER.filter((p) => enabled[p]);
+  // "Add to queue" / "Next available" need at least one selected channel with a saved schedule.
+  const queueReady = selected.some((p) => schedulePlatforms.includes(p));
 
-  function buildSaveInput(mode: "draft" | "schedule") {
+  function buildSaveInput(mode: "draft" | "schedule" | "queue") {
     const schedule = scheduleInstantForSave(scheduledAt, scheduleOriginRef.current);
-    if (!schedule.ok || (mode === "schedule" && !schedule.iso)) {
-      return null;
-    }
+    if (!schedule.ok) return null;
+    if (mode === "schedule" && !schedule.iso) return null;
     const platforms = PLATFORM_ORDER.filter((p) => enabled[p]);
     const overrides: Partial<Record<string, string>> = {};
     for (const p of platforms) {
@@ -199,7 +200,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       firstComment,
       platforms,
       overrides,
-      scheduledAt: schedule.iso,
+      // "queue" lets the server pick the next free slot, so no client time is sent.
+      scheduledAt: mode === "queue" ? null : schedule.iso,
       mode,
       imageUrl: mediaUrls[0]?.trim() !== "" ? mediaUrls[0].trim() : null,
       mediaUrls,
@@ -250,7 +252,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     }
   }
 
-  function handleSave(mode: "draft" | "schedule") {
+  function handleSave(mode: "draft" | "schedule" | "queue") {
     setFeedback(null);
     const input = buildSaveInput(mode);
     if (!input) {
@@ -272,6 +274,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       }
       if (mode === "draft") {
         setFeedback({ kind: "ok", text: "Draft saved" });
+      } else if (mode === "queue") {
+        setFeedback({ kind: "ok", text: "Added to the queue — it will publish at the next free slot." });
       } else {
         const when = input.scheduledAt
           ? new Date(input.scheduledAt).toLocaleString(undefined, {
@@ -286,6 +290,25 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
         router.replace(calendarHrefWithoutDraft());
       }
       router.refresh();
+    });
+  }
+
+  // "Next available": fill the time picker with the next free slot from the channel schedules.
+  function handleNextAvailable() {
+    setFeedback(null);
+    const platforms = PLATFORM_ORDER.filter((p) => enabled[p]);
+    startTransition(async () => {
+      try {
+        const result = await nextAvailableSlot(platforms);
+        if (!result.ok) {
+          setFeedback({ kind: "err", text: result.error });
+          return;
+        }
+        setScheduledAt(toLocalInputValue(new Date(result.iso)));
+        setFeedback({ kind: "ok", text: "Picked the next available time." });
+      } catch {
+        setFeedback({ kind: "err", text: "Could not find the next available time. Please try again." });
+      }
     });
   }
 
@@ -751,6 +774,21 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   })}
                 </div>
               )}
+              {queueReady && (
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={handleNextAvailable}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)] disabled:opacity-60"
+                >
+                  Next available
+                </button>
+              )}
+              {!queueReady && (
+                <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
+                  Set a posting schedule in Settings → Channels to use “Next available” and “Add to queue”.
+                </p>
+              )}
               <p className="mt-1 text-xs text-[var(--poskoo-muted)]">Timezone: {timeZone || "…"}</p>
             </div>
           </div>
@@ -771,6 +809,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               className={`${ui.inkFill} rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60`}
             >
               {isPending ? "Saving…" : "Schedule"}
+            </button>
+            <button
+              type="button"
+              disabled={isPending || !queueReady || storyMediaError}
+              onClick={() => handleSave("queue")}
+              className="rounded-full border border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 px-4 py-2 text-sm font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/20 disabled:opacity-60"
+            >
+              {isPending ? "Saving…" : "Add to queue"}
             </button>
           </div>
           {feedback && (

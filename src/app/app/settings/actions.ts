@@ -5,6 +5,19 @@ import { redirect } from "next/navigation";
 import { deleteAccountData, disconnectAccounts } from "@/lib/accountData";
 import { endSession, requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
+import { TIMEZONES } from "@/lib/postingSchedule";
+
+const SCHEDULE_PLATFORMS = ["instagram", "facebook", "threads"] as const;
+
+function validTimeZone(tz: string): boolean {
+  if ((TIMEZONES as readonly string[]).includes(tz)) return true;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // Disconnect: wipes the stored Instagram token right away (history and rules stay).
 export async function disconnectAccountAction(formData: FormData): Promise<void> {
@@ -73,6 +86,37 @@ export async function saveAiReplySettings(formData: FormData): Promise<void> {
   }
   revalidatePath("/app/settings");
   redirect("/app/settings?ai_reply=saved");
+}
+
+// Per-channel posting schedule (Settings → Channels): days of week x times in the user's timezone.
+export async function savePostingSchedule(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const rawPlatform = formData.get("platform");
+  const platform = typeof rawPlatform === "string" ? rawPlatform.trim() : "";
+  const rawTz = formData.get("timezone");
+  const timezone = typeof rawTz === "string" && rawTz.trim() !== "" ? rawTz.trim() : "UTC";
+  const days = [...new Set(
+    formData.getAll("days").map((d) => Number(String(d).trim())).filter((d) => Number.isInteger(d) && d >= 1 && d <= 7),
+  )].sort((a, b) => a - b);
+  const times = [...new Set(
+    formData.getAll("times").map((t) => String(t).trim()).filter((t) => /^\d{2}:\d{2}$/.test(t)),
+  )].sort();
+  if (!isDbConfigured() || !(SCHEDULE_PLATFORMS as readonly string[]).includes(platform)) return;
+  if (!validTimeZone(timezone)) redirect("/app/settings?schedule=error");
+  try {
+    await query(
+      `insert into socialapp.posting_schedules (user_id, platform, timezone, days, times)
+       values ($1, $2, $3, $4::int[], $5::text[])
+       on conflict (user_id, platform) do update
+         set timezone = excluded.timezone, days = excluded.days, times = excluded.times, updated_at = now()`,
+      [user.id, platform, timezone, days, times],
+    );
+  } catch (err) {
+    console.error("savePostingSchedule failed for user", user.id, err instanceof Error ? err.message : err);
+    redirect("/app/settings?schedule=error");
+  }
+  revalidatePath("/app/settings");
+  redirect("/app/settings?schedule=saved");
 }
 
 // Self-serve account deletion: wipes every table row that belongs to the user, then the user row itself

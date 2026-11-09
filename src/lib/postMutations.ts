@@ -1,7 +1,8 @@
 // Server only: guarded delete / reschedule for scheduled posts.
 // Each change is ONE conditional statement, so it cannot race the publisher's claim
 // (the claim locks the post row and flips it to 'publishing' in the same transaction).
-import { query } from "@/lib/db";
+import { getPool, query } from "@/lib/db";
+import { reassignQueueTimes } from "@/lib/postingSchedule";
 
 export type MutationResult = { ok: true } | { ok: false; error: string };
 
@@ -114,4 +115,88 @@ export async function reschedulePostForUser(
   );
   if (rows.length > 0) return { ok: true };
   return { ok: false, error: blockedReason(await postState(id, userId), "moved") };
+}
+
+/**
+ * "Share now": make a queued post due immediately so the publisher claims it on its next tick.
+ * One conditional statement, so it cannot race the publisher's claim (which flips status to
+ * 'publishing' in the same transaction). A draft is promoted to 'scheduled' so it publishes.
+ */
+export async function sharePostNow(id: string, userId: string): Promise<MutationResult> {
+  if (!UUID_RE.test(id)) return { ok: false, error: "Invalid post." };
+  const rows = await query<{ id: string }>(
+    `update socialapp.scheduled_posts p
+     set scheduled_at = now(), status = 'scheduled', updated_at = now()
+     where p.id=$1 and p.user_id=$2 and p.status in ('draft','scheduled')
+       and not exists (select 1 from socialapp.post_targets t where t.post_id=p.id and t.status in ('publishing','published'))
+     returning p.id`,
+    [id, userId],
+  );
+  if (rows.length > 0) return { ok: true };
+  return { ok: false, error: blockedReason(await postState(id, userId), "moved") };
+}
+
+/**
+ * Drag reorder of the publishing queue. Locks the rows, refuses if any is mid-publish, then
+ * reassigns queue_order and the publish times (reassignQueueTimes) so the new order is the
+ * publish order. Status is preserved (a draft stays a draft, just with a planned time).
+ */
+export async function reorderQueueForUser(orderedIds: string[], userId: string): Promise<MutationResult> {
+  if (orderedIds.length === 0) return { ok: true };
+  if (orderedIds.length > 100) return { ok: false, error: "Too many posts to reorder at once." };
+  if (orderedIds.some((id) => !UUID_RE.test(id))) return { ok: false, error: "Invalid post." };
+
+  let client;
+  try {
+    client = await getPool().connect();
+  } catch {
+    return { ok: false, error: "Could not reorder the queue." };
+  }
+  try {
+    await client.query("begin");
+    const res = await client.query<{ id: string; status: string; scheduled_at: Date | string | null }>(
+      `select id, status, scheduled_at from socialapp.scheduled_posts
+       where user_id=$1 and id = any($2::uuid[]) and status in ('draft','scheduled')
+       for update`,
+      [userId, orderedIds],
+    );
+    const found = new Set(res.rows.map((r) => r.id));
+    if (orderedIds.some((id) => !found.has(id))) {
+      await client.query("rollback");
+      return { ok: false, error: "A post in the queue can no longer be reordered. Reload and try again." };
+    }
+    for (const row of res.rows) {
+      const started = await client.query(
+        "select 1 from socialapp.post_targets t where t.post_id=$1 and t.status <> 'pending' limit 1",
+        [row.id],
+      );
+      if (started.rows.length > 0) {
+        await client.query("rollback");
+        return { ok: false, error: "A post in the queue is being published. Reload and try again." };
+      }
+    }
+    const byId = new Map(res.rows.map((r) => [r.id, r]));
+    const ordered = orderedIds.map((id) => {
+      const row = byId.get(id)!;
+      return { id: row.id, scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).getTime() : null };
+    });
+    const times = reassignQueueTimes(ordered, Date.now());
+    for (let i = 0; i < ordered.length; i++) {
+      const post = ordered[i];
+      const instant = times.get(post.id);
+      if (instant === undefined) continue;
+      await client.query(
+        "update socialapp.scheduled_posts set scheduled_at=$2, queue_order=$3, updated_at=now() where id=$1",
+        [post.id, new Date(instant).toISOString(), i],
+      );
+    }
+    await client.query("commit");
+    return { ok: true };
+  } catch (err) {
+    await client.query("rollback").catch(() => {});
+    console.error("reorderQueueForUser failed", err instanceof Error ? err.message : err);
+    return { ok: false, error: "Could not reorder the queue." };
+  } finally {
+    client.release();
+  }
 }

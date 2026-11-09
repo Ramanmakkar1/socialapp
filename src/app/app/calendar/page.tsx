@@ -4,6 +4,7 @@ import type { ComposerDraftInitial } from "@/lib/composerDraft";
 import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
+import QueueView from "./QueueView";
 import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
@@ -123,6 +124,7 @@ export default async function CalendarPage({
   let draftPublishingSoon = false;
   let facebookReady = false;
   let threadsReady = false;
+  let schedulePlatforms: string[] = [];
 
   const reloadHref =
     view === "month"
@@ -190,6 +192,17 @@ export default async function CalendarPage({
     } catch {
       commentHourRows = [];
     }
+    // Channels that have a usable posting schedule (at least one time) drive the
+    // composer's "Add to queue" / "Next available". Missing table = none set.
+    try {
+      const schedRows = await query<{ platform: string; times: string[] }>(
+        "select platform, times from socialapp.posting_schedules where user_id=$1",
+        [user.id],
+      );
+      schedulePlatforms = [...new Set(schedRows.filter((r) => (r.times ?? []).length > 0).map((r) => r.platform))];
+    } catch {
+      schedulePlatforms = [];
+    }
     const [rulesRes, upcomingRes, rangeRes, publishedRes] = await Promise.allSettled([
       query<RuleOption>(
         "select id, name, status from socialapp.dm_rules where user_id = $1 order by created_at desc",
@@ -244,7 +257,7 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} />
+        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} />
       )}
       <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
         <Link
@@ -300,6 +313,7 @@ export default async function CalendarPage({
             : undefined
         }
       />
+      <QueueView posts={rows} />
       {publishedFailed && (
         <section className={styles.published} aria-label="Recently published">
           <h2 className={styles.sectionTitle}>Recently published</h2>

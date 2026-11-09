@@ -6,8 +6,9 @@ import { getPool, isDbConfigured, query } from "@/lib/db";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { checkCaption, type PlatformId } from "@/lib/platforms";
 import { scheduledPostLimitError } from "@/lib/planLimits";
-import { deletePostForUser, UUID_RE } from "@/lib/postMutations";
+import { deletePostForUser, reorderQueueForUser, sharePostNow, UUID_RE } from "@/lib/postMutations";
 import { canPublishToFacebook } from "@/lib/facebookPublish";
+import { nextSlot } from "@/lib/postingSchedule";
 
 const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads"];
 
@@ -39,7 +40,7 @@ type SavePostInput = {
   platforms: ("instagram" | "facebook" | "threads")[];
   overrides: Partial<Record<string, string>>;
   scheduledAt: string | null;
-  mode: "draft" | "schedule";
+  mode: "draft" | "schedule" | "queue";
   imageUrl?: string | null;
   mediaUrls?: string[];
   dmRuleId?: string | null;
@@ -85,6 +86,25 @@ function effectiveCaption(
     return overrides[platform] ?? "";
   }
   return caption;
+}
+
+// Next free slot across the user's saved channel schedules for the selected platforms.
+// Returns null when there is no usable schedule (or the table is not present yet).
+async function nextQueueSlot(userId: string, platforms: PlatformId[]): Promise<Date | null> {
+  let rows: { platform: string; timezone: string; days: number[]; times: string[] }[];
+  try {
+    rows = await query(
+      "select platform, timezone, days, times from socialapp.posting_schedules where user_id=$1",
+      [userId],
+    );
+  } catch {
+    return null;
+  }
+  const schedules = rows
+    .filter((r) => (ALLOWED_PLATFORMS as string[]).includes(r.platform) && platforms.includes(r.platform as PlatformId))
+    .map((r) => ({ platform: r.platform as PlatformId, timezone: r.timezone, days: r.days ?? [], times: r.times ?? [] }));
+  const slot = nextSlot(schedules, Date.now());
+  return slot === null ? null : new Date(slot);
 }
 
 export async function savePost(
@@ -193,7 +213,16 @@ export async function savePost(
     scheduledAt = parsed;
   }
 
-  if (input.mode === "schedule") {
+  if (input.mode === "queue") {
+    // "Add to queue": the server picks the next free slot from the channel schedules.
+    const slot = await nextQueueSlot(user.id, platforms);
+    if (!slot) {
+      return { ok: false, error: "Set a posting schedule in Settings → Channels first, then add posts to the queue." };
+    }
+    scheduledAt = slot;
+  }
+
+  if (input.mode === "schedule" || input.mode === "queue") {
     if (!scheduledAt) {
       return { ok: false, error: "Pick a schedule time." };
     }
@@ -202,7 +231,7 @@ export async function savePost(
     }
   }
 
-  if (input.mode === "schedule" && scheduledAt) {
+  if ((input.mode === "schedule" || input.mode === "queue") && scheduledAt) {
     try {
       if (platforms.includes("instagram")) {
         const connected = await query(
@@ -392,4 +421,66 @@ export async function savePost(
   revalidatePath("/app");
 
   return { ok: true, id: id! };
+}
+
+// Drag reorder of the publishing queue: reassigns queue_order and the publish times.
+export async function reorderQueue(orderedIds: string[]): Promise<{ ok: boolean; error?: string }> {
+  if (!isDbConfigured()) {
+    return { ok: false, error: "Database not configured" };
+  }
+  const user = await requireUser();
+  try {
+    const result = await reorderQueueForUser(orderedIds, user.id);
+    if (!result.ok) return result;
+    revalidatePath("/app/calendar");
+    revalidatePath("/app");
+    return { ok: true };
+  } catch (err) {
+    console.error("reorderQueue failed", err instanceof Error ? err.message : err);
+    return { ok: false, error: "Could not reorder the queue." };
+  }
+}
+
+// "Next available": the next free slot across the user's channel schedules for the given
+// platforms. The composer fills its time picker with the result.
+export async function nextAvailableSlot(
+  platforms: string[],
+): Promise<{ ok: true; iso: string } | { ok: false; error: string }> {
+  if (!isDbConfigured()) {
+    return { ok: false, error: "Database not configured" };
+  }
+  const user = await requireUser();
+  const valid = platforms.filter((p) => (ALLOWED_PLATFORMS as string[]).includes(p));
+  if (valid.length === 0) {
+    return { ok: false, error: "Select at least one platform." };
+  }
+  const slot = await nextQueueSlot(user.id, valid as PlatformId[]);
+  if (!slot) {
+    return {
+      ok: false,
+      error: "Set a posting schedule in Settings → Channels first, then use “Next available”.",
+    };
+  }
+  return { ok: true, iso: slot.toISOString() };
+}
+
+// "Share now": publish a queued post immediately by making it due for the publisher.
+export async function shareNow(id: string): Promise<{ ok: boolean; error?: string }> {
+  if (typeof id !== "string" || !UUID_RE.test(id)) {
+    return { ok: false, error: "Invalid post." };
+  }
+  if (!isDbConfigured()) {
+    return { ok: false, error: "Database not configured" };
+  }
+  const user = await requireUser();
+  try {
+    const result = await sharePostNow(id, user.id);
+    if (!result.ok) return result;
+    revalidatePath("/app/calendar");
+    revalidatePath("/app");
+    return { ok: true };
+  } catch (err) {
+    console.error("shareNow failed", id, err instanceof Error ? err.message : err);
+    return { ok: false, error: "Could not share this post now." };
+  }
 }

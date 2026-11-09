@@ -13,6 +13,7 @@ import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { deleteMyAccountAction, disconnectAccountAction, saveAiReplySettings, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
+import ChannelSchedules, { type ChannelScheduleInput } from "./ChannelSchedules";
 import DeleteAccountForm from "./DeleteAccountForm";
 import styles from "../app-page.module.css";
 
@@ -77,13 +78,15 @@ const THREADS_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   not_configured: { tone: "warn", text: "Threads connection isn't set up on this server yet." },
 };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[] }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[] }> }) {
   const user = await requireUser();
-  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam } = await searchParams;
+  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam } = await searchParams;
   const voiceSaved = voiceParam === "saved";
   const voiceFailed = voiceParam === "error";
   const aiReplySaved = aiReplyParam === "saved";
   const aiReplyFailed = aiReplyParam === "error";
+  const scheduleSaved = scheduleParam === "saved";
+  const scheduleFailed = scheduleParam === "error";
   const account = typeof accountParam === "string" ? accountParam : null;
   const banner = typeof ig === "string" && Object.hasOwn(BANNERS, ig) ? BANNERS[ig] : null;
   const threadsBanner = typeof threadsParam === "string" && Object.hasOwn(THREADS_BANNERS, threadsParam) ? THREADS_BANNERS[threadsParam] : null;
@@ -106,6 +109,25 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const aiConfigured = isAiConfigured();
   // Instagram login needs the Meta app keys on the server; until then show a clear "not yet" state.
   const connectReady = isMetaLoginConfigured() || isIgConfigured();
+  // Per-channel posting schedules, only for channels the user has connected.
+  const connectedPlatforms = [...new Set(accounts.filter((a) => a.status === "active").map((a) => a.platform))];
+  const channelSchedules: ChannelScheduleInput[] = [];
+  if (isDbConfigured()) {
+    try {
+      const schedRows = await query<{ platform: string; timezone: string; days: number[]; times: string[] }>(
+        "select platform, timezone, days, times from socialapp.posting_schedules where user_id=$1",
+        [user.id],
+      );
+      for (const row of schedRows) {
+        if (connectedPlatforms.includes(row.platform)) {
+          channelSchedules.push({ platform: row.platform, timezone: row.timezone, days: row.days ?? [], times: row.times ?? [] });
+        }
+      }
+    } catch {
+      // posting_schedules not present yet (migration pending): treat as no schedules set.
+    }
+  }
+  channelSchedules.sort((a, b) => a.platform.localeCompare(b.platform));
   return (
     <div className={styles.page}>
       <PageHero
@@ -280,6 +302,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )}
         {aiReplySaved && <p role="status" className={ui.notice}>AI reply settings saved.</p>}
         {aiReplyFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your AI reply settings. Please try again.</p>}
+      </section>
+      <section className={styles.section} aria-labelledby="channels-heading">
+        <h2 id="channels-heading" className={styles.sectionTitle}>Channels</h2>
+        <p className={ui.hint}>
+          Pick the days and times each channel should publish. The composer&apos;s “Add to queue” and “Next available” use these slots.
+        </p>
+        {isDbConfigured() ? (
+          <ChannelSchedules channels={channelSchedules} />
+        ) : (
+          <p className={ui.hint}>Channel schedules can be saved once the database is set up on this server.</p>
+        )}
+        {scheduleSaved && <p role="status" className={ui.notice}>Posting schedule saved.</p>}
+        {scheduleFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your posting schedule. Please try again.</p>}
       </section>
       <section className={styles.section} aria-labelledby="danger-heading">
         <h2 id="danger-heading" className={styles.sectionTitle}>Delete account</h2>
