@@ -1,7 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
-import { Check, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { instrumentSans } from "@/lib/fonts";
 import { EMPTY_STATS, getDashboardStats, getUpcomingPosts } from "@/lib/stats";
@@ -11,6 +10,7 @@ import { fetchRecentMedia, type IgMediaItem } from "@/lib/igMedia";
 import { automationSummary, getAutomationRows, getSnapshot, EMPTY_SNAPSHOT, pctChange } from "@/lib/homeStats";
 import TodaysActions from "./TodaysActions";
 import ActiveAutomations from "./ActiveAutomations";
+import FirstSessionChecklist from "./FirstSessionChecklist";
 import home from "./home.module.css";
 import { BtnA, BtnLink } from "@/components/ui/kit";
 import uiKit from "@/components/ui/ui.module.css";
@@ -42,6 +42,20 @@ async function igAccount(userId: string): Promise<GraphAccount | null> {
   }
 }
 
+// Any post row for this user (drafts included) — "created a post" signal.
+async function hasAnyPost(userId: string): Promise<boolean> {
+  if (!isDbConfigured()) return false;
+  try {
+    const rows = await query<{ n: boolean }>(
+      "select exists(select 1 from socialapp.scheduled_posts where user_id=$1) as n",
+      [userId],
+    );
+    return rows[0]?.n ?? false;
+  } catch {
+    return false;
+  }
+}
+
 function Change({ cur, prev }: { cur: number; prev: number }) {
   const p = pctChange(cur, prev);
   if (p === null) return <span className={home.up}>New</span>;
@@ -53,9 +67,9 @@ export default async function AppHome() {
   const user = await getCurrentUser();
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
   const upcoming = user ? await getUpcomingPosts(user.id) : [];
-  const [snapshot, automations, account] = user
-    ? await Promise.all([getSnapshot(user.id), getAutomationRows(user.id), igAccount(user.id)])
-    : [EMPTY_SNAPSHOT, [], null];
+  const [snapshot, automations, account, postCreated] = user
+    ? await Promise.all([getSnapshot(user.id), getAutomationRows(user.id), igAccount(user.id), hasAnyPost(user.id)])
+    : [EMPTY_SNAPSHOT, [], null, false];
   let profile: IgProfile | null = null;
   let media: IgMediaItem[] = [];
   let mediaError = false;
@@ -74,13 +88,7 @@ export default async function AppHome() {
     { label: "Leads collected", value: snapshot.leads, prev: snapshot.leadsPrev, dot: "var(--poskoo-green)" },
     { label: "Total followers", value: profile?.followers ?? 0, prev: null, dot: "var(--poskoo-peach)", note: profile?.mediaCount != null ? `${profile.mediaCount} posts` : undefined },
   ];
-  const steps = [
-    { done: stats.hasAccount, label: "Connect Instagram", href: "/api/instagram/connect" },
-    { done: stats.hasRule, label: "Create your first auto-DM rule", href: "/app/auto-dm" },
-    { done: stats.hasPost, label: "Schedule your first post", href: "/app/calendar#new" },
-  ];
-  const doneCount = steps.filter(s => s.done).length;
-  const firstIncompleteIndex = steps.findIndex(s => !s.done);
+  const checklistDone = stats.hasAccount && postCreated && stats.hasPost;
   const tiles: [string, number, string][] = [
     ["Scheduled", stats.scheduled, "var(--poskoo-lilac)"],
     ["DMs sent (7 days)", stats.dmsSent, "var(--poskoo-peach)"],
@@ -230,70 +238,7 @@ export default async function AppHome() {
             <UpcomingPosts posts={upcoming} />
           )}
         </section>
-        {doneCount < 3 ? (
-          <section className={`${uiKit.card} ${uiKit.band} min-w-0`}>
-            <div className={styles.checklist}>
-              <div className="min-w-0">
-                <div className={styles.panelHead}>
-                  <h2 className={styles.panelTitle}>Get set up in 3 minutes</h2>
-                </div>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                  <Link href="/help/getting-started" className={uiKit.link}>Help</Link>
-                  <span className="text-sm" style={{ color: "var(--poskoo-muted)" }}>{doneCount} of 3 done</span>
-                </div>
-                <div className={styles.progress} role="progressbar" aria-valuemin={0} aria-valuemax={3} aria-valuenow={doneCount} aria-label="Setup progress">
-                  <div className={styles.progressFill} style={{ width: `${(doneCount / 3) * 100}%` }} />
-                </div>
-                <ol className={styles.steps}>
-                  {steps.map((step, index) => (
-                    <li key={step.href} className={styles.step}>
-                      <span
-                        className={`${styles.stepDot} ${step.done ? styles.stepDotDone : ""}`}
-                        aria-hidden="true"
-                      >
-                        {step.done ? <Check width={14} height={14} /> : index + 1}
-                      </span>
-                      <span className="sr-only">{step.done ? "Completed: " : ""}</span>
-                      <div className={`${styles.stepLabel} ${step.done ? styles.stepLabelDone : ""}`}>
-                        {step.done ? (
-                          step.label
-                        ) : (
-                          <Link href={step.href} className={uiKit.link}>{step.label}</Link>
-                        )}
-                      </div>
-                      {index === firstIncompleteIndex && (
-                        <BtnLink href={step.href} size="sm" aria-label={`Start: ${step.label}`}>
-                          Start
-                        </BtnLink>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              <div className={`${styles.checklistArt} min-w-0`}>
-                {stats.hasAccount ? (
-                  <Image
-                    src="/landing/card-schedule.webp"
-                    alt=""
-                    width={1024}
-                    height={1024}
-                    sizes="200px"
-                    className="h-auto w-full max-w-[200px] object-contain"
-                  />
-                ) : (
-                  <Image
-                    src="/illustrations/connect-account.webp"
-                    alt=""
-                    width={1536}
-                    height={1024}
-                    sizes="(max-width: 720px) 260px, 200px"
-                    className="h-auto w-full max-w-[260px] object-contain"
-                  />
-                )}
-              </div>
-            </div>
-          </section>
-        ) : (
+        {checklistDone ? (
           <section className={`${uiKit.card} min-w-0 p-5 sm:p-6`}>
             <h2 className={styles.panelTitle}>Next steps</h2>
             <ul className="mt-3 grid gap-1 text-[.95rem]" style={{ color: "var(--poskoo-ink)" }}>
@@ -302,6 +247,12 @@ export default async function AppHome() {
               <li><Link href="/app/leads" className={uiKit.link}>See your leads</Link></li>
             </ul>
           </section>
+        ) : (
+          <FirstSessionChecklist
+            connected={stats.hasAccount}
+            postCreated={postCreated}
+            postScheduled={stats.hasPost}
+          />
         )}
       </div>
     </div>

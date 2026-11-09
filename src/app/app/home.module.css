@@ -206,3 +206,83 @@
   .row { grid-auto-columns: 78%; }
   .statValue { font-size: 1.6rem; }
 }
+
+/* First-session checklist card (dashboard right panel). */
+.fsc {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-band);
+  box-shadow: var(--poskoo-shadow-card);
+  padding: 18px;
+}
+.fscHead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.fscArt { width: 64px; height: auto; flex: none; animation: fsc-float 4s ease-in-out infinite; }
+.fscHeadText { min-width: 0; }
+.fscTitle { margin: 0; color: var(--poskoo-ink); font-size: 1.15rem; font-weight: 700; letter-spacing: -.02em; }
+.fscSub { margin: 2px 0 0; color: var(--poskoo-muted); font-size: .85rem; }
+.fscProgress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-card);
+}
+.fscFill { height: 100%; border-radius: inherit; background: var(--poskoo-violet); }
+.fscSteps { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.fscStep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  border-radius: var(--poskoo-radius-sm);
+  padding: 4px 8px 4px 4px;
+}
+.fscStep:hover { background: rgba(255, 255, 255, .65); }
+.fscDot {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  place-items: center;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 50%;
+  background: var(--poskoo-card);
+  color: var(--poskoo-muted);
+  font-size: .74rem;
+  font-weight: 700;
+}
+.fscDotDone { border-color: var(--poskoo-ink); background: var(--poskoo-ink); color: #fff; }
+.fscStepText { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.fscLink { color: var(--poskoo-violet); font-size: .92rem; font-weight: 700; text-decoration: none; }
+.fscLink:hover { text-decoration: underline; }
+.fscLabelDone { color: var(--poskoo-muted); font-size: .92rem; font-weight: 600; text-decoration: line-through; }
+.fscDetail { color: var(--poskoo-muted); font-size: .78rem; }
+.fscNext {
+  flex: none;
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-lime);
+  color: var(--poskoo-ink);
+  padding: 3px 10px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+@keyframes fsc-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (max-width: 480px) {
+  .fsc { gap: 12px; padding: 16px 14px; }
+  .fscArt { width: 52px; }
+  .fscTitle { font-size: 1.05rem; }
+  .fscStep { min-height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fscArt { animation: none; }
+}
