@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Heart, ImagePlus, MessageCircle, Send } from "lucide-react";
 import { analyzeCaption, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { readCaptionHandoff } from "@/lib/captionHandoff";
+import UseInSchedulerLink from "@/components/UseInSchedulerLink";
 import ui from "@/components/ui/ui.module.css";
 
 export default function PostPreviewTool() {
@@ -96,6 +97,13 @@ export default function PostPreviewTool() {
         </fieldset>
         <button type="button" onClick={copyCaption} disabled={!caption} className={`${ui.inkFill} min-h-11 rounded-full px-5 py-3 text-sm font-medium disabled:opacity-50`}>Copy caption</button>
         <p role="status" aria-live="polite" aria-atomic="true" className="min-h-6 text-sm text-[#3d3450]">{copyStatus}</p>
+        <div className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-4">
+          <p className="text-sm font-semibold">Take it to the scheduler</p>
+          <p className="mt-1 text-sm text-[#3d3450]">
+            Copy this caption, then continue to sign up and paste it into your first scheduled post.
+          </p>
+          <UseInSchedulerLink text={caption} className="mt-3" />
+        </div>
         {imported && (
           <div role="status" aria-live="polite" aria-atomic="true" className="mt-4 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-violet)]/10 p-3">
             <p className="font-medium text-[var(--poskoo-ink)]">Caption imported from the Instagram caption counter</p>

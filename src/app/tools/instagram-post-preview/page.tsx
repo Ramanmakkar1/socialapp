@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const steps = [
   { title: "1. Choose a photo", text: "Pick a local image and enter your display handle. No Instagram login needed." },
   { title: "2. Shape your story", text: "Write your caption with emoji and line breaks. Expand it to review the full text." },
-  { title: "3. Check the frame", text: "Compare square and portrait crops, then copy your caption for your next post." },
+  { title: "3. Check the frame", text: "Compare square and portrait crops, copy your caption, then paste it into your next post or the Instagram scheduler." },
 ];
 const faqs = [
   { q: "Are my images private?", a: "Yes. Images stay in this browser tab through local object URLs. This tool never uploads them or fetches your profile. Images and captions are not saved; refreshing clears the preview." },

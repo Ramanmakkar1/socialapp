@@ -72,6 +72,13 @@ export default function InstagramCaptionFormatterPage() {
         <CaptionFormatter />
       </div>
       <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+        Copy your finished caption above, then paste it into Instagram or a new post in the{" "}
+        <Link className={s.vlink} href="/instagram-scheduler">
+          Instagram scheduler
+        </Link>
+        .
+      </p>
+      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
         More free Instagram tools:{" "}
         <Link className={s.vlink} href="/tools/instagram-caption-counter">
           Caption counter

@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { countChars, extractHashtags } from "@/lib/captionLimits";
+import UseInSchedulerLink from "@/components/UseInSchedulerLink";
 
 const SAMPLE =
   "New drop is live ✨\n\nComment GUIDE and we'll DM you the styling guide.\n\nThanks @studio.north!\n\n#fashion #ootd #smallbusiness";
@@ -111,8 +112,15 @@ export default function CaptionFormatter() {
             </p>
           )}
           <p className="mt-3 text-sm text-[var(--poskoo-muted)]">
-            Blank lines and spacing are preserved exactly as you type them. Copy the result into Instagram or your scheduler.
+            Blank lines and spacing are preserved exactly as you type them. Copy the result, then paste it into Instagram or your scheduler.
           </p>
+          <div className="mt-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-4">
+            <p className="text-sm font-semibold">Take it to the scheduler</p>
+            <p className="mt-1 text-sm text-[var(--poskoo-muted)]">
+              Copy your finished caption, then continue to sign up and paste it into your first scheduled post.
+            </p>
+            <UseInSchedulerLink text={text} className="mt-3" />
+          </div>
         </div>
 
         <div className="min-w-0">
