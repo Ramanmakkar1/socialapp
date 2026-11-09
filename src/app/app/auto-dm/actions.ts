@@ -245,7 +245,17 @@ export async function rewindRuleAction(
   const user = await requireUser();
   try {
     const result = await rewindRule(user.id, id);
+    try {
+      await query(
+        "insert into socialapp.rewind_runs (user_id, rule_id, scanned, queued, failures) values ($1,$2,$3,$4,$5)",
+        [user.id, id, result.scanned, result.queued, result.failures],
+      );
+    } catch (recordErr) {
+      // The DMs are already queued; a failed history record should not fail the scan.
+      console.error("rewind run record failed for rule", id, recordErr instanceof Error ? recordErr.message : recordErr);
+    }
     revalidatePath("/app/auto-dm");
+    revalidatePath("/app/rewind");
     return { ok: true, queued: result.queued, scanned: result.scanned, failures: result.failures };
   } catch (err) {
     if (err instanceof RewindError) return { ok: false, error: err.message };

@@ -1,0 +1,27 @@
+/* Contacts page specifics. */
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--poskoo-lilac);
+  color: var(--poskoo-ink);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.mobileDl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+.mobileDl dd {
+  text-align: right;
+  overflow-wrap: anywhere;
+}

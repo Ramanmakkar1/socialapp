@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck } from "lucide-react";
+import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History } from "lucide-react";
 import styles from "./shell.module.css";
 
 const nav = [
@@ -11,10 +11,11 @@ const nav = [
   { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Auto-DM" },
   { href: "/app/templates", icon: LayoutTemplate, label: "Templates" },
   { href: "/app/inbox", icon: Inbox, label: "Inbox" },
-  { href: "/app/leads", icon: Users, label: "Leads" },
+  { href: "/app/contacts", icon: Users, label: "Contacts" },
   { href: "/app/analytics", icon: BarChart3, label: "Analytics" },
   { href: "/app/settings", icon: Settings, label: "Settings" },
   { href: "/app/review-guide", icon: BookOpenCheck, label: "Review guide" },
+  { href: "/app/rewind", icon: History, label: "Rewind" },
 ];
 
 function isActive(pathname: string, href: string) {
