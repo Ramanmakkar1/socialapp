@@ -124,6 +124,11 @@ const tools = [
     title: "Instagram scheduling checklist",
     description: "Tick off the preflight before you schedule: caption limits, media format, channel, time and timezone, connected account and publishing status.",
   },
+  {
+    href: "/tools/instagram-time-zone-converter",
+    title: "Instagram time zone converter",
+    description: "Convert a posting time between any two time zones with daylight saving handled, then schedule it at the right local time.",
+  },
 ];
 
 const itemListJsonLd = {
