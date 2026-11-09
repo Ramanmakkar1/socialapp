@@ -53,7 +53,7 @@ export default function AutoDmDemo() {
   const t = active.template;
 
   return (
-    <section aria-labelledby={`${id}-title`} className="mx-auto max-w-6xl px-4 pb-20">
+    <section aria-labelledby={`${id}-title`} className="mx-auto max-w-6xl px-4 pb-20 min-[1300px]:max-w-[88%]">
       <div className="rounded-3xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-5 shadow-sm sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id={`${id}-title`} className="text-2xl font-semibold tracking-tight sm:text-3xl">

@@ -74,7 +74,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <p className="lede">Poskoo plans your posts on one calendar, then sends your link to everyone who comments, within seconds. One app, one plan, no copy-paste.</p>
     <div className="ctas"><Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link><Link className="btn btn-line" href="#how">See how it works</Link></div>
     <p className="small">Free plan. No credit card.</p>
-    <div className="hero-art"><Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/hero.webp" priority width={1400} height={933} alt="A big phone shows a post; a comment saying GUIDE pops out and a paper plane carries a DM with a link. A creator sits on a calendar block and a friend waves with a coffee, with a happy dog and plants below." /></div>
+    <div className="hero-art"><Image sizes="(max-width: 1140px) 100vw, 88vw" src="/landing/hero.webp" priority width={1400} height={933} alt="A big phone shows a post; a comment saying GUIDE pops out and a paper plane carries a DM with a link. A creator sits on a calendar block and a friend waves with a coffee, with a happy dog and plants below." /></div>
   </header>
   <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><span>· Built on the official Meta API</span></div>
 </div>

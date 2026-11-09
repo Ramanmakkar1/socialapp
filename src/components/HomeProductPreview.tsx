@@ -27,7 +27,7 @@ export default function HomeProductPreview() {
   }
 
   return (
-    <div className="glow relative mx-auto mt-14 min-w-0 max-w-5xl rounded-2xl border border-line bg-surface">
+    <div className="glow relative mx-auto mt-14 min-w-0 max-w-5xl min-[1300px]:max-w-[80%] rounded-2xl border border-line bg-surface">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3 text-xs text-ink-2">
         <span className="flex items-center gap-2"><span aria-hidden="true" className="h-2 w-2 rounded-full bg-brand" />{BRAND.name} · This week</span>
         <span className="rounded-full bg-surface-2 px-2 py-1">Product preview · sample data</span>

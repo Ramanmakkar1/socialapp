@@ -5,20 +5,59 @@ import PoskooMark from "./PoskooMark";
 // The one site footer, used by the landing page and every public page (via
 // PublicShell). Must be rendered inside a .landing wrapper
 // so the landing.module.css global classes (footer.rich, .fh, …) apply.
-function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+type FooterLink = { href: string; label: string };
+
+function FooterColumn({ title, links, extra }: { title: string; links: FooterLink[]; extra?: { title: string; links: FooterLink[] } }) {
   return (
-    <nav aria-label={title}>
-      <p className="fh">{title}</p>
-      <ul>
-        {links.map((l) => (
-          <li key={l.href}>
-            <Link href={l.href}>{l.label}</Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <div className="fcol">
+      <nav aria-label={title}>
+        <p className="fh">{title}</p>
+        <ul>
+          {links.map((l) => (
+            <li key={l.href}>
+              <Link href={l.href}>{l.label}</Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      {extra && (
+        <nav aria-label={extra.title} className="fgroup">
+          <p className="fh">{extra.title}</p>
+          <ul>
+            {extra.links.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+    </div>
   );
 }
+
+const TOOLS: FooterLink[] = [
+  { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
+  { href: "/tools/instagram-caption-counter", label: "Caption counter" },
+  { href: "/tools/instagram-font-generator", label: "Font generator" },
+  { href: "/tools/instagram-bio-generator", label: "Bio generator" },
+  { href: "/tools/instagram-username-generator", label: "Username generator" },
+  { href: "/tools/instagram-caption-generator", label: "Caption generator" },
+  { href: "/tools/instagram-image-size", label: "Image size guide" },
+  { href: "/tools/instagram-engagement-rate-calculator", label: "Engagement rate calculator" },
+  { href: "/tools/instagram-line-break-generator", label: "Line break generator" },
+  { href: "/tools/instagram-comment-keyword-tester", label: "Comment keyword tester" },
+  { href: "/tools/instagram-comment-picker", label: "Comment picker" },
+  { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
+  { href: "/tools/instagram-post-preview", label: "Post preview" },
+  { href: "/tools/instagram-safe-zone-checker", label: "Safe zone checker" },
+  { href: "/tools/instagram-highlight-cover-maker", label: "Highlight cover maker" },
+  { href: "/tools/instagram-reel-cover-maker", label: "Reel cover maker" },
+  { href: "/tools/instagram-story-maker", label: "Story maker" },
+  { href: "/tools/instagram-post-ideas-generator", label: "Post ideas" },
+  { href: "/tools/instagram-hook-generator", label: "Hook generator" },
+  { href: "/tools/instagram-utm-builder", label: "UTM builder" },
+];
 
 export function SiteFooter() {
   return (
@@ -38,33 +77,16 @@ export function SiteFooter() {
           { href: "/instagram-auto-dm/templates", label: "Auto-DM templates" },
           { href: "/pricing", label: "Pricing" },
         ]}
+        extra={{ title: "Company", links: [
+            { href: "/help", label: "Help center" },
+            { href: "/contact", label: "Contact" },
+            { href: "/privacy", label: "Privacy" },
+            { href: "/terms", label: "Terms" },
+            { href: "/data-deletion", label: "Data deletion" },
+          ] }}
       />
-      <FooterColumn
-        title="Free tools"
-        links={[
-          { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
-          { href: "/tools/instagram-caption-counter", label: "Caption counter" },
-          { href: "/tools/instagram-font-generator", label: "Font generator" },
-          { href: "/tools/instagram-bio-generator", label: "Bio generator" },
-          { href: "/tools/instagram-username-generator", label: "Username generator" },
-          { href: "/tools/instagram-caption-generator", label: "Caption generator" },
-          { href: "/tools/instagram-image-size", label: "Image size guide" },
-          { href: "/tools/instagram-engagement-rate-calculator", label: "Engagement rate calculator" },
-          { href: "/tools/instagram-line-break-generator", label: "Line break generator" },
-          { href: "/tools/instagram-comment-keyword-tester", label: "Comment keyword tester" },
-          { href: "/tools/instagram-comment-picker", label: "Comment picker" },
-          { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
-          { href: "/tools/instagram-post-preview", label: "Post preview" },
-          { href: "/tools/instagram-safe-zone-checker", label: "Safe zone checker" },
-          { href: "/tools/instagram-highlight-cover-maker", label: "Highlight cover maker" },
-          { href: "/tools/instagram-reel-cover-maker", label: "Reel cover maker" },
-          { href: "/tools/instagram-story-maker", label: "Story maker" },
-          { href: "/tools/instagram-post-ideas-generator", label: "Post ideas" },
-          { href: "/tools/instagram-hook-generator", label: "Hook generator" },
-          { href: "/tools/instagram-utm-builder", label: "UTM builder" },
-          { href: "/tools", label: "All free tools" },
-        ]}
-      />
+      <FooterColumn title="Free tools" links={TOOLS.slice(0, 10)} />
+      <FooterColumn title="More free tools" links={[...TOOLS.slice(10), { href: "/tools", label: "All free tools →" }]} />
       <FooterColumn
         title="Compare"
         links={[
@@ -77,16 +99,6 @@ export function SiteFooter() {
           { href: "/manychat-alternative", label: "ManyChat alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
           { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative" },
-        ]}
-      />
-      <FooterColumn
-        title="Company"
-        links={[
-          { href: "/help", label: "Help center" },
-          { href: "/contact", label: "Contact" },
-          { href: "/privacy", label: "Privacy" },
-          { href: "/terms", label: "Terms" },
-          { href: "/data-deletion", label: "Data deletion" },
         ]}
       />
       <div className="legal">

@@ -265,6 +265,8 @@
   color:var(--ink)}
 .landing :global(footer.rich .fh){
   color:var(--ink);font-weight:600;margin-bottom:8px}
+.landing :global(footer.rich .fgroup){
+  margin-top:20px}
 .landing :global(footer.rich .legal){
   grid-column:1 / -1;padding-top:20px;border-top:1px solid var(--line,rgba(0,0,0,.08))}
 /* The illustrations have transparent backgrounds (2026-11-04), so no blend mode: multiply left a light box on the
@@ -361,3 +363,14 @@
   }
  }
 
+
+
+/* Big desktops: the page grows with the screen (percent of the width, not a fixed pixel box), so
+   1440-2560px screens are not a narrow column with empty sides. Text blocks keep their ch limits. */
+@media (min-width: 1300px) {
+  .landing :global(.wrap) { max-width: 88%; }
+  .landing :global(.hero-art) { max-width: 100%; }
+}
+@media (min-width: 1800px) {
+  .landing :global(.wrap) { max-width: 82%; }
+}

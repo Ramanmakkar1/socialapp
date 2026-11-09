@@ -47,7 +47,7 @@ export default function TemplateChooser() {
   }
 
   return (
-    <section aria-labelledby={`${id}-title`} className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-16">
+    <section aria-labelledby={`${id}-title`} className="mx-auto max-w-6xl min-[1300px]:max-w-[88%] scroll-mt-20 px-4 pb-16">
       <div className="rounded-3xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-5 sm:p-8">
         <h2 id={`${id}-title`} className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Not sure which template? <span className={ui.accent}>Start from your goal.</span>
