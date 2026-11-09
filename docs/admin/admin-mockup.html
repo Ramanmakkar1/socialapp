@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poskoo Admin: design mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Design reference only (docs/admin/ADMIN-DESIGN.md). Built with Poskoo's own tokens from src/app/globals.css. */
+:root{--paper:#fffcf6;--card:#fff;--ink:#1e1631;--muted:#5f5873;--line:#ece6da;--lilac:#cdbdf6;--peach:#ffcf96;--mint:#bdebd2;--lime:#ddf46b;--coral:#ff6a3d;--violet:#6b4eff;--green:#1fa971;--red:#e5484d;--band:#f3eeff;--pill:#e2d9ff;--shadow:0 2px 0 rgba(30,22,49,.06),0 18px 30px -22px rgba(30,22,49,.35)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "Instrument Sans",system-ui,sans-serif}
+.app{display:flex;min-height:100vh}
+aside{width:248px;flex:none;background:var(--card);border-right:1.5px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:21px;letter-spacing:-.04em}.logo b{color:var(--coral)}
+.logo .dot{width:28px;height:28px;border-radius:50%;background:var(--coral)}
+.adm{margin-left:auto;background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:3px 8px;border-radius:999px}
+.grp{margin-top:18px}.grp p{margin:0 0 4px;padding:0 10px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.nav a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:12px;color:var(--muted);font-weight:600;text-decoration:none;font-size:14.5px}
+.nav a:hover{background:var(--band);color:var(--ink)}.nav a.on{background:var(--band);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--pill)}.nav a.on i{color:var(--coral)}
+.nav i{font-style:normal;width:18px;text-align:center}
+.foot{margin-top:auto;border-top:1.5px solid var(--line);padding-top:12px;font-size:13px;color:var(--muted)}.foot a{display:block;color:var(--ink);font-weight:600;text-decoration:none;margin-top:6px}
+main{flex:1;min-width:0}
+.top{height:64px;background:var(--card);border-bottom:1.5px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 28px;position:sticky;top:0;z-index:2}
+.top h1{margin:0;font-size:20px;letter-spacing:-.03em}
+.search{flex:1;max-width:520px;margin:0 auto;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;color:var(--muted);font-size:14px}.search kbd{margin-left:auto;font:12px inherit;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.env{background:var(--mint);color:#0e6b40;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+.wrap{max-width:1400px;margin:0 auto;padding:28px;display:grid;gap:24px}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.kpi{padding:16px 18px}.kpi .l{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:30px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin-top:2px}
+.d{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-top:4px}.up{background:#e3f7ec;color:var(--green)}.dn{background:#fde4e5;color:var(--red)}
+.row2{display:grid;grid-template-columns:2fr 1fr;gap:16px}.row3{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ph{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1.5px solid var(--line)}.ph h2{margin:0;font-size:16px}.ph span{color:var(--muted);font-size:13px}.ph .act{margin-left:auto}
+.pb{padding:16px 18px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:12px;font:600 14px inherit;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--coral);border-color:var(--coral);color:#fff}.btn.dan{color:var(--red);border-color:#f3b8ba}
+table{width:100%;border-collapse:collapse;font-size:14px}th{position:sticky;top:0;background:var(--band);text-align:left;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:10px 14px}
+td{padding:12px 14px;border-top:1.5px solid var(--line)}tr:hover td{background:#faf8ff}td.n{text-align:right;font-variant-numeric:tabular-nums}
+.u{display:flex;gap:10px;align-items:center}.av{width:32px;height:32px;border-radius:50%;background:var(--lilac);display:grid;place-items:center;font-weight:700;font-size:13px}.u small{display:block;color:var(--muted);font-size:12.5px}
+.pill{display:inline-block;height:24px;line-height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600}
+.p-ok{background:var(--mint);color:#0e6b40}.p-warn{background:var(--peach);color:#8a4b00}.p-err{background:#fde4e5;color:var(--red)}.p-info{background:var(--lilac);color:var(--ink)}
+.pf{display:inline-block;width:18px;height:18px;border-radius:5px;margin-right:3px;vertical-align:middle}.ig{background:#d62976}.fb{background:#1877f2}.th{background:#000}.yt{background:#f00}
+.att li{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1.5px solid var(--line);font-size:14px}.att li:first-child{border-top:0}.att a{margin-left:auto;color:var(--violet);font-weight:600;text-decoration:none}
+.att{list-style:none;margin:0;padding:0}
+.det{display:flex;gap:16px;align-items:center;padding:20px}.det .av{width:56px;height:56px;font-size:22px;background:var(--peach)}
+.det h3{margin:0;font-size:20px}.det .acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:22px;padding:0 20px;border-top:1.5px solid var(--line)}.tabs a{padding:12px 0;color:var(--muted);font-weight:600;text-decoration:none;border-bottom:2px solid transparent}.tabs a.on{color:var(--ink);border-color:var(--coral)}
+.banner{background:var(--coral);color:#fff;font-weight:700;display:flex;align-items:center;gap:10px;height:44px;padding:0 20px;border-radius:14px}.banner a{margin-left:auto;color:#fff;background:rgba(0,0,0,.18);padding:4px 12px;border-radius:999px;text-decoration:none}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 -12px}
+@media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.row2,.row3{grid-template-columns:1fr}}
+@media(max-width:900px){aside{display:none}.kpis{grid-template-columns:repeat(2,1fr)}.wrap{padding:16px}.search{display:none}.det{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="logo"><span class="dot"></span>poskoo<b>.</b><span class="adm">ADMIN</span></div>
+    <div class="grp nav"><p>Monitor</p><a class="on" href="#"><i>▦</i>Overview</a><a href="#"><i>◎</i>System</a></div>
+    <div class="grp nav"><p>Customers</p><a href="#"><i>☺</i>Users</a><a href="#"><i>$</i>Billing</a></div>
+    <div class="grp nav"><p>Content</p><a href="#"><i>▤</i>Posts &amp; queue</a><a href="#"><i>✉</i>Automations</a></div>
+    <div class="grp nav"><p>Control</p><a href="#"><i>⚙</i>Settings</a><a href="#"><i>☰</i>Audit log</a></div>
+    <div class="foot">townmedialabs@gmail.com<a href="#">← Back to app</a><a href="#">Log out</a></div>
+  </aside>
+  <main>
+    <div class="top"><h1>Overview</h1><div class="search">🔍 Search users, emails, @handles <kbd>⌘K</kbd></div><span class="env">● Live</span></div>
+    <div class="wrap">
+      <div class="kpis">
+        <div class="card kpi"><div class="l">Users</div><div class="v">1,240</div><span class="d up">▲ 18%</span></div>
+        <div class="card kpi"><div class="l">New · 30 d</div><div class="v">212</div><span class="d up">▲ 9%</span></div>
+        <div class="card kpi"><div class="l">Paid users</div><div class="v">86</div><span class="d up">▲ 4</span></div>
+        <div class="card kpi"><div class="l">MRR</div><div class="v" style="color:var(--coral)">$2,431</div><span class="d up">▲ $320</span></div>
+        <div class="card kpi"><div class="l">Channels</div><div class="v">1,503</div><span class="d up">▲ 11%</span></div>
+        <div class="card kpi"><div class="l">Posts · 30 d</div><div class="v">9,880</div><span class="d dn">▼ 2%</span></div>
+      </div>
+      <div class="row2">
+        <div class="card"><div class="ph"><h2>Signups per day</h2><span>last 30 days</span></div><div class="pb">
+          <svg viewBox="0 0 600 180" width="100%" height="180" role="img" aria-label="Signups rose from about 4 to 11 per day">
+            <g stroke="#ece6da"><line x1="0" y1="40" x2="600" y2="40"/><line x1="0" y1="90" x2="600" y2="90"/><line x1="0" y1="140" x2="600" y2="140"/></g>
+            <path d="M0,150 L40,140 L80,145 L120,128 L160,132 L200,118 L240,121 L280,104 L320,110 L360,92 L400,96 L440,80 L480,84 L520,66 L560,70 L600,52 L600,180 L0,180Z" fill="rgba(255,106,61,.10)"/>
+            <path d="M0,150 L40,140 L80,145 L120,128 L160,132 L200,118 L240,121 L280,104 L320,110 L360,92 L400,96 L440,80 L480,84 L520,66 L560,70 L600,52" fill="none" stroke="#ff6a3d" stroke-width="3" stroke-linejoin="round"/>
+          </svg></div></div>
+        <div class="card"><div class="ph"><h2>Plan mix</h2><span>active users</span></div><div class="pb">
+          <div style="display:grid;gap:12px">
+            <div><b>Free</b> <span style="float:right">1,154</span><div style="height:10px;background:var(--band);border-radius:99px;margin-top:4px"><i style="display:block;width:93%;height:100%;background:var(--lilac);border-radius:99px"></i></div></div>
+            <div><b>Pro · $19</b> <span style="float:right">71</span><div style="height:10px;background:var(--band);border-radius:99px;margin-top:4px"><i style="display:block;width:6%;height:100%;background:var(--coral);border-radius:99px"></i></div></div>
+            <div><b>Agency · $49</b> <span style="float:right">15</span><div style="height:10px;background:var(--band);border-radius:99px;margin-top:4px"><i style="display:block;width:1.5%;height:100%;background:var(--violet);border-radius:99px"></i></div></div>
+          </div></div></div>
+      </div>
+      <div class="row3">
+        <div class="card"><div class="ph"><h2>Needs attention</h2><span>4 items</span></div><div class="pb"><ul class="att">
+          <li><span class="pill p-err">Failed</span>12 posts failed to publish today<a href="#">Open queue →</a></li>
+          <li><span class="pill p-warn">Expiring</span>9 Instagram logins expire within 7 days<a href="#">See users →</a></li>
+          <li><span class="pill p-err">Payment</span>2 failed card payments<a href="#">Billing →</a></li>
+          <li><span class="pill p-warn">Webhook</span>Meta webhook: 3 errors in the last hour<a href="#">System →</a></li></ul></div></div>
+        <div class="card"><div class="ph"><h2>Recent signups</h2><span class="act"><a class="btn" href="#">All users</a></span></div>
+          <table><thead><tr><th>User</th><th>Plan</th><th>Channels</th><th class="n">Joined</th></tr></thead><tbody>
+            <tr><td><div class="u"><span class="av">A</span><div>Aarav Studio<small>hello@aarav.studio</small></div></div></td><td><span class="pill p-info">Free</span></td><td><span class="pf ig"></span><span class="pf yt"></span></td><td class="n">12 min ago</td></tr>
+            <tr><td><div class="u"><span class="av" style="background:var(--mint)">M</span><div>Maple Bakery<small>owner@maplebakery.ca</small></div></div></td><td><span class="pill p-ok">Pro</span></td><td><span class="pf ig"></span><span class="pf fb"></span></td><td class="n">1 h ago</td></tr>
+            <tr><td><div class="u"><span class="av" style="background:var(--peach)">S</span><div>Sana Fitness<small>sana@fit.co</small></div></div></td><td><span class="pill p-warn">Trial</span></td><td><span class="pf ig"></span><span class="pf th"></span></td><td class="n">3 h ago</td></tr>
+          </tbody></table></div>
+      </div>
+      <p class="lbl">User detail page (example)</p>
+      <div class="card">
+        <div class="det"><span class="av">M</span><div><h3>Maple Bakery</h3><div style="color:var(--muted)">owner@maplebakery.ca · joined Oct 2, 2026</div><div style="margin-top:6px"><span class="pill p-ok">Pro · $19</span> <span class="pill p-ok">Active</span></div></div>
+          <div class="acts"><button class="btn pri">👁 View as user</button><button class="btn">Change plan</button><button class="btn dan">Suspend</button><button class="btn">⋯</button></div></div>
+        <div class="tabs"><a class="on" href="#">Overview</a><a href="#">Channels</a><a href="#">Posts</a><a href="#">Automations</a><a href="#">Billing</a><a href="#">Activity</a><a href="#">Danger zone</a></div>
+      </div>
+      <p class="lbl">"View as user" banner (on top of the user's own /app)</p>
+      <div class="banner">👁 Viewing as owner@maplebakery.ca · read-only<a href="#">Exit view</a></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
