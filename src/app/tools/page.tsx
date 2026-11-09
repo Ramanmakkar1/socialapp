@@ -213,6 +213,10 @@ export default function ToolsPage() {
             <div>
               <h2>Schedule posts and auto-DM everyone who comments</h2>
               <p>{BRAND.tagline}</p>
+              <p>
+                Planning across channels?{" "}
+                <Link href="/facebook-scheduler">Explore the Facebook Page scheduler</Link>.
+              </p>
               <Link className="btn" href="/signup">
                 Start free <span aria-hidden="true">→</span>
               </Link>

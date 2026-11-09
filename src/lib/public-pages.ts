@@ -48,6 +48,7 @@ export const PUBLIC_PATHS = [
   "/help/schedule-instagram-carousel",
   "/help/instagram-story-reply-auto-dm",
   "/instagram-scheduler",
+  "/facebook-scheduler",
   "/instagram-content-planner",
   "/pricing",
 ] as const;
@@ -102,6 +103,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
   "/help/schedule-instagram-carousel": { priority: 0.6, changeFrequency: "yearly" },
   "/help/instagram-story-reply-auto-dm": { priority: 0.6, changeFrequency: "yearly" },
   "/instagram-scheduler": { priority: 0.8, changeFrequency: "weekly" },
+  "/facebook-scheduler": { priority: 0.8, changeFrequency: "weekly" },
   "/instagram-content-planner": { priority: 0.7, changeFrequency: "weekly" },
   "/pricing": { priority: 0.8, changeFrequency: "weekly" },
 };
@@ -128,6 +130,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
   "/help/schedule-instagram-carousel": "Carousel Scheduling Guide",
   "/help/instagram-story-reply-auto-dm": "Story Reply Auto-DM Guide",
   "/instagram-scheduler": "Instagram Scheduler",
+  "/facebook-scheduler": "Facebook Page Scheduler",
   "/instagram-content-planner": "Content Planner",
   "/pricing": "Pricing",
 };
@@ -179,6 +182,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/help/schedule-instagram-carousel": "Schedule Instagram carousels: paste 2-10 public image links, write one caption and Poskoo publishes the post at your chosen time.",
   "/help/instagram-story-reply-auto-dm": "Step-by-step guide to auto-DM everyone who replies to your Instagram Story with a keyword.",
   "/instagram-scheduler": "Schedule Instagram posts with drag-and-drop calendar, feed, Reels and carousel support.",
+  "/facebook-scheduler": "Schedule Facebook Page posts with text, photos or video through Meta's official login. Plan Instagram and Threads content on the same calendar with Poskoo.",
   "/instagram-content-planner": "Plan an Instagram post step by step with free tools: draft a hook, write a caption, check image dimensions, preview the post and schedule it.",
   "/pricing": "Compare Poskoo Free, Pro and Agency plans.",
 };
