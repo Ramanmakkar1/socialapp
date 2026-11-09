@@ -30,6 +30,11 @@ const tools = [
     description: "Count characters and hashtags as you type and see how close your caption is to the Instagram limit.",
   },
   {
+    href: "/tools/instagram-caption-formatter",
+    title: "Instagram caption formatter",
+    description: "Keep blank lines and spacing in your caption, see character and hashtag counts as you type, then copy it to post or schedule.",
+  },
+  {
     href: "/tools/instagram-comment-keyword-tester",
     title: "Instagram comment keyword tester",
     description: "Try comment keywords and contains vs exact match before you turn on Instagram auto-DM rules.",
