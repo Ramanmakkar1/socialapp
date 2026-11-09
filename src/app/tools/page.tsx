@@ -220,7 +220,9 @@ export default function ToolsPage() {
               <p>{BRAND.tagline}</p>
               <p>
                 Planning across channels?{" "}
-                <Link href="/facebook-scheduler">Explore the Facebook Page scheduler</Link>.
+                <Link href="/facebook-scheduler">Explore the Facebook Page scheduler</Link>
+                {" "}or read how{" "}
+                <Link href="/instagram-dm-automation">Instagram DM automation turns comments into leads</Link>.
               </p>
               <Link className="btn" href="/signup">
                 Start free <span aria-hidden="true">→</span>

@@ -179,6 +179,10 @@ export default function InstagramAutoDm() {
                 <span className="font-medium">Comment-to-DM campaign calculator</span>
                 <p className="text-sm text-ink-2">Estimate comments, DMs and link clicks from your views and rates.</p>
               </Link>
+              <Link href="/instagram-dm-automation" className="group min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40">
+                <span className="font-medium">Instagram DM automation explained</span>
+                <p className="text-sm text-ink-2">See what comment keywords, Story replies, email capture and AI replies can automate.</p>
+              </Link>
             </div>
           </div>
         </div>
