@@ -14,6 +14,7 @@ import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
 import { deleteMyAccountAction, disconnectAccountAction, disconnectYouTubeAction, saveAiReplySettings, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
+import AiReplyPreview from "./AiReplyPreview";
 import ChannelSchedules, { type ChannelScheduleInput } from "./ChannelSchedules";
 import DeleteAccountForm from "./DeleteAccountForm";
 import styles from "../app-page.module.css";
@@ -364,6 +365,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                       <SubmitButton label="Save AI reply settings" />
                     </div>
                   </form>
+                  <AiReplyPreview instructions={a.ai_reply_instructions} bookingLink={a.ai_booking_link} />
                 </div>
               </li>
             ))}

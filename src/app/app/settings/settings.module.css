@@ -1,0 +1,73 @@
+/* AI DM reply preview on the settings page. Colours, radii and the font stack
+   come from the shared --poskoo-* tokens — no new colours. */
+
+.preview {
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-sm);
+  background: var(--poskoo-card);
+  padding: 16px;
+}
+
+.previewTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.previewQuestion { min-width: 0; }
+
+.previewLabel {
+  display: block;
+  color: var(--poskoo-muted);
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.previewText { margin: 4px 0 0; color: var(--poskoo-ink); font-size: .95rem; }
+
+.previewBtn {
+  min-height: 44px;
+  border: 1.5px solid var(--poskoo-ink);
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-ink);
+  color: #fff;
+  padding: .6rem 1.15rem;
+  font: 600 .92rem/1 var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform .2s, background .2s;
+}
+
+.previewBtn:hover { background: var(--poskoo-violet); transform: translateY(-1px); }
+
+.previewBtn:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+
+.previewOutput { margin-top: 4px; }
+
+.previewBubble {
+  margin-top: 10px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-mint);
+  padding: 14px 16px;
+  color: var(--poskoo-ink);
+  font-size: .95rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.previewNotice { margin: 12px 0 0; }
+
+@media (max-width: 480px) {
+  .preview { padding: 13px; }
+  .previewTop { align-items: stretch; flex-direction: column; }
+  .previewBtn { width: 100%; }
+  .previewBubble { padding: 12px 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .previewBtn { transition: none; }
+}
