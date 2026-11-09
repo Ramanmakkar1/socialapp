@@ -13,6 +13,78 @@ export const metadata: Metadata = {
   alternates: { canonical: "/instagram-scheduler" },
 };
 
+const capabilities = [
+  {
+    feature: "Schedule & auto-publish",
+    feed: "Yes",
+    reels: "Yes",
+    carousel: "Yes",
+    stories: "Yes",
+    helpHref: null,
+  },
+  {
+    feature: "Best-time suggestions",
+    feed: "Yes",
+    reels: "Yes",
+    carousel: "Yes",
+    stories: "Yes",
+    helpHref: null,
+  },
+  {
+    feature: "First comment (hashtags / CTA)",
+    feed: "Yes",
+    reels: "Yes",
+    carousel: "Yes",
+    stories: "No — API limit",
+    helpHref: null,
+  },
+  {
+    feature: "AI caption assistant",
+    feed: "Yes",
+    reels: "Yes",
+    carousel: "Yes",
+    stories: "Yes",
+    helpHref: null,
+  },
+  {
+    feature: "Comment-to-DM automation",
+    feed: "Yes",
+    reels: "Yes",
+    carousel: "Yes",
+    stories: "Via Story replies",
+    helpHref: "/help/instagram-story-reply-auto-dm",
+  },
+  {
+    feature: "Media type",
+    feed: "Image",
+    reels: "Video (.mp4)",
+    carousel: "2–10 images",
+    stories: "Image or video",
+    helpHref: null,
+  },
+  {
+    feature: "Aspect ratio",
+    feed: "1:1, 4:5, 1.91:1",
+    reels: "9:16 (1080×1920)",
+    carousel: "Match all slides",
+    stories: "9:16 (1080×1920)",
+    helpHref: null,
+  },
+  {
+    feature: "Step-by-step guide",
+    feed: null,
+    reels: "Guide",
+    carousel: "Guide",
+    stories: "Guide",
+    helpHref: null,
+    guideLinks: {
+      reels: "/help/schedule-instagram-reels",
+      carousel: "/help/schedule-instagram-carousel",
+      stories: "/help/schedule-instagram-stories",
+    },
+  },
+];
+
 const benefits = [
   {
     no: "01 / Calendar",
@@ -158,6 +230,73 @@ export default function InstagramScheduler() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="capabilities" style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Capability matrix</p>
+            <h2>What you can schedule for each <em className="s">Instagram format.</em></h2>
+          </div>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead>
+                <tr>
+                  <th className={s.th} scope="col">Capability</th>
+                  <th className={s.th} scope="col">Feed posts</th>
+                  <th className={s.th} scope="col">Reels</th>
+                  <th className={s.th} scope="col">Carousels</th>
+                  <th className={s.th} scope="col">Stories</th>
+                </tr>
+              </thead>
+              <tbody>
+                {capabilities.map((cap, i) => (
+                  <tr key={cap.feature} className={i === capabilities.length - 1 ? "guide-row" : ""}>
+                    <td className={s.td} style={{ fontWeight: 600 }}>
+                      {cap.feature}
+                    </td>
+                    <td className={s.td}>{cap.feed ?? "—"}</td>
+                    <td className={s.td}>
+                      {cap.guideLinks?.reels ? (
+                        <Link className={s.vlink} href={cap.guideLinks.reels}>
+                          {cap.reels}
+                        </Link>
+                      ) : (
+                        cap.reels
+                      )}
+                    </td>
+                    <td className={s.td}>
+                      {cap.guideLinks?.carousel ? (
+                        <Link className={s.vlink} href={cap.guideLinks.carousel}>
+                          {cap.carousel}
+                        </Link>
+                      ) : (
+                        cap.carousel
+                      )}
+                    </td>
+                    <td className={s.td}>
+                      {cap.helpHref ? (
+                        <Link className={s.vlink} href={cap.helpHref}>
+                          {cap.stories}
+                        </Link>
+                      ) : cap.guideLinks?.stories ? (
+                        <Link className={s.vlink} href={cap.guideLinks.stories}>
+                          {cap.stories}
+                        </Link>
+                      ) : (
+                        cap.stories
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="small" style={{ marginTop: 16, textAlign: "center" }}>
+            Ready to schedule? <Link className={s.vlink} href="/signup">Start free</Link> — no credit card,
+            2 accounts and 10 posts/month included.
+          </p>
         </div>
       </section>
 
