@@ -20,6 +20,7 @@ import {
   type ComposerDraftInitial,
   type ScheduleOrigin,
 } from "@/lib/composerDraft";
+import { dayPrefill } from "@/lib/composerUrl";
 import ui from "@/components/ui/ui.module.css";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
@@ -158,6 +159,16 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- browser time zone is only known after hydration
     if (origin) setScheduledAt(origin.local);
   }, [draftScheduledAt]);
+
+  // "+" on a calendar day opens /app/calendar?compose=1&day=YYYY-MM-DD: pre-fill that day's time.
+  const dayParam = searchParams.get("day");
+  const hasDraft = Boolean(initialDraft);
+  useEffect(() => {
+    if (hasDraft) return;
+    const at = dayPrefill(dayParam);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- local wall time is only known in the browser
+    if (at) setScheduledAt(toLocalInputValue(at));
+  }, [dayParam, hasDraft]);
 
   useEffect(() => {
     // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.

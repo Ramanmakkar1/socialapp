@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { CalendarDays, CalendarRange, List, Plus } from "lucide-react";
 import Composer from "./Composer";
+import ComposerDialog from "./ComposerDialog";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
 import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
@@ -10,11 +12,10 @@ import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { canPublishToFacebook } from "@/lib/facebookPublish";
-import { PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
 
-export const metadata = { title: "Calendar" };
+export const metadata = { title: "Publish" };
 
 type WeekPost = {
   id: string;
@@ -85,7 +86,7 @@ export default async function CalendarPage({
 }) {
   const { week, view: viewParam, month, status, draft } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
-  const view: "week" | "month" = viewParam === "month" ? "month" : "week";
+  const view: "week" | "month" | "list" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : "week";
   const weekStart = parseWeekParam(week);
   const monthStart = parseMonthParam(month);
   const prevMonth = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() - 1, 1));
@@ -130,7 +131,9 @@ export default async function CalendarPage({
   const reloadHref =
     view === "month"
       ? `/app/calendar?view=month&month=${monthQueryParam(monthStart)}`
-      : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
+      : view === "list"
+        ? "/app/calendar?view=list"
+        : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
 
   const queueReloadHref = initialFilter === "all" ? reloadHref : `${reloadHref}&status=${initialFilter}`;
 
@@ -245,14 +248,28 @@ export default async function CalendarPage({
 
   return (
     <div className={styles.calendarPage}>
-      <PageHero
-        eyebrow="Plan your posts"
-        title="Your"
-        accent="calendar"
-        lede="Plan and schedule posts for Instagram, Facebook, Threads and YouTube."
-        art="/landing/card-schedule.webp"
-        artAlt=""
-      />
+      <header className={styles.pubHeader}>
+        <div className={styles.pubTitleWrap}>
+          <h1 className={styles.pubTitle}>Publish</h1>
+          <p className={styles.pubSub}>Plan, schedule and track posts for Instagram, Facebook, Threads and YouTube.</p>
+        </div>
+        <div className={styles.pubActions}>
+          <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
+            <Link href="/app/calendar?view=week" aria-current={view === "week" ? "page" : undefined} className={`${styles.viewLink} ${view === "week" ? styles.viewLinkActive : ""}`}>
+              <CalendarRange width={16} height={16} aria-hidden="true" /> Week
+            </Link>
+            <Link href="/app/calendar?view=month" aria-current={view === "month" ? "page" : undefined} className={`${styles.viewLink} ${view === "month" ? styles.viewLinkActive : ""}`}>
+              <CalendarDays width={16} height={16} aria-hidden="true" /> Month
+            </Link>
+            <Link href="/app/calendar?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
+              <List width={16} height={16} aria-hidden="true" /> List
+            </Link>
+          </div>
+          <Link href={`${reloadHref}&compose=1`} scroll={false} className={styles.newPostBtn}>
+            <Plus width={18} height={18} aria-hidden="true" /> New post
+          </Link>
+        </div>
+      </header>
       {draftFailed ? (
         <LoadFailed
           message={draftPublishingSoon ? "This post is about to publish and can no longer be edited." : "We couldn’t load this draft. Your saved post is unchanged."}
@@ -267,24 +284,10 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} />
+        <ComposerDialog title={initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
+          <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} />
+        </ComposerDialog>
       )}
-      <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
-        <Link
-          href="/app/calendar?view=week"
-          aria-current={view === "week" ? "page" : undefined}
-          className={`${styles.viewLink} ${view === "week" ? styles.viewLinkActive : ""}`}
-        >
-          Week
-        </Link>
-        <Link
-          href="/app/calendar?view=month"
-          aria-current={view === "month" ? "page" : undefined}
-          className={`${styles.viewLink} ${view === "month" ? styles.viewLinkActive : ""}`}
-        >
-          Month
-        </Link>
-      </div>
       {view === "month" ? (
         <section className={styles.viewSection} aria-label="Month view">
           <MonthView
@@ -299,13 +302,14 @@ export default async function CalendarPage({
             }
           />
         </section>
-      ) : (
+      ) : view === "week" ? (
         <section className={styles.viewSection} aria-label="Week view">
           <WeekView
             posts={weekRows}
             weekStart={weekStart}
             prevHref={`/app/calendar?week=${weekQueryParam(prevStart)}`}
             nextHref={`/app/calendar?week=${weekQueryParam(nextStart)}`}
+            composeBase={`/app/calendar?view=week&week=${weekQueryParam(weekStart)}&compose=1`}
             loadError={
               weekRowsFailed
                 ? { message: "We couldn’t load the posts scheduled for this week. They may still exist.", reloadHref }
@@ -313,7 +317,9 @@ export default async function CalendarPage({
             }
           />
         </section>
-      )}
+      ) : null}
+      {view === "list" && (
+        <>
       <PostList
         posts={rows}
         initialFilter={initialFilter}
@@ -358,6 +364,8 @@ export default async function CalendarPage({
             ))}
           </ul>
         </section>
+      )}
+        </>
       )}
     </div>
   );

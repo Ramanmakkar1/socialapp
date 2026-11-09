@@ -2,14 +2,15 @@
 
 import { useEffect, useState, useTransition } from "react";
 import type { DragEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AtSign, ChevronLeft, ChevronRight, Facebook, Instagram, Plus, Youtube } from "lucide-react";
 import { reschedulePost } from "./rescheduleActions";
 import RescheduleControl from "./RescheduleControl";
 import LoadFailed, { type LoadError } from "./LoadFailed";
-import { BtnA } from "@/components/ui/kit";
 import styles from "./calendar.module.css";
 
-const TINTS = [styles.dayTint1, styles.dayTint2, styles.dayTint3];
+const PLATFORM_ICON: Record<string, typeof Instagram> = { instagram: Instagram, facebook: Facebook, threads: AtSign, youtube: Youtube };
 
 type WeekViewPost = {
   id: string;
@@ -24,6 +25,9 @@ type WeekViewProps = {
   weekStart: Date;
   prevHref: string;
   nextHref: string;
+  /** "/app/calendar?view=week&week=...&compose=1"; "&day=YYYY-MM-DD" is added per day. */
+  composeBase?: string;
+  todayHref?: string;
   loadError?: LoadError;
 };
 
@@ -62,14 +66,17 @@ function formatLocalTime(at: Date | string): string {
 }
 
 function captionPreview(caption: string): string {
-  return caption.trim().slice(0, 40);
+  const t = caption.trim();
+  return t.length > 90 ? `${t.slice(0, 90)}…` : t || "(no caption)";
 }
+
+const STATUS_LABEL: Record<string, string> = { draft: "Draft", failed: "Failed", published: "Published", publishing: "Publishing" };
 
 function isMovable(status: string): boolean {
   return status === "scheduled" || status === "draft";
 }
 
-export default function WeekView({ posts, weekStart, prevHref, nextHref, loadError }: WeekViewProps) {
+export default function WeekView({ posts, weekStart, prevHref, nextHref, composeBase, todayHref = "/app/calendar?view=week", loadError }: WeekViewProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -120,22 +127,17 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
 
   return (
     <div>
-      <div className={styles.navRow}>
-        <div>
+      <div className={styles.toolbar}>
+        <div className={styles.toolbarNav}>
+          <Link href={todayHref} className={styles.todayBtn}>Today</Link>
+          <Link href={prevHref} className={styles.arrowBtn} aria-label="Previous week"><ChevronLeft width={18} height={18} aria-hidden="true" /></Link>
+          <Link href={nextHref} className={styles.arrowBtn} aria-label="Next week"><ChevronRight width={18} height={18} aria-hidden="true" /></Link>
           <p className={styles.rangeLabel}>{formatWeekRange(weekStart)}</p>
-          <p className={styles.rangeHint}>
-            Days are grouped in UTC{tz ? `; each post also shows your time (${tz})` : ""}.
-            <span className={styles.wideOnly}> Drag a post to another day to move it.</span>
-          </p>
         </div>
-        <div className={styles.navBtns}>
-          <BtnA href={prevHref} variant="ghost" size="sm">
-            <span aria-hidden="true">←</span> Previous
-          </BtnA>
-          <BtnA href={nextHref} variant="ghost" size="sm">
-            Next <span aria-hidden="true">→</span>
-          </BtnA>
-        </div>
+        <p className={styles.rangeHint}>
+          {tz ? <span className={styles.tzChip}>{tz}</span> : null}
+          <span className={styles.wideOnly}>Days in UTC · drag a post to another day to move it</span>
+        </p>
       </div>
       {error && (
         <p role="alert" className={styles.errorText}>
@@ -143,21 +145,14 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
         </p>
       )}
       {loadError && <LoadFailed {...loadError} className={styles.mb} />}
-      <div className={styles.dayGrid}>
-        {days.map((day, index) => {
+      <div className={styles.weekGrid}>
+        {days.map((day) => {
           const key = utcDateKey(day);
           const dayPosts = byDay.get(key) ?? [];
           const isToday = key === todayKey;
-          const weekday = day.toLocaleDateString("en-US", {
-            weekday: "short",
-            timeZone: "UTC",
-          });
-          const dateLabel = day.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            timeZone: "UTC",
-          });
-
+          const weekday = day.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+          const dateNum = day.getUTCDate();
+          const isPast = key < todayKey;
           return (
             <div
               key={key}
@@ -169,39 +164,56 @@ export default function WeekView({ posts, weekStart, prevHref, nextHref, loadErr
                 if (dragOverKey === key) setDragOverKey(null);
               }}
               onDrop={(e) => handleDrop(e, key, dayPosts)}
-              className={[styles.day, TINTS[index % 3], isToday ? styles.dayToday : "", dragOverKey === key ? styles.dayOver : ""].filter(Boolean).join(" ")}
+              className={[styles.weekCol, isToday ? styles.weekColToday : "", isPast ? styles.weekColPast : "", dragOverKey === key ? styles.weekColOver : ""].filter(Boolean).join(" ")}
             >
-              <p className={styles.dayLabel}>
-                {weekday} · {dateLabel}
-              </p>
-              <div className={styles.dayPosts}>
-                {dayPosts.length === 0 ? (
-                  loadError ? null : <p className={styles.dash} aria-label="No posts">—</p>
-                ) : (
-                  dayPosts.map((post) => (
-                    <div key={`${post.id}-${utcDateKey(new Date(post.scheduled_at!))}`} className="min-w-0">
-                      <span
-                        draggable={isMovable(post.status)}
+              <div className={styles.weekHead}>
+                <span className={styles.weekDay}>{weekday}</span>
+                <span className={`${styles.weekNum} ${isToday ? styles.weekNumToday : ""}`}>{dateNum}</span>
+                {dayPosts.length > 0 && <span className={styles.weekCount}>{dayPosts.length}</span>}
+              </div>
+              <div className={styles.weekPosts}>
+                {dayPosts.map((post) => {
+                  const movable = isMovable(post.status);
+                  return (
+                    <div key={`${post.id}-${key}`} className="min-w-0">
+                      <div
+                        draggable={movable}
                         onDragStart={
-                          isMovable(post.status)
+                          movable
                             ? (e) => {
                                 e.dataTransfer.setData("text/plain", post.id);
                                 e.dataTransfer.effectAllowed = "move";
                               }
                             : undefined
                         }
-                        className={[styles.chip, post.status === "failed" ? styles.chipFailed : "", isMovable(post.status) ? styles.chipMovable : ""].filter(Boolean).join(" ")}
+                        className={[styles.postTile, post.status === "failed" ? styles.postTileFailed : "", post.status === "draft" ? styles.postTileDraft : "", post.status === "published" ? styles.postTilePublished : "", movable ? styles.chipMovable : ""].filter(Boolean).join(" ")}
                         title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
                       >
-                        {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
-                        {tz && <span className={styles.chipLocal}>{formatLocalTime(post.scheduled_at!)} your time</span>}
-                      </span>
-                      {isMovable(post.status) && (
-                        <RescheduleControl id={post.id} scheduledAt={post.scheduled_at!} caption={post.caption} />
-                      )}
+                        <div className={styles.postTileTop}>
+                          <span className={styles.postTileIcons}>
+                            {(post.platforms.length ? post.platforms : ["instagram"]).map((p) => {
+                              const Icon = PLATFORM_ICON[p] ?? AtSign;
+                              return <Icon key={p} width={13} height={13} aria-label={p} className={styles[`ico_${p}`]} />;
+                            })}
+                          </span>
+                          <span className={styles.postTileTime} suppressHydrationWarning>
+                            {tz ? formatLocalTime(post.scheduled_at!) : `${formatTimeUtc(post.scheduled_at!)} UTC`}
+                          </span>
+                        </div>
+                        <p className={styles.postTileCaption}>{captionPreview(post.caption)}</p>
+                        {STATUS_LABEL[post.status] && <span className={styles.postTileStatus}>{STATUS_LABEL[post.status]}</span>}
+                      </div>
+                      {movable && <RescheduleControl id={post.id} scheduledAt={post.scheduled_at!} caption={post.caption} />}
                     </div>
-                  ))
+                  );
+                })}
+                {composeBase && !isPast && (
+                  <Link href={`${composeBase}&day=${key}`} scroll={false} className={`${styles.addSlot} ${dayPosts.length ? "" : styles.addSlotEmpty}`} aria-label={`New post on ${weekday} ${dateNum}`}>
+                    <Plus width={16} height={16} aria-hidden="true" />
+                    <span>{dayPosts.length ? "Add" : "New post"}</span>
+                  </Link>
                 )}
+                {!composeBase && dayPosts.length === 0 && !loadError && <p className={styles.dash} aria-label="No posts">—</p>}
               </div>
             </div>
           );
