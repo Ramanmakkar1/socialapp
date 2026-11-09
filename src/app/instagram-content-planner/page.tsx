@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
 
 const PATH = "/instagram-content-planner";
@@ -138,6 +139,12 @@ export default function InstagramContentPlannerPage() {
             ))}
           </div>
         ))}
+        <p className="small" style={{ textAlign: "center", marginTop: 26 }}>
+          Planning a comment keyword?{" "}
+          <Link className={s.vlink} href="/tools/instagram-comment-to-dm-calculator">
+            Estimate comments, DMs and link clicks →
+          </Link>
+        </p>
       </section>
 
       <section style={{ paddingTop: 20 }}>

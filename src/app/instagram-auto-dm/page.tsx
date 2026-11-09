@@ -175,6 +175,10 @@ export default function InstagramAutoDm() {
                 <span className="font-medium">Free comment keyword tester</span>
                 <p className="text-sm text-ink-2">See which comments your keywords will match.</p>
               </Link>
+              <Link href="/tools/instagram-comment-to-dm-calculator" className="group min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40">
+                <span className="font-medium">Comment-to-DM campaign calculator</span>
+                <p className="text-sm text-ink-2">Estimate comments, DMs and link clicks from your views and rates.</p>
+              </Link>
             </div>
           </div>
         </div>

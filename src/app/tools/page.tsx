@@ -40,6 +40,11 @@ const tools = [
     description: "Try comment keywords and contains vs exact match before you turn on Instagram auto-DM rules.",
   },
   {
+    href: "/tools/instagram-comment-to-dm-calculator",
+    title: "Instagram comment-to-DM campaign calculator",
+    description: "Estimate comments, DMs and link clicks from views, comment rate, DM delivery rate and link-click rate, with every formula shown.",
+  },
+  {
     href: "/tools/instagram-dm-link-generator",
     title: "Instagram DM link generator",
     description: "Create an ig.me link that opens a direct message with your account—copy it for bio, Stories and email.",
