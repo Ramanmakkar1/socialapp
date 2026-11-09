@@ -134,6 +134,11 @@ const tools = [
     title: "Instagram time zone converter",
     description: "Convert a posting time between any two time zones with daylight saving handled, then schedule it at the right local time.",
   },
+  {
+    href: "/tools/instagram-posting-frequency-calculator",
+    title: "Instagram posting frequency calculator",
+    description: "Pick your weekly time budget and content formats to see a realistic weekly posting range and a sample posting plan for your account.",
+  },
 ];
 
 const itemListJsonLd = {
