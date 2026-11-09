@@ -114,6 +114,11 @@ const tools = [
     title: "Instagram hook generator",
     description: "Get ready-to-copy Reel hooks for any topic across eight styles — curiosity, mistake, how-to, myth, story, list, contrarian and result.",
   },
+  {
+    href: "/tools/instagram-scheduling-checklist",
+    title: "Instagram scheduling checklist",
+    description: "Tick off the preflight before you schedule: caption limits, media format, channel, time and timezone, connected account and publishing status.",
+  },
 ];
 
 const itemListJsonLd = {
