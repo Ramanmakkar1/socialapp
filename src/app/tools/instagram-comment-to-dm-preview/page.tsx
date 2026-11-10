@@ -30,6 +30,10 @@ const faqs = [
     q: "Does this preview connect to Instagram or send real DMs?",
     a: "No. This is a local preview, not a live Meta connection. It does not read your posts, contact Instagram, save your entries or send comments or DMs. A live Poskoo rule uses a connected professional Instagram account and the official Meta API.",
   },
+  {
+    q: "How does the optional email-capture step work?",
+    a: "Switch it on to preview a sample email prompt, a submitted sample email and a follow-up DM. Use sample data only: the field is never submitted, transmitted or stored, and no real personal information is collected.",
+  },
 ];
 
 const toolJsonLd = toolSoftwareJsonLd({
@@ -55,8 +59,9 @@ export default function InstagramCommentToDmPreviewPage() {
           Instagram comment-to-DM <em className="s mark">flow preview</em>
         </h1>
         <p className="lede">
-          See how a keyword comment becomes an Instagram DM before you set up a rule. Test your own keyword and message
-          with the same matching logic as {BRAND.name}; this preview is not a live Meta connection and sends nothing.
+          See how a keyword comment becomes an Instagram DM before you set up a rule. This is a simulated, local preview:
+          edit the keyword, sample comment, match type, DM text and optional email-capture step, and the flow updates in
+          your browser without contacting Instagram or saving anything.
         </p>
         <div className="hero-art" style={{ maxWidth: 520 }}>
           <Image
@@ -78,6 +83,9 @@ export default function InstagramCommentToDmPreviewPage() {
         className="small"
         style={{ textAlign: "center", marginTop: 20, display: "flex", flexWrap: "wrap", gap: "8px 20px", justifyContent: "center" }}
       >
+        <Link className={s.vlink} href="/instagram-auto-dm">
+          Run this flow live with Instagram auto-DM
+        </Link>
         <Link className={s.vlink} href="/instagram-dm-automation">
           Explore Instagram DM automation
         </Link>

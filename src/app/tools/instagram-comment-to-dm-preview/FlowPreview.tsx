@@ -59,14 +59,23 @@ export default function FlowPreview() {
   const [comment, setComment] = useState("GUIDE please!");
   const [dmText, setDmText] = useState("Thanks for commenting! Here is the guide you asked for.");
   const [matchType, setMatchType] = useState<MatchType>("contains");
+  const [captureEmail, setCaptureEmail] = useState(false);
+  const [emailPrompt, setEmailPrompt] = useState("Want the full guide? Leave your email and I'll send it over.");
+  const [sampleEmail, setSampleEmail] = useState("reader@example.com");
+  const [followUpDm, setFollowUpDm] = useState(
+    "Thanks! I've sent the guide to your inbox. Reply here if you have questions.",
+  );
 
   const hasKeyword = keyword.trim().length > 0;
   const hasComment = comment.trim().length > 0;
   const hasDm = dmText.trim().length > 0;
+  const hasEmailPrompt = emailPrompt.trim().length > 0;
+  const hasSampleEmail = sampleEmail.trim().length > 0;
+  const hasFollowUp = followUpDm.trim().length > 0;
   const match = hasKeyword && hasComment ? findMatch(comment, keyword, matchType) : null;
   const matchedKeyword = match?.keyword === "*" ? "Any comment" : match?.keyword;
 
-  const status = !hasKeyword
+  const baseStatus = !hasKeyword
     ? "Enter a keyword to test this comment. No DM preview is shown yet."
     : !hasComment
       ? "Enter a sample comment to test your keyword. No DM preview is shown yet."
@@ -75,6 +84,18 @@ export default function FlowPreview() {
           ? `Matched “${matchedKeyword}” with ${matchType} matching. Your outgoing DM preview is ready; nothing was sent.`
           : `Matched “${matchedKeyword}”. Enter DM text to complete the outgoing message preview.`
         : `No ${matchType} match, so no outgoing DM preview is shown.`;
+
+  const emailStatus = !captureEmail
+    ? ""
+    : !hasEmailPrompt
+      ? " Add an email prompt to complete the capture step."
+      : !hasSampleEmail
+        ? " Add a sample email to preview the capture step."
+        : !hasFollowUp
+          ? " Add follow-up DM text to complete the email flow."
+          : " The email capture and follow-up DM previews are ready; nothing was sent or saved.";
+
+  const status = baseStatus + emailStatus;
 
   function tryExample(example: (typeof MATCH_EXAMPLES)[number]) {
     setKeyword(example.keyword);
@@ -96,7 +117,8 @@ export default function FlowPreview() {
         </span>
       </div>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#3d3450]">
-        Change the keyword, sample comment, match type or DM text. The preview updates in this browser; it does not
+        Change the keyword, sample comment, match type or DM text, then switch on the optional email-capture step to
+        preview a prompt, a submitted sample email and a follow-up DM. The preview updates in this browser; it does not
         contact Instagram, send a message or save your entries.
       </p>
 
@@ -183,6 +205,83 @@ export default function FlowPreview() {
               Leave this empty to see the missing-message state. Text stays in this browser tab.
             </p>
           </div>
+
+          <div className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-3">
+            <label htmlFor={`${id}-capture-email`} className="flex min-h-11 cursor-pointer items-center gap-3">
+              <input
+                id={`${id}-capture-email`}
+                type="checkbox"
+                checked={captureEmail}
+                onChange={(event) => setCaptureEmail(event.target.checked)}
+                className="h-5 w-5 shrink-0 accent-[var(--poskoo-violet)]"
+              />
+              <span className="text-sm font-medium text-[var(--poskoo-ink)]">Add an optional email-capture step</span>
+            </label>
+            <p className={HINT}>
+              Off by default. When on, the preview shows a sample email prompt, a submitted sample email and a follow-up
+              DM. Use sample data only; nothing is sent or saved.
+            </p>
+          </div>
+
+          {captureEmail && (
+            <>
+              <div>
+                <label htmlFor={`${id}-email-prompt`} className={LABEL}>
+                  Email prompt
+                </label>
+                <textarea
+                  id={`${id}-email-prompt`}
+                  rows={3}
+                  value={emailPrompt}
+                  onChange={(event) => setEmailPrompt(event.target.value)}
+                  placeholder="Want the full guide? Leave your email and I'll send it over."
+                  aria-describedby={`${id}-email-prompt-hint`}
+                  className={`${INPUT} resize-y`}
+                />
+                <p id={`${id}-email-prompt-hint`} className={HINT}>
+                  The message that asks the visitor for an email address.
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor={`${id}-sample-email`} className={LABEL}>
+                  Sample visitor email
+                </label>
+                <input
+                  id={`${id}-sample-email`}
+                  type="email"
+                  value={sampleEmail}
+                  onChange={(event) => setSampleEmail(event.target.value)}
+                  placeholder="reader@example.com"
+                  autoComplete="off"
+                  spellCheck={false}
+                  aria-describedby={`${id}-sample-email-hint`}
+                  className={INPUT}
+                />
+                <p id={`${id}-sample-email-hint`} className={HINT}>
+                  Example data only. Do not enter a real email address; this field is never submitted or stored.
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor={`${id}-follow-up`} className={LABEL}>
+                  Follow-up DM after email
+                </label>
+                <textarea
+                  id={`${id}-follow-up`}
+                  rows={4}
+                  value={followUpDm}
+                  onChange={(event) => setFollowUpDm(event.target.value)}
+                  placeholder="Thanks! I've sent the guide to your inbox."
+                  aria-describedby={`${id}-follow-up-hint`}
+                  className={`${INPUT} resize-y`}
+                />
+                <p id={`${id}-follow-up-hint`} className={HINT}>
+                  The message sent after the sample email is captured. Leave it empty to see the missing-message state.
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         <div className={s.flowPreview}>
@@ -277,6 +376,45 @@ export default function FlowPreview() {
                   </span>
                 </div>
               </div>
+
+              {captureEmail && (
+                <>
+                  <ArrowDown aria-hidden="true" className="mx-auto h-4 w-4 text-[var(--poskoo-muted)]" />
+                  <div className={s.flowStep}>
+                    <p className={STEP_LABEL}>4 · Optional email capture</p>
+                    <div className="mt-1 min-w-0 rounded-2xl rounded-tl-md border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-2.5 text-sm">
+                      <span className="mb-1 block text-xs font-semibold text-[var(--poskoo-muted)]">
+                        yourbrand → sample.follower · preview only
+                      </span>
+                      <span className="block whitespace-pre-wrap [overflow-wrap:anywhere]">
+                        {hasEmailPrompt ? emailPrompt : "Add an email prompt to complete this preview."}
+                      </span>
+                      <span className="mt-2 block rounded-lg border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-2.5 py-1.5 text-xs text-[#3d3450] [overflow-wrap:anywhere]">
+                        {hasSampleEmail ? `Sample email: ${sampleEmail}` : "Sample email will appear here."}
+                      </span>
+                    </div>
+                  </div>
+
+                  <ArrowDown aria-hidden="true" className="mx-auto h-4 w-4 text-[var(--poskoo-muted)]" />
+                  <div className={s.flowStep}>
+                    <p className={STEP_LABEL}>5 · Follow-up DM preview</p>
+                    <div
+                      className={`mt-1 ml-auto w-fit max-w-[95%] rounded-2xl rounded-br-md px-3 py-2.5 text-sm ${
+                        hasFollowUp
+                          ? "bg-[var(--poskoo-violet)] text-white"
+                          : "border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-band)] text-[#3d3450]"
+                      }`}
+                    >
+                      <span className="mb-1 block text-xs font-semibold opacity-80">
+                        yourbrand → sample.follower · preview only
+                      </span>
+                      <span className="block whitespace-pre-wrap [overflow-wrap:anywhere]">
+                        {hasFollowUp ? followUpDm : "Add follow-up DM text to complete this preview."}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

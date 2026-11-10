@@ -328,6 +328,13 @@ export default function ToolsPage() {
               ))}
             </div>
           ))}
+          {s.id === "dm" && (
+            <p className="small" style={{ textAlign: "center", marginTop: 18 }}>
+              Not sure which keyword to use?{" "}
+              <Link href="/tools/instagram-comment-to-dm-preview">Preview the comment-to-DM flow</Link> before you
+              estimate results with the calculator.
+            </p>
+          )}
           {s.next && (
             <p className="small" style={{ textAlign: "center", marginTop: 30 }}>
               {s.next.label}{" "}
