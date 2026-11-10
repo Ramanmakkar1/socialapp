@@ -3,9 +3,19 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
-import { GraphError, graphCall, replyToCommentPublicly, sendDirectMessage, userAccount } from "@/lib/igGraph";
+import { GraphError, graphCall, likeComment, replyToCommentPublicly, sendDirectMessage, userAccount } from "@/lib/igGraph";
 import { guardedDmSend } from "@/lib/dmCooldown";
-import { DM_WINDOW_MS, PRIVATE_REPLY_WINDOW_MS, commentReceivedAt, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
+import {
+  DM_WINDOW_MS,
+  PRIVATE_REPLY_WINDOW_MS,
+  commentReceivedAt,
+  lastInboundMessageAt,
+  markCommentDone,
+  markCommentLiked,
+  toggleCommentDone,
+  toggleCommentHidden,
+  withinWindow,
+} from "@/lib/inbox";
 
 function field(formData: FormData, key: string, max = 1000): string {
   const v = formData.get(key);
@@ -37,6 +47,14 @@ export async function replyToCommentAction(formData: FormData): Promise<void> {
     await replyToCommentPublicly(account, commentId, message);
   } catch (err) {
     error = failMessage(err);
+  }
+  if (!error) {
+    try {
+      // A public reply answers the comment: it leaves the "unanswered" list.
+      await markCommentDone(user.id, account.id, commentId);
+    } catch (err) {
+      console.error("replyToCommentAction: reply sent but not marked done", commentId, err instanceof Error ? err.message : err);
+    }
   }
   back(error ? { error } : { ok: "comment" });
 }
@@ -71,6 +89,7 @@ export async function privateReplyAction(formData: FormData): Promise<void> {
   try {
     if (sent.ok) {
       await query("update socialapp.dm_queue set status='sent', sent_at=now(), attempts=1 where id=$1", [rowId]);
+      await markCommentDone(user.id, account.id, commentId);
     } else if (sent.rateLimited) {
       // Not sent: release the claim so the private reply can be tried again after the cooldown.
       await query("delete from socialapp.dm_queue where id=$1 and status='skipped' and kind='manual_reply'", [rowId]);
@@ -110,4 +129,51 @@ export async function replyInThreadAction(formData: FormData): Promise<void> {
     console.error("replyInThreadAction: sent but not recorded, account", account.id, err instanceof Error ? err.message : err);
   }
   back({ thread, ok: "dm" });
+}
+
+// Hide / unhide a comment in the inbox (local only; Instagram has no hide-comment endpoint).
+export async function hideCommentAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const accountId = field(formData, "account_id", 64);
+  const commentId = field(formData, "comment_id", 64);
+  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." });
+  try {
+    await toggleCommentHidden(user.id, accountId, commentId);
+  } catch {
+    back({ error: "We couldn't update the comment. Please try again." });
+  }
+  back({ filter: field(formData, "filter", 16) });
+}
+
+// Like the comment on Instagram (instagram_business_manage_comments, the same permission as replies).
+export async function likeCommentAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const accountId = field(formData, "account_id", 64);
+  const commentId = field(formData, "comment_id", 64);
+  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." });
+  const account = await userAccount(user.id, accountId);
+  if (!account) back({ error: "Reconnect Instagram in Settings to like comments." });
+  let error = "";
+  try {
+    await likeComment(account, commentId);
+    await markCommentLiked(user.id, account.id, commentId);
+  } catch (err) {
+    error = failMessage(err);
+  }
+  const filter = field(formData, "filter", 16);
+  back(error ? { filter, error } : { filter, ok: "liked" });
+}
+
+// Mark a comment done (answered) / reopen it.
+export async function toggleDoneAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const accountId = field(formData, "account_id", 64);
+  const commentId = field(formData, "comment_id", 64);
+  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." });
+  try {
+    await toggleCommentDone(user.id, accountId, commentId);
+  } catch {
+    back({ error: "We couldn't update the comment. Please try again." });
+  }
+  back({ filter: field(formData, "filter", 16) });
 }

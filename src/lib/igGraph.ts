@@ -170,6 +170,11 @@ export async function replyToCommentPublicly(account: GraphAccount, commentId: s
   await graphCall(account, `${encodeURIComponent(commentId)}/replies`, { method: "POST", body: { message } });
 }
 
+// Like a comment (instagram_business_manage_comments). No body.
+export async function likeComment(account: GraphAccount, commentId: string): Promise<void> {
+  await graphCall(account, `${encodeURIComponent(commentId)}/likes`, { method: "POST" });
+}
+
 export async function sendDirectMessage(account: GraphAccount, recipientId: string, text: string): Promise<void> {
   await graphCall(account, `${encodeURIComponent(account.external_id)}/messages`, {
     method: "POST",

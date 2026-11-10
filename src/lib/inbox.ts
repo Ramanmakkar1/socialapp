@@ -26,6 +26,9 @@ export type InboxComment = {
   mediaId: string | null;
   receivedAt: Date;
   dmStatus: string | null;
+  hidden: boolean;
+  done: boolean;
+  liked: boolean;
 };
 
 export type ThreadMessage = { direction: "in" | "out"; text: string; at: Date; ai?: boolean };
@@ -77,7 +80,7 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
       const acc = byExternal.get(c.accountExternalId);
       if (!acc || c.fromId === acc.external_id || seenComments.has(c.commentId)) continue;
       seenComments.add(c.commentId);
-      comments.push({ ...c, accountId: acc.id, receivedAt: ev.received_at, dmStatus: null });
+      comments.push({ ...c, accountId: acc.id, receivedAt: ev.received_at, dmStatus: null, hidden: false, done: false, liked: false });
     }
   }
   for (const ev of [...events].reverse()) {
@@ -123,6 +126,24 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
     }
     for (const c of comments) c.dmStatus = dmByComment.get(c.commentId) ?? null;
 
+    try {
+      const statusRows = await query<{ comment_id: string; hidden: boolean; done: boolean; liked: boolean }>(
+        "select comment_id, hidden, done, liked from socialapp.comment_status where user_id=$1",
+        [userId]
+      );
+      const statusByComment = new Map(statusRows.map((s) => [s.comment_id, s]));
+      for (const c of comments) {
+        const s = statusByComment.get(c.commentId);
+        if (s) {
+          c.hidden = s.hidden;
+          c.done = s.done;
+          c.liked = s.liked;
+        }
+      }
+    } catch {
+      // comment_status table missing (migration not applied yet): all comments stay visible and open.
+    }
+
     const senderIds = [...new Set([...threads.values()].map((t) => t.senderId))];
     if (senderIds.length > 0) {
       const contacts = await query<{ external_id: string; username: string | null }>(
@@ -141,6 +162,96 @@ export async function loadInbox(userId: string): Promise<{ accounts: InboxAccoun
   });
   threadList.sort((a, b) => new Date(b.lastAt).getTime() - new Date(a.lastAt).getTime());
   return { accounts, comments: comments.slice(0, 100), threads: threadList };
+}
+
+// Inbox filters: "all" hides hidden comments, "unanswered" keeps only open ones, "hidden" shows only hidden.
+export type InboxFilter = "all" | "unanswered" | "hidden";
+
+export function filterComments(comments: InboxComment[], filter: InboxFilter): InboxComment[] {
+  if (filter === "hidden") return comments.filter((c) => c.hidden);
+  if (filter === "unanswered") return comments.filter((c) => !c.hidden && !c.done);
+  return comments.filter((c) => !c.hidden);
+}
+
+// Unanswered (not done, not hidden) first, then newest first.
+export function sortInboxComments(a: InboxComment, b: InboxComment): number {
+  const aOpen = a.done || a.hidden ? 1 : 0;
+  const bOpen = b.done || b.hidden ? 1 : 0;
+  if (aOpen !== bOpen) return aOpen - bOpen;
+  return new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime();
+}
+
+export type PostGroup = {
+  mediaId: string | null;
+  accountId: string;
+  username: string | null;
+  latestAt: Date;
+  unanswered: number;
+  comments: InboxComment[];
+};
+
+// Group comments by the post they belong to; posts with unanswered comments first, then newest first.
+export function groupCommentsByPost(comments: InboxComment[], accounts: InboxAccount[]): PostGroup[] {
+  const byAccount = new Map(accounts.map((a) => [a.id, a]));
+  const groups = new Map<string, PostGroup>();
+  for (const c of comments) {
+    const key = `${c.accountId}:${c.mediaId ?? "none"}`;
+    let g = groups.get(key);
+    if (!g) {
+      g = {
+        mediaId: c.mediaId,
+        accountId: c.accountId,
+        username: byAccount.get(c.accountId)?.username ?? null,
+        latestAt: c.receivedAt,
+        unanswered: 0,
+        comments: [],
+      };
+      groups.set(key, g);
+    }
+    g.comments.push(c);
+    if (new Date(c.receivedAt).getTime() > new Date(g.latestAt).getTime()) g.latestAt = c.receivedAt;
+    if (!c.done && !c.hidden) g.unanswered += 1;
+  }
+  const list = [...groups.values()];
+  for (const g of list) g.comments.sort(sortInboxComments);
+  list.sort(
+    (a, b) =>
+      b.unanswered - a.unanswered ||
+      new Date(b.latestAt).getTime() - new Date(a.latestAt).getTime()
+  );
+  return list;
+}
+
+// Inbox status writes (migration 028).
+async function upsertCommentStatus(
+  userId: string,
+  accountId: string,
+  commentId: string,
+  setClause: string,
+  params: unknown[]
+): Promise<void> {
+  await query(
+    `insert into socialapp.comment_status (user_id, social_account_id, comment_id)
+     values ($1,$2,$3)
+     on conflict (user_id, comment_id) do update set ${setClause}, updated_at=now()`,
+    [userId, accountId, commentId, ...params]
+  );
+}
+
+export async function toggleCommentHidden(userId: string, accountId: string, commentId: string): Promise<void> {
+  await upsertCommentStatus(userId, accountId, commentId, "hidden = not socialapp.comment_status.hidden", []);
+}
+
+export async function toggleCommentDone(userId: string, accountId: string, commentId: string): Promise<void> {
+  await upsertCommentStatus(userId, accountId, commentId, "done = not socialapp.comment_status.done", []);
+}
+
+export async function markCommentDone(userId: string, accountId: string, commentId: string): Promise<void> {
+  await upsertCommentStatus(userId, accountId, commentId, "done = true", []);
+}
+
+export async function markCommentLiked(userId: string, accountId: string, commentId: string): Promise<void> {
+  await upsertCommentStatus(userId, accountId, commentId, "liked = true", []);
 }
 
 // Time of the latest message this person sent to the account (for the 24-hour rule).
