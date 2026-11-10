@@ -85,6 +85,11 @@ const tools = [
     description: "Split one image into equal-width carousel slides, preview every crop in order, and download the PNGs locally without uploading.",
   },
   {
+    href: "/tools/instagram-carousel-maker",
+    title: "Instagram carousel maker",
+    description: "Create editable text-and-colour carousel slides, preview them in order, and download each as a correctly sized 1080×1350 PNG.",
+  },
+  {
     href: "/tools/instagram-font-generator",
     title: "Instagram font generator",
     description: "Create and copy Unicode font styles for your Instagram bio and captions.",
