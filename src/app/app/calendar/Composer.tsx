@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AtSign, Facebook, Instagram, Sparkles, Youtube as YouTube } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Facebook, Instagram, Link2, Loader2, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
 import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import { aiAvailable, suggestCaptions } from "./aiActions";
@@ -24,6 +24,7 @@ import {
   type ScheduleOrigin,
 } from "@/lib/composerDraft";
 import { dayPrefill } from "@/lib/composerUrl";
+import { instagramAspectWarning, mediaKindFromUrl, validateMediaFile } from "@/lib/mediaUpload";
 import ui from "@/components/ui/ui.module.css";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
@@ -59,6 +60,22 @@ function effectiveCaption(
 
 type RuleOption = { id: string; name: string; status: string };
 export type { ComposerDraftInitial };
+
+function readImageSize(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new window.Image();
+    image.onload = () => {
+      resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      URL.revokeObjectURL(objectUrl);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Could not read the image."));
+    };
+    image.src = objectUrl;
+  });
+}
 
 function nextSlotLocal(hourUtc: number): Date {
   const now = new Date();
@@ -97,6 +114,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const scheduleId = useId();
   const dmRuleId = useId();
   const imageId = useId();
+  const mediaInputId = useId();
   const igFormatLegendId = useId();
   const aiTopicId = useId();
   const aiToneId = useId();
@@ -121,6 +139,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [customize, setCustomize] = useState<Record<PlatformId, boolean>>(init.customize);
   const [customCaption, setCustomCaption] = useState<Record<PlatformId, string>>(init.customCaption);
   const [mediaUrls, setMediaUrls] = useState<string[]>(init.mediaUrls);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [mediaWarnings, setMediaWarnings] = useState<string[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const [linkMode, setLinkMode] = useState(false);
   const [igFormat, setIgFormat] = useState<"feed" | "story">(init.igFormat);
   const [selectedRuleId, setSelectedRuleId] = useState(init.selectedRuleId);
   const [scheduledAt, setScheduledAt] = useState("");
@@ -161,6 +184,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     setHashtagText("");
     setCustomCaption(blank.customCaption);
     setMediaUrls(blank.mediaUrls);
+    setUploadError("");
+    setMediaWarnings([]);
+    setLinkMode(false);
+    setDragActive(false);
     setIgFormat(blank.igFormat);
     setSelectedRuleId(blank.selectedRuleId);
     setCustomize(blank.customize);
@@ -287,6 +314,91 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const filledMediaCount = mediaUrls.map((u) => u.trim()).filter((u) => u !== "").length;
   const storyMediaError =
     enabled.instagram && igFormat === "story" && filledMediaCount > 1;
+
+  function addMediaUrl(url: string) {
+    setMediaUrls((prev) => {
+      const next = prev.map((u) => u.trim()).filter((u) => u !== "");
+      if (next.length >= 10) return prev;
+      return [...next, url];
+    });
+  }
+
+  function moveMedia(index: number, delta: number) {
+    setMediaUrls((prev) => {
+      const target = index + delta;
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+
+  function removeMedia(index: number) {
+    setMediaUrls((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      return next.length > 0 ? next : [""];
+    });
+  }
+
+  async function uploadFiles(files: File[]) {
+    if (files.length === 0) return;
+    setUploadError("");
+    setMediaWarnings([]);
+    const storyMode = enabled.instagram && igFormat === "story";
+    const room = 10 - filledMediaCount;
+    if (!storyMode && room <= 0) {
+      setUploadError("You can add up to 10 images per post.");
+      return;
+    }
+    const queue = storyMode ? files.slice(0, 1) : files.slice(0, room);
+    setUploading(true);
+    const warnings: string[] = [];
+    try {
+      for (const file of queue) {
+        const check = validateMediaFile({ type: file.type, size: file.size, name: file.name });
+        if (!check.ok) {
+          setUploadError(check.error);
+          continue;
+        }
+        if (check.kind === "image" && !storyMode) {
+          try {
+            const size = await readImageSize(file);
+            const warning = instagramAspectWarning(size.width, size.height);
+            if (warning) warnings.push(`${file.name}: ${warning}`);
+          } catch {
+            // The server still validates type and size; a preview failure is not fatal.
+          }
+        }
+        const body = new FormData();
+        body.append("file", file);
+        const response = await fetch("/api/media/upload", { method: "POST", body });
+        const result = (await response.json().catch(() => ({}))) as { url?: string; error?: string };
+        if (!response.ok || !result.url) {
+          setUploadError(result.error || "Could not upload that file. Please try again.");
+          continue;
+        }
+        if (storyMode) setMediaUrls([result.url]);
+        else addMediaUrl(result.url);
+      }
+    } catch {
+      setUploadError("Could not upload that file. Please try again.");
+    } finally {
+      setUploading(false);
+      setMediaWarnings(warnings);
+    }
+  }
+
+  function handleMediaDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setDragActive(false);
+    void uploadFiles(Array.from(event.dataTransfer.files));
+  }
+
+  function handleMediaInput(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    void uploadFiles(files);
+  }
 
   function focusChecklistTarget(target: ChecklistFixTarget) {
     const focusEl = (id: string | undefined) => {
@@ -715,43 +827,179 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           )}
 
           <div>
-            <span className="text-sm font-medium text-[#3d3450]">
-              Image or video link (https, .jpg, .png or .mp4)
-            </span>
-            <div className="mt-2 space-y-2">
-              {mediaUrls.map((url, index) => {
-                const fieldId = index === 0 ? imageId : `${imageId}-${index}`;
-                return (
-                  <div key={fieldId} className="flex gap-2">
-                    <input
-                      id={fieldId}
-                      type="url"
-                      value={url}
-                      onChange={(e) =>
-                        setMediaUrls((prev) =>
-                          prev.map((u, i) => (i === index ? e.target.value : u)),
-                        )
-                      }
-                      placeholder="https://…/photo.jpg"
-                      className="min-w-0 flex-1 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
-                    />
-                    {mediaUrls.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() =>
+            <span className="text-sm font-medium text-[#3d3450]">Media</span>
+            <div
+              id={imageId}
+              tabIndex={-1}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragActive(true);
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={handleMediaDrop}
+              className={`mt-2 rounded-2xl border-2 border-dashed p-4 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)] ${
+                dragActive
+                  ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/5"
+                  : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)]"
+              }`}
+            >
+              <UploadCloud className="mx-auto h-8 w-8 text-[var(--poskoo-violet)]" aria-hidden />
+              <p className="mt-2 text-sm font-medium text-[#3d3450]">Drag &amp; drop images or videos</p>
+              <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
+                JPG or PNG up to 8 MB · MP4 or MOV up to 100 MB · up to 10 images
+              </p>
+              <label
+                htmlFor={mediaInputId}
+                className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--poskoo-violet)] px-4 py-2 text-sm font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/10"
+              >
+                {uploading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  <UploadCloud className="h-4 w-4" aria-hidden />
+                )}
+                {uploading ? "Uploading…" : "Choose files"}
+              </label>
+              <input
+                id={mediaInputId}
+                type="file"
+                accept="image/jpeg,image/png,video/mp4,video/quicktime"
+                multiple
+                disabled={uploading}
+                onChange={handleMediaInput}
+                className="sr-only"
+              />
+            </div>
+            {uploadError && (
+              <p className="mt-2 text-sm text-[var(--poskoo-coral)]" role="alert">
+                {uploadError}
+              </p>
+            )}
+            {mediaWarnings.length > 0 && (
+              <ul className="mt-2 space-y-1 text-xs text-[var(--poskoo-coral)]">
+                {mediaWarnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            )}
+            {filledMediaCount > 0 && (
+              <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {mediaUrls.map((url, index) => {
+                  const trimmed = url.trim();
+                  if (!trimmed) return null;
+                  const kind = mediaKindFromUrl(trimmed);
+                  return (
+                    <li
+                      key={`${trimmed}-${index}`}
+                      className="relative overflow-hidden rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)]"
+                    >
+                      {kind === "video" ? (
+                        <video
+                          src={trimmed}
+                          className="h-28 w-full object-cover"
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={trimmed}
+                          alt={`Media ${index + 1}`}
+                          className="h-28 w-full object-cover"
+                        />
+                      )}
+                      <span className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                        {index + 1}
+                      </span>
+                      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/55 p-1">
+                        <div className="flex gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveMedia(index, -1)}
+                            disabled={index === 0}
+                            aria-label="Move media earlier"
+                            className="rounded bg-white/90 p-1 text-[#3d3450] disabled:opacity-40"
+                          >
+                            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveMedia(index, 1)}
+                            disabled={index === mediaUrls.length - 1}
+                            aria-label="Move media later"
+                            className="rounded bg-white/90 p-1 text-[#3d3450] disabled:opacity-40"
+                          >
+                            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                          </button>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeMedia(index)}
+                          aria-label="Remove media"
+                          className="rounded bg-white/90 p-1 text-[var(--poskoo-coral)]"
+                        >
+                          <X className="h-3.5 w-3.5" aria-hidden />
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <button
+              type="button"
+              onClick={() => setLinkMode((open) => !open)}
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)]"
+            >
+              <Link2 className="h-4 w-4" aria-hidden />
+              {linkMode ? "Hide link fields" : "Add from link"}
+            </button>
+            {linkMode && (
+              <div className="mt-2 space-y-2">
+                {mediaUrls.map((url, index) => {
+                  const fieldId = index === 0 ? `${imageId}-link` : `${imageId}-link-${index}`;
+                  return (
+                    <div key={fieldId} className="flex gap-2">
+                      <input
+                        id={fieldId}
+                        type="url"
+                        value={url}
+                        onChange={(e) =>
                           setMediaUrls((prev) =>
-                            prev.length <= 1 ? prev : prev.filter((_, i) => i !== index),
+                            prev.map((u, i) => (i === index ? e.target.value : u)),
                           )
                         }
-                        className="shrink-0 rounded-lg border border-[var(--poskoo-line)] px-2 py-2 text-xs font-medium text-[var(--poskoo-muted)] transition-colors hover:bg-[var(--poskoo-band)]"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                        placeholder="https://…/photo.jpg"
+                        className="min-w-0 flex-1 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
+                      />
+                      {mediaUrls.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeMedia(index)}
+                          className="shrink-0 rounded-lg border border-[var(--poskoo-line)] px-2 py-2 text-xs font-medium text-[var(--poskoo-muted)] transition-colors hover:bg-[var(--poskoo-band)]"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+                {mediaUrls.length < 10 && !(enabled.instagram && igFormat === "story") && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMediaUrls((prev) => (prev.length >= 10 ? prev : [...prev, ""]))
+                    }
+                    className="text-sm font-medium text-[var(--poskoo-violet)] hover:underline"
+                  >
+                    + Add another link
+                  </button>
+                )}
+                <p className="text-xs text-[var(--poskoo-muted)]">
+                  Paste a public https link (for example from your website or cloud storage); a .mp4 link is posted as a Reel. 2–10 image links = carousel post.
+                </p>
+              </div>
+            )}
             {enabled.instagram && (
               <fieldset id={igFormatLegendId} tabIndex={-1} className="mt-3 border-0 p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]">
                 <legend className="text-sm font-medium text-[#3d3450]">
@@ -803,48 +1051,6 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 )}
               </fieldset>
             )}
-            {mediaUrls.length < 10 && !(enabled.instagram && igFormat === "story") && (
-              <button
-                type="button"
-                onClick={() =>
-                  setMediaUrls((prev) => (prev.length >= 10 ? prev : [...prev, ""]))
-                }
-                className="mt-2 text-sm font-medium text-[var(--poskoo-violet)] hover:underline"
-              >
-                + Add another image
-              </button>
-            )}
-            {(() => {
-              const previewUrl = mediaUrls.map((u) => u.trim()).find((u) => u !== "") ?? "";
-              let parsed: URL | null = null;
-              try {
-                parsed = previewUrl ? new URL(previewUrl) : null;
-              } catch {
-                parsed = null;
-              }
-              if (parsed && parsed.protocol === "https:") {
-                return (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={parsed.href}
-                      alt="Post image preview"
-                      className="mt-2 h-32 w-auto rounded-xl border border-[var(--poskoo-line)] object-cover"
-                    />
-                    <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
-                      Paste a public https link (for example from your website or cloud storage); a .mp4 link is posted as a Reel. 2–10 image links =
-                      carousel post.
-                    </p>
-                  </>
-                );
-              }
-              return (
-                <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
-                  Paste a public https link (for example from your website or cloud storage); a .mp4 link is posted as a Reel. 2–10 image links =
-                  carousel post.
-                </p>
-              );
-            })()}
             {storyMediaError && (
               <p className="mt-2 text-sm text-[var(--poskoo-coral)]" aria-live="polite">
                 A Story takes one image or video.
@@ -911,7 +1117,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   This is a Short (vertical, under 60 seconds)
                 </label>
                 <p className="text-xs text-[var(--poskoo-muted)]">
-                  The caption above is used as the video description. Add a .mp4 video link above for the upload.
+                  The caption above is used as the video description. Upload an MP4 video above or add a link.
                 </p>
               </div>
             </div>
@@ -1080,7 +1286,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              disabled={isPending || storyMediaError}
+              disabled={isPending || uploading || storyMediaError}
               onClick={() => handleSave("draft")}
               className="rounded-full border border-[var(--poskoo-line)] px-4 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:bg-[var(--poskoo-band)] disabled:opacity-60"
             >
@@ -1088,7 +1294,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             </button>
             <button
               type="button"
-              disabled={isPending || !scheduledAt || storyMediaError}
+              disabled={isPending || uploading || !scheduledAt || storyMediaError}
               onClick={() => handleSave("schedule")}
               className={`${ui.inkFill} rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60`}
             >
@@ -1096,7 +1302,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             </button>
             <button
               type="button"
-              disabled={isPending || !queueReady || storyMediaError}
+              disabled={isPending || uploading || !queueReady || storyMediaError}
               onClick={() => handleSave("queue")}
               className="rounded-full border border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 px-4 py-2 text-sm font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/20 disabled:opacity-60"
             >
@@ -1150,10 +1356,31 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     <div className="truncate text-xs text-[var(--poskoo-muted)]">{HANDLE}</div>
                   </div>
                 </div>
-                <div
-                  className="mt-3 aspect-square w-full rounded-lg bg-[var(--poskoo-band)]"
-                  aria-hidden
-                />
+                {(() => {
+                  const firstMedia = mediaUrls.map((u) => u.trim()).find((u) => u !== "") ?? "";
+                  if (!firstMedia) {
+                    return <div className="mt-3 aspect-square w-full rounded-lg bg-[var(--poskoo-band)]" aria-hidden />;
+                  }
+                  if (mediaKindFromUrl(firstMedia) === "video") {
+                    return (
+                      <video
+                        src={firstMedia}
+                        className="mt-3 aspect-square w-full rounded-lg object-cover"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                    );
+                  }
+                  return (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={firstMedia}
+                      alt="Post media preview"
+                      className="mt-3 aspect-square w-full rounded-lg object-cover"
+                    />
+                  );
+                })()}
                 <p className="mt-3 whitespace-pre-wrap text-sm text-[#3d3450]">
                   {previewCaption(platform, text) || (
                     <span className="text-[var(--poskoo-muted)]">Your caption appears here.</span>
