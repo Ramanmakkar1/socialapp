@@ -2,13 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
+import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
-const description = "Schedule Instagram posts, auto-DM keyword comments and capture leads with Poskoo. Start free using the official Meta API. No credit card needed.";
+const description = PAGE_DESCRIPTIONS["/"];
 export const metadata: Metadata = {
  title: { absolute: title }, description, alternates: { canonical: `${BRAND.url}/` },
  openGraph: { title, description, url: `${BRAND.url}/`, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
