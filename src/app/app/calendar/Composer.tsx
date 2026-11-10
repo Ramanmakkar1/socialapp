@@ -148,6 +148,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [selectedRuleId, setSelectedRuleId] = useState(init.selectedRuleId);
   const [scheduledAt, setScheduledAt] = useState("");
   const [timeZone, setTimeZone] = useState("");
+  const [nextSlotLabel, setNextSlotLabel] = useState("");
   const [ytTitle, setYtTitle] = useState("");
   const [ytTags, setYtTags] = useState("");
   const [ytPrivacy, setYtPrivacy] = useState<"public" | "unlisted" | "private">("public");
@@ -194,6 +195,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     setEnabled(blank.enabled);
     setActiveTab("instagram");
     setScheduledAt("");
+    setNextSlotLabel("");
     setDraftId(undefined);
     setYtTitle("");
     setYtTags("");
@@ -278,6 +280,18 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const selected = PLATFORM_ORDER.filter((p) => enabled[p]);
   // "Add to queue" / "Next available" need at least one selected channel with a saved schedule.
   const queueReady = selected.some((p) => schedulePlatforms.includes(p));
+  const selectedScheduleDate = scheduledAt ? new Date(scheduledAt) : null;
+  const selectedScheduleLabel = selectedScheduleDate &&
+    !Number.isNaN(selectedScheduleDate.getTime()) &&
+    toLocalInputValue(selectedScheduleDate) === scheduledAt
+    ? selectedScheduleDate.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+    : "";
+
+  function changeScheduledAt(value: string) {
+    scheduleOriginRef.current = null;
+    setScheduledAt(value);
+    setNextSlotLabel("");
+  }
 
   function buildSaveInput(mode: "draft" | "schedule" | "queue") {
     const schedule = scheduleInstantForSave(scheduledAt, scheduleOriginRef.current);
@@ -490,8 +504,15 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           setFeedback({ kind: "err", text: result.error });
           return;
         }
-        setScheduledAt(toLocalInputValue(new Date(result.iso)));
-        setFeedback({ kind: "ok", text: "Picked the next available time." });
+        const slot = new Date(result.iso);
+        scheduleOriginRef.current = null;
+        setScheduledAt(toLocalInputValue(slot));
+        setNextSlotLabel(`${slot.toLocaleString(undefined, {
+          timeZone: result.timeZone,
+          dateStyle: "medium",
+          timeStyle: "short",
+        })} (${result.timeZone})`);
+        setFeedback({ kind: "ok", text: "Picked the next available time. Review it below, then select Schedule to save." });
       } catch {
         setFeedback({ kind: "err", text: "Could not find the next available time. Please try again." });
       }
@@ -1242,9 +1263,19 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 id={scheduleId}
                 type="datetime-local"
                 value={scheduledAt}
-                onChange={(e) => setScheduledAt(e.target.value)}
+                onChange={(e) => changeScheduledAt(e.target.value)}
                 className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm focus:border-[var(--poskoo-violet)] focus:outline-none"
               />
+              {selectedScheduleLabel && (
+                <p className="mt-2 text-sm font-medium text-[#3d3450]" aria-live="polite">
+                  Selected: {selectedScheduleLabel}{timeZone ? ` (${timeZone})` : ""}
+                </p>
+              )}
+              {nextSlotLabel && (
+                <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
+                  Account schedule: {nextSlotLabel}
+                </p>
+              )}
               {timeZone && bestHoursUtc.length > 0 && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <span className="text-xs text-[var(--poskoo-muted)]">Best times:</span>
@@ -1255,7 +1286,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                         key={h}
                         type="button"
                         aria-label={`Schedule for ${label}`}
-                        onClick={() => setScheduledAt(toLocalInputValue(nextSlotLocal(h)))}
+                        onClick={() => changeScheduledAt(toLocalInputValue(nextSlotLocal(h)))}
                         className="rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs text-[#3d3450] hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)]"
                       >
                         {label}

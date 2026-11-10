@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import type { PlatformId } from "@/lib/platforms";
+import { nextSlot, nextSlotForChannel, type ChannelSchedule } from "@/lib/postingSchedule";
 import { deletePostForUser, reorderQueueForUser, sharePostNow, UUID_RE } from "@/lib/postMutations";
-import { ALLOWED_PLATFORMS, nextQueueSlot, savePostForUser, type SavePostInput } from "@/lib/savePost";
+import { ALLOWED_PLATFORMS, savePostForUser, type SavePostInput } from "@/lib/savePost";
 import { hashtagGroupValidationError, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
 import { parseTags } from "@/lib/tagFilter";
 import { TEMPLATES_LIST_SQL, templateDeleteResult, templateValidationError, type PostTemplate } from "@/lib/templates";
@@ -69,7 +70,7 @@ export async function reorderQueue(orderedIds: string[]): Promise<{ ok: boolean;
 // platforms. The composer fills its time picker with the result.
 export async function nextAvailableSlot(
   platforms: string[],
-): Promise<{ ok: true; iso: string } | { ok: false; error: string }> {
+): Promise<{ ok: true; iso: string; timeZone: string } | { ok: false; error: string }> {
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
@@ -78,14 +79,33 @@ export async function nextAvailableSlot(
   if (valid.length === 0) {
     return { ok: false, error: "Select at least one platform." };
   }
-  const slot = await nextQueueSlot(user.id, valid as PlatformId[]);
-  if (!slot) {
+  let rows: { platform: string; timezone: string; days: number[]; times: string[] }[];
+  try {
+    rows = await query(
+      "select platform, timezone, days, times from socialapp.posting_schedules where user_id=$1",
+      [user.id],
+    );
+  } catch {
+    rows = [];
+  }
+  const schedules: ChannelSchedule[] = rows
+    .filter((row) => valid.includes(row.platform))
+    .map((row) => ({
+      platform: row.platform as PlatformId,
+      timezone: row.timezone,
+      days: row.days ?? [],
+      times: row.times ?? [],
+    }));
+  const nowMs = Date.now();
+  const slotMs = nextSlot(schedules, nowMs);
+  const schedule = schedules.find((candidate) => nextSlotForChannel(candidate, nowMs) === slotMs);
+  if (slotMs === null || !schedule) {
     return {
       ok: false,
       error: "Set a posting schedule in Settings → Channels first, then use “Next available”.",
     };
   }
-  return { ok: true, iso: slot.toISOString() };
+  return { ok: true, iso: new Date(slotMs).toISOString(), timeZone: schedule.timezone || "UTC" };
 }
 
 // "Share now": publish a queued post immediately by making it due for the publisher.
