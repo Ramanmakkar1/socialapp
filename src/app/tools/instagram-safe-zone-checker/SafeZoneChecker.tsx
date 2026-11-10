@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
-import { Download } from "lucide-react";
+import { Bookmark, Download, Heart, MessageCircle, Music2, Send } from "lucide-react";
 import {
   FRAME_H,
   FRAME_W,
@@ -107,11 +107,47 @@ function PlaceholderArt() {
   );
 }
 
+function ReelInterfaceOverlay() {
+  const actions = [
+    { label: "Like", Icon: Heart },
+    { label: "Comment", Icon: MessageCircle },
+    { label: "Share", Icon: Send },
+    { label: "Save", Icon: Bookmark },
+  ];
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10 text-white" aria-hidden="true">
+      <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+      <div className="absolute bottom-[3%] left-[4%] right-[19%] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
+        <div className="flex items-center gap-1.5 text-[10px] font-semibold">
+          <span className="h-5 w-5 shrink-0 rounded-full border border-white/80 bg-[var(--poskoo-lilac)]" />
+          <span>yourhandle</span>
+          <span className="rounded border border-white/80 px-1.5 py-0.5 text-[8px] leading-none">Follow</span>
+        </div>
+        <p className="mt-2 text-[10px] leading-snug">Your caption appears here… <span className="text-white/75">more</span></p>
+        <div className="mt-2 flex items-center gap-1.5 text-[9px]">
+          <Music2 className="h-3 w-3 shrink-0" />
+          <span className="truncate">Original audio · yourhandle</span>
+        </div>
+      </div>
+      <div className="absolute bottom-[17%] right-[2%] flex w-10 flex-col items-center gap-2.5 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
+        {actions.map(({ label, Icon }) => (
+          <div key={label} className="flex flex-col items-center gap-0.5 text-[8px] font-medium">
+            <Icon className="h-5 w-5 drop-shadow" strokeWidth={1.8} />
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function SafeZoneChecker() {
   const [mode, setMode] = useState<SafeZoneMode>("reels");
   const [media, setMedia] = useState<Media | null>(null);
   const [opacity, setOpacity] = useState(45);
   const [showGrid, setShowGrid] = useState(false);
+  const [showReelInterface, setShowReelInterface] = useState(true);
   const fileId = useId();
   const modeLegendId = useId();
 
@@ -219,6 +255,8 @@ export default function SafeZoneChecker() {
                   </div>
                 );
               })}
+
+              {mode === "reels" && showReelInterface ? <ReelInterfaceOverlay /> : null}
             </div>
           </div>
         </div>
@@ -265,6 +303,21 @@ export default function SafeZoneChecker() {
               ))}
             </div>
           </fieldset>
+
+          <label
+            className={`flex min-h-10 items-center gap-3 text-sm font-medium ${
+              mode === "reels" ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={showReelInterface}
+              disabled={mode !== "reels"}
+              onChange={(e) => setShowReelInterface(e.target.checked)}
+              className="h-4 w-4 shrink-0 accent-[var(--poskoo-violet)]"
+            />
+            Show Reel interface (caption and buttons)
+          </label>
 
           <label className="block text-sm font-medium">
             Overlay opacity: {opacity}%

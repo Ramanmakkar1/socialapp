@@ -32,7 +32,7 @@ const storyBottom = px("story", "bottom");
 const steps = [
   "Load a 9:16 image or video from your device (it stays in your browser).",
   "Pick Reels or Story to see the shaded areas Instagram covers in that format.",
-  "Raise the overlay opacity or turn on the grid to line up text and faces.",
+  "Toggle the Reel interface to preview the caption and action buttons, and adjust the overlay opacity or grid to line up text and faces.",
   "Move anything important out of the shaded areas in your editor and check again.",
   "Download the blank template to design inside the safe area next time.",
 ];
@@ -101,8 +101,8 @@ export default function InstagramSafeZoneCheckerPage() {
           Instagram Reels &amp; Story <em className="s mark">Safe Zone Checker</em>
         </h1>
         <p className="lede">
-          Load a cover, Story or video frame and see exactly what the caption, buttons and profile bar will hide.
-          Switch between Reels and Story, then download a free 1080×1920 template.
+          On a 1080×1920 Reel, keep important text and faces out of roughly the top {reelsTop.h} px, bottom {reelsBottom.h} px and right {reelsRight.w} px so Instagram&apos;s caption and buttons do not cover them.
+          Load a cover, Story or video frame to check your layout, then download a free template.
         </p>
         <div className="hero-art">
           <Image
@@ -119,6 +119,15 @@ export default function InstagramSafeZoneCheckerPage() {
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
         <SafeZoneChecker />
       </div>
+      <p className="small" style={{ maxWidth: 760, margin: "20px auto 0", textAlign: "center" }}>
+        The Reel interface overlay adds a sample username, caption and audio label at the bottom, plus like, comment,
+        share and save buttons down the right. Toggle it on or off to compare your design with the interface it sits
+        behind. When your Reel is ready, plan its publish time with our{" "}
+        <Link className={s.vlink} href="/instagram-scheduler">
+          Instagram scheduler
+        </Link>
+        .
+      </p>
       <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
         More free Instagram tools:{" "}
         <Link className={s.vlink} href="/tools/instagram-image-size">
