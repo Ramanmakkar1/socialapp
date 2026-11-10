@@ -7,6 +7,7 @@ import { SchedulerHeroIllustration } from "@/components/SchedulerHeroIllustratio
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import ToolsHeroIllustration from "@/components/ToolsHeroIllustration";
 import s from "@/components/site.module.css";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: { absolute: "Poskoo Features: Scheduling, Auto-DM & AI DM Replies" },
@@ -80,9 +81,24 @@ function AiRepliesIllustration() {
   );
 }
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": BRAND.url + "/features#webpage",
+      url: BRAND.url + "/features",
+      name: "Everything Poskoo does, in one place.",
+      inLanguage: "en",
+      isPartOf: { "@id": BRAND.url + "#website" },
+    },
+  ],
+};
+
 export default function FeaturesPage() {
   return (
     <PublicShell breadcrumbs={[{ name: "Features", path: "/features" }]}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <header className="hero">
         <span className="pill"><span>ALL-IN-ONE</span>Schedule · Auto-DM · AI replies · Free tools</span>
         <p className="eyebrow">Features</p>

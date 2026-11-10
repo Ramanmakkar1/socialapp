@@ -9,9 +9,32 @@ export const metadata: Metadata = {
   description: "Read how Poskoo stores your Instagram, Facebook, Threads and YouTube data, which cookies we use, and how to export or delete your account at any time.",
   alternates: { canonical: "/privacy" },
 };
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": BRAND.url + "/privacy#webpage",
+      url: BRAND.url + "/privacy",
+      name: "Privacy policy",
+      inLanguage: "en",
+      isPartOf: { "@id": BRAND.url + "#website" },
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: BRAND.url + "/" },
+        { "@type": "ListItem", position: 2, name: "Privacy", item: BRAND.url + "/privacy" },
+      ],
+    },
+  ],
+};
+
 export default function Page() {
   return (
     <PublicShell>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/">Home</Link> / Privacy
       </nav>

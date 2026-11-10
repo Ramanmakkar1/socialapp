@@ -9,9 +9,32 @@ export const metadata: Metadata = {
   description: "Review the rules for using Poskoo to schedule posts and send auto-DMs, retain ownership of your content, and cancel your account at any time.",
   alternates: { canonical: "/terms" },
 };
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": BRAND.url + "/terms#webpage",
+      url: BRAND.url + "/terms",
+      name: "Terms of service",
+      inLanguage: "en",
+      isPartOf: { "@id": BRAND.url + "#website" },
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: BRAND.url + "/" },
+        { "@type": "ListItem", position: 2, name: "Terms", item: BRAND.url + "/terms" },
+      ],
+    },
+  ],
+};
+
 export default function Page() {
   return (
     <PublicShell>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/">Home</Link> / Terms
       </nav>
