@@ -8,6 +8,7 @@ import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { LandingDemo } from "./LandingDemo";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 const canonical = new URL("/", BRAND.url).toString();
@@ -260,20 +261,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
 </div></section>
 
 <section id="demo" style={{"paddingTop": "20px"}}><div className="wrap">
-  <div className="band">
-    <div className="copy">
-      <p className="eyebrow">How a comment becomes a lead</p>
-      <h2>They comment <em className="s mark">LINK.</em> Poskoo does the rest.</h2>
-      <p>Choose the keyword, write the message once, and decide what to ask before sending the link.</p>
-      <div className="chips"><span className="chip">Keyword triggers</span><span className="chip">Follow-to-unlock</span><span className="chip">Email capture</span><span className="chip">Public reply</span><span className="chip">Email gate</span></div>
-    </div>
-    <div className="demo" aria-label="Example: a comment, the automatic DM, and the saved lead">
-      <div className="ui c1"><div className="who"><span className="av" style={{"background": "var(--peach)"}}></span>riya.makes <span className="t">2m</span></div><p style={{"marginTop": "6px"}}>LINK please! 😍</p></div>
-      <svg className="arrow-doodle" viewBox="0 0 70 60" aria-hidden="true"><path d="M8 8c10 30 30 40 52 42" stroke="var(--ink)" strokeWidth="2.5" fill="none" strokeDasharray="5 6" strokeLinecap="round"/><path d="M50 42l11 8-13 3" stroke="var(--ink)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
-      <div className="ui c2"><div className="who" style={{"color": "#fff"}}>poskoo DM <span className="t" style={{"color": "rgba(255,255,255,.75)"}}>now</span></div><p style={{"marginTop": "6px"}}>Hey Riya! Here&apos;s the guide you asked for. Want my weekly tips too?</p><span className="linkbtn">Open the guide</span></div>
-      <div className="ui c3"><div className="ok"><svg width="18" height="18"><use href="#ok"/></svg>New lead saved</div><p className="t" style={{"marginTop": "4px"}}>riya@studio.co · from your Reel</p></div>
-    </div>
-  </div>
+  <LandingDemo />
 </div></section>
 
 <section id="channels" style={{"paddingTop": "20px"}}><div className="wrap">

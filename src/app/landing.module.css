@@ -544,3 +544,258 @@
 @media (min-width: 1800px) {
   .landing :global(.wrap) { max-width: 82%; }
 }
+
+/* Interactive, illustrative product demo. All sample content is local; only the selected panel renders. */
+.landing :global(.demoTabs) {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  width:100%;
+}
+.landing :global(.demoTab) {
+  min-width:0;
+  min-height:56px;
+  padding:12px 14px;
+  border:1.5px solid var(--line);
+  border-radius:var(--poskoo-radius-sm);
+  background:var(--card);
+  color:var(--muted);
+  font:600 .9rem/1.35 var(--sans);
+  text-align:left;
+  cursor:pointer;
+}
+.landing :global(.demoTab[aria-selected="true"]) {
+  border-color:var(--ink);
+  background:var(--ink);
+  color:#fff;
+  box-shadow:var(--poskoo-shadow-card);
+}
+.landing :global(.demoTab:focus-visible),.landing :global(.demoPanel:focus-visible) {
+  outline:3px solid var(--violet);
+  outline-offset:3px;
+}
+.landing :global(.demoActions) {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.landing :global(.demoActions .btn) {
+  min-height:48px;
+}
+.landing :global(.demoLinks) {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:2px;
+}
+.landing :global(.demoFeatureLink) {
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  color:var(--ink);
+  font-size:.93rem;
+  font-weight:600;
+  text-underline-offset:4px;
+}
+.landing :global(.demoStage) {
+  min-width:0;
+}
+.landing :global(.demoNote) {
+  margin-bottom:14px;
+  color:var(--muted);
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-align:center;
+  text-transform:uppercase;
+}
+.landing :global(.demoPanel) {
+  min-width:0;
+  border-radius:var(--poskoo-radius-panel);
+}
+.landing :global(.scheduleDemo) {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  align-items:center;
+  min-height:330px;
+}
+.landing :global(.calendarCard),.landing :global(.postPreview) {
+  min-width:0;
+  padding:18px;
+  border:1.5px solid var(--line);
+  border-radius:var(--poskoo-radius-md);
+  background:var(--card);
+  box-shadow:var(--poskoo-shadow-float);
+}
+.landing :global(.calendarCard) {
+  transform:rotate(-2deg);
+}
+.landing :global(.postPreview) {
+  transform:rotate(2deg);
+}
+.landing :global(.calendarTop) {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+.landing :global(.calendarTop h3) {
+  margin-top:5px;
+  font-size:1.3rem;
+}
+.landing :global(.previewLabel) {
+  display:block;
+  color:var(--muted);
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  line-height:1.35;
+  text-transform:uppercase;
+}
+.landing :global(.scheduleTime) {
+  color:var(--violet);
+  font-size:.78rem;
+  font-weight:700;
+  white-space:nowrap;
+}
+.landing :global(.calendarWeek) {
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:4px;
+  margin:16px 0 0;
+  padding:0;
+  list-style:none;
+}
+.landing :global(.calendarDay) {
+  display:flex;
+  min-width:0;
+  min-height:58px;
+  padding:7px 2px;
+  border:1px solid transparent;
+  border-radius:10px;
+  background:var(--poskoo-band);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+}
+.landing :global(.calendarDay.hasPost) {
+  border-color:var(--violet);
+  background:var(--lilac);
+}
+.landing :global(.calendarDow) {
+  color:var(--muted);
+  font-size:.56rem;
+  font-weight:700;
+  text-transform:uppercase;
+}
+.landing :global(.calendarDate) {
+  font-size:.82rem;
+  font-weight:700;
+}
+.landing :global(.calendarMarker) {
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--violet);
+}
+.landing :global(.scheduledSlot) {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:14px;
+  color:var(--muted);
+  font-size:.73rem;
+  line-height:1.4;
+}
+.landing :global(.scheduledSlot>span) {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--violet);
+  flex:none;
+}
+.landing :global(.postAuthor) {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+  font-size:.84rem;
+  font-weight:600;
+}
+.landing :global(.postAuthor .av) {
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:var(--peach);
+}
+.landing :global(.postArt) {
+  margin-top:12px;
+}
+.landing :global(.postArt svg) {
+  display:block;
+  width:100%;
+  height:auto;
+}
+.landing :global(.postCaption) {
+  margin-top:12px;
+  font-size:.82rem;
+  line-height:1.45;
+}
+.landing :global(.exampleStatus) {
+  display:inline-flex;
+  margin-top:12px;
+  padding:6px 9px;
+  border-radius:var(--poskoo-radius-pill);
+  background:var(--mint);
+  color:var(--ink);
+  font-size:.68rem;
+  font-weight:700;
+  line-height:1.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing :global(.demoTab) {
+    transition:background .2s,border-color .2s,color .2s,transform .2s;
+  }
+  .landing :global(.demoTab:hover) {
+    transform:translateY(-2px);
+  }
+  .landing :global(.demoPanel) {
+    animation:demoPanelIn .25s ease-out both;
+  }
+  @keyframes demoPanelIn {
+    from { opacity:0; translate:0 8px; }
+    to { opacity:1; translate:0 0; }
+  }
+}
+
+@media (max-width: 960px) {
+  .landing :global(.demoStage) {
+    width:100%;
+    max-width:620px;
+    margin-inline:auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .landing :global(.demoTab) {
+    min-height:68px;
+    padding:10px;
+    font-size:.84rem;
+  }
+  .landing :global(.demoActions),.landing :global(.demoActions .btn) {
+    width:100%;
+  }
+  .landing :global(.demoActions .btn) {
+    justify-content:center;
+  }
+  .landing :global(.scheduleDemo) {
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+  .landing :global(.calendarCard),.landing :global(.postPreview) {
+    transform:none;
+  }
+}
