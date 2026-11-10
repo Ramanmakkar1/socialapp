@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
 import robots from "./robots.ts";
 import sitemap from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
+import { PUBLIC_PATHS } from "@/lib/public-pages";
 
 test("sitemap stays empty while staging is noindex", () => {
   assert.deepEqual(sitemap(), []);
@@ -44,5 +47,20 @@ test("robots points to the sitemap once BRAND.indexable is true", () => {
     assert.equal(result.sitemap, `${BRAND.url}/sitemap.xml`);
   } finally {
     BRAND.indexable = was;
+  }
+});
+
+test("every PUBLIC_PATHS entry has a page.tsx route file", () => {
+  for (const p of PUBLIC_PATHS) {
+    const file = p === "/" ? "src/app/page.tsx" : join("src/app", p, "page.tsx");
+    assert.ok(existsSync(file), `PUBLIC_PATHS entry ${p} has no route file at ${file}`);
+  }
+});
+
+test("no PUBLIC_PATHS entry is noindex", () => {
+  for (const p of PUBLIC_PATHS) {
+    const file = p === "/" ? "src/app/page.tsx" : join("src/app", p, "page.tsx");
+    const text = readFileSync(file, "utf8");
+    assert.ok(!text.includes("robots: { index: false"), `PUBLIC_PATHS entry ${p} is noindex in ${file}`);
   }
 });
