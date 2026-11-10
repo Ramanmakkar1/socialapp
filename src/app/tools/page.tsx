@@ -70,6 +70,11 @@ const tools = [
     description: "Check every carousel slide's pixel dimensions, aspect ratio and file size, and see whether all slides match before you schedule.",
   },
   {
+    href: "/tools/instagram-carousel-splitter",
+    title: "Instagram carousel splitter",
+    description: "Split one image into equal-width carousel slides, preview every crop in order, and download the PNGs locally without uploading.",
+  },
+  {
     href: "/tools/instagram-font-generator",
     title: "Instagram font generator",
     description: "Create and copy Unicode font styles for your Instagram bio and captions.",
