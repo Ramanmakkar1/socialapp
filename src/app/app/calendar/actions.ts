@@ -9,6 +9,10 @@ import { scheduledPostLimitError } from "@/lib/planLimits";
 import { deletePostForUser, reorderQueueForUser, sharePostNow, UUID_RE } from "@/lib/postMutations";
 import { canPublishToFacebook } from "@/lib/facebookPublish";
 import { nextSlot } from "@/lib/postingSchedule";
+import { shouldPostFirstComment } from "@/lib/firstComment";
+import { hashtagGroupValidationError, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
+import { hasColumn, parseTags, tagValidationError } from "@/lib/tagFilter";
+import { TEMPLATES_LIST_SQL, templateDeleteResult, templateValidationError, type PostTemplate } from "@/lib/templates";
 
 const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
 
@@ -37,6 +41,7 @@ type SavePostInput = {
   draftId?: string;
   caption: string;
   firstComment?: string;
+  tags?: string[];
   platforms: PlatformId[];
   overrides: Partial<Record<string, string>>;
   scheduledAt: string | null;
@@ -181,6 +186,9 @@ export async function savePost(
   if (countChars(firstComment) > (PLATFORM_LIMITS.instagram.max ?? 2200)) {
     return { ok: false, error: "First comment must be 2,200 characters or fewer." };
   }
+  const tags = parseTags(input.tags);
+  const tagsError = tagValidationError(tags);
+  if (tagsError) return { ok: false, error: tagsError };
 
   if (igFormat === "story" && mediaItems.length > 1) {
     return { ok: false, error: "A Story takes one image or video." };
@@ -332,6 +340,17 @@ export async function savePost(
     dmRuleId = input.dmRuleId;
   }
 
+  // Check once before BEGIN: a missing-column failure inside the transaction cannot be retried.
+  let hasTags = false;
+  try {
+    const columnRows = await query<{ exists: boolean }>(
+      "select exists (select 1 from information_schema.columns where table_schema='socialapp' and table_name='scheduled_posts' and column_name='tags') as exists",
+    );
+    hasTags = hasColumn(columnRows);
+  } catch {
+    hasTags = false;
+  }
+
   let client;
   try {
     client = await getPool().connect();
@@ -388,7 +407,7 @@ export async function savePost(
       }
 
       const postRes = await client.query<{ id: string }>(
-        "update scheduled_posts set caption=$2, scheduled_at=$3, status=$4, media=$5::jsonb, dm_rule_id=$6, ig_format=$7, first_comment=$8, updated_at=now() where id=$1 returning id",
+        `update scheduled_posts set caption=$2, scheduled_at=$3, status=$4, media=$5::jsonb, dm_rule_id=$6, ig_format=$7, first_comment=$8${hasTags ? ", tags=$9" : ""}, updated_at=now() where id=$1 returning id`,
         [
           input.draftId,
           input.caption,
@@ -397,7 +416,8 @@ export async function savePost(
           JSON.stringify(mediaItems),
           dmRuleId,
           instagramSelected ? igFormat : "feed",
-          igFormat === "story" ? null : firstComment || null,
+          shouldPostFirstComment(igFormat, firstComment) ? firstComment : null,
+          ...(hasTags ? [tags] : []),
         ],
       );
       id = postRes.rows[0]?.id;
@@ -409,7 +429,7 @@ export async function savePost(
       await client.query("delete from post_targets where post_id = $1", [id]);
     } else {
       const postRes = await client.query<{ id: string }>(
-        "insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8) returning id",
+        `insert into scheduled_posts (user_id, caption, scheduled_at, status, media, dm_rule_id, ig_format, first_comment${hasTags ? ", tags" : ""}) values ($1, $2, $3, $4, $5::jsonb, $6, $7, $8${hasTags ? ", $9" : ""}) returning id`,
         [
           user.id,
           input.caption,
@@ -418,7 +438,8 @@ export async function savePost(
           JSON.stringify(mediaItems),
           dmRuleId,
           instagramSelected ? igFormat : "feed",
-          igFormat === "story" ? null : firstComment || null,
+          shouldPostFirstComment(igFormat, firstComment) ? firstComment : null,
+          ...(hasTags ? [tags] : []),
         ],
       );
       id = postRes.rows[0]?.id;
@@ -521,5 +542,100 @@ export async function shareNow(id: string): Promise<{ ok: boolean; error?: strin
   } catch (err) {
     console.error("shareNow failed", id, err instanceof Error ? err.message : err);
     return { ok: false, error: "Could not share this post now." };
+  }
+}
+
+export async function listTemplates(): Promise<PostTemplate[]> {
+  if (!isDbConfigured()) return [];
+  try {
+    const user = await requireUser();
+    return await query<PostTemplate>(TEMPLATES_LIST_SQL, [user.id]);
+  } catch {
+    // A pending migration must not hide the post composer.
+    return [];
+  }
+}
+
+export async function saveTemplate(input: {
+  name: string;
+  caption: string;
+  firstComment?: string;
+  tags?: string[];
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!isDbConfigured()) return { ok: false, error: "Database not configured" };
+  const validationError = templateValidationError(input);
+  if (validationError) return { ok: false, error: validationError };
+  const user = await requireUser();
+  try {
+    await query(
+      "insert into socialapp.post_templates (user_id, name, caption, first_comment, tags) values ($1, $2, $3, $4, $5)",
+      [user.id, input.name.trim(), input.caption, input.firstComment?.trim() || null, parseTags(input.tags)],
+    );
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Could not save the template. Please try again." };
+  }
+}
+
+export async function deleteTemplate(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!UUID_RE.test(id)) return { ok: false, error: "Invalid template." };
+  if (!isDbConfigured()) return { ok: false, error: "Database not configured" };
+  const user = await requireUser();
+  try {
+    const res = await query<{ id: string }>(
+      "delete from socialapp.post_templates where id=$1 and user_id=$2 returning id",
+      [id, user.id],
+    );
+    return templateDeleteResult(res);
+  } catch {
+    return { ok: false, error: "Could not delete the template." };
+  }
+}
+
+export async function listHashtagGroups(): Promise<SavedHashtagGroup[]> {
+  if (!isDbConfigured()) return [];
+  try {
+    const user = await requireUser();
+    return await query<SavedHashtagGroup>(
+      "select id, name, hashtags, created_at from socialapp.hashtag_groups where user_id = $1 order by created_at desc",
+      [user.id],
+    );
+  } catch {
+    return [];
+  }
+}
+
+export async function saveHashtagGroup(input: {
+  name: string;
+  hashtags: string[];
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!isDbConfigured()) return { ok: false, error: "Database not configured" };
+  const hashtags = parseHashtagGroup(input.hashtags);
+  const validationError = hashtagGroupValidationError(input.name, hashtags);
+  if (validationError) return { ok: false, error: validationError };
+  const user = await requireUser();
+  try {
+    await query(
+      "insert into socialapp.hashtag_groups (user_id, name, hashtags) values ($1, $2, $3)",
+      [user.id, input.name.trim(), hashtags],
+    );
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Could not save the hashtag group. Please try again." };
+  }
+}
+
+export async function deleteHashtagGroup(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!UUID_RE.test(id)) return { ok: false, error: "Invalid hashtag group." };
+  if (!isDbConfigured()) return { ok: false, error: "Database not configured" };
+  const user = await requireUser();
+  try {
+    const res = await query<{ id: string }>(
+      "delete from socialapp.hashtag_groups where id=$1 and user_id=$2 returning id",
+      [id, user.id],
+    );
+    return res.length > 0 ? { ok: true } : { ok: false, error: "Hashtag group not found." };
+  } catch {
+    return { ok: false, error: "Could not delete the hashtag group." };
   }
 }

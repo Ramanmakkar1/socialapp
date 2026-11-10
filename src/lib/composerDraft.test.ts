@@ -13,6 +13,7 @@ function draft(overrides: Partial<ComposerDraftInitial> = {}): ComposerDraftInit
     id: "d1",
     caption: "Draft one caption",
     firstComment: "#tags",
+    tags: ["Launch"],
     platforms: ["instagram"],
     overrides: { instagram: "IG only text" },
     mediaUrls: ["https://cdn.example.com/a.jpg", "https://cdn.example.com/b.jpg"],
@@ -39,6 +40,7 @@ test("draft opened by URL: the first render already holds every saved field", ()
   assert.equal(state.draftId, "d1");
   assert.equal(state.mainCaption, "Draft one caption");
   assert.equal(state.firstComment, "#tags");
+  assert.deepEqual(state.tags, ["Launch"]);
   assert.deepEqual(state.enabled, { instagram: true, facebook: false, threads: false, youtube: false });
   assert.deepEqual(state.customize, { instagram: true, facebook: false, threads: false, youtube: false });
   assert.equal(state.customCaption.instagram, "IG only text");

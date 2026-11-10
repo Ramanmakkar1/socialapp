@@ -6,6 +6,7 @@ export type ComposerDraftInitial = {
   id: string;
   caption: string;
   firstComment: string;
+  tags: string[];
   platforms: string[];
   overrides: Partial<Record<PlatformId, string>>;
   mediaUrls: string[];
@@ -21,6 +22,7 @@ export type ComposerState = {
   draftId: string | undefined;
   mainCaption: string;
   firstComment: string;
+  tags: string[];
   enabled: Record<PlatformId, boolean>;
   customize: Record<PlatformId, boolean>;
   customCaption: Record<PlatformId, string>;
@@ -36,6 +38,7 @@ export function blankComposerState(): ComposerState {
     draftId: undefined,
     mainCaption: "",
     firstComment: "",
+    tags: [],
     enabled: { instagram: true, facebook: false, threads: false, youtube: false },
     customize: { instagram: false, facebook: false, threads: false, youtube: false },
     customCaption: { instagram: "", facebook: "", threads: "", youtube: "" },
@@ -58,6 +61,7 @@ export function composerStateFromDraft(draft?: ComposerDraftInitial | null): Com
     draftId: draft.id,
     mainCaption: draft.caption ?? "",
     firstComment: draft.firstComment ?? "",
+    tags: [...(draft.tags ?? [])],
     // A draft saved with no platform (or only "coming soon" ones) still opens with Instagram on.
     enabled: {
       instagram: draft.platforms.includes("instagram") || draft.platforms.length === 0,

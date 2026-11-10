@@ -15,6 +15,7 @@ import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { canPublishToFacebook } from "@/lib/facebookPublish";
 import { IDEA_BY_ID_SQL, IDEAS_LIST_SQL, ideaComposerPrefill, normalizeIdeaStatus, type IdeaRow } from "@/lib/ideas";
+import { allPostTags, hasColumn, postMatchesTag } from "@/lib/tagFilter";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
 
@@ -26,6 +27,7 @@ type WeekPost = {
   scheduled_at: Date | string | null;
   status: string;
   platforms: string[];
+  tags?: string[];
 };
 
 type PublishedPost = {
@@ -85,9 +87,9 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string }>;
 }) {
-  const { week, view: viewParam, month, status, draft, idea } = await searchParams;
+  const { week, view: viewParam, month, status, draft, idea, tag = "" } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
   const view: "week" | "month" | "list" | "ideas" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : viewParam === "ideas" ? "ideas" : "week";
   const weekStart = parseWeekParam(week);
@@ -134,6 +136,7 @@ export default async function CalendarPage({
   let threadsReady = false;
   let schedulePlatforms: string[] = [];
   let youtubeReady = false;
+  let hasTags = false;
 
   const reloadHref =
     view === "month"
@@ -148,10 +151,18 @@ export default async function CalendarPage({
 
   if (isDbConfigured()) {
     const user = await requireUser();
+    try {
+      const columnRows = await query<{ exists: boolean }>(
+        "select exists (select 1 from information_schema.columns where table_schema='socialapp' and table_name='scheduled_posts' and column_name='tags') as exists",
+      );
+      hasTags = hasColumn(columnRows);
+    } catch {
+      hasTags = false;
+    }
     if (draft && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(draft)) {
       try {
         const [row] = await query<DraftRow>(
-          `select p.id, p.caption, p.first_comment, p.scheduled_at, p.status, p.media, p.dm_rule_id, p.ig_format,
+          `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags" : "'{}'::text[] as tags"}, p.scheduled_at, p.status, p.media, p.dm_rule_id, p.ig_format,
            coalesce(array_agg(t.platform) filter (where t.platform is not null), '{}') as platforms,
            coalesce(jsonb_object_agg(t.platform, t.caption_override) filter (where t.caption_override is not null), '{}'::jsonb) as overrides
            from scheduled_posts p left join post_targets t on t.post_id = p.id
@@ -169,7 +180,7 @@ export default async function CalendarPage({
           } else {
             initialDraft = {
               id: row.id, caption: row.caption, platforms: row.platforms, overrides: row.overrides,
-              firstComment: row.first_comment ?? "", mediaUrls: Array.isArray(row.media) ? row.media.map((item) => item?.url).filter((url): url is string => typeof url === "string") : [],
+              firstComment: row.first_comment ?? "", tags: Array.isArray(row.tags) ? row.tags : [], mediaUrls: Array.isArray(row.media) ? row.media.map((item) => item?.url).filter((url): url is string => typeof url === "string") : [],
               scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
               dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
               status: row.status,
@@ -259,11 +270,11 @@ export default async function CalendarPage({
         [user.id],
       ),
       query<Post>(
-        "select p.id, p.caption, p.first_comment, p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50",
+        `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50`,
         [user.id],
       ),
       query<WeekPost>(
-        "select p.id, p.caption, p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.scheduled_at >= $2 and p.scheduled_at < $3 group by p.id order by p.scheduled_at limit 200",
+        `select p.id, p.caption, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.scheduled_at >= $2 and p.scheduled_at < $3 group by p.id order by p.scheduled_at limit 200`,
         [user.id, rangeStart, rangeEnd],
       ),
       query<PublishedPost>(
@@ -282,6 +293,8 @@ export default async function CalendarPage({
   }
 
   const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
+  const allTags = allPostTags(weekRows);
+  const filteredWeekRows = weekRows.filter((post) => postMatchesTag(post, tag));
 
   return (
     <div className={styles.calendarPage}>
@@ -333,10 +346,36 @@ export default async function CalendarPage({
           <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} />
         </ComposerDialog>
       )}
+      {(view === "week" || view === "month") && allTags.length > 0 && (
+        <form className={`${styles.filters} mb-4 items-end`}>
+          {view === "month" ? (
+            <>
+              <input type="hidden" name="view" value="month" />
+              <input type="hidden" name="month" value={monthQueryParam(monthStart)} />
+            </>
+          ) : (
+            <>
+              <input type="hidden" name="view" value="week" />
+              <input type="hidden" name="week" value={weekQueryParam(weekStart)} />
+            </>
+          )}
+          <div className={ui.field}>
+            <label htmlFor="calendar-tag-filter" className={ui.label}>Filter by tag</label>
+            <select id="calendar-tag-filter" name="tag" defaultValue={tag} className={ui.input}>
+              <option value="">All tags</option>
+              {allTags.map((availableTag) => (
+                <option key={availableTag} value={availableTag}>{availableTag}</option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className={styles.filterBtn}>Apply</button>
+          {tag && <Link href={reloadHref} className={styles.todayBtn}>Clear</Link>}
+        </form>
+      )}
       {view === "month" ? (
         <section className={styles.viewSection} aria-label="Month view">
           <MonthView
-            posts={weekRows}
+            posts={filteredWeekRows}
             monthStart={monthStart}
             prevHref={`/app/calendar?view=month&month=${monthQueryParam(prevMonth)}`}
             nextHref={`/app/calendar?view=month&month=${monthQueryParam(nextMonth)}`}
@@ -350,7 +389,7 @@ export default async function CalendarPage({
       ) : view === "week" ? (
         <section className={styles.viewSection} aria-label="Week view">
           <WeekView
-            posts={weekRows}
+            posts={filteredWeekRows}
             weekStart={weekStart}
             prevHref={`/app/calendar?week=${weekQueryParam(prevStart)}`}
             nextHref={`/app/calendar?week=${weekQueryParam(nextStart)}`}

@@ -112,3 +112,40 @@ export function buildHashtags(niche: string, opts: { count: number; mix: Hashtag
   }
   return result;
 }
+
+export type SavedHashtagGroup = {
+  id: string;
+  name: string;
+  hashtags: string[];
+  created_at?: Date | string;
+};
+
+/** Accepts whitespace or comma-separated tags, with or without the leading #. */
+export function parseHashtagGroup(input: string | string[] | null | undefined): string[] {
+  const values = Array.isArray(input) ? input : (input ?? "").split(/[\s,]+/);
+  const tags = values
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim().replace(/^#+/, "").toLocaleLowerCase())
+    .filter((value) => /^[\p{L}\p{N}_]*[\p{L}_][\p{L}\p{N}_]*$/u.test(value));
+  return [...new Set(tags)];
+}
+
+export function hashtagGroupValidationError(name: string, hashtags: string[]): string | null {
+  if (!name.trim()) return "Give the hashtag group a name.";
+  if (name.trim().length > 80) return "Hashtag group names must be 80 characters or fewer.";
+  if (hashtags.length === 0) return "Add at least one valid hashtag.";
+  if (hashtags.length > 30) return "Use up to 30 hashtags per group.";
+  if (hashtags.some((tag) => tag.length > 100)) return "Each hashtag must be 100 characters or fewer.";
+  return null;
+}
+
+/** One-click insertion keeps existing text and never duplicates a hashtag already present. */
+export function insertHashtags(caption: string, hashtags: string[]): string {
+  const existing = new Set(
+    [...caption.matchAll(/#([\p{L}\p{N}_]+)/gu)].map((match) => match[1].toLocaleLowerCase()),
+  );
+  const additions = parseHashtagGroup(hashtags).filter((tag) => !existing.has(tag));
+  if (additions.length === 0) return caption;
+  const suffix = additions.map((tag) => `#${tag}`).join(" ");
+  return caption.trim() ? `${caption.trimEnd()}\n\n${suffix}` : suffix;
+}

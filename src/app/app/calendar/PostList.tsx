@@ -7,6 +7,7 @@ import { duplicatePost } from "./duplicateActions";
 import { retryPost } from "./retryActions";
 import EmptyState from "../EmptyState";
 import { Btn, BtnA, BtnLink } from "@/components/ui/kit";
+import { allPostTags, postMatchesTag } from "@/lib/tagFilter";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
 
@@ -17,6 +18,7 @@ export type Post = {
   scheduled_at: Date | string | null;
   status: string;
   platforms: string[];
+  tags?: string[];
   error?: string | null;
 };
 
@@ -34,8 +36,11 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<PostFilter>(initialFilter);
   const [search, setSearch] = useState("");
+  const [tag, setTag] = useState("");
+  const allTags = allPostTags(posts);
   const visiblePosts = posts.filter((post) =>
     (filter === "all" || post.status === filter) &&
+    postMatchesTag(post, tag) &&
     post.caption.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
   );
 
@@ -50,6 +55,7 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
   function clearFilters() {
     selectFilter("all");
     setSearch("");
+    setTag("");
   }
 
   function handleDelete(id: string) {
@@ -122,6 +128,17 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
               className={ui.input}
             />
           </div>
+          {allTags.length > 0 && (
+            <div className={`${ui.field} ${styles.search}`}>
+              <label htmlFor="queue-tag-filter" className={ui.label}>Filter by tag</label>
+              <select id="queue-tag-filter" value={tag} onChange={(event) => setTag(event.target.value)} className={ui.input}>
+                <option value="">All tags</option>
+                {allTags.map((availableTag) => (
+                  <option key={availableTag} value={availableTag}>{availableTag}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <p className={styles.count} role="status">{visiblePosts.length} {visiblePosts.length === 1 ? "post" : "posts"} shown; scheduled times first, unscheduled posts last</p>
           {visiblePosts.length === 0 ? (
             posts.length === 0 ? (
@@ -178,6 +195,11 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
                     {post.scheduled_at ? new Date(post.scheduled_at).toLocaleString() : "No time set"}
                   </p>
                   <p className={styles.postPlatforms}>{post.platforms.join(", ")}</p>
+                  {(post.tags ?? []).length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Post tags">
+                      {post.tags?.map((postTag) => <span key={postTag} className={ui.pill}>{postTag}</span>)}
+                    </div>
+                  )}
                   <p className={styles.postCaption}>{post.caption.slice(0, 140)}</p>
                   {post.first_comment && (
                     <span className={`${ui.pill} ${styles.mt}`}>First comment</span>

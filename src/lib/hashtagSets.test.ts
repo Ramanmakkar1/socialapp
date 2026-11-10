@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { HASHTAG_SETS, buildHashtags, type HashtagMix } from "./hashtagSets.ts";
+import { HASHTAG_SETS, buildHashtags, hashtagGroupValidationError, insertHashtags, parseHashtagGroup, type HashtagMix } from "./hashtagSets.ts";
 
 test("every curated tier has 8–10 plain tags, unique within its niche", () => {
   assert.equal(Object.keys(HASHTAG_SETS).length, 15);
@@ -66,4 +66,19 @@ test("unknown niches and unusual counts are safe", () => {
   }
   assert.equal(buildHashtags("food", { count: Infinity, mix: "balanced" }).length, 30);
   assert.equal(buildHashtags("food", { count: 5.9, mix: "balanced" }).length, 5);
+});
+
+test("saved groups normalize tags and reject empty or oversized groups", () => {
+  assert.deepEqual(parseHashtagGroup("#Launch, spring_sale\n#LAUNCH bad-tag #123"), ["launch", "spring_sale"]);
+  assert.match(hashtagGroupValidationError(" ", ["launch"]) ?? "", /name/);
+  assert.match(hashtagGroupValidationError("Launch", []) ?? "", /at least one/);
+  assert.equal(hashtagGroupValidationError("Launch", ["launch"]), null);
+  assert.match(hashtagGroupValidationError("Launch", Array.from({ length: 31 }, (_, i) => `tag${i}`)) ?? "", /up to 30/);
+});
+
+test("one-click hashtag insertion preserves captions and avoids duplicate tags", () => {
+  assert.equal(insertHashtags("", ["Launch", "Sale"]), "#launch #sale");
+  assert.equal(insertHashtags("Our launch news", ["launch", "sale"]), "Our launch news\n\n#launch #sale");
+  assert.equal(insertHashtags("News #Launch", ["launch", "sale"]), "News #Launch\n\n#sale");
+  assert.equal(insertHashtags("News #Launch", ["launch"]), "News #Launch");
 });

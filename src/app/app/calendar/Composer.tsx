@@ -4,12 +4,15 @@ import { useCallback, useEffect, useId, useRef, useState, useTransition } from "
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AtSign, Facebook, Instagram, Sparkles, Youtube as YouTube } from "lucide-react";
-import { nextAvailableSlot, savePost } from "./actions";
+import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import { aiAvailable, suggestCaptions } from "./aiActions";
 import { BRAND } from "@/lib/brand";
 import type { CaptionIdea } from "@/lib/ai";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
+import { insertHashtags, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
+import { parseTags } from "@/lib/tagFilter";
+import type { PostTemplate } from "@/lib/templates";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
 import {
   blankComposerState,
@@ -100,11 +103,21 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const ytTitleId = useId();
   const ytTagsId = useId();
   const ytPrivacyId = useId();
+  const postTagsId = useId();
+  const templateNameId = useId();
+  const hashtagGroupNameId = useId();
+  const hashtagTextId = useId();
 
   const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>(init.enabled);
   const [activeTab, setActiveTab] = useState<PlatformId>("instagram");
   const [mainCaption, setMainCaption] = useState(init.mainCaption);
   const [firstComment, setFirstComment] = useState(init.firstComment);
+  const [postTags, setPostTags] = useState(init.tags.join(", "));
+  const [templates, setTemplates] = useState<PostTemplate[]>([]);
+  const [templateName, setTemplateName] = useState("");
+  const [hashtagGroups, setHashtagGroups] = useState<SavedHashtagGroup[]>([]);
+  const [hashtagGroupName, setHashtagGroupName] = useState("");
+  const [hashtagText, setHashtagText] = useState("");
   const [customize, setCustomize] = useState<Record<PlatformId, boolean>>(init.customize);
   const [customCaption, setCustomCaption] = useState<Record<PlatformId, string>>(init.customCaption);
   const [mediaUrls, setMediaUrls] = useState<string[]>(init.mediaUrls);
@@ -118,6 +131,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [ytShorts, setYtShorts] = useState(false);
   const [feedback, setFeedback] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [extrasPending, startExtrasTransition] = useTransition();
   const [aiOn, setAiOn] = useState<boolean | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
@@ -141,6 +155,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     const blank = blankComposerState();
     setMainCaption(blank.mainCaption);
     setFirstComment(blank.firstComment);
+    setPostTags(blank.tags.join(", "));
+    setTemplateName("");
+    setHashtagGroupName("");
+    setHashtagText("");
     setCustomCaption(blank.customCaption);
     setMediaUrls(blank.mediaUrls);
     setIgFormat(blank.igFormat);
@@ -201,6 +219,22 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    Promise.all([listTemplates(), listHashtagGroups()])
+      .then(([savedTemplates, savedGroups]) => {
+        if (!active) return;
+        setTemplates(savedTemplates);
+        setHashtagGroups(savedGroups);
+      })
+      .catch(() => {
+        // Saved extras are optional; an unavailable table never blocks composing.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   function togglePlatform(platform: PlatformId) {
     if (!livePlatforms.includes(platform)) return;
     const next = { ...enabled, [platform]: !enabled[platform] };
@@ -233,6 +267,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       draftId,
       caption: mainCaption,
       firstComment,
+      tags: parseTags(postTags),
       platforms,
       overrides,
       // "queue" lets the server pick the next free slot, so no client time is sent.
@@ -351,6 +386,89 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     });
   }
 
+  function applyTemplate(template: PostTemplate) {
+    setMainCaption(template.caption);
+    setFirstComment(template.first_comment ?? "");
+    setPostTags((template.tags ?? []).join(", "));
+    setFeedback({ kind: "ok", text: `Template “${template.name}” inserted.` });
+  }
+
+  function handleTemplateSave() {
+    setFeedback(null);
+    startExtrasTransition(async () => {
+      try {
+        const result = await saveTemplate({
+          name: templateName,
+          caption: mainCaption,
+          firstComment,
+          tags: parseTags(postTags),
+        });
+        if (!result.ok) {
+          setFeedback({ kind: "err", text: result.error });
+          return;
+        }
+        setTemplates(await listTemplates());
+        setTemplateName("");
+        setFeedback({ kind: "ok", text: "Post template saved." });
+      } catch {
+        setFeedback({ kind: "err", text: "Could not save the template. Please try again." });
+      }
+    });
+  }
+
+  function handleTemplateDelete(id: string) {
+    if (!window.confirm("Delete this saved template?")) return;
+    setFeedback(null);
+    startExtrasTransition(async () => {
+      try {
+        const result = await deleteTemplate(id);
+        if (!result.ok) {
+          setFeedback({ kind: "err", text: result.error });
+          return;
+        }
+        setTemplates((current) => current.filter((template) => template.id !== id));
+      } catch {
+        setFeedback({ kind: "err", text: "Could not delete the template." });
+      }
+    });
+  }
+
+  function handleHashtagGroupSave() {
+    setFeedback(null);
+    startExtrasTransition(async () => {
+      try {
+        const result = await saveHashtagGroup({ name: hashtagGroupName, hashtags: parseHashtagGroup(hashtagText) });
+        if (!result.ok) {
+          setFeedback({ kind: "err", text: result.error });
+          return;
+        }
+        setHashtagGroups(await listHashtagGroups());
+        setHashtagGroupName("");
+        setHashtagText("");
+        setFeedback({ kind: "ok", text: "Hashtag group saved." });
+      } catch {
+        setFeedback({ kind: "err", text: "Could not save the hashtag group. Please try again." });
+      }
+    });
+  }
+
+  function handleHashtagGroupDelete(id: string) {
+    if (!window.confirm("Delete this saved hashtag group?")) return;
+    setFeedback(null);
+    startExtrasTransition(async () => {
+      try {
+        const result = await deleteHashtagGroup(id);
+        if (!result.ok) {
+          setFeedback({ kind: "err", text: result.error });
+          return;
+        }
+        setHashtagGroups((current) => current.filter((group) => group.id !== id));
+      } catch {
+        setFeedback({ kind: "err", text: "Could not delete the hashtag group." });
+      }
+    });
+  }
+
   return (
     <section id="new" className="mt-6 scroll-mt-20" aria-labelledby={`${mainId}-heading`}>
       <h2 id={`${mainId}-heading`} className="sr-only">
@@ -413,6 +531,31 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               })}
             </div>
           </div>
+
+          <details className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
+            <summary className="cursor-pointer text-sm font-medium text-[#3d3450]">Saved post templates</summary>
+            {templates.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {templates.map((template) => (
+                  <article key={template.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--poskoo-paper)] p-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-semibold text-[#3d3450]">{template.name}</h3>
+                      <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-xs text-[var(--poskoo-muted)]">{template.caption}</p>
+                    </div>
+                    <button type="button" onClick={() => applyTemplate(template)} className="rounded-full border border-[var(--poskoo-violet)] px-3 py-1.5 text-xs font-medium text-[var(--poskoo-violet)]">Insert</button>
+                    <button type="button" disabled={extrasPending} onClick={() => handleTemplateDelete(template.id)} aria-label={`Delete template ${template.name}`} className="rounded-full border border-[var(--poskoo-line)] px-3 py-1.5 text-xs text-[var(--poskoo-muted)] disabled:opacity-60">Delete</button>
+                  </article>
+                ))}
+              </div>
+            )}
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <div className="min-w-0 flex-1">
+                <label htmlFor={templateNameId} className="sr-only">New template name</label>
+                <input id={templateNameId} value={templateName} maxLength={80} onChange={(event) => setTemplateName(event.target.value)} placeholder="Template name" className="w-full rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)]" />
+              </div>
+              <button type="button" disabled={extrasPending || !templateName.trim()} onClick={handleTemplateSave} className="rounded-full border border-[var(--poskoo-line)] px-3 py-2 text-sm font-medium text-[#3d3450] disabled:opacity-60">Save current as template</button>
+            </div>
+          </details>
 
           <div>
             <label htmlFor={mainId} className="text-sm font-medium text-[#3d3450]">
@@ -513,6 +656,41 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               </div>
             )}
           </div>
+
+          <div>
+            <label htmlFor={postTagsId} className="text-sm font-medium text-[#3d3450]">Campaign tags (optional)</label>
+            <input id={postTagsId} value={postTags} onChange={(event) => setPostTags(event.target.value)} placeholder="Spring launch, awareness" aria-describedby={`${postTagsId}-help`} className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none" />
+            <p id={`${postTagsId}-help`} className="mt-1 text-xs text-[var(--poskoo-muted)]">Separate up to 10 tags with commas. Use them to filter the queue and calendar.</p>
+          </div>
+
+          <details className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
+            <summary className="cursor-pointer text-sm font-medium text-[#3d3450]">Saved hashtag groups</summary>
+            {hashtagGroups.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {hashtagGroups.map((group) => (
+                  <article key={group.id} className="rounded-lg bg-[var(--poskoo-paper)] p-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="min-w-0 flex-1 text-sm font-semibold text-[#3d3450]">{group.name}</h3>
+                      <button type="button" onClick={() => setMainCaption((caption) => insertHashtags(caption, group.hashtags))} className="rounded-full border border-[var(--poskoo-violet)] px-3 py-1.5 text-xs font-medium text-[var(--poskoo-violet)]">Insert hashtags</button>
+                      <button type="button" disabled={extrasPending} onClick={() => handleHashtagGroupDelete(group.id)} aria-label={`Delete hashtag group ${group.name}`} className="rounded-full border border-[var(--poskoo-line)] px-3 py-1.5 text-xs text-[var(--poskoo-muted)] disabled:opacity-60">Delete</button>
+                    </div>
+                    <p className="mt-2 break-words text-xs text-[var(--poskoo-muted)]">{group.hashtags.map((hashtag) => `#${hashtag}`).join(" ")}</p>
+                  </article>
+                ))}
+              </div>
+            )}
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div>
+                <label htmlFor={hashtagGroupNameId} className="sr-only">New hashtag group name</label>
+                <input id={hashtagGroupNameId} value={hashtagGroupName} maxLength={80} onChange={(event) => setHashtagGroupName(event.target.value)} placeholder="Group name" className="w-full rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)]" />
+              </div>
+              <div>
+                <label htmlFor={hashtagTextId} className="sr-only">Hashtags for the new group</label>
+                <input id={hashtagTextId} value={hashtagText} onChange={(event) => setHashtagText(event.target.value)} placeholder="#launch #newproduct" className="w-full rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)]" />
+              </div>
+            </div>
+            <button type="button" disabled={extrasPending || !hashtagGroupName.trim() || !hashtagText.trim()} onClick={handleHashtagGroupSave} className="mt-2 rounded-full border border-[var(--poskoo-line)] px-3 py-2 text-sm font-medium text-[#3d3450] disabled:opacity-60">Save hashtag group</button>
+          </details>
 
           {igFormat !== "story" && (
             <div>
