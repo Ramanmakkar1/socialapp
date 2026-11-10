@@ -20,6 +20,11 @@ const tools = [
     description: "Build a hand-curated hashtag set for your niche, mix broad and specific tags, and copy up to 30 at once.",
   },
   {
+    href: "/tools/instagram-hashtag-strategy",
+    title: "Instagram hashtag strategy worksheet",
+    description: "Group tags into broad, niche and branded sets, save named sets in your browser, and copy a set for your next post.",
+  },
+  {
     href: "/tools/instagram-post-preview",
     title: "Instagram post preview",
     description: "Preview a local photo and caption in a feed mockup, compare square and portrait crops, and copy your caption.",
