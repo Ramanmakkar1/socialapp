@@ -45,6 +45,11 @@ const tools = [
     description: "Try comment keywords and contains vs exact match before you turn on Instagram auto-DM rules.",
   },
   {
+    href: "/tools/instagram-comment-to-dm-preview",
+    title: "Instagram comment-to-DM flow preview",
+    description: "Enter a keyword, sample comment and DM text to see the flow locally, with contains and exact matching examples.",
+  },
+  {
     href: "/tools/instagram-comment-to-dm-calculator",
     title: "Instagram comment-to-DM campaign calculator",
     description: "Estimate comments, DMs and link clicks from views, comment rate, DM delivery rate and link-click rate, with every formula shown.",
