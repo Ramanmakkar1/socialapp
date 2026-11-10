@@ -10,7 +10,7 @@ import s from "@/components/site.module.css";
 export const metadata: Metadata = {
   title: { absolute: `Buffer Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
-    "A Buffer alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and AI replies. Facebook and Threads soon.",
+    "A Buffer alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and AI replies. Facebook Pages and Threads too.",
   alternates: { canonical: "/buffer-alternative" },
 };
 
