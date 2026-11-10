@@ -8,7 +8,7 @@ export const BRAND = {
     "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
   // Raman must authorize the new-domain launch before this value changes.
-  // Keep staging noindex and its sitemap empty, even when SITE_INDEXABLE=true.
+  // indexable stays false (staging noindex, empty sitemap) until Raman authorizes the new-domain launch. No env var changes it.
   indexable: false,
   supportEmail: "support@splitforms.com",
   company: "Town Media Labs",
