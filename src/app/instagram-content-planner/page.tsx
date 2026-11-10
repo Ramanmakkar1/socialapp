@@ -95,8 +95,9 @@ export default function InstagramContentPlannerPage() {
           From hook to scheduled post, <em className="s mark">in five steps.</em>
         </h1>
         <p className="lede">
-          Plan one Instagram post with free tools: draft a hook, write the caption, check the image
-          dimensions, preview the post, then schedule it to publish automatically.
+          This free Instagram content planner walks you through one post in five steps — hook,
+          caption, image size, preview, then schedule — with tools that run in your browser. When
+          you are ready, a free {BRAND.name} account publishes the post at the time you pick.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/instagram-scheduler">
@@ -151,11 +152,11 @@ export default function InstagramContentPlannerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Questions</p>
-            <h2>Content planner questions</h2>
+            <h2>How do I plan an Instagram post?</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
-              <details key={f.q}>
+            {faqs.map((f, index) => (
+              <details key={f.q} open={index === 0}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
               </details>
