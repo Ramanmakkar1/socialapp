@@ -30,6 +30,11 @@ const tools = [
     description: "Preview a local photo and caption in a feed mockup, compare square and portrait crops, and copy your caption.",
   },
   {
+    href: "/tools/threads-post-preview",
+    title: "Threads post preview & character counter",
+    description: "Write a Threads post, count characters against the 500-character limit, preview it on mobile, then copy or reset your text.",
+  },
+  {
     href: "/tools/instagram-caption-counter",
     title: "Instagram caption counter",
     description: "Count characters and hashtags as you type and see how close your caption is to the Instagram limit.",
