@@ -57,6 +57,15 @@ test("every PUBLIC_PATHS entry has a page.tsx route file", () => {
   }
 });
 
+test("every public page declares a canonical", () => {
+  for (const p of PUBLIC_PATHS) {
+    const file = p === "/" ? "src/app/page.tsx" : join("src/app", p, "page.tsx");
+    if (!existsSync(file)) continue; // missing route files are covered by the "real route file" test
+    const text = readFileSync(file, "utf8");
+    assert.ok(text.includes("canonical"), `public page ${p} has no canonical in ${file}`);
+  }
+});
+
 test("no PUBLIC_PATHS entry is noindex", () => {
   for (const p of PUBLIC_PATHS) {
     const file = p === "/" ? "src/app/page.tsx" : join("src/app", p, "page.tsx");
