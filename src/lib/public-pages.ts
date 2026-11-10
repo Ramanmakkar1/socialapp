@@ -2,6 +2,7 @@
 
 export const PUBLIC_PATHS = [
   "/",
+  "/features",
   "/instagram-auto-dm",
   "/instagram-auto-dm/templates",
   "/buffer-alternative",
@@ -57,6 +58,7 @@ export type PublicPath = typeof PUBLIC_PATHS[number];
 
 export const META: Record<PublicPath, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
   "/": { priority: 1, changeFrequency: "weekly" },
+  "/features": { priority: 0.9, changeFrequency: "weekly" },
   "/instagram-auto-dm": { priority: 0.8, changeFrequency: "weekly" },
   "/instagram-auto-dm/templates": { priority: 0.7, changeFrequency: "weekly" },
   "/buffer-alternative": { priority: 0.8, changeFrequency: "weekly" },
@@ -109,7 +111,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
 };
 
 export const PAGE_TITLES: Record<PublicPath, string> = {
-  "/": "Home", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates",
+  "/": "Home", "/features": "Features", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates",
   "/buffer-alternative": "Buffer Alternative", "/manychat-alternative": "ManyChat Alternative",
   "/publer-alternative": "Publer Alternative",
   "/later-alternative": "Later Alternative", "/planoly-alternative": "Planoly Alternative", "/sprout-social-alternative": "Sprout Social Alternative", "/metricool-alternative": "Metricool Alternative", "/hootsuite-alternative": "Hootsuite Alternative", "/meta-business-suite-alternative": "Meta Business Suite Alternative",
@@ -137,6 +139,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
 
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/": "Instagram scheduler and auto-DM tool with lead capture.",
+  "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI DM replies, free tools and comparisons.",
   "/instagram-auto-dm": "Automatically DM anyone who comments a keyword with your link and capture their email or phone.",
   "/instagram-auto-dm/templates": "Pre-built auto-DM message templates for giveaways, promotions, and lead generation.",
   "/buffer-alternative": "Buffer alternative with built-in Instagram auto-DM and comment-to-lead conversion.",

@@ -15,7 +15,7 @@ const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative", key: "meta" },
 ];
 
-export function CompareAlternativesNav({ current }: { current: ComparePage }) {
+export function CompareAlternativesNav({ current }: { current?: ComparePage }) {
   return (
     <nav aria-label="Compare alternatives" className={s.chipRow}>
       <p>Compare</p>
