@@ -1,9 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import { Download, Plus, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
+import Link from "next/link";
+import { Check, Copy, Download, Plus, Printer, Trash2 } from "lucide-react";
 
 type Row = { day: string; platform: string; format: string; idea: string };
+
+type ApprovalItem = { id: string; title: string; detail: string };
+
+const APPROVAL_ITEMS: ApprovalItem[] = [
+  {
+    id: "copy",
+    title: "Copy",
+    detail: "Caption, hook and call to action are written, proofread and match the post idea.",
+  },
+  {
+    id: "media",
+    title: "Media",
+    detail: "Image or video is cropped to the platform size, sharp, and has descriptive alt text.",
+  },
+  {
+    id: "links",
+    title: "Links",
+    detail: "Every link opens the right page, is tagged with UTM fields, and has no broken or placeholder URL.",
+  },
+  {
+    id: "formatting",
+    title: "Platform formatting",
+    detail: "Caption length, hashtags, line breaks and aspect ratio fit the platform you are posting to.",
+  },
+  {
+    id: "approver",
+    title: "Approver",
+    detail: "A named person has reviewed the post and signed off on the final copy and media.",
+  },
+  {
+    id: "time",
+    title: "Publish time",
+    detail: "Date, time and time zone are confirmed, and the post is at least a minute in the future.",
+  },
+];
 
 const SAMPLE: Row[] = [
   { day: "Monday", platform: "Instagram", format: "Reel", idea: "Behind the scenes of how we make our best-selling product" },
@@ -23,6 +59,39 @@ const csvCell = (value: string) => `"${value.replace(/"/g, '""')}"`;
 
 export default function CalendarTemplate() {
   const [rows, setRows] = useState<Row[]>(SAMPLE);
+  const [postLabel, setPostLabel] = useState("");
+  const [approved, setApproved] = useState<Record<string, boolean>>({});
+  const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const approvedCount = APPROVAL_ITEMS.filter((item) => approved[item.id]).length;
+  const allApproved = approvedCount === APPROVAL_ITEMS.length;
+
+  const toggleApproval = (id: string) =>
+    setApproved((current) => ({ ...current, [id]: !current[id] }));
+
+  function approvalSummary() {
+    const label = postLabel.trim() || "Untitled post";
+    return [
+      "Social media post approval summary",
+      `Post: ${label}`,
+      `Status: ${approvedCount} of ${APPROVAL_ITEMS.length} steps complete — ${allApproved ? "ready to publish" : "not ready yet"}`,
+      "",
+      "Checklist:",
+      ...APPROVAL_ITEMS.map((item) => `${approved[item.id] ? "[x]" : "[ ]"} ${item.title} — ${item.detail}`),
+    ].join("\n");
+  }
+
+  async function copySummary() {
+    try {
+      await navigator.clipboard.writeText(approvalSummary());
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+      setCopied(true);
+      copyTimer.current = setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   const update = (index: number, field: keyof Row, value: string) =>
     setRows((current) => current.map((row, i) => (i === index ? { ...row, [field]: value } : row)));
@@ -109,6 +178,135 @@ export default function CalendarTemplate() {
           Your calendar is empty. Choose <strong>Add row</strong> to plan your first post.
         </p>
       )}
+
+      <section className="mt-8 border-t border-[var(--poskoo-line)] pt-6" aria-labelledby="approval-heading">
+        <h2 id="approval-heading" className="text-lg font-semibold text-[var(--poskoo-ink)]">
+          Post approval checklist
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--poskoo-muted)]">
+          A post is ready to publish when copy, media, links, platform formatting, an approver and the publish time are
+          all confirmed. Add a post label, tick each step, then copy or print the plain-text approval summary. Everything
+          stays in your browser — nothing is uploaded. When it is approved, schedule it with the{" "}
+          <Link href="/instagram-scheduler" className="font-medium text-[var(--poskoo-violet)] hover:underline">
+            Instagram scheduler
+          </Link>{" "}
+          or plan the rest of the week in the{" "}
+          <Link
+            href="/tools/social-media-content-calendar"
+            className="font-medium text-[var(--poskoo-violet)] hover:underline"
+          >
+            social media content calendar
+          </Link>
+          .
+        </p>
+
+        <div className="mt-4">
+          <label htmlFor="approval-post-label" className="text-sm font-semibold text-[var(--poskoo-ink)]">
+            Post label
+          </label>
+          <input
+            id="approval-post-label"
+            type="text"
+            value={postLabel}
+            onChange={(e) => setPostLabel(e.target.value)}
+            placeholder="e.g. Friday Reel — new colour launch"
+            className={`${inputClass} mt-1`}
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-[var(--poskoo-ink)]" aria-live="polite">
+            {approvedCount} of {APPROVAL_ITEMS.length} steps complete
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={copySummary}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 text-sm font-medium text-[#3d3450] hover:text-[var(--poskoo-violet)]"
+            >
+              {copied ? <Check className="h-4 w-4 text-[var(--poskoo-green)]" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
+              {copied ? "Copied" : "Copy summary"}
+            </button>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 text-sm font-medium text-[#3d3450] hover:text-[var(--poskoo-violet)]"
+            >
+              <Printer className="h-4 w-4" aria-hidden /> Print summary
+            </button>
+            {approvedCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setApproved({})}
+                className="inline-flex min-h-11 items-center rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 text-sm font-medium text-[#3d3450] hover:text-[var(--poskoo-violet)]"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div
+          className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--poskoo-band)]"
+          role="progressbar"
+          aria-valuenow={approvedCount}
+          aria-valuemin={0}
+          aria-valuemax={APPROVAL_ITEMS.length}
+          aria-label="Approval progress"
+        >
+          <div
+            className="h-2 rounded-full bg-[var(--poskoo-violet)] transition-all"
+            style={{ width: `${(approvedCount / APPROVAL_ITEMS.length) * 100}%` }}
+          />
+        </div>
+
+        <ul className="mt-4 space-y-2" aria-label="Post approval checklist">
+          {APPROVAL_ITEMS.map((item) => {
+            const checked = !!approved[item.id];
+            const inputId = `approval-${item.id}`;
+            return (
+              <li
+                key={item.id}
+                className={`rounded-2xl border bg-[var(--poskoo-paper)] transition-colors ${
+                  checked ? "border-[var(--poskoo-green)]/50" : "border-[var(--poskoo-line)]"
+                }`}
+              >
+                <label htmlFor={inputId} className="flex min-h-11 cursor-pointer items-center gap-3 px-4 pt-3">
+                  <input
+                    id={inputId}
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleApproval(item.id)}
+                    className="h-5 w-5 shrink-0 accent-[var(--poskoo-violet)]"
+                  />
+                  <span
+                    className={`text-sm font-semibold ${
+                      checked ? "text-[var(--poskoo-muted)] line-through" : "text-[var(--poskoo-ink)]"
+                    }`}
+                  >
+                    {item.title}
+                  </span>
+                  {checked && <Check className="ml-auto h-4 w-4 shrink-0 text-[var(--poskoo-green)]" aria-hidden />}
+                </label>
+                <p className="px-4 pb-3 pl-12 text-sm leading-relaxed text-[var(--poskoo-muted)]">{item.detail}</p>
+              </li>
+            );
+          })}
+        </ul>
+
+        {allApproved && (
+          <p className="mt-4 rounded-2xl border border-[var(--poskoo-green)]/40 bg-[var(--poskoo-green)]/10 px-4 py-3 text-sm font-medium text-[var(--poskoo-ink)]">
+            All steps confirmed — this post is ready to schedule.
+          </p>
+        )}
+
+        <div id="approval-print" style={{ display: "none" }}>
+          <pre style={{ whiteSpace: "pre-wrap", fontFamily: "inherit", fontSize: 14, lineHeight: 1.6 }}>
+            {approvalSummary()}
+          </pre>
+        </div>
+        <style>{`@media print { body * { visibility: hidden; } #approval-print, #approval-print * { visibility: visible; } #approval-print { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 24px; } }`}</style>
+      </section>
     </div>
   );
 }
