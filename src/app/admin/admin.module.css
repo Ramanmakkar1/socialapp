@@ -263,8 +263,8 @@
 
 /* ---------- Table ---------- */
 .tableWrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th {
+.tableWrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tableWrap th {
   position: sticky;
   top: 0;
   background: var(--poskoo-band);
@@ -276,8 +276,8 @@ th {
   padding: 10px 14px;
   white-space: nowrap;
 }
-td { padding: 12px 14px; border-top: 1.5px solid var(--poskoo-line); vertical-align: middle; }
-tbody tr:hover td { background: #faf8ff; }
+.tableWrap td { padding: 12px 14px; border-top: 1.5px solid var(--poskoo-line); vertical-align: middle; }
+.tableWrap tbody tr:hover td { background: #faf8ff; }
 td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
 .rowLink { cursor: pointer; }
 
