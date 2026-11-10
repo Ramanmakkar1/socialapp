@@ -39,9 +39,6 @@ export const PLANS: Plan[] = [
     items: [
       { text: "25 social accounts" },
       { text: "50,000 auto-DMs / month" },
-      { text: "Client workspaces", soon: true },
-      { text: "Approve-before-post", soon: true },
-      { text: "Team seats", soon: true },
       { text: "Priority support" },
     ],
     cta: "Start free, upgrade later",
