@@ -206,6 +206,82 @@ export default function Home() { return <main className={`${styles.landing} ${in
   </div>
 </div></section>
 
+<section id="features" style={{"paddingTop": "20px"}}><div className="wrap">
+  <div className="head"><p className="eyebrow">What you get</p><h2>One app for the whole <em className="s">post-to-lead</em> loop.</h2></div>
+  <div className="bento">
+    <article className="bentoCard">
+      <div className="bentoArt">
+        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
+          <rect x="10" y="18" width="200" height="122" rx="16" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
+          <path d="M10 50h200" stroke="var(--line)" strokeWidth="2" />
+          <path d="M46 10v16M174 10v16" stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" />
+          <rect x="28" y="30" width="46" height="8" rx="4" fill="var(--ink)" opacity=".18" />
+          <g fill="var(--muted)" opacity=".5">
+            <circle cx="34" cy="64" r="3" /><circle cx="62" cy="64" r="3" /><circle cx="90" cy="64" r="3" /><circle cx="118" cy="64" r="3" /><circle cx="146" cy="64" r="3" /><circle cx="174" cy="64" r="3" />
+          </g>
+          <rect x="24" y="78" width="52" height="18" rx="9" fill="var(--lilac)" />
+          <rect x="84" y="78" width="52" height="18" rx="9" fill="var(--peach)" />
+          <rect x="144" y="78" width="52" height="18" rx="9" fill="var(--pink)" />
+          <rect x="24" y="106" width="52" height="18" rx="9" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
+          <rect x="84" y="106" width="52" height="18" rx="9" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
+          <rect x="144" y="106" width="52" height="18" rx="9" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
+        </svg>
+      </div>
+      <h3>Calendar</h3>
+      <p>Plan a week of Instagram, Facebook and Threads posts on one calendar.</p>
+    </article>
+    <article className="bentoCard">
+      <div className="bentoArt">
+        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
+          <rect x="82" y="12" width="56" height="126" rx="14" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
+          <rect x="98" y="20" width="24" height="5" rx="2.5" fill="var(--ink)" opacity=".25" />
+          <rect x="90" y="34" width="40" height="34" rx="8" fill="var(--lilac)" />
+          <circle cx="110" cy="51" r="9" fill="var(--violet)" />
+          <rect x="90" y="76" width="40" height="6" rx="3" fill="var(--line)" />
+          <rect x="90" y="88" width="28" height="6" rx="3" fill="var(--line)" />
+          <rect x="8" y="30" width="66" height="30" rx="12" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
+          <path d="M30 60l-4 10 12-6" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
+          <text x="41" y="50" textAnchor="middle" fontFamily="var(--sans)" fontSize="12" fontWeight="700" fill="var(--ink)">GUIDE</text>
+          <rect x="146" y="86" width="66" height="34" rx="12" fill="var(--violet)" />
+          <path d="M190 120l4 10-12-6" fill="var(--violet)" />
+          <text x="179" y="107" textAnchor="middle" fontFamily="var(--sans)" fontSize="11" fontWeight="700" fill="#fff">Sent!</text>
+        </svg>
+      </div>
+      <h3>Comment to DM</h3>
+      <p>When someone comments your keyword, Poskoo sends them your link by Instagram DM.</p>
+    </article>
+    <article className="bentoCard">
+      <div className="bentoArt">
+        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
+          <path d="M60 30l7 18 18 7-18 7-7 18-7-18-18-7 18-7z" fill="var(--violet)" />
+          <path d="M96 18l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="var(--coral)" />
+          <path d="M40 78l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="var(--lime)" />
+          <rect x="96" y="70" width="112" height="52" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
+          <path d="M120 122l-4 12 14-8" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
+          <rect x="112" y="86" width="80" height="7" rx="3.5" fill="var(--line)" />
+          <rect x="112" y="100" width="56" height="7" rx="3.5" fill="var(--line)" />
+        </svg>
+      </div>
+      <h3>AI replies</h3>
+      <p>Let AI draft replies to the comments and DMs you get, so you can answer faster.</p>
+    </article>
+    <article className="bentoCard">
+      <div className="bentoArt">
+        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
+          <rect x="24" y="18" width="172" height="114" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
+          <rect x="40" y="34" width="60" height="8" rx="4" fill="var(--ink)" opacity=".2" />
+          <rect x="40" y="54" width="140" height="20" rx="8" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
+          <rect x="40" y="82" width="140" height="20" rx="8" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
+          <rect x="40" y="110" width="72" height="14" rx="7" fill="var(--green)" />
+          <path d="M52 117l4 4 8-8" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+      <h3>Lead capture</h3>
+      <p>Ask for an email in the DM and save every new lead in one place.</p>
+    </article>
+  </div>
+</div></section>
+
 <section style={{"paddingTop": "20px"}}><div className="wrap">
   <div className="split">
     <div className="art"><Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/onesub.webp" width={1400} height={933} loading="lazy" alt="A happy creator in an armchair holds one membership card while app cards and bills fly away" /></div>

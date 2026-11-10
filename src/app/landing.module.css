@@ -427,6 +427,66 @@
   }
 }
 
+.landing :global(.bento) {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
+
+.landing :global(.bentoCard) {
+  background:var(--card);
+  border:1.5px solid var(--line);
+  border-radius:var(--poskoo-radius-card);
+  box-shadow:var(--poskoo-shadow-card);
+  padding:26px 26px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-width:0;
+}
+
+.landing :global(.bentoArt) {
+  background:var(--poskoo-band);
+  border-radius:var(--poskoo-radius-md);
+  padding:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.landing :global(.bentoArt svg) {
+  width:100%;
+  height:auto;
+  max-width:220px;
+  display:block;
+}
+
+.landing :global(.bentoCard h3) {
+  font-size:1.35rem;
+  letter-spacing:-.02em;
+}
+
+.landing :global(.bentoCard p) {
+  color:var(--muted);
+  font-size:1rem;
+}
+
+@media (max-width: 640px) {
+  .landing :global(.bento) {
+    grid-template-columns:1fr;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing :global(.bentoCard) {
+    transition:transform .3s, box-shadow .3s;
+  }
+  .landing :global(.bentoCard:hover) {
+    transform:translateY(-6px);
+    box-shadow:var(--poskoo-shadow-float);
+  }
+}
+
 /* Big desktops: the page grows with the screen (percent of the width, not a fixed pixel box), so
    1440-2560px screens are not a narrow column with empty sides. Text blocks keep their ch limits. */
 @media (min-width: 1300px) {
