@@ -309,7 +309,7 @@ export default function PublishingChecklist({
   }
 
   const platformsComplete = selected.length > 0;
-  const formatComplete = true;
+  const formatComplete = !mediaError && !needsMediaForSchedule;
 
   const readyCount =
     (platformsComplete ? 1 : 0) +
