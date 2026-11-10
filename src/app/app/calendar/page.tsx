@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CalendarDays, CalendarRange, Lightbulb, List, Plus } from "lucide-react";
+import CalendarEmptyState from "./CalendarEmptyState";
 import Composer from "./Composer";
 import ComposerDialog from "./ComposerDialog";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
@@ -385,6 +386,9 @@ export default async function CalendarPage({
                 : undefined
             }
           />
+          {!rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0 && (
+            <CalendarEmptyState composeHref={`${reloadHref}&compose=1`} />
+          )}
         </section>
       ) : view === "week" ? (
         <section className={styles.viewSection} aria-label="Week view">
@@ -400,6 +404,9 @@ export default async function CalendarPage({
                 : undefined
             }
           />
+          {!rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0 && (
+            <CalendarEmptyState composeHref={`${reloadHref}&compose=1`} />
+          )}
         </section>
       ) : null}
       {view === "ideas" && (
