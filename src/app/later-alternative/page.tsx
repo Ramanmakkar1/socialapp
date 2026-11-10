@@ -21,7 +21,7 @@ const whyLook = [
 ];
 
 const compare: [string, string, string][] = [
-  ["Scheduling for Instagram, Facebook and Threads", "Instagram now, Facebook & Threads soon", "Yes"],
+  ["Scheduling for Instagram, Facebook and Threads", "Instagram, Facebook Pages and Threads", "Yes"],
   ["Visual calendar", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "No"],
   ["Email capture in the DM", "Yes", "No"],
