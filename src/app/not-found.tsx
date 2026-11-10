@@ -59,6 +59,7 @@ export default function NotFound() {
             <circle cx="176" cy="104" r="4" fill="var(--poskoo-ink)" opacity="0.55" />
             <circle cx="190" cy="100" r="4" fill="var(--poskoo-ink)" opacity="0.55" />
             <path d="M176 116C180 111 186 111 190 116" stroke="var(--poskoo-ink)" strokeWidth="2.5" strokeLinecap="round" opacity="0.55" />
+            <text x="214" y="86" textAnchor="middle" fontFamily="var(--sans)" fontSize="34" fontWeight="700" fill="var(--poskoo-violet)">?</text>
           </g>
 
           <g className="nf-float-slow">
@@ -76,11 +77,11 @@ export default function NotFound() {
           </g>
         </svg>
         <span className="pill"><span>404</span>Page not found</span>
-        <h1>This page wandered off</h1>
-        <p className="lede">The link may be old, but everything else is right where you left it.</p>
+        <h1>This page took a wrong turn</h1>
+        <p className="lede">The link may be old or mistyped. Here is where you can go next.</p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/">Back to home</Link>
-          <Link className="btn btn-line" href="/signup">Start free</Link>
+          <Link className="btn btn-line" href="/pricing">See pricing</Link>
         </div>
       </header>
     </PublicShell>
