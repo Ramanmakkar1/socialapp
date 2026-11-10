@@ -10,9 +10,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
+const canonical = new URL("/", BRAND.url).toString();
 export const metadata: Metadata = {
- title: { absolute: title }, description, alternates: { canonical: `${BRAND.url}/` },
- openGraph: { title, description, url: `${BRAND.url}/`, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
+ title: { absolute: title }, description, alternates: { canonical },
+ openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
 export const dynamic = "force-static";

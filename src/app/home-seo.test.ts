@@ -16,8 +16,12 @@ test("sitemap stays empty while BRAND.indexable is false", () => {
 
 test("home page canonical and description match the shared values", () => {
   assert.ok(
-    pageSource.includes("alternates: { canonical: `${BRAND.url}/` }"),
-    "home page must set alternates.canonical to `${BRAND.url}/`",
+    pageSource.includes('const canonical = new URL("/", BRAND.url).toString();'),
+    "home page must build an absolute canonical from BRAND.url",
+  );
+  assert.ok(
+    pageSource.includes("alternates: { canonical }"),
+    "home page must set alternates.canonical to the absolute canonical",
   );
   assert.ok(
     pageSource.includes('const description = PAGE_DESCRIPTIONS["/"];'),
