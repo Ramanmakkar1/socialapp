@@ -135,6 +135,11 @@ const tools = [
     description: "Get ready-to-copy Reel hooks for any topic across eight styles — curiosity, mistake, how-to, myth, story, list, contrarian and result.",
   },
   {
+    href: "/tools/social-media-content-calendar",
+    title: "Social media content calendar template",
+    description: "Plan a week of posts with editable day, platform, format and post-idea fields, then download a CSV for Sheets or Excel.",
+  },
+  {
     href: "/tools/instagram-scheduling-checklist",
     title: "Instagram scheduling checklist",
     description: "Tick off the preflight before you schedule: caption limits, media format, channel, time and timezone, connected account and publishing status.",
