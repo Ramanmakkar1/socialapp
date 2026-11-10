@@ -365,6 +365,25 @@ export default function Home() { return <main className={`${styles.landing} ${in
       <h3>Lead capture</h3>
       <p>Ask for an email in the DM and save every new lead in one place.</p>
     </article>
+    <article className="bentoCard">
+      <div className="bentoArt">
+        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
+          <rect x="76" y="8" width="68" height="134" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
+          <rect x="98" y="16" width="24" height="5" rx="2.5" fill="var(--ink)" opacity=".25" />
+          <circle cx="110" cy="40" r="12" fill="var(--violet)" />
+          <rect x="88" y="58" width="44" height="6" rx="3" fill="var(--ink)" opacity=".5" />
+          <rect x="94" y="70" width="32" height="5" rx="2.5" fill="var(--line)" />
+          <rect x="86" y="84" width="48" height="14" rx="7" fill="var(--lilac)" stroke="var(--violet)" strokeWidth="2" />
+          <rect x="86" y="104" width="48" height="14" rx="7" fill="var(--peach)" stroke="var(--violet)" strokeWidth="2" />
+          <rect x="86" y="124" width="48" height="14" rx="7" fill="var(--mint)" stroke="var(--violet)" strokeWidth="2" />
+          <path d="M18 44l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="var(--coral)" />
+          <path d="M190 96l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="var(--lime)" />
+        </svg>
+      </div>
+      <h3>Link in bio</h3>
+      <p>One page for every link in your Instagram bio, with click tracking and four themes.</p>
+      <Link href="/instagram-link-in-bio" style={{"marginTop": "auto", "fontWeight": 600, "color": "var(--poskoo-violet)"}}>Build your Instagram link-in-bio page <span aria-hidden="true">→</span></Link>
+    </article>
   </div>
 </div></section>
 

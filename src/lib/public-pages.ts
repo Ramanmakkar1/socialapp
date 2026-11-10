@@ -5,6 +5,7 @@ export const PUBLIC_PATHS = [
   "/features",
   "/instagram-auto-dm",
   "/instagram-auto-dm/templates",
+  "/instagram-link-in-bio",
   "/instagram-dm-automation",
   "/buffer-alternative",
   "/publer-alternative",
@@ -79,6 +80,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
   "/features": { priority: 0.9, changeFrequency: "weekly" },
   "/instagram-auto-dm": { priority: 0.8, changeFrequency: "weekly" },
   "/instagram-auto-dm/templates": { priority: 0.7, changeFrequency: "weekly" },
+  "/instagram-link-in-bio": { priority: 0.8, changeFrequency: "weekly" },
   "/instagram-dm-automation": { priority: 0.8, changeFrequency: "weekly" },
   "/buffer-alternative": { priority: 0.8, changeFrequency: "weekly" },
   "/publer-alternative": { priority: 0.8, changeFrequency: "weekly" },
@@ -147,7 +149,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
 };
 
 export const PAGE_TITLES: Record<PublicPath, string> = {
-  "/": "Home", "/features": "Features", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates",
+  "/": "Home", "/features": "Features", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates", "/instagram-link-in-bio": "Instagram Link in Bio",
   "/instagram-dm-automation": "Instagram DM Automation",
   "/buffer-alternative": "Buffer Alternative", "/manychat-alternative": "ManyChat Alternative",
   "/publer-alternative": "Publer Alternative",
@@ -189,6 +191,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI DM replies, lead capture, free tools and comparisons, all in one workspace.",
   "/instagram-auto-dm": "Automatically DM anyone who comments a keyword with your link, then capture email or phone with Poskoo auto-DM rules. It works on every post you pick.",
   "/instagram-auto-dm/templates": "Pre-built auto-DM message templates for giveaways, promotions and lead generation, ready to customise for your brand and send to your audience in Poskoo.",
+  "/instagram-link-in-bio": "Create a free Instagram link-in-bio page at poskoo.com/@yourname. Add up to 5 links on Free or 20 on paid plans, pick a theme and track every click.",
   "/instagram-dm-automation": "Instagram DM automation replies to comment keywords, Story replies and incoming DMs, captures emails and sends AI answers. See how Poskoo works.",
   "/buffer-alternative": "A Buffer alternative with built-in Instagram auto-DM and comment-to-lead conversion, so Poskoo turns your Instagram comments into real contacts.",
   "/publer-alternative": "A Publer alternative with built-in Instagram auto-DM, comment-to-lead conversion and AI captions, all inside one Poskoo workspace for your content.",

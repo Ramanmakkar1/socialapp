@@ -268,6 +268,8 @@ export default function ToolsPage() {
                 <Link href="/facebook-scheduler">Explore the Facebook Page scheduler</Link>
                 {" "}or read how{" "}
                 <Link href="/instagram-dm-automation">Instagram DM automation turns comments into leads</Link>.
+                {" "}Need one page for all your links?{" "}
+                <Link href="/instagram-link-in-bio">Create a free Instagram link-in-bio page</Link>.
               </p>
               <Link className="btn" href="/signup">
                 Start free <span aria-hidden="true">→</span>
