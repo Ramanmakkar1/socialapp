@@ -1,6 +1,7 @@
 import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { isAdminEmail } from "@/lib/admin";
 import { isDbConfigured, query } from "@/lib/db";
 import { instrumentSans } from "@/lib/fonts";
 import { logoutAction } from "../login/actions";
@@ -119,7 +120,7 @@ async function AppShell({ children }: { children: ReactNode }) {
           <SidebarNav failedPosts={failedPosts} />
           <Channels channels={channels} />
         </div>
-        <SidebarNav variant="footer" failedPosts={failedPosts} />
+        <SidebarNav variant="footer" failedPosts={failedPosts} showAdmin={isAdminEmail(user.email)} />
         <div className={styles.userBox}>
           <p className={styles.userEmail} title={user.email}>{user.email}</p>
           <form action={logoutAction}>

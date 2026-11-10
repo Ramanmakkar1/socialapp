@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2 } from "lucide-react";
+import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield } from "lucide-react";
 import styles from "./shell.module.css";
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string };
@@ -24,12 +24,15 @@ const groups: { title: string | null; items: NavItem[] }[] = [
   { title: "Analyze", items: [{ href: "/app/analytics", icon: BarChart3, label: "Analytics" }] },
 ];
 
-const footer: NavItem[] = [
+const baseFooter: NavItem[] = [
   { href: "/app/settings", icon: Settings, label: "Settings" },
   { href: "/app/review-guide", icon: BookOpenCheck, label: "Review guide" },
 ];
 
-const flat: NavItem[] = [...groups.flatMap((g) => g.items), ...footer];
+// The Admin link only appears for super-admins (see lib/admin.ts).
+function getFooter(showAdmin: boolean): NavItem[] {
+  return showAdmin ? [...baseFooter, { href: "/admin", icon: Shield, label: "Admin" }] : baseFooter;
+}
 
 function isActive(pathname: string, href: string) {
   if (href === "/app") return pathname === "/app";
@@ -59,8 +62,18 @@ function Item({ item, pathname, failedPosts, tabs }: { item: NavItem; pathname: 
 
 // variant "sidebar" = grouped vertical list in the aside; "tabs" = horizontal scrollable pill bar for mobile;
 // "footer" = Settings + Review guide at the bottom of the sidebar.
-export default function SidebarNav({ variant = "sidebar", failedPosts = 0 }: { variant?: "sidebar" | "tabs" | "footer"; failedPosts?: number }) {
+export default function SidebarNav({
+  variant = "sidebar",
+  failedPosts = 0,
+  showAdmin = false,
+}: {
+  variant?: "sidebar" | "tabs" | "footer";
+  failedPosts?: number;
+  showAdmin?: boolean;
+}) {
   const pathname = usePathname() ?? "";
+  const footer = getFooter(showAdmin);
+  const flat = [...groups.flatMap((g) => g.items), ...footer];
   if (variant === "tabs") {
     return (
       <nav aria-label="Dashboard" className={styles.tabs}>
