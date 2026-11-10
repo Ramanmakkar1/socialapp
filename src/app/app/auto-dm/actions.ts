@@ -11,7 +11,7 @@ import type { GraphAccount } from "@/lib/igGraph";
 import { isMissingColumnError } from "@/lib/ruleMedia";
 import { ANY_COMMENT_KEYWORD, MAX_KEYWORD_CHIPS } from "@/lib/keywordChips";
 
-export type RuleTrigger = "comment" | "story_reply";
+export type RuleTrigger = "comment" | "story_reply" | "dm";
 
 export type RuleFormInput = {
   name: string;
@@ -53,7 +53,7 @@ function formToDmRule(input: RuleFormInput, id: string, active: boolean): DmRule
   };
 }
 
-const ALLOWED_TRIGGERS: ReadonlySet<RuleTrigger> = new Set(["comment", "story_reply"]);
+const ALLOWED_TRIGGERS: ReadonlySet<RuleTrigger> = new Set(["comment", "story_reply", "dm"]);
 
 function validateFormInput(input: RuleFormInput): string[] {
   const errors: string[] = [];

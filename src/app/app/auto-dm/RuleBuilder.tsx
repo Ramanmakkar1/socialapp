@@ -33,6 +33,7 @@ function normalizeTriggers(raw: RuleTrigger[] | undefined): RuleTrigger[] {
   const out: RuleTrigger[] = [];
   if (list.includes("comment")) out.push("comment");
   if (list.includes("story_reply")) out.push("story_reply");
+  if (list.includes("dm")) out.push("dm");
   return out.length > 0 ? out : ["comment"];
 }
 
@@ -218,6 +219,7 @@ export default function RuleBuilder({
   const [socialAccountId, setSocialAccountId] = useState<string | null>(initialAccount);
   const [triggerComment, setTriggerComment] = useState(initialTriggers.includes("comment"));
   const [triggerStoryReply, setTriggerStoryReply] = useState(initialTriggers.includes("story_reply"));
+  const [triggerDm, setTriggerDm] = useState(initialTriggers.includes("dm"));
   const [postMode, setPostMode] = useState<"any" | "specific">(initialMediaIds.length > 0 ? "specific" : "any");
   const [mediaIds, setMediaIds] = useState<string[]>(initialMediaIds);
   const [media, setMedia] = useState<IgMediaItem[]>([]);
@@ -292,6 +294,7 @@ export default function RuleBuilder({
     const triggers: RuleTrigger[] = [];
     if (triggerComment) triggers.push("comment");
     if (triggerStoryReply) triggers.push("story_reply");
+    if (triggerDm) triggers.push("dm");
     return {
       name,
       keywords: anyWord ? [ANY_COMMENT_KEYWORD] : keywords,
@@ -428,6 +431,10 @@ export default function RuleBuilder({
               <label className={ui.checkRow}>
                 <input type="checkbox" checked={triggerStoryReply} onChange={(event) => setTriggerStoryReply(event.target.checked)} />
                 Story replies
+              </label>
+              <label className={ui.checkRow}>
+                <input type="checkbox" checked={triggerDm} onChange={(event) => setTriggerDm(event.target.checked)} />
+                When someone sends a DM with
               </label>
             </div>
           </section>

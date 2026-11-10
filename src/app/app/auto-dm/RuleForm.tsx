@@ -136,6 +136,7 @@ function normalizeTriggers(raw: string[] | RuleTrigger[] | undefined): RuleTrigg
   const out: RuleTrigger[] = [];
   if (list.includes("comment")) out.push("comment");
   if (list.includes("story_reply")) out.push("story_reply");
+  if (list.includes("dm")) out.push("dm");
   return out.length > 0 ? out : ["comment"];
 }
 

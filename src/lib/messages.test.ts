@@ -331,6 +331,49 @@ test("an email-gated story automation asks first, then the reply unlocks its lin
   assert.deepEqual(kinds(world), [["rule-story", "story_reply"], ["rule-story", "gated_link"]]);
 });
 
+test("a DM containing the keyword triggers the dm automation once per day; non-matching and story replies do not", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [
+      rule({ id: "rule-dm", keywords: ["price"], triggers: ["dm"], dm_text: "Here's our pricing {{link}}" }),
+      rule({ id: "rule-comment", keywords: ["price"], triggers: ["comment"] }),
+    ],
+  });
+  await inWorld(world, true, async () => {
+    assert.equal(await processMessageEvents([reply("PRICE")]), 1);
+    // Repeating the keyword the same day: matched, but the reply is not queued twice.
+    assert.equal(await processMessageEvents([reply("price please", "m2")]), 1);
+    // No keyword: no automation.
+    assert.equal(await processMessageEvents([reply("hello", "m3")]), 0);
+    // A story reply never hits dm rules (and there is no story_reply rule here).
+    assert.equal(await processMessageEvents([{ ...reply("PRICE", "s1"), storyReply: true }]), 0);
+  });
+  const sent = world.queue.filter((q) => q.kind === "dm_keyword");
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].rule_id, "rule-dm");
+  assert.equal(sent[0].comment_id, null);
+  assert.equal(sent[0].recipient_external_id, "lead");
+  assert.match(sent[0].message, /^Here.s our pricing .*coderuledm$/);
+});
+
+test("an email-gated DM keyword automation asks first, then the reply unlocks its link", async () => {
+  const { processMessageEvents } = await import("./messages.ts");
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-dm", keywords: ["price"], triggers: ["dm"], email_gate: true })],
+  });
+  await inWorld(world, true, async () => {
+    await processMessageEvents([reply("PRICE")]);
+    const prompt = world.queue.find((q) => q.kind === "dm_keyword")!;
+    assert.match(prompt.message, /email/i);
+    prompt.status = "sent";
+    prompt.sent_at = Date.now();
+    await processMessageEvents([reply("me@example.com", "m2")]);
+  });
+  assert.deepEqual(kinds(world), [["rule-dm", "dm_keyword"], ["rule-dm", "gated_link"]]);
+});
+
 // Facebook Login for Business: the same webhook payloads (object "instagram", entry.id = IG account id).
 const FB_ACCOUNT = { ...ACCOUNT, auth_type: "facebook_login" };
 
