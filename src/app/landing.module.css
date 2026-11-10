@@ -127,6 +127,17 @@
   font-size:.98rem;color:#3d3450}
 .landing :global(.pcard .go){
   display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid rgba(30,22,49,.15);padding-top:12px;margin-top:4px;font-weight:600;font-size:.95rem;text-decoration:none}
+.landing :global(.jumprow){
+  display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;align-items:center}
+.landing :global(.jumprow .eyebrow){
+  margin-right:.2rem}
+.landing :global(.jumprow a){
+  display:inline-flex;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:var(--poskoo-radius-pill);padding:.6rem 1.05rem;font-size:.92rem;font-weight:600;text-decoration:none;transition:transform .2s}
+.landing :global(.jumprow a:hover){
+  transform:translateY(-2px)}
+/* Anchor targets clear the sticky site header when a jump link is used. */
+.landing :global(section[id]){
+  scroll-margin-top:96px}
 .landing :global(.split){
   display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
 .landing :global(.split.rev){

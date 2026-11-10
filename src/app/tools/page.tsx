@@ -13,178 +13,238 @@ export const metadata: Metadata = {
   alternates: { canonical: PATH },
 };
 
-const tools = [
+type Tool = { href: string; title: string; description: string };
+
+type Section = {
+  id: string;
+  eyebrow: string;
+  heading: string;
+  sub: string;
+  tools: Tool[];
+  next?: { label: string; linkText: string; href: string };
+};
+
+const sections: Section[] = [
   {
-    href: "/tools/instagram-hashtag-generator",
-    title: "Instagram hashtag generator",
-    description: "Build a hand-curated hashtag set for your niche, mix broad and specific tags, and copy up to 30 at once.",
+    id: "create",
+    eyebrow: "Step 1 · Content",
+    heading: "Create and format posts",
+    sub: "Write captions, hashtags and hooks, then format them so they look right in the feed.",
+    tools: [
+      {
+        href: "/tools/instagram-caption-generator",
+        title: "Instagram caption generator",
+        description: "Generate engaging Instagram post captions with hooks, clean line breaks, and comment CTAs for any niche.",
+      },
+      {
+        href: "/tools/instagram-caption-counter",
+        title: "Instagram caption counter",
+        description: "Count characters and hashtags as you type and see how close your caption is to the Instagram limit.",
+      },
+      {
+        href: "/tools/instagram-caption-formatter",
+        title: "Instagram caption formatter",
+        description: "Keep blank lines and spacing in your caption, see character and hashtag counts as you type, then copy it to post or schedule.",
+      },
+      {
+        href: "/tools/instagram-line-break-generator",
+        title: "Instagram line break generator",
+        description: "Keep blank lines and paragraph spacing in your captions so they don’t collapse into one block of text.",
+      },
+      {
+        href: "/tools/instagram-font-generator",
+        title: "Instagram font generator",
+        description: "Create and copy Unicode font styles for your Instagram bio and captions.",
+      },
+      {
+        href: "/tools/instagram-hashtag-generator",
+        title: "Instagram hashtag generator",
+        description: "Build a hand-curated hashtag set for your niche, mix broad and specific tags, and copy up to 30 at once.",
+      },
+      {
+        href: "/tools/instagram-hashtag-strategy",
+        title: "Instagram hashtag strategy worksheet",
+        description: "Group tags into broad, niche and branded sets, save named sets in your browser, and copy a set for your next post.",
+      },
+      {
+        href: "/tools/instagram-hook-generator",
+        title: "Instagram hook generator",
+        description: "Get ready-to-copy Reel hooks for any topic across eight styles — curiosity, mistake, how-to, myth, story, list, contrarian and result.",
+      },
+      {
+        href: "/tools/instagram-post-ideas-generator",
+        title: "Instagram post ideas generator",
+        description: "Get 6 ready-to-use post ideas for your niche — Reels, carousels and Stories with hooks and caption starters.",
+      },
+      {
+        href: "/tools/instagram-bio-generator",
+        title: "Instagram bio generator",
+        description: "Get ready-to-copy Instagram bio ideas for your niche, with emojis, line breaks and a clear call to action.",
+      },
+      {
+        href: "/tools/instagram-username-generator",
+        title: "Instagram username generator",
+        description: "Turn your name and niche into up to 30 Instagram username ideas that follow Instagram's character rules.",
+      },
+    ],
+    next: {
+      label: "Post ready?",
+      linkText: "Schedule it with the free Instagram scheduler",
+      href: "/instagram-scheduler",
+    },
   },
   {
-    href: "/tools/instagram-hashtag-strategy",
-    title: "Instagram hashtag strategy worksheet",
-    description: "Group tags into broad, niche and branded sets, save named sets in your browser, and copy a set for your next post.",
+    id: "media",
+    eyebrow: "Step 2 · Media",
+    heading: "Design and size your media",
+    sub: "Split, check and create photos, carousels, Stories and covers at exact Instagram sizes.",
+    tools: [
+      {
+        href: "/tools/instagram-post-preview",
+        title: "Instagram post preview",
+        description: "Preview a local photo and caption in a feed mockup, compare square and portrait crops, and copy your caption.",
+      },
+      {
+        href: "/tools/threads-post-preview",
+        title: "Threads post preview & character counter",
+        description: "Write a Threads post, count characters against the 500-character limit, preview it on mobile, then copy or reset your text.",
+      },
+      {
+        href: "/tools/instagram-image-size",
+        title: "Instagram image size guide",
+        description: "Check the right sizes for posts, portraits and Stories, preview and reposition the 1:1, 4:5, 3:4 and 9:16 crops of your photo, then download a JPG.",
+      },
+      {
+        href: "/tools/instagram-carousel-size-checker",
+        title: "Instagram carousel size checker",
+        description: "Check every carousel slide's pixel dimensions, aspect ratio and file size, and see whether all slides match before you schedule.",
+      },
+      {
+        href: "/tools/instagram-carousel-splitter",
+        title: "Instagram carousel splitter",
+        description: "Split one image into equal-width carousel slides, preview every crop in order, and download the PNGs locally without uploading.",
+      },
+      {
+        href: "/tools/instagram-carousel-maker",
+        title: "Instagram carousel maker",
+        description: "Create editable text-and-colour carousel slides, preview them in order, and download each as a correctly sized 1080×1350 PNG.",
+      },
+      {
+        href: "/tools/instagram-safe-zone-checker",
+        title: "Instagram Reels & Story safe zone checker",
+        description: "Load an image or video frame and see what the Reels caption, buttons and Story bars cover. Download a free 1080×1920 template.",
+      },
+      {
+        href: "/tools/instagram-story-size-checker",
+        title: "Instagram Story size checker",
+        description: "Load a Story image to see its exact dimensions and aspect ratio, preview it in a 9:16 frame, and check whether it matches 1080 × 1920.",
+      },
+      {
+        href: "/tools/instagram-highlight-cover-maker",
+        title: "Highlight Cover Maker",
+        description: "Make matching Instagram highlight covers with icons and brand colours, then download PNGs.",
+      },
+      {
+        href: "/tools/instagram-reel-cover-maker",
+        title: "Reel Cover Maker",
+        description: "Make 1080x1920 Reel covers with a title that stays inside the profile-grid crop.",
+      },
+      {
+        href: "/tools/instagram-story-maker",
+        title: "Instagram Story maker",
+        description: "Design a 1080×1920 Story with a photo, text and gradient background, then download the PNG. Safe zone guides keep text clear.",
+      },
+    ],
   },
   {
-    href: "/tools/instagram-post-preview",
-    title: "Instagram post preview",
-    description: "Preview a local photo and caption in a feed mockup, compare square and portrait crops, and copy your caption.",
+    id: "plan",
+    eyebrow: "Step 3 · Planning",
+    heading: "Plan and publish",
+    sub: "Plan your week, convert time zones and measure the results before you schedule.",
+    tools: [
+      {
+        href: "/tools/social-media-content-calendar",
+        title: "Social media content calendar template",
+        description: "Plan a week of posts with editable day, platform, format and post-idea fields, then download a CSV for Sheets or Excel.",
+      },
+      {
+        href: "/tools/social-media-analytics-report",
+        title: "Social media analytics report template",
+        description: "Enter followers, reach, impressions, engagement, clicks and leads for two periods, calculate engagement rate and change, then download a CSV.",
+      },
+      {
+        href: "/tools/instagram-scheduling-checklist",
+        title: "Instagram scheduling checklist",
+        description: "Tick off the preflight before you schedule: caption limits, media format, channel, time and timezone, connected account and publishing status.",
+      },
+      {
+        href: "/tools/instagram-time-zone-converter",
+        title: "Instagram time zone converter",
+        description: "Convert a posting time between any two time zones with daylight saving handled, then schedule it at the right local time.",
+      },
+      {
+        href: "/tools/instagram-posting-frequency-calculator",
+        title: "Instagram posting frequency calculator",
+        description: "Pick your weekly time budget and content formats to see a realistic weekly posting range and a sample posting plan for your account.",
+      },
+      {
+        href: "/tools/instagram-engagement-rate-calculator",
+        title: "Instagram engagement rate calculator",
+        description: "Calculate engagement rate by followers or reach from likes, comments, saves and shares.",
+      },
+    ],
+    next: {
+      label: "Put your plan on a calendar?",
+      linkText: "Schedule posts with the Instagram scheduler",
+      href: "/instagram-scheduler",
+    },
   },
   {
-    href: "/tools/threads-post-preview",
-    title: "Threads post preview & character counter",
-    description: "Write a Threads post, count characters against the 500-character limit, preview it on mobile, then copy or reset your text.",
-  },
-  {
-    href: "/tools/instagram-caption-counter",
-    title: "Instagram caption counter",
-    description: "Count characters and hashtags as you type and see how close your caption is to the Instagram limit.",
-  },
-  {
-    href: "/tools/instagram-caption-formatter",
-    title: "Instagram caption formatter",
-    description: "Keep blank lines and spacing in your caption, see character and hashtag counts as you type, then copy it to post or schedule.",
-  },
-  {
-    href: "/tools/instagram-comment-keyword-tester",
-    title: "Instagram comment keyword tester",
-    description: "Try comment keywords and contains vs exact match before you turn on Instagram auto-DM rules.",
-  },
-  {
-    href: "/tools/instagram-comment-to-dm-preview",
-    title: "Instagram comment-to-DM flow preview",
-    description: "Enter a keyword, sample comment and DM text to see the flow locally, with contains and exact matching examples.",
-  },
-  {
-    href: "/tools/instagram-comment-to-dm-calculator",
-    title: "Instagram comment-to-DM campaign calculator",
-    description: "Estimate comments, DMs and link clicks from views, comment rate, DM delivery rate and link-click rate, with every formula shown.",
-  },
-  {
-    href: "/tools/instagram-dm-link-generator",
-    title: "Instagram DM link generator",
-    description: "Create an ig.me link that opens a direct message with your account—copy it for bio, Stories and email.",
-  },
-  {
-    href: "/tools/instagram-utm-builder",
-    title: "Instagram UTM builder",
-    description: "Tag links for your bio, Story stickers and auto-DMs with UTM campaign fields so your website analytics shows what Instagram sent.",
-  },
-  {
-    href: "/tools/instagram-line-break-generator",
-    title: "Instagram line break generator",
-    description: "Keep blank lines and paragraph spacing in your captions so they don’t collapse into one block of text.",
-  },
-  {
-    href: "/tools/instagram-image-size",
-    title: "Instagram image size guide",
-    description: "Check the right sizes for posts, portraits and Stories, preview and reposition the 1:1, 4:5, 3:4 and 9:16 crops of your photo, then download a JPG.",
-  },
-  {
-    href: "/tools/instagram-carousel-size-checker",
-    title: "Instagram carousel size checker",
-    description: "Check every carousel slide's pixel dimensions, aspect ratio and file size, and see whether all slides match before you schedule.",
-  },
-  {
-    href: "/tools/instagram-carousel-splitter",
-    title: "Instagram carousel splitter",
-    description: "Split one image into equal-width carousel slides, preview every crop in order, and download the PNGs locally without uploading.",
-  },
-  {
-    href: "/tools/instagram-carousel-maker",
-    title: "Instagram carousel maker",
-    description: "Create editable text-and-colour carousel slides, preview them in order, and download each as a correctly sized 1080×1350 PNG.",
-  },
-  {
-    href: "/tools/instagram-font-generator",
-    title: "Instagram font generator",
-    description: "Create and copy Unicode font styles for your Instagram bio and captions.",
-  },
-  {
-    href: "/tools/instagram-bio-generator",
-    title: "Instagram bio generator",
-    description: "Get ready-to-copy Instagram bio ideas for your niche, with emojis, line breaks and a clear call to action.",
-  },
-  {
-    href: "/tools/instagram-username-generator",
-    title: "Instagram username generator",
-    description: "Turn your name and niche into up to 30 Instagram username ideas that follow Instagram's character rules.",
-  },
-  {
-    href: "/tools/instagram-caption-generator",
-    title: "Instagram caption generator",
-    description: "Generate engaging Instagram post captions with hooks, clean line breaks, and comment CTAs for any niche.",
-  },
-  {
-    href: "/tools/instagram-engagement-rate-calculator",
-    title: "Instagram engagement rate calculator",
-    description: "Calculate engagement rate by followers or reach from likes, comments, saves and shares.",
-  },
-  {
-    href: "/tools/instagram-comment-picker",
-    title: "Instagram comment picker",
-    description: "Paste giveaway comments, filter by keyword and tagged friends, and pick a random winner. Nothing leaves your browser.",
-  },
-  {
-    href: "/tools/instagram-safe-zone-checker",
-    title: "Instagram Reels & Story safe zone checker",
-    description: "Load an image or video frame and see what the Reels caption, buttons and Story bars cover. Download a free 1080×1920 template.",
-  },
-  {
-    href: "/tools/instagram-story-size-checker",
-    title: "Instagram Story size checker",
-    description: "Load a Story image to see its exact dimensions and aspect ratio, preview it in a 9:16 frame, and check whether it matches 1080 × 1920.",
-  },
-  {
-    href: "/tools/instagram-highlight-cover-maker",
-    title: "Highlight Cover Maker",
-    description: "Make matching Instagram highlight covers with icons and brand colours, then download PNGs.",
-  },
-  {
-    href: "/tools/instagram-reel-cover-maker",
-    title: "Reel Cover Maker",
-    description: "Make 1080x1920 Reel covers with a title that stays inside the profile-grid crop.",
-  },
-  {
-    href: "/tools/instagram-story-maker",
-    title: "Instagram Story maker",
-    description: "Design a 1080×1920 Story with a photo, text and gradient background, then download the PNG. Safe zone guides keep text clear.",
-  },
-  {
-    href: "/tools/instagram-post-ideas-generator",
-    title: "Instagram post ideas generator",
-    description: "Get 6 ready-to-use post ideas for your niche — Reels, carousels and Stories with hooks and caption starters.",
-  },
-  {
-    href: "/tools/instagram-hook-generator",
-    title: "Instagram hook generator",
-    description: "Get ready-to-copy Reel hooks for any topic across eight styles — curiosity, mistake, how-to, myth, story, list, contrarian and result.",
-  },
-  {
-    href: "/tools/social-media-content-calendar",
-    title: "Social media content calendar template",
-    description: "Plan a week of posts with editable day, platform, format and post-idea fields, then download a CSV for Sheets or Excel.",
-  },
-  {
-    href: "/tools/social-media-analytics-report",
-    title: "Social media analytics report template",
-    description: "Enter followers, reach, impressions, engagement, clicks and leads for two periods, calculate engagement rate and change, then download a CSV.",
-  },
-  {
-    href: "/tools/instagram-scheduling-checklist",
-    title: "Instagram scheduling checklist",
-    description: "Tick off the preflight before you schedule: caption limits, media format, channel, time and timezone, connected account and publishing status.",
-  },
-  {
-    href: "/tools/instagram-time-zone-converter",
-    title: "Instagram time zone converter",
-    description: "Convert a posting time between any two time zones with daylight saving handled, then schedule it at the right local time.",
-  },
-  {
-    href: "/tools/instagram-posting-frequency-calculator",
-    title: "Instagram posting frequency calculator",
-    description: "Pick your weekly time budget and content formats to see a realistic weekly posting range and a sample posting plan for your account.",
+    id: "dm",
+    eyebrow: "Step 4 · Automation",
+    heading: "Automate comments and DMs",
+    sub: "Test keywords, preview flows, estimate reach and pick giveaway winners.",
+    tools: [
+      {
+        href: "/tools/instagram-comment-keyword-tester",
+        title: "Instagram comment keyword tester",
+        description: "Try comment keywords and contains vs exact match before you turn on Instagram auto-DM rules.",
+      },
+      {
+        href: "/tools/instagram-comment-to-dm-preview",
+        title: "Instagram comment-to-DM flow preview",
+        description: "Enter a keyword, sample comment and DM text to see the flow locally, with contains and exact matching examples.",
+      },
+      {
+        href: "/tools/instagram-comment-to-dm-calculator",
+        title: "Instagram comment-to-DM campaign calculator",
+        description: "Estimate comments, DMs and link clicks from views, comment rate, DM delivery rate and link-click rate, with every formula shown.",
+      },
+      {
+        href: "/tools/instagram-dm-link-generator",
+        title: "Instagram DM link generator",
+        description: "Create an ig.me link that opens a direct message with your account—copy it for bio, Stories and email.",
+      },
+      {
+        href: "/tools/instagram-comment-picker",
+        title: "Instagram comment picker",
+        description: "Paste giveaway comments, filter by keyword and tagged friends, and pick a random winner. Nothing leaves your browser.",
+      },
+      {
+        href: "/tools/instagram-utm-builder",
+        title: "Instagram UTM builder",
+        description: "Tag links for your bio, Story stickers and auto-DMs with UTM campaign fields so your website analytics shows what Instagram sent.",
+      },
+    ],
+    next: {
+      label: "Ready to run it live?",
+      linkText: "Set up Instagram auto-DM",
+      href: "/instagram-auto-dm",
+    },
   },
 ];
+
+const tools = sections.flatMap((s) => s.tools);
 
 const itemListJsonLd = {
   "@context": "https://schema.org",
@@ -199,8 +259,11 @@ const itemListJsonLd = {
 };
 
 // One .cards grid per 3 tools so the pcard tilt/colors (nth-child 1-3) work.
-const groups: (typeof tools)[] = [];
-for (let i = 0; i < tools.length; i += 3) groups.push(tools.slice(i, i + 3));
+const chunks = (list: Tool[]) => {
+  const out: Tool[][] = [];
+  for (let i = 0; i < list.length; i += 3) out.push(list.slice(i, i + 3));
+  return out;
+};
 
 export default function ToolsPage() {
   return (
@@ -215,8 +278,9 @@ export default function ToolsPage() {
           Free <em className="s mark">Instagram tools</em>
         </h1>
         <p className="lede">
-          Small, fast tools for getting a post ready: generate a caption and its hashtags, split a photo into a grid
-          or carousel, pick a giveaway winner and check image sizes — all free, before you post or schedule with {BRAND.name}.
+          {tools.length} free tools that get your Instagram content ready to post: create and format captions, size
+          your media, plan your week and turn comments into DMs. No signup needed — use them before you post or
+          schedule with {BRAND.name}.
         </p>
         <div className="hero-art" style={{ maxWidth: 820 }}>
           <Image
@@ -230,32 +294,49 @@ export default function ToolsPage() {
         </div>
       </header>
 
-      <section style={{ paddingTop: 20 }}>
-        <div className="head">
-          <p className="eyebrow">All free tools</p>
-          <h2>
-            Pick a tool and <em className="s">get the post ready.</em>
-          </h2>
-        </div>
-        {groups.map((group, gi) => (
-          <div key={group[0].href} className="cards" style={gi > 0 ? { marginTop: 26 } : undefined}>
-            {group.map((t) => (
-              <article
-                key={t.href}
-                className="pcard"
-                style={group.length === 1 ? { gridColumn: "1 / -1", width: "100%", maxWidth: 460, marginInline: "auto" } : undefined}
-              >
-                <span className="no">{String(tools.indexOf(t) + 1).padStart(2, "0")} / Free tool</span>
-                <h3>{t.title}</h3>
-                <p>{t.description}</p>
-                <Link className="go" href={t.href}>
-                  Open the tool <span aria-hidden="true">→</span>
-                </Link>
-              </article>
-            ))}
-          </div>
+      <nav aria-label="What do you want to do?" className="jumprow">
+        <span className="eyebrow">What do you want to do?</span>
+        {sections.map((s) => (
+          <a key={s.id} href={`#${s.id}`}>
+            {s.heading}
+          </a>
         ))}
-      </section>
+      </nav>
+
+      {sections.map((s) => (
+        <section key={s.id} id={s.id} style={{ paddingTop: 20 }}>
+          <div className="head">
+            <p className="eyebrow">{s.eyebrow}</p>
+            <h2>{s.heading}</h2>
+            <p>{s.sub}</p>
+          </div>
+          {chunks(s.tools).map((group, gi) => (
+            <div key={group[0].href} className="cards" style={gi > 0 ? { marginTop: 26 } : undefined}>
+              {group.map((t) => (
+                <article
+                  key={t.href}
+                  className="pcard"
+                  style={group.length === 1 ? { gridColumn: "1 / -1", width: "100%", maxWidth: 460, marginInline: "auto" } : undefined}
+                >
+                  <span className="no">{String(tools.indexOf(t) + 1).padStart(2, "0")} / Free tool</span>
+                  <h3>{t.title}</h3>
+                  <p>{t.description}</p>
+                  <Link className="go" href={t.href}>
+                    Open the tool <span aria-hidden="true">→</span>
+                  </Link>
+                </article>
+              ))}
+            </div>
+          ))}
+          {s.next && (
+            <p className="small" style={{ textAlign: "center", marginTop: 30 }}>
+              {s.next.label}{" "}
+              <Link href={s.next.href}>{s.next.linkText}</Link>
+              <span aria-hidden="true"> →</span>
+            </p>
+          )}
+        </section>
+      ))}
 
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
