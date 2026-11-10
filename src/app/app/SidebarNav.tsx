@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History } from "lucide-react";
+import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2 } from "lucide-react";
 import styles from "./shell.module.css";
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string };
@@ -20,7 +20,7 @@ const groups: { title: string | null; items: NavItem[] }[] = [
       { href: "/app/rewind", icon: History, label: "Rewind" },
     ],
   },
-  { title: "Create", items: [{ href: "/app/templates", icon: LayoutTemplate, label: "Templates" }] },
+  { title: "Create", items: [{ href: "/app/templates", icon: LayoutTemplate, label: "Templates" }, { href: "/app/bio", icon: Link2, label: "Link in bio" }] },
   { title: "Analyze", items: [{ href: "/app/analytics", icon: BarChart3, label: "Analytics" }] },
 ];
 

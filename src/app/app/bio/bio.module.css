@@ -1,0 +1,243 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 18px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-md);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+}
+
+.statValue {
+  color: var(--poskoo-ink);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  margin: 0;
+  color: var(--poskoo-ink);
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  color: var(--poskoo-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 14px;
+  background: var(--poskoo-paper);
+  color: var(--poskoo-ink);
+  font: inherit;
+  font-weight: 400;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: 2px solid var(--poskoo-violet);
+  outline-offset: 1px;
+}
+
+.handleWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 13px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 14px;
+  background: var(--poskoo-paper);
+  color: var(--poskoo-muted);
+  font-weight: 400;
+}
+
+.handleWrap input {
+  border: 0;
+  background: transparent;
+  padding-left: 0;
+}
+
+.themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.themeOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-pill);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.themeOption input {
+  width: auto;
+  margin: 0;
+}
+
+.themeDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--poskoo-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.linkRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  align-items: end;
+  gap: 10px;
+  padding: 12px;
+  border: 1px dashed var(--poskoo-line);
+  border-radius: var(--poskoo-radius-md);
+  background: var(--poskoo-paper);
+}
+
+.remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 12px;
+  background: var(--poskoo-card);
+  color: var(--poskoo-red);
+  cursor: pointer;
+}
+
+.remove:hover {
+  background: #fff0f0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.muted {
+  margin: 0;
+  color: var(--poskoo-muted);
+  font-size: 0.85rem;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--poskoo-muted);
+  font-size: 0.9rem;
+}
+
+.bannerOk,
+.bannerWarn {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--poskoo-radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.bannerOk {
+  background: #e7f8ef;
+  color: #0f6b45;
+}
+
+.bannerWarn {
+  background: #fff0e8;
+  color: #9a3412;
+}
+
+@media (max-width: 640px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .grid2,
+  .linkRow {
+    grid-template-columns: 1fr;
+  }
+
+  .remove {
+    justify-self: end;
+  }
+}

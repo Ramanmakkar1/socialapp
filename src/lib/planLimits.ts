@@ -8,12 +8,14 @@ export type PlanLimits = {
   /** null = unlimited */
   scheduledPostsPerMonth: number | null;
   autoDmsPerMonth: number;
+  /** Links on the link-in-bio page. */
+  bioLinks: number;
 };
 
 export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
-  Free: { socialAccounts: 2, scheduledPostsPerMonth: 10, autoDmsPerMonth: 500 },
-  Pro: { socialAccounts: 5, scheduledPostsPerMonth: null, autoDmsPerMonth: 10_000 },
-  Agency: { socialAccounts: 25, scheduledPostsPerMonth: null, autoDmsPerMonth: 50_000 },
+  Free: { socialAccounts: 2, scheduledPostsPerMonth: 10, autoDmsPerMonth: 500, bioLinks: 5 },
+  Pro: { socialAccounts: 5, scheduledPostsPerMonth: null, autoDmsPerMonth: 10_000, bioLinks: 20 },
+  Agency: { socialAccounts: 25, scheduledPostsPerMonth: null, autoDmsPerMonth: 50_000, bioLinks: 20 },
 };
 
 /** Every account is on the Free plan until paid plans open (see PLANS_NOTE). */
