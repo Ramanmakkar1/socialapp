@@ -125,6 +125,11 @@ const tools = [
     description: "Load an image or video frame and see what the Reels caption, buttons and Story bars cover. Download a free 1080×1920 template.",
   },
   {
+    href: "/tools/instagram-story-size-checker",
+    title: "Instagram Story size checker",
+    description: "Load a Story image to see its exact dimensions and aspect ratio, preview it in a 9:16 frame, and check whether it matches 1080 × 1920.",
+  },
+  {
     href: "/tools/instagram-highlight-cover-maker",
     title: "Highlight Cover Maker",
     description: "Make matching Instagram highlight covers with icons and brand colours, then download PNGs.",
