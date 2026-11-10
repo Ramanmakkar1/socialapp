@@ -39,6 +39,13 @@ const jsonLd = {
       url: BRAND.url,
       email: BRAND.supportEmail,
       logo: BRAND.url + "/icon.svg",
+      description: BRAND.description,
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: BRAND.supportEmail,
+        availableLanguage: "English",
+      },
     },
     {
       "@type": "WebSite",
@@ -47,6 +54,7 @@ const jsonLd = {
       name: BRAND.name,
       publisher: { "@id": BRAND.url + "#org" },
       inLanguage: "en",
+      description: BRAND.description,
     },
   ],
 };
