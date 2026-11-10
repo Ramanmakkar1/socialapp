@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { deleteAccountData, disconnectAccounts } from "@/lib/accountData";
+import { createApiKey, revokeApiKey } from "@/lib/apiKeys";
 import { endSession, requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { TIMEZONES } from "@/lib/postingSchedule";
@@ -132,6 +133,31 @@ export async function savePostingSchedule(formData: FormData): Promise<void> {
   }
   revalidatePath("/app/settings");
   redirect("/app/settings?schedule=saved");
+}
+
+// Create an API key for the MCP server (Settings → API keys). The full key is
+// shown once, in the redirect query string; only its hash is stored.
+export async function createApiKeyAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const raw = formData.get("key_name");
+  const name = typeof raw === "string" ? raw.trim().slice(0, 60) : "";
+  if (!isDbConfigured()) redirect("/app/settings?api_key=error");
+  const result = await createApiKey(user.id, name);
+  if ("error" in result) redirect("/app/settings?api_key=error");
+  revalidatePath("/app/settings");
+  redirect(`/app/settings?api_key=created&key=${encodeURIComponent(result.key)}`);
+}
+
+// Revoke one of the user's API keys (Settings → API keys).
+export async function revokeApiKeyAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  const raw = formData.get("key_id");
+  const keyId = typeof raw === "string" ? raw.trim().slice(0, 64) : "";
+  if (!isDbConfigured() || !keyId) return;
+  const result = await revokeApiKey(user.id, keyId);
+  if (!result.ok) redirect("/app/settings?api_key=error");
+  revalidatePath("/app/settings");
+  redirect("/app/settings?api_key=revoked");
 }
 
 // Self-serve account deletion: wipes every table row that belongs to the user, then the user row itself

@@ -53,6 +53,7 @@ export const PUBLIC_PATHS = [
   "/facebook-scheduler",
   "/instagram-content-planner",
   "/pricing",
+  "/developers",
 ] as const;
 
 export type PublicPath = typeof PUBLIC_PATHS[number];
@@ -110,6 +111,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
   "/facebook-scheduler": { priority: 0.8, changeFrequency: "weekly" },
   "/instagram-content-planner": { priority: 0.7, changeFrequency: "weekly" },
   "/pricing": { priority: 0.8, changeFrequency: "weekly" },
+  "/developers": { priority: 0.7, changeFrequency: "weekly" },
 };
 
 export const PAGE_TITLES: Record<PublicPath, string> = {
@@ -137,6 +139,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
   "/facebook-scheduler": "Facebook Page Scheduler",
   "/instagram-content-planner": "Content Planner",
   "/pricing": "Pricing",
+  "/developers": "Developers",
 };
 
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
@@ -191,4 +194,5 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/facebook-scheduler": "Schedule Facebook Page posts with text, photos or video through Meta's official login. Plan Instagram and Threads content on the same calendar with Poskoo.",
   "/instagram-content-planner": "Plan an Instagram post step by step with free tools: draft a hook, write a caption, check image dimensions, preview the post and schedule it.",
   "/pricing": "Compare Poskoo Free, Pro and Agency plans.",
+  "/developers": "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp. Schedule posts, list channels and read analytics.",
 };

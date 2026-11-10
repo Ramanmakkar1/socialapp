@@ -7,12 +7,13 @@ import ui from "@/components/ui/ui.module.css";
 import { isAiConfigured } from "@/lib/ai";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
+import { listApiKeys } from "@/lib/apiKeys";
 import { isDbConfigured, query } from "@/lib/db";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
-import { deleteMyAccountAction, disconnectAccountAction, disconnectYouTubeAction, saveAiReplySettings, saveBrandVoice } from "./actions";
+import { createApiKeyAction, deleteMyAccountAction, disconnectAccountAction, disconnectYouTubeAction, revokeApiKeyAction, saveAiReplySettings, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 import AiReplyPreview from "./AiReplyPreview";
 import ChannelSchedules, { type ChannelScheduleInput } from "./ChannelSchedules";
@@ -93,9 +94,11 @@ const YOUTUBE_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   error: { tone: "warn", text: "We couldn't connect your YouTube channel. Please try again." },
 };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[]; yt?: string | string[] }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[]; yt?: string | string[]; api_key?: string | string[]; key?: string | string[] }> }) {
   const user = await requireUser();
-  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam } = await searchParams;
+  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam, api_key: apiKeyParam, key: keyParam } = await searchParams;
+  const apiKey = typeof apiKeyParam === "string" ? apiKeyParam : null;
+  const newKey = typeof keyParam === "string" && keyParam.startsWith("poskoo_") ? keyParam : null;
   const voiceSaved = voiceParam === "saved";
   const voiceFailed = voiceParam === "error";
   const aiReplySaved = aiReplyParam === "saved";
@@ -152,6 +155,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )
       )[0] ?? null
     : null;
+  const apiKeys = isDbConfigured() ? await listApiKeys(user.id) : [];
   return (
     <div className={styles.page}>
       <PageHero
@@ -386,6 +390,56 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )}
         {scheduleSaved && <p role="status" className={ui.notice}>Posting schedule saved.</p>}
         {scheduleFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your posting schedule. Please try again.</p>}
+      </section>
+      <section className={styles.section} aria-labelledby="api-keys-heading">
+        <div className={styles.sectionHeader}>
+          <h2 id="api-keys-heading" className={styles.sectionTitle}>API keys</h2>
+          <BtnA href="/developers" size="sm">Developer guide</BtnA>
+        </div>
+        <p className={ui.hint}>
+          Connect Claude, ChatGPT or another AI assistant to Poskoo through the MCP server at{" "}
+          <code style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>{BRAND.url}/api/mcp</code>.
+          Create a key, copy it once, and share it with your assistant.
+        </p>
+        {apiKey === "created" && newKey && (
+          <p role="status" className={ui.notice}>
+            Your new API key — copy it now, it is shown only once:{" "}
+            <code style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", background: "rgba(0,0,0,0.06)", borderRadius: 6, padding: "2px 6px" }}>{newKey}</code>
+          </p>
+        )}
+        {apiKey === "revoked" && <p role="status" className={ui.notice}>API key revoked. It stops working right away.</p>}
+        {apiKey === "error" && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your API key. Please try again.</p>}
+        {isDbConfigured() ? (
+          <form action={createApiKeyAction} style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", margin: "12px 0" }}>
+            <input name="key_name" maxLength={60} defaultValue="" className={ui.input} placeholder="Name this key, e.g. Claude" aria-label="API key name" style={{ maxWidth: 280 }} />
+            <SubmitButton label="Create API key" pendingLabel="Creating…" />
+          </form>
+        ) : (
+          <p className={ui.hint}>API keys are available once the database is set up on this server.</p>
+        )}
+        {apiKeys.length > 0 && (
+          <ul className={styles.accountList}>
+            {apiKeys.map((k) => (
+              <li key={k.id} className={styles.accountCard}>
+                <div className={styles.accountIdentity}>
+                  <span className={styles.username}>{k.name}</span>
+                  <code style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>{k.key_prefix}…</code>
+                  <span className={k.revoked_at ? `${ui.pill} ${ui.pillPeach}` : `${ui.pill} ${ui.pillMint}`}>{k.revoked_at ? "Revoked" : "Active"}</span>
+                </div>
+                <div className={styles.accountActions}>
+                  <span className={ui.hint}>Created {new Date(k.created_at).toLocaleDateString()}</span>
+                  {k.last_used_at && <span className={ui.hint}>Last used {new Date(k.last_used_at).toLocaleDateString()}</span>}
+                  {!k.revoked_at && (
+                    <form action={revokeApiKeyAction}>
+                      <input type="hidden" name="key_id" value={k.id} />
+                      <SubmitButton label="Revoke" pendingLabel="Revoking…" variant="ghost" size="sm" />
+                    </form>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
       <section className={styles.section} aria-labelledby="danger-heading">
         <h2 id="danger-heading" className={styles.sectionTitle}>Delete account</h2>
