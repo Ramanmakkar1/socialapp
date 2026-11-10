@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { PageArt } from "@/components/PageArt";
 
 export default function SiteError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
@@ -25,15 +25,7 @@ export default function SiteError({ reset }: { error: Error & { digest?: string 
             Visit help
           </Link>
         </p>
-        <div className="hero-art" style={{ maxWidth: 460 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 460px"
-            src="/landing/problem.webp"
-            width={900}
-            height={900}
-            alt=""
-          />
-        </div>
+        <PageArt />
       </header>
     </PublicShell>
   );
