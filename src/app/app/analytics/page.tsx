@@ -209,7 +209,7 @@ export default async function AnalyticsPage() {
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className={`${styles.legendSwatch} ${styles.coralSwatch}`} aria-hidden />
-                Leads
+                Contacts
               </span>
             </div>
             <ul className={styles.dailyList}>
@@ -302,7 +302,7 @@ export default async function AnalyticsPage() {
                     Failed
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-medium">
-                    Leads
+                    Contacts
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-medium">
                     Link clicks
