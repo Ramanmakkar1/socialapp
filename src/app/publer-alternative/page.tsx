@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 const whySwitch = [
   { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page and Threads posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },
-  { no: "02 / Free to start", title: "Start on the Free plan", text: `${BRAND.name} Free includes 2 social accounts, 10 scheduled posts / month and 500 auto-DMs / month. Pro at $19 / month is coming soon.` },
+  { no: "02 / Free to start", title: "Start on the Free plan", text: `${BRAND.name} Free includes 2 social accounts, 10 scheduled posts / month and 500 auto-DMs / month.` },
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email or phone number in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 

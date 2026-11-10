@@ -140,7 +140,7 @@ export default function MetaBusinessSuiteAlternative() {
               </tbody>
             </table>
           </div>
-          <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Meta Business Suite features change over time. Check Meta&apos;s site for the current feature list. AI replies to DMs are coming soon in {BRAND.name}.</p>
+          <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Meta Business Suite features change over time. Check Meta&apos;s site for the current feature list.</p>
         </div>
       </section>
 

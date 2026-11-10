@@ -155,7 +155,7 @@ const faqs = [
   },
   {
     q: "Is there a free plan?",
-    a: `Yes. The Free plan is $0 forever and includes 2 social accounts, 10 scheduled posts per month and 500 auto-DMs per month. A link in bio page is coming soon.`,
+    a: `Yes. The Free plan is $0 forever and includes 2 social accounts, 10 scheduled posts per month and 500 auto-DMs per month.`,
   },
   {
     q: "Can I combine scheduling with Instagram auto DM?",
