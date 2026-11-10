@@ -9,7 +9,7 @@ import s from "@/components/site.module.css";
 export const metadata: Metadata = {
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
   description:
-    "Schedule Instagram posts, reels, carousels and stories, see the best time to post, and auto-DM everyone who comments. Free plan available.",
+    "Schedule Instagram posts, reels, carousels and stories, see the best time to post, and auto-DM everyone who comments. Free plan, no credit card.",
   alternates: { canonical: "/instagram-scheduler" },
 };
 

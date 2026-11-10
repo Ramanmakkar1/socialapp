@@ -31,7 +31,7 @@ const jsonLd = {
 
 export const metadata: Metadata = {
   title: { absolute: `Delete Your ${BRAND.name} Account Data and Disconnect Instagram` },
-  description: "Learn how to disconnect Instagram or Facebook from Poskoo and request deletion of all stored account data, including posts and messages.",
+  description: "Learn how to disconnect Instagram or Facebook from Poskoo and request deletion of all stored account data, including posts, messages and contacts.",
   alternates: { canonical: "/data-deletion" },
 };
 export default function Page() {

@@ -8,9 +8,9 @@ import AutoDmDemo from "@/components/AutoDmDemo";
 import FlowDemo from "./FlowDemo";
 
 export const metadata: Metadata = {
-  title: "Instagram Auto DM: Send a DM to Everyone Who Comments",
+  title: "Instagram Auto DM: DM Everyone Who Comments",
   description:
-    "Automatically DM everyone who comments a keyword on your Instagram posts and reels. Official Meta API, email capture, AI replies. A simpler, cheaper ManyChat alternative.",
+    "Auto-DM everyone who comments a keyword on your Instagram posts and reels. Official Meta API, email capture, AI replies and a simpler ManyChat alternative.",
   alternates: { canonical: "/instagram-auto-dm" },
 };
 
