@@ -1,7 +1,7 @@
 // Run on a schedule (same cron secret as refresh-tokens).
 import { timingSafeEqual } from "node:crypto";
 import { isDbConfigured } from "@/lib/db";
-import { refreshRecentInsights } from "@/lib/insights";
+import { refreshRecentInsights, snapshotAccountFollowers } from "@/lib/insights";
 
 function secretMatches(given: string | null, expected: string): boolean {
   if (!given) return false;
@@ -19,8 +19,8 @@ export async function POST(request: Request) {
     return Response.json({ status: "not_configured" });
   }
   try {
-    const result = await refreshRecentInsights();
-    return Response.json({ status: "ok", ...result });
+    const [result, snapshots] = await Promise.all([refreshRecentInsights(), snapshotAccountFollowers()]);
+    return Response.json({ status: "ok", ...result, ...snapshots });
   } catch (err) {
     console.error("refresh-insights job failed", err instanceof Error ? err.message : err);
     return Response.json({ status: "error" }, { status: 500 });

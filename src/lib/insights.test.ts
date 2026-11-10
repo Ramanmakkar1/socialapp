@@ -6,6 +6,7 @@ test("parseInsights reads full Graph media insights response", () => {
   const parsed = parseInsights({
     data: [
       { name: "reach", period: "lifetime", values: [{ value: 1200 }] },
+      { name: "impressions", period: "lifetime", values: [{ value: 1500 }] },
       { name: "likes", period: "lifetime", values: [{ value: 88 }] },
       { name: "comments", period: "lifetime", values: [{ value: 12 }] },
       { name: "saved", period: "lifetime", values: [{ value: 5 }] },
@@ -14,6 +15,7 @@ test("parseInsights reads full Graph media insights response", () => {
   });
   assert.deepEqual(parsed, {
     reach: 1200,
+    impressions: 1500,
     likes: 88,
     comments: 12,
     saved: 5,
@@ -27,6 +29,7 @@ test("parseInsights fills missing metrics with null", () => {
   });
   assert.deepEqual(parsed, {
     reach: 50,
+    impressions: null,
     likes: null,
     comments: null,
     saved: null,

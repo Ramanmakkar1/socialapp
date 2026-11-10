@@ -1,9 +1,11 @@
 import { decryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
 import { graphBaseFor } from "@/lib/graphHost";
+import { fetchIgProfile, GraphError } from "@/lib/igGraph";
 
 export type MediaInsights = {
   reach: number | null;
+  impressions: number | null;
   likes: number | null;
   comments: number | null;
   saved: number | null;
@@ -20,10 +22,10 @@ type GraphInsightsResponse = {
   error?: { code?: number; message?: string; type?: string };
 };
 
-const METRIC_NAMES = ["reach", "likes", "comments", "saved", "shares"] as const;
+const METRIC_NAMES = ["reach", "impressions", "likes", "comments", "saved", "shares"] as const;
 
 function emptyInsights(): MediaInsights {
-  return { reach: null, likes: null, comments: null, saved: null, shares: null };
+  return { reach: null, impressions: null, likes: null, comments: null, saved: null, shares: null };
 }
 
 export function parseInsights(json: unknown): MediaInsights {
@@ -43,7 +45,7 @@ export function parseInsights(json: unknown): MediaInsights {
 
 export async function fetchMediaInsights(mediaId: string, token: string, authType?: string | null): Promise<MediaInsights> {
   const params = new URLSearchParams({
-    metric: "reach,likes,comments,saved,shares",
+    metric: "reach,impressions,likes,comments,saved,shares",
     access_token: token,
   });
   const res = await fetch(`${graphBaseFor(authType)}/${encodeURIComponent(mediaId)}/insights?${params.toString()}`, {
@@ -130,4 +132,49 @@ export async function refreshRecentInsights(limit = 50): Promise<{ updated: numb
   }
 
   return { updated };
+}
+
+type SnapshotAccountRow = {
+  id: string;
+  user_id: string;
+  external_id: string;
+  access_token_enc: string;
+  auth_type?: string | null;
+};
+
+// Record today's follower count for each active Instagram account (growth chart data).
+// At most one snapshot per account per ~24 h. Tolerates the snapshots table being absent.
+export async function snapshotAccountFollowers(limit = 20): Promise<{ snapshotted: number }> {
+  const rows = await query<SnapshotAccountRow>(
+    `select id, user_id, external_id, access_token_enc, auth_type
+     from socialapp.social_accounts
+     where platform = 'instagram' and status = 'active' and access_token_enc is not null
+     order by updated_at desc
+     limit $1`,
+    [limit]
+  );
+
+  let snapshotted = 0;
+  for (const row of rows) {
+    try {
+      const profile = await fetchIgProfile(row);
+      if (profile.followers == null) continue;
+      await query(
+        `insert into socialapp.account_snapshots (user_id, account_id, followers, taken_at)
+         select $1, $2, $3, now()
+         where not exists (
+           select 1 from socialapp.account_snapshots
+           where account_id = $2 and taken_at > now() - interval '20 hours'
+         )`,
+        [row.user_id, row.id, profile.followers]
+      );
+      snapshotted++;
+    } catch (e) {
+      // Rate limits and expired tokens are expected noise; only log the rest.
+      if (e instanceof GraphError && (e.kind === "rate_limited" || e.kind === "token")) continue;
+      console.error("snapshotAccountFollowers: profile fetch failed for account", row.id);
+    }
+  }
+
+  return { snapshotted };
 }

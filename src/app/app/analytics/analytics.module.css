@@ -74,7 +74,47 @@
 .hourChart { display: flex; height: 104px; align-items: flex-end; gap: 4px; margin-top: 22px; padding: 12px; border-radius: var(--poskoo-radius-md); background: var(--poskoo-card); }
 .hourBar { min-height: 0; flex: 1; border-radius: 7px 7px 3px 3px; background: var(--poskoo-coral); }
 
+.tableToolbar { display: flex; justify-content: flex-end; margin-top: 16px; }
+.exportBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-card);
+  padding: 8px 14px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--poskoo-ink);
+  cursor: pointer;
+  box-shadow: var(--poskoo-shadow-card);
+}
+.exportBtn:hover:not(:disabled) { transform: translateY(-1px); transition: transform .15s ease; }
+.exportBtn:disabled { opacity: .5; cursor: default; }
+.sortBtn { display: inline-flex; align-items: center; gap: 4px; font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.sortArrow { font-size: .7rem; color: var(--poskoo-muted); }
+
 .section { margin-top: 36px; }
+.sectionHead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.rangePicker { display: inline-flex; gap: 6px; border: 1.5px solid var(--poskoo-line); border-radius: var(--poskoo-radius-pill); background: var(--poskoo-card); padding: 4px; }
+.rangeOption { border-radius: var(--poskoo-radius-pill); padding: 6px 12px; font-size: .82rem; font-weight: 600; color: var(--poskoo-muted); text-decoration: none; }
+.rangeOption:hover { color: var(--poskoo-ink); }
+.rangeActive { background: var(--poskoo-violet); color: #fff; }
+.rangeActive:hover { color: #fff; }
+.reportBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 28px;
+  padding: 18px 22px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-band);
+  box-shadow: var(--poskoo-shadow-card);
+}
+.reportBar p { margin: 0; font-size: .94rem; }
 .tableWrap { margin-top: 16px; overflow-x: auto; border: 1.5px solid var(--poskoo-line); border-radius: var(--poskoo-radius-panel); background: var(--poskoo-card); box-shadow: var(--poskoo-shadow-card); }
 .tableWrap table { border-collapse: collapse; }
 .tableHead { border-bottom: 1.5px solid var(--poskoo-line); color: var(--poskoo-muted); }

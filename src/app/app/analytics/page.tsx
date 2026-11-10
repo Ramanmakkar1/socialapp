@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { BarChart3 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { hourBars, topHours } from "@/lib/bestTime";
+import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parseRangeDays, RANGE_OPTIONS } from "@/lib/analytics";
 import { isDbConfigured, query } from "@/lib/db";
 import { getCommentActivity, getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import { BtnLink, PageHero } from "@/components/ui/kit";
@@ -10,6 +11,7 @@ import LocalTime from "@/components/LocalTime";
 import ui from "@/components/ui/ui.module.css";
 import EmptyState from "../EmptyState";
 import AccountInsightsPanel from "../AccountInsights";
+import PostPerformanceTable from "./PostPerformanceTable";
 import styles from "./analytics.module.css";
 
 export const metadata = { title: "Analytics" };
@@ -50,15 +52,25 @@ function shortDayUtc(day: string): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 }
 
-export default async function AnalyticsPage() {
+export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
   const user = await requireUser();
-  const [stats, rules, recentPosts, activity, dailyActivity] = await Promise.all([
+  const { range: rangeParam } = await searchParams;
+  const rangeDays = parseRangeDays(rangeParam);
+  const [stats, rules, recentPosts, activity, dailyActivity, postPerformance, growthSnapshots] = await Promise.all([
     getDashboardStats(user.id),
     getRuleStats(user.id),
     getRecentPosts(user.id),
     getCommentActivity(user.id),
     getDailyActivity(user.id),
+    getPostPerformance(user.id, rangeDays),
+    getGrowthSnapshots(user.id, rangeDays),
   ]);
+  const todayUtc = new Date().toISOString().slice(0, 10);
+  const growthSeries = buildGrowthSeries(todayUtc, rangeDays, growthSnapshots);
+  const growthMax = growthSeries.reduce((max, row) => Math.max(max, row.followers), 0);
+  const growthStart = growthSeries[0]?.followers ?? 0;
+  const growthEnd = growthSeries[growthSeries.length - 1]?.followers ?? 0;
+  const hasGrowth = growthMax > 0;
 
   let commentHourRows: { hour: number; count: number }[] = [];
   if (isDbConfigured()) {
@@ -138,6 +150,72 @@ export default async function AnalyticsPage() {
             <div className={styles.statValue}>{v.toLocaleString("en-US")}</div>
           </div>
         ))}
+      </div>
+      <div className={styles.section}>
+        <div className={styles.sectionHead}>
+          <div>
+            <h2>Post performance</h2>
+            <p className={styles.subtle}>Reach, impressions and engagement per post, last {rangeDays} days.</p>
+          </div>
+          <div className={styles.rangePicker} role="group" aria-label="Date range">
+            {RANGE_OPTIONS.map((days) => (
+              <Link
+                key={days}
+                href={`/app/analytics?range=${days}`}
+                className={`${styles.rangeOption} ${days === rangeDays ? styles.rangeActive : ""}`}
+                aria-current={days === rangeDays ? "true" : undefined}
+              >
+                {days} days
+              </Link>
+            ))}
+          </div>
+        </div>
+        {postPerformance.length > 0 ? (
+          <PostPerformanceTable rows={postPerformance} />
+        ) : (
+          <p className={`${styles.emptyCopy} ${styles.tableWrap}`}>
+            No published posts in the last {rangeDays} days. Post something and its reach, impressions and engagement will show up here.
+          </p>
+        )}
+      </div>
+      <div className={`${styles.panel} ${styles.mintPanel}`}>
+        <h2>Account growth</h2>
+        <p className={styles.subtle}>
+          Followers across your connected accounts, last {rangeDays} days (UTC)
+          {hasGrowth ? ` · ${growthEnd.toLocaleString("en-US")} now, ${growthEnd - growthStart >= 0 ? "+" : ""}${(growthEnd - growthStart).toLocaleString("en-US")} in period` : ""}
+        </p>
+        {hasGrowth ? (
+          <ul className={styles.dailyList}>
+            {growthSeries.map((row) => (
+              <li key={row.day} className="flex items-start gap-2 sm:gap-3">
+                <span className={styles.dayLabel}>{shortDayUtc(row.day)}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <div className={styles.track}>
+                      <div
+                        className={`${styles.fill} ${styles.violetFill}`}
+                        style={{ width: growthMax > 0 ? `${(row.followers / growthMax) * 100}%` : "0%" }}
+                      />
+                    </div>
+                    <span className={styles.chartValue}>{row.followers.toLocaleString("en-US")}</span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className={styles.emptyCopy}>
+            No follower data yet. Snapshots are recorded each day from your connected Instagram accounts.
+          </p>
+        )}
+      </div>
+      <div className={styles.reportBar}>
+        <p>
+          Want to share these numbers? The <strong>printable report</strong> packs everything on this page into one clean page.
+        </p>
+        <BtnLink href={`/app/analytics/report?range=${rangeDays}`} size="sm">
+          Open printable report
+        </BtnLink>
       </div>
       <Suspense fallback={<div role="status" className={styles.insightsLoading} aria-label="Loading Instagram insights" />}>
         <AccountInsightsPanel userId={user.id} />
