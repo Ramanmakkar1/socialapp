@@ -140,7 +140,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <div className="copy">
       <p className="eyebrow">Multi-channel scheduling</p>
       <h2>Write once. <em className="s">Post everywhere.</em></h2>
-      <p>Schedule Instagram, Facebook Pages and Threads posts from one calendar. <Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link></p>
+      <p>Schedule Instagram, Facebook Pages and Threads posts from one calendar. <Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link> Or read the <Link className="go" href="/social-media-scheduler-comparison">social media scheduler comparison <span aria-hidden="true">→</span></Link></p>
       <div className="pains">
         <div className="pain"><b>Instagram</b><span>Feed posts, carousels, Reels and Stories</span></div>
         <div className="pain"><b>Facebook</b><span>Live</span></div>
