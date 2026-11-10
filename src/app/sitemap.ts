@@ -4,7 +4,7 @@ import { PUBLIC_PATHS, META } from "@/lib/public-pages";
 
 // Always-noindex pages (auth + app). PUBLIC_PATHS already excludes them, so this is
 // a safety net: if one is ever added to PUBLIC_PATHS it must not leak into the sitemap.
-const NOINDEX_PATHS = new Set(["/login", "/signup", "/data-deletion/status", "/app/review-guide"]);
+const NOINDEX_PATHS = new Set(["/login", "/signup", "/data-deletion/status", "/app/review-guide", "/admin"]);
 
 // The single noindex check the sitemap filters on. A path is noindex when:
 //  - the whole site is in staging (BRAND.indexable false -> root layout noindexes every page), or

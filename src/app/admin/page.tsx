@@ -9,6 +9,8 @@ import Button from "./ui/Button";
 import { AreaChart, StackedBars, type DayStatus } from "./ui/charts";
 import styles from "./admin.module.css";
 
+export const metadata = { title: "Admin", robots: { index: false, follow: false } };
+
 // Plan → monthly price (USD). Used for MRR when a users.plan column exists.
 const PLAN_PRICE: Record<string, number> = { free: 0, pro: 19, agency: 49 };
 const PLAN_COLOR: Record<string, string> = { free: "var(--poskoo-lilac)", pro: "var(--poskoo-coral)", agency: "var(--poskoo-violet)" };
