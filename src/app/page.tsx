@@ -426,7 +426,31 @@ export default function Home() { return <main className={`${styles.landing} ${in
 
 <div className="wrap">
   <div className="cta">
-    <div><h2>Your next post could fill your inbox <em className="s">with leads.</em></h2><p>Start free. Connect your account in one tap.</p><Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link></div>
+    <div className="ctaCopy">
+      <div><h2>Your next post could fill your inbox <em className="s">with leads.</em></h2><p>Start free. Connect your account in one tap.</p><Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link></div>
+      <svg className="ctaArt" viewBox="0 0 320 240" aria-hidden="true" focusable="false">
+        <rect x="64" y="24" width="150" height="200" rx="26" fill="var(--poskoo-pink)" opacity="0.16" stroke="var(--poskoo-pink)" strokeWidth="4" />
+        <rect x="82" y="50" width="114" height="128" rx="12" fill="var(--poskoo-pink)" />
+        <circle cx="96" cy="66" r="7" fill="var(--poskoo-violet)" />
+        <rect x="108" y="63" width="40" height="5" rx="2.5" fill="var(--poskoo-ink)" opacity="0.5" />
+        <rect x="90" y="80" width="98" height="64" rx="8" fill="var(--poskoo-violet)" />
+        <circle cx="112" cy="100" r="8" fill="var(--poskoo-lime)" />
+        <path d="M90 132l24-22 18 16 14-12 42 30v0H90z" fill="var(--poskoo-coral)" />
+        <rect x="90" y="152" width="70" height="5" rx="2.5" fill="var(--poskoo-ink)" opacity="0.4" />
+        <rect x="90" y="162" width="50" height="5" rx="2.5" fill="var(--poskoo-ink)" opacity="0.4" />
+        <g className="ctaBubble">
+          <rect x="190" y="70" width="100" height="44" rx="16" fill="var(--poskoo-lime)" />
+          <path d="M206 114l-4 12 14-12z" fill="var(--poskoo-lime)" />
+          <text x="240" y="98" textAnchor="middle" fill="var(--poskoo-ink)" fontSize="16" fontWeight="700" fontFamily="inherit">LINK</text>
+        </g>
+        <g className="ctaBubble ctaBubbleDelay">
+          <rect x="200" y="150" width="80" height="40" rx="16" fill="var(--poskoo-coral)" />
+          <path d="M240 178c-9-6-14-11-14-16 0-4 3-7 7-7 3 0 5 2 7 4 2-2 4-4 7-4 4 0 7 3 7 7 0 5-5 10-14 16z" fill="var(--poskoo-pink)" />
+        </g>
+        <path d="M40 54l4 12 12 4-12 4-4 12-4-12-12-4 12-4z" fill="var(--poskoo-lime)" />
+        <circle cx="290" cy="40" r="6" fill="var(--poskoo-coral)" />
+      </svg>
+    </div>
     <Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 39vw, 490px" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" decoding="async" alt="Two friends high-five next to a board of new leads" />
   </div>
   <SiteFooter />
