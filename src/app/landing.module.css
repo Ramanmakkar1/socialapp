@@ -87,6 +87,10 @@
   width:100%;max-width:1060px;margin-top:6px}
 .landing :global(.hero-art img){
   width:100%;height:auto;display:block}
+.landing :global(.heroVisual){
+  width:100%;max-width:520px;aspect-ratio:520/420;margin-inline:auto}
+.landing :global(.heroVisual svg){
+  width:100%;height:100%;display:block}
 .landing :global(.works){
   display:flex;gap:1.6rem;flex-wrap:wrap;justify-content:center;align-items:center;color:var(--muted);font-size:.92rem;padding-block:6px 30px;border-bottom:1px solid var(--line)}
 .landing :global(.works b){
@@ -484,6 +488,50 @@
   .landing :global(.bentoCard:hover) {
     transform:translateY(-6px);
     box-shadow:var(--poskoo-shadow-float);
+  }
+}
+
+@media (min-width: 900px) {
+  .landing :global(.hero) {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,520px);
+    column-gap:40px;
+    align-items:center;
+    justify-items:start;
+    text-align:left;
+  }
+  .landing :global(.hero .pill),
+  .landing :global(.hero .eyebrow),
+  .landing :global(.hero h1),
+  .landing :global(.hero .lede),
+  .landing :global(.hero .ctas),
+  .landing :global(.hero .small) {
+    grid-column:1;
+  }
+  .landing :global(.hero .ctas) {
+    justify-content:flex-start;
+  }
+  .landing :global(.heroVisual) {
+    grid-column:2;
+    grid-row:1 / span 6;
+  }
+  .landing :global(.hero-art) {
+    grid-column:1 / -1;
+    justify-self:center;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing :global(.heroChip) {
+    animation:heroChipFloat 5s ease-in-out infinite;
+    transform-box:fill-box;
+  }
+  .landing :global(.heroChipDelay) {
+    animation-delay:-2.5s;
+  }
+  @keyframes heroChipFloat {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-6px); }
   }
 }
 

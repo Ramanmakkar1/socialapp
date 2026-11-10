@@ -44,6 +44,104 @@ const jsonLd = {
   ],
 };
 
+function HeroVisual() {
+  return (
+    <div className="heroVisual">
+      <svg viewBox="0 0 520 420" width="520" height="420" aria-hidden="true" focusable="false" role="presentation">
+        <defs>
+          <linearGradient id="heroPost" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="var(--lilac)" />
+            <stop offset="1" stopColor="var(--pink)" />
+          </linearGradient>
+        </defs>
+
+        <circle cx="110" cy="80" r="86" fill="var(--lilac)" opacity="0.4" />
+        <circle cx="440" cy="340" r="96" fill="var(--peach)" opacity="0.45" />
+        <circle cx="470" cy="70" r="40" fill="var(--mint)" opacity="0.6" />
+
+        <g>
+          <rect x="268" y="70" width="220" height="196" rx="22" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
+          <path d="M268 92a22 22 0 0 1 22-22h176a22 22 0 0 1 22 22v24H268z" fill="var(--poskoo-band)" />
+          <text x="290" y="99" fontFamily="var(--sans)" fontSize="14" fontWeight="700" fill="var(--ink)">September</text>
+          <circle cx="452" cy="93" r="9" fill="var(--violet)" />
+          <path d="M448 93h8M453 89l4 4-4 4" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <g fill="var(--poskoo-band)">
+            <rect x="286" y="132" width="22" height="22" rx="6" />
+            <rect x="312" y="132" width="22" height="22" rx="6" />
+            <rect x="338" y="132" width="22" height="22" rx="6" />
+            <rect x="364" y="132" width="22" height="22" rx="6" />
+            <rect x="390" y="132" width="22" height="22" rx="6" />
+            <rect x="416" y="132" width="22" height="22" rx="6" />
+            <rect x="442" y="132" width="22" height="22" rx="6" />
+            <rect x="286" y="166" width="22" height="22" rx="6" />
+            <rect x="312" y="166" width="22" height="22" rx="6" />
+            <rect x="338" y="166" width="22" height="22" rx="6" />
+            <rect x="364" y="166" width="22" height="22" rx="6" />
+            <rect x="416" y="166" width="22" height="22" rx="6" />
+            <rect x="442" y="166" width="22" height="22" rx="6" />
+            <rect x="286" y="200" width="22" height="22" rx="6" />
+            <rect x="312" y="200" width="22" height="22" rx="6" />
+            <rect x="338" y="200" width="22" height="22" rx="6" />
+            <rect x="364" y="200" width="22" height="22" rx="6" />
+            <rect x="390" y="200" width="22" height="22" rx="6" />
+            <rect x="416" y="200" width="22" height="22" rx="6" />
+            <rect x="442" y="200" width="22" height="22" rx="6" />
+          </g>
+          <rect x="312" y="132" width="22" height="22" rx="6" fill="var(--peach)" />
+          <rect x="364" y="166" width="22" height="22" rx="6" fill="var(--mint)" />
+          <rect x="338" y="200" width="22" height="22" rx="6" fill="var(--lime)" />
+          <rect x="390" y="166" width="22" height="22" rx="6" fill="var(--violet)" />
+          <circle cx="401" cy="177" r="3" fill="#fff" />
+          <rect x="300" y="232" width="96" height="20" rx="10" fill="var(--poskoo-band)" />
+          <rect x="308" y="238" width="52" height="8" rx="4" fill="var(--violet)" opacity="0.55" />
+        </g>
+
+        <rect x="58" y="64" width="176" height="312" rx="30" fill="var(--ink)" />
+        <rect x="66" y="72" width="160" height="296" rx="24" fill="var(--card)" />
+        <rect x="126" y="80" width="40" height="6" rx="3" fill="var(--ink)" opacity="0.25" />
+
+        <rect x="78" y="98" width="136" height="150" rx="14" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
+        <circle cx="92" cy="114" r="8" fill="var(--peach)" />
+        <rect x="106" y="109" width="46" height="6" rx="3" fill="var(--ink)" opacity="0.55" />
+        <rect x="106" y="119" width="30" height="5" rx="2.5" fill="var(--muted)" opacity="0.5" />
+        <rect x="86" y="130" width="120" height="82" rx="10" fill="url(#heroPost)" />
+        <circle cx="150" cy="152" r="12" fill="var(--lime)" />
+        <path d="M86 196l30-26 22 18 20-14 48 38v0H86z" fill="var(--violet)" opacity="0.75" />
+        <path d="M86 200l34-20 26 16 24-12 36 22v6H86z" fill="var(--coral)" opacity="0.8" />
+        <path d="M90 222c0-3 2-5 5-5s5 2 5 5-5 7-5 7-5-4-5-7z" fill="var(--coral)" />
+        <circle cx="112" cy="222" r="5" fill="none" stroke="var(--ink)" strokeWidth="2" />
+        <path d="M124 220l10 8-10 8" fill="none" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="86" y="238" width="100" height="5" rx="2.5" fill="var(--line)" />
+
+        <g className="heroChip">
+          <rect x="24" y="24" width="150" height="40" rx="20" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
+          <circle cx="46" cy="44" r="9" fill="var(--mint)" />
+          <path d="M42 44l3 3 5-6" stroke="var(--ink)" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <text x="62" y="49" fontFamily="var(--sans)" fontSize="13" fontWeight="700" fill="var(--ink)">Scheduled 9:00</text>
+        </g>
+
+        <g className="heroChip heroChipDelay">
+          <rect x="196" y="250" width="120" height="52" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
+          <path d="M214 302l-6 14 18-10" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
+          <text x="256" y="282" textAnchor="middle" fontFamily="var(--sans)" fontSize="15" fontWeight="700" fill="var(--ink)">GUIDE</text>
+        </g>
+
+        <path d="M330 236l58-24-18 50-11-18-29-8z" fill="var(--coral)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M370 212l-11 32" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" />
+
+        <g className="heroChip">
+          <rect x="360" y="300" width="120" height="40" rx="20" fill="var(--violet)" />
+          <path d="M380 320l6 6 12-13" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <text x="404" y="325" fontFamily="var(--sans)" fontSize="13" fontWeight="700" fill="#fff">DM sent</text>
+        </g>
+
+        <path d="M470 34l4 12 12 4-12 4-4 12-4-12-12-4 12-4z" fill="var(--lime)" stroke="var(--ink)" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M40 330l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="var(--pink)" />
+      </svg>
+    </div>
+  );
+}
+
 export default function Home() { return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
@@ -61,6 +159,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <p className="lede">Poskoo plans your posts on one calendar, then sends your link to everyone who comments, within seconds. One app, one plan, no copy-paste.</p>
     <div className="ctas"><Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link><Link className="btn btn-line" href="#how">See how it works</Link></div>
     <p className="small">Free plan. No credit card.</p>
+    <HeroVisual />
     <div className="hero-art"><Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/hero.webp" priority width={1400} height={933} alt="A big phone shows a post; a comment saying GUIDE pops out and a paper plane carries a DM with a link. A creator sits on a calendar block and a friend waves with a coffee, with a happy dog and plants below." /></div>
   </header>
   <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><span>· Built on the official Meta API</span></div>
