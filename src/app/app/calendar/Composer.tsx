@@ -443,6 +443,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
         fieldset?.focus();
         break;
       }
+      case "ytTitle":
+        focusEl(ytTitleId);
+        break;
       case "platformCaption":
         setActiveTab(target.platform);
         requestAnimationFrame(() => {
@@ -1360,6 +1363,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             customCaption={customCaption}
             mediaUrls={mediaUrls}
             igFormat={igFormat}
+            ytTitle={ytTitle}
             scheduledAt={scheduledAt}
             timeZone={timeZone}
             onFix={focusChecklistTarget}

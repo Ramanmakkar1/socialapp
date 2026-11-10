@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
+import { planFacebookPost } from "@/lib/facebookPublish";
 import { checkCaption, PLATFORMS, type PlatformId } from "@/lib/platforms";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
@@ -13,6 +14,7 @@ export type ChecklistFixTarget =
   | { kind: "mainCaption" }
   | { kind: "firstComment" }
   | { kind: "igFormat" }
+  | { kind: "ytTitle" }
   | { kind: "platformCaption"; platform: PlatformId };
 
 type MediaItem = { type: "image" | "video"; url: string };
@@ -181,6 +183,7 @@ export type PublishingChecklistProps = {
   customCaption: Record<PlatformId, string>;
   mediaUrls: string[];
   igFormat: "feed" | "story";
+  ytTitle: string;
   scheduledAt: string;
   timeZone: string;
   onFix: (target: ChecklistFixTarget) => void;
@@ -194,6 +197,7 @@ export default function PublishingChecklist({
   customCaption,
   mediaUrls,
   igFormat,
+  ytTitle,
   scheduledAt,
   timeZone,
   onFix,
@@ -281,6 +285,57 @@ export default function PublishingChecklist({
   const firstCommentMax = PLATFORM_LIMITS.instagram.max ?? 2200;
   const firstCommentOver = countChars(firstComment) > firstCommentMax;
   const showFirstComment = instagramOn && igFormat !== "story";
+
+  type PlatformIssue = { text: string; fixTarget: ChecklistFixTarget };
+  const platformReadiness = selected.map((platform) => {
+    const text = effectiveCaption(platform, mainCaption, customize, customCaption);
+    const check = checkCaption(platform, text);
+    const captionFix: ChecklistFixTarget = customize[platform]
+      ? { kind: "platformCaption", platform }
+      : { kind: "mainCaption" };
+    const issues: PlatformIssue[] = [];
+    if (!text.trim()) {
+      issues.push({ text: "Add a caption.", fixTarget: captionFix });
+    } else if (check.errors.length > 0) {
+      issues.push({ text: check.errors[0], fixTarget: captionFix });
+    }
+    if (mediaError) {
+      issues.push({ text: mediaError, fixTarget: { kind: "media" } });
+    } else if (platform === "instagram" && needsMediaForSchedule) {
+      issues.push({
+        text:
+          igFormat === "story"
+            ? "Add exactly one image or video for this Story."
+            : "Add at least one image or video.",
+        fixTarget: { kind: "media" },
+      });
+    } else if (platform === "facebook") {
+      if (text.trim() || mediaItems.length > 0) {
+        const plan = planFacebookPost(text, mediaItems);
+        if ("error" in plan) {
+          issues.push({
+            text: plan.error,
+            fixTarget: plan.error.toLowerCase().includes("caption") ? captionFix : { kind: "media" },
+          });
+        }
+      }
+    } else if (platform === "youtube") {
+      if (!ytTitle.trim()) {
+        issues.push({ text: "Add a video title.", fixTarget: { kind: "ytTitle" } });
+      }
+      if (mediaItems.filter((m) => m.type === "video").length === 0) {
+        issues.push({ text: "Add a .mp4 video link.", fixTarget: { kind: "media" } });
+      }
+    }
+    if (platform === "instagram" && showFirstComment && firstCommentOver) {
+      issues.push({
+        text: `First comment must be ${firstCommentMax.toLocaleString("en-US")} characters or fewer.`,
+        fixTarget: { kind: "firstComment" },
+      });
+    }
+    return { platform, label: PLATFORMS[platform].label, issues };
+  });
+
   const firstCommentComplete = !showFirstComment || !firstCommentOver;
   const firstCommentDetail = firstCommentOver
     ? `First comment must be ${firstCommentMax.toLocaleString("en-US")} characters or fewer.`
@@ -335,7 +390,7 @@ export default function PublishingChecklist({
         <ChecklistIllustration />
         <div className="min-w-0 flex-1">
           <h3 id="publishing-checklist-heading" className="text-sm font-semibold text-[var(--poskoo-ink)]">
-            Input readiness
+            Publishing readiness
           </h3>
           <p className="mt-0.5 text-xs text-[var(--poskoo-muted)]">
             Checks what you entered in the composer. Does not verify that media URLs load remotely or that
@@ -345,6 +400,58 @@ export default function PublishingChecklist({
             {readyCount} of {totalCount} ready to schedule
           </p>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
+          Platform readiness
+        </h4>
+        <ul className="mt-2 space-y-2" aria-label="Platform publishing readiness" aria-live="polite">
+          {platformReadiness.map(({ platform, label, issues }) => {
+            const ready = issues.length === 0;
+            return (
+              <li
+                key={platform}
+                className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2.5"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium text-[var(--poskoo-ink)]">{label}</span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      ready
+                        ? "bg-[var(--poskoo-green)]/15 text-[var(--poskoo-green)]"
+                        : "bg-[var(--poskoo-coral)]/10 text-[var(--poskoo-coral)]"
+                    }`}
+                  >
+                    {ready ? "Ready" : "Needs attention"}
+                  </span>
+                </div>
+                {!ready && (
+                  <ul className="mt-1.5 space-y-1">
+                    {issues.map((issue, index) => (
+                      <li
+                        key={`${platform}-${index}`}
+                        className="flex items-start justify-between gap-2 text-xs leading-relaxed text-[var(--poskoo-muted)]"
+                      >
+                        <span className="min-w-0 flex-1">{issue.text}</span>
+                        <button
+                          type="button"
+                          onClick={() => onFix(issue.fixTarget)}
+                          className="shrink-0 rounded-lg border border-[var(--poskoo-violet)]/40 px-2 py-0.5 text-xs font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
+                        >
+                          Fix
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+        <p className="mt-2 text-xs text-[var(--poskoo-muted)]">
+          Missing media or caption issues do not block saving a draft.
+        </p>
       </div>
 
       <ul className="mt-4 space-y-2" aria-label="Publishing input checklist">
