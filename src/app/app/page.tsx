@@ -8,6 +8,7 @@ import { isDbConfigured, query } from "@/lib/db";
 import { fetchIgProfile, type GraphAccount, type IgProfile } from "@/lib/igGraph";
 import { fetchRecentMedia, type IgMediaItem } from "@/lib/igMedia";
 import { automationSummary, getAutomationRows, getSnapshot, EMPTY_SNAPSHOT, pctChange } from "@/lib/homeStats";
+import { filterComments, loadInbox } from "@/lib/inbox";
 import TodaysActions from "./TodaysActions";
 import ActiveAutomations from "./ActiveAutomations";
 import FirstSessionChecklist from "./FirstSessionChecklist";
@@ -42,6 +43,17 @@ async function igAccount(userId: string): Promise<GraphAccount | null> {
   }
 }
 
+// Count of open, visible comments — same rule as the inbox "Unanswered" filter.
+async function unansweredComments(userId: string): Promise<number> {
+  if (!isDbConfigured()) return 0;
+  try {
+    const data = await loadInbox(userId);
+    return filterComments(data.comments, "unanswered").length;
+  } catch {
+    return 0;
+  }
+}
+
 // Any post row for this user (drafts included) — "created a post" signal.
 async function hasAnyPost(userId: string): Promise<boolean> {
   if (!isDbConfigured()) return false;
@@ -67,9 +79,9 @@ export default async function AppHome() {
   const user = await getCurrentUser();
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
   const upcoming = user ? await getUpcomingPosts(user.id) : [];
-  const [snapshot, automations, account, postCreated] = user
-    ? await Promise.all([getSnapshot(user.id), getAutomationRows(user.id), igAccount(user.id), hasAnyPost(user.id)])
-    : [EMPTY_SNAPSHOT, [], null, false];
+  const [snapshot, automations, account, postCreated, unanswered] = user
+    ? await Promise.all([getSnapshot(user.id), getAutomationRows(user.id), igAccount(user.id), hasAnyPost(user.id), unansweredComments(user.id)])
+    : [EMPTY_SNAPSHOT, [], null, false, 0];
   let profile: IgProfile | null = null;
   let media: IgMediaItem[] = [];
   let mediaError = false;
@@ -131,6 +143,20 @@ export default async function AppHome() {
               )}
             </div>
           </div>
+          <Link href="/app/inbox?filter=unanswered" className={`${home.stat} ${home.quick}`}>
+            <div className={home.statLabel}>
+              <span className={home.statDot} style={{ background: "var(--poskoo-coral)" }} aria-hidden="true" />
+              Unanswered comments
+            </div>
+            <div className={home.statValue}>{unanswered.toLocaleString("en-US")}</div>
+            <div className={home.statFoot}>
+              <span>
+                {unanswered === 0
+                  ? "You're all caught up — no comments waiting for a reply."
+                  : "Reply from your inbox before they go cold."}
+              </span>
+            </div>
+          </Link>
           {media.length > 0 ? (
             <TodaysActions items={media} username={profile?.username ?? "instagram"} avatarUrl={profile?.profilePictureUrl ?? null} automationOn={automationOn} />
           ) : (

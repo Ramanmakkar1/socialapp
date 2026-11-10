@@ -154,6 +154,22 @@
 .up { color: var(--poskoo-green); font-weight: 700; }
 .down { color: var(--poskoo-red); font-weight: 700; }
 
+/* Unanswered-comments quick action (reuses the stat card look). */
+.quick {
+  display: block;
+  text-decoration: none;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.quick:hover {
+  border-color: var(--poskoo-coral);
+  box-shadow: var(--poskoo-shadow-card), 0 10px 24px rgba(30, 22, 49, .08);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick { transition: none; }
+  .quick:hover { transform: none; }
+}
+
 /* Active automations table */
 .tableCard {
   overflow-x: auto;
