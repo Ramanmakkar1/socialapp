@@ -79,6 +79,61 @@ export default function Home() { return <main className={`${styles.landing} ${in
   <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><span>· Built on the official Meta API</span></div>
 </div>
 
+<section className="howSection">
+  <div className="wrap">
+    <div className="head"><p className="eyebrow">Three steps</p><h2>How Poskoo works in 3 steps</h2></div>
+    <div className="howGrid">
+      <article className="howStep">
+        <svg className="howArt" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="52" fill="var(--lilac)" />
+          <circle cx="44" cy="50" r="15" fill="var(--peach)" />
+          <circle cx="44" cy="45" r="6" fill="var(--ink)" />
+          <path d="M34 60c2-7 18-7 20 0" fill="var(--ink)" />
+          <circle cx="78" cy="50" r="15" fill="var(--pink)" />
+          <circle cx="78" cy="45" r="6" fill="var(--ink)" />
+          <path d="M68 60c2-7 18-7 20 0" fill="var(--ink)" />
+          <rect x="46" y="76" width="28" height="12" rx="6" fill="var(--violet)" />
+          <path d="M52 82h16" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+          <path d="M40 82h-6M86 82h-6" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+        <h3>Connect your Instagram</h3>
+        <p>Log in with Instagram&apos;s own screen through Meta&apos;s official API. We never see your password.</p>
+      </article>
+      <article className="howStep">
+        <svg className="howArt" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="52" fill="var(--mint)" />
+          <rect x="28" y="34" width="64" height="58" rx="12" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
+          <path d="M28 50h64" stroke="var(--ink)" strokeWidth="3" />
+          <path d="M42 28v12M78 28v12" stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" />
+          <rect x="38" y="58" width="12" height="10" rx="3" fill="var(--lilac)" />
+          <rect x="54" y="58" width="12" height="10" rx="3" fill="var(--peach)" />
+          <rect x="70" y="58" width="12" height="10" rx="3" fill="var(--pink)" />
+          <rect x="38" y="72" width="12" height="10" rx="3" fill="var(--lime)" />
+          <rect x="54" y="72" width="28" height="10" rx="3" fill="var(--violet)" />
+          <rect x="66" y="80" width="34" height="24" rx="7" fill="var(--coral)" />
+          <path d="M74 88h18M74 94h12" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+        <h3>Plan and schedule posts</h3>
+        <p>Schedule Reels, carousels and single posts for the time you pick, in your time zone.</p>
+      </article>
+      <article className="howStep">
+        <svg className="howArt" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="52" fill="var(--peach)" />
+          <rect x="24" y="34" width="46" height="30" rx="12" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
+          <path d="M36 64l-4 10 12-6" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" strokeLinejoin="round" />
+          <path d="M34 46h26M34 54h16" stroke="var(--muted)" strokeWidth="3" strokeLinecap="round" />
+          <rect x="52" y="58" width="44" height="28" rx="12" fill="var(--violet)" />
+          <path d="M84 86l4 10-12-6" fill="var(--violet)" />
+          <path d="M64 68h20M64 76h12" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+          <path d="M78 30l18-8-6 18-4-7-8-3z" fill="var(--coral)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
+        </svg>
+        <h3>Auto-DM every keyword comment</h3>
+        <p>When someone comments your keyword, Poskoo sends them your link by DM.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
 <section id="how"><div className="wrap">
   <div className="head"><p className="eyebrow">Three jobs, one app</p><h2>Everything between <em className="s">posting</em> and <em className="s">getting paid.</em></h2></div>
   <div className="cards">
