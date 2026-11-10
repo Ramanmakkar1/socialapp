@@ -43,6 +43,60 @@ function accountStatusLabel(status: string): string {
   return status;
 }
 
+export function AccountReadiness({
+  accounts,
+  selectedId,
+}: {
+  accounts: InstagramAccountOption[];
+  selectedId: string | null;
+}) {
+  const selected = selectedId ? accounts.find((a) => a.id === selectedId) : null;
+  const activeCount = accounts.filter((a) => a.status === "active").length;
+
+  let tone: "ready" | "warn" | "empty";
+  let message: string;
+  let linkLabel: string | null = null;
+
+  if (accounts.length === 0) {
+    tone = "empty";
+    message = "No Instagram account connected yet.";
+    linkLabel = "Connect Instagram";
+  } else if (selected) {
+    if (selected.status === "active") {
+      tone = "ready";
+      message = `@${selected.username ?? "this account"} is connected and ready.`;
+    } else {
+      tone = "warn";
+      message = `@${selected.username ?? "This account"} needs reconnection before DMs can send.`;
+      linkLabel = "Reconnect in Settings";
+    }
+  } else if (activeCount > 0) {
+    tone = "ready";
+    message = activeCount === 1 ? "1 connected account is ready." : `${activeCount} connected accounts are ready.`;
+  } else {
+    tone = "warn";
+    message = "Your Instagram account needs reconnection before DMs can send.";
+    linkLabel = "Reconnect in Settings";
+  }
+
+  const color =
+    tone === "ready" ? "var(--poskoo-green)" : tone === "warn" ? "var(--poskoo-coral)" : "var(--poskoo-muted)";
+
+  return (
+    <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs" role="status">
+      <span className="inline-flex items-center gap-1.5 font-semibold" style={{ color }}>
+        <span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
+        {message}
+      </span>
+      {linkLabel && (
+        <Link href="/app/settings" className={ui.link}>
+          {linkLabel}
+        </Link>
+      )}
+    </p>
+  );
+}
+
 function validOptionalHttpsUrl(raw: string): boolean {
   if (!raw.trim()) return true;
   try {
@@ -421,6 +475,7 @@ export default function RuleBuilder({
                     <option key={account.id} value={account.id}>@{account.username ?? "unknown"} ({accountStatusLabel(account.status)})</option>
                   ))}
                 </select>
+                <AccountReadiness accounts={instagramAccounts} selectedId={socialAccountId} />
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1">

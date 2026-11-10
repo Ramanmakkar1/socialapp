@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
-import RuleBuilder from "./RuleBuilder";
+import RuleBuilder, { AccountReadiness } from "./RuleBuilder";
 import TemplatePicker from "./TemplatePicker";
 import AutomationMessagePreview from "@/components/AutomationMessagePreview";
 import CommentKeywordTester from "@/components/CommentKeywordTester";
@@ -326,6 +326,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
                   </option>
                 ))}
               </select>
+              <AccountReadiness accounts={instagramAccounts} selectedId={socialAccountId} />
               <p className="mt-2 text-xs leading-relaxed text-[var(--poskoo-muted)]">
                 Rules scoped to one profile only run on comments for that account. Choose{" "}
                 <span className="text-[var(--poskoo-ink)]">All connected Instagram accounts</span> to reuse the same keywords and DM
