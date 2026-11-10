@@ -122,15 +122,15 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <section id="how"><div className="wrap">
   <div className="head"><p className="eyebrow">Three jobs, one app</p><h2>Everything between <em className="s">posting</em> and <em className="s">getting paid.</em></h2></div>
   <div className="cards">
-    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-schedule.webp" width={900} height={900} loading="lazy" alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /><span className="no">01 / Schedule</span><h3>Plan a month in one sitting.</h3><p>Drag posts onto the calendar and they go live at the time you choose.</p><Link className="go" href="/instagram-scheduler">See the calendar <span aria-hidden="true">→</span></Link></article>
-    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-dm.webp" width={900} height={900} loading="lazy" alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /><span className="no">02 / Auto-DM</span><h3>Every comment gets your link.</h3><p>Pick a word like LINK or PRICE. Anyone who comments it gets a DM in seconds, day or night.</p><Link className="go" href="/instagram-auto-dm">Watch it work <span aria-hidden="true">→</span></Link></article>
-    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of contacts with check marks and a rising chart" /><span className="no">03 / Grow</span><h3>Turn followers into leads.</h3><p>Collect emails and phone numbers right in the DM, then see which posts bring them in.</p><Link className="go" href="/instagram-auto-dm/templates">Start collecting <span aria-hidden="true">→</span></Link></article>
+    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-schedule.webp" width={900} height={900} loading="lazy" decoding="async" alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /><span className="no">01 / Schedule</span><h3>Plan a month in one sitting.</h3><p>Drag posts onto the calendar and they go live at the time you choose.</p><Link className="go" href="/instagram-scheduler">See the calendar <span aria-hidden="true">→</span></Link></article>
+    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-dm.webp" width={900} height={900} loading="lazy" decoding="async" alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /><span className="no">02 / Auto-DM</span><h3>Every comment gets your link.</h3><p>Pick a word like LINK or PRICE. Anyone who comments it gets a DM in seconds, day or night.</p><Link className="go" href="/instagram-auto-dm">Watch it work <span aria-hidden="true">→</span></Link></article>
+    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" decoding="async" alt="Two friends high-five next to a board of contacts with check marks and a rising chart" /><span className="no">03 / Grow</span><h3>Turn followers into leads.</h3><p>Collect emails and phone numbers right in the DM, then see which posts bring them in.</p><Link className="go" href="/instagram-auto-dm/templates">Start collecting <span aria-hidden="true">→</span></Link></article>
   </div>
 </div></section>
 
 <section style={{"paddingTop": "20px"}}><div className="wrap">
   <div className="split">
-    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/problem.webp" width={900} height={900} loading="lazy" alt="A tired creator at night buried under phones and chat-bubble notifications" /></div>
+    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/problem.webp" width={900} height={900} loading="lazy" decoding="async" alt="A tired creator at night buried under phones and chat-bubble notifications" /></div>
     <div className="copy">
       <p className="eyebrow">Sound familiar?</p>
       <h2>Replying by hand doesn&apos;t scale.</h2>
@@ -187,7 +187,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
         <div className="pain"><b>Threads</b><span>Live</span></div>
       </div>
     </div>
-    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/multichannel.webp" width={1400} height={933} loading="lazy" alt="A creator at a laptop sends one post that splits to several phones and screens" /></div>
+    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/multichannel.webp" width={1400} height={933} loading="lazy" decoding="async" alt="A creator at a laptop sends one post that splits to several phones and screens" /></div>
   </div>
 </div></section>
 
@@ -269,7 +269,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
 
 <section style={{"paddingTop": "20px"}}><div className="wrap">
   <div className="split">
-    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/onesub.webp" width={1400} height={933} loading="lazy" alt="A happy creator in an armchair holds one membership card while app cards and bills fly away" /></div>
+    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/onesub.webp" width={1400} height={933} loading="lazy" decoding="async" alt="A happy creator in an armchair holds one membership card while app cards and bills fly away" /></div>
     <div className="copy">
       <p className="eyebrow">One subscription</p>
       <h2>Stop paying <em className="s">here and there.</em></h2>
@@ -319,7 +319,7 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <div className="wrap">
   <div className="cta">
     <div><h2>Your next post could fill your inbox <em className="s">with leads.</em></h2><p>Start free. Connect your account in one tap.</p><Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link></div>
-    <Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 39vw, 490px" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
+    <Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 39vw, 490px" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" decoding="async" alt="Two friends high-five next to a board of new leads" />
   </div>
   <SiteFooter />
 </div>
