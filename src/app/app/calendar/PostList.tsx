@@ -29,7 +29,7 @@ const filters: { value: PostFilter; label: string }[] = [
   { value: "failed", label: "Failed" },
 ];
 
-export default function PostList({ posts, loadError, initialFilter = "all" }: { posts: Post[]; loadError?: LoadError; initialFilter?: PostFilter }) {
+export default function PostList({ posts, loadError, initialFilter = "all", title = "Publishing queue" }: { posts: Post[]; loadError?: LoadError; initialFilter?: PostFilter; title?: string }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<PostFilter>(initialFilter);
@@ -91,7 +91,7 @@ export default function PostList({ posts, loadError, initialFilter = "all" }: { 
 
   return (
     <section className={styles.queue} aria-labelledby="upcoming-posts-heading">
-      <h2 id="upcoming-posts-heading" className={styles.sectionTitle}>Publishing queue</h2>
+      <h2 id="upcoming-posts-heading" className={styles.sectionTitle}>{title}</h2>
       {error && <p role="alert" className={`${styles.errorText} ${styles.mt}`}>{error}</p>}
       {loadError ? (
         <LoadFailed message={loadError.message} reloadHref={loadError.reloadHref} className={styles.mt} />

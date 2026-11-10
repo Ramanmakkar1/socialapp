@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { CalendarDays, CalendarRange, List, Plus } from "lucide-react";
+import { CalendarDays, CalendarRange, Lightbulb, List, Plus } from "lucide-react";
 import Composer from "./Composer";
 import ComposerDialog from "./ComposerDialog";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
+import IdeasBoard from "./IdeasBoard";
+import type { Idea } from "./IdeaCard";
 import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
@@ -12,6 +14,7 @@ import { requireUser } from "@/lib/auth";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { canPublishToFacebook } from "@/lib/facebookPublish";
+import { IDEA_BY_ID_SQL, IDEAS_LIST_SQL, ideaComposerPrefill, normalizeIdeaStatus, type IdeaRow } from "@/lib/ideas";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
 
@@ -82,11 +85,11 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string }>;
 }) {
-  const { week, view: viewParam, month, status, draft } = await searchParams;
+  const { week, view: viewParam, month, status, draft, idea } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
-  const view: "week" | "month" | "list" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : "week";
+  const view: "week" | "month" | "list" | "ideas" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : viewParam === "ideas" ? "ideas" : "week";
   const weekStart = parseWeekParam(week);
   const monthStart = parseMonthParam(month);
   const prevMonth = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() - 1, 1));
@@ -121,7 +124,11 @@ export default async function CalendarPage({
   let weekRowsFailed = false;
   let publishedFailed = false;
   let initialDraft: ComposerDraftInitial | undefined;
+  let initialIdea: { id: string; caption: string; mediaUrls: string[] } | undefined;
+  let ideas: Idea[] = [];
+  let ideasFailed = false;
   let draftFailed = Boolean(draft);
+  let ideaFailed = Boolean(idea) && !draft;
   let draftPublishingSoon = false;
   let facebookReady = false;
   let threadsReady = false;
@@ -133,7 +140,9 @@ export default async function CalendarPage({
       ? `/app/calendar?view=month&month=${monthQueryParam(monthStart)}`
       : view === "list"
         ? "/app/calendar?view=list"
-        : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
+        : view === "ideas"
+          ? "/app/calendar?view=ideas"
+          : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
 
   const queueReloadHref = initialFilter === "all" ? reloadHref : `${reloadHref}&status=${initialFilter}`;
 
@@ -169,6 +178,34 @@ export default async function CalendarPage({
           }
         }
       } catch { /* Keep the composer hidden rather than overwrite an unloaded draft. */ }
+    }
+    if (idea && !draft && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idea)) {
+      try {
+        const [row] = await query<IdeaRow>(IDEA_BY_ID_SQL, [idea, user.id]);
+        if (row) {
+          initialIdea = ideaComposerPrefill(row);
+          ideaFailed = false;
+        }
+      } catch { /* Keep the composer hidden rather than overwrite an unloaded idea. */ }
+    }
+    if (view === "ideas") {
+      try {
+        const ideaRows = await query<IdeaRow>(IDEAS_LIST_SQL, [user.id]);
+        ideas = ideaRows.map((row) => ({
+          id: row.id,
+          text: row.text,
+          media: Array.isArray(row.media)
+            ? row.media
+                .map((item) => (item && typeof item === "object" && "url" in item ? (item as { url?: unknown }).url : undefined))
+                .filter((url): url is string => typeof url === "string" && url !== "")
+                .map((url) => ({ url }))
+            : [],
+          tags: Array.isArray(row.tags) ? row.tags.filter((tag): tag is string => typeof tag === "string") : [],
+          status: normalizeIdeaStatus(row.status),
+        }));
+      } catch {
+        ideasFailed = true;
+      }
     }
     try {
       const [fbRow] = await query<{ scopes: string[] | null; auth_type: string | null }>(
@@ -264,6 +301,9 @@ export default async function CalendarPage({
             <Link href="/app/calendar?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
               <List width={16} height={16} aria-hidden="true" /> List
             </Link>
+            <Link href="/app/calendar?view=ideas" aria-current={view === "ideas" ? "page" : undefined} className={`${styles.viewLink} ${view === "ideas" ? styles.viewLinkActive : ""}`}>
+              <Lightbulb width={16} height={16} aria-hidden="true" /> Ideas
+            </Link>
           </div>
           <Link href={`${reloadHref}&compose=1`} scroll={false} className={styles.newPostBtn}>
             <Plus width={18} height={18} aria-hidden="true" /> New post
@@ -275,6 +315,11 @@ export default async function CalendarPage({
           message={draftPublishingSoon ? "This post is about to publish and can no longer be edited." : "We couldn’t load this draft. Your saved post is unchanged."}
           reloadHref={`/app/calendar?draft=${encodeURIComponent(draft ?? "")}#new`}
         />
+      ) : ideaFailed ? (
+        <LoadFailed
+          message="We couldn’t load this idea. Your saved idea is unchanged."
+          reloadHref={reloadHref}
+        />
       ) : rulesFailed ? (
         <section className={styles.viewSection} aria-labelledby="composer-unavailable">
           <h2 id="composer-unavailable" className="sr-only">Composer unavailable</h2>
@@ -284,8 +329,8 @@ export default async function CalendarPage({
           />
         </section>
       ) : (
-        <ComposerDialog title={initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
-          <Composer key={initialDraft?.id ?? "new"} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} />
+        <ComposerDialog title={initialIdea ? "Create post from idea" : initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
+          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} />
         </ComposerDialog>
       )}
       {view === "month" ? (
@@ -318,6 +363,21 @@ export default async function CalendarPage({
           />
         </section>
       ) : null}
+      {view === "ideas" && (
+        <>
+          <IdeasBoard ideas={ideas} loadFailed={ideasFailed} />
+          <PostList
+            posts={rows.filter((post) => post.status === "draft")}
+            initialFilter="draft"
+            title="Drafts"
+            loadError={
+              rowsFailed
+                ? { message: "We couldn’t load your drafts. They may still exist.", reloadHref: queueReloadHref }
+                : undefined
+            }
+          />
+        </>
+      )}
       {view === "list" && (
         <>
       <PostList

@@ -64,7 +64,7 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const livePlatforms: PlatformId[] = ["instagram"];
@@ -73,7 +73,17 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   if (youtubeReady) livePlatforms.push("youtube");
   // Lazy initial state from the draft: the page keys this component by draft id, so a draft
   // opened by URL is filled in on the first render and switching drafts remounts cleanly.
-  const [init] = useState(() => composerStateFromDraft(initialDraft));
+  const [init] = useState(() => {
+    if (initialIdea && !initialDraft) {
+      const blank = blankComposerState();
+      return {
+        ...blank,
+        mainCaption: initialIdea.caption,
+        mediaUrls: initialIdea.mediaUrls.length ? [...initialIdea.mediaUrls] : [""],
+      };
+    }
+    return composerStateFromDraft(initialDraft);
+  });
   const [draftId, setDraftId] = useState(init.draftId);
   // The stored instant of the draft's schedule, so an untouched time saves exactly unchanged.
   const scheduleOriginRef = useRef<ScheduleOrigin | null>(null);
@@ -120,6 +130,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     (hash = "#new") => {
       const params = new URLSearchParams(searchParams.toString());
       params.delete("draft");
+      params.delete("idea");
       const query = params.toString();
       return query ? `/app/calendar?${query}${hash}` : `/app/calendar${hash}`;
     },
@@ -162,7 +173,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
 
   // "+" on a calendar day opens /app/calendar?compose=1&day=YYYY-MM-DD: pre-fill that day's time.
   const dayParam = searchParams.get("day");
-  const hasDraft = Boolean(initialDraft);
+  const hasDraft = Boolean(initialDraft) || Boolean(initialIdea);
   useEffect(() => {
     if (hasDraft) return;
     const at = dayPrefill(dayParam);
@@ -314,7 +325,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
         setFeedback({ kind: "ok", text: `Scheduled for ${when}` });
       }
       resetComposerForNewPost();
-      if (editingDraftId) {
+      if (editingDraftId || initialIdea) {
         router.replace(calendarHrefWithoutDraft());
       }
       router.refresh();
