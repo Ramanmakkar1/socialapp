@@ -27,6 +27,17 @@ const nextConfig: NextConfig = {
             key: "Cache-Control",
             value: "public, s-maxage=3600, stale-while-revalidate=86400",
           },
+          // Cloudflare ignores the browser Cache-Control for HTML by default.
+          // These headers let the edge cache the prerendered home page too, so
+          // repeat visits are served from the CDN instead of the origin.
+          {
+            key: "CDN-Cache-Control",
+            value: "public, s-maxage=3600, stale-while-revalidate=86400",
+          },
+          {
+            key: "Cloudflare-CDN-Cache-Control",
+            value: "public, s-maxage=3600, stale-while-revalidate=86400",
+          },
         ],
       },
     ];
