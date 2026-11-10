@@ -79,6 +79,10 @@ const faqs = [
     a: "No. You sign in through Meta's official login and approve publishing access. Poskoo never asks for, stores or scrapes your Threads password.",
   },
   {
+    q: "Does Poskoo use the official Threads API?",
+    a: "Yes. Poskoo connects through Meta's official login and publishes Threads posts through the official Threads API, so you never share your password with us.",
+  },
+  {
     q: "What can I post to Threads?",
     a: "A Threads post can be text up to 500 characters, one image or one video. A single post cannot contain both an image and a video.",
   },
@@ -133,6 +137,11 @@ export default function ThreadsSchedulerPage() {
         <h1>
           Threads scheduler for <em className="s mark">planning and auto-publishing posts</em>
         </h1>
+        <p className="lede">
+          A Threads scheduler is a tool that lets you write Threads posts ahead of time and publish them automatically at
+          the date and time you choose. Poskoo schedules Threads posts from the same calendar as Instagram and Facebook,
+          uses Meta&apos;s official API, and starts on a $0 Free plan with no credit card.
+        </p>
         <p className="lede">
           Plan Threads posts on one calendar and publish them automatically through Meta&apos;s official API. Write the
           text, add an image or video, choose a time, and track each result in the queue.
