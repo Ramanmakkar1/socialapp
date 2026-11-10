@@ -8,7 +8,7 @@ import {
   performanceCsvRows,
   toCsv,
   type PostPerformanceRow,
-} from "@/lib/analytics";
+} from "@/lib/analyticsCsv";
 import styles from "./analytics.module.css";
 
 type SortKey = "publishedAt" | "reach" | "impressions" | "likes" | "comments" | "saved" | "linkClicks";

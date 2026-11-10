@@ -1,5 +1,6 @@
 // Server-only analytics queries + pure helpers (CSV export, growth series) for the analytics page and report.
 import { isDbConfigured, query } from "@/lib/db";
+import type { PostPerformanceRow } from "@/lib/analyticsCsv";
 
 export const RANGE_OPTIONS = [7, 30, 90] as const;
 
@@ -10,19 +11,6 @@ export function parseRangeDays(value: string | null | undefined): number {
   if (Number.isInteger(n) && (RANGE_OPTIONS as readonly number[]).includes(n)) return n;
   return 30;
 }
-
-export type PostPerformanceRow = {
-  id: string;
-  caption: string;
-  publishedAt: string | null;
-  platforms: string[];
-  reach: number | null;
-  impressions: number | null;
-  likes: number | null;
-  comments: number | null;
-  saved: number | null;
-  linkClicks: number;
-};
 
 // Per-post metrics (Instagram insights + link clicks) for the last `days` days.
 // Tolerates missing columns/tables: returns [] on any query error.
@@ -119,40 +107,6 @@ export function buildGrowthSeries(today: string, days: number, rows: GrowthSnaps
   });
 }
 
-export const PERFORMANCE_CSV_HEADERS = [
-  "Post",
-  "Published (UTC)",
-  "Platforms",
-  "Reach",
-  "Impressions",
-  "Likes",
-  "Comments",
-  "Saves",
-  "Link clicks",
-];
-
-export function performanceCsvRows(rows: PostPerformanceRow[]): (string | number | null)[][] {
-  return rows.map((r) => [
-    r.caption,
-    r.publishedAt ?? "",
-    r.platforms.join(" "),
-    r.reach,
-    r.impressions,
-    r.likes,
-    r.comments,
-    r.saved,
-    r.linkClicks,
-  ]);
-}
-
-// RFC 4180 CSV: quotes fields containing commas/quotes/newlines, CRLF line endings.
-export function toCsv(headers: string[], rows: (string | number | null)[][]): string {
-  const esc = (v: string | number | null): string => {
-    if (v == null) return "";
-    const s = String(v);
-    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  const lines = [headers.map(esc).join(",")];
-  for (const row of rows) lines.push(row.map(esc).join(","));
-  return lines.join("\r\n");
-}
+// CSV helpers + the row type live in the client-safe analyticsCsv.ts; re-exported here for server callers.
+export { PERFORMANCE_CSV_HEADERS, performanceCsvRows, toCsv } from "@/lib/analyticsCsv";
+export type { PostPerformanceRow } from "@/lib/analyticsCsv";
