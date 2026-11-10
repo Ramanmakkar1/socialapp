@@ -216,6 +216,54 @@
   .main { padding-block: 0 24px; }
 }
 
+/* Pricing hero: copy left, illustration right from 768px up; stacked below
+   (the SVG keeps its aspect ratio via its width/height attributes). */
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  width: 100%;
+  max-width: 1060px;
+}
+.heroCopy {
+  min-width: 0;
+  text-align: center;
+}
+.heroArt {
+  min-width: 0;
+}
+.heroArt svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+@media (min-width: 768px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 44px;
+  }
+  .heroCopy {
+    text-align: left;
+  }
+  .heroCopy :global(.ctas) {
+    justify-content: flex-start;
+  }
+}
+
+/* Pricing illustration: the coin/check badge floats. */
+@keyframes pricing-badge-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .badgeFloat {
+    animation: pricing-badge-float 6s ease-in-out infinite;
+    transform-box: fill-box;
+  }
+}
+
 /* Interactive comment-to-DM flow demo (Instagram auto-DM page): one column on
    phones, form + live preview side by side from 960px up. */
 .flowCard {

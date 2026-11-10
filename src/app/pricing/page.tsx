@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
+import PricingIllustration from "@/components/PricingIllustration";
 import s from "@/components/site.module.css";
 
 const PATH = "/pricing";
@@ -91,14 +92,21 @@ export default function PricingPage() {
         <Link href="/">Home</Link> / Pricing
       </nav>
       <header className="hero">
-        <span className="pill">Free plan · no credit card · official Meta API</span>
-        <h1>
-          Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
-        </h1>
-        <p className="lede">Start free today and upgrade only when you need more accounts, posts or DMs.</p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
+        <div className={s.heroGrid}>
+          <div className={s.heroCopy}>
+            <span className="pill">Free plan · no credit card · official Meta API</span>
+            <h1>
+              Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
+            </h1>
+            <p className="lede">Start free today and upgrade only when you need more accounts, posts or DMs.</p>
+            <div className="ctas">
+              <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+              <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
+            </div>
+          </div>
+          <div className={s.heroArt}>
+            <PricingIllustration />
+          </div>
         </div>
       </header>
 
