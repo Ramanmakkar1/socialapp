@@ -187,7 +187,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/": "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, AI replies and free tools to plan, publish and grow.",
   "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI DM replies, lead capture, free tools and comparisons.",
-  "/instagram-auto-dm": "Automatically DM anyone who comments a keyword with your link, then capture their email or phone with Poskoo auto-DM rules.",
+  "/instagram-auto-dm": "Automatically DM anyone who comments a keyword with your link, then capture email or phone with Poskoo auto-DM rules. It works on every post you pick.",
   "/instagram-auto-dm/templates": "Pre-built auto-DM message templates for giveaways, promotions and lead generation, ready to customise for your brand in Poskoo.",
   "/instagram-dm-automation": "Instagram DM automation replies to comment keywords, Story replies and incoming DMs, captures emails and sends AI answers. See how Poskoo works.",
   "/buffer-alternative": "A Buffer alternative with built-in Instagram auto-DM and comment-to-lead conversion, so Poskoo turns comments into contacts.",
