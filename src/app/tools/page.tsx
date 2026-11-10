@@ -65,6 +65,11 @@ const tools = [
     description: "Check the right sizes for posts, portraits and Stories, preview and reposition the 1:1, 4:5, 3:4 and 9:16 crops of your photo, then download a JPG.",
   },
   {
+    href: "/tools/instagram-carousel-size-checker",
+    title: "Instagram carousel size checker",
+    description: "Check every carousel slide's pixel dimensions, aspect ratio and file size, and see whether all slides match before you schedule.",
+  },
+  {
     href: "/tools/instagram-font-generator",
     title: "Instagram font generator",
     description: "Create and copy Unicode font styles for your Instagram bio and captions.",
