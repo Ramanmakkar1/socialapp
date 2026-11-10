@@ -22,23 +22,19 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "How does this Instagram hashtag generator work?",
-    a: "Choose one of 15 niches, a count and a mix. The tool selects from hand-curated broad, mid-level and specific tag sets in a repeatable order. It runs in your browser without AI, scraping or uploading your keyword.",
+    a: "Choose one of 15 niches, a count and a mix. The tool selects from hand-curated broad, mid-level and specific tag sets in a repeatable order. You can add an optional keyword and copy the finished set.",
   },
   {
-    q: "How many Instagram hashtags should I use?",
-    a: "Instagram allows up to 30 hashtags. That is a ceiling, not a target: use only tags that describe your post. It is better to mix broad and specific tags than to stuff a caption with loosely related ones.",
+    q: "How many hashtags should I use on an Instagram post?",
+    a: "Use only tags that describe your post; 30 is a limit, not a target. This generator lets you choose and copy between 5 and 30 hashtags at once, so you can start with a smaller, relevant set instead of filling every slot.",
   },
   {
-    q: "What changes when I choose a different mix?",
-    a: "Balanced spreads tags evenly across the three tiers. More broad favors general topics; more specific favors focused subjects. Each tier has 10 tags, so at 30 tags without an extra keyword, every mix contains the full set. Use a smaller count to see the mix change.",
+    q: "Are my hashtags generated and copied in the browser?",
+    a: "Yes. The generator builds your set and copies it in your browser without uploading your keyword, using AI or scraping Instagram. Choose Copy all to copy the full set, or select the plain text if clipboard access is unavailable.",
   },
   {
-    q: "Are these trending hashtags or a guarantee of reach?",
-    a: "No. These are static editorial suggestions, not live popularity rankings, account checks or a promise of reach. Review every tag for relevance and check it in Instagram before posting. Your content and audience matter more than filling every hashtag slot.",
-  },
-  {
-    q: "Can I add my city or brand as a keyword?",
-    a: "Yes. The optional keyword becomes one combined tag, plus its first word for a multi-word phrase. Spaces, hash symbols and punctuation are removed, accented Latin letters are simplified, and duplicates are removed. Keyword tags count toward your selected total.",
+    q: "How should I group broad, niche and branded hashtags?",
+    a: "Use broad tags for general topics, specific tags for your niche and a branded or location keyword when it fits. Choose Balanced, More broad or More specific, then use Extra keyword to add your brand or city. Review the finished set for relevance before posting.",
   },
 ];
 
@@ -52,9 +48,13 @@ const crumbsJsonLd = breadcrumbJsonLd([
 export default function InstagramHashtagGeneratorPage() {
   return (
     <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
+      {[toolJsonLd, crumbsJsonLd, faqJsonLd(faqs)].map((data) => (
+        <script
+          key={data["@type"]}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ldJson(data) }}
+        />
+      ))}
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/tools">Free Instagram tools</Link> / Hashtag generator
       </nav>
