@@ -29,10 +29,36 @@ export const metadata: Metadata = {
   robots: BRAND.indexable ? { index: true, follow: true } : { index: false, follow: false },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": BRAND.url + "#org",
+      name: BRAND.company,
+      url: BRAND.url,
+      email: BRAND.supportEmail,
+      logo: BRAND.url + "/icon.svg",
+    },
+    {
+      "@type": "WebSite",
+      "@id": BRAND.url + "#website",
+      url: BRAND.url,
+      name: BRAND.name,
+      publisher: { "@id": BRAND.url + "#org" },
+      inLanguage: "en",
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\u003c") }}
+        />
         {children}
         <CookieNotice />
         <Analytics />
