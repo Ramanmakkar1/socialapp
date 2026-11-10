@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
   // which made the image optimizer slow and served needlessly huge files.
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200, 1400, 1536],
+    // Next keys the optimizer cache by URL, width and quality, not by file
+    // content, so replacing an image at the same path can keep serving the old
+    // variant. A 7-day TTL still avoids re-optimizing on every cold request
+    // while bounding how long a replaced image can stay stale.
+    minimumCacheTTL: 604800,
   },
   turbopack: {
     rules: {
