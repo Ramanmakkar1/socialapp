@@ -154,6 +154,41 @@
 .up { color: var(--poskoo-green); font-weight: 700; }
 .down { color: var(--poskoo-red); font-weight: 700; }
 
+/* Weekly summary card */
+.weekCard {
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-md);
+  background: var(--poskoo-card);
+  padding: 18px;
+  box-shadow: var(--poskoo-shadow-card);
+}
+.weekMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.weekMetric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  border-radius: var(--poskoo-radius-sm);
+  background: var(--poskoo-band);
+  padding: 10px 12px;
+}
+.weekMetricLabel { color: var(--poskoo-muted); font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.weekMetricValue { color: var(--poskoo-ink); font-size: 1.5rem; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.weekMetricChange { display: flex; flex-wrap: wrap; gap: 4px; color: var(--poskoo-muted); font-size: .78rem; }
+.weekNotes { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.weekNote { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; border-top: 1px solid var(--poskoo-line); padding-top: 10px; color: var(--poskoo-ink); font-size: .92rem; }
+.weekNote:first-child { border-top: 0; padding-top: 0; }
+.weekEmpty { margin: 0; color: var(--poskoo-muted); font-size: .92rem; }
+@media (max-width: 560px) {
+  .weekMetrics { grid-template-columns: 1fr; }
+}
+
 /* Unanswered-comments quick action (reuses the stat card look). */
 .quick {
   display: block;

@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { instrumentSans } from "@/lib/fonts";
-import { EMPTY_STATS, getDashboardStats, getUpcomingPosts } from "@/lib/stats";
+import { EMPTY_STATS, getDashboardStats, getRecentPosts, getUpcomingPosts } from "@/lib/stats";
 import { isDbConfigured, query } from "@/lib/db";
 import { fetchIgProfile, type GraphAccount, type IgProfile } from "@/lib/igGraph";
 import { fetchRecentMedia, type IgMediaItem } from "@/lib/igMedia";
@@ -74,14 +74,24 @@ function Change({ cur, prev }: { cur: number; prev: number }) {
   return <span className={p > 0 ? home.up : p < 0 ? home.down : undefined}>{p > 0 ? "+" : ""}{p}%</span>;
 }
 
+function weekCutoff(): number {
+  return Date.now() - 7 * 24 * 60 * 60 * 1000;
+}
+
+function postLabel(caption: string): string {
+  const text = caption.trim();
+  if (!text) return "Untitled post";
+  return text.length > 48 ? `${text.slice(0, 48).trimEnd()}…` : text;
+}
+
 export default async function AppHome() {
   await connection();
   const user = await getCurrentUser();
   const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
   const upcoming = user ? await getUpcomingPosts(user.id) : [];
-  const [snapshot, automations, account, postCreated, unanswered] = user
-    ? await Promise.all([getSnapshot(user.id), getAutomationRows(user.id), igAccount(user.id), hasAnyPost(user.id), unansweredComments(user.id)])
-    : [EMPTY_SNAPSHOT, [], null, false, 0];
+  const [snapshot, automations, account, postCreated, unanswered, recentPosts] = user
+    ? await Promise.all([getSnapshot(user.id), getAutomationRows(user.id), igAccount(user.id), hasAnyPost(user.id), unansweredComments(user.id), getRecentPosts(user.id)])
+    : [EMPTY_SNAPSHOT, [], null, false, 0, []];
   let profile: IgProfile | null = null;
   let media: IgMediaItem[] = [];
   let mediaError = false;
@@ -100,6 +110,60 @@ export default async function AppHome() {
     { label: "Leads collected", value: snapshot.leads, prev: snapshot.leadsPrev, dot: "var(--poskoo-green)" },
     { label: "Total followers", value: profile?.followers ?? 0, prev: null, dot: "var(--poskoo-peach)", note: profile?.mediaCount != null ? `${profile.mediaCount} posts` : undefined },
   ];
+  const weekAgo = weekCutoff();
+  const weekPosts = recentPosts.filter((post) => {
+    if (!post.publishedAt) return false;
+    const published = new Date(post.publishedAt).getTime();
+    return Number.isFinite(published) && published >= weekAgo;
+  });
+  const topPost = weekPosts
+    .map((post) => ({
+      post,
+      engagement:
+        (post.insights?.likes ?? 0) +
+        (post.insights?.comments ?? 0) +
+        (post.insights?.saved ?? 0) +
+        post.dmsSent +
+        post.linkClicks +
+        post.leads,
+    }))
+    .filter((row) => row.engagement > 0)
+    .sort((a, b) => b.engagement - a.engagement)[0];
+  const weekMetrics = [
+    { label: "DMs sent", value: snapshot.dmsSent, prev: snapshot.dmsSentPrev },
+    { label: "Link clicks", value: snapshot.linkClicks, prev: snapshot.linkClicksPrev },
+    { label: "Leads", value: snapshot.leads, prev: snapshot.leadsPrev },
+  ];
+  const observations: { text: string; href: string; label: string }[] = [];
+  if (stats.hasAccount) {
+    if (topPost) {
+      observations.push({
+        text: `“${postLabel(topPost.post.caption)}” had the most engagement this week (${topPost.engagement.toLocaleString("en-US")} interactions).`,
+        href: "/app/analytics?range=7",
+        label: "See post analytics",
+      });
+    } else if (weekPosts.length === 0) {
+      observations.push({
+        text: "No posts published in the last 7 days. Publish one to start seeing results here.",
+        href: "/app/calendar#new",
+        label: "Schedule a post",
+      });
+    }
+    if (stats.scheduled > 0) {
+      observations.push({
+        text: `${stats.scheduled.toLocaleString("en-US")} ${stats.scheduled === 1 ? "post is" : "posts are"} scheduled and waiting to publish.`,
+        href: "/app/calendar",
+        label: "Open calendar",
+      });
+    } else if (weekPosts.length > 0) {
+      observations.push({
+        text: "Nothing is scheduled yet. Plan your next post so your week stays active.",
+        href: "/app/calendar#new",
+        label: "Schedule a post",
+      });
+    }
+  }
+  const weeklyObservations = observations.slice(0, 2);
   const checklistDone = stats.hasAccount && postCreated && stats.hasPost;
   const tiles: [string, number, string][] = [
     ["Scheduled", stats.scheduled, "var(--poskoo-lilac)"],
@@ -189,6 +253,46 @@ export default async function AppHome() {
           </div>
         </section>
       )}
+
+      <section className={home.section} aria-labelledby="weekly-summary">
+        <div className={home.sectionHead}>
+          <div>
+            <h2 id="weekly-summary" className={home.sectionTitle}>Weekly summary</h2>
+            <p className={home.sectionSub}>Last 7 days compared with the 7 days before</p>
+          </div>
+          <Link href="/app/analytics?range=7" className={uiKit.link}>Open analytics →</Link>
+        </div>
+        <div className={home.weekCard}>
+          {stats.hasAccount ? (
+            <div className={home.weekMetrics}>
+              {weekMetrics.map((metric) => (
+                <div key={metric.label} className={home.weekMetric}>
+                  <span className={home.weekMetricLabel}>{metric.label}</span>
+                  <span className={home.weekMetricValue}>{metric.value.toLocaleString("en-US")}</span>
+                  <span className={home.weekMetricChange}>
+                    <Change cur={metric.value} prev={metric.prev} /> vs previous 7 days
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className={home.weekEmpty}>
+              Connect Instagram to start tracking your weekly results.{" "}
+              <Link href="/api/instagram/connect" className={uiKit.link}>Connect Instagram →</Link>
+            </p>
+          )}
+          {weeklyObservations.length > 0 && (
+            <ul className={home.weekNotes}>
+              {weeklyObservations.map((observation) => (
+                <li key={observation.text} className={home.weekNote}>
+                  <span>{observation.text}</span>
+                  <Link href={observation.href} className={uiKit.link}>{observation.label} →</Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
 
       {account && (
         <section className={home.section} aria-labelledby="active-automations">
