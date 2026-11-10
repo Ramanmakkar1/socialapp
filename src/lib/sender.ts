@@ -15,7 +15,7 @@ import {
   remainingBudget,
 } from "@/lib/sendPolicy";
 import { graphBaseFor } from "@/lib/graphHost";
-import { cleanPublicReply, sendPublicCommentReply, shouldPublicReply } from "@/lib/publicReply";
+import { choosePublicReply, sendPublicCommentReply, shouldPublicReply } from "@/lib/publicReply";
 
 const SEND_TIMEOUT_MS = 15_000;
 const RATE_LIMIT_PAUSE_MS = 15 * 60 * 1000;
@@ -356,7 +356,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           if (shouldPublicReply(sendRow)) {
             try {
               const r = await query<{ public_reply: string | null }>("select public_reply from socialapp.dm_rules where id=$1 and user_id=$2", [row.rule_id, row.user_id]);
-              const text = cleanPublicReply(r[0]?.public_reply);
+              const text = choosePublicReply(r[0]?.public_reply);
               if (text) {
                 const pr = await sendPublicCommentReply(graphBaseFor(account.auth_type), row.comment_id!, token, text);
                 if (!pr.ok) console.error("public comment reply failed for row", row.id, pr.error);

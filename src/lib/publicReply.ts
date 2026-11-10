@@ -11,6 +11,19 @@ export function cleanPublicReply(raw: unknown): string | null {
   return Array.from(trimmed).slice(0, PUBLIC_REPLY_MAX).join("");
 }
 
+/** Newline-delimited variants stored in the existing public_reply field. */
+export function publicReplyVariants(raw: unknown): string[] {
+  const cleaned = cleanPublicReply(raw);
+  return cleaned ? cleaned.split(/\r?\n/).map((line) => line.trim()).filter(Boolean) : [];
+}
+
+export function choosePublicReply(raw: unknown, random = Math.random): string | null {
+  const variants = publicReplyVariants(raw);
+  if (variants.length === 0) return null;
+  const index = Math.min(variants.length - 1, Math.floor(random() * variants.length));
+  return variants[index];
+}
+
 /**
  * Reply publicly only once, on the first DM for a comment: only comment-driven
  * kinds with both a comment and a rule. Manual replies, follow checks/nudges,

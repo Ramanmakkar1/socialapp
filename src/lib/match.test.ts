@@ -43,6 +43,12 @@ test('paused rules are skipped and empty keywords ignored', () => {
   assert.equal(matchComment('hello', [rule('x', ['', '  ', '!!'])]), null);
 });
 
+test('the any-comment sentinel matches arbitrary words', () => {
+  const any = rule('any', ['*']);
+  assert.equal(matchComment('anything at all', [any])?.rule.id, 'any');
+  assert.equal(matchComment('anything at all', [{ ...any, status: 'paused' }]), null);
+});
+
 test('first matching rule wins', () => {
   const first = rule('1', ['price']);
   const second = rule('2', ['link']);

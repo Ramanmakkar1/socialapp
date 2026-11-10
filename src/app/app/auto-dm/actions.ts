@@ -6,6 +6,10 @@ import { isDbConfigured, query } from "@/lib/db";
 import { validateRule, type DmRule } from "@/lib/rules";
 import { RewindError, rewindRule } from "@/lib/rewind";
 import { cleanPublicReply } from "@/lib/publicReply";
+import { fetchRecentMedia, type IgMediaItem } from "@/lib/igMedia";
+import type { GraphAccount } from "@/lib/igGraph";
+import { isMissingColumnError } from "@/lib/ruleMedia";
+import { ANY_COMMENT_KEYWORD, MAX_KEYWORD_CHIPS } from "@/lib/keywordChips";
 
 export type RuleTrigger = "comment" | "story_reply";
 
@@ -21,6 +25,8 @@ export type RuleFormInput = {
   /** null = all connected Instagram accounts */
   socialAccountId: string | null;
   publicReply: string;
+  mediaIds?: string[];
+  linkLabel?: string;
 };
 
 export type RuleActionResult = { ok: true } | { ok: false; errors: string[] };
@@ -34,12 +40,13 @@ function formToDmRule(input: RuleFormInput, id: string, active: boolean): DmRule
     id,
     name: input.name.trim(),
     keywords: input.keywords,
-    matchMode: input.matchType,
+    matchMode: input.keywords.includes(ANY_COMMENT_KEYWORD) ? "any" : input.matchType,
     triggers: input.triggers,
     replyPublicly: false,
     publicReplies: [],
     dmMessage: input.dmText,
     linkUrl: link || undefined,
+    linkLabel: input.linkLabel?.trim() || "Open link",
     askEmail: input.emailGate,
     requireFollow: input.followGate,
     active,
@@ -67,8 +74,14 @@ function validateFormInput(input: RuleFormInput): string[] {
   if (name.length > 80) {
     errors.push("Name must be 80 characters or fewer.");
   }
-  if (input.keywords.length > 10) {
-    errors.push("Use at most 10 keywords.");
+  if (input.keywords.length > MAX_KEYWORD_CHIPS) {
+    errors.push(`Use at most ${MAX_KEYWORD_CHIPS} keywords.`);
+  }
+  if ((input.mediaIds?.length ?? 0) > 25) {
+    errors.push("Choose at most 25 posts or reels.");
+  }
+  if ((input.linkLabel?.length ?? 0) > 80) {
+    errors.push("Link button text must be 80 characters or fewer.");
   }
   if (errors.length > 0) {
     return errors;
@@ -100,6 +113,27 @@ async function resolveSocialAccountId(
   return { id: socialAccountId };
 }
 
+export type RecentMediaResult =
+  | { ok: true; media: IgMediaItem[] }
+  | { ok: false; error: string };
+
+export async function listRecentMedia(socialAccountId: string): Promise<RecentMediaResult> {
+  if (!isDbConfigured()) return { ok: false, error: "Database not configured." };
+  if (!UUID_RE.test(socialAccountId)) return { ok: false, error: "Choose a connected Instagram account." };
+  const user = await requireUser();
+  try {
+    const accounts = await query<GraphAccount>(
+      `select id, external_id, access_token_enc, auth_type from socialapp.social_accounts
+       where id=$1 and user_id=$2 and platform='instagram' and status='active'`,
+      [socialAccountId, user.id],
+    );
+    if (!accounts[0]) return { ok: false, error: "Reconnect Instagram to choose a post or reel." };
+    return { ok: true, media: await fetchRecentMedia(accounts[0], 25) };
+  } catch {
+    return { ok: false, error: "Could not load recent posts. Please try again." };
+  }
+}
+
 export async function createRule(input: RuleFormInput): Promise<RuleActionResult> {
   if (!isDbConfigured()) {
     return dbNotReady();
@@ -119,23 +153,49 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
     return { ok: false, errors: [account.error] };
   }
   const link = input.linkUrl.trim() || null;
+  const mediaIds = input.mediaIds ?? [];
+  const linkLabel = input.linkLabel?.trim() || "Open link";
   try {
-    const rows = await query<{ id: string }>(
-      `insert into socialapp.dm_rules (user_id, social_account_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, triggers, status)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active') returning id`,
-      [
-        user.id,
-        account.id,
-        input.name.trim(),
-        input.keywords,
-        input.matchType,
-        input.dmText,
-        link,
-        input.emailGate,
-        input.followGate,
-        input.triggers,
-      ],
-    );
+    let rows: { id: string }[];
+    try {
+      rows = await query<{ id: string }>(
+        `insert into socialapp.dm_rules (user_id, social_account_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, triggers, media_ids, link_label, status)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'active') returning id`,
+        [
+          user.id,
+          account.id,
+          input.name.trim(),
+          input.keywords,
+          input.matchType,
+          input.dmText,
+          link,
+          input.emailGate,
+          input.followGate,
+          input.triggers,
+          mediaIds,
+          linkLabel,
+        ],
+      );
+    } catch (error) {
+      if (!isMissingColumnError(error)) throw error;
+      // Pre-021 databases retain the original any-post behaviour.
+      rows = await query<{ id: string }>(
+        `insert into socialapp.dm_rules (user_id, social_account_id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, triggers, status)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active') returning id`,
+        [
+          user.id,
+          account.id,
+          input.name.trim(),
+          input.keywords,
+          input.matchType,
+          input.dmText,
+          link,
+          input.emailGate,
+          input.followGate,
+          input.triggers,
+        ],
+      );
+    }
     try {
       await query(
         `update socialapp.dm_rules set public_reply=$3 where id=$1 and user_id=$2`,
@@ -173,24 +233,50 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
     return { ok: false, errors: [account.error] };
   }
   const link = input.linkUrl.trim() || null;
+  const mediaIds = input.mediaIds ?? [];
+  const linkLabel = input.linkLabel?.trim() || "Open link";
   try {
-    const rows = await query<{ id: string }>(
-      `update socialapp.dm_rules set name=$2, keywords=$3, match_type=$4, dm_text=$5, link_url=$6, email_gate=$7, follow_gate=$8, triggers=$9, social_account_id=$10, updated_at=now()
-       where id=$1 and user_id=$11 returning id`,
-      [
-        id,
-        input.name.trim(),
-        input.keywords,
-        input.matchType,
-        input.dmText,
-        link,
-        input.emailGate,
-        input.followGate,
-        input.triggers,
-        account.id,
-        user.id,
-      ],
-    );
+    let rows: { id: string }[];
+    try {
+      rows = await query<{ id: string }>(
+        `update socialapp.dm_rules set name=$2, keywords=$3, match_type=$4, dm_text=$5, link_url=$6, email_gate=$7, follow_gate=$8, triggers=$9, social_account_id=$10, media_ids=$11, link_label=$12, updated_at=now()
+         where id=$1 and user_id=$13 returning id`,
+        [
+          id,
+          input.name.trim(),
+          input.keywords,
+          input.matchType,
+          input.dmText,
+          link,
+          input.emailGate,
+          input.followGate,
+          input.triggers,
+          account.id,
+          mediaIds,
+          linkLabel,
+          user.id,
+        ],
+      );
+    } catch (error) {
+      if (!isMissingColumnError(error)) throw error;
+      rows = await query<{ id: string }>(
+        `update socialapp.dm_rules set name=$2, keywords=$3, match_type=$4, dm_text=$5, link_url=$6, email_gate=$7, follow_gate=$8, triggers=$9, social_account_id=$10, updated_at=now()
+         where id=$1 and user_id=$11 returning id`,
+        [
+          id,
+          input.name.trim(),
+          input.keywords,
+          input.matchType,
+          input.dmText,
+          link,
+          input.emailGate,
+          input.followGate,
+          input.triggers,
+          account.id,
+          user.id,
+        ],
+      );
+    }
     if (!rows[0]) {
       return { ok: false, errors: ["Automation not found."] };
     }

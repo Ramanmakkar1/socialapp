@@ -14,6 +14,7 @@ export type WRule = {
   email_gate: boolean;
   follow_gate: boolean;
   triggers: string[];
+  media_ids?: string[];
   created_at: number;
 };
 
@@ -60,12 +61,13 @@ export function rule(overrides: Partial<WRule> & Pick<WRule, "id">): WRule {
     email_gate: false,
     follow_gate: false,
     triggers: ["comment"],
+    media_ids: [],
     created_at: 1,
     ...overrides,
   };
 }
 
-export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; contacts?: WContact[]; queue?: WQueue[] }) {
+export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; contacts?: WContact[]; queue?: WQueue[]; missingMediaColumn?: boolean }) {
   const accounts = init.accounts;
   const rules = init.rules ?? [];
   const contacts = init.contacts ?? [];
@@ -136,12 +138,18 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
       },
     },
     {
-      match: /^select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate from socialapp\.dm_rules/,
-      reply: (p, sql) => rules
-        .filter((r) => r.user_id === p[0] && r.status === "active" && (r.social_account_id === null || r.social_account_id === p[1]))
-        .filter((r) => r.triggers.includes(sql.includes("'story_reply' = any(triggers)") ? "story_reply" : "comment"))
-        .filter((r) => p[2] === undefined || r.id === p[2])
-        .sort((a, b) => a.created_at - b.created_at),
+      match: /^select id, keywords, match_type, status, dm_text, link_url, email_gate, follow_gate(?:, media_ids)? from socialapp\.dm_rules/,
+      reply: (p, sql) => {
+        if (init.missingMediaColumn && sql.includes(", media_ids from socialapp.dm_rules")) {
+          throw Object.assign(new Error('column "media_ids" does not exist'), { code: "42703" });
+        }
+        return rules
+          .filter((r) => r.user_id === p[0] && r.status === "active" && (r.social_account_id === null || r.social_account_id === p[1]))
+          .filter((r) => r.triggers.includes(sql.includes("'story_reply' = any(triggers)") ? "story_reply" : "comment"))
+          .filter((r) => p[2] === undefined || r.id === p[2])
+          .sort((a, b) => a.created_at - b.created_at)
+          .map((r) => sql.includes(", media_ids from socialapp.dm_rules") ? r : { ...r, media_ids: undefined });
+      },
     },
     { match: /^insert into socialapp\.short_links/, reply: (p) => [{ code: `code${String(p[2]).replace(/\W/g, "")}` }] },
     { match: /pg_advisory_xact_lock/, reply: () => [] },

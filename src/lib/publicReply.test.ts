@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { PUBLIC_REPLY_MAX, cleanPublicReply, shouldPublicReply } from "./publicReply.ts";
+import { PUBLIC_REPLY_MAX, choosePublicReply, cleanPublicReply, publicReplyVariants, shouldPublicReply } from "./publicReply.ts";
 
 test("cleanPublicReply: non-strings and empty strings return null", () => {
   assert.equal(cleanPublicReply(null), null);
@@ -22,6 +22,14 @@ test("cleanPublicReply: cuts a 400-char string to 300 without splitting emoji", 
   assert.equal(typeof out, "string");
   assert.equal(Array.from(out as string).length, PUBLIC_REPLY_MAX);
   assert.equal(out, "a".repeat(298) + "📩📩");
+});
+
+test("public reply variants use one non-empty line per send", () => {
+  const raw = "First reply ✅\n\n Second reply 📩 ";
+  assert.deepEqual(publicReplyVariants(raw), ["First reply ✅", "Second reply 📩"]);
+  assert.equal(choosePublicReply(raw, () => 0), "First reply ✅");
+  assert.equal(choosePublicReply(raw, () => 0.99), "Second reply 📩");
+  assert.equal(choosePublicReply("\n"), null);
 });
 
 test("shouldPublicReply: only comment_reply and comment_link with a comment and rule", () => {

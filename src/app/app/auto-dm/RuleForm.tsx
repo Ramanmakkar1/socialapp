@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState, useTransition, type ComponentType } from "react";
 import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
+import RuleBuilder from "./RuleBuilder";
 import TemplatePicker from "./TemplatePicker";
 import AutomationMessagePreview from "@/components/AutomationMessagePreview";
 import CommentKeywordTester from "@/components/CommentKeywordTester";
@@ -41,6 +42,8 @@ export type DbRuleRow = {
   triggers: string[];
   social_account_id: string | null;
   public_reply: string | null;
+  media_ids?: string[];
+  link_label?: string | null;
 };
 
 export type RuleFormDefaults = {
@@ -55,6 +58,8 @@ export type RuleFormDefaults = {
   matchModeNote?: string;
   socialAccountId?: string | null;
   publicReply?: string | null;
+  mediaIds?: string[];
+  linkLabel?: string | null;
 };
 
 const ALL_ACCOUNTS_VALUE = "";
@@ -360,7 +365,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
               ))}
             </div>
           )}
-          <p className={`mt-1 text-xs text-[var(--poskoo-muted)]`}>Comma-separated, up to 10 keywords.</p>
+          <p className={`mt-1 text-xs text-[var(--poskoo-muted)]`}>Comma-separated, up to 20 keywords.</p>
         </div>
         <fieldset>
           <legend className={ui.label}>Match type</legend>
@@ -687,6 +692,8 @@ export function AutoDmView({
         followGate: editing.follow_gate,
         triggers: normalizeTriggers(editing.triggers),
         socialAccountId: editing.social_account_id,
+        mediaIds: editing.media_ids ?? [],
+        linkLabel: editing.link_label ?? "Open link",
       }
     : blankDraft
       ? undefined
@@ -725,7 +732,7 @@ export function AutoDmView({
 
       {formOpen && (
         <div className="mt-6">
-          <RuleForm
+          <RuleBuilder
             key={editing ? `edit:${editing.id}` : blankDraft ? "create:blank" : `create:${templateKey}`}
             mode={editing ? "edit" : "create"}
             ruleId={editing?.id}
@@ -772,7 +779,7 @@ export function AutoDmView({
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {rule.keywords.map((k) => (
                         <span key={k} className={`${ui.pill} font-mono text-xs`} style={{ color: "var(--poskoo-violet)" }}>
-                          {k}
+                          {k === "*" ? "Any word" : k}
                         </span>
                       ))}
                     </div>

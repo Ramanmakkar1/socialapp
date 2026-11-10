@@ -6,6 +6,7 @@ import { DM_TEMPLATES } from "@/lib/dmTemplates";
 import { AutoDmView, type DbRuleRow, type InstagramAccountOption, type RuleFormDefaults } from "./RuleForm";
 import { DmDeliveryStatus, loadDmDeliveryRows, type DmDeliveryRow } from "./DmDeliveryStatus";
 import { RewindPastCommentsButton } from "./RewindPastCommentsButton";
+import { isMissingColumnError } from "@/lib/ruleMedia";
 
 export const metadata = { title: "Auto-DM" };
 
@@ -23,10 +24,18 @@ export default async function AutoDmPage({
   try {
     [rules, instagramAccounts] = await Promise.all([
       query<DbRuleRow>(
-        `select id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status, triggers, social_account_id
+        `select id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status, triggers, social_account_id, media_ids, link_label
          from socialapp.dm_rules where user_id = $1 order by created_at desc`,
         [user.id],
-      ),
+      ).catch(async (error: unknown) => {
+        if (!isMissingColumnError(error)) throw error;
+        const rows = await query<DbRuleRow>(
+          `select id, name, keywords, match_type, dm_text, link_url, email_gate, follow_gate, status, triggers, social_account_id
+           from socialapp.dm_rules where user_id = $1 order by created_at desc`,
+          [user.id],
+        );
+        return rows.map((rule) => ({ ...rule, media_ids: [], link_label: null }));
+      }),
       query<InstagramAccountOption>(
         `select id, username, status from socialapp.social_accounts
          where user_id = $1 and platform = 'instagram' order by created_at`,

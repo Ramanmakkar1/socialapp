@@ -38,6 +38,8 @@ export function matchComment<T extends MatchableRule>(
   const padded = ' ' + normalized + ' ';
   for (const rule of rules) {
     if (rule.status === 'paused') continue;
+    // The builder stores "Any word" as a sentinel so existing database constraints stay unchanged.
+    if ((rule.keywords ?? []).includes('*')) return { rule, keyword: '*' };
     for (const raw of rule.keywords ?? []) {
       const keyword = normalize(raw);
       if (!keyword) continue;

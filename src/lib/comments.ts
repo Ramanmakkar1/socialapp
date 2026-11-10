@@ -2,6 +2,7 @@ import { buildCommentDmMessage } from "@/lib/commentMessage";
 import { query } from "@/lib/db";
 import { shortLinkFor } from "@/lib/links";
 import { matchComment, type MatchableRule } from "@/lib/match";
+import { isMissingColumnError, ruleMatchesMedia } from "@/lib/ruleMedia";
 
 export type CommentEvent = {
   accountExternalId: string;
@@ -33,6 +34,7 @@ type DmRuleRow = MatchableRule & {
   link_url: string | null;
   email_gate: boolean;
   follow_gate: boolean;
+  media_ids?: string[];
 };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -110,6 +112,21 @@ export type ReplayScope = {
   ruleId: string;
 };
 
+async function loadCommentRules(ruleSql: string, ruleParams: string[]): Promise<DmRuleRow[]> {
+  const scopedSql = ruleSql.replace(
+    "follow_gate from socialapp.dm_rules",
+    "follow_gate, media_ids from socialapp.dm_rules",
+  );
+  try {
+    return await query<DmRuleRow>(scopedSql, ruleParams);
+  } catch (error) {
+    if (!isMissingColumnError(error)) throw error;
+    // Older databases run in any-post mode until migration 021 is applied.
+    const rows = await query<DmRuleRow>(ruleSql, ruleParams);
+    return rows.map((rule) => ({ ...rule, media_ids: [] }));
+  }
+}
+
 export async function processCommentEvents(
   events: CommentEvent[],
   scope?: ReplayScope,
@@ -140,7 +157,8 @@ export async function processCommentEvents(
         ruleParams.push(scope.ruleId);
       }
       ruleSql += " order by created_at";
-      const rules = await query<DmRuleRow>(ruleSql, ruleParams);
+      const loadedRules = await loadCommentRules(ruleSql, ruleParams);
+      const rules = loadedRules.filter((rule) => ruleMatchesMedia(rule, event.mediaId));
       const ruleId = matchRule(event.text, rules);
       if (!ruleId) {
         continue;

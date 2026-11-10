@@ -38,6 +38,32 @@ test("replayed comments keep their original comment time in the queue (j)", asyn
   assert.match(messagingWindowError({ comment_id: "c-8", created_at: eight.created_at }) ?? "", /7-day/);
 });
 
+test("post-specific rules only queue comments on selected media", async () => {
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-media", media_ids: ["m2"] })],
+  });
+  await inWorld(world, async () => {
+    const otherPost = { ...comment("c-other", "link", null), mediaId: "m1" };
+    const selectedPost = { ...comment("c-selected", "link", null), mediaId: "m2" };
+    const missingPost = { ...comment("c-missing", "link", null), mediaId: null };
+    assert.equal(await processCommentEvents([otherPost, selectedPost, missingPost]), 1);
+  });
+  assert.deepEqual(world.queue.map((item) => item.comment_id), ["c-selected"]);
+});
+
+test("empty media scopes match any post and a missing media column falls back safely", async () => {
+  const world = createDmWorld({
+    accounts: [{ ...ACCOUNT }],
+    rules: [rule({ id: "rule-any", media_ids: [] })],
+    missingMediaColumn: true,
+  });
+  await inWorld(world, async () => {
+    const otherPost = { ...comment("c-any", "link", null), mediaId: "another-post" };
+    assert.equal(await processCommentEvents([otherPost]), 1);
+  });
+});
+
 test("webhook comments take their time from the payload; times are never in the future", () => {
   const now = Math.floor(Date.now() / 1000);
   const events = extractCommentEvents({
