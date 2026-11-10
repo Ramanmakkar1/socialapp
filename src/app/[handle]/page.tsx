@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLatestPosts, getPublicBioPage, themeFor } from "@/lib/bioPage";
 import { isDbConfigured } from "@/lib/db";
+import { BRAND } from "@/lib/brand";
 import styles from "./bio-public.module.css";
 
 type Props = { params: Promise<{ handle: string }> };
@@ -24,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${page.display_name} (@${page.handle})`,
     description: page.bio || `Links from ${page.display_name} on Poskoo.`,
     robots: { index: false, follow: false },
+    alternates: { canonical: `${BRAND.url}/${handle}` },
   };
 }
 
@@ -37,11 +39,28 @@ export default async function PublicBioPage({ params }: Props) {
   const theme = themeFor(page.theme);
   const posts = await getLatestPosts(page.user_id, 6);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    name: `${page.display_name} (@${page.handle})`,
+    url: `${BRAND.url}/@${page.handle}`,
+    mainEntity: {
+      "@type": "Person",
+      name: page.display_name,
+      alternateName: `@${page.handle}`,
+      url: `${BRAND.url}/@${page.handle}`,
+    },
+  };
+
   return (
     <main
       className={styles.page}
       style={{ background: theme.bg, color: theme.ink }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <div className={styles.shell}>
         <header className={styles.header}>
           {page.avatar_url ? (
