@@ -140,6 +140,11 @@ const tools = [
     description: "Plan a week of posts with editable day, platform, format and post-idea fields, then download a CSV for Sheets or Excel.",
   },
   {
+    href: "/tools/social-media-analytics-report",
+    title: "Social media analytics report template",
+    description: "Enter followers, reach, impressions, engagement, clicks and leads for two periods, calculate engagement rate and change, then download a CSV.",
+  },
+  {
     href: "/tools/instagram-scheduling-checklist",
     title: "Instagram scheduling checklist",
     description: "Tick off the preflight before you schedule: caption limits, media format, channel, time and timezone, connected account and publishing status.",
