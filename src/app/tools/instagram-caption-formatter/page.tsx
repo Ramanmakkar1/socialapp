@@ -45,7 +45,12 @@ const toolJsonLd = toolSoftwareJsonLd({
 
 export default function InstagramCaptionFormatterPage() {
   return (
-    <PublicShell>
+    <PublicShell
+      breadcrumbs={[
+        { name: "Free Instagram tools", path: "/tools" },
+        { name: "Instagram caption formatter", path: PATH },
+      ]}
+    >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
       <header className="hero">
