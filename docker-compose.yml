@@ -13,6 +13,11 @@ services:
       META_LOGIN_CONFIG_ID: "966709382780716"
     # 2026-11-06: reach the home Supabase database (DATABASE_URL host supabase-db) on its private Docker network
     networks: [default, supabase]
+    # 2026-11-11: uploaded media (src/lib/mediaStorage.ts default dir) must survive rebuilds/deploys.
+    volumes:
+      - poskoo-media:/data/poskoo-media
+volumes:
+  poskoo-media:
 networks:
   supabase:
     external: true
