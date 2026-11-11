@@ -58,7 +58,7 @@ test("referral bonus adds to the monthly auto-DM limit (500 per qualified referr
   assert.equal(autoDmLimitWithBonus("Free", 0), 500);
   assert.equal(autoDmLimitWithBonus("Free", 500), 1000);
   assert.equal(autoDmLimitWithBonus("Free", 1500), 2000);
-  assert.equal(autoDmLimitWithBonus("Pro", 500), 10_500);
+  assert.equal(autoDmLimitWithBonus("Pro", 500), 3_000);
   assert.equal(autoDmLimitWithBonus("Free", -10), 500);
   assert.equal(autoDmLimitWithBonus("Free", Number.NaN), 500);
 });
@@ -107,7 +107,9 @@ test("accountLimitError counts social accounts + YouTube channels (not disconnec
     assert.equal(await accountLimitError("u-1", { kind: "social", platform: "instagram", externalId: "ig-1" }), null, "reconnect is allowed");
     reply = { social: 1, youtube: 0, already: false };
     assert.equal(await accountLimitError("u-1", { kind: "youtube", channelId: "UC1" }), null);
-    assert.deepEqual(calls[2].params, ["u-1", "youtube", null, "UC1"]);
+    // planForUser also reads billing_subscriptions (no row here = Free): only look at the account counts.
+    const counts = calls.filter((c) => /from socialapp\.social_accounts/.test(c.sql));
+    assert.deepEqual(counts[2].params, ["u-1", "youtube", null, "UC1"]);
   } finally {
     restore();
   }

@@ -16,7 +16,7 @@ const ITEMS: Item[] = [
     id: "caption",
     title: "Caption",
     detail:
-      "Write a caption for every channel you selected and stay inside its limits — Instagram 2,200 characters and 30 hashtags, Threads 500 characters, Facebook Page 63,206. Keep your hook in the first line, before Instagram’s “more” cutoff.",
+      "Write a caption for every channel you selected and stay inside its limits — Instagram 2,200 characters and 30 hashtags, Threads 500 characters; Facebook Pages publish no limit, so keep it readable. Keep your hook in the first line, before Instagram’s “more” cutoff.",
     links: [{ href: "/tools/instagram-caption-counter", label: "Caption counter" }],
   },
   {

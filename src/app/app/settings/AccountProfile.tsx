@@ -1,11 +1,12 @@
-import { GraphError, fetchIgProfile, type GraphAccount } from "@/lib/igGraph";
+import { GraphError, type GraphAccount, type IgProfile } from "@/lib/igGraph";
+import { cachedIgProfile } from "@/lib/igCached";
 
 // Connected-account card details from Instagram (instagram_business_basic): avatar, name, followers, posts.
 export default async function AccountProfile({ account, fallbackUsername }: { account: GraphAccount; fallbackUsername: string | null }) {
-  let profile: Awaited<ReturnType<typeof fetchIgProfile>> | null = null;
+  let profile: IgProfile | null = null;
   let error: string | null = null;
   try {
-    profile = await fetchIgProfile(account);
+    profile = await cachedIgProfile(account);
   } catch (err) {
     error = err instanceof GraphError ? err.message : "Profile is not available right now.";
   }

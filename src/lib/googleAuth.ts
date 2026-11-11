@@ -223,7 +223,12 @@ export async function findOrCreateGoogleUser(id: GoogleIdentity): Promise<Curren
       "insert into socialapp.users (email, password_hash, name, google_sub, email_verified_at) values ($1, null, $2, $3, now()) on conflict do nothing returning id, email, name",
       [id.email, id.name, id.sub],
     );
-    if (created[0]) return { ...created[0], emailVerified: true };
+    if (created[0]) {
+      const fresh = created[0];
+      // Welcome e-mail for new Google sign-ups (once per user, after the response).
+      void import("@/lib/emailNotify").then((m) => m.inBackground("welcome", () => m.sendWelcome(fresh))).catch(() => undefined);
+      return { ...fresh, emailVerified: true };
+    }
     // Lost a race with a parallel sign-in or sign-up: use the row that won (and claim it if needed).
     const again = await query<CurrentUser & { google_sub: string | null }>("select id, email, name, google_sub from socialapp.users where google_sub=$1 or email=$2 order by (google_sub=$1) desc nulls last limit 1", [
       id.sub,

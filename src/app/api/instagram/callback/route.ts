@@ -22,13 +22,20 @@ type BackResult =
   | "limit";
 
 function back(result: BackResult) {
+  // Success opens the Connect dialog's "connected" step (ConnectChannelDialog); problems keep the Settings banners.
+  if (result === "connected") return NextResponse.redirect(new URL("/app/calendar?connected=instagram", BRAND.url));
   return NextResponse.redirect(new URL(`/app/settings?ig=${result}`, BRAND.url));
 }
 
 export async function GET(request: Request) {
   // Outside the try so the /login redirect is not swallowed.
   const user = await requireUser();
-  if (isMetaLoginConfigured()) {
+  // The Connect dialog's "Continue with Instagram" sets ig_flow=instagram (Instagram Login) even
+  // when Facebook Login for Business is configured too.
+  const flowStore = await cookies();
+  const instagramFlow = flowStore.get("ig_flow")?.value === "instagram";
+  if (instagramFlow) flowStore.delete({ name: "ig_flow", path: "/api/instagram" });
+  if (isMetaLoginConfigured() && !instagramFlow) {
     try {
       const url = new URL(request.url);
       const code = url.searchParams.get("code");

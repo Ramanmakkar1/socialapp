@@ -18,7 +18,7 @@ type Result =
   | { kind: "ok"; queued: number; scanned: number; failures: number }
   | { kind: "err"; error: string };
 
-const STEPS = ["Select automation", "Scan comments", "Processing", "Complete"];
+const STEPS = ["Select Auto-DM", "Scan comments", "Processing", "Complete"];
 
 export default function RewindFlow({ rules }: { rules: RewindRule[] }) {
   const [ruleId, setRuleId] = useState("");
@@ -59,7 +59,7 @@ export default function RewindFlow({ rules }: { rules: RewindRule[] }) {
         })}
       </ol>
 
-      <h2 id="rewind-choose" className={styles.h2}>Choose an automation to rewind</h2>
+      <h2 id="rewind-choose" className={styles.h2}>Choose an Auto-DM to rewind</h2>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -67,7 +67,7 @@ export default function RewindFlow({ rules }: { rules: RewindRule[] }) {
         }}
       >
         <fieldset className={styles.ruleList} disabled={pending}>
-          <legend className="sr-only">Automation</legend>
+          <legend className="sr-only">Auto-DM</legend>
           {rules.map((rule) => {
             const off = rule.unavailable !== null;
             const selected = ruleId === rule.id;

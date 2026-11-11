@@ -1,0 +1,40 @@
+/* Dashboard "Verify your email" banner (same strip as the shell's reconnect banner, lime accent). */
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  border-bottom: 1px solid var(--poskoo-line);
+  background: color-mix(in srgb, var(--poskoo-lime) 38%, var(--poskoo-card));
+  color: var(--poskoo-ink);
+  padding: 12px 20px;
+  font-size: .95rem;
+}
+.text { min-width: 0; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.actions form { display: contents; }
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--poskoo-ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link:hover { color: var(--poskoo-violet); }
+.dismiss {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--poskoo-muted);
+  cursor: pointer;
+}
+.dismiss:hover { background: rgba(30, 22, 49, .08); color: var(--poskoo-ink); }

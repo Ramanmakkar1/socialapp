@@ -16,7 +16,7 @@ import styles from "./contacts.module.css";
 export const metadata = {
   title: "Contacts",
   description:
-    "Every contact your auto-DMs capture: username, email, phone, source automation and last interaction. Search, filter and export to CSV.",
+    "Every contact your auto-DMs capture: username, email, phone, source Auto-DM and last interaction. Search, filter and export to CSV.",
 };
 
 type Contact = {
@@ -36,7 +36,7 @@ function Header({ action }: { action?: ReactNode }) {
     <header className={styles.head}>
       <div>
         <h1 className={styles.title}>Contacts</h1>
-        <p className={styles.sub}>Everyone your automations talk to, with the emails and phone numbers they share.</p>
+        <p className={styles.sub}>Everyone your Auto-DMs talk to, with the emails and phone numbers they share.</p>
       </div>
       {action}
     </header>
@@ -145,7 +145,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
               <Download width={15} height={15} aria-hidden="true" /> {exportCapped ? "Export latest 10,000" : "Export to CSV"}
             </ExportLeadsLink>
             {exportCapped ? (
-              <p className={styles.hint}>CSV downloads are limited to the 10,000 newest matching contacts. Narrow with search, automation, or email filters.</p>
+              <p className={styles.hint}>CSV downloads are limited to the 10,000 newest matching contacts. Narrow with search, Auto-DM, or email filters.</p>
             ) : null}
           </div>
         ) : undefined}
@@ -176,9 +176,9 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
           />
         </div>
         <div className={ui.field}>
-          <label htmlFor="contacts-rule" className="sr-only">From automation</label>
+          <label htmlFor="contacts-rule" className="sr-only">From Auto-DM</label>
           <select id="contacts-rule" name="rule" defaultValue={selectedRule} className={styles.select}>
-            <option value="">All automations</option>
+            <option value="">All Auto-DMs</option>
             {rules.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
         </div>
@@ -192,11 +192,11 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
       {selectedRuleName ? (
         <div className={`${styles.ruleBanner} flex flex-wrap items-center gap-4`}>
           <div className="min-w-0 flex-1">
-            <p className={`${ui.eyebrow} m-0`}>Automation</p>
+            <p className={`${ui.eyebrow} m-0`}>Auto-DM</p>
             <p className="m-0 truncate font-semibold text-[var(--poskoo-ink)]">{selectedRuleName}</p>
           </div>
           <div className="flex w-full flex-wrap gap-x-4 gap-y-2 sm:w-auto sm:justify-end">
-            <Link href="/app/auto-dm" className={ui.link}>Manage automations</Link>
+            <Link href="/app/auto-dm" className={ui.link}>Manage Auto-DMs</Link>
             <Link href={showAllContactsHref} className={ui.link}>Show all contacts</Link>
           </div>
         </div>
@@ -209,10 +209,10 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
               {filters.search || filters.onlyWithEmail ? " with your current filters" : " yet"}.
             </p>
             <p className="mt-2 text-[var(--poskoo-muted)]">
-              Turn on email capture or run the automation on Instagram comments — contacts appear here as people complete your DM flow.
+              Turn on email capture or run the Auto-DM on Instagram comments — contacts appear here as people complete your DM flow.
             </p>
             <Link href="/app/auto-dm" className={`${ui.link} mt-3 inline-flex min-h-[44px] items-center`}>
-              Back to this automation
+              Back to this Auto-DM
             </Link>
           </div>
         ) : filterActive ? (
@@ -222,7 +222,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
             <EmptyState
               icon={Users}
               title="No contacts yet"
-              text={configured ? "Contacts will appear here when users interact with your automations." : "Connect Instagram in Settings to start collecting contacts."}
+              text={configured ? "Contacts will appear here when users interact with your Auto-DMs." : "Connect Instagram in Settings to start collecting contacts."}
               art="/illustrations/empty-leads.webp"
               artWidth={1536}
               artHeight={1024}
@@ -254,7 +254,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
                       <dd className="m-0 break-all">{contact.phone || "—"}</dd>
                     </div>
                     <div>
-                      <dt className={`text-xs ${ui.hint}`}>From automation</dt>
+                      <dt className={`text-xs ${ui.hint}`}>From Auto-DM</dt>
                       <dd className="m-0 break-all">{contact.rule_name || "—"}</dd>
                     </div>
                     <div>
@@ -276,7 +276,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
-                <tr>{["Contact", "Email", "From automation", "Last interaction", "Tags"].map((heading) => <th key={heading} scope="col">{heading}</th>)}</tr>
+                <tr>{["Contact", "Email", "From Auto-DM", "Last interaction", "Tags"].map((heading) => <th key={heading} scope="col">{heading}</th>)}</tr>
               </thead>
               <tbody>{contacts.map((contact) => (
                 <tr key={contact.id}>

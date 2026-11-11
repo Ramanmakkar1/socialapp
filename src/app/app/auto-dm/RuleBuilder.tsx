@@ -178,7 +178,7 @@ function PhonePreview({
 
   return (
     <div className={styles.canvas}>
-      <h2 className={styles.canvasTitle}>Preview automation</h2>
+      <h2 className={styles.canvasTitle}>Preview Auto-DM</h2>
       <div className={styles.phone}>
         <div className={styles.screen}>
           <span className={styles.notch} aria-hidden="true" />
@@ -353,7 +353,7 @@ export default function RuleBuilder({
           setErrors(result.errors);
         }
       } catch {
-        setErrors(["Could not save this automation. Please try again."]);
+        setErrors(["Could not save this Auto-DM. Please try again."]);
       }
     });
   }
@@ -385,7 +385,7 @@ export default function RuleBuilder({
     >
       <div className={styles.builderBar}>
         <div className={styles.builderBarLeft}>
-          <p className={styles.builderTitle}>{mode === "edit" ? "Edit automation" : "New automation"}</p>
+          <p className={styles.builderTitle}>{mode === "edit" ? "Edit Auto-DM" : "New Auto-DM"}</p>
           <Link href="/help/instagram-auto-dm-not-working" className={`${ui.link} px-1 py-2 text-sm`}>Need help?</Link>
         </div>
         <div className={styles.builderBarRight}>
@@ -393,11 +393,11 @@ export default function RuleBuilder({
           {/* Save as new always calls createRule; the primary button updates in edit mode. */}
           {mode === "edit" && (
             <button type="button" className={styles.lineBtn} disabled={pending} onClick={() => submit(true)}>
-              Save as new automation
+              Save as new Auto-DM
             </button>
           )}
           <button type="submit" className={styles.goLive} disabled={pending} aria-busy={pending}>
-            {pending ? "Saving…" : mode === "edit" ? "Update automation" : "Go live"}
+            {pending ? "Saving…" : mode === "edit" ? "Update Auto-DM" : "Go live"}
           </button>
         </div>
       </div>
@@ -424,7 +424,7 @@ export default function RuleBuilder({
 
         <fieldset disabled={pending} className="m-0 min-w-0 space-y-4 border-0 p-0">
           <section className={styles.stepCard} aria-labelledby="automation-settings">
-            <h2 id="automation-settings" className={styles.stepTitle}>Automation settings</h2>
+            <h2 id="automation-settings" className={styles.stepTitle}>Auto-DM settings</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="rule-builder-name" className={ui.label}>Name</label>

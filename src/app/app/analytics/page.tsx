@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { postThumbUrl } from "@/lib/mediaUpload";
 import { Suspense } from "react";
 import { BarChart3, Download, Info, Instagram, MessageCircle, TrendingUp, Trophy } from "lucide-react";
 import { requireUser } from "@/lib/auth";
@@ -119,8 +120,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           [user.id, postPerformance.map((p) => p.id)],
         );
         for (const row of mediaRows) {
-          const first = Array.isArray(row.media) ? (row.media[0] as { url?: unknown } | undefined) : undefined;
-          if (typeof first?.url === "string" && !/\.(mp4|mov|webm)(\?|$)/i.test(first.url)) thumbs[row.id] = first.url;
+          const thumb = postThumbUrl(row.media);
+          if (thumb) thumbs[row.id] = thumb;
         }
       } catch {
         // Thumbnails are optional.
@@ -212,7 +213,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     { label: "Eng. rate", value: engRate ?? "—", tip: "(Likes + comments + saves) divided by reach, across those posts." },
     { label: "Reach", value: fmt(totalReach), tip: "Accounts that saw those posts (Instagram insights)." },
     { label: "DMs sent", value: fmt(stats.dmsSent), tip: "Automated DMs sent in the last 7 days." },
-    { label: "Leads", value: fmt(stats.leads), tip: "Contacts collected by your automations (all time)." },
+    { label: "Leads", value: fmt(stats.leads), tip: "Contacts collected by your Auto-DMs (all time)." },
     { label: "Link clicks", value: fmt(totalClicks), tip: "Clicks on tracked DM links from rules attached to those posts." },
   ];
 
@@ -288,7 +289,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         rules.length > 0 ? (
           <DmPerformance userId={user.id} period={period} rules={rules} sort={sortParam ?? "dms"} />
         ) : (
-          <EmptyState icon={BarChart3} title="No automations yet" text="Create your first auto-DM rule to see results here." art="/landing/card-dm.webp">
+          <EmptyState icon={BarChart3} title="No Auto-DMs yet" text="Create your first Auto-DM to see results here." art="/landing/card-dm.webp">
             <BtnLink href="/app/auto-dm" size="sm">Create auto-DM rule</BtnLink>
           </EmptyState>
         )

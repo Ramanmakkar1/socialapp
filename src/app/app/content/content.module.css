@@ -30,3 +30,5 @@
 .pillLive { background: color-mix(in srgb, var(--poskoo-green) 14%, var(--poskoo-card)); color: color-mix(in srgb, var(--poskoo-green) 70%, var(--poskoo-ink)); }
 .actions { text-align: right; }
 .page > * { min-width: 0; }
+button.ghost { font-family: inherit; cursor: pointer; }
+button.ghost:disabled { opacity: .7; cursor: progress; }

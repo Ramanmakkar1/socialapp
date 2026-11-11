@@ -44,7 +44,7 @@ const faqs = [
   { q: "Why do teams switch from Sprout Social?", a: `Per-seat pricing adds up as the team grows, and teams that need comment-to-DM often pay for a second tool on top. ${BRAND.name} combines Instagram scheduling, comment-to-DM, AI captions and lead capture in one account, starting on the Free plan.` },
   { q: "Can I import my Sprout Social schedule?", a: `There is no Sprout Social import yet. Add your upcoming posts to the ${BRAND.name} calendar. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
   { q: "Which platforms are supported?", a: "Instagram, Facebook Pages, Threads and YouTube (videos and Shorts) scheduling work today, plus Instagram auto-DMs. LinkedIn, Pinterest, TikTok and WhatsApp are on the roadmap, with no date yet." },
-  { q: "Is there a free plan?", a: `Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and paid Pro and Agency plans are coming soon.` },
+  { q: "Is there a free plan?", a: `Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and you can upgrade to Pro or Agency any time.` },
   { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 

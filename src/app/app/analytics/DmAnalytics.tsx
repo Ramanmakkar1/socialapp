@@ -101,15 +101,15 @@ export async function DmPerformance({ userId, period, rules, sort }: { userId: s
         <h2 id="dm-highlights" className={styles.blockTitle}>Highlights</h2>
         <div className={styles.highlightGrid}>
           <article className={styles.highlight}>
-            <span className={styles.limePill}>Best automation</span>
+            <span className={styles.limePill}>Best Auto-DM</span>
             {best ? (
               <>
                 <h3 className={styles.hlTitle}>{best.name}</h3>
                 <p className={styles.hlMeta}>{ctr(best.uniqueClicks, best.dmsSent)} CTR · {best.dmsSent.toLocaleString("en-US")} DMs · {best.clicks.toLocaleString("en-US")} clicks</p>
-                <Link href="/app/auto-dm" className={styles.hlLink}>View automation <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
+                <Link href="/app/auto-dm" className={styles.hlLink}>View Auto-DM <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
               </>
             ) : (
-              <p className={styles.hlMeta}>No automation has sent a DM yet.</p>
+              <p className={styles.hlMeta}>No Auto-DM has sent a DM yet.</p>
             )}
           </article>
           <article className={styles.highlight}>
@@ -141,11 +141,11 @@ export async function DmPerformance({ userId, period, rules, sort }: { userId: s
 
       <section aria-labelledby="dm-rules" className={styles.block}>
         <div className={styles.blockHead}>
-          <h2 id="dm-rules" className={styles.blockTitle}>Automation performance <span className={styles.blockSub}>all time</span></h2>
+          <h2 id="dm-rules" className={styles.blockTitle}>Auto-DM performance <span className={styles.blockSub}>all time</span></h2>
           <form className={styles.sortForm}>
             <input type="hidden" name="tab" value="dms" />
             <input type="hidden" name="range" value={period.key} />
-            <label htmlFor="rule-sort" className={styles.srOnly}>Sort automations</label>
+            <label htmlFor="rule-sort" className={styles.srOnly}>Sort Auto-DMs</label>
             <select id="rule-sort" name="sort" defaultValue={sort} className={styles.select}>
               <option value="dms">Most DMs</option>
               <option value="clicks">Most clicks</option>
@@ -156,7 +156,7 @@ export async function DmPerformance({ userId, period, rules, sort }: { userId: s
           </form>
         </div>
         {sorted.length === 0 ? (
-          <p className={styles.emptyCopy}>No automations yet. <Link href="/app/auto-dm" className={styles.inlineLink}>Create one</Link> to see its results here.</p>
+          <p className={styles.emptyCopy}>No Auto-DMs yet. <Link href="/app/auto-dm" className={styles.inlineLink}>Create one</Link> to see its results here.</p>
         ) : (
           <ul className={styles.ruleList}>
             {sorted.map((r) => (
@@ -222,18 +222,18 @@ export async function DmActivity({ userId }: { userId: string }) {
       </aside>
       <section aria-labelledby="dm-activity" className={styles.block}>
         <div className={styles.blockHead}>
-          <h2 id="dm-activity" className={styles.blockTitle}>Recent automation activity</h2>
+          <h2 id="dm-activity" className={styles.blockTitle}>Recent Auto-DM activity</h2>
           <Link href="/app/analytics?tab=activity" className={styles.ghostBtn}><RefreshCw width={14} height={14} aria-hidden="true" /> Refresh</Link>
         </div>
         {rows.length === 0 ? (
-          <p className={styles.emptyCopy}>No automation activity yet. DMs your rules send show up here.</p>
+          <p className={styles.emptyCopy}>No Auto-DM activity yet. DMs your rules send show up here.</p>
         ) : (
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th scope="col">User &amp; comment</th>
-                  <th scope="col">Automation</th>
+                  <th scope="col">Auto-DM</th>
                   <th scope="col">Public reply</th>
                   <th scope="col">DM status</th>
                   <th scope="col">Date &amp; time</th>

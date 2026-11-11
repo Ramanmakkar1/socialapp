@@ -1,0 +1,90 @@
+// Single list of every free tool: the /tools hub grid, related-tool chips and the template's
+// breadcrumbs all read from here, so a new tool is added once.
+
+export type ToolCategory = "create" | "media" | "plan" | "dm";
+
+/** Lucide icon names used by the hub cards (mapped to components in ToolIcon.tsx). */
+export type ToolIconName =
+  | "sparkles" | "hash" | "type" | "pilcrow" | "align" | "layers" | "lightbulb" | "megaphone" | "user" | "at"
+  | "eye" | "message" | "image" | "gallery" | "scissors" | "square-stack" | "frame" | "smartphone" | "circle"
+  | "clapperboard" | "palette" | "calendar" | "chart" | "check" | "globe" | "gauge" | "percent" | "key"
+  | "workflow" | "calculator" | "link" | "gift" | "tag" | "list";
+
+export type ToolEntry = {
+  href: string;
+  /** Short name used on cards, chips and breadcrumbs. */
+  name: string;
+  /** One-line summary for the hub card. */
+  summary: string;
+  category: ToolCategory;
+  icon: ToolIconName;
+};
+
+export const TOOL_CATEGORIES: { id: ToolCategory; label: string; blurb: string }[] = [
+  { id: "create", label: "Write & format", blurb: "Captions, hashtags, hooks, bios and fonts." },
+  { id: "media", label: "Images & video", blurb: "Sizes, crops, carousels, Stories and covers." },
+  { id: "plan", label: "Plan & measure", blurb: "Calendars, checklists, time zones and metrics." },
+  { id: "dm", label: "Comments & DMs", blurb: "Keywords, DM flows, links and giveaways." },
+];
+
+export const TOOLS: ToolEntry[] = [
+  // Write & format
+  { href: "/tools/instagram-caption-generator", name: "Caption generator", summary: "Caption drafts with a hook, clean line breaks and a comment CTA for any niche.", category: "create", icon: "sparkles" },
+  { href: "/tools/instagram-caption-counter", name: "Caption counter", summary: "Count characters and hashtags as you type against Instagram's caption limits.", category: "create", icon: "type" },
+  { href: "/tools/instagram-caption-formatter", name: "Caption formatter", summary: "Keep blank lines and spacing in a caption, with live counts and copy.", category: "create", icon: "align" },
+  { href: "/tools/instagram-line-break-generator", name: "Line break generator", summary: "Stop paragraphs collapsing into one block of text in your captions.", category: "create", icon: "pilcrow" },
+  { href: "/tools/instagram-font-generator", name: "Font generator", summary: "Copy Unicode font styles for your Instagram bio and captions.", category: "create", icon: "type" },
+  { href: "/tools/instagram-hashtag-generator", name: "Hashtag generator", summary: "Hand-curated hashtag sets for 15 niches, mixed broad to specific, up to 30 tags.", category: "create", icon: "hash" },
+  { href: "/tools/instagram-hashtag-strategy", name: "Hashtag strategy worksheet", summary: "Group tags into broad, niche and branded sets and save them in your browser.", category: "create", icon: "layers" },
+  { href: "/tools/instagram-hook-generator", name: "Hook generator", summary: "Ready-to-copy Reel hooks for any topic across eight hook styles.", category: "create", icon: "megaphone" },
+  { href: "/tools/instagram-post-ideas-generator", name: "Post ideas generator", summary: "Six post ideas for your niche: Reels, carousels and Stories with caption starters.", category: "create", icon: "lightbulb" },
+  { href: "/tools/instagram-bio-generator", name: "Bio generator", summary: "Instagram bio ideas for your niche with emojis, line breaks and a call to action.", category: "create", icon: "user" },
+  { href: "/tools/instagram-username-generator", name: "Username generator", summary: "Up to 30 username ideas from your name and niche that follow Instagram's rules.", category: "create", icon: "at" },
+  // Images & video
+  { href: "/tools/instagram-post-preview", name: "Post preview", summary: "Preview a photo and caption in a feed mockup with square and portrait crops.", category: "media", icon: "eye" },
+  { href: "/tools/threads-post-preview", name: "Threads post preview", summary: "Write a Threads post, count against 500 characters and preview it on mobile.", category: "media", icon: "message" },
+  { href: "/tools/instagram-image-size", name: "Image size guide", summary: "Every Instagram size in pixels, plus a crop preview and exact-size JPG download.", category: "media", icon: "image" },
+  { href: "/tools/instagram-carousel-size-checker", name: "Carousel size checker", summary: "Check each slide's dimensions, ratio and file size before you schedule.", category: "media", icon: "square-stack" },
+  { href: "/tools/instagram-carousel-splitter", name: "Carousel splitter", summary: "Split one wide image into equal carousel slides and download the PNGs.", category: "media", icon: "scissors" },
+  { href: "/tools/instagram-carousel-maker", name: "Carousel maker", summary: "Design text-and-colour carousel slides and download 1080×1350 PNGs.", category: "media", icon: "gallery" },
+  { href: "/tools/instagram-safe-zone-checker", name: "Safe zone checker", summary: "See what Reels and Story buttons and captions cover on your 9:16 frame.", category: "media", icon: "frame" },
+  { href: "/tools/instagram-story-size-checker", name: "Story size checker", summary: "Check a Story image's size and ratio in a 9:16 frame against 1080×1920.", category: "media", icon: "smartphone" },
+  { href: "/tools/instagram-highlight-cover-maker", name: "Highlight cover maker", summary: "Matching highlight covers with icons and brand colours, downloaded as PNGs.", category: "media", icon: "circle" },
+  { href: "/tools/instagram-reel-cover-maker", name: "Reel cover maker", summary: "1080×1920 Reel covers with a title that stays inside the grid crop.", category: "media", icon: "clapperboard" },
+  { href: "/tools/instagram-story-maker", name: "Story maker", summary: "Design a 1080×1920 Story with a photo, text and gradient, then download it.", category: "media", icon: "palette" },
+  // Plan & measure
+  { href: "/tools/social-media-content-calendar", name: "Content calendar template", summary: "Plan a week of posts by day, platform and format, then download a CSV.", category: "plan", icon: "calendar" },
+  { href: "/tools/social-media-analytics-report", name: "Analytics report template", summary: "Compare two periods of reach, engagement and clicks and export a CSV.", category: "plan", icon: "chart" },
+  { href: "/tools/instagram-scheduling-checklist", name: "Scheduling checklist", summary: "Tick off captions, media, time zone and account checks before you schedule.", category: "plan", icon: "check" },
+  { href: "/tools/instagram-time-zone-converter", name: "Time zone converter", summary: "Convert a posting time between time zones with daylight saving handled.", category: "plan", icon: "globe" },
+  { href: "/tools/instagram-posting-frequency-calculator", name: "Posting frequency calculator", summary: "Turn your weekly time budget into a realistic posting range and plan.", category: "plan", icon: "gauge" },
+  { href: "/tools/instagram-engagement-rate-calculator", name: "Engagement rate calculator", summary: "Engagement rate by followers or by reach from likes, comments, saves and shares.", category: "plan", icon: "percent" },
+  // Comments & DMs
+  { href: "/tools/instagram-comment-keyword-tester", name: "Comment keyword tester", summary: "Test which comments trigger a keyword with contains or exact matching.", category: "dm", icon: "key" },
+  { href: "/tools/instagram-comment-to-dm-preview", name: "Comment-to-DM preview", summary: "Preview a keyword, sample comment and DM reply as a full flow.", category: "dm", icon: "workflow" },
+  { href: "/tools/instagram-comment-to-dm-calculator", name: "Comment-to-DM calculator", summary: "Estimate comments, DMs and link clicks from views and your rates.", category: "dm", icon: "calculator" },
+  { href: "/tools/instagram-dm-link-generator", name: "DM link generator", summary: "Make an ig.me link that opens a DM with your account.", category: "dm", icon: "link" },
+  { href: "/tools/instagram-comment-picker", name: "Comment picker", summary: "Paste giveaway comments, filter them and pick a random winner locally.", category: "dm", icon: "gift" },
+  { href: "/tools/instagram-utm-builder", name: "UTM builder", summary: "Tag bio, Story and DM links with UTM fields for your analytics.", category: "dm", icon: "tag" },
+];
+
+export const toolByHref = (href: string) => TOOLS.find((t) => t.href === href);
+
+/** Doodle art for a tool's family (AnimArt name; its still poster is /landing/anim/<name>.webp). */
+export type ToolArt = "writing" | "visual" | "hashtag" | "analytics" | "card-dm" | "card-schedule";
+
+const SCHEDULE_TOOLS = new Set([
+  "/tools/social-media-content-calendar",
+  "/tools/instagram-scheduling-checklist",
+  "/tools/instagram-time-zone-converter",
+]);
+const ANALYTICS_TOOLS = new Set(["/tools/instagram-utm-builder", "/tools/instagram-comment-to-dm-calculator"]);
+
+export function toolArt(tool: ToolEntry): ToolArt {
+  if (tool.href.includes("hashtag")) return "hashtag";
+  if (SCHEDULE_TOOLS.has(tool.href)) return "card-schedule";
+  if (ANALYTICS_TOOLS.has(tool.href)) return "analytics";
+  return ({ create: "writing", media: "visual", plan: "analytics", dm: "card-dm" } as const)[tool.category];
+}
+
+export const categoryLabel = (c: ToolCategory) => TOOL_CATEGORIES.find((x) => x.id === c)?.label ?? c;

@@ -51,7 +51,7 @@ function Mock({ kind }: { kind: Card["mock"] }) {
 }
 
 // "Start a new automation" chooser. Each card opens the builder at /app/auto-dm?trigger=<trigger>.
-export default function NewAutomationDialog({ label = "New automation", className }: { label?: string; className?: string }) {
+export default function NewAutomationDialog({ label = "New Auto-DM", className }: { label?: string; className?: string }) {
   const ref = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
@@ -77,7 +77,7 @@ export default function NewAutomationDialog({ label = "New automation", classNam
         <div className={styles.inner}>
           <div className={styles.head}>
             <div>
-              <h2 id="new-automation-title" className={styles.title}>Start a new automation</h2>
+              <h2 id="new-automation-title" className={styles.title}>Start a new Auto-DM</h2>
               <p id="new-automation-sub" className={styles.sub}>Choose what triggers it, or pick a ready-made template</p>
             </div>
             <button type="button" className={styles.close} onClick={() => ref.current?.close()} aria-label="Close">

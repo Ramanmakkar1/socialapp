@@ -2,7 +2,7 @@
 // default) and are served through short-lived signed URLs so Meta can fetch them for publishing.
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { createReadStream, createWriteStream, type ReadStream } from "node:fs";
-import { mkdir, readdir, rename, stat, unlink } from "node:fs/promises";
+import { mkdir, readdir, rename, stat, statfs, unlink } from "node:fs/promises";
 import path from "node:path";
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -13,8 +13,11 @@ import type { ReadableStream as WebReadableStream } from "node:stream/web";
 // time, so it cannot be shorter than the furthest a post can be scheduled.
 export const MEDIA_URL_TTL_SECONDS = 60 * 60 * 24 * 365;
 
-/** Storage per user (all uploads together). */
+/** Legacy whole-folder cap; the per-plan "waiting to be posted" quota is in src/lib/mediaLimits.ts. */
 export const MEDIA_QUOTA_BYTES = 1024 * 1024 * 1024;
+
+/** Thumbnails / posters stay after the original is deleted, so published posts still show a picture. */
+export const THUMB_MAX_BYTES = 400 * 1024;
 
 export class MediaTooLargeError extends Error {
   constructor() {
@@ -30,7 +33,18 @@ const CONTENT_TYPES: Record<string, string> = {
   mov: "video/quicktime",
 };
 
-const KEY_RE = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|jpeg|png|mp4|mov)$/i;
+// "<user>/<uuid>.<ext>" for uploads, "<user>/<uuid>.thumb.jpg" for their small poster.
+const KEY_RE = /^[0-9a-f-]{36}\/[0-9a-f-]{36}(\.(jpg|jpeg|png|mp4|mov)|\.thumb\.jpg)$/i;
+const THUMB_SUFFIX = ".thumb.jpg";
+
+export function isThumbKey(key: string): boolean {
+  return key.toLowerCase().endsWith(THUMB_SUFFIX);
+}
+
+/** Poster key for an upload: "<user>/<uuid>.mp4" -> "<user>/<uuid>.thumb.jpg". */
+export function thumbKeyFor(key: string): string {
+  return key.replace(/\.[a-z0-9]+$/i, THUMB_SUFFIX);
+}
 
 export function mediaStorageDir(): string {
   if (process.env.MEDIA_STORAGE_DIR) return process.env.MEDIA_STORAGE_DIR;
@@ -99,8 +113,9 @@ export async function saveMediaStream(
   body: WebReadableStream<Uint8Array> | ReadableStream<Uint8Array>,
   ext: string,
   maxBytes: number,
+  fixedKey?: string,
 ): Promise<{ key: string; size: number }> {
-  const key = mediaKeyFor(userId, ext);
+  const key = fixedKey ?? mediaKeyFor(userId, ext);
   const file = mediaFilePath(key);
   if (!file) throw new Error("Invalid media key");
   await mkdir(path.dirname(file), { recursive: true });
@@ -176,19 +191,19 @@ export function openMediaStream(key: string, range?: ByteRange | null): ReadStre
 /** Storage keys mentioned in a text (post media JSON, rule rows, ...). */
 export function mediaKeysInText(text: string): string[] {
   const out: string[] = [];
-  const re = /\/api\/media\/([0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:jpg|jpeg|png|mp4|mov))/gi;
+  const re = /\/api\/media\/([0-9a-f-]{36}\/[0-9a-f-]{36}(?:\.thumb\.jpg|\.(?:jpg|jpeg|png|mp4|mov)))/gi;
   for (const m of text.matchAll(re)) out.push(m[1].toLowerCase());
   return out;
 }
 
 /**
  * Delete uploads older than `olderThanDays` that no row of their owner mentions any more
- * (posts, ideas, automations, bio page, lead magnets, products). If any lookup fails for a
- * user, that user's files are left alone.
+ * (posts, ideas, automations, bio page, lead magnets, products). A poster (.thumb.jpg) is kept
+ * while its original still exists. If any lookup fails for a user, that user's files are left alone.
  */
 export async function cleanupUnusedMedia(
   referencedTexts: (userId: string) => Promise<string[]>,
-  olderThanDays = 30,
+  olderThanDays = 7,
   nowMs = Date.now(),
 ): Promise<{ deleted: number; freedBytes: number }> {
   const base = path.resolve(mediaStorageDir());
@@ -230,8 +245,13 @@ export async function cleanupUnusedMedia(
       console.error("cleanupUnusedMedia: reference lookup failed for user", userId);
       continue;
     }
+    const present = new Set(names.map((n) => `${userId}/${n}`.toLowerCase()));
     for (const item of old) {
       if (referenced.has(item.key.toLowerCase())) continue;
+      if (isThumbKey(item.key)) {
+        const stem = item.key.toLowerCase().slice(0, -THUMB_SUFFIX.length);
+        if (["jpg", "jpeg", "png", "mp4", "mov"].some((e) => present.has(`${stem}.${e}`))) continue;
+      }
       try {
         await unlink(path.join(base, item.key));
         deleted++;
@@ -278,4 +298,116 @@ export function signedMediaUrl(
   const expires = Math.floor(Date.now() / 1000) + ttlSeconds;
   const signature = signMediaKey(key, expires, secret);
   return `${baseUrl.replace(/\/$/, "")}/api/media/${key}?exp=${expires}&sig=${signature}`;
+}
+
+/** Files in one user's folder (finished uploads and posters; temp .part files are skipped). */
+export async function listUserMedia(userId: string): Promise<{ key: string; size: number; mtimeMs: number }[]> {
+  if (!/^[0-9a-f-]{36}$/i.test(userId)) return [];
+  const dir = path.join(path.resolve(mediaStorageDir()), userId);
+  let names: string[];
+  try {
+    names = await readdir(dir);
+  } catch {
+    return [];
+  }
+  const out: { key: string; size: number; mtimeMs: number }[] = [];
+  for (const name of names) {
+    const key = `${userId}/${name}`;
+    if (!mediaFilePath(key)) continue;
+    try {
+      const info = await stat(path.join(dir, name));
+      if (info.isFile()) out.push({ key, size: info.size, mtimeMs: info.mtimeMs });
+    } catch {
+      // removed meanwhile
+    }
+  }
+  return out;
+}
+
+/** Delete stored files by key. Missing files are fine. Returns the bytes freed. */
+export async function deleteMediaKeys(keys: Iterable<string>): Promise<{ deleted: number; freedBytes: number }> {
+  let deleted = 0;
+  let freedBytes = 0;
+  for (const key of new Set(keys)) {
+    const file = mediaFilePath(key);
+    if (!file) continue;
+    try {
+      const info = await stat(file);
+      await unlink(file);
+      deleted += 1;
+      freedBytes += info.size;
+    } catch {
+      // already gone
+    }
+  }
+  return { deleted, freedBytes };
+}
+
+// ---- Disk safety ---------------------------------------------------------------------------
+
+/** Free space the media disk must keep after an upload (MEDIA_MIN_FREE_GB, default 20 GB). */
+export function minFreeBytes(): number {
+  const gb = Number(process.env.MEDIA_MIN_FREE_GB);
+  return (Number.isFinite(gb) && gb >= 0 ? gb : 20) * 1_000_000_000;
+}
+
+/** Free / total bytes on the disk that holds the media folder (null when it cannot be read). */
+export async function mediaDiskSpace(): Promise<{ freeBytes: number; totalBytes: number } | null> {
+  const base = path.resolve(mediaStorageDir());
+  try {
+    await mkdir(base, { recursive: true });
+    const info = await statfs(base);
+    return { freeBytes: info.bavail * info.bsize, totalBytes: info.blocks * info.bsize };
+  } catch {
+    return null;
+  }
+}
+
+export const DISK_FULL_MESSAGE =
+  "Uploads are paused for a moment because the media disk is nearly full. Please try again later, or use a link to the file instead.";
+
+/**
+ * Pure: may an upload of `incomingBytes` go ahead with `freeBytes` left on the disk?
+ * "warn" when the disk is under twice the minimum (log it), "refuse" when the upload would
+ * take it under the minimum.
+ */
+export function diskDecision(freeBytes: number, incomingBytes: number, minFree: number): "ok" | "warn" | "refuse" {
+  const after = freeBytes - Math.max(0, incomingBytes);
+  if (after < minFree) return "refuse";
+  if (after < minFree * 2) return "warn";
+  return "ok";
+}
+
+/** Total bytes in the media folder (admin health line). Walks one level of user folders. */
+export async function mediaDirSize(): Promise<{ bytes: number; files: number }> {
+  const base = path.resolve(mediaStorageDir());
+  let users: string[];
+  try {
+    users = await readdir(base);
+  } catch {
+    return { bytes: 0, files: 0 };
+  }
+  let bytes = 0;
+  let files = 0;
+  for (const userId of users) {
+    const dir = path.join(base, userId);
+    let names: string[];
+    try {
+      names = await readdir(dir);
+    } catch {
+      continue;
+    }
+    for (const name of names) {
+      try {
+        const info = await stat(path.join(dir, name));
+        if (info.isFile()) {
+          bytes += info.size;
+          files += 1;
+        }
+      } catch {
+        // gone
+      }
+    }
+  }
+  return { bytes, files };
 }

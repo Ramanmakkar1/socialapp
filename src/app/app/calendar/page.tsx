@@ -6,6 +6,9 @@ import CalendarToolbar from "./CalendarToolbar";
 import { weekMonthLabel, type AccountNames, type CalendarPost } from "./calendarUtils";
 import CalendarEmptyState from "./CalendarEmptyState";
 import Composer from "./Composer";
+import type { NetworkPanelData } from "./NetworkOptionsPanel";
+import { NETWORK_IDS } from "@/lib/networks/common";
+import { linkedinConfig } from "@/lib/networks/linkedin";
 import ComposerDialog from "./ComposerDialog";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
 import IdeasBoard from "./IdeasBoard";
@@ -16,7 +19,7 @@ import PostList, { type Post, type PostFilter } from "./PostList";
 import QueueView from "./QueueView";
 import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
-import { scheduledPostsUsage } from "@/lib/planLimits";
+import { planForUser, scheduledPostsUsage } from "@/lib/planLimits";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { facebookPageStatus, type FacebookSourceAccount } from "@/lib/facebookPublish";
@@ -44,8 +47,10 @@ const MONTH_FMT = { month: "long", year: "numeric", timeZone: "UTC" } as const;
 
 // Calendar card data: first media item as the thumbnail, a public link when one can be derived.
 function toCalendarPost(row: WeekPost): CalendarPost {
-  const first = Array.isArray(row.media) ? (row.media[0] as { url?: unknown; type?: unknown } | undefined) : undefined;
+  const first = Array.isArray(row.media) ? (row.media[0] as { url?: unknown; type?: unknown; thumb?: unknown } | undefined) : undefined;
   const url = typeof first?.url === "string" ? first.url : null;
+  // After publish the upload is deleted and `thumb` (poster / placeholder) is kept instead.
+  const poster = typeof first?.thumb === "string" ? first.thumb : null;
   const isVideo = first?.type === "video" || (url ? /\.(mp4|mov|webm)(\?|$)/i.test(url) : false);
   return {
     id: row.id,
@@ -53,7 +58,7 @@ function toCalendarPost(row: WeekPost): CalendarPost {
     scheduled_at: row.scheduled_at,
     status: row.status,
     platforms: row.platforms,
-    thumb: url && !isVideo ? url : null,
+    thumb: poster ?? (url && !isVideo ? url : null),
     thumbIsVideo: isVideo,
     insights: row.insights ?? null,
     permalink: row.fb_post_id && /^[0-9_]+$/.test(row.fb_post_id) ? `https://www.facebook.com/${row.fb_post_id}` : null,
@@ -170,6 +175,10 @@ export default async function CalendarPage({
   let schedulePlatforms: string[] = [];
   let scheduleRowCount = -1; // -1 = unknown (table missing / not read)
   let youtubeReady = false;
+  // TikTok, Bluesky, Mastodon, LinkedIn, Pinterest, X: connected + per-account composer data.
+  const networkReady: Partial<Record<string, boolean>> = {};
+  const captionMaxOverrides: Partial<Record<string, number>> = {};
+  const networkData: NetworkPanelData = {};
   let hasTags = false;
   let accountNames: AccountNames = {};
   const previewAccountNames: AccountNames = {};
@@ -186,9 +195,10 @@ export default async function CalendarPage({
   const queueReloadHref = initialFilter === "all" ? reloadHref : `${reloadHref}&status=${initialFilter}`;
 
   let scheduledUsage: { used: number; limit: number | null } | null = null;
+  let mediaPlan: Awaited<ReturnType<typeof planForUser>> = "Free";
   if (isDbConfigured()) {
     const user = await requireUser();
-    scheduledUsage = await scheduledPostsUsage(user.id).catch(() => null);
+    [scheduledUsage, mediaPlan] = await Promise.all([scheduledPostsUsage(user.id).catch(() => null), planForUser(user.id)]);
     try {
       const columnRows = await query<{ exists: boolean }>(
         "select exists (select 1 from information_schema.columns where table_schema='socialapp' and table_name='scheduled_posts' and column_name='tags') as exists",
@@ -282,6 +292,36 @@ export default async function CalendarPage({
       youtubeReady = ytRows.length > 0;
     } catch {
       youtubeReady = false;
+    }
+    try {
+      const netRows = await query<{ platform: string; meta: Record<string, unknown> | null }>(
+        "select platform, meta from socialapp.social_accounts where user_id=$1 and status='active' and access_token_enc is not null and platform = any($2::text[]) order by created_at",
+        [user.id, NETWORK_IDS],
+      );
+      for (const r of netRows) {
+        if (networkReady[r.platform]) continue;
+        networkReady[r.platform] = true;
+        const meta = r.meta ?? {};
+        if (r.platform === "mastodon" && Number(meta.maxChars) > 0) captionMaxOverrides.mastodon = Number(meta.maxChars);
+        if (r.platform === "linkedin" && Array.isArray(meta.orgs) && linkedinConfig().companyPages) {
+          networkData.linkedinOrgs = (meta.orgs as { urn?: unknown; name?: unknown }[])
+            .filter((o) => typeof o.urn === "string")
+            .map((o) => ({ urn: String(o.urn), name: typeof o.name === "string" ? o.name : String(o.urn) }));
+        }
+      }
+    } catch {
+      // migration 040 not applied yet: the new networks stay unavailable in the composer
+    }
+    if (initialDraft) {
+      try {
+        const optRows = await query<{ platform: string; net_options: unknown }>(
+          "select platform, net_options from post_targets where post_id=$1 and net_options is not null",
+          [initialDraft.id],
+        );
+        initialDraft.netOptions = Object.fromEntries(optRows.map((r) => [r.platform, r.net_options]));
+      } catch {
+        // no saved network options (or column missing)
+      }
     }
     try {
       commentHourRows = await query<{ hour: number; count: number }>(
@@ -415,13 +455,13 @@ export default async function CalendarPage({
         <section className={styles.viewSection} aria-labelledby="composer-unavailable">
           <h2 id="composer-unavailable" className="sr-only">Composer unavailable</h2>
           <LoadFailed
-            message="We couldn’t load your auto-DM rules, so the composer is hidden. Scheduling now could post without the automation you meant to attach."
+            message="We couldn’t load your Auto-DM rules, so the composer is hidden. Scheduling now could post without the Auto-DM you meant to attach."
             reloadHref={reloadHref}
           />
         </section>
       ) : (
         <ComposerDialog title={initialIdea ? "Create post from idea" : initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
-          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} />
+          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} networkReady={networkReady} captionMaxOverrides={captionMaxOverrides} networkData={networkData} mediaPlan={mediaPlan} />
         </ComposerDialog>
       )}
       {view === "month" ? (

@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowRight, Pencil, Save, Trash2 } from "lucide-react";
 import { deleteIdea, saveIdea } from "./ideasActions";
 import { IDEA_STATUSES, type IdeaStatus } from "@/lib/ideas";
@@ -21,7 +20,6 @@ function isImage(url: string): boolean {
 }
 
 export default function IdeaCard({ idea }: { idea: Idea }) {
-  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(idea.text);
   const [mediaText, setMediaText] = useState(idea.media.map((item) => item.url).join("\n"));
@@ -48,7 +46,6 @@ export default function IdeaCard({ idea }: { idea: Idea }) {
         // Keep the tag box as typed: clearing it here used to wipe the saved tags on the next save.
         setFeedback({ kind: "ok", text: "Idea saved" });
         setEditing(false);
-        router.refresh();
       } catch {
         setFeedback({ kind: "err", text: "Could not save idea. Please try again." });
       }
@@ -65,7 +62,6 @@ export default function IdeaCard({ idea }: { idea: Idea }) {
           setFeedback({ kind: "err", text: result.error ?? "Could not delete idea." });
           return;
         }
-        router.refresh();
       } catch {
         setFeedback({ kind: "err", text: "Could not delete idea." });
       }

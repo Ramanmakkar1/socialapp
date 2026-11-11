@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { BIO_MAX_BIO, BIO_MAX_LABEL, BIO_MAX_LINKS, BIO_MAX_NAME, BIO_THEMES, type BioPage } from "@/lib/bioPageShared";
 import { Btn } from "@/components/ui/kit";
+import SubmitButton from "@/components/ui/SubmitButton";
 import { saveBioPageAction } from "./actions";
 import styles from "./bio.module.css";
 
@@ -114,7 +115,7 @@ export default function BioEditor({ page }: { page: BioPage | null }) {
       </section>
 
       <div className={styles.actions}>
-        <Btn type="submit" variant="dark">Save page</Btn>
+        <SubmitButton label="Save page" pendingLabel="Saving…" />
       </div>
     </form>
   );

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, type ReactNode } from "react";
 import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard } from "lucide-react";
 import styles from "./shell.module.css";
 
@@ -16,7 +15,7 @@ const groups: { title: string | null; items: NavItem[] }[] = [
     title: "Engage",
     items: [
       { href: "/app/inbox", icon: Inbox, label: "Inbox" },
-      { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Automations" },
+      { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Auto-DM" },
       { href: "/app/contacts", icon: Users, label: "Contacts" },
       { href: "/app/rewind", icon: History, label: "Rewind" },
     ],
@@ -40,17 +39,35 @@ const baseFooter: NavItem[] = [
   { href: "/help/getting-started", icon: LifeBuoy, label: "Help" },
 ];
 
+const TITLES: [string, string][] = [
+  ...groups.flatMap((g) => g.items.map((i): [string, string] => [i.href, i.label])),
+  ...baseFooter.map((i): [string, string] => [i.href, i.label]),
+  ["/app/auto-dm/activity", "Auto-DM activity"],
+  ["/app/analytics/report", "Analytics report"],
+  ["/app/leads", "Leads"],
+  ["/app/settings/instagram", "Instagram settings"],
+];
+
+/** Short page name for the mobile top bar ("Home", "Calendar", ...); the longest matching href wins. */
+export function pageTitle(pathname: string): string {
+  let best: [string, string] | null = null;
+  for (const entry of TITLES) {
+    if (isActive(pathname, entry[0]) && (!best || entry[0].length > best[0].length)) best = entry;
+  }
+  return best?.[1] ?? "Dashboard";
+}
+
 // The Admin link only appears for super-admins (see lib/admin.ts).
 function getFooter(showAdmin: boolean): NavItem[] {
   return showAdmin ? [...baseFooter, { href: "/admin", icon: Shield, label: "Admin" }] : baseFooter;
 }
 
-function isActive(pathname: string, href: string) {
+export function isActive(pathname: string, href: string) {
   if (href === "/app") return pathname === "/app";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function Item({ item, pathname, failedPosts, scheduledPosts = 0, tabs }: { item: NavItem; pathname: string; failedPosts: number; scheduledPosts?: number; tabs: boolean }) {
+function Item({ item, pathname, failedPosts, scheduledPosts = 0 }: { item: NavItem; pathname: string; failedPosts: number; scheduledPosts?: number }) {
   const { href, icon: Icon, label, badge } = item;
   const active = isActive(pathname, href);
   const showBadge = href === "/app/calendar" && failedPosts > 0;
@@ -59,7 +76,7 @@ function Item({ item, pathname, failedPosts, scheduledPosts = 0, tabs }: { item:
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`${tabs ? styles.tab : styles.navItem} ${active ? (tabs ? styles.tabActive : styles.navItemActive) : ""}`}
+      className={`${styles.navItem} ${active ? styles.navItemActive : ""}`}
     >
       <Icon width={17} height={17} aria-hidden="true" />
       {label}
@@ -78,7 +95,7 @@ function Item({ item, pathname, failedPosts, scheduledPosts = 0, tabs }: { item:
   );
 }
 
-// variant "sidebar" = grouped vertical list in the aside; "tabs" = horizontal scrollable pill bar for mobile;
+// variant "sidebar" = grouped vertical list in the aside (also the mobile drawer);
 // "footer" = Settings + Review guide at the bottom of the sidebar.
 export default function SidebarNav({
   variant = "sidebar",
@@ -86,28 +103,18 @@ export default function SidebarNav({
   scheduledPosts = 0,
   showAdmin = false,
 }: {
-  variant?: "sidebar" | "tabs" | "footer";
+  variant?: "sidebar" | "footer";
   failedPosts?: number;
   scheduledPosts?: number;
   showAdmin?: boolean;
 }) {
   const pathname = usePathname() ?? "";
   const footer = getFooter(showAdmin);
-  const flat = [...groups.flatMap((g) => g.items), ...footer];
-  if (variant === "tabs") {
-    return (
-      <TabsScroller pathname={pathname}>
-        {flat.map((item) => (
-          <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} scheduledPosts={scheduledPosts} tabs />
-        ))}
-      </TabsScroller>
-    );
-  }
   if (variant === "footer") {
     return (
       <nav aria-label="Account" className={styles.footNav}>
         {footer.map((item) => (
-          <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} tabs={false} />
+          <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} />
         ))}
       </nav>
     );
@@ -118,41 +125,10 @@ export default function SidebarNav({
         <div key={g.title ?? "top"} className={styles.navGroup}>
           {g.title && <p className={styles.navGroupTitle}>{g.title}</p>}
           {g.items.map((item) => (
-            <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} scheduledPosts={scheduledPosts} tabs={false} />
+            <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} scheduledPosts={scheduledPosts} />
           ))}
         </div>
       ))}
-    </nav>
-  );
-}
-
-// Mobile tab bar: fades the edge that has more tabs behind it (so it reads as scrollable)
-// and keeps the active tab in view.
-function TabsScroller({ pathname, children }: { pathname: string; children: ReactNode }) {
-  const ref = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const update = () => {
-      el.dataset.moreLeft = el.scrollLeft > 4 ? "1" : "0";
-      el.dataset.moreRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 4 ? "1" : "0";
-    };
-    const active = el.querySelector<HTMLElement>("[aria-current='page']");
-    if (active) {
-      const offset = active.getBoundingClientRect().left - el.getBoundingClientRect().left + el.scrollLeft;
-      el.scrollLeft = Math.max(0, offset - el.clientWidth / 2 + active.offsetWidth / 2);
-    }
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      el.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [pathname]);
-  return (
-    <nav ref={ref} aria-label="Dashboard" className={styles.tabs} data-more-right="1">
-      {children}
     </nav>
   );
 }

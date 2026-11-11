@@ -19,7 +19,7 @@ async function exportContacts(request: Request, userId: string): Promise<Respons
   const url = new URL(request.url);
   const filters = parseContactFilters(Object.fromEntries(url.searchParams));
   if (filters.rule && !isValidRuleId(filters.rule)) {
-    return new Response("Invalid automation", { status: 400 });
+    return new Response("Invalid Auto-DM", { status: 400 });
   }
   const { where, params } = buildContactQuery(userId, filters);
   const contacts = await query<LeadRow & { last_seen_at: Date }>(

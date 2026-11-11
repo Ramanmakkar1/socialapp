@@ -23,6 +23,8 @@ type BackResult =
   | "error";
 
 function back(result: BackResult) {
+  // Success opens the Connect dialog's "connected" step (ConnectChannelDialog); problems keep the Settings banners.
+  if (result === "connected") return NextResponse.redirect(new URL("/app/calendar?connected=youtube", BRAND.url));
   return NextResponse.redirect(new URL(`/app/settings?yt=${result}`, BRAND.url));
 }
 

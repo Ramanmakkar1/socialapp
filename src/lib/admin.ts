@@ -24,7 +24,7 @@ export function isAdminEmail(email: string | null | undefined): boolean {
 export type AdminDecision = "admin" | "guest" | "non_admin";
 
 // Pure decision used by requireAdmin() so it can be tested without a request context.
-// Admin = allow-listed email AND that email proved through Google sign-in (email_verified_at).
+// Admin = allow-listed email AND that email proved (email_verified_at: Google sign-in, e-mailed code or reset).
 // A password sign-up with an admin's address is never an admin: sign-up proves nothing.
 export function adminDecision(user: CurrentUser | null): AdminDecision {
   if (!user) return "guest";

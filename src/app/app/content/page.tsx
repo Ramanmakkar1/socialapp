@@ -1,11 +1,15 @@
+import { Suspense } from "react";
 import Link from "next/link";
-import { Film, RefreshCw } from "lucide-react";
+import { Film } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
-import { fetchIgProfile, type IgProfile } from "@/lib/igGraph";
-import { fetchRecentMedia, relativeDay, type IgMediaItem } from "@/lib/igMedia";
+import type { IgProfile } from "@/lib/igGraph";
+import { relativeDay, type IgMediaItem } from "@/lib/igMedia";
+import { cachedIgProfile, cachedRecentMedia } from "@/lib/igCached";
 import { ruleMatchesMedia } from "@/lib/ruleMedia";
 import TodaysActions from "../TodaysActions";
+import RefreshInstagramButton from "../RefreshInstagramButton";
+import { CardRowSkeleton, TableSkeleton } from "../Skeleton";
 import styles from "./content.module.css";
 
 export const metadata = { title: "Posts & Reels" };
@@ -37,11 +41,37 @@ export default async function ContentPage() {
       scopes = [];
     }
   }
+  return (
+    <div className={styles.page}>
+      <header className={styles.head}>
+        <span className={styles.headIcon} aria-hidden="true"><Film width={20} height={20} /></span>
+        <div className={styles.headText}>
+          <h1 className={styles.h1}>Posts &amp; Reels</h1>
+          <p className={styles.sub}>Your latest Instagram posts and reels, and which ones an Auto-DM answers.</p>
+        </div>
+        {account && <RefreshInstagramButton className={styles.ghost} />}
+      </header>
+      <Suspense
+        fallback={
+          <div className={styles.section} role="status" aria-label="Loading posts from Instagram">
+            <CardRowSkeleton count={4} h={360} />
+            <TableSkeleton rows={5} thumb />
+          </div>
+        }
+      >
+        <ContentFeed account={account} scopes={scopes} />
+      </Suspense>
+    </div>
+  );
+}
+
+// Instagram media list: streamed behind Suspense so the page header renders without waiting for Meta.
+async function ContentFeed({ account, scopes }: { account: Account | null; scopes: { media_ids: string[] }[] }) {
   let media: IgMediaItem[] = [];
   let profile: IgProfile | null = null;
   let failed = false;
   if (account) {
-    const [p, m] = await Promise.allSettled([fetchIgProfile(account), fetchRecentMedia(account, 25)]);
+    const [p, m] = await Promise.allSettled([cachedIgProfile(account), cachedRecentMedia(account, 25)]);
     if (p.status === "fulfilled") profile = p.value;
     if (m.status === "fulfilled") media = m.value;
     else failed = true;
@@ -51,17 +81,7 @@ export default async function ContentPage() {
   const items = media.map((m) => ({ ...m, hasRule: covered(m.id) }));
 
   return (
-    <div className={styles.page}>
-      <header className={styles.head}>
-        <span className={styles.headIcon} aria-hidden="true"><Film width={20} height={20} /></span>
-        <div className={styles.headText}>
-          <h1 className={styles.h1}>Posts &amp; Reels</h1>
-          <p className={styles.sub}>Your latest Instagram posts and reels, and which ones an automation answers.</p>
-        </div>
-        <Link href="/app/content" prefetch={false} className={styles.ghost}>
-          <RefreshCw width={14} height={14} aria-hidden="true" /> Refresh
-        </Link>
-      </header>
+    <>
 
       {!account ? (
         <div className={styles.empty}>
@@ -119,14 +139,14 @@ export default async function ContentPage() {
                             </span>
                           </div>
                         </td>
-                        <td><span className={`${styles.pill} ${m.hasRule ? styles.pillLive : ""}`}>{m.hasRule ? "Live" : "No automation"}</span></td>
+                        <td><span className={`${styles.pill} ${m.hasRule ? styles.pillLive : ""}`}>{m.hasRule ? "Live" : "No Auto-DM"}</span></td>
                         <td className={styles.num}>–</td>
                         <td className={styles.num}>{m.likes ?? "–"}</td>
                         <td className={styles.num}>{m.comments ?? "–"}</td>
                         <td className={styles.num}>–</td>
                         <td className={styles.num}>–</td>
                         <td className={styles.actions}>
-                          <Link href="/app/auto-dm" className={styles.ghost}>{m.hasRule ? "View automation" : "Add automation"}</Link>
+                          <Link href="/app/auto-dm" className={styles.ghost}>{m.hasRule ? "View Auto-DM" : "Add Auto-DM"}</Link>
                         </td>
                       </tr>
                     ))}
@@ -138,6 +158,6 @@ export default async function ContentPage() {
           )}
         </>
       )}
-    </div>
+    </>
   );
 }

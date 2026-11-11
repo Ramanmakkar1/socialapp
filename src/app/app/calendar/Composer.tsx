@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, AtSign, CalendarClock, ChevronDown, Facebook, Hash, Instagram, Link2, Loader2, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
 import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, nextAvailableSlots, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
+import PostPreview from "./PostPreview";
 import { useComposerDialog } from "./ComposerDialog";
 import { COMPOSER_EMOJI, insertAtCursor } from "@/lib/captionInsert";
 import { aiAvailable, suggestCaptions } from "./aiActions";
@@ -26,33 +27,29 @@ import {
 } from "@/lib/composerDraft";
 import { dayPrefill, hrefWithoutComposer } from "@/lib/composerUrl";
 import { instagramAspectWarning, mediaKindFromUrl, validateMediaFile } from "@/lib/mediaUpload";
+import { checkMediaForTargets, formatBytes, maxBytesForTargets, type MediaFacts } from "@/lib/mediaLimits";
+import { probeMediaFile, UploadCancelled, uploadWithProgress } from "@/lib/mediaUploadClient";
+import type { PlanName } from "@/lib/planLimits";
 import ui from "@/components/ui/ui.module.css";
+import { NEW_NETWORK_COLOR, NEW_NETWORK_ICON } from "@/components/brandIcons";
+import NetworkOptionsPanel, { type NetworkPanelData } from "./NetworkOptionsPanel";
 
-const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
-/** Preview name for the connected account ("@brew.co" -> "brew.co", "Brew Co" page name as is). */
-function previewName(account: string | undefined): string {
-  return account ? account.replace(/^@/, "") : "Your account";
-}
-
-const NET_COLOR: Record<PlatformId, string> = { instagram: "#d62976", facebook: "#1877f2", threads: "#000", youtube: "#ff0000" };
+const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp"];
+const NEW_NETWORKS = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp"] as const;
+const NET_COLOR: Record<PlatformId, string> = { instagram: "#d62976", facebook: "#1877f2", threads: "#000", youtube: "#ff0000", ...NEW_NETWORK_COLOR };
 
 const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
   instagram: Instagram,
   facebook: Facebook,
   threads: AtSign,
   youtube: YouTube,
+  ...NEW_NETWORK_ICON,
 };
 
 function counterClass(length: number, max: number): string {
   if (length > max) return "text-[var(--poskoo-coral)]";
   if (length >= max * 0.9) return "text-[var(--poskoo-coral)]";
   return "text-[var(--poskoo-muted)]";
-}
-
-function previewCaption(platform: PlatformId, text: string): string {
-  if (platform !== "instagram") return text;
-  if (text.length <= 125) return text;
-  return `${text.slice(0, 125)}… more`;
 }
 
 function effectiveCaption(
@@ -67,22 +64,6 @@ function effectiveCaption(
 type RuleOption = { id: string; name: string; status: string };
 export type { ComposerDraftInitial };
 
-function readImageSize(file: File): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const objectUrl = URL.createObjectURL(file);
-    const image = new window.Image();
-    image.onload = () => {
-      resolve({ width: image.naturalWidth, height: image.naturalHeight });
-      URL.revokeObjectURL(objectUrl);
-    };
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error("Could not read the image."));
-    };
-    image.src = objectUrl;
-  });
-}
-
 function nextSlotLocal(hourUtc: number): Date {
   const now = new Date();
   const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hourUtc, 0, 0));
@@ -90,13 +71,17 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false, scheduledUsage = null, accountNames = {} }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean; scheduledUsage?: { used: number; limit: number | null } | null; accountNames?: Record<string, string> }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false, scheduledUsage = null, accountNames = {}, networkReady = {}, captionMaxOverrides = {}, networkData = {}, mediaPlan = "Free" }: { mediaPlan?: PlanName; networkReady?: Partial<Record<string, boolean>>; captionMaxOverrides?: Partial<Record<string, number>>; networkData?: NetworkPanelData; rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean; scheduledUsage?: { used: number; limit: number | null } | null; accountNames?: Record<string, string> }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const livePlatforms: PlatformId[] = ["instagram"];
   if (facebookReady) livePlatforms.push("facebook");
   if (threadsReady) livePlatforms.push("threads");
   if (youtubeReady) livePlatforms.push("youtube");
+  for (const n of NEW_NETWORKS) if (networkReady[n]) livePlatforms.push(n);
+  // After connecting a channel the composer opens with ?with=<network>: start with just that one.
+  const withParam = searchParams.get("with");
+  const preselect = !initialDraft && !initialIdea && withParam && livePlatforms.includes(withParam as PlatformId) ? (withParam as PlatformId) : null;
   // Lazy initial state from the draft: the page keys this component by draft id, so a draft
   // opened by URL is filled in on the first render and switching drafts remounts cleanly.
   const [init] = useState(() => {
@@ -132,8 +117,17 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const hashtagGroupNameId = useId();
   const hashtagTextId = useId();
 
-  const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>(init.enabled);
-  const [activeTab, setActiveTab] = useState<PlatformId>("instagram");
+  const [enabled, setEnabled] = useState<Record<PlatformId, boolean>>(() =>
+    preselect ? (Object.fromEntries(PLATFORM_ORDER.map((p) => [p, p === preselect])) as Record<PlatformId, boolean>) : init.enabled,
+  );
+  const [activeTab, setActiveTab] = useState<PlatformId>(preselect ?? "instagram");
+  const [netOptions, setNetOptions] = useState<Record<string, Record<string, unknown>>>(() => {
+    const saved: Record<string, Record<string, unknown>> = {};
+    for (const [k, v] of Object.entries(initialDraft?.netOptions ?? {})) {
+      if (v && typeof v === "object") saved[k] = v as Record<string, unknown>;
+    }
+    return saved;
+  });
   const [mainCaption, setMainCaption] = useState(init.mainCaption);
   const [firstComment, setFirstComment] = useState(init.firstComment);
   const [postTags, setPostTags] = useState(init.tags.join(", "));
@@ -148,6 +142,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [mediaWarnings, setMediaWarnings] = useState<string[]>([]);
+  // Upload progress + cancel, and the facts of files uploaded in this session (re-checked when
+  // the selected networks change).
+  const [uploadProgress, setUploadProgress] = useState<{ name: string; loaded: number; total: number } | null>(null);
+  const uploadAbortRef = useRef<AbortController | null>(null);
+  const [mediaFacts, setMediaFacts] = useState<Record<string, MediaFacts>>({});
   const [dragActive, setDragActive] = useState(false);
   const [linkMode, setLinkMode] = useState(false);
   const [igFormat, setIgFormat] = useState<"feed" | "story">(init.igFormat);
@@ -215,6 +214,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     setYtTags("");
     setYtPrivacy("public");
     setYtShorts(false);
+    setNetOptions({});
     setAiOpen(false);
     setAiTopic("");
     setAiTone("friendly");
@@ -371,12 +371,28 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       ytTags: enabled.youtube ? ytTags.split(",").map((t) => t.trim()).filter((t) => t !== "") : undefined,
       ytPrivacy: enabled.youtube ? ytPrivacy : undefined,
       ytShorts: enabled.youtube ? ytShorts : undefined,
+      netOptions: Object.fromEntries(NEW_NETWORKS.filter((n) => enabled[n]).map((n) => [n, netOptions[n] ?? {}])),
     };
   }
 
   const firstNet = selected[0] ?? "instagram";
-  const captionMax = firstNet === "youtube" ? null : PLATFORM_LIMITS[firstNet].max;
+  const captionMax =
+    firstNet === "youtube"
+      ? null
+      : firstNet === "instagram" || firstNet === "facebook" || firstNet === "threads"
+        ? PLATFORM_LIMITS[firstNet].max
+        : (captionMaxOverrides[firstNet] ?? PLATFORMS[firstNet].captionMax);
   const filledMediaCount = mediaUrls.map((u) => u.trim()).filter((u) => u !== "").length;
+  const selectedPlatforms = PLATFORM_ORDER.filter((p) => enabled[p]);
+  // Files uploaded in this session, re-checked against the networks selected now.
+  const attachedMediaIssues = [
+    ...new Set(
+      mediaUrls.flatMap((u) => {
+        const facts = mediaFacts[u.trim()];
+        return facts ? checkMediaForTargets(facts, { plan: mediaPlan, platforms: selectedPlatforms, igFormat: enabled.instagram ? igFormat : "feed" }).errors : [];
+      }),
+    ),
+  ];
   const storyMediaError =
     enabled.instagram && igFormat === "story" && filledMediaCount > 1;
 
@@ -416,44 +432,77 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       return;
     }
     const queue = storyMode ? files.slice(0, 1) : files.slice(0, room);
+    const platforms = PLATFORM_ORDER.filter((p) => enabled[p]);
+    const igFormatNow = enabled.instagram ? igFormat : "feed";
     setUploading(true);
     const warnings: string[] = [];
+    const controller = new AbortController();
+    uploadAbortRef.current = controller;
     try {
       for (const file of queue) {
-        const check = validateMediaFile({ type: file.type, size: file.size, name: file.name });
+        if (controller.signal.aborted) break;
+        const check = validateMediaFile({ type: file.type, size: file.size, name: file.name }, mediaPlan);
         if (!check.ok) {
-          setUploadError(check.error);
+          setUploadError(`${file.name}: ${check.error}`);
           continue;
         }
-        if (check.kind === "image" && !storyMode) {
-          try {
-            const size = await readImageSize(file);
-            const warning = instagramAspectWarning(size.width, size.height);
-            if (warning) warnings.push(`${file.name}: ${warning}`);
-          } catch {
-            // The server still validates type and size; a preview failure is not fatal.
-          }
+        // Before upload: size, type, pixels and video length (hidden <video>) against every selected network.
+        const { facts, poster } = await probeMediaFile(file, check.kind);
+        const verdict = checkMediaForTargets(facts, { plan: mediaPlan, platforms, igFormat: igFormatNow });
+        if (verdict.errors.length > 0) {
+          setUploadError(`${file.name}: ${verdict.errors[0]}`);
+          continue;
+        }
+        for (const w of verdict.warnings) warnings.push(`${file.name}: ${w}`);
+        if (check.kind === "image" && !storyMode && enabled.instagram && facts.width && facts.height) {
+          const warning = instagramAspectWarning(facts.width, facts.height);
+          if (warning) warnings.push(`${file.name}: ${warning}`);
         }
         // Raw body: the server streams it to disk instead of buffering a multipart form in memory.
-        const response = await fetch("/api/media/upload", {
-          method: "POST",
-          body: file,
-          headers: { "Content-Type": file.type || "application/octet-stream", "X-File-Name": encodeURIComponent(file.name) },
-        });
-        const result = (await response.json().catch(() => ({}))) as { url?: string; error?: string };
-        if (!response.ok || !result.url) {
+        setUploadProgress({ name: file.name, loaded: 0, total: file.size });
+        const response = await uploadWithProgress(
+          "/api/media/upload",
+          file,
+          {
+            "Content-Type": file.type || "application/octet-stream",
+            "X-File-Name": encodeURIComponent(file.name),
+            "X-Networks": platforms.join(","),
+            "X-Ig-Format": igFormatNow,
+          },
+          (loaded, total) => setUploadProgress({ name: file.name, loaded, total }),
+          controller.signal,
+        );
+        const result = response.body as { url?: string; key?: string; error?: string; durationSec?: number | null };
+        if (response.status < 200 || response.status >= 300 || !result.url) {
           setUploadError(result.error || "Could not upload that file. Please try again.");
           continue;
         }
-        if (storyMode) setMediaUrls([result.url]);
-        else addMediaUrl(result.url);
+        const url = result.url;
+        if (typeof result.durationSec === "number") facts.durationSec = result.durationSec;
+        setMediaFacts((prev) => ({ ...prev, [url]: facts }));
+        // Small poster that stays after the file is deleted on publish (best effort).
+        if (poster && result.key) {
+          void fetch("/api/media/upload", {
+            method: "POST",
+            body: poster,
+            headers: { "Content-Type": "image/jpeg", "X-Thumb-For": result.key },
+          }).catch(() => undefined);
+        }
+        if (storyMode) setMediaUrls([url]);
+        else addMediaUrl(url);
       }
-    } catch {
-      setUploadError("Could not upload that file. Please try again.");
+    } catch (err) {
+      setUploadError(err instanceof UploadCancelled ? "Upload cancelled." : "Could not upload that file. Please try again.");
     } finally {
+      uploadAbortRef.current = null;
+      setUploadProgress(null);
       setUploading(false);
       setMediaWarnings(warnings);
     }
+  }
+
+  function cancelUpload() {
+    uploadAbortRef.current?.abort();
   }
 
   function handleMediaDrop(event: React.DragEvent<HTMLDivElement>) {
@@ -551,7 +600,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       } else if (editingDraftId || initialIdea) {
         router.replace(calendarHrefWithoutDraft());
       }
-      router.refresh();
+      // savePost revalidates /app/calendar, so no extra router.refresh() (it re-rendered the whole page twice).
     });
   }
 
@@ -712,14 +761,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           Cancel editing · New post
         </Link>
       )}
-      <div className="composerPanes grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
+      <div className="composerPanes grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
         <div className="composerEditor min-w-0 space-y-5">
           <div>
             <span className="text-sm font-medium text-[var(--poskoo-ink)]">Channels</span>
             <div
               id={platformsFocusId}
               tabIndex={-1}
-              className="mt-2 flex flex-wrap gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]"
+              className="mt-2 flex w-full min-w-0 max-w-full flex-wrap gap-2.5 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)] sm:gap-3"
             >
               {PLATFORM_ORDER.map((platform) => {
                 const Icon = PLATFORM_ICON[platform];
@@ -732,7 +781,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                       ? "Threads: connect your Threads account in Settings to enable"
                       : platform === "youtube"
                         ? "YouTube: connect a channel in Settings to enable"
-                        : `${PLATFORMS[platform].label} publishing is not available yet`
+                        : `${PLATFORMS[platform].label}: connect it with “Connect a channel” to enable`
                   : undefined;
                 return (
                   <button
@@ -1057,7 +1106,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               <UploadCloud className="mx-auto h-8 w-8 text-[var(--poskoo-violet)]" aria-hidden />
               <p className="mt-2 text-sm font-medium text-[var(--poskoo-ink)]">Drag &amp; drop images or videos</p>
               <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
-                JPG or PNG up to 8 MB · MP4 or MOV up to 100 MB · up to 10 images
+                JPG or PNG up to {formatBytes(maxBytesForTargets("image", { plan: mediaPlan, platforms: selectedPlatforms, igFormat: enabled.instagram ? igFormat : "feed" }))} · MP4 or MOV up to {formatBytes(maxBytesForTargets("video", { plan: mediaPlan, platforms: selectedPlatforms, igFormat: enabled.instagram ? igFormat : "feed" }))} · up to 10 images
               </p>
               <label
                 htmlFor={mediaInputId}
@@ -1080,10 +1129,46 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 className="sr-only"
               />
             </div>
+            {uploadProgress && (
+              <div className="mt-2 flex items-center gap-3" aria-live="polite">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs text-[var(--poskoo-muted)]">
+                    Uploading {uploadProgress.name} · {formatBytes(uploadProgress.loaded)} of {formatBytes(uploadProgress.total)}
+                  </p>
+                  <div
+                    className="mt-1 h-2 overflow-hidden rounded-full bg-[var(--poskoo-line)]"
+                    role="progressbar"
+                    aria-label={`Uploading ${uploadProgress.name}`}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round((uploadProgress.loaded / Math.max(1, uploadProgress.total)) * 100)}
+                  >
+                    <div
+                      className="h-full rounded-full bg-[var(--poskoo-violet)] transition-[width]"
+                      style={{ width: `${Math.min(100, Math.round((uploadProgress.loaded / Math.max(1, uploadProgress.total)) * 100))}%` }}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={cancelUpload}
+                  className="shrink-0 rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs font-medium text-[var(--poskoo-ink)] hover:bg-[var(--poskoo-line)]/40"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
             {uploadError && (
               <p className="mt-2 text-sm text-[var(--poskoo-coral)]" role="alert">
                 {uploadError}
               </p>
+            )}
+            {attachedMediaIssues.length > 0 && (
+              <ul className="mt-2 space-y-1 text-xs text-[var(--poskoo-coral)]" role="status">
+                {attachedMediaIssues.map((issue) => (
+                  <li key={issue}>{issue}</li>
+                ))}
+              </ul>
             )}
             {mediaWarnings.length > 0 && (
               <ul className="mt-2 space-y-1 text-xs text-[var(--poskoo-coral)]">
@@ -1334,6 +1419,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             </div>
           )}
 
+          <NetworkOptionsPanel
+            enabled={enabled}
+            options={netOptions}
+            onChange={(network, value) => setNetOptions((prev) => ({ ...prev, [network]: value }))}
+            mediaUrls={mediaUrls}
+            data={networkData}
+          />
+
           <div>
             {rules.length > 0 ? (
               <>
@@ -1372,29 +1465,34 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
 
           {selected.length > 0 && (
             <div>
-              <div className="flex flex-wrap gap-1 border-b border-[var(--poskoo-line)]">
-                {selected.map((platform) => (
-                  <button
-                    key={platform}
-                    type="button"
-                    role="tab"
-                    aria-selected={activeTab === platform}
-                    onClick={() => setActiveTab(platform)}
-                    className={`rounded-t-lg px-3 py-2 text-sm font-medium ${
-                      activeTab === platform ? "border border-b-0 border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[var(--poskoo-ink)]" : "text-[var(--poskoo-muted)]"
-                    }`}
-                  >
-                    {PLATFORMS[platform].label}
-                  </button>
-                ))}
+              <div role="tablist" aria-label="Customize per network" className="flex gap-1 overflow-x-auto border-b border-[var(--poskoo-line)] [scrollbar-width:none]">
+                {selected.map((platform) => {
+                  const TabIcon = PLATFORM_ICON[platform];
+                  const on = activeTab === platform;
+                  return (
+                    <button
+                      key={platform}
+                      type="button"
+                      role="tab"
+                      aria-selected={on}
+                      onClick={() => setActiveTab(platform)}
+                      className={`-mb-px inline-flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                        on ? "border-[var(--poskoo-ink)] text-[var(--poskoo-ink)]" : "border-transparent text-[var(--poskoo-muted)] hover:text-[var(--poskoo-ink)]"
+                      }`}
+                    >
+                      <TabIcon className="h-4 w-4" style={{ color: NET_COLOR[platform] }} aria-hidden />
+                      {PLATFORMS[platform].label}
+                    </button>
+                  );
+                })}
               </div>
-              <div className="rounded-b-xl rounded-tr-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
+              <div role="tabpanel" className="rounded-b-xl border border-t-0 border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
                 {(() => {
                   const platform = activeTab;
                   if (!enabled[platform]) return null;
                   const config = PLATFORMS[platform];
                   const text = effectiveCaption(platform, mainCaption, customize, customCaption);
-                  const check = checkCaption(platform, text);
+                  const check = checkCaption(platform, text, captionMaxOverrides[platform]);
                   return (
                     <>
                       <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--poskoo-ink)]">
@@ -1420,8 +1518,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                           className="mt-3 w-full resize-y rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm focus:border-[var(--poskoo-violet)] focus:outline-none"
                         />
                       )}
-                      <p className={`mt-3 text-sm tabular-nums ${counterClass(check.length, config.captionMax)}`}>
-                        {check.length.toLocaleString("en-US")} / {config.captionMax.toLocaleString("en-US")}
+                      <p className={`mt-3 text-sm tabular-nums ${counterClass(check.length, check.max)}`}>
+                        {check.length.toLocaleString("en-US")} / {check.max.toLocaleString("en-US")}
+                        {platform === "bluesky" ? " characters (graphemes)" : platform === "x" ? " (links count as 23)" : ""}
                       </p>
                       {check.errors.length > 0 && (
                         <ul className="mt-2 space-y-1 text-sm text-[var(--poskoo-coral)]" aria-live="polite">
@@ -1551,141 +1650,100 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             </div>
           </div>
 
-          <div className="composerFooter sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center justify-end gap-2 border-t border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-1 py-3">
-            {dialog && (
-              <label className="mr-auto inline-flex cursor-pointer items-center gap-2 text-sm text-[var(--poskoo-ink)]">
-                <input
-                  type="checkbox"
-                  checked={createAnother}
-                  onChange={(e) => setCreateAnother(e.target.checked)}
-                  className="h-4 w-4 accent-[var(--poskoo-violet)]"
-                />
-                Create another
-              </label>
-            )}
-            {scheduledUsage && scheduledUsage.limit !== null && (
-              <span
-                className={`${dialog ? "" : "mr-auto "}text-xs ${scheduledUsage.used >= scheduledUsage.limit ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-muted)]"}`}
-                title="Posts scheduled or published this month (UTC) on your plan. Drafts don't count."
-              >
-                Scheduled this month {scheduledUsage.used}/{scheduledUsage.limit}
-              </span>
-            )}
-            <button
-              type="button"
-              disabled={isPending || uploading || storyMediaError}
-              onClick={() => handleSave("draft")}
-              className="rounded-full border border-[var(--poskoo-line)] px-4 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:bg-[var(--poskoo-band)] disabled:opacity-60"
-            >
-              {isPending ? "Saving…" : "Save Draft"}
-            </button>
-            <button
-              type="button"
-              disabled={isPending || uploading || !queueReady || storyMediaError}
-              onClick={() => handleSave("queue")}
-              title={queueReady ? undefined : "Set a posting schedule in Settings → Channels first"}
-              className="rounded-full border border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 px-4 py-2 text-sm font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/20 disabled:opacity-60"
-            >
-              {isPending ? "Saving…" : "Add to Queue"}
-            </button>
-            <button
-              type="button"
-              disabled={isPending || uploading || !scheduledAt || storyMediaError}
-              onClick={() => handleSave("schedule")}
-              className={`${ui.inkFill} rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60`}
-            >
-              {isPending ? "Saving…" : "Schedule Post"}
-            </button>
+
+        </div>
+
+        <div className="composerPreview">
+          <div className="composerPreviewCard space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 lg:sticky lg:top-0 lg:self-start">
+            <PostPreview
+              selected={selected}
+              captions={Object.fromEntries(selected.map((p) => [p, effectiveCaption(p, mainCaption, customize, customCaption)]))}
+              mediaUrls={mediaUrls}
+              accountNames={accountNames}
+              netOptions={netOptions}
+              whenLabel={selectedScheduleDate && !Number.isNaN(selectedScheduleDate.getTime())
+                ? selectedScheduleDate.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+                : "now"}
+            />
+            <PublishingChecklist
+              enabled={enabled}
+              selected={selected}
+              mainCaption={mainCaption}
+              firstComment={firstComment}
+              customize={customize}
+              customCaption={customCaption}
+              mediaUrls={mediaUrls}
+              igFormat={igFormat}
+              ytTitle={ytTitle}
+              scheduledAt={scheduledAt}
+              timeZone={timeZone}
+              onFix={focusChecklistTarget}
+            />
           </div>
-          {feedback && (
-            <p
-              className={`text-sm ${feedback.kind === "ok" ? "text-[var(--poskoo-green)]" : "text-[var(--poskoo-coral)]"}`}
-              role={feedback.kind === "err" ? "alert" : "status"}
-            >
-              {feedback.text}
-            </p>
+        </div>
+      </div>
+      {/* Full-width action bar: sticky at the bottom of the composer window, the last thing in the flow,
+          so it never covers the schedule fields once scrolled to the end. */}
+      <div className="composerFooter sticky bottom-0 z-10 mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--poskoo-line)] bg-[var(--poskoo-card)] py-3">
+        <div className="mr-auto flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+          {dialog && (
+            <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-[var(--poskoo-ink)]">
+              <input
+                type="checkbox"
+                checked={createAnother}
+                onChange={(e) => setCreateAnother(e.target.checked)}
+                className="h-4 w-4 accent-[var(--poskoo-violet)]"
+              />
+              Create another
+            </label>
           )}
-
+          {scheduledUsage && scheduledUsage.limit !== null && (
+            <span
+              className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums ${scheduledUsage.used >= scheduledUsage.limit ? "bg-[var(--poskoo-red)]/10 text-[var(--poskoo-red)]" : "bg-[var(--poskoo-band)] text-[var(--poskoo-muted)]"}`}
+              title="Posts scheduled or published this month (UTC) on your plan. Drafts don't count."
+            >
+              {scheduledUsage.used}/{scheduledUsage.limit} scheduled this month
+              {scheduledUsage.used >= scheduledUsage.limit && (
+                <Link href="/app/settings/billing" className="underline underline-offset-2">Upgrade</Link>
+              )}
+            </span>
+          )}
         </div>
-
-        <div className="composerPreview space-y-4 rounded-2xl bg-[var(--poskoo-paper)] p-4 lg:sticky lg:top-20 lg:self-start">
-          <h3 className="m-0 text-sm font-semibold text-[var(--poskoo-ink)]">
-            {selected.length === 1 ? `${PLATFORMS[selected[0]].label} Preview` : "Preview"}
-          </h3>
-          {selected.length === 0 || (!mainCaption.trim() && filledMediaCount === 0) ? (
-            <div className="grid place-items-center rounded-2xl border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-6 py-12 text-center">
-              <p className="m-0 text-sm font-medium text-[var(--poskoo-ink)]">See your post&apos;s preview here</p>
-              <p className="mt-1 text-xs text-[var(--poskoo-muted)]">Pick a channel and start writing.</p>
-            </div>
-          ) : selected.map((platform) => {
-            const text = effectiveCaption(platform, mainCaption, customize, customCaption);
-            const Icon = PLATFORM_ICON[platform];
-            return (
-              <article
-                key={platform}
-                aria-label={`${PLATFORMS[platform].label} preview`}
-                className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="h-10 w-10 shrink-0 rounded-full bg-[var(--poskoo-band)]"
-                    aria-hidden
-                  />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 text-sm font-semibold">
-                      <Icon className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden />
-                      {previewName(accountNames[platform])}
-                    </div>
-                    <div className="truncate text-xs text-[var(--poskoo-muted)]">{accountNames[platform] ?? "Connect this channel"}</div>
-                  </div>
-                </div>
-                {(() => {
-                  const firstMedia = mediaUrls.map((u) => u.trim()).find((u) => u !== "") ?? "";
-                  if (!firstMedia) {
-                    return <div className="mt-3 aspect-square w-full rounded-lg bg-[var(--poskoo-band)]" aria-hidden />;
-                  }
-                  if (mediaKindFromUrl(firstMedia) === "video") {
-                    return (
-                      <video
-                        src={firstMedia}
-                        className="mt-3 aspect-square w-full rounded-lg object-cover"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                    );
-                  }
-                  return (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={firstMedia}
-                      alt="Post media preview"
-                      className="mt-3 aspect-square w-full rounded-lg object-cover"
-                    />
-                  );
-                })()}
-                <p className="mt-3 whitespace-pre-wrap text-sm text-[var(--poskoo-ink)]">
-                  {previewCaption(platform, text) || (
-                    <span className="text-[var(--poskoo-muted)]">Your caption appears here.</span>
-                  )}
-                </p>
-              </article>
-            );
-          })}
-          <PublishingChecklist
-            enabled={enabled}
-            mainCaption={mainCaption}
-            firstComment={firstComment}
-            customize={customize}
-            customCaption={customCaption}
-            mediaUrls={mediaUrls}
-            igFormat={igFormat}
-            ytTitle={ytTitle}
-            scheduledAt={scheduledAt}
-            timeZone={timeZone}
-            onFix={focusChecklistTarget}
-          />
+        <div className="composerActions grid w-full grid-cols-3 gap-2 sm:ml-auto sm:flex sm:w-auto sm:flex-nowrap sm:items-center">
+          <button
+            type="button"
+            disabled={isPending || uploading || storyMediaError}
+            onClick={() => handleSave("draft")}
+            className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:bg-[var(--poskoo-band)] disabled:opacity-60 sm:px-4"
+          >
+            {isPending ? "Saving…" : "Save Draft"}
+          </button>
+          <button
+            type="button"
+            disabled={isPending || uploading || !queueReady || storyMediaError}
+            onClick={() => handleSave("queue")}
+            title={queueReady ? undefined : "Set a posting schedule in Settings → Channels first"}
+            className="whitespace-nowrap rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)] disabled:opacity-60 sm:px-4"
+          >
+            {isPending ? "Saving…" : "Add to Queue"}
+          </button>
+          <button
+            type="button"
+            disabled={isPending || uploading || !scheduledAt || storyMediaError}
+            onClick={() => handleSave("schedule")}
+            className={`${ui.inkFill} whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold disabled:opacity-60 sm:px-5`}
+          >
+            {isPending ? "Saving…" : "Schedule Post"}
+          </button>
         </div>
+        {feedback && (
+          <p
+            className={`m-0 basis-full text-sm ${feedback.kind === "ok" ? "text-[var(--poskoo-green)]" : "text-[var(--poskoo-coral)]"}`}
+            role={feedback.kind === "err" ? "alert" : "status"}
+          >
+            {feedback.text}
+          </p>
+        )}
       </div>
     </section>
   );

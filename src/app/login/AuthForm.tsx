@@ -105,7 +105,7 @@ export default function AuthForm({
             </div>
             {!signup && (
               <div className={a.forgot}>
-                <Link href="/contact#password-reset" className={a.textLink}>
+                <Link href="/forgot-password" className={a.textLink}>
                   Forgot password?
                 </Link>
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useEffect, useId, useRef, useState, useTransition, type ComponentType } from "react";
+import { Fragment, useEffect, useId, useOptimistic, useRef, useState, useTransition, type ComponentType } from "react";
 import { Activity, LifeBuoy, MessageCircle, MessageCircleHeart, MoreHorizontal, Pause, Pencil, Play, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
 import RuleBuilder, { AccountReadiness } from "./RuleBuilder";
@@ -281,7 +281,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           setErrors(result.errors);
         }
       } catch {
-        setErrors(["Could not save this automation. Please try again."]);
+        setErrors(["Could not save this Auto-DM. Please try again."]);
       }
     });
   }
@@ -296,7 +296,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
       }}
     >
       <div className="flex items-start justify-between gap-3">
-        <h2 className="m-0 text-lg font-semibold text-[var(--poskoo-ink)]">{mode === "edit" ? "Edit automation" : "New automation"}</h2>
+        <h2 className="m-0 text-lg font-semibold text-[var(--poskoo-ink)]">{mode === "edit" ? "Edit Auto-DM" : "New Auto-DM"}</h2>
         <button type="button" disabled={pending} onClick={onClose} className="rounded-full p-2 text-[var(--poskoo-muted)] hover:bg-[var(--poskoo-band)] hover:text-[var(--poskoo-ink)] disabled:opacity-60" aria-label="Close">
           <X className="h-5 w-5" />
         </button>
@@ -596,7 +596,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
         )}
         <div className="flex flex-wrap gap-2 pt-1">
           <Btn type="submit" variant="dark" disabled={pending} aria-busy={pending}>
-            {pending ? "Saving…" : mode === "edit" ? "Save changes" : "Create automation"}
+            {pending ? "Saving…" : mode === "edit" ? "Save changes" : "Create Auto-DM"}
           </Btn>
           <Btn type="button" variant="line" onClick={onClose} disabled={pending}>
             Cancel
@@ -673,7 +673,7 @@ function RuleMenu({
       </summary>
       <div className={styles.menuList} role="menu">
         <button type="button" role="menuitem" className={styles.menuItem} disabled={pending} onClick={() => { close(); onEdit(); }}>
-          <Pencil width={15} height={15} aria-hidden="true" /> Edit automation
+          <Pencil width={15} height={15} aria-hidden="true" /> Edit Auto-DM
         </button>
         {canRewind && (
           <button type="button" role="menuitem" className={styles.menuItem} disabled={pending} onClick={() => { close(); onRewind(); }}>
@@ -706,6 +706,11 @@ export function AutoDmView({
   const [rewindId, setRewindId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [actionError, setActionError] = useState<string | null>(null);
+  // Pause/Resume and Delete show at once; the actions revalidate this page, and a failed one snaps back.
+  const [shownRules, applyRuleChange] = useOptimistic(rules, (cur, change: { id: string; kind: "toggle" | "delete" }) =>
+    change.kind === "delete"
+      ? cur.filter((r) => r.id !== change.id)
+      : cur.map((r) => (r.id === change.id ? { ...r, status: r.status === "active" ? "paused" : "active" } : r)));
   // Picking a template is a client-side navigation, so open the draft when the template changes.
   const templateKey = templateDefaults?.name ?? "";
   const [seenTemplateKey, setSeenTemplateKey] = useState(templateKey);
@@ -748,11 +753,12 @@ export function AutoDmView({
   function onToggle(id: string) {
     setActionError(null);
     startTransition(async () => {
+      applyRuleChange({ id, kind: "toggle" });
       try {
         const result = await toggleRule(id);
         if (!result.ok) setActionError(result.errors.join(" "));
       } catch {
-        setActionError("Could not update this automation. Please try again.");
+        setActionError("Could not update this Auto-DM. Please try again.");
       }
     });
   }
@@ -760,6 +766,7 @@ export function AutoDmView({
   function onDelete(id: string) {
     setActionError(null);
     startTransition(async () => {
+      applyRuleChange({ id, kind: "delete" });
       try {
         const result = await deleteRule(id);
         if (result.ok) {
@@ -768,7 +775,7 @@ export function AutoDmView({
           setActionError(result.errors.join(" "));
         }
       } catch {
-        setActionError("Could not delete this automation. Please try again.");
+        setActionError("Could not delete this Auto-DM. Please try again.");
       }
     });
   }
@@ -792,21 +799,21 @@ export function AutoDmView({
     : blankDraft
       ? undefined
       : templateDefaults ?? triggerDefaults;
-  const live = rules.filter((r) => r.status === "active").length;
+  const live = shownRules.filter((r) => r.status === "active").length;
 
   return (
     <>
       <header className={styles.pageHead}>
         <div className="min-w-0">
-          <h1 className={styles.pageTitle}>Automations</h1>
-          <p className={styles.pageSub}>Send a DM automatically when someone comments a keyword, replies to your story or messages you.</p>
+          <h1 className={styles.pageTitle}>Auto-DM</h1>
+          <p className={styles.pageSub}>Comment to DM: send your link to everyone who comments a keyword. Story replies and DMs work too.</p>
         </div>
         <div className={styles.headActions}>
           <Link href="/app/auto-dm/activity" className={styles.headLink}><Activity width={16} height={16} aria-hidden="true" /> Activity</Link>
           <Link href="/help/instagram-auto-dm-not-working" className={styles.headLink}><LifeBuoy width={16} height={16} aria-hidden="true" /> DMs not sending?</Link>
           {!formOpen && (
             <button type="button" className={styles.primaryBtn} onClick={() => openCreate(true)}>
-              <Plus width={16} height={16} aria-hidden="true" /> New automation
+              <Plus width={16} height={16} aria-hidden="true" /> New Auto-DM
             </button>
           )}
         </div>
@@ -838,29 +845,29 @@ export function AutoDmView({
         </p>
       )}
 
-      {rules.length === 0 && !formOpen ? (
+      {shownRules.length === 0 && !formOpen ? (
         <div className="mt-6">
           <EmptyState
             icon={MessageCircleHeart}
-            title="No automations yet"
+            title="No Auto-DMs yet"
             text="Create a keyword rule to send DMs when someone comments on your posts."
           />
           <div className="mt-4 text-center">
-            <Btn onClick={() => openCreate()}>Create your first automation</Btn>
+            <Btn onClick={() => openCreate()}>Create your first Auto-DM</Btn>
           </div>
         </div>
       ) : (
-        rules.length > 0 && (
+        shownRules.length > 0 && (
           <section className={styles.tableCard} aria-labelledby="your-automations">
             <div className={styles.tableHead}>
-              <h2 id="your-automations" className={styles.tableTitle}>Your automations</h2>
-              <span className={styles.tableMeta}>{live} live · {rules.length - live} paused</span>
+              <h2 id="your-automations" className={styles.tableTitle}>Your Auto-DMs</h2>
+              <span className={styles.tableMeta}>{live} live · {shownRules.length - live} paused</span>
             </div>
             <div className={styles.tableScroll}>
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th scope="col">Automation</th>
+                    <th scope="col">Auto-DM</th>
                     <th scope="col" className={styles.num}>DMs</th>
                     <th scope="col" className={styles.num}>Clicks</th>
                     <th scope="col" className={styles.num}>CTR</th>
@@ -869,7 +876,7 @@ export function AutoDmView({
                   </tr>
                 </thead>
                 <tbody>
-                  {rules.map((rule) => {
+                  {shownRules.map((rule) => {
                     const st = stats[rule.id];
                     const ctr = st ? formatCtr(st.uniqueClicks ?? st.clicks, st.dms) : "–";
                     const active = rule.status === "active";

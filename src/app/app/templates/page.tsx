@@ -28,7 +28,7 @@ export default async function TemplatesPage({ searchParams }: { searchParams: Pr
       <header className={styles.head}>
         <span className={styles.headIcon} aria-hidden="true"><LayoutTemplate width={20} height={20} /></span>
         <div className={styles.headText}>
-          <h1 className={styles.h1}>{posts ? "Post templates" : "Automation templates"}</h1>
+          <h1 className={styles.h1}>{posts ? "Post templates" : "Auto-DM templates"}</h1>
           <p className={styles.sub}>
             {posts
               ? "Reusable captions you saved from the post composer."
@@ -36,7 +36,7 @@ export default async function TemplatesPage({ searchParams }: { searchParams: Pr
           </p>
         </div>
         <nav className={styles.switch} aria-label="Template type">
-          <Link href="/app/templates" aria-current={!posts ? "page" : undefined} className={`${styles.switchLink} ${!posts ? styles.switchActive : ""}`}>Automations</Link>
+          <Link href="/app/templates" aria-current={!posts ? "page" : undefined} className={`${styles.switchLink} ${!posts ? styles.switchActive : ""}`}>Auto-DM</Link>
           <Link href="/app/templates?tab=posts" aria-current={posts ? "page" : undefined} className={`${styles.switchLink} ${posts ? styles.switchActive : ""}`}>
             Posts <span className={styles.chipCount}>{postTemplates.length}</span>
           </Link>

@@ -148,7 +148,7 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
   try {
     account = await resolveSocialAccountId(user.id, input.socialAccountId);
   } catch {
-    return { ok: false, errors: ["Could not save automation. Please try again."] };
+    return { ok: false, errors: ["Could not save the Auto-DM. Please try again."] };
   }
   if ("error" in account) {
     return { ok: false, errors: [account.error] };
@@ -206,9 +206,10 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
       console.error("Could not save public reply for rule", rows[0].id, err);
     }
     revalidatePath("/app/auto-dm");
+    revalidatePath("/app"); // Home lists automations too
     return { ok: true };
   } catch {
-    return { ok: false, errors: ["Could not save automation."] };
+    return { ok: false, errors: ["Could not save the Auto-DM."] };
   }
 }
 
@@ -217,7 +218,7 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
     return dbNotReady();
   }
   if (!UUID_RE.test(id)) {
-    return { ok: false, errors: ["Invalid automation."] };
+    return { ok: false, errors: ["Invalid Auto-DM."] };
   }
   const user = await requireUser();
   const errors = validateFormInput(input);
@@ -228,7 +229,7 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
   try {
     account = await resolveSocialAccountId(user.id, input.socialAccountId);
   } catch {
-    return { ok: false, errors: ["Could not save automation. Please try again."] };
+    return { ok: false, errors: ["Could not save the Auto-DM. Please try again."] };
   }
   if ("error" in account) {
     return { ok: false, errors: [account.error] };
@@ -279,7 +280,7 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
       );
     }
     if (!rows[0]) {
-      return { ok: false, errors: ["Automation not found."] };
+      return { ok: false, errors: ["Auto-DM not found."] };
     }
     try {
       // Link edited away from the attached lead magnet: stop tagging leads with that magnet.
@@ -296,9 +297,10 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
       console.error("Could not save public reply for rule", id, err);
     }
     revalidatePath("/app/auto-dm");
+    revalidatePath("/app"); // Home lists automations too
     return { ok: true };
   } catch {
-    return { ok: false, errors: ["Could not update automation."] };
+    return { ok: false, errors: ["Could not update the Auto-DM."] };
   }
 }
 
@@ -307,7 +309,7 @@ export async function toggleRule(id: string): Promise<RuleActionResult> {
     return dbNotReady();
   }
   if (!UUID_RE.test(id)) {
-    return { ok: false, errors: ["Invalid automation."] };
+    return { ok: false, errors: ["Invalid Auto-DM."] };
   }
   const user = await requireUser();
   try {
@@ -317,7 +319,7 @@ export async function toggleRule(id: string): Promise<RuleActionResult> {
       [id, user.id],
     );
     if (!current[0]) {
-      return { ok: false, errors: ["Automation not found."] };
+      return { ok: false, errors: ["Auto-DM not found."] };
     }
     if (current[0].status !== "active") {
       const linkError = linkTokenError(current[0].dm_text ?? "", current[0].link_url);
@@ -329,9 +331,10 @@ export async function toggleRule(id: string): Promise<RuleActionResult> {
       [id, user.id],
     );
     if (!rows[0]) {
-      return { ok: false, errors: ["Automation not found."] };
+      return { ok: false, errors: ["Auto-DM not found."] };
     }
     revalidatePath("/app/auto-dm");
+    revalidatePath("/app"); // Home lists automations too
     return { ok: true };
   } catch {
     return { ok: false, errors: ["Could not update status."] };
@@ -345,7 +348,7 @@ export async function rewindRuleAction(
     return { ok: false, error: "Database not configured." };
   }
   if (!UUID_RE.test(id)) {
-    return { ok: false, error: "Invalid automation." };
+    return { ok: false, error: "Invalid Auto-DM." };
   }
   const user = await requireUser();
   try {
@@ -360,6 +363,7 @@ export async function rewindRuleAction(
       console.error("rewind run record failed for rule", id, recordErr instanceof Error ? recordErr.message : recordErr);
     }
     revalidatePath("/app/auto-dm");
+    revalidatePath("/app"); // Home lists automations too
     revalidatePath("/app/rewind");
     return { ok: true, queued: result.queued, scanned: result.scanned, failures: result.failures };
   } catch (err) {
@@ -374,7 +378,7 @@ export async function deleteRule(id: string): Promise<RuleActionResult> {
     return dbNotReady();
   }
   if (!UUID_RE.test(id)) {
-    return { ok: false, errors: ["Invalid automation."] };
+    return { ok: false, errors: ["Invalid Auto-DM."] };
   }
   const user = await requireUser();
   try {
@@ -383,11 +387,12 @@ export async function deleteRule(id: string): Promise<RuleActionResult> {
       [id, user.id],
     );
     if (!rows[0]) {
-      return { ok: false, errors: ["Automation not found."] };
+      return { ok: false, errors: ["Auto-DM not found."] };
     }
     revalidatePath("/app/auto-dm");
+    revalidatePath("/app"); // Home lists automations too
     return { ok: true };
   } catch {
-    return { ok: false, errors: ["Could not delete automation."] };
+    return { ok: false, errors: ["Could not delete the Auto-DM."] };
   }
 }

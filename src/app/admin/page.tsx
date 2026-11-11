@@ -9,6 +9,8 @@ import PlatformBadge, { type PlatformId } from "./ui/PlatformBadge";
 import Button from "./ui/Button";
 import { AreaChart, StackedBars, type DayStatus } from "./ui/charts";
 import styles from "./admin.module.css";
+import { formatBytes } from "@/lib/mediaLimits";
+import { mediaDirSize, mediaDiskSpace, mediaStorageDir, minFreeBytes } from "@/lib/mediaStorage";
 
 export const metadata = { title: "Admin", robots: { index: false, follow: false } };
 
@@ -221,7 +223,8 @@ function PlanMix({ mix, total }: { mix: Overview["planMix"]; total: number }) {
 export default async function AdminOverviewPage() {
   // The layout checks too, but pages render in parallel with layouts: guard the data here as well.
   await requireAdmin();
-  const data = await getOverview();
+  const [data, mediaSize, mediaDisk] = await Promise.all([getOverview(), mediaDirSize(), mediaDiskSpace()]);
+  const mediaLow = mediaDisk !== null && mediaDisk.freeBytes < minFreeBytes() * 2;
   const mrrText = data.mrr === null ? "Not set up" : `$${data.mrr.toLocaleString("en-US")}`;
   const signupTotal = data.signupsPerDay.reduce((a, b) => a + b, 0);
 
@@ -249,6 +252,11 @@ export default async function AdminOverviewPage() {
 
   return (
     <>
+      <p className={styles.panelSub} role={mediaLow ? "alert" : undefined}>
+        Media storage ({mediaStorageDir()}): {formatBytes(mediaSize.bytes)} in {mediaSize.files.toLocaleString("en-US")} files ·{" "}
+        {mediaDisk ? `${formatBytes(mediaDisk.freeBytes)} free of ${formatBytes(mediaDisk.totalBytes)}` : "free space unknown"}
+        {mediaLow ? ` · LOW: uploads stop below ${formatBytes(minFreeBytes())} free` : ""}
+      </p>
       <div className={styles.kpis}>
         <KpiCard label="Users" value={data.totalUsers.toLocaleString("en-US")} delta={data.newUsers30 > 0 ? `${data.newUsers30} new` : undefined} deltaDir="up" />
         <KpiCard label="New · 30 d" value={data.newUsers30.toLocaleString("en-US")} />

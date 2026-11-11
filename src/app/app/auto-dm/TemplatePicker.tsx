@@ -17,7 +17,7 @@ export default function TemplatePicker({ activeTitle, onReopen }: { activeTitle?
       </div>
       <p className={styles.mutedNote}>
         <Info width={14} height={14} aria-hidden="true" />
-        A template only fills in a draft. Nothing is sent until you finish the setup, add your link and save the automation.
+        A template only fills in a draft. Nothing is sent until you finish the setup, add your link and save the Auto-DM.
       </p>
       <ul className={card.grid} style={{ marginTop: 14 }}>
         {items.map((t) => (

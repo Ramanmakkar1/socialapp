@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { planFacebookPost } from "@/lib/facebookPublish";
-import { checkCaption, PLATFORMS, type PlatformId } from "@/lib/platforms";
+import { checkCaption, PLATFORM_IDS, PLATFORMS, type PlatformId } from "@/lib/platforms";
 
-const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
 
 export type ChecklistFixTarget =
   | { kind: "platforms" }
@@ -76,107 +75,27 @@ function formatExplainer(igFormat: "feed" | "story", mediaCount: number, hasVide
   return hasVideo ? "Feed — single video (.mp4) posts as a Reel." : "Feed — single image post.";
 }
 
-function ChecklistIllustration() {
-  return (
-    <svg
-      viewBox="0 0 120 72"
-      className="h-16 w-auto shrink-0 text-[var(--poskoo-violet)] motion-safe:animate-[checklist-float_4s_ease-in-out_infinite]"
-      aria-hidden
-      role="presentation"
-    >
-      <style>{`
-        @keyframes checklist-float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .motion-safe\\:animate-\\[checklist-float_4s_ease-in-out_infinite\\] {
-            animation: none !important;
-          }
-        }
-      `}</style>
-      <rect x="8" y="10" width="48" height="52" rx="8" fill="var(--poskoo-band)" stroke="var(--poskoo-line)" strokeWidth="1.5" />
-      <rect x="16" y="18" width="32" height="6" rx="3" fill="var(--poskoo-violet)" opacity="0.35" />
-      {[0, 1, 2].map((row) => (
-        <g key={row}>
-          <rect x="16" y={30 + row * 12} width="8" height="8" rx="2" fill="var(--poskoo-line)" />
-          <rect x="28" y={31 + row * 12} width="20" height="6" rx="2" fill="var(--poskoo-line)" />
-        </g>
-      ))}
-      <circle cx="88" cy="28" r="14" fill="var(--poskoo-violet)" opacity="0.15" />
-      <circle cx="88" cy="24" r="6" fill="var(--poskoo-violet)" opacity="0.5" />
-      <path
-        d="M78 48c4-8 12-12 20-10 4 1 8 5 10 10-6 2-12 2-18 0-4-1-8-3-12-6z"
-        fill="var(--poskoo-coral)"
-        opacity="0.25"
-      />
-      <path
-        d="M72 52h32v4H72z"
-        fill="var(--poskoo-band)"
-        stroke="var(--poskoo-line)"
-        strokeWidth="1"
-        rx="2"
-      />
-      <path
-        d="M76 44l3 3 6-7"
-        stroke="var(--poskoo-green)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-    </svg>
-  );
-}
+type Check = { key: string; label: string; hint: string; state: "done" | "todo" | "error"; fix?: ChecklistFixTarget; fixLabel: string };
 
-function Row({
-  label,
-  detail,
-  complete,
-  fixTarget,
-  onFix,
-}: {
-  label: string;
-  detail: string;
-  complete: boolean;
-  fixTarget?: ChecklistFixTarget;
-  onFix: (target: ChecklistFixTarget) => void;
-}) {
-  const statusId = label.replace(/\s+/g, "-").toLowerCase();
+function StatusIcon({ state }: { state: Check["state"] }) {
+  if (state === "done") {
+    return (
+      <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-[var(--poskoo-green)] text-[10px] font-bold text-white" aria-hidden>
+        ✓
+      </span>
+    );
+  }
   return (
-    <li className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2.5">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 text-sm font-medium text-[var(--poskoo-ink)]">
-            <span
-              className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
-                complete ? "bg-[var(--poskoo-green)]/15 text-[var(--poskoo-green)]" : "bg-[var(--poskoo-band)] text-[var(--poskoo-muted)]"
-              }`}
-              aria-hidden
-            >
-              {complete ? "✓" : "·"}
-            </span>
-            <span id={`check-${statusId}`}>{label}</span>
-          </div>
-          <p className="mt-1 pl-7 text-xs leading-relaxed text-[var(--poskoo-muted)]">{detail}</p>
-        </div>
-        {!complete && fixTarget && (
-          <button
-            type="button"
-            onClick={() => onFix(fixTarget)}
-            className="shrink-0 rounded-lg border border-[var(--poskoo-violet)]/40 px-2.5 py-1 text-xs font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
-            aria-describedby={`check-${statusId}`}
-          >
-            Fix
-          </button>
-        )}
-      </div>
-    </li>
+    <span className="grid h-4 w-4 shrink-0 place-items-center" aria-hidden>
+      <span className={`h-2 w-2 rounded-full ${state === "error" ? "bg-[#f5a524]" : "bg-[var(--poskoo-line)] ring-1 ring-[var(--poskoo-muted)]/30"}`} />
+    </span>
   );
 }
 
 export type PublishingChecklistProps = {
   enabled: Record<PlatformId, boolean>;
+  /** The composer's selected channels (same list as its tabs and preview). Defaults to every enabled platform. */
+  selected?: PlatformId[];
   mainCaption: string;
   firstComment: string;
   customize: Record<PlatformId, boolean>;
@@ -191,6 +110,7 @@ export type PublishingChecklistProps = {
 
 export default function PublishingChecklist({
   enabled,
+  selected: selectedProp,
   mainCaption,
   firstComment,
   customize,
@@ -210,8 +130,9 @@ export default function PublishingChecklist({
     return () => window.clearInterval(id);
   }, []);
 
-  const selected = PLATFORM_ORDER.filter((p) => enabled[p]);
-  const instagramOn = enabled.instagram;
+  // One source of truth with the composer tabs/preview: every selected network counts (Bluesky, TikTok, …).
+  const selected = selectedProp ?? PLATFORM_IDS.filter((p) => enabled[p]);
+  const instagramOn = selected.includes("instagram");
 
   const urlList = mediaUrls.map((u) => u.trim()).filter((u) => u !== "");
   const mediaItems: MediaItem[] = [];
@@ -236,7 +157,7 @@ export default function PublishingChecklist({
 
   const needsMediaForSchedule =
     instagramOn && igFormat === "story" ? mediaItems.length !== 1 : instagramOn && mediaItems.length === 0;
-  const youtubeOn = enabled.youtube;
+  const youtubeOn = selected.includes("youtube");
   const youtubeNeedsVideo = youtubeOn && mediaItems.filter((m) => m.type === "video").length === 0;
 
   let mediaDetail = formatExplainer(
@@ -261,26 +182,6 @@ export default function PublishingChecklist({
     !(instagramOn && needsMediaForSchedule) &&
     !youtubeNeedsVideo &&
     (urlList.length === 0 || mediaItems.length === urlList.length);
-
-  const captionRows = selected.map((platform) => {
-    const text = effectiveCaption(platform, mainCaption, customize, customCaption);
-    const check = checkCaption(platform, text);
-    const empty = !text.trim();
-    const complete = !empty && check.errors.length === 0;
-    let detail = empty
-      ? "Add a caption for this platform."
-      : check.errors[0] ??
-        `${check.length.toLocaleString("en-US")} / ${PLATFORMS[platform].captionMax.toLocaleString("en-US")} characters${
-          customize[platform] ? " (custom override)" : ""
-        }.`;
-    if (complete && check.warnings.length > 0) {
-      detail = `${detail} ${check.warnings[0]}`;
-    }
-    const fixTarget: ChecklistFixTarget = customize[platform]
-      ? { kind: "platformCaption", platform }
-      : { kind: "mainCaption" };
-    return { platform, label: `${PLATFORMS[platform].label} caption`, detail, complete, fixTarget };
-  });
 
   const firstCommentMax = PLATFORM_LIMITS.instagram.max ?? 2200;
   const firstCommentOver = countChars(firstComment) > firstCommentMax;
@@ -336,10 +237,6 @@ export default function PublishingChecklist({
     return { platform, label: PLATFORMS[platform].label, issues };
   });
 
-  const firstCommentComplete = !showFirstComment || !firstCommentOver;
-  const firstCommentDetail = firstCommentOver
-    ? `First comment must be ${firstCommentMax.toLocaleString("en-US")} characters or fewer.`
-    : `${countChars(firstComment).toLocaleString("en-US")} / ${firstCommentMax.toLocaleString("en-US")} characters.`;
 
   let scheduleComplete = false;
   let scheduleDetail = "Pick a date and time in your local timezone.";
@@ -363,151 +260,103 @@ export default function PublishingChecklist({
     }
   }
 
-  const platformsComplete = selected.length > 0;
-  const formatComplete = !mediaError && !needsMediaForSchedule;
+  const labels = selected.map((p) => PLATFORMS[p].label);
+  const listLabel = labels.length <= 2 ? labels.join(" and ") : `${labels.length} channels`;
 
-  const readyCount =
-    (platformsComplete ? 1 : 0) +
-    (instagramOn ? (formatComplete ? 1 : 0) : 0) +
-    (mediaComplete ? 1 : 0) +
-    captionRows.filter((r) => r.complete).length +
-    (showFirstComment && firstCommentComplete ? 1 : 0) +
-    (scheduleComplete ? 1 : 0);
-  const totalCount =
-    1 +
-    (instagramOn ? 1 : 0) +
-    1 +
-    captionRows.length +
-    (showFirstComment ? 1 : 0) +
-    1;
+  // Media other networks need before they can publish (Instagram/YouTube rules come from the checks above).
+  const tiktokNeedsVideo = selected.includes("tiktok") && !mediaItems.some((m) => m.type === "video");
+  const pinterestNeedsImage = selected.includes("pinterest") && !mediaItems.some((m) => m.type === "image");
+  const mediaRequired = (instagramOn && igFormat !== "story") || youtubeOn || selected.includes("tiktok") || selected.includes("pinterest");
+  const mediaOk = mediaComplete && !tiktokNeedsVideo && !pinterestNeedsImage;
+  let mediaHint: string;
+  if (mediaError) mediaHint = mediaError;
+  else if (tiktokNeedsVideo) mediaHint = "TikTok needs a video";
+  else if (pinterestNeedsImage) mediaHint = "Pinterest needs an image";
+  else if (!mediaComplete) mediaHint = mediaDetail;
+  else if (urlList.length === 0) mediaHint = selected.length === 0 ? "optional" : mediaRequired ? "required" : `optional for ${listLabel}`;
+  else mediaHint = `${urlList.length} ${urlList.length === 1 ? "file" : "files"} added`;
+
+  // Content issues from the per-network checks (caption, YouTube title, first comment, Facebook rules);
+  // media issues have their own row. An empty caption is fine for a media-only post on networks that allow it.
+  const textFirst = selected.some((p) => p === "bluesky" || p === "x" || p === "threads" || p === "mastodon");
+  const contentIssue = platformReadiness
+    .flatMap((r) => r.issues.map((issue) => ({ ...issue, platform: r.platform })))
+    .find((issue) => issue.fixTarget.kind !== "media" && !(issue.text === "Add a caption." && mediaItems.length > 0 && !textFirst));
+  const contentLabel = contentIssue?.fixTarget.kind === "ytTitle" ? "Title" : contentIssue?.fixTarget.kind === "firstComment" ? "First comment" : "Caption";
+  const contentHint = contentIssue
+    ? contentIssue.text === "Add a caption."
+      ? `add text for ${PLATFORMS[contentIssue.platform].label}`
+      : contentIssue.text.replace(/\.$/, "")
+    : "";
+
+  const checks: Check[] = [
+    {
+      key: "channel",
+      label: "Channel",
+      hint: selected.length > 0 ? `${listLabel} selected` : "none selected",
+      state: selected.length > 0 ? "done" : "todo",
+      fix: { kind: "platforms" },
+      fixLabel: "Choose",
+    },
+    ...(contentIssue
+      ? [{ key: "content", label: contentLabel, hint: contentHint, state: "error" as const, fix: contentIssue.fixTarget, fixLabel: "Edit" }]
+      : []),
+    {
+      key: "media",
+      label: "Media",
+      hint: mediaHint,
+      state: mediaOk ? "done" : mediaError ? "error" : "todo",
+      fix: { kind: "media" },
+      fixLabel: "Add",
+    },
+    {
+      key: "time",
+      label: "Time",
+      hint: scheduleComplete ? scheduleDetail : scheduledAt ? scheduleDetail.replace(/\.$/, "") : "not set",
+      state: scheduleComplete ? "done" : scheduledAt ? "error" : "todo",
+      fix: { kind: "schedule" },
+      fixLabel: "Set",
+    },
+  ];
+  const done = checks.filter((c) => c.state === "done").length;
 
   return (
-    <aside
-      className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4"
-      aria-labelledby="publishing-checklist-heading"
-    >
-      <div className="flex items-start gap-3">
-        <ChecklistIllustration />
-        <div className="min-w-0 flex-1">
-          <h3 id="publishing-checklist-heading" className="text-sm font-semibold text-[var(--poskoo-ink)]">
-            Publishing readiness
-          </h3>
-          <p className="mt-0.5 text-xs text-[var(--poskoo-muted)]">
-            Checks what you entered in the composer. Does not verify that media URLs load remotely or that
-            platforms will accept delivery.
-          </p>
-          <p className="mt-1 text-xs font-medium text-[#3d3450]" aria-live="polite">
-            {readyCount} of {totalCount} ready to schedule
-          </p>
-        </div>
+    <aside className="border-t border-[var(--poskoo-line)] pt-3" aria-labelledby="publishing-checklist-heading">
+      <div className="flex items-center gap-3">
+        <h3 id="publishing-checklist-heading" className="m-0 text-sm font-semibold text-[var(--poskoo-ink)]">
+          {done === checks.length ? "Ready to schedule" : "Before you schedule"}
+        </h3>
+        <span className="ml-auto text-xs tabular-nums text-[var(--poskoo-muted)]" aria-live="polite">
+          {done}/{checks.length}
+        </span>
+        <span className="h-1 w-16 overflow-hidden rounded-full bg-[var(--poskoo-band)]" aria-hidden>
+          <span
+            className="block h-full rounded-full bg-[var(--poskoo-green)] transition-[width] motion-reduce:transition-none"
+            style={{ width: `${Math.round((done / checks.length) * 100)}%` }}
+          />
+        </span>
       </div>
-
-      <div className="mt-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
-          Platform readiness
-        </h4>
-        <ul className="mt-2 space-y-2" aria-label="Platform publishing readiness" aria-live="polite">
-          {platformReadiness.map(({ platform, label, issues }) => {
-            const ready = issues.length === 0;
-            return (
-              <li
-                key={platform}
-                className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2.5"
+      <ul className="mt-2 space-y-0.5" aria-label="Publishing checks">
+        {checks.map((c) => (
+          <li key={c.key} className="relative flex min-h-8 items-center gap-2.5 text-sm">
+            <StatusIcon state={c.state} />
+            <span className="sr-only">{c.state === "done" ? "Done: " : "Needs attention: "}</span>
+            <span className="min-w-0 flex-1 truncate" title={`${c.label} · ${c.hint}`}>
+              <span className="font-medium text-[var(--poskoo-ink)]">{c.label}</span>
+              <span className="text-[var(--poskoo-muted)]"> · {c.hint}</span>
+            </span>
+            {c.state !== "done" && c.fix && (
+              <button
+                type="button"
+                onClick={() => onFix(c.fix!)}
+                className="shrink-0 rounded px-1 text-xs font-semibold text-[var(--poskoo-violet)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--poskoo-violet)]"
+                aria-label={`${c.fixLabel} ${c.label.toLowerCase()}`}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium text-[var(--poskoo-ink)]">{label}</span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      ready
-                        ? "bg-[var(--poskoo-green)]/15 text-[var(--poskoo-green)]"
-                        : "bg-[var(--poskoo-coral)]/10 text-[var(--poskoo-coral)]"
-                    }`}
-                  >
-                    {ready ? "Ready" : "Needs attention"}
-                  </span>
-                </div>
-                {!ready && (
-                  <ul className="mt-1.5 space-y-1">
-                    {issues.map((issue, index) => (
-                      <li
-                        key={`${platform}-${index}`}
-                        className="flex items-start justify-between gap-2 text-xs leading-relaxed text-[var(--poskoo-muted)]"
-                      >
-                        <span className="min-w-0 flex-1">{issue.text}</span>
-                        <button
-                          type="button"
-                          onClick={() => onFix(issue.fixTarget)}
-                          className="shrink-0 rounded-lg border border-[var(--poskoo-violet)]/40 px-2 py-0.5 text-xs font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
-                        >
-                          Fix
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-        <p className="mt-2 text-xs text-[var(--poskoo-muted)]">
-          Missing media or caption issues do not block saving a draft.
-        </p>
-      </div>
-
-      <ul className="mt-4 space-y-2" aria-label="Publishing input checklist">
-        <Row
-          label="Platforms"
-          detail={
-            platformsComplete
-              ? selected.map((p) => PLATFORMS[p].label).join(", ")
-              : "Select at least one platform."
-          }
-          complete={platformsComplete}
-          fixTarget={{ kind: "platforms" }}
-          onFix={onFix}
-        />
-        {instagramOn && (
-          <Row
-            label="Instagram format"
-            detail={formatExplainer(igFormat, mediaItems.length, mediaItems.some((m) => m.type === "video"))}
-            complete={formatComplete}
-            fixTarget={{ kind: "igFormat" }}
-            onFix={onFix}
-          />
-        )}
-        <Row
-          label="Media links"
-          detail={mediaDetail}
-          complete={mediaComplete}
-          fixTarget={{ kind: "media" }}
-          onFix={onFix}
-        />
-        {captionRows.map((row) => (
-          <Row
-            key={row.platform}
-            label={row.label}
-            detail={row.detail}
-            complete={row.complete}
-            fixTarget={row.fixTarget}
-            onFix={onFix}
-          />
+                {c.fixLabel}
+              </button>
+            )}
+          </li>
         ))}
-        {showFirstComment && (
-          <Row
-            label="First comment"
-            detail={firstCommentDetail}
-            complete={firstCommentComplete}
-            fixTarget={{ kind: "firstComment" }}
-            onFix={onFix}
-          />
-        )}
-        <Row
-          label="Schedule time"
-          detail={scheduleDetail}
-          complete={scheduleComplete}
-          fixTarget={{ kind: "schedule" }}
-          onFix={onFix}
-        />
       </ul>
     </aside>
   );

@@ -1,5 +1,6 @@
 // Client-safe helpers shared by the week / month calendar, post cards and the post popover.
 import { AtSign, Facebook, Instagram, Youtube } from "lucide-react";
+import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { engagementRate } from "@/lib/engagementRate";
 
 export type CalendarPost = {
@@ -21,8 +22,11 @@ export type CalendarPost = {
 /** platform -> account handle shown in the popover ("@brewhouse.coffee"). */
 export type AccountNames = Record<string, string>;
 
-export const PLATFORM_ICON: Record<string, typeof Instagram> = { instagram: Instagram, facebook: Facebook, threads: AtSign, youtube: Youtube };
-export const PLATFORM_LABEL: Record<string, string> = { instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube" };
+export const PLATFORM_ICON: Record<string, typeof Instagram> = { instagram: Instagram, facebook: Facebook, threads: AtSign, youtube: Youtube, ...NEW_NETWORK_ICON };
+export const PLATFORM_LABEL: Record<string, string> = {
+  instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube",
+  tiktok: "TikTok", bluesky: "Bluesky", mastodon: "Mastodon", linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", gbp: "Google Business Profile",
+};
 
 export const STATUS_LABEL: Record<string, string> = {
   draft: "Draft",
@@ -78,11 +82,20 @@ export function addDays(key: string, n: number): string {
  * "targetKey at the post's current local time".
  */
 export function utcDateForLocalDay(scheduledAt: Date | string, targetKey: string, tz: string): string {
+  return movedToLocalDay(scheduledAt, targetKey, tz).slice(0, 10);
+}
+
+/** The post's new time (ISO) after moving it to local day `targetKey`, keeping its time of day: what the calendar shows optimistically. */
+export function movedToLocalDay(scheduledAt: Date | string, targetKey: string, tz: string): string {
   const at = new Date(scheduledAt);
   const fromKey = zonedParts(at, tz).key;
   const diff = Math.round((Date.parse(`${targetKey}T00:00:00Z`) - Date.parse(`${fromKey}T00:00:00Z`)) / 86_400_000);
-  const moved = new Date(at.getTime() + diff * 86_400_000);
-  return moved.toISOString().slice(0, 10);
+  return new Date(at.getTime() + diff * 86_400_000).toISOString();
+}
+
+/** Same list with one post moved to a new time (optimistic drag-and-drop / reschedule). */
+export function withMovedPost(posts: CalendarPost[], id: string, scheduledAt: string): CalendarPost[] {
+  return posts.map((p) => (p.id === id ? { ...p, scheduled_at: scheduledAt } : p));
 }
 
 export function groupByDay(posts: CalendarPost[], tz: string): Map<string, CalendarPost[]> {

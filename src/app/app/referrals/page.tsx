@@ -27,7 +27,7 @@ export default async function ReferralsPage() {
       console.error("referral stats failed for user", user.id, err instanceof Error ? err.message : err);
     }
   }
-  const base = PLAN_LIMITS[planForUser()].autoDmsPerMonth;
+  const base = PLAN_LIMITS[await planForUser(user.id)].autoDmsPerMonth;
   const bonus = REFERRAL_BONUS_DMS.toLocaleString("en-US");
   return (
     <>

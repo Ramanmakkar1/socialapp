@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { seedDefaultScheduleAction } from "./actions";
 
 // Renders nothing. When the user has a connected channel but no posting schedule yet, seeds the
-// default one (Mon-Fri 9:00, 12:00, 18:00) in the browser's time zone, then refreshes the page.
+// default one (Mon-Fri 9:00, 12:00, 18:00) in the browser's time zone. The action revalidates
+// Settings and Calendar, so the new schedule shows without a second full-page refresh.
 export default function ScheduleSeeder({ needed }: { needed: boolean }) {
-  const router = useRouter();
   const ran = useRef(false);
   useEffect(() => {
     if (!needed || ran.current) return;
@@ -18,11 +17,7 @@ export default function ScheduleSeeder({ needed }: { needed: boolean }) {
     } catch {
       tz = "UTC";
     }
-    seedDefaultScheduleAction(tz)
-      .then((r) => {
-        if (r.seeded > 0) router.refresh();
-      })
-      .catch(() => {});
-  }, [needed, router]);
+    seedDefaultScheduleAction(tz).catch(() => {});
+  }, [needed]);
   return null;
 }

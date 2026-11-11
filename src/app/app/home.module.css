@@ -2,11 +2,56 @@
 
 .page { display: flex; flex-direction: column; gap: 28px; }
 
-.welcomeRow { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px; }
-.welcome { margin: 0; color: var(--poskoo-ink); font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -.03em; line-height: 1.1; }
+/* Welcome band: soft pastel card with avatar, greeting, real-data status line, quick actions and a doodle. */
+.band {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--poskoo-violet) 14%, var(--poskoo-line));
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--poskoo-lime) 30%, transparent) 0%, transparent 45%),
+    linear-gradient(120deg, var(--poskoo-lilac) 0%, var(--poskoo-pink) 55%, var(--poskoo-peach) 100%);
+  padding: 22px 24px;
+}
+.bandAvatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: flex-start;
+  width: 56px;
+  height: 56px;
+  border: 3px solid var(--poskoo-card);
+  border-radius: 999px;
+  background: var(--poskoo-card);
+  box-shadow: 0 6px 16px -10px rgba(20, 18, 26, .45);
+  color: var(--poskoo-violet);
+  font-size: 1.4rem;
+  font-weight: 700;
+  object-fit: cover;
+}
+.bandText { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 8px; }
+.welcome { margin: 0; color: var(--poskoo-ink); font-size: clamp(1.45rem, 2.6vw, 2rem); letter-spacing: -.03em; line-height: 1.15; overflow-wrap: anywhere; }
 .welcome span { color: var(--poskoo-violet); }
-.welcomeSub { margin: 6px 0 0; color: var(--poskoo-muted); font-size: .95rem; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.welcome .wave { display: inline-block; color: inherit; transform-origin: 70% 70%; }
+.welcomeSub { margin: 0; color: var(--ink-2, var(--poskoo-muted)); font-size: .95rem; font-weight: 600; }
+.dot { color: var(--poskoo-muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.bandArt { flex: none; width: 132px; height: auto; align-self: flex-end; margin: -8px -6px -14px 0; pointer-events: none; }
+@media (max-width: 720px) {
+  .band { flex-wrap: wrap; padding: 18px 16px; gap: 12px; }
+  .bandArt { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .welcome .wave { animation: wave 1.6s ease-in-out 1 .4s; }
+}
+@keyframes wave {
+  0%, 60%, 100% { transform: rotate(0); }
+  10%, 30% { transform: rotate(14deg); }
+  20%, 40% { transform: rotate(-8deg); }
+}
 
 .alert {
   display: flex;
@@ -31,6 +76,9 @@
 .headLinks { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: .88rem; }
 .textLink { display: inline-flex; align-items: center; gap: 5px; color: var(--poskoo-violet); font-size: .88rem; font-weight: 700; text-decoration: none; }
 .textLink:hover { text-decoration: underline; }
+button.textLink { min-height: 32px; border: 0; background: none; padding: 0; font-family: inherit; cursor: pointer; }
+button.textLink:disabled { opacity: .7; cursor: progress; }
+.viewAll { align-self: flex-start; }
 .pillLink {
   display: inline-flex;
   align-items: center;
@@ -146,8 +194,11 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
 .split { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 
 /* Active automations table. */
-.tableCard { position: relative; overflow-x: auto; border: 1px solid var(--poskoo-line); border-radius: 14px; background: var(--poskoo-card); box-shadow: var(--poskoo-shadow-card); }
-.table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: .9rem; }
+.tableCard { position: relative; overflow-x: auto; container-type: inline-size; border: 1px solid var(--poskoo-line); border-radius: 14px; background: var(--poskoo-card); box-shadow: var(--poskoo-shadow-card); }
+.table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+/* The table fits its card (no inner scrollbar at 1280px): Clicks and CTR drop out when the card is narrow. */
+@container (max-width: 560px) { .narrowHide { display: none; } }
+@container (max-width: 380px) { .table { min-width: 380px; } }
 .table th { padding: 10px 14px; border-bottom: 1px solid var(--poskoo-line); background: var(--poskoo-paper); color: var(--poskoo-muted); font-size: .76rem; font-weight: 600; text-align: left; }
 .table td { padding: 12px 14px; border-bottom: 1px solid var(--poskoo-line); color: var(--poskoo-ink); vertical-align: middle; }
 .table tr:last-child td { border-bottom: 0; }
@@ -291,3 +342,4 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
 @media (prefers-reduced-motion: reduce) {
   .fscArt { animation: none; }
 }
+.tableError { color: var(--poskoo-red); text-align: left; }

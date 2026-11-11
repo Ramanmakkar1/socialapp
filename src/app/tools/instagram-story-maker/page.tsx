@@ -1,202 +1,237 @@
-import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
-import PublicShell from "@/components/PublicShell";
-import s from "@/components/site.module.css";
+import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import t from "@/components/tools/tools.module.css";
 import StoryMaker from "./StoryMaker";
-import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
-import { AnimArt } from "@/components/AnimArt";
 
-const PATH = "/tools/instagram-story-maker";
-const description =
-  "Free Instagram Story maker: design 1080x1920 Stories with a photo, text and gradient background. Safe zone guides keep text clear. Runs in your browser.";
-
-export const metadata: Metadata = {
-  title: { absolute: "Instagram Story Maker: Free 1080x1920 Story Designs" },
-  description,
-  alternates: { canonical: PATH },
+const config: ToolPageConfig = {
+  path: "/tools/instagram-story-maker",
+  name: "Instagram Story maker",
+  crumb: "Story maker",
+  title: "Instagram Story Maker: Free 1080x1920 Story Designs",
+  description:
+    "Free Instagram Story maker: design a 1080x1920 Story with a photo, text and gradient background. Safe zone guides keep text clear. Runs in your browser.",
+  pill: "Free · runs in your browser · nothing is uploaded",
+  h1: { before: "Instagram Story", mark: "maker", after: "with safe zone guides" },
+  lede: "Design a 1080×1920 Instagram Story with your photo, text and an optional gradient background, then download a PNG. Safe zone guides keep text clear of the profile name and reply bar.",
+  art: "visual",
+  artLabel: "A creator measures a photo frame with a ruler next to phone screens of different shapes",
+  heroPoints: ["1080×1920 PNG", "Safe zone guides", "No watermark"],
+  toolTitle: "Design your Story",
+  toolNote: "Free · your photo stays on your device",
+  stepsTitle: "How to use the Instagram Story maker",
+  steps: [
+    {
+      title: "Add a photo or background",
+      text: "Choose an image under Story photo; it fills the 9:16 frame from the centre. Skip the photo and tick Gradient background for a violet-to-pink backdrop instead.",
+      art: "visual",
+    },
+    {
+      title: "Write and style the text",
+      text: "Type in Text on Story, set Text size from 32 to 120 px, and pick a Text colour: Brand violet, Ink or Paper. The text sits on a band in the middle of the frame.",
+      art: "writing",
+    },
+    {
+      title: "Check the zones and download",
+      text: "Keep Show safe zone guides on to see the top and bottom bars, then press Download PNG to save instagram-story.png without the guides.",
+      art: "card-schedule",
+    },
+  ],
+  featuresTitle: "A Story design that stays readable in the app",
+  features: [
+    {
+      title: "Text kept in the clear band",
+      text: "Your text is centred inside the area between the top 250 px and bottom 250 px, so the profile name and reply bar do not cover it.",
+      art: "visual",
+    },
+    {
+      title: "Ready-made colour bands",
+      text: "Three colour presets put a solid band behind the text, so it stays readable on busy photos without any design work.",
+      art: "writing",
+    },
+    {
+      title: "Private and watermark-free",
+      text: "Everything is drawn on a canvas in your browser. The PNG is saved straight to your device with no upload, account or watermark.",
+      art: "analytics",
+    },
+  ],
+  guide: {
+    title: "A practical guide to designing Instagram Stories",
+    intro:
+      "A Story is a full-screen 9:16 frame, but Instagram draws its own interface over the top and bottom. Good Story designs keep the message in the middle and leave stickers and links to the Instagram app. Here is how this maker works and how to get clean results.",
+    sections: [
+      {
+        title: "What this Story maker does",
+        body: (
+          <>
+            <p>
+              The tool draws on a 1080×1920 canvas. The background is white, or a violet-to-pink gradient when you tick{" "}
+              <b>Gradient background</b>. If you choose a photo, it is scaled to cover the whole frame from the centre, so
+              wide photos lose their sides.
+            </p>
+            <p>
+              Your text wraps onto up to four lines and sits on a full-width colour band, centred in the clear area between
+              the safe zones. <b>Download PNG</b> saves <code>instagram-story.png</code> at full size. The tool designs the
+              image only; it does not add stickers, music or links.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Instagram Story size and safe zones",
+        body: (
+          <>
+            <div className={t.tableWrap}>
+              <table className={t.table}>
+                <thead>
+                  <tr>
+                    <th>Area</th>
+                    <th>Size</th>
+                    <th>What sits there</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Full Story</td>
+                    <td>1080×1920 (9:16)</td>
+                    <td>The size this tool exports.</td>
+                  </tr>
+                  <tr>
+                    <td>Top safe zone</td>
+                    <td>About the top 250 px</td>
+                    <td>Profile picture, name and progress bar.</td>
+                  </tr>
+                  <tr>
+                    <td>Bottom safe zone</td>
+                    <td>About the bottom 250 px</td>
+                    <td>Reply bar and message field.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              These are practical margins, not official Instagram numbers, and the overlays vary a little by phone. Test a
+              finished design with the <Link href="/tools/instagram-safe-zone-checker">safe zone checker</Link> or the{" "}
+              <Link href="/tools/instagram-story-size-checker">Story size checker</Link>.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Best practices for Instagram Stories in 2026",
+        body: (
+          <ul>
+            <li>
+              <b>One message per frame.</b> Stories are tapped through quickly, so a short line people can read in a second
+              or two works better than a paragraph.
+            </li>
+            <li>
+              <b>Leave room for stickers.</b> If you plan a link, poll or question sticker, keep a clear area above the
+              reply bar for it.
+            </li>
+            <li>
+              <b>Use a band on busy photos.</b> Solid colour behind text keeps it readable on any background.
+            </li>
+            <li>
+              <b>Keep a consistent style.</b> Reusing one colour preset for a series makes your Stories recognisable.
+            </li>
+            <li>
+              <b>Plan Stories ahead.</b> Poskoo&apos;s <Link href="/instagram-scheduler">Instagram scheduler</Link> can
+              publish a Story image or video at a set time; interactive stickers are still added in the app.
+            </li>
+          </ul>
+        ),
+      },
+      {
+        title: "Example: a product drop announcement",
+        body: (
+          <>
+            <p>A shop announcing a release on a product photo could use these settings:</p>
+            <div className={t.example}>
+              <p>
+                Story photo: product flat-lay · Text on Story: &ldquo;New collection drops Friday&rdquo; · Text size: 56 px ·
+                Text colour: Brand violet · Show safe zone guides: on
+              </p>
+            </div>
+            <p>
+              At 56 px the 27-character line fits on one line on a violet band in the middle of the frame, well clear of
+              both tinted zones. Raise the size to 96 px and it wraps onto two lines. After downloading, upload the PNG as a Story and add a countdown or link sticker in the Instagram app,
+              placed above the reply bar.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Common Story design mistakes",
+        body: (
+          <ul>
+            <li>Putting text or a call to action in the bottom 250 px, where the reply bar covers it.</li>
+            <li>Writing long text at a large size; anything past four lines is cut with an ellipsis.</li>
+            <li>Using a wide landscape photo, which loses its sides when cropped to 9:16.</li>
+            <li>Baking a URL into the image. People cannot tap it; use a link sticker in the app.</li>
+            <li>Choosing Paper text on a white background with no photo or gradient.</li>
+          </ul>
+        ),
+      },
+    ],
+  },
+  faqTitle: "Instagram Story maker questions",
+  faqs: [
+    {
+      q: "What size is an Instagram Story?",
+      a: "An Instagram Story is 1080x1920 pixels (9:16). This tool draws on a 1080x1920 canvas and exports that exact PNG.",
+    },
+    {
+      q: "Where are the Story safe zones?",
+      a: "Keep roughly the top 250 px (profile name and progress bar) and the bottom 250 px (reply bar) clear. This tool shows those areas as tinted guides and fits your text inside the clear middle band. Guides are not saved in the PNG.",
+    },
+    {
+      q: "Is my photo uploaded to your server?",
+      a: "No. Your photo is opened and drawn on a canvas inside your browser, and the PNG is saved straight to your device. Nothing is uploaded and no account is needed.",
+    },
+    {
+      q: "Can I add a clickable link sticker here?",
+      a: "No. This tool designs the Story image with your photo and text. Link stickers are an Instagram feature, so add them in the Instagram app after you upload the PNG, and keep them out of the bottom 250 px where the reply bar sits.",
+    },
+    {
+      q: "Can I make a Story without a photo?",
+      a: "Yes. Leave Story photo empty and the Story uses a white background, or tick Gradient background for a violet-to-pink gradient behind your text.",
+    },
+    {
+      q: "Can I schedule the Story I make here?",
+      a: "Yes. Poskoo's Instagram scheduler can publish one Story image or video at the date and time you choose. Interactive stickers such as links, polls and music still have to be added in the Instagram app.",
+    },
+  ],
+  related: [
+    "/tools/instagram-story-size-checker",
+    "/tools/instagram-safe-zone-checker",
+    "/tools/instagram-reel-cover-maker",
+    "/tools/instagram-highlight-cover-maker",
+    "/tools/instagram-image-size",
+    "/tools/instagram-carousel-maker",
+  ],
+  schema: {
+    category: "MultimediaApplication",
+    features: [
+      "1080x1920 Story PNG export",
+      "Top and bottom safe zone guides",
+      "Text with three colour presets and adjustable size",
+      "Optional gradient background",
+      "Runs in the browser, no upload or watermark",
+    ],
+  },
+  cta: {
+    title: "Your Story is designed.",
+    mark: "Schedule it.",
+    text: "Schedule Stories, posts and Reels with Poskoo and auto-DM everyone who comments your keyword.",
+  },
 };
 
-const sizes = [
-  {
-    title: "Full Story: 1080×1920",
-    text: "An Instagram Story is a full 9:16 frame, 1080 pixels wide and 1920 pixels tall. That is the size this tool exports.",
-  },
-  {
-    title: "Top safe zone: profile name and progress bar",
-    text: "Instagram keeps the top ~250 px for your profile name, picture and Story progress bar. Keep text below it.",
-  },
-  {
-    title: "Bottom safe zone: reply bar",
-    text: "Instagram keeps the bottom ~250 px for the reply bar and message field. Keep links, CTAs and important text above it.",
-  },
-];
-
-const steps = [
-  "Tap Choose photo and pick one image from your device. It opens in your browser and is never uploaded.",
-  "Add your text, pick a size and a colour preset, or switch on the gradient background.",
-  "Keep the text inside the clear band between the two tinted safe zones, then tap Download PNG.",
-  "Upload the 1080×1920 PNG to your Instagram Story and add any link sticker, music or poll in the Instagram app.",
-];
-
-const faqs = [
-  {
-    q: "What size is an Instagram Story?",
-    a: "An Instagram Story is 1080×1920 pixels (9:16). This tool draws on a 1080×1920 canvas and exports that exact PNG.",
-  },
-  {
-    q: "Where are the Story safe zones?",
-    a: "Instagram keeps roughly the top 250 px (profile name and progress bar) and the bottom 250 px (reply bar) clear. This tool shows those areas as tinted guides and fits your text inside the clear middle band. Guides are not saved in the PNG.",
-  },
-  {
-    q: "Is my photo uploaded to your server?",
-    a: "No. Your photo is opened and drawn on a canvas inside your browser, and the PNG is saved straight to your device. Nothing is uploaded and no account is needed.",
-  },
-  {
-    q: "Can I add a clickable link sticker here?",
-    a: "No. This tool designs the Story image with your photo and text. Clickable link stickers are an Instagram feature — add them in the Instagram app after you upload the PNG, and keep any link out of the bottom 250 px where the reply bar sits.",
-  },
-];
-
-const toolJsonLd = toolSoftwareJsonLd({
-  name: "Instagram Story Maker",
-  description,
-  url: `${BRAND.url}${PATH}`,
-  category: "MultimediaApplication",
-});
+export const metadata = toolMetadata(config);
 
 export default function InstagramStoryMakerPage() {
   return (
-    <PublicShell
-      breadcrumbs={[
-        { name: "Free Instagram tools", path: "/tools" },
-        { name: "Story Maker", path: PATH },
-      ]}
-    >
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
-
-      <header className="hero">
-        <span className="pill">Free · runs in your browser · nothing is uploaded</span>
-        <h1>
-          Instagram Story <em className="s mark">maker</em>
-        </h1>
-        <p className="lede">
-          Design a 1080×1920 Instagram Story with your photo, text and an optional gradient background. Safe zone
-          guides keep text clear of the profile name and reply bar. Download a PNG — no upload, no account, no
-          watermark.
-        </p>
-        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
-      </header>
-
-      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
-        <StoryMaker />
-      </div>
-
-      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
-        More free Instagram tools:{" "}
-        <Link className={s.vlink} href="/tools/instagram-safe-zone-checker">
-          Safe zone checker
-        </Link>
-        {" · "}
-        <Link className={s.vlink} href="/help/schedule-instagram-stories">
-          How to schedule Instagram Stories
-        </Link>
-      </p>
-
-      {/* Sizes */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">The sizes</p>
-            <h2>Instagram Story size and safe zones</h2>
-            <p>Design for the full 9:16 frame, but keep the important part between the top and bottom bars.</p>
-          </div>
-          <div className="pains" style={{ maxWidth: 760, marginInline: "auto" }}>
-            {sizes.map((z) => (
-              <div key={z.title} className="pain">
-                <b style={{ whiteSpace: "normal" }}>{z.title}</b>
-                <span>{z.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How to use */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="split">
-            <div className="copy">
-              <p className="eyebrow">Step by step</p>
-              <h2>How to make an Instagram Story</h2>
-            </div>
-            <ol className="pains" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {steps.map((step, i) => (
-                <li key={step} className="pain">
-                  <b>Step {i + 1}</b>
-                  <span>{step}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">Questions</p>
-            <h2>Instagram Story maker FAQ</h2>
-          </div>
-          <div className="faq">
-            {faqs.map((f) => (
-              <details key={f.q}>
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="cta">
-            <div>
-              <h2>Schedule this Story with {BRAND.name}</h2>
-              <p>
-                Paste one public image or video link, pick the Story format, choose a date and time in your time
-                zone, and {BRAND.name} publishes it for you. A Story takes exactly one image or video; interactive
-                stickers such as links, polls and music are added in the Instagram app instead.
-              </p>
-              <Link className="btn" href="/instagram-scheduler">
-                Open the scheduler <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-            <Image
-              sizes="(max-width: 960px) 100vw, 50vw"
-              src="/landing/card-leads.webp"
-              width={900}
-              height={900}
-              loading="lazy"
-              alt="Two friends high-five next to a board of new leads"
-            />
-          </div>
-          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
-            <Link className={s.vlink} href="/help/schedule-instagram-stories">
-              How to schedule Instagram Stories
-            </Link>
-            {" · "}
-            <Link className={s.vlink} href="/tools/instagram-safe-zone-checker">
-              Instagram safe zone checker
-            </Link>
-          </p>
-        </div>
-      </section>
-    </PublicShell>
+    <ToolPageTemplate config={config}>
+      <StoryMaker />
+    </ToolPageTemplate>
   );
 }

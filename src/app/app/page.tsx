@@ -1,16 +1,19 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
-import { AlertTriangle, ArrowRight, Heart, Inbox, Link2, MessageCircle, Plus, RefreshCw, Send, Trophy, UserPlus, Users } from "lucide-react";
+import { AlertTriangle, ArrowRight, Heart, Inbox, Link2, MessageCircle, Plus, Send, Trophy, UserPlus, Users } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { instrumentSans } from "@/lib/fonts";
 import { EMPTY_STATS, getDashboardStats, getRecentPosts, getUpcomingPosts, type RecentPost } from "@/lib/stats";
 import { isDbConfigured, query } from "@/lib/db";
-import { fetchIgProfile, type GraphAccount, type IgProfile } from "@/lib/igGraph";
-import { fetchRecentMedia, type IgMediaItem } from "@/lib/igMedia";
 import { automationSummary, getAutomationRows, getSnapshot, EMPTY_SNAPSHOT, pctChange } from "@/lib/homeStats";
 import { filterComments, loadInbox } from "@/lib/inbox";
-import { ruleMatchesMedia } from "@/lib/ruleMedia";
-import TodaysActions from "./TodaysActions";
+import { homeStatusParts } from "@/lib/homeGreeting";
+import { AnimArt } from "@/components/AnimArt";
+import { InitialAvatar, LiveFollowers, ProfileAvatar, TodaysActionsFeed, type HomeIgAccount } from "./HomeInstagram";
+import Greeting from "./Greeting";
+import RefreshInstagramButton from "./RefreshInstagramButton";
+import { CardRowSkeleton } from "./Skeleton";
 import ActiveAutomations from "./ActiveAutomations";
 import FirstSessionChecklist from "./FirstSessionChecklist";
 import home from "./home.module.css";
@@ -20,12 +23,10 @@ import UpcomingPosts from "./UpcomingPosts";
 
 export const metadata = { title: "Dashboard" };
 
-type IgRow = GraphAccount & { username: string | null };
-
-async function igAccount(userId: string): Promise<IgRow | null> {
+async function igAccount(userId: string): Promise<HomeIgAccount | null> {
   if (!isDbConfigured()) return null;
   try {
-    const rows = await query<IgRow>(
+    const rows = await query<HomeIgAccount>(
       "select id, external_id, access_token_enc, auth_type, username from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='active' order by updated_at desc nulls last limit 1",
       [userId],
     );
@@ -68,6 +69,20 @@ async function hasAnyPost(userId: string): Promise<boolean> {
     return rows[0]?.n ?? false;
   } catch {
     return false;
+  }
+}
+
+// Scheduled posts due in the next 7 days (welcome band status line).
+async function scheduledNextWeek(userId: string): Promise<number> {
+  if (!isDbConfigured()) return 0;
+  try {
+    const rows = await query<{ n: number }>(
+      "select count(*)::int as n from socialapp.scheduled_posts where user_id=$1 and status='scheduled' and scheduled_at >= now() and scheduled_at < now() + interval '7 days'",
+      [userId],
+    );
+    return rows[0]?.n ?? 0;
+  } catch {
+    return 0;
   }
 }
 
@@ -138,10 +153,11 @@ const n = (v: number | null | undefined) => (v == null ? "–" : v.toLocaleStrin
 export default async function AppHome() {
   await connection();
   const user = await getCurrentUser();
-  const stats = user ? await getDashboardStats(user.id) : EMPTY_STATS;
-  const upcoming = user ? await getUpcomingPosts(user.id) : [];
-  const [snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle] = user
+  // Database only: nothing here calls Instagram, so the page shell renders at once. Graph reads stream in below.
+  const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek] = user
     ? await Promise.all([
+        getDashboardStats(user.id),
+        getUpcomingPosts(user.id),
         getSnapshot(user.id),
         getAutomationRows(user.id),
         igAccount(user.id),
@@ -151,27 +167,18 @@ export default async function AppHome() {
         followerTrend(user.id),
         commentRuleScopes(user.id),
         anyHandle(user.id),
+        scheduledNextWeek(user.id),
       ])
-    : [EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null];
-  let profile: IgProfile | null = null;
-  let media: IgMediaItem[] = [];
-  let mediaError = false;
-  if (account) {
-    const [p, m] = await Promise.allSettled([fetchIgProfile(account), fetchRecentMedia(account, 12)]);
-    if (p.status === "fulfilled") profile = p.value;
-    if (m.status === "fulfilled") media = m.value;
-    else mediaError = true;
-  }
-  const handle = profile?.username ?? account?.username ?? dbHandle;
+    : [EMPTY_STATS, [], EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null, 0];
+  const handle = account?.username ?? dbHandle;
   const activeCount = automations.filter((a) => a.status === "active").length;
-  const covered = (mediaId: string) => scopes.some((rule) => ruleMatchesMedia(rule, mediaId));
+  const status = homeStatusParts({ scheduledThisWeek: nextWeek, liveAutomations: activeCount, commentsWaiting: unanswered });
 
-  const followerNow = profile?.followers ?? followers.now;
-  const tiles: { label: string; icon: typeof Send; value: number | null; prev: number | null; note?: string }[] = [
+  const tiles: { label: string; icon: typeof Send; value: number | null; prev: number | null; note?: string; live?: boolean }[] = [
     { label: "DMs sent", icon: Send, value: snapshot.dmsSent, prev: snapshot.dmsSentPrev, note: `Queue: ${snapshot.dmQueue.toLocaleString("en-US")}` },
     { label: "Link clicks", icon: Link2, value: snapshot.linkClicks, prev: snapshot.linkClicksPrev },
     { label: "Leads collected", icon: UserPlus, value: snapshot.leads, prev: snapshot.leadsPrev },
-    { label: "Total followers", icon: Users, value: followerNow, prev: profile ? null : followers.prev, note: followerNow == null ? "Not tracked yet" : undefined },
+    { label: "Total followers", icon: Users, value: followers.now, prev: followers.prev, live: true, note: followers.now == null && !account ? "Not tracked yet" : undefined },
   ];
 
   const top = recentPosts
@@ -184,19 +191,32 @@ export default async function AppHome() {
 
   return (
     <div className={`${instrumentSans.variable} ${home.page}`}>
-      <header className={home.welcomeRow}>
-        <div>
-          <h1 className={home.welcome}>Welcome{handle ? <> <span>@{handle}</span></> : ""}!</h1>
-          <p className={home.welcomeSub}>Here&apos;s what your posts and automations did for you this week.</p>
+      <header className={home.band}>
+        <Suspense fallback={<InitialAvatar handle={handle} />}>
+          <ProfileAvatar account={account} handle={handle} />
+        </Suspense>
+        <div className={home.bandText}>
+          <h1 className={home.welcome}>
+            <Greeting />{handle ? <>, <span>@{handle}</span></> : null} <span className={home.wave} aria-hidden="true">👋</span>
+          </h1>
+          <p className={home.welcomeSub}>
+            {status.map((part, i) => (
+              <span key={part}>{i > 0 && <span className={home.dot} aria-hidden="true"> · </span>}{part}</span>
+            ))}
+          </p>
+          <div className={home.actions}>
+            <BtnLink href="/app/calendar?compose=1" size="sm">
+              <Plus width={16} height={16} aria-hidden="true" /> New post
+            </BtnLink>
+            <BtnLink href="/app/auto-dm" variant="lime" size="sm">
+              <Plus width={16} height={16} aria-hidden="true" /> New Auto-DM
+            </BtnLink>
+            <BtnLink href="/app/inbox" variant="ghost" size="sm">
+              <Inbox width={16} height={16} aria-hidden="true" /> Open inbox{unanswered > 0 ? ` (${unanswered.toLocaleString("en-US")})` : ""}
+            </BtnLink>
+          </div>
         </div>
-        <div className={home.actions}>
-          <BtnLink href="/app/calendar?compose=1" variant="ghost" size="sm">
-            <Plus width={16} height={16} aria-hidden="true" /> New post
-          </BtnLink>
-          <BtnLink href="/app/auto-dm" variant="lime" size="sm">
-            <Plus width={16} height={16} aria-hidden="true" /> New automation
-          </BtnLink>
-        </div>
+        <AnimArt name="feat-dm" className={home.bandArt} />
       </header>
 
       {stats.failed > 0 && (
@@ -215,38 +235,19 @@ export default async function AppHome() {
         <div className={home.sectionHead}>
           <div>
             <h2 id="todays-actions" className={home.sectionTitle}>Today&apos;s actions</h2>
-            <p className={home.sectionSub}>Your latest posts and reels, and whether an automation answers their comments.</p>
+            <p className={home.sectionSub}>Your latest posts and reels, and whether an Auto-DM answers their comments.</p>
           </div>
           <div className={home.headLinks}>
             <Link href="/app/inbox?filter=unanswered" className={home.pillLink}>
               <Inbox width={14} height={14} aria-hidden="true" />
               {unanswered.toLocaleString("en-US")} unanswered {unanswered === 1 ? "comment" : "comments"}
             </Link>
-            <Link href="/app" className={home.textLink}><RefreshCw width={14} height={14} aria-hidden="true" /> Refresh</Link>
-            {profile?.username && (
-              <a href={`https://www.instagram.com/${encodeURIComponent(profile.username)}/`} target="_blank" rel="noopener noreferrer" className={home.textLink}>
-                View all <ArrowRight width={14} height={14} aria-hidden="true" />
-              </a>
-            )}
+            {account && <RefreshInstagramButton className={home.textLink} />}
           </div>
         </div>
-        {media.length > 0 ? (
-          <TodaysActions
-            items={media.map((m) => ({ ...m, hasRule: covered(m.id) }))}
-            username={profile?.username ?? handle ?? "instagram"}
-            avatarUrl={profile?.profilePictureUrl ?? null}
-          />
-        ) : (
-          <div className={home.emptyCard}>
-            {account ? (
-              <p>{mediaError ? "We couldn't load your posts from Instagram right now. Try Refresh in a minute." : "No posts yet. Your latest posts and reels will show here."}</p>
-            ) : stats.hasAccount ? (
-              <p>Instagram needs you to reconnect before your latest posts can load. <Link href="/api/instagram/connect">Reconnect Instagram</Link></p>
-            ) : (
-              <p>Connect Instagram to see your latest posts here. <Link href="/api/instagram/connect">Connect Instagram</Link></p>
-            )}
-          </div>
-        )}
+        <Suspense fallback={<CardRowSkeleton count={4} h={360} />}>
+          <TodaysActionsFeed account={account} scopes={scopes} hasAnyAccount={stats.hasAccount || dbHandle !== null} fallbackHandle={handle} />
+        </Suspense>
       </section>
 
       <section className={home.section} aria-labelledby="snapshot">
@@ -264,7 +265,15 @@ export default async function AppHome() {
                 {t.label}
               </div>
               <div className={home.statRow}>
-                <span className={home.statValue}>{n(t.value)}</span>
+                <span className={home.statValue}>
+                  {t.live ? (
+                    <Suspense fallback={n(t.value)}>
+                      <LiveFollowers account={account} snapshot={t.value} />
+                    </Suspense>
+                  ) : (
+                    n(t.value)
+                  )}
+                </span>
                 {t.value != null && <Change cur={t.value} prev={t.prev} />}
               </div>
               <div className={home.statFoot}>
@@ -280,7 +289,7 @@ export default async function AppHome() {
         <section className={home.section} aria-labelledby="active-automations">
           <div className={home.sectionHead}>
             <div>
-              <h2 id="active-automations" className={home.sectionTitle}>Active automations ({activeCount})</h2>
+              <h2 id="active-automations" className={home.sectionTitle}>Active Auto-DMs ({activeCount})</h2>
               <p className={home.sectionSub}>Running 24/7 to turn comments into DMs and contacts</p>
             </div>
             <Link href="/app/auto-dm" className={home.textLink}>View all <ArrowRight width={14} height={14} aria-hidden="true" /></Link>

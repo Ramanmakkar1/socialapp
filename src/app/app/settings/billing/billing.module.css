@@ -1,0 +1,31 @@
+/* Plan & billing page. Tokens: src/app/globals.css (--poskoo-*). */
+.current { display: grid; gap: 6px; padding: 18px 20px; }
+.planName { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--poskoo-ink); }
+
+.meters { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.meter { display: grid; gap: 6px; padding: 14px 16px; border: 1px solid var(--poskoo-line); border-radius: 16px; background: var(--poskoo-card); }
+.meterTop { display: flex; justify-content: space-between; gap: 8px; margin: 0; color: var(--poskoo-muted); font-size: .85rem; font-weight: 600; }
+.meterNum { color: var(--poskoo-ink); font-variant-numeric: tabular-nums; }
+.meterBar { display: block; height: 8px; overflow: hidden; border-radius: 999px; background: var(--poskoo-band); }
+.meterBar > span { display: block; height: 100%; min-width: 2px; border-radius: inherit; background: var(--poskoo-violet); }
+.meterBar > .meterHot { background: var(--poskoo-coral); }
+.meterNote { margin: 0; color: var(--poskoo-muted); font-size: .78rem; }
+
+.toggle { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--poskoo-line); border-radius: 999px; background: var(--poskoo-card); }
+.toggle a { padding: 6px 14px; border-radius: 999px; color: var(--poskoo-muted); font-size: .85rem; font-weight: 600; text-decoration: none; }
+.toggle a.toggleOn { background: var(--poskoo-ink); color: var(--poskoo-paper); }
+
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.planCard { display: flex; flex-direction: column; gap: 10px; padding: 20px; }
+.picked { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+.price { margin: 0; font-size: 2rem; font-weight: 800; color: var(--poskoo-ink); }
+.price span { font-size: .95rem; font-weight: 600; color: var(--poskoo-muted); }
+.priceNote { margin: 0; color: var(--poskoo-muted); font-size: .85rem; }
+.items { display: grid; gap: 6px; margin: 4px 0 8px; padding: 0; list-style: none; font-size: .9rem; color: var(--poskoo-ink); }
+.items li { display: flex; align-items: center; gap: 8px; }
+.items svg { flex: none; color: var(--poskoo-green); }
+
+@media (max-width: 640px) {
+  .toggle { width: 100%; }
+  .toggle a { flex: 1; text-align: center; }
+}

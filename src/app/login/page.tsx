@@ -11,9 +11,14 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ google?: string | string[]; account?: string | string[] }> }) {
-  const { google, account } = await searchParams;
-  const notice = account === "deleted" ? "Your Poskoo account and its data were deleted. Thanks for trying Poskoo." : null;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ google?: string | string[]; account?: string | string[]; reset?: string | string[] }> }) {
+  const { google, account, reset } = await searchParams;
+  const notice =
+    account === "deleted"
+      ? "Your Poskoo account and its data were deleted. Thanks for trying Poskoo."
+      : reset === "done"
+        ? "Password updated. Log in with your new password."
+        : null;
   const googleError = typeof google === "string" && Object.hasOwn(GOOGLE_ERRORS, google) ? GOOGLE_ERRORS[google] : null;
   return <AuthForm mode="login" googleEnabled={isGoogleConfigured()} googleError={googleError} notice={notice} />;
 }

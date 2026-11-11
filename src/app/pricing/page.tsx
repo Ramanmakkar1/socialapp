@@ -9,7 +9,7 @@ import s from "@/components/site.module.css";
 
 const PATH = "/pricing";
 const title = `${BRAND.name} Pricing: Free Instagram Scheduler & Auto-DM Plans`;
-const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, with Pro and Agency plans coming soon. No credit card needed.`;
+const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, then upgrade to Pro or Agency when you need more. No credit card needed to start.`;
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -33,11 +33,11 @@ const faqs = [
   },
   {
     q: "Can I cancel any time?",
-    a: "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel.",
+    a: "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for.",
   },
   {
     q: "Which platforms are included?",
-    a: "Instagram, Facebook Pages, Threads and YouTube scheduling work today, plus Instagram auto-DMs.",
+    a: "Instagram, Facebook Pages, Threads, YouTube, Bluesky and Mastodon scheduling work today, plus Instagram auto-DMs. TikTok, LinkedIn, Pinterest and X are coming soon.",
   },
 ];
 
@@ -96,7 +96,7 @@ export default function PricingPage() {
         <h1>
               Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
             </h1>
-        <p className="lede">Start free today. Paid plans with more accounts, posts and DMs are coming soon.</p>
+        <p className="lede">Start free today. Upgrade to Pro or Agency for more accounts, posts and DMs whenever you are ready.</p>
         <div className="ctas">
               <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
               <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
@@ -112,6 +112,7 @@ export default function PricingPage() {
                 {p.popular ? <span className="tag">Most popular</span> : null}
                 <h3>{p.name}</h3>
                 <div className="price">{p.price} <small>{p.per}</small></div>
+        {p.yearly && <p className="priceYearly">or {p.yearlyHref ? <a href={p.yearlyHref}>{p.yearly}</a> : p.yearly}</p>}
                 <ul>
                   {p.items.map((item) => (
                     <li key={item.text}>
@@ -121,7 +122,7 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</Link>
+                {p.ctaHref.startsWith("/upgrade") ? <a className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</a> : <Link className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</Link>}
               </div>
             ))}
           </div>

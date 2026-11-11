@@ -1,7 +1,8 @@
 // Plan limits as numbers, enforced on the server. The numbers mirror the plan cards in
 // src/lib/plans.ts (planLimits.test.ts fails if they drift apart). Prices are not here.
-import { query } from "@/lib/db";
+import { isDbConfigured, query } from "@/lib/db";
 import { referralBonusDms } from "@/lib/referrals";
+import { planFromBilling, type BillingRow } from "@/lib/billingState";
 
 export type PlanName = "Free" | "Pro" | "Agency";
 export type PlanLimits = {
@@ -15,13 +16,28 @@ export type PlanLimits = {
 
 export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
   Free: { socialAccounts: 2, scheduledPostsPerMonth: 10, autoDmsPerMonth: 500, bioLinks: 5 },
-  Pro: { socialAccounts: 5, scheduledPostsPerMonth: null, autoDmsPerMonth: 10_000, bioLinks: 20 },
-  Agency: { socialAccounts: 25, scheduledPostsPerMonth: null, autoDmsPerMonth: 50_000, bioLinks: 20 },
+  Pro: { socialAccounts: 5, scheduledPostsPerMonth: null, autoDmsPerMonth: 2_500, bioLinks: 20 },
+  Agency: { socialAccounts: 25, scheduledPostsPerMonth: null, autoDmsPerMonth: 10_000, bioLinks: 20 },
 };
 
-/** Every account is on the Free plan until paid plans open (see PLANS_NOTE). */
-export function planForUser(): PlanName {
-  return "Free";
+/**
+ * The user's plan from their Stripe subscription (billing_subscriptions, migration 043): Pro/Agency
+ * while active or trialing, or past_due within the 7-day grace period (billingState.planFromBilling);
+ * otherwise Free. Any read error falls back to Free (limits fail closed, nothing is deleted).
+ */
+export async function planForUser(userId: string): Promise<PlanName> {
+  if (!userId || !isDbConfigured()) return "Free";
+  try {
+    const rows = await query<BillingRow>("select plan, status, past_due_since from socialapp.billing_subscriptions where user_id=$1", [userId]);
+    return planFromBilling(rows[0]);
+  } catch {
+    return "Free";
+  }
+}
+
+/** Short nudge appended to limit messages ("" on the biggest plan). */
+export function upgradeHint(plan: PlanName): string {
+  return plan === "Agency" ? "" : ` Need more? Upgrade to ${plan === "Free" ? "Pro" : "Agency"} in Settings > Plan & billing.`;
 }
 
 /** UTC calendar month [start, end) containing `at`. */
@@ -32,7 +48,7 @@ export function utcMonthRange(at: Date): { start: Date; end: Date } {
 }
 
 export function scheduledLimitMessage(limit: number, plan: PlanName): string {
-  return `The ${plan} plan includes ${limit} scheduled posts per month, and that month is full. Save this one as a draft, pick another month, or delete a scheduled post.`;
+  return `The ${plan} plan includes ${limit} scheduled posts per month, and that month is full. Save this one as a draft, pick another month, or delete a scheduled post.${upgradeHint(plan)}`;
 }
 
 /**
@@ -46,13 +62,12 @@ export function autoDmLimitWithBonus(plan: PlanName, bonusDms: number): number {
 
 /** Server-side monthly automated-DM limit for a user (plan + referral bonus; bonus 0 if it cannot be read). */
 export async function monthlyAutoDmLimit(userId: string): Promise<{ plan: PlanName; limit: number; bonus: number }> {
-  const plan = planForUser();
-  const bonus = await referralBonusDms(userId);
+  const [plan, bonus] = await Promise.all([planForUser(userId), referralBonusDms(userId)]);
   return { plan, limit: autoDmLimitWithBonus(plan, bonus), bonus };
 }
 
 export function autoDmLimitMessage(limit: number, plan: PlanName): string {
-  return `Monthly auto-DM limit reached (${limit.toLocaleString("en-US")} on the ${plan} plan). Auto-DMs start again on the 1st of next month (UTC).`;
+  return `Monthly auto-DM limit reached (${limit.toLocaleString("en-US")} on the ${plan} plan). Auto-DMs start again on the 1st of next month (UTC).${upgradeHint(plan)}`;
 }
 
 /**
@@ -60,7 +75,7 @@ export function autoDmLimitMessage(limit: number, plan: PlanName): string {
  * publishing or published in the UTC month of `at`, ignoring `excludePostId` (the post being saved / moved).
  */
 export async function scheduledPostLimitError(userId: string, at: Date, excludePostId?: string | null): Promise<string | null> {
-  const plan = planForUser();
+  const plan = await planForUser(userId);
   const limit = PLAN_LIMITS[plan].scheduledPostsPerMonth;
   if (limit === null) return null;
   const { start, end } = utcMonthRange(at);
@@ -78,7 +93,7 @@ export async function scheduledPostLimitError(userId: string, at: Date, excludeP
  * published in the current UTC month, counted exactly like scheduledPostLimitError. limit null = unlimited.
  */
 export async function scheduledPostsUsage(userId: string, at: Date = new Date()): Promise<{ used: number; limit: number | null }> {
-  const limit = PLAN_LIMITS[planForUser()].scheduledPostsPerMonth;
+  const limit = PLAN_LIMITS[await planForUser(userId)].scheduledPostsPerMonth;
   const { start, end } = utcMonthRange(at);
   const rows = await query<{ n: number }>(
     `select count(*)::int as n from socialapp.scheduled_posts
@@ -91,7 +106,7 @@ export async function scheduledPostsUsage(userId: string, at: Date = new Date())
 
 /** Shown in Settings when a NEW account would go over the plan's connected-account limit. */
 export function accountLimitMessage(limit: number, plan: PlanName): string {
-  return `The ${plan} plan includes ${limit} connected accounts and they are all in use. Disconnect one below, then connect the new one. Reconnecting an account you already have always works.`;
+  return `The ${plan} plan includes ${limit} connected accounts and they are all in use. Disconnect one below, then connect the new one. Reconnecting an account you already have always works.${upgradeHint(plan)}`;
 }
 
 /**
@@ -104,7 +119,11 @@ export function accountConnectAllowed(input: { alreadyConnected: boolean; connec
 }
 
 export type ConnectTarget =
-  | { kind: "social"; platform: "instagram" | "facebook" | "threads"; externalId: string }
+  | {
+      kind: "social";
+      platform: "instagram" | "facebook" | "threads" | "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp";
+      externalId: string;
+    }
   | { kind: "youtube"; channelId: string };
 
 /**
@@ -114,8 +133,6 @@ export type ConnectTarget =
  * null when the connect may go ahead.
  */
 export async function accountLimitError(userId: string, target: ConnectTarget): Promise<string | null> {
-  const plan = planForUser();
-  const limit = PLAN_LIMITS[plan].socialAccounts;
   const rows = await query<{ social: number; youtube: number; already: boolean }>(
     `select
        (select count(*)::int from socialapp.social_accounts where user_id=$1 and status <> 'disconnected') as social,
@@ -127,6 +144,8 @@ export async function accountLimitError(userId: string, target: ConnectTarget): 
     [userId, target.kind, target.kind === "social" ? target.platform : null, target.kind === "social" ? target.externalId : target.channelId],
   );
   const r = rows[0] ?? { social: 0, youtube: 0, already: false };
+  const plan = await planForUser(userId);
+  const limit = PLAN_LIMITS[plan].socialAccounts;
   const allowed = accountConnectAllowed({ alreadyConnected: r.already === true, connectedCount: (r.social ?? 0) + (r.youtube ?? 0), limit });
   return allowed ? null : accountLimitMessage(limit, plan);
 }

@@ -25,10 +25,10 @@ const MAX_CHIPS = 3;
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default function MonthView({ posts, monthStart, composeBase, accounts = {}, loadError }: MonthViewProps) {
-  const { tz, error, dragOverKey, dropProps, open, openPost, closePost } = useCalendar(posts);
+  const { posts: visiblePosts, tz, error, dragOverKey, dropProps, open, openPost, closePost } = useCalendar(posts);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const todayKey = zonedParts(new Date(), tz).key;
-  const byDay = groupByDay(posts, tz);
+  const byDay = groupByDay(visiblePosts, tz);
   const monthKey = monthStart.toISOString().slice(0, 7);
 
   // Monday on/before the 1st through the Sunday on/after the last day.

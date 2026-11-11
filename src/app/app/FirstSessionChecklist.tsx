@@ -20,7 +20,7 @@ type Step = { label: string; detail: string; href: string; done: boolean };
 // step is done.
 export default function FirstSessionChecklist({ connected, postCreated, postScheduled }: FirstSessionChecklistProps) {
   const steps: Step[] = [
-    { label: "Connect Instagram", detail: "Link your account from Settings.", href: "/app/settings", done: connected },
+    { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", href: "/app#connect", done: connected },
     { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar#new", done: postCreated },
     { label: "Schedule it", detail: "Pick a date and time on the calendar.", href: "/app/calendar", done: postScheduled },
   ];

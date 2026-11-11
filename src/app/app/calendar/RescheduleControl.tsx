@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
 import { Btn } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
@@ -17,7 +16,6 @@ export default function RescheduleControl({ id, scheduledAt, caption, tz = "", o
   tz?: string;
   onMoved?: () => void;
 }) {
-  const router = useRouter();
   const fieldId = useId();
   const originalDate = zonedParts(scheduledAt, tz).key;
   const [date, setDate] = useState(originalDate);
@@ -48,8 +46,8 @@ export default function RescheduleControl({ id, scheduledAt, caption, tz = "", o
                 setError(result.error ?? "Could not move post. Please try again.");
                 return;
               }
+              // reschedulePost revalidates the calendar, so the moved post is already on screen here.
               onMoved?.();
-              router.refresh();
             } catch {
               setError("Could not move post. Please try again.");
             }

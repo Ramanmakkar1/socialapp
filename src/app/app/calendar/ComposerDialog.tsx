@@ -24,6 +24,8 @@ export default function ComposerDialog({ title, children }: { title: string; chi
   const [open, setOpen] = useState(false);
   const [wide, setWide] = useState(false);
   const [preview, setPreview] = useState(true);
+  // Below 1024px the preview is a sheet over the form, opened from the header "Preview" button.
+  const [sheet, setSheet] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,7 +51,9 @@ export default function ComposerDialog({ title, children }: { title: string; chi
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key !== "Escape") return;
+      if (sheet) setSheet(false);
+      else close();
     };
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
@@ -59,7 +63,7 @@ export default function ComposerDialog({ title, children }: { title: string; chi
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [open, close]);
+  }, [open, close, sheet]);
 
   return (
     <div className={styles.dialogBackdrop} hidden={!open} onMouseDown={(e) => { if (e.target === e.currentTarget) close(); }}>
@@ -71,13 +75,18 @@ export default function ComposerDialog({ title, children }: { title: string; chi
         aria-label={title}
         className={`${styles.dialogPanel} ${wide ? styles.dialogPanelWide : ""}`}
         data-preview={preview ? "on" : "off"}
+        data-sheet={sheet ? "open" : undefined}
       >
         <div className={styles.dialogHead}>
           <h2 className={styles.dialogTitle}>{title}</h2>
           <div className={styles.dialogTools}>
-            <button type="button" onClick={() => setPreview((v) => !v)} className={styles.dialogTool} aria-pressed={preview}>
+            <button type="button" onClick={() => setPreview((v) => !v)} className={`${styles.dialogTool} ${styles.desktopOnly}`} aria-pressed={preview}>
               {preview ? <EyeOff width={16} height={16} aria-hidden="true" /> : <Eye width={16} height={16} aria-hidden="true" />}
               <span>{preview ? "Hide preview" : "Preview"}</span>
+            </button>
+            <button type="button" onClick={() => setSheet((v) => !v)} className={`${styles.dialogTool} ${styles.mobileOnly}`} aria-pressed={sheet}>
+              <Eye width={16} height={16} aria-hidden="true" />
+              <span>{sheet ? "Close preview" : "Preview"}</span>
             </button>
             <button type="button" onClick={() => setWide((v) => !v)} className={`${styles.dialogClose} ${styles.wideOnly}`} aria-label={wide ? "Exit full screen" : "Full screen"} aria-pressed={wide}>
               {wide ? <Minimize2 width={18} height={18} aria-hidden="true" /> : <Maximize2 width={18} height={18} aria-hidden="true" />}
@@ -90,6 +99,7 @@ export default function ComposerDialog({ title, children }: { title: string; chi
         <div className={styles.dialogBody}>
           <ComposerDialogContext.Provider value={dialogApi}>{children}</ComposerDialogContext.Provider>
         </div>
+        {sheet && <button type="button" className={styles.sheetScrim} aria-label="Close preview" onClick={() => setSheet(false)} />}
       </div>
     </div>
   );

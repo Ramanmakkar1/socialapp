@@ -1,209 +1,208 @@
-import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
-import PublicShell from "@/components/PublicShell";
-import s from "@/components/site.module.css";
+import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import t from "@/components/tools/tools.module.css";
 import HighlightCoverMaker from "./HighlightCoverMaker";
-import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
-import { AnimArt } from "@/components/AnimArt";
 
-const PATH = "/tools/instagram-highlight-cover-maker";
-const description =
-  "Free Instagram highlight cover maker: pick a colour and icon, preview the circle crop, and download a 1080x1080 PNG. Runs in your browser, no upload.";
-
-export const metadata: Metadata = {
-  title: { absolute: "Instagram Highlight Cover Maker: Free Icon Covers (PNG)" },
-  description,
-  alternates: { canonical: PATH },
+const config: ToolPageConfig = {
+  path: "/tools/instagram-highlight-cover-maker",
+  name: "Instagram highlight cover maker",
+  crumb: "Highlight cover maker",
+  title: "Instagram Highlight Cover Maker: Free Icon Covers (PNG)",
+  description:
+    "Free Instagram highlight cover maker: pick a colour, icon and short label, preview the circle crop and download a 1080×1080 or 1080×1920 PNG. No upload.",
+  pill: "Free · runs in your browser · no watermark",
+  h1: { mark: "Instagram highlight cover maker", after: "with free icons" },
+  lede: "Pick a colour and an icon, add an optional label, preview the circle crop and download a ready-to-use highlight cover PNG. No upload, no account, no watermark.",
+  art: "visual",
+  artLabel: "A creator measures a photo frame with a ruler next to phone screens of different shapes",
+  heroPoints: ["16 icons, 8 palettes", "Circle-crop preview", "No signup"],
+  toolTitle: "Design your highlight cover",
+  toolNote: "Free · nothing leaves your browser",
+  stepsTitle: "How to make an Instagram highlight cover",
+  steps: [
+    {
+      title: "Pick a colour and icon",
+      text: "Choose one of 8 palettes or set a Custom background and Custom icon colour, then pick one of 16 icons. Add an optional label of up to 12 characters.",
+      art: "visual",
+    },
+    {
+      title: "Choose style and format",
+      text: "Set the Background style to solid, gradient or ring, and the Format to square (1080×1080) or story (1080×1920). Check the small round preview.",
+      art: "writing",
+    },
+    {
+      title: "Download and set the cover",
+      text: "Press Download PNG, or Download all 16 icons in this colour for a matching set. In Instagram, edit the highlight and choose the PNG as its cover.",
+      art: "card-schedule",
+    },
+  ],
+  featuresTitle: "A tidy profile in a few clicks",
+  features: [
+    {
+      title: "A matching set at once",
+      text: "Download all 16 icons in one colour and style, so every highlight on your profile looks like part of one set.",
+      art: "visual",
+    },
+    {
+      title: "See the real crop",
+      text: "A 64 px round preview shows how the cover looks as a highlight circle on your profile, before you download it.",
+      art: "feat-linkbio",
+    },
+    {
+      title: "Your brand colours",
+      text: "Use the colour pickers to match your brand exactly, or start from soft presets like Blush, Sage and Lilac.",
+      art: "feat-ai",
+    },
+  ],
+  guide: {
+    title: "A practical guide to Instagram highlight covers in 2026",
+    intro:
+      "Highlights sit just under your bio, so their covers are one of the first things a profile visitor sees. Simple, matching icons make it easy to tell what each highlight holds. Here is how this maker works and how to set the covers up.",
+    sections: [
+      {
+        title: "What this highlight cover maker does",
+        body: (
+          <>
+            <p>
+              The maker draws a cover on a canvas in your browser: a background colour (solid, a soft radial gradient,
+              or with a thin ring), one of 16 icons and an optional label of up to 12 characters, all centred. The{" "}
+              <b>square</b> format exports a 1080×1080 PNG where the circle fills the image; the <b>story</b> format
+              exports a 1080×1920 PNG with the design in the middle.
+            </p>
+            <p>
+              Files are named after the icon, such as <code>highlight-cover-heart.png</code>. Nothing is uploaded and
+              there is no watermark.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "How to add a highlight cover on Instagram",
+        body: (
+          <>
+            <ol>
+              <li>Save the PNG to your phone&apos;s camera roll.</li>
+              <li>Open your profile and press and hold the highlight you want to change.</li>
+              <li>Tap Edit highlight, then Edit cover.</li>
+              <li>Choose the PNG, centre the icon in the circle and tap Done.</li>
+            </ol>
+            <p>Menu names can change between app versions, so look for the edit option if the wording differs.</p>
+          </>
+        ),
+      },
+      {
+        title: "Best practices for highlight covers",
+        body: (
+          <ul>
+            <li>
+              <b>Design for the circle.</b> Instagram shows a small circle from the centre of the image, so keep the icon
+              and label well inside it.
+            </li>
+            <li>
+              <b>One style for every cover.</b> Same colour, same background style, different icons.
+            </li>
+            <li>
+              <b>Short labels or none.</b> The highlight name already appears under the circle, so a label inside the
+              cover is optional.
+            </li>
+            <li>
+              <b>Pick icons that match the content.</b> A calendar for events, a tag for offers, a question mark for FAQs.
+              Write the bio above them with the <Link href="/tools/instagram-bio-generator">bio generator</Link>.
+            </li>
+          </ul>
+        ),
+      },
+      {
+        title: "Example: a five-highlight set for a small shop",
+        body: (
+          <>
+            <p>
+              Choose the Charcoal palette, the ring style and the square format, then press Download all 16 icons in this
+              colour. Keep the five you need:
+            </p>
+            <div className={t.example}>
+              <p>highlight-cover-bag.png · New in</p>
+              <p>highlight-cover-tag.png · Offers</p>
+              <p>highlight-cover-star.png · Reviews</p>
+              <p>highlight-cover-question.png · FAQ</p>
+              <p>highlight-cover-pin.png · Find us</p>
+            </div>
+            <p>
+              Every file is 1080×1080 with the same colour and ring, so the row of highlights looks consistent. Name each
+              highlight in the app; the cover itself needs no label.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Common highlight cover mistakes",
+        body: (
+          <ul>
+            <li>Putting the icon or text near the edge, where the circle crop cuts it off.</li>
+            <li>Mixing many colours and styles, so the row looks unplanned.</li>
+            <li>Long labels that are unreadable at highlight size.</li>
+            <li>
+              Leaving highlights empty. Keep adding Stories to them; the{" "}
+              <Link href="/instagram-scheduler">Instagram scheduler</Link> helps you plan them.
+            </li>
+          </ul>
+        ),
+      },
+    ],
+  },
+  faqTitle: "Instagram highlight cover questions",
+  faqs: [
+    {
+      q: "What size are Instagram highlight covers?",
+      a: "Instagram shows a highlight cover as a small circle cropped from the centre of the image. This tool exports a 1080×1080 square PNG, where the circle fills the image, or a 1080×1920 Story-size PNG with the design centred. Both work when you choose a cover.",
+    },
+    {
+      q: "How do I change a highlight cover on Instagram?",
+      a: "Save the PNG to your phone, open your profile, press and hold the highlight, tap Edit highlight, then Edit cover. Choose the PNG, centre the icon in the circle and tap Done.",
+    },
+    {
+      q: "Why does my cover look cut off at the edges?",
+      a: "Instagram only shows a circle from the centre of the image. Keep your icon and label well inside the middle of the circle; anything near the edge can be cropped out.",
+    },
+    {
+      q: "Are my designs uploaded to your server?",
+      a: "No. The cover is drawn on a canvas inside your browser and saved straight to your device. Nothing is sent to a server and no account is needed.",
+    },
+    {
+      q: "Is this Instagram highlight cover maker free?",
+      a: "Yes. It is free with no watermark, no signup and no limit on downloads, including the option to download all 16 icons in one colour.",
+    },
+  ],
+  related: [
+    "/tools/instagram-story-maker",
+    "/tools/instagram-bio-generator",
+    "/tools/instagram-story-size-checker",
+    "/tools/instagram-reel-cover-maker",
+    "/tools/instagram-safe-zone-checker",
+  ],
+  schema: {
+    category: "MultimediaApplication",
+    features: [
+      "16 icons and 8 colour palettes plus custom colours",
+      "Solid, gradient and ring backgrounds",
+      "Optional label up to 12 characters",
+      "1080×1080 or 1080×1920 PNG export",
+      "Download all 16 icons in one colour",
+    ],
+  },
+  cta: {
+    title: "Your highlights look sharp.",
+    mark: "Now fill them with Stories.",
+    text: "Plan your Stories with Poskoo, and DM everyone who comments your keyword.",
+  },
 };
 
-const steps = [
-  "Open your Instagram profile and find the highlight you want to customise.",
-  "Press and hold the highlight circle until the menu appears.",
-  "Tap “Edit highlight”.",
-  "Tap “Edit cover” and choose the PNG you downloaded from your camera roll.",
-  "Crop it so the icon sits in the middle, then tap Done.",
-];
-
-const sizes = [
-  {
-    title: "Story frame: 1080×1920",
-    text: "Highlight covers are cropped from a 1080×1920 Story. This tool exports a 1080×1080 square (the circle fills it) or a full 1080×1920 frame with the icon centred.",
-  },
-  {
-    title: "Circle crop from the centre",
-    text: "Instagram shows the cover as a circle cut from the centre of the image. Anything outside that circle is hidden, so the design lives in the middle.",
-  },
-  {
-    title: "Keep the icon in the middle ~60%",
-    text: "Stay inside the central 60% of the circle. Icons and labels placed near the edge get clipped on some devices and screen sizes.",
-  },
-];
-
-const faqs = [
-  {
-    q: "What size are Instagram highlight covers?",
-    a: "They are cropped to a circle from a 1080×1920 Story frame. This tool exports a 1080×1080 square PNG (the circle fills it) or a 1080×1920 story PNG with the icon centred, so both work when you choose a cover.",
-  },
-  {
-    q: "Are my images uploaded to your server?",
-    a: "No. The cover is drawn on an HTML5 canvas inside your browser and saved straight to your device. Nothing is sent to a server and no account is needed.",
-  },
-  {
-    q: "Why does my cover look cut off at the edges?",
-    a: "Instagram only shows a circle from the centre of the image. Keep your icon and label inside the middle ~60% of the circle; anything closer to the edge is cropped out.",
-  },
-  {
-    q: "Can I use the same design for Reels or Story covers?",
-    a: "The centred-circle layout works for highlight covers. For full Story or Reel backgrounds, pair this with the safe zone checker to keep text and faces out of the areas Instagram overlays.",
-  },
-  {
-    q: "Is this Instagram highlight cover maker free?",
-    a: "Yes. It is 100% free with no watermark, no sign-up and no limit on how many covers you download, including the “download all 16 icons” option.",
-  },
-];
-
-const toolJsonLd = toolSoftwareJsonLd({
-  name: "Instagram Highlight Cover Maker",
-  description,
-  url: `${BRAND.url}${PATH}`,
-  category: "MultimediaApplication",
-});
+export const metadata = toolMetadata(config);
 
 export default function InstagramHighlightCoverMakerPage() {
   return (
-    <PublicShell
-      breadcrumbs={[
-        { name: "Free Instagram tools", path: "/tools" },
-        { name: "Highlight Cover Maker", path: PATH },
-      ]}
-    >
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
-
-      <header className="hero">
-        <span className="pill">Free · runs in your browser · nothing is uploaded</span>
-        <h1>
-          Instagram Highlight <em className="s mark">Cover Maker</em>
-        </h1>
-        <p className="lede">
-          Pick a colour and an icon, preview the circle crop, and download a ready-to-use highlight cover PNG.
-          No upload, no account, no watermark.
-        </p>
-        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
-      </header>
-
-      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
-        <HighlightCoverMaker />
-      </div>
-
-      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
-        More free Instagram tools:{" "}
-        <Link className={s.vlink} href="/tools/instagram-safe-zone-checker">
-          Safe zone checker
-        </Link>
-        {" · "}
-        <Link className={s.vlink} href="/help/schedule-instagram-stories">
-          How to schedule Instagram Stories
-        </Link>
-      </p>
-
-      {/* How to add a highlight cover */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="split">
-            <div className="copy">
-              <p className="eyebrow">Step by step</p>
-              <h2>How to add a highlight cover</h2>
-            </div>
-            <div className="pains">
-              {steps.map((step, i) => (
-                <div key={step} className="pain">
-                  <b>Step {i + 1}</b>
-                  <span>{step}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sizes */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">The sizes</p>
-            <h2>Highlight cover sizes</h2>
-            <p>Design for the circle, not the square — Instagram crops the rest.</p>
-          </div>
-          <div className="pains" style={{ maxWidth: 760, marginInline: "auto" }}>
-            {sizes.map((z) => (
-              <div key={z.title} className="pain">
-                <b style={{ whiteSpace: "normal" }}>{z.title}</b>
-                <span>{z.text}</span>
-              </div>
-            ))}
-          </div>
-          <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
-            Planning full Story backgrounds too? Check what the profile and reply bars hide with the{" "}
-            <Link className={s.vlink} href="/tools/instagram-safe-zone-checker">
-              safe zone checker
-            </Link>
-            , then plan your posts with our{" "}
-            <Link className={s.vlink} href="/help/schedule-instagram-stories">
-              Instagram Stories guide
-            </Link>
-            .
-          </p>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">Questions</p>
-            <h2>Highlight cover FAQ</h2>
-          </div>
-          <div className="faq">
-            {faqs.map((f) => (
-              <details key={f.q}>
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="cta">
-            <div>
-              <h2>Schedule your Stories with Poskoo</h2>
-              <p>{BRAND.tagline}</p>
-              <Link className="btn" href="/signup">
-                Start free <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-            <Image
-              sizes="(max-width: 960px) 100vw, 50vw"
-              src="/landing/card-leads.webp"
-              width={900}
-              height={900}
-              loading="lazy"
-              alt="Two friends high-five next to a board of new leads"
-            />
-          </div>
-          <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
-            <Link className={s.vlink} href="/instagram-scheduler">
-              Instagram scheduler
-            </Link>
-          </p>
-        </div>
-      </section>
-    </PublicShell>
+    <ToolPageTemplate config={config}>
+      <HighlightCoverMaker />
+    </ToolPageTemplate>
   );
 }

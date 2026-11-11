@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import IdeaCard, { type Idea } from "./IdeaCard";
 import { saveIdea } from "./ideasActions";
 import { IDEA_STATUSES } from "@/lib/ideas";
 
 export default function IdeasBoard({ ideas, loadFailed = false }: { ideas: Idea[]; loadFailed?: boolean }) {
-  const router = useRouter();
   const [text, setText] = useState("");
   const [mediaText, setMediaText] = useState("");
   const [tagsText, setTagsText] = useState("");
@@ -32,8 +30,8 @@ export default function IdeasBoard({ ideas, loadFailed = false }: { ideas: Idea[
         setText("");
         setMediaText("");
         setTagsText("");
+        // saveIdea revalidates the calendar page, so the new card renders in this same transition.
         setFeedback({ kind: "ok", text: "Idea saved" });
-        router.refresh();
       } catch {
         setFeedback({ kind: "err", text: "Could not save idea. Please try again." });
       }

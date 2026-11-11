@@ -3,6 +3,7 @@ import { query } from "@/lib/db";
 import { refreshLongLivedToken } from "@/lib/instagram";
 import { checkPageToken, type PageTokenCheck } from "@/lib/metaLogin";
 import { refreshThreadsToken } from "@/lib/threadsAuth";
+import { refreshNetworkTokens, type NetworkRefreshResult } from "@/lib/networks/refresh";
 
 type AccountRow = {
   id: string;
@@ -19,6 +20,8 @@ export type RefreshResult = {
   threadsRefreshed: number;
   threadsFailed: number;
   threadsExpired: number;
+  /** TikTok, Bluesky, LinkedIn, Pinterest, X (src/lib/networks/refresh.ts). */
+  networks?: NetworkRefreshResult;
 };
 
 type Refresher = (token: string) => Promise<{ access_token: string; expires_in: number }>;
@@ -27,6 +30,7 @@ export type RefreshDeps = {
   checkPage?: (token: string) => Promise<PageTokenCheck>;
   refreshInstagram?: Refresher;
   refreshThreads?: Refresher;
+  refreshNetworks?: () => Promise<NetworkRefreshResult>;
 };
 
 // Both Instagram Login and Threads long-lived tokens last 60 days and can be refreshed while still valid.
@@ -120,7 +124,15 @@ export async function refreshExpiringTokens(limit = 50, deps: RefreshDeps = {}):
     }
   }
 
+  let networks: NetworkRefreshResult | undefined;
+  try {
+    networks = await (deps.refreshNetworks ?? refreshNetworkTokens)();
+  } catch (err) {
+    console.error("refreshExpiringTokens: network refresh failed", err instanceof Error ? err.message : err);
+  }
+
   return {
+    networks,
     refreshed: ig.refreshed,
     failed: ig.failed,
     expired: ig.expired,

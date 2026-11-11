@@ -5,6 +5,7 @@ import {
   PAGE_TITLES,
   PUBLIC_PATHS,
 } from "@/lib/public-pages";
+import { networkAvailability } from "@/lib/networks/registry";
 
 const NOINDEX_PATHS = new Set(["/login", "/signup", "/data-deletion/status", "/app/review-guide"]);
 
@@ -27,6 +28,12 @@ export async function GET() {
     pageLines.push(`- [${title}](${BRAND.url}${path}): ${description}`);
   }
 
+  // Only networks that can actually be connected on this server are listed as working.
+  const nets = networkAvailability();
+  const keyed = ([["tiktok", "TikTok"], ["linkedin", "LinkedIn"], ["pinterest", "Pinterest"], ["x", "X"], ["gbp", "Google Business Profile"]] as const);
+  const live = ["Instagram", "Facebook Pages", "Threads", "YouTube (videos and Shorts)", "Bluesky", "Mastodon", ...keyed.filter(([id]) => nets[id]).map(([, l]) => l)];
+  const soon = [...keyed.filter(([id]) => !nets[id]).map(([, l]) => l), "WhatsApp", "Messenger"];
+
   const body = [
     `# ${BRAND.name}`,
     "",
@@ -34,7 +41,7 @@ export async function GET() {
     "",
     "## What it does",
     "",
-    "- Schedule posts for Instagram, Facebook Pages, Threads and YouTube (videos and Shorts).",
+    `- Schedule posts for ${live.slice(0, -1).join(", ")} and ${live[live.length - 1]}.`,
     "- Automate Instagram comment-to-DM, Story-reply and DM-keyword conversations (Instagram only).",
     "- Draft captions and DM message ideas with AI.",
     "- Capture leads: ask for an email in the DM before the link is sent.",
@@ -44,9 +51,8 @@ export async function GET() {
     "",
     "## Not available yet",
     "",
-    "- Paid plans (Pro, Agency): coming soon. Every account is on the Free plan today.",
     "- AI replies to DMs: coming soon.",
-    "- LinkedIn, Pinterest, TikTok, WhatsApp and Messenger: on the roadmap, no date.",
+    `- ${soon.slice(0, -1).join(", ")} and ${soon[soon.length - 1]}: coming soon.`,
     "",
     "## Pages",
     "",

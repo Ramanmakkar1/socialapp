@@ -2,7 +2,6 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { BarChart3, ExternalLink, Maximize2, MoreVertical, PencilLine, Play, X } from "lucide-react";
 import { deletePost } from "./actions";
 import { duplicatePost } from "./duplicateActions";
@@ -19,6 +18,8 @@ type Props = {
   onClose: () => void;
 };
 
+const BUSY_TEXT: Record<string, string> = { retry: "Retrying…", duplicate: "Duplicating…", delete: "Deleting…" };
+
 function fmt(n: number | null | undefined): string {
   return n == null ? "–" : n.toLocaleString("en-US");
 }
@@ -26,13 +27,13 @@ function fmt(n: number | null | undefined): string {
 // Floating card for one calendar post (Buffer-style): opens next to the clicked card,
 // closes on Escape / click outside and gives focus back to the card.
 export default function PostPopover({ post, anchor, tz, accounts, onClose }: Props) {
-  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [busy, setBusy] = useState<string | null>(null);
   const titleId = `pp-${post.id}`;
 
   useLayoutEffect(() => {
@@ -84,6 +85,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
   function run(label: string, fn: () => Promise<{ ok: boolean; error?: string }>, closeAfter = false) {
     setMsg(null);
     setMenuOpen(false);
+    setBusy(label);
     startTransition(async () => {
       try {
         const res = await fn();
@@ -91,7 +93,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
           setMsg(res.error ?? `Could not ${label}.`);
           return;
         }
-        router.refresh();
+        // The actions revalidate the calendar: the change is visible when this transition ends.
         if (closeAfter) onClose();
         else setMsg(label === "duplicate" ? "Duplicated as a draft." : "Done.");
       } catch {
@@ -192,7 +194,11 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
         <RescheduleControl key={tz} id={post.id} scheduledAt={post.scheduled_at} caption={post.caption} tz={tz} onMoved={onClose} />
       )}
 
-      {msg && <p role="status" className={styles.popMsg}>{msg}</p>}
+      {pending && busy ? (
+        <p role="status" className={styles.popMsg}>{BUSY_TEXT[busy] ?? "Working…"}</p>
+      ) : (
+        msg && <p role="status" className={styles.popMsg}>{msg}</p>
+      )}
 
       <div className={styles.popFoot}>
         {post.permalink ? (
@@ -205,7 +211,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
           </Link>
         ) : post.status === "failed" ? (
           <button type="button" className={styles.popPrimary} disabled={pending} onClick={() => run("retry", () => retryPost(post.id), true)}>
-            Retry now
+            {pending && busy === "retry" ? "Retrying…" : "Retry now"}
           </button>
         ) : (
           <span />

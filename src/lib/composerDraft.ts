@@ -1,6 +1,6 @@
 // Pure helpers for the post composer: draft -> initial state, and the exact schedule instant.
 // No React, no DB: safe to unit test.
-import type { PlatformId } from "@/lib/platforms";
+import { PLATFORM_IDS, type PlatformId } from "@/lib/platforms";
 
 export type ComposerDraftInitial = {
   id: string;
@@ -16,6 +16,8 @@ export type ComposerDraftInitial = {
   scheduledAt: string | null;
   /** The post's status; scheduled posts open in the composer for editing too. */
   status?: "draft" | "scheduled";
+  /** Saved per-network options (post_targets.net_options) keyed by platform. */
+  netOptions?: Partial<Record<string, unknown>>;
 };
 
 export type ComposerState = {
@@ -31,7 +33,15 @@ export type ComposerState = {
   selectedRuleId: string;
 };
 
-const LIVE: PlatformId[] = ["instagram", "youtube"];
+/** Networks added 2026-11-11: restored from a draft like YouTube (enabled + custom caption). */
+const NEW_NETWORKS: PlatformId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp"];
+const LIVE: PlatformId[] = ["instagram", "youtube", ...NEW_NETWORKS];
+
+function fill<T>(value: T, over: Partial<Record<PlatformId, T>> = {}): Record<PlatformId, T> {
+  const out = {} as Record<PlatformId, T>;
+  for (const p of PLATFORM_IDS) out[p] = over[p] ?? value;
+  return out;
+}
 
 export function blankComposerState(): ComposerState {
   return {
@@ -39,9 +49,9 @@ export function blankComposerState(): ComposerState {
     mainCaption: "",
     firstComment: "",
     tags: [],
-    enabled: { instagram: true, facebook: false, threads: false, youtube: false },
-    customize: { instagram: false, facebook: false, threads: false, youtube: false },
-    customCaption: { instagram: "", facebook: "", threads: "", youtube: "" },
+    enabled: fill(false, { instagram: true }),
+    customize: fill(false),
+    customCaption: fill(""),
     mediaUrls: [""],
     igFormat: "feed",
     selectedRuleId: "",
@@ -63,14 +73,13 @@ export function composerStateFromDraft(draft?: ComposerDraftInitial | null): Com
     firstComment: draft.firstComment ?? "",
     tags: [...(draft.tags ?? [])],
     // A draft saved with no platform (or only "coming soon" ones) still opens with Instagram on.
-    enabled: {
+    enabled: fill(false, {
       instagram: draft.platforms.includes("instagram") || draft.platforms.length === 0,
-      facebook: false,
-      threads: false,
       youtube: draft.platforms.includes("youtube"),
-    },
-    customize: { instagram: hasOverride("instagram"), facebook: false, threads: false, youtube: hasOverride("youtube") },
-    customCaption: { instagram: overrides.instagram ?? "", facebook: "", threads: "", youtube: overrides.youtube ?? "" },
+      ...Object.fromEntries(NEW_NETWORKS.map((p) => [p, draft.platforms.includes(p)])),
+    }),
+    customize: fill(false, Object.fromEntries(LIVE.map((p) => [p, hasOverride(p)]))),
+    customCaption: fill("", Object.fromEntries(LIVE.map((p) => [p, overrides[p] ?? ""]))),
     mediaUrls: draft.mediaUrls.length ? [...draft.mediaUrls] : [""],
     igFormat: draft.igFormat === "story" ? "story" : "feed",
     selectedRuleId: draft.dmRuleId ?? "",

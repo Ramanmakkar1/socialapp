@@ -42,7 +42,7 @@ export default function TodaysActions({ items, username, avatarUrl }: { items: A
               </span>
             )}
             <span className={`${styles.chip} ${m.hasRule ? styles.chipOn : styles.chipOff}`}>
-              {m.hasRule ? "Automation on" : "No automation"}
+              {m.hasRule ? "Auto-DM on" : "No Auto-DM"}
             </span>
           </div>
           <div className={styles.counts}>
@@ -55,7 +55,7 @@ export default function TodaysActions({ items, username, avatarUrl }: { items: A
           </p>
           <span className={styles.when}>{relativeDay(m.timestamp)}</span>
           <Link href="/app/auto-dm" className={`${styles.postBtn} ${m.hasRule ? "" : styles.postBtnAdd}`}>
-            {m.hasRule ? "View automation" : "Add automation"}
+            {m.hasRule ? "View Auto-DM" : "Add Auto-DM"}
           </Link>
         </li>
       ))}

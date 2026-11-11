@@ -38,10 +38,17 @@ export {
 export async function saveBioPage(userId: string, input: BioPageInput): Promise<{ handle: string }> {
   const error = validateBioPage(input);
   if (error) throw new Error(error);
-  const plan = planForUser();
+  const plan = await planForUser(userId);
   const maxLinks = PLAN_LIMITS[plan].bioLinks;
   if (input.links.length > maxLinks) {
-    throw new Error(`The ${plan} plan includes ${maxLinks} links on your bio page. Remove a link to save.`);
+    // After a downgrade, links saved on a bigger plan stay: saving is fine as long as no link is added.
+    const saved = await query<{ n: number }>(
+      "select count(*)::int as n from socialapp.bio_links l join socialapp.bio_pages p on p.id = l.page_id where p.user_id=$1",
+      [userId],
+    );
+    if (input.links.length > (saved[0]?.n ?? 0)) {
+      throw new Error(`The ${plan} plan includes ${maxLinks} links on your bio page. Remove a link to save${plan === "Agency" ? "" : `, or upgrade in Settings > Plan & billing`}.`);
+    }
   }
   const handle = normalizeHandle(input.handle);
   const displayName = input.displayName.trim();

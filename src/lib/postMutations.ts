@@ -3,6 +3,7 @@
 // (the claim locks the post row and flips it to 'publishing' in the same transaction).
 import { getPool, query } from "@/lib/db";
 import { reassignQueueTimes } from "@/lib/postingSchedule";
+import { releaseDeletedPostMedia } from "@/lib/mediaLifecycle";
 
 export type MutationResult = { ok: true } | { ok: false; error: string };
 
@@ -49,14 +50,18 @@ function blockedReason(state: PostState | null, verb: "deleted" | "moved"): stri
 /** Deletes a draft / scheduled / failed post, never one the publisher has claimed or published (bug b). */
 export async function deletePostForUser(id: string, userId: string): Promise<MutationResult> {
   if (!UUID_RE.test(id)) return { ok: false, error: "Invalid post." };
-  const deleted = await query<{ id: string }>(
+  const deleted = await query<{ id: string; media: string | null }>(
     `delete from socialapp.scheduled_posts p
      where p.id=$1 and p.user_id=$2 and p.status in ('draft','scheduled','failed')
        and not exists (select 1 from socialapp.post_targets t where t.post_id=p.id and t.status in ('publishing','published'))
-     returning p.id`,
+     returning p.id, p.media::text as media`,
     [id, userId],
   );
-  if (deleted.length > 0) return { ok: true };
+  if (deleted.length > 0) {
+    // Its uploads go right away unless another post (or idea, automation, ...) still uses them.
+    await releaseDeletedPostMedia(userId, deleted.map((r) => r.media ?? ""));
+    return { ok: true };
+  }
   return { ok: false, error: blockedReason(await postState(id, userId), "deleted") };
 }
 

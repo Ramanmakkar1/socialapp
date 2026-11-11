@@ -93,14 +93,16 @@ function drawSlide(canvas: HTMLCanvasElement, slide: Slide, index: number, total
   ctx.globalAlpha = 1;
 }
 
-function SlidePreview({ slide, index, total, onDownload }: { slide: Slide; index: number; total: number; onDownload: () => void }) {
+function SlidePreview({ slide, index, total, onDownload, onSelect, isSelected }: { slide: Slide; index: number; total: number; onDownload: () => void; onSelect: () => void; isSelected: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     if (ref.current) drawSlide(ref.current, slide, index, total);
   }, [slide, index, total]);
   return (
-    <li className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3">
-      <canvas ref={ref} role="img" aria-label={`Slide ${index + 1} of ${total}: ${slide.title || "untitled"}`} className="block w-full rounded-xl border border-[var(--poskoo-line)]" />
+    <li className={`rounded-2xl border bg-[var(--poskoo-paper)] p-3 ${isSelected ? "border-[var(--poskoo-violet)] ring-2 ring-[var(--poskoo-violet)]" : "border-[var(--poskoo-line)]"}`}>
+      <button type="button" onClick={onSelect} aria-pressed={isSelected} aria-label={`Edit slide ${index + 1} of ${total}: ${slide.title || "untitled"}`} className="block w-full cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]">
+        <canvas ref={ref} aria-hidden="true" className="block w-full rounded-xl border border-[var(--poskoo-line)]" />
+      </button>
       <div className="mt-2 flex items-center justify-between gap-2">
         <span className="text-sm font-medium text-[var(--poskoo-ink)]">Slide {index + 1} of {total}</span>
         <button type="button" onClick={onDownload} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-2.5 py-1.5 text-xs font-medium text-[#3d3450]">
@@ -182,7 +184,7 @@ export default function CarouselMaker() {
           </div>
           <ol className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {slides.map((slide, i) => (
-              <SlidePreview key={slide.id} slide={slide} index={i} total={slides.length} onDownload={() => download(i)} />
+              <SlidePreview key={slide.id} slide={slide} index={i} total={slides.length} onDownload={() => download(i)} onSelect={() => setSelected(i)} isSelected={i === Math.min(selected, slides.length - 1)} />
             ))}
           </ol>
         </div>

@@ -1,3 +1,5 @@
+import PendingButton from "@/components/ui/PendingButton";
+import { postThumbUrl } from "@/lib/mediaUpload";
 import Link from "next/link";
 import { Check, EyeOff, Heart, Image as ImageIcon, Inbox, Instagram, LayoutGrid, List, MessageCircle, MessagesSquare } from "lucide-react";
 import LocalTime from "@/components/LocalTime";
@@ -94,8 +96,7 @@ async function postInfoByMedia(userId: string, mediaIds: string[]): Promise<Map<
       [userId, mediaIds],
     );
     for (const r of rows) {
-      const first = Array.isArray(r.media) ? (r.media[0] as { url?: unknown } | undefined) : undefined;
-      const url = typeof first?.url === "string" && !/\.(mp4|mov|webm)(\?|$)/i.test(first.url) ? first.url : null;
+      const url = postThumbUrl(r.media);
       out.set(r.external_post_id, { caption: r.caption ?? "", thumb: url, at: r.published_at });
     }
   } catch {
@@ -398,28 +399,28 @@ function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
           <input type="hidden" name="account_id" value={c.accountId} />
           <input type="hidden" name="comment_id" value={c.commentId} />
           <ReturnFields ret={ret} />
-          <button type="submit" disabled={c.liked} className={styles.actionBtn} aria-label={c.liked ? `Comment by ${who} is liked` : `Like the comment by ${who}`}>
+          <PendingButton disabled={c.liked} className={styles.actionBtn} aria-label={c.liked ? `Comment by ${who} is liked` : `Like the comment by ${who}`}>
             <Heart width={14} height={14} aria-hidden="true" />
             {c.liked ? "Liked" : "Like"}
-          </button>
+          </PendingButton>
         </form>
         <form action={toggleDoneAction}>
           <input type="hidden" name="account_id" value={c.accountId} />
           <input type="hidden" name="comment_id" value={c.commentId} />
           <ReturnFields ret={ret} />
-          <button type="submit" className={styles.actionBtn} aria-pressed={c.done} aria-label={c.done ? `Reopen the comment by ${who}` : `Mark the comment by ${who} done`}>
+          <PendingButton className={styles.actionBtn} aria-pressed={c.done} aria-label={c.done ? `Reopen the comment by ${who}` : `Mark the comment by ${who} done`}>
             <Check width={14} height={14} aria-hidden="true" />
             {c.done ? "Done" : "Mark done"}
-          </button>
+          </PendingButton>
         </form>
         <form action={hideCommentAction}>
           <input type="hidden" name="account_id" value={c.accountId} />
           <input type="hidden" name="comment_id" value={c.commentId} />
           <ReturnFields ret={ret} />
-          <button type="submit" className={styles.actionBtn} aria-pressed={c.hidden} aria-label={c.hidden ? `Show the comment by ${who} again` : `Hide the comment by ${who}`}>
+          <PendingButton className={styles.actionBtn} aria-pressed={c.hidden} aria-label={c.hidden ? `Show the comment by ${who} again` : `Hide the comment by ${who}`}>
             <EyeOff width={14} height={14} aria-hidden="true" />
             {c.hidden ? "Show" : "Hide"}
-          </button>
+          </PendingButton>
         </form>
       </div>
       <details className="mt-3">
@@ -504,17 +505,17 @@ function ThreadComment({ c, filter }: { c: InboxComment; filter: InboxFilter }) 
             <input type="hidden" name="account_id" value={c.accountId} />
             <input type="hidden" name="comment_id" value={c.commentId} />
             <ReturnFields ret={ret} />
-            <button type="submit" disabled={c.liked} className={styles.linkAction} aria-label={c.liked ? `Comment by ${who} is liked` : `Like the comment by ${who}`}>
+            <PendingButton disabled={c.liked} className={styles.linkAction} aria-label={c.liked ? `Comment by ${who} is liked` : `Like the comment by ${who}`}>
               <Heart width={13} height={13} aria-hidden="true" /> {c.liked ? "Liked" : "Like"}
-            </button>
+            </PendingButton>
           </form>
           <form action={hideCommentAction}>
             <input type="hidden" name="account_id" value={c.accountId} />
             <input type="hidden" name="comment_id" value={c.commentId} />
             <ReturnFields ret={ret} />
-            <button type="submit" className={styles.linkAction} aria-pressed={c.hidden} aria-label={c.hidden ? `Show the comment by ${who} again` : `Hide the comment by ${who}`}>
+            <PendingButton className={styles.linkAction} aria-pressed={c.hidden} aria-label={c.hidden ? `Show the comment by ${who} again` : `Hide the comment by ${who}`}>
               <EyeOff width={13} height={13} aria-hidden="true" /> {c.hidden ? "Show" : "Hide"}
-            </button>
+            </PendingButton>
           </form>
         </div>
         <div className={styles.replyRow}>
@@ -523,9 +524,9 @@ function ThreadComment({ c, filter }: { c: InboxComment; filter: InboxFilter }) 
             <input type="hidden" name="account_id" value={c.accountId} />
             <input type="hidden" name="comment_id" value={c.commentId} />
             <ReturnFields ret={ret} />
-            <button type="submit" className={`${styles.doneBtn} ${c.done ? styles.doneBtnOn : ""}`} aria-pressed={c.done} aria-label={c.done ? `Reopen the comment by ${who}` : `Mark the comment by ${who} done`} title={c.done ? "Reopen" : "Mark as done"}>
+            <PendingButton className={`${styles.doneBtn} ${c.done ? styles.doneBtnOn : ""}`} aria-pressed={c.done} aria-label={c.done ? `Reopen the comment by ${who}` : `Mark the comment by ${who} done`} title={c.done ? "Reopen" : "Mark as done"}>
               <Check width={18} height={18} aria-hidden="true" />
-            </button>
+            </PendingButton>
           </form>
         </div>
         {canPrivate ? (

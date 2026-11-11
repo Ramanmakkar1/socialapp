@@ -12,7 +12,7 @@ export default function TemplatesGallery({ templates }: { templates: DmTemplate[
   const sections = category === "all" ? CATEGORIES.filter((c) => c.id !== "all") : CATEGORIES.filter((c) => c.id === category);
 
   return (
-    <section aria-label="Automation templates">
+    <section aria-label="Auto-DM templates">
       <div className={styles.chips} role="group" aria-label="Filter templates">
         {CATEGORIES.map((c) => {
           const count = templates.filter((t) => visibleIn(t, c.id)).length;
@@ -53,7 +53,7 @@ export default function TemplatesGallery({ templates }: { templates: DmTemplate[
       })}
 
       <p className={styles.note}>
-        A template only fills in a draft in the automation builder. Nothing is sent until you add your link and save the automation.
+        A template only fills in a draft in the Auto-DM builder. Nothing is sent until you add your link and save the Auto-DM.
       </p>
     </section>
   );

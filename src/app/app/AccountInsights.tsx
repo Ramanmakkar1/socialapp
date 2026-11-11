@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { isDbConfigured, query } from "@/lib/db";
-import { GraphError, fetchAccountInsights, fetchIgProfile, type AccountInsights, type GraphAccount, type IgProfile } from "@/lib/igGraph";
+import { GraphError, type AccountInsights, type GraphAccount, type IgProfile } from "@/lib/igGraph";
+import { cachedAccountInsights, cachedIgProfile } from "@/lib/igCached";
 import styles from "./analytics/analytics.module.css";
 
 type Row = GraphAccount & { username: string | null };
@@ -27,7 +28,7 @@ export default async function AccountInsightsPanel({ userId }: { userId: string 
   const loaded: Loaded[] = await Promise.all(
     rows.map(async (row) => {
       try {
-        const [profile, insights] = await Promise.all([fetchIgProfile(row), fetchAccountInsights(row)]);
+        const [profile, insights] = await Promise.all([cachedIgProfile(row), cachedAccountInsights(row)]);
         return { row, profile, insights, error: null };
       } catch (err) {
         return { row, profile: null, insights: null, error: err instanceof GraphError ? err.message : "Instagram insights are not available right now." };

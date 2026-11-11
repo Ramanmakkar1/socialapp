@@ -151,3 +151,37 @@
   color: var(--poskoo-ink);
 }
 .googleNotice { margin-top: 16px; }
+
+/* E-mail flows (/forgot-password, /reset-password, /verify-email). */
+.codeInput {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: .45em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding-left: .45em;
+}
+.hint { margin-top: 6px; color: var(--poskoo-muted); font-size: .86rem; }
+.card .form .hint { margin-top: 6px; }
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.linkButton {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--poskoo-ink);
+  font: inherit;
+  font-size: .92rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.linkButton:hover { color: var(--poskoo-violet); }
+.linkButton:disabled { opacity: .6; cursor: default; }
+.stack { display: grid; gap: 16px; margin-top: 26px; }
+.stack :global(.btn) { width: 100%; justify-content: center; min-height: 52px; }

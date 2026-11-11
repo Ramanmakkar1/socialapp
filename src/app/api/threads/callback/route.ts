@@ -10,6 +10,8 @@ import { THREADS_SCOPES, exchangeThreadsCode, fetchThreadsProfile, threadsLongLi
 type BackResult = "connected" | "error" | "state_error" | "declined" | "limit";
 
 function back(result: BackResult) {
+  // Success opens the Connect dialog's "connected" step (ConnectChannelDialog); problems keep the Settings banners.
+  if (result === "connected") return NextResponse.redirect(new URL("/app/calendar?connected=threads", BRAND.url));
   return NextResponse.redirect(new URL(`/app/settings?threads=${result}`, BRAND.url));
 }
 

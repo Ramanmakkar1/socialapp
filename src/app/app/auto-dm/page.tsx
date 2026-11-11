@@ -10,7 +10,7 @@ import { RewindPastCommentsButton } from "./RewindPastCommentsButton";
 import { isMissingColumnError } from "@/lib/ruleMedia";
 import { clickCountSql, uniqueClickCountSql } from "@/lib/links";
 
-export const metadata = { title: "Automations" };
+export const metadata = { title: "Auto-DM" };
 
 const TRIGGERS: RuleTrigger[] = ["comment", "story_reply", "dm"];
 
@@ -62,19 +62,19 @@ export default async function AutoDmPage({
     return (
       <>
         <PageHero
-          eyebrow="Automation"
-          title="Automations"
+          eyebrow="Comment to DM"
+          title="Auto-DM"
           lede="Send a DM to everyone who comments a keyword."
           art="/landing/card-dm.webp"
           artAlt=""
         />
         <div role="alert" className={`${ui.card} ${ui.peach} mt-6 p-6`}>
-          <h2 className="m-0 text-lg font-semibold">We couldn&apos;t load your automations</h2>
+          <h2 className="m-0 text-lg font-semibold">We couldn&apos;t load your Auto-DMs</h2>
           <p className="mt-2 text-sm">
             Please try again in a moment. Your existing rules have not changed.
           </p>
           <BtnA href="/app/auto-dm" size="sm" className="mt-5">
-            Retry loading automations
+            Retry loading Auto-DMs
           </BtnA>
         </div>
       </>
@@ -103,7 +103,7 @@ export default async function AutoDmPage({
       }
       if (tpl.matchMode === "any") {
         templateNote =
-          "This template uses “match any comment” in the library. Saved rules use “contains keyword” instead, because automations only support contains or exact match.";
+          "This template uses “match any comment” in the library. Saved rules use “contains keyword” instead, because Auto-DMs only support contains or exact match.";
       }
     }
   }

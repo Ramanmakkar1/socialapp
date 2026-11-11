@@ -1,11 +1,14 @@
 // Shared (client + server) rules for composer media uploads. No Node APIs here so the
 // browser can validate a file before it is sent to /api/media/upload.
 import { IG_FORMATS } from "@/lib/igSizes";
+import { PLAN_MEDIA_LIMITS, planMediaError } from "@/lib/mediaLimits";
+import type { PlanName } from "@/lib/planLimits";
 
 export type MediaKind = "image" | "video";
 
-export const MEDIA_IMAGE_MAX_BYTES = 8 * 1024 * 1024;
-export const MEDIA_VIDEO_MAX_BYTES = 100 * 1024 * 1024;
+/** Largest files any plan accepts (per-plan and per-network caps live in src/lib/mediaLimits.ts). */
+export const MEDIA_IMAGE_MAX_BYTES = PLAN_MEDIA_LIMITS.Agency.imageBytes;
+export const MEDIA_VIDEO_MAX_BYTES = PLAN_MEDIA_LIMITS.Agency.videoBytes;
 
 const IMAGE_MIME: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -27,8 +30,8 @@ export type MediaValidation =
   | { ok: true; kind: MediaKind; ext: string }
   | { ok: false; error: string };
 
-/** Validates a browser File (or a server upload) against the formats Instagram accepts. */
-export function validateMediaFile(file: MediaFileInfo): MediaValidation {
+/** Validates a browser File (or a server upload): supported type, not empty, within the plan's per-file size. */
+export function validateMediaFile(file: MediaFileInfo, plan: PlanName = "Free"): MediaValidation {
   const type = (file.type || "").toLowerCase();
   const imageExt = IMAGE_MIME[type];
   const videoExt = VIDEO_MIME[type];
@@ -37,16 +40,11 @@ export function validateMediaFile(file: MediaFileInfo): MediaValidation {
     return { ok: false, error: "Use a JPG, PNG, MP4 or MOV file." };
   }
   const kind: MediaKind = imageExt ? "image" : "video";
-  const max = kind === "image" ? MEDIA_IMAGE_MAX_BYTES : MEDIA_VIDEO_MAX_BYTES;
   if (!Number.isFinite(file.size) || file.size <= 0) {
     return { ok: false, error: "That file is empty." };
   }
-  if (file.size > max) {
-    return {
-      ok: false,
-      error: `${kind === "image" ? "Images" : "Videos"} must be ${Math.round(max / 1024 / 1024)} MB or smaller.`,
-    };
-  }
+  const tooBig = planMediaError({ kind, size: file.size }, plan);
+  if (tooBig) return { ok: false, error: tooBig };
   return { ok: true, kind, ext };
 }
 
@@ -82,5 +80,16 @@ export function instagramAspectWarning(width: number, height: number): string | 
   if (ratio > max + 0.001) {
     return `This image is wider than Instagram's 1.91:1 feed limit (${width}×${height}). Crop it to 1.91:1 or square.`;
   }
+  return null;
+}
+
+/**
+ * Picture for a saved post's media JSON: the kept poster (`thumb`, set once the upload is deleted
+ * after publishing), else the first image itself. Null for a video without a poster.
+ */
+export function postThumbUrl(media: unknown): string | null {
+  const first = Array.isArray(media) ? (media[0] as { url?: unknown; thumb?: unknown } | undefined) : undefined;
+  if (typeof first?.thumb === "string" && first.thumb !== "") return first.thumb;
+  if (typeof first?.url === "string" && !/\.(mp4|mov|webm)(\?|$)/i.test(first.url)) return first.url;
   return null;
 }

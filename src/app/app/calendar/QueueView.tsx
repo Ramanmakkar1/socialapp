@@ -18,6 +18,7 @@ type ChannelFilter = "all" | PlatformId;
 // "Share now" publishes a post immediately.
 export default function QueueView({ posts }: { posts: Post[] }) {
   const [isPending, startTransition] = useTransition();
+  const [sharingId, setSharingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [channel, setChannel] = useState<ChannelFilter>("all");
   const [dragId, setDragId] = useState<string | null>(null);
@@ -38,6 +39,7 @@ export default function QueueView({ posts }: { posts: Post[] }) {
 
   function handleShare(id: string) {
     setError(null);
+    setSharingId(id);
     startTransition(async () => {
       try {
         const result = await shareNow(id);
@@ -149,7 +151,7 @@ export default function QueueView({ posts }: { posts: Post[] }) {
                   {post.status === "scheduled" && (
                     <div className={styles.postActions}>
                       <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleShare(post.id)}>
-                        Share now
+                        {isPending && sharingId === post.id ? "Sharing…" : "Share now"}
                       </Btn>
                     </div>
                   )}

@@ -33,6 +33,8 @@ export async function disconnectAccounts(accountIds: string[]): Promise<number> 
      where id = any($1::uuid[]) returning id`,
     [accountIds]
   );
+  // Extra secrets of the newer networks (Bluesky app password). Column from migration 040.
+  await query("update socialapp.social_accounts set secret_enc=null where id = any($1::uuid[]) and secret_enc is not null", [accountIds]).catch(() => undefined);
   await query(
     "update socialapp.dm_queue set status='skipped', last_error='Instagram account disconnected' where social_account_id = any($1::uuid[]) and status='pending'",
     [accountIds]

@@ -1,16 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useOptimistic, useState, useTransition } from "react";
 import type { DragEvent } from "react";
-import { useRouter } from "next/navigation";
 import { reschedulePost } from "./rescheduleActions";
-import { utcDateForLocalDay, type CalendarPost } from "./calendarUtils";
+import { movedToLocalDay, withMovedPost, type CalendarPost } from "./calendarUtils";
 
 // Shared state for the week and month calendars: browser time zone, drag-and-drop
 // rescheduling (through the guarded reschedulePost action) and the open post popover.
-export function useCalendar(posts: CalendarPost[]) {
-  const router = useRouter();
+// A dropped post moves at once (optimistic); the action's revalidatePath brings the saved state, and a
+// failed move snaps back when the transition ends.
+export function useCalendar(serverPosts: CalendarPost[]) {
   const [isPending, startTransition] = useTransition();
+  const [posts, movePost] = useOptimistic(serverPosts, (cur, move: { id: string; at: string }) => withMovedPost(cur, move.id, move.at));
   const [error, setError] = useState<string | null>(null);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const [tz, setTz] = useState("");
@@ -43,17 +44,14 @@ export function useCalendar(posts: CalendarPost[]) {
         if (current.some((p) => p.id === id)) return;
         const post = posts.find((p) => p.id === id);
         if (!post?.scheduled_at) return;
-        const utcDay = utcDateForLocalDay(post.scheduled_at, key, tz);
+        const at = movedToLocalDay(post.scheduled_at, key, tz);
         setError(null);
         setOpen(null);
         startTransition(async () => {
+          movePost({ id, at });
           try {
-            const res = await reschedulePost(id, utcDay);
-            if (!res.ok) {
-              setError(res.error ?? "Could not move post.");
-              return;
-            }
-            router.refresh();
+            const res = await reschedulePost(id, at.slice(0, 10));
+            if (!res.ok) setError(res.error ?? "Could not move post.");
           } catch {
             setError("Could not move post. Please try again.");
           }
@@ -62,5 +60,5 @@ export function useCalendar(posts: CalendarPost[]) {
     };
   }
 
-  return { tz, error, isPending, dragOverKey, dropProps, open, openPost, closePost };
+  return { posts, tz, error, isPending, dragOverKey, dropProps, open, openPost, closePost };
 }

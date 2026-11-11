@@ -34,7 +34,8 @@
 /* Shell fallback while the signed-in user loads (sidebar + content). */
 .shell { display: flex; min-height: 100dvh; background: #fff; }
 .side { display: none; width: 256px; flex: none; flex-direction: column; gap: 10px; border-right: 1px solid #ebe9e4; background: #f7f6f3; padding: 18px 14px; }
-.main { flex: 1; min-width: 0; max-width: 1360px; margin-inline: auto; padding: 28px 24px; }
+.main { flex: 1; min-width: 0; max-width: 1360px; margin-inline: auto; padding: 20px 16px; }
+@media (min-width: 640px) { .main { padding: 28px 24px; } }
 @media (min-width: 900px) { .side { display: flex; } }
 @media (prefers-color-scheme: dark) {
   .shell { background: #1b1824; }

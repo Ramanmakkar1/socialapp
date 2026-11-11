@@ -17,8 +17,10 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
     const client = await getPool().connect();
     try {
       await client.query("begin");
+      // Files of a published post are deleted after publishing (src/lib/mediaLifecycle.ts): the copy
+      // leaves those out, so the composer asks for a fresh upload instead of showing a dead link.
       const result = await client.query<{ id: string }>(
-        "insert into socialapp.scheduled_posts (caption, media, user_id, scheduled_at, status, ig_format, first_comment, dm_rule_id) select caption, media, user_id, null, 'draft', ig_format, first_comment, dm_rule_id from socialapp.scheduled_posts where id=$1 and user_id=$2 returning id",
+        "insert into socialapp.scheduled_posts (caption, media, user_id, scheduled_at, status, ig_format, first_comment, dm_rule_id) select caption, (select coalesce(jsonb_agg(m), '[]'::jsonb) from jsonb_array_elements(media) m where coalesce(m->>'purged', '') <> 'true'), user_id, null, 'draft', ig_format, first_comment, dm_rule_id from socialapp.scheduled_posts where id=$1 and user_id=$2 returning id",
         [id, user.id],
       );
       if (!result.rows[0]) {

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 const whySwitch = [
   { no: "01 / Instagram", title: "Built for Instagram growth", text: "Schedule your posts and reply to every keyword comment with a DM from the same place, instead of a big suite plus a separate chatbot tool." },
-  { no: "02 / Pricing", title: "Simple, clear pricing", text: `Scheduling, comment-to-DM, AI captions and lead capture live in one ${BRAND.name} account. Start on the Free plan; paid plans are coming soon.` },
+  { no: "02 / Pricing", title: "Simple, clear pricing", text: `Scheduling, comment-to-DM, AI captions and lead capture live in one ${BRAND.name} account. Start on the Free plan and upgrade when you need more.` },
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 

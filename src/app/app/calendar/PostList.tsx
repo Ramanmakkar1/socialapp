@@ -33,6 +33,9 @@ const filters: { value: PostFilter; label: string }[] = [
 
 export default function PostList({ posts, loadError, initialFilter = "all", title = "Publishing queue" }: { posts: Post[]; loadError?: LoadError; initialFilter?: PostFilter; title?: string }) {
   const [isPending, startTransition] = useTransition();
+  // Which row action is running, so that button says what is happening until the list updates.
+  const [busy, setBusy] = useState<{ id: string; kind: "delete" | "duplicate" | "retry" } | null>(null);
+  const isBusy = (id: string, kind: "delete" | "duplicate" | "retry") => isPending && busy?.id === id && busy.kind === kind;
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<PostFilter>(initialFilter);
   const [search, setSearch] = useState("");
@@ -61,6 +64,7 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
   function handleDelete(id: string) {
     if (!window.confirm("Delete this post?")) return;
     setError(null);
+    setBusy({ id, kind: "delete" });
     startTransition(async () => {
       try {
         const result = await deletePost(id);
@@ -73,6 +77,7 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
 
   function handleDuplicate(id: string) {
     setError(null);
+    setBusy({ id, kind: "duplicate" });
     startTransition(async () => {
       try {
         const result = await duplicatePost(id);
@@ -85,6 +90,7 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
 
   function handleRetry(id: string) {
     setError(null);
+    setBusy({ id, kind: "retry" });
     startTransition(async () => {
       try {
         const result = await retryPost(id);
@@ -178,15 +184,15 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
                       )}
                       {post.status === "failed" && (
                         <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleRetry(post.id)}>
-                          Retry
+                          {isBusy(post.id, "retry") ? "Retrying…" : "Retry"}
                         </Btn>
                       )}
                       <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleDuplicate(post.id)}>
-                        Duplicate
+                        {isBusy(post.id, "duplicate") ? "Duplicating…" : "Duplicate"}
                       </Btn>
                       {["draft", "scheduled", "failed"].includes(post.status) && (
                         <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleDelete(post.id)}>
-                          Delete
+                          {isBusy(post.id, "delete") ? "Deleting…" : "Delete"}
                         </Btn>
                       )}
                     </div>

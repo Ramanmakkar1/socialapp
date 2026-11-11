@@ -15,7 +15,10 @@ import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { facebookPageStatus } from "@/lib/facebookPublish";
 import { accountLimitMessage, PLAN_LIMITS, planForUser } from "@/lib/planLimits";
+import { pendingMediaUsage } from "@/lib/mediaLifecycle";
+import { PLAN_MEDIA_LIMITS, formatBytes, pendingStorageLabel } from "@/lib/mediaLimits";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
+import { connectHref } from "@/lib/networks/registry";
 import { createApiKeyAction, deleteMyAccountAction, disconnectAccountAction, disconnectYouTubeAction, revokeApiKeyAction, saveAiReplySettings, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 import AiReplyPreview from "./AiReplyPreview";
@@ -60,7 +63,10 @@ const TOKEN_PILL: Record<ReturnType<typeof tokenState>, { label: string; classNa
   expired: { label: "Reconnect needed", className: `${ui.pill} ${ui.pillPeach}` },
 };
 
+const NEW_NETWORK_LABEL: Record<string, string> = { tiktok: "TikTok", bluesky: "Bluesky", mastodon: "Mastodon", linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", gbp: "Google Business Profile" };
+
 function platformLabel(p: string): string {
+  if (NEW_NETWORK_LABEL[p]) return NEW_NETWORK_LABEL[p];
   if (p === "threads") return "Threads";
   if (p === "facebook") return "Facebook";
   if (p === "instagram") return "Instagram";
@@ -106,6 +112,8 @@ const YOUTUBE_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[]; yt?: string | string[]; api_key?: string | string[]; key?: string | string[]; payments?: string | string[] }> }) {
   const user = await requireUser();
+  const mediaPending = isDbConfigured() ? await pendingMediaUsage(user.id).catch(() => 0) : 0;
+  const plan = await planForUser(user.id);
   const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam, api_key: apiKeyParam, key: keyParam, payments: paymentsParam } = await searchParams;
   const apiKey = typeof apiKeyParam === "string" ? apiKeyParam : null;
   const newKey = typeof keyParam === "string" && keyParam.startsWith("poskoo_") ? keyParam : null;
@@ -129,7 +137,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   // as the composer decides what the Facebook row shows (facebookPageStatus).
   const facebook = facebookPageStatus(accounts.map((a) => ({ ...a, has_token: a.access_token_enc !== null })));
   const limitBanner = [ig, threadsParam, ytParam].includes("limit")
-    ? accountLimitMessage(PLAN_LIMITS[planForUser()].socialAccounts, planForUser())
+    ? accountLimitMessage(PLAN_LIMITS[plan].socialAccounts, plan)
     : null;
   let emailVerifiedAt: Date | null = null;
   if (isDbConfigured() && user.emailVerified) {
@@ -207,8 +215,18 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <p role="status" className={`${ui.notice} ${threadsBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{threadsBanner.text}</p>
       )}
       {limitBanner && (
-        <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>{limitBanner}</p>
+        <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>
+          {limitBanner}
+          {plan !== "Agency" ? <>{" "}<Link href="/app/settings/billing" className={ui.link}>See plans</Link></> : null}
+        </p>
       )}
+      <section className={styles.section} aria-labelledby="plan-heading">
+        <div className={styles.sectionHeader}>
+          <h2 id="plan-heading" className={styles.sectionTitle}>Plan &amp; billing</h2>
+          <BtnA href="/app/settings/billing" size="sm">{plan === "Free" ? "Upgrade" : "Manage plan"}</BtnA>
+        </div>
+        <p className={ui.hint}>You are on the {plan} plan.</p>
+      </section>
       {youtubeBanner && (
         <p role="status" className={`${ui.notice} ${youtubeBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{youtubeBanner.text}</p>
       )}
@@ -216,6 +234,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <div className={styles.sectionHeader}>
           <h2 id="accounts-heading" className={styles.sectionTitle}>Connected accounts</h2>
           {accounts.length > 0 && connectReady ? <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA> : null}
+          <BtnA href="#connect" size="sm">Connect a channel</BtnA>
           {isThreadsConfigured() ? <BtnA href="/api/threads/connect" size="sm">Connect Threads</BtnA> : null}
           {isYouTubeConfigured() ? <BtnA href="/api/youtube/connect" size="sm">Connect YouTube</BtnA> : null}
         </div>
@@ -295,11 +314,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         <p className={`${ui.hint} ${styles.accountNote}`}>
                           {a.status === "disconnected"
                             ? "Disconnected. Connect again to schedule posts and send auto-DMs."
-                            : state === "expired"
-                              ? "Instagram access expired or was removed. Reconnect so posts publish and auto-DMs keep sending."
-                              : "Instagram needs you to reconnect so auto-DMs keep sending."}
+                            : a.platform !== "instagram"
+                              ? `${platformLabel(a.platform)} access expired or was removed. Reconnect so scheduled posts keep publishing.`
+                              : state === "expired"
+                                ? "Instagram access expired or was removed. Reconnect so posts publish and auto-DMs keep sending."
+                                : "Instagram needs you to reconnect so auto-DMs keep sending."}
                         </p>
-                        <BtnA href="/api/instagram/connect" size="sm">Reconnect</BtnA>
+                        <BtnA href={connectHref(a.platform)} size="sm">Reconnect</BtnA>
                       </>
                     )}
                     {a.status !== "disconnected" && (
@@ -460,6 +481,17 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         {scheduleSaved && <p role="status" className={ui.notice}>Posting schedule saved.</p>}
         {scheduleFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your posting schedule. Please try again.</p>}
       </section>
+      <section className={styles.section} aria-labelledby="media-heading">
+        <h2 id="media-heading" className={styles.sectionTitle}>Media</h2>
+        <p className={ui.hint}>
+          {pendingStorageLabel(mediaPending, plan)} (only files waiting to be posted count).
+        </p>
+        <p className={ui.hint}>
+          Uploads are deleted as soon as every network has published the post; a small preview stays in your calendar.
+          Files not attached to a post are removed after 7 days. Per file: images up to {formatBytes(PLAN_MEDIA_LIMITS[plan].imageBytes)},
+          videos up to {formatBytes(PLAN_MEDIA_LIMITS[plan].videoBytes)} on the {plan} plan (each network may allow less).
+        </p>
+      </section>
       <PaymentsSettings userId={user.id} status={typeof paymentsParam === "string" ? paymentsParam : undefined} />
       <section className={styles.section} aria-labelledby="api-keys-heading">
         <div className={styles.sectionHeader}>
@@ -524,8 +556,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </span>
               <p className={`${ui.hint} ${styles.accountNote}`}>
                 {user.emailVerified
-                  ? `Verified with Google${emailVerifiedAt ? ` on ${new Date(emailVerifiedAt).toLocaleDateString()}` : ""}. Sign in with “Continue with Google”.`
-                  : "To verify this email, log out and sign in with “Continue with Google” using the same address. Your password then stops working and you sign in with Google from then on."}
+                  ? `Verified${emailVerifiedAt ? ` on ${new Date(emailVerifiedAt).toLocaleDateString()}` : ""}.`
+                  : <>We emailed you a 6-digit code. <Link href="/verify-email" className="underline">Verify your email</Link> to get password resets and alerts.</>}
               </p>
             </div>
           </li>

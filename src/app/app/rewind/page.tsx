@@ -10,7 +10,7 @@ import styles from "./rewind.module.css";
 export const metadata = {
   title: "Rewind",
   description:
-    "Send your auto-DM to comments from the past 7 days that your automation missed. Pick an automation, scan recent posts and queue the DMs.",
+    "Send your auto-DM to comments from the past 7 days that your Auto-DM missed. Pick an Auto-DM, scan recent posts and queue the DMs.",
 };
 
 type RuleRow = { id: string; name: string; status: string; triggers: string[] | null; keywords: string[] | null; dm_text: string | null };
@@ -26,8 +26,8 @@ type Run = {
 
 // Same conditions rewindRule() (src/lib/rewind.ts) checks before scanning.
 function unavailableReason(rule: RuleRow): string | null {
-  if (rule.status !== "active") return "This automation is paused. Turn it on to rewind it.";
-  if (!(rule.triggers ?? []).includes("comment")) return "Rewind replays post comments, and this automation has no comment trigger.";
+  if (rule.status !== "active") return "This Auto-DM is paused. Turn it on to rewind it.";
+  if (!(rule.triggers ?? []).includes("comment")) return "Rewind replays post comments, and this Auto-DM has no comment trigger.";
   return null;
 }
 
@@ -37,7 +37,7 @@ function Header() {
       <span className={styles.headIcon} aria-hidden="true"><History width={20} height={20} /></span>
       <div>
         <h1 className={styles.h1}>Rewind</h1>
-        <p className={styles.sub}>Send DMs to comments your automation missed</p>
+        <p className={styles.sub}>Send DMs to comments your Auto-DM missed</p>
       </div>
     </header>
   );
@@ -79,11 +79,11 @@ export default async function RewindPage() {
       <Header />
       {rules.length === 0 ? (
         <section className={styles.card}>
-          <h2 className={styles.h2}>Choose an automation to rewind</h2>
+          <h2 className={styles.h2}>Choose an Auto-DM to rewind</h2>
           <div className={styles.empty}>
-            <p><b>No comment automations to rewind yet.</b></p>
-            <p>Create an automation with a comment trigger and it will appear here, ready to replay on your recent posts.</p>
-            <Link href="/app/auto-dm" className={styles.primary}>Create an automation</Link>
+            <p><b>No comment Auto-DMs to rewind yet.</b></p>
+            <p>Create an Auto-DM with a comment trigger and it will appear here, ready to replay on your recent posts.</p>
+            <Link href="/app/auto-dm" className={styles.primary}>Create an Auto-DM</Link>
           </div>
         </section>
       ) : (
@@ -107,7 +107,7 @@ export default async function RewindPage() {
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
-                <tr>{["When", "Automation", "Comments scanned", "DMs queued", "Status"].map((h) => <th key={h} scope="col">{h}</th>)}</tr>
+                <tr>{["When", "Auto-DM", "Comments scanned", "DMs queued", "Status"].map((h) => <th key={h} scope="col">{h}</th>)}</tr>
               </thead>
               <tbody>
                 {runs.map((run) => (

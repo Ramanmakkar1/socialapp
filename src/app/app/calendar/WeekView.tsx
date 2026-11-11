@@ -34,12 +34,12 @@ function dayLabels(key: string) {
 }
 
 export default function WeekView({ posts, weekStart, composeBase, accounts = {}, loadError }: WeekViewProps) {
-  const { tz, error, dragOverKey, dropProps, open, openPost, closePost } = useCalendar(posts);
+  const { posts: visiblePosts, tz, error, dragOverKey, dropProps, open, openPost, closePost } = useCalendar(posts);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const todayKey = zonedParts(new Date(), tz).key;
   const startKey = weekStart.toISOString().slice(0, 10);
   const days = Array.from({ length: 7 }, (_, i) => addDays(startKey, i));
-  const byDay = groupByDay(posts, tz);
+  const byDay = groupByDay(visiblePosts, tz);
 
   // Rows: every hour that has a post this week, or a working-day range when the week is empty.
   const byCell = new Map<string, CalendarPost[]>();

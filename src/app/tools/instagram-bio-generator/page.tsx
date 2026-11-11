@@ -1,137 +1,201 @@
-import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
-import PublicShell from "@/components/PublicShell";
-import s from "@/components/site.module.css";
+import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import t from "@/components/tools/tools.module.css";
 import BioTool from "./BioTool";
-import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
-import { AnimArt } from "@/components/AnimArt";
 
-const PATH = "/tools/instagram-bio-generator";
-const description =
-  "Free Instagram bio generator with niche templates, optional styled names, and a live 150-character counter. Copy ideas for creators, coaches, and brands.";
-export const metadata: Metadata = {
-  title: { absolute: "Instagram Bio Generator: Free Bio Ideas You Can Copy" },
-  description,
-  alternates: { canonical: PATH },
+const config: ToolPageConfig = {
+  path: "/tools/instagram-bio-generator",
+  name: "Instagram bio generator",
+  crumb: "Bio generator",
+  title: "Instagram Bio Generator: Free Bio Ideas You Can Copy",
+  description:
+    "Free Instagram bio generator: enter your name, what you do and a call to action, pick one of 8 niches and copy a bio with a live 150-character counter.",
+  pill: "Free · runs in your browser · nothing is uploaded",
+  h1: { before: "Instagram bio generator:", mark: "bio ideas", after: "you can copy" },
+  lede: "Fill in your name, what you do and one call to action, pick a niche, and get four ready-to-copy bios with emojis, line breaks and a 150-character counter.",
+  art: "writing",
+  artLabel: "A creator writes with a giant pencil on a phone-shaped card full of lines and emoji",
+  heroPoints: ["150-char counter", "8 niches", "No signup"],
+  toolTitle: "Write your Instagram bio",
+  toolNote: "Free · nothing leaves your browser",
+  stepsTitle: "How to use the Instagram bio generator",
+  steps: [
+    {
+      title: "Enter your details",
+      text: "Type your Name or brand, What you do and a Call to action. The call to action starts as a sample you can overwrite.",
+      art: "writing",
+    },
+    {
+      title: "Pick a niche and name style",
+      text: "Choose one of 8 niches, such as Coach, Food or Agency, to get four templates. Optionally pick a Style the name font like Bold or Script.",
+      art: "visual",
+    },
+    {
+      title: "Check the count and copy",
+      text: "Each bio shows its length out of 150 and turns red if it runs over. Press Copy on the one you like and paste it into Edit profile.",
+      art: "card-dm",
+    },
+  ],
+  featuresTitle: "A bio that fits, reads well and asks for one thing",
+  features: [
+    {
+      title: "Four templates per niche",
+      text: "Creator, small business, coach, photographer, fitness, food, e-commerce and agency each have their own four layouts with matching emojis.",
+      art: "writing",
+    },
+    {
+      title: "Live 150-character check",
+      text: "Every filled-in bio shows its length against Instagram's 150-character bio limit, so you know what fits before you paste it.",
+      art: "analytics",
+    },
+    {
+      title: "Optional styled name",
+      text: "Turn just your name into Unicode styles such as bold, italic or script while the rest of the bio stays in plain, searchable text.",
+      art: "feat-linkbio",
+    },
+  ],
+  guide: {
+    title: "How to write an Instagram bio that works in 2026",
+    intro:
+      "Your bio is the first thing a profile visitor reads after your name. In 150 characters it has to say who you are, what you offer and what to do next. This generator gives you proven layouts so you can focus on the words.",
+    sections: [
+      {
+        title: "What this bio generator does",
+        body: (
+          <>
+            <p>
+              The tool fills your three inputs into four hand-written templates for the niche you pick. Templates put each
+              idea on its own line and add a fitting emoji, then end with your call to action. Empty lines are removed, so
+              leaving <b>Name or brand</b> blank still gives a clean bio.
+            </p>
+            <p>
+              The counter counts characters as your browser sees them. Most emojis count as one, but some combined emojis
+              (for example a chef emoji built from several symbols) may count as more, and Instagram&apos;s own counter can
+              differ slightly. Nothing is sent anywhere and nothing is saved.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Instagram bio best practices",
+        body: (
+          <ul>
+            <li>
+              <b>Lead with what you do.</b> &ldquo;Career coach for new managers&rdquo; tells a visitor more in a second
+              than a slogan does.
+            </li>
+            <li>
+              <b>One call to action.</b> Ask for one thing: tap the link, book a call, or DM a keyword. Several asks
+              compete with each other.
+            </li>
+            <li>
+              <b>Keep keywords in plain text.</b> Styled Unicode letters look nice but may not be read by search or screen
+              readers. Style only your name, if anything.
+            </li>
+            <li>
+              <b>Use line breaks.</b> Short lines are easier to scan. If spacing looks off after pasting, try the{" "}
+              <Link href="/tools/instagram-line-break-generator">line break generator</Link>.
+            </li>
+            <li>
+              <b>Make the CTA real.</b> If your bio says &ldquo;DM START&rdquo;, be ready to reply quickly. For posts,
+              an <Link href="/instagram-auto-dm">Instagram auto DM</Link> can send your link to everyone who comments a
+              keyword.
+            </li>
+          </ul>
+        ),
+      },
+      {
+        title: "Example: a coach bio",
+        body: (
+          <>
+            <p>
+              With Name &ldquo;Maya Chen&rdquo;, What you do &ldquo;Career coach for new managers&rdquo;, Call to action
+              &ldquo;DM &quot;LEAD&quot; for my free 1:1 checklist&rdquo; and the Coach niche, the first template gives:
+            </p>
+            <div className={t.example}>
+              <p>Maya Chen | Career coach for new managers</p>
+              <p>🎯 Your next step</p>
+              <p>👇 DM &quot;LEAD&quot; for my free 1:1 checklist</p>
+            </div>
+            <p>
+              That is 96 characters out of 150, which leaves room to add a location or a short proof point such as years of
+              experience.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Common bio mistakes",
+        body: (
+          <ul>
+            <li>
+              Not matching the template&apos;s wording. One Coach template reads &ldquo;Helping you {"{what you do}"}&rdquo;,
+              so phrase that field as an action (&ldquo;lead your first team&rdquo;) if you pick it.
+            </li>
+            <li>Styling the whole bio in fancy fonts so it is hard to read and search.</li>
+            <li>Listing three different links or offers in one short bio.</li>
+            <li>Leaving a call to action that points to an expired offer.</li>
+            <li>
+              Using a name that does not match your handle. The{" "}
+              <Link href="/tools/instagram-username-generator">username generator</Link> helps you pick one that fits.
+            </li>
+          </ul>
+        ),
+      },
+    ],
+  },
+  faqTitle: "Instagram bio questions",
+  faqs: [
+    {
+      q: "What is the Instagram bio character limit?",
+      a: "Instagram bios allow up to 150 characters. Emojis, spaces, line breaks and styled Unicode letters all count toward that limit, and some combined emojis can count as more than one character.",
+    },
+    {
+      q: "How do I add line breaks to my Instagram bio?",
+      a: "Copy a bio from this generator, which already has line breaks, and paste it into Edit profile > Bio in the Instagram app. If the spacing changes, prepare the text in the line break generator and paste again.",
+    },
+    {
+      q: "Are fancy fonts safe to use in my bio?",
+      a: "Styled names use standard Unicode characters that you copy and paste. Keep important keywords in plain text, because styled letters may not be read by search or screen readers. This tool only styles the name field.",
+    },
+    {
+      q: "What should I put in a bio call to action?",
+      a: "Tell people the one action you want: DM a keyword, tap the link, book a call or shop. Keep it short and make sure it matches something you actually offer.",
+    },
+    {
+      q: "Does this Instagram bio generator use AI or save my details?",
+      a: "No. It fills your text into fixed templates in your browser. Nothing is uploaded, no AI is used and nothing is saved when you leave the page.",
+    },
+  ],
+  related: [
+    "/tools/instagram-username-generator",
+    "/tools/instagram-font-generator",
+    "/tools/instagram-line-break-generator",
+    "/tools/instagram-dm-link-generator",
+    "/tools/instagram-caption-generator",
+  ],
+  schema: {
+    features: [
+      "Bio templates for 8 niches",
+      "Live 150-character counter",
+      "Optional Unicode name styles",
+      "One-click copy for each bio",
+      "Runs in the browser, no signup",
+    ],
+  },
+  cta: {
+    title: "Your bio is ready.",
+    mark: "Now turn comments into DMs.",
+    text: "Schedule your posts with Poskoo and auto-DM your link to everyone who comments a keyword, on the official Meta API.",
+  },
 };
-const steps = [
-  "Enter your name, what you do, and a call to action.",
-  "Pick a niche to see four bio templates you can customize.",
-  "Copy a bio, then paste it into Instagram. Use our line break tool if spacing looks off.",
-];
-const faqs = [
-  {
-    q: "What is the Instagram bio character limit?",
-    a: "Instagram bios allow up to 150 characters. Emojis and styled Unicode letters each count toward that limit.",
-  },
-  {
-    q: "How do I add line breaks to my Instagram bio?",
-    a: "Type your bio with line breaks in Notes or our line break generator, copy the text, then paste into Edit profile > Bio on Instagram.",
-  },
-  {
-    q: "Are fancy fonts safe to use in my bio?",
-    a: "Yes. Styled names use standard Unicode characters you copy and paste. Keep important keywords in plain text for search and accessibility.",
-  },
-  {
-    q: "What should I put in a bio call to action?",
-    a: "Tell people the one action you want: DM a keyword, tap the link, book a call, or shop. Keep it short and match what you actually offer.",
-  },
-];
-const toolJsonLd = toolSoftwareJsonLd({ name: "Instagram Bio Generator", description, url: `${BRAND.url}${PATH}` });
+
+export const metadata = toolMetadata(config);
 
 export default function InstagramBioGeneratorPage() {
   return (
-    <PublicShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(toolJsonLd) }} />
-      <header className="hero">
-        <span className="pill">Free / runs in your browser / nothing is uploaded</span>
-        <h1>
-          Instagram bio <em className="s mark">generator</em>
-        </h1>
-        <p className="lede">
-          Get niche bio templates with emojis and line breaks, optional styled names, and a live 150-character counter.
-        </p>
-        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
-      </header>
-
-      <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>
-        <BioTool />
-      </div>
-      <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
-        More free Instagram tools:{" "}
-        <Link className={s.vlink} href="/tools/instagram-font-generator">
-          Font generator
-        </Link>
-        {" / "}
-        <Link className={s.vlink} href="/tools/instagram-line-break-generator">
-          Line break generator
-        </Link>
-        {" / "}
-        <Link className={s.vlink} href="/tools/instagram-username-generator">
-          Instagram username generator
-        </Link>
-      </p>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="split">
-            <div className="copy">
-              <p className="eyebrow">Step by step</p>
-              <h2>How to use this tool</h2>
-            </div>
-            <div className="pains">
-              {steps.map((step, i) => (
-                <div key={step} className="pain">
-                  <b>Step {i + 1}</b>
-                  <span>{step}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">Questions</p>
-            <h2>Instagram bio FAQ</h2>
-          </div>
-          <div className="faq">
-            {faqs.map((f) => (
-              <details key={f.q}>
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="cta">
-            <div>
-              <h2>Schedule posts and auto-DM everyone who comments</h2>
-              <p>{BRAND.tagline}</p>
-              <Link className="btn" href="/signup">
-                Start free <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-            <Image
-              sizes="(max-width: 960px) 100vw, 50vw"
-              src="/landing/card-leads.webp"
-              width={900}
-              height={900}
-              loading="lazy"
-              alt="Two friends high-five next to a board of new leads"
-            />
-          </div>
-        </div>
-      </section>
-    </PublicShell>
+    <ToolPageTemplate config={config}>
+      <BioTool />
+    </ToolPageTemplate>
   );
 }

@@ -48,7 +48,7 @@ const faqs = [
   { q: `Is ${BRAND.name} a Meta Business Suite alternative?`, a: `Yes, for Instagram creators and small brands. ${BRAND.name} schedules your Instagram posts on a calendar and also sends an automatic DM with your link to everyone who comments a keyword, with email capture and AI caption ideas built in. Meta Business Suite is free and made by Meta; check Meta's help pages for its current automation options.` },
   { q: "Why do scheduled posts fail or get stuck in Meta Business Suite?", a: `Common causes are an expired Facebook or Instagram connection, a photo or video in a size or format Instagram does not accept, or a temporary sync problem between the Facebook Page and the Instagram account. Reconnecting the account and re-uploading the media in a supported format fixes most of them, and ${BRAND.name} publishes through the official Meta APIs.` },
   { q: "Can I use both tools at the same time?", a: `Yes. Many creators keep Meta Business Suite for ads and Page settings and use ${BRAND.name} for scheduling and comment-to-DM automation. Just avoid scheduling the same post in both tools so it is not published twice.` },
-  { q: "Is there a free plan?", a: "Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and paid Pro and Agency plans are coming soon." },
+  { q: "Is there a free plan?", a: "Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and you can upgrade to Pro or Agency any time." },
   { q: "Is it safe for my Instagram account?", a: "Yes. We connect through the official Meta login and APIs, never ask for your password, never scrape, and follow Meta's messaging limits." },
 ];
 

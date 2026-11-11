@@ -6,6 +6,7 @@ import robots from "./robots.ts";
 import sitemap from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
 import { PUBLIC_PATHS } from "@/lib/public-pages";
+import { toolMetadata } from "@/components/tools/seo";
 
 test("sitemap stays empty while staging is noindex", () => {
   assert.deepEqual(sitemap(), []);
@@ -62,8 +63,19 @@ test("every public page declares a canonical", () => {
     const file = p === "/" ? "src/app/page.tsx" : join("src/app", p, "page.tsx");
     if (!existsSync(file)) continue; // missing route files are covered by the "real route file" test
     const text = readFileSync(file, "utf8");
-    assert.ok(text.includes("canonical"), `public page ${p} has no canonical in ${file}`);
+    // Tool pages get their canonical from toolMetadata({ path }) (asserted below), and must pass their own path.
+    const viaToolMetadata = text.includes("toolMetadata(") && text.includes(`path: "${p}"`);
+    assert.ok(text.includes("canonical") || viaToolMetadata, `public page ${p} has no canonical in ${file}`);
   }
+});
+
+test("toolMetadata sets the canonical, title, description and social card", () => {
+  const meta = toolMetadata({ path: "/tools/x", title: "T", description: "D" });
+  assert.equal(meta.alternates?.canonical, "/tools/x");
+  assert.deepEqual(meta.title, { absolute: "T" });
+  assert.equal(meta.description, "D");
+  assert.equal((meta.openGraph as { url?: string } | undefined)?.url, "/tools/x");
+  assert.ok(meta.openGraph?.images, "tool pages carry an Open Graph image");
 });
 
 test("no PUBLIC_PATHS entry is noindex", () => {

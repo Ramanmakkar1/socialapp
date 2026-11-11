@@ -33,8 +33,11 @@ test("rejects unsupported types, empty files and files over the size limit", () 
   assert.equal(validateMediaFile({ type: "image/gif", size: 1024 }).ok, false);
   assert.equal(validateMediaFile({ type: "application/pdf", size: 1024 }).ok, false);
   assert.equal(validateMediaFile({ type: "image/jpeg", size: 0 }).ok, false);
-  assert.equal(validateMediaFile({ type: "image/jpeg", size: 8 * 1024 * 1024 + 1 }).ok, false);
-  assert.equal(validateMediaFile({ type: "video/mp4", size: 100 * 1024 * 1024 + 1 }).ok, false);
+  assert.equal(validateMediaFile({ type: "image/jpeg", size: 20_000_000 }).ok, true);
+  assert.equal(validateMediaFile({ type: "image/jpeg", size: 20_000_001 }).ok, false);
+  assert.equal(validateMediaFile({ type: "video/mp4", size: 250_000_001 }).ok, false);
+  assert.equal(validateMediaFile({ type: "video/mp4", size: 250_000_001 }, "Pro").ok, true);
+  assert.match(String((validateMediaFile({ type: "video/mp4", size: 412_000_000 }) as { error?: string }).error), /This video is 412 MB\. The Free plan allows videos up to 250 MB/);
 });
 
 test("reads the media kind from a signed upload URL", () => {

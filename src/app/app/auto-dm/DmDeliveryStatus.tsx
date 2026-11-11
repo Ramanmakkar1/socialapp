@@ -58,9 +58,9 @@ export function failureCategory(lastError: string | null): string | null {
     return "Outside Instagram messaging window";
   }
   if (e.includes("automation rule")) {
-    if (e.includes("paused")) return "Automation paused";
-    if (e.includes("deleted") || e.includes("missing")) return "Automation removed";
-    return "Automation not eligible";
+    if (e.includes("paused")) return "Auto-DM paused";
+    if (e.includes("deleted") || e.includes("missing")) return "Auto-DM removed";
+    return "Auto-DM not eligible";
   }
   if (e.startsWith("network:") || e.includes("timeout") || e.includes("fetch failed")) return "Temporary network error";
   if (e.includes("permission") || e.includes("not authorized")) return "Permission or policy block";
@@ -80,7 +80,7 @@ function statusPill(row: DmDeliveryRow): { label: string; className: string } {
 }
 
 function pendingHoldReason(row: DmDeliveryRow, now: number): string | null {
-  if (row.rule_status === "paused") return "Waiting — automation is paused.";
+  if (row.rule_status === "paused") return "Waiting — Auto-DM is paused.";
   if (row.account_status === "expired") return "Waiting — Instagram connection expired. Reconnect in Settings.";
   if (row.account_status === "disconnected") return "Waiting — Instagram account disconnected. Reconnect in Settings.";
   if (row.dm_cooldown_until && new Date(row.dm_cooldown_until).getTime() > now) {
@@ -110,7 +110,7 @@ export function DmDeliveryStatus({ rows, loadError, asOf }: Props) {
       {loadError ? (
         <div role="alert" className={`${ui.notice} ${ui.noticeWarn} mx-4 mb-4 text-center`}>
           <p className="m-0 text-sm">
-            We couldn&apos;t load delivery status right now. Your automations still work. Try refreshing.
+            We couldn&apos;t load delivery status right now. Your Auto-DMs still work. Try refreshing.
           </p>
         </div>
       ) : !rows?.length ? (
@@ -121,7 +121,7 @@ export function DmDeliveryStatus({ rows, loadError, asOf }: Props) {
             <thead>
               <tr>
                 <th scope="col">User</th>
-                <th scope="col">Automation</th>
+                <th scope="col">Auto-DM</th>
                 <th scope="col">Status</th>
                 <th scope="col" className={styles.num}>Attempts</th>
                 <th scope="col">Time</th>
@@ -150,7 +150,7 @@ export function DmDeliveryStatus({ rows, loadError, asOf }: Props) {
                         </span>
                       </span>
                     </td>
-                    <td data-label="Automation">
+                    <td data-label="Auto-DM">
                       {row.rule_name ?? "—"}
                       {row.rule_status === "paused" && <span className={`ml-1 text-xs ${styles.muted}`}>(paused)</span>}
                     </td>

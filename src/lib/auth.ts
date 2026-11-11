@@ -12,8 +12,9 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 days, in seconds
 const DUMMY_HASH =
   "scrypt$16384$8$1$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
 
-// emailVerified: the email was proved through Google sign-in (users.email_verified_at, migration 037).
-// Password sign-ups are never verified (the app sends no e-mail). Missing = not verified.
+// emailVerified: the email was proved (users.email_verified_at, migration 037): by Google sign-in, by the
+// 6-digit code / link e-mailed after sign-up (redeemable only while signed in to that account), or by a
+// password reset. A bare password sign-up is unverified. Missing = not verified.
 export type CurrentUser = { id: string; email: string; name: string | null; emailVerified?: boolean };
 
 // Creates a user; returns null if the email is already taken.

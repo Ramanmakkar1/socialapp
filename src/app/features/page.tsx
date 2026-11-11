@@ -238,7 +238,7 @@ export default function FeaturesPage() {
               <ul>
                 <li>Scheduling and auto-DM in one plan, not separate subscriptions.</li>
                 <li>Official Meta API with no password sharing.</li>
-                <li>Free plan to test the whole workflow. Paid plans are coming soon.</li>
+                <li>Free plan to test the whole workflow, then Pro or Agency when you grow.</li>
               </ul>
             </div>
             <div className="art">

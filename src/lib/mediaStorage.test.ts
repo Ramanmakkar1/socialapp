@@ -131,3 +131,80 @@ test("cleanup leaves a user's files alone when the reference lookup fails", asyn
     }
   });
 });
+
+test("thumbnail keys are served, follow their upload, and are found in post JSON", async () => {
+  const { thumbKeyFor, isThumbKey, mediaKeysInText } = await import("./mediaStorage.ts");
+  const thumb = thumbKeyFor(KEY);
+  assert.equal(thumb, KEY.replace(/\.jpg$/, ".thumb.jpg"));
+  assert.ok(isThumbKey(thumb));
+  assert.ok(mediaFilePath(thumb));
+  assert.deepEqual(mediaKeysInText(`x /api/media/${KEY}?a /api/media/${thumb}?b`), [KEY, thumb]);
+});
+
+test("cleanup (7 days) keeps a poster while its upload exists, and drops orphaned posters", async () => {
+  const { saveMediaStream, cleanupUnusedMedia, mediaFilePath: filePath, thumbKeyFor } = await import("./mediaStorage.ts");
+  const { utimes, stat } = await import("node:fs/promises");
+  await withTempStorage(async () => {
+    const kept = await saveMediaStream(USER, streamOf(10), "mp4", 100);
+    const keptThumb = await saveMediaStream(USER, streamOf(3), "jpg", 100, thumbKeyFor(kept.key));
+    const orphanThumb = await saveMediaStream(USER, streamOf(4), "jpg", 100, thumbKeyFor(`${USER}/44444444-4444-4444-4444-444444444444.mp4`));
+    const eightDays = new Date(Date.now() - 8 * 86_400_000);
+    for (const k of [kept.key, keptThumb.key, orphanThumb.key]) await utimes(filePath(k)!, eightDays, eightDays);
+    const result = await cleanupUnusedMedia(async () => [`/api/media/${kept.key}?x`]);
+    assert.deepEqual(result, { deleted: 1, freedBytes: 4 });
+    await stat(filePath(keptThumb.key)!);
+    await assert.rejects(stat(filePath(orphanThumb.key)!));
+  });
+});
+
+test("deleteMediaKeys and listUserMedia", async () => {
+  const { saveMediaStream, deleteMediaKeys, listUserMedia } = await import("./mediaStorage.ts");
+  await withTempStorage(async () => {
+    const a = await saveMediaStream(USER, streamOf(10), "jpg", 100);
+    const b = await saveMediaStream(USER, streamOf(20), "png", 100);
+    assert.equal((await listUserMedia(USER)).length, 2);
+    assert.deepEqual(await deleteMediaKeys([a.key, a.key, "../../etc/passwd"]), { deleted: 1, freedBytes: 10 });
+    assert.deepEqual((await listUserMedia(USER)).map((f) => f.key), [b.key]);
+  });
+});
+
+test("disk threshold: refuse below the minimum, warn below twice the minimum", async () => {
+  const { diskDecision, minFreeBytes, mediaDiskSpace } = await import("./mediaStorage.ts");
+  const G = 1_000_000_000;
+  assert.equal(diskDecision(100 * G, 1 * G, 20 * G), "ok");
+  assert.equal(diskDecision(45 * G, 6 * G, 20 * G), "warn");
+  assert.equal(diskDecision(21 * G, 2 * G, 20 * G), "refuse");
+  const prev = process.env.MEDIA_MIN_FREE_GB;
+  delete process.env.MEDIA_MIN_FREE_GB;
+  assert.equal(minFreeBytes(), 20 * G);
+  process.env.MEDIA_MIN_FREE_GB = "5";
+  assert.equal(minFreeBytes(), 5 * G);
+  if (prev === undefined) delete process.env.MEDIA_MIN_FREE_GB;
+  else process.env.MEDIA_MIN_FREE_GB = prev;
+  await withTempStorage(async () => {
+    const space = await mediaDiskSpace();
+    assert.ok(space && space.freeBytes > 0 && space.totalBytes >= space.freeBytes);
+  });
+});
+
+test("video length is read from the MP4 mvhd box", async () => {
+  const { probeVideoDurationSec } = await import("./mediaProbe.ts");
+  const { writeFile } = await import("node:fs/promises");
+  await withTempStorage(async (dir) => {
+    const box = (type: string, body: Buffer) => {
+      const head = Buffer.alloc(8);
+      head.writeUInt32BE(8 + body.length, 0);
+      head.write(type, 4, "latin1");
+      return Buffer.concat([head, body]);
+    };
+    const mvhd = Buffer.alloc(100);
+    mvhd.writeUInt32BE(1000, 12); // timescale
+    mvhd.writeUInt32BE(5500, 16); // duration -> 5.5 s
+    const file = Buffer.concat([box("ftyp", Buffer.from("isom0000")), box("mdat", Buffer.alloc(64)), box("moov", box("mvhd", mvhd))]);
+    const p = path.join(dir, "v.mp4");
+    await writeFile(p, file);
+    assert.equal(await probeVideoDurationSec(p), 5.5);
+    await writeFile(p, Buffer.from("not a video"));
+    assert.equal(await probeVideoDurationSec(p), null);
+  });
+});

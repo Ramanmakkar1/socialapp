@@ -110,6 +110,11 @@ export async function qualifyReferrals(referrerUserId: string | null = null): Pr
        returning r.id`,
       [referrerUserId, REFERRAL_BONUS_DMS],
     );
+    if (rows.length > 0) {
+      // "+500 DMs" e-mail to each referrer, once per referral (src/lib/emailNotify.ts).
+      const ids = rows.map((r) => r.id);
+      void import("@/lib/emailNotify").then((m) => m.inBackground("referral", () => m.notifyReferralsQualified(ids))).catch(() => undefined);
+    }
     return rows.length;
   } catch (err) {
     console.error("qualifyReferrals failed", err instanceof Error ? err.message : err);

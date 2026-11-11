@@ -9,8 +9,13 @@ import { canPublishToFacebook } from "@/lib/facebookPublish";
 import { nextSlot } from "@/lib/postingSchedule";
 import { shouldPostFirstComment } from "@/lib/firstComment";
 import { hasColumn, parseTags, tagValidationError } from "@/lib/tagFilter";
+import { isNetworkId, NETWORK_LABEL } from "@/lib/networks/common";
+import { networkTargetError, normalizeNetOptions } from "@/lib/networks/validate";
+import { scheduledMediaError } from "@/lib/mediaLifecycle";
 
-export const ALLOWED_PLATFORMS: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
+export const ALLOWED_PLATFORMS: PlatformId[] = [
+  "instagram", "facebook", "threads", "youtube", "tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x",
+];
 
 export type SavePostInput = {
   draftId?: string;
@@ -29,6 +34,8 @@ export type SavePostInput = {
   ytTags?: string[];
   ytPrivacy?: "public" | "unlisted" | "private";
   ytShorts?: boolean;
+  /** Per-network options (TikTok privacy / disclosure, Pinterest board + title + link, LinkedIn author). */
+  netOptions?: Partial<Record<string, unknown>>;
 };
 
 type MediaItem = { type: "image" | "video"; url: string };
@@ -114,12 +121,26 @@ export async function savePostForUser(
     platforms.push(p);
   }
 
+  // Mastodon servers can allow more than 500 characters (stored when the account was connected).
+  let mastodonMax: number | null = null;
+  if (platforms.includes("mastodon")) {
+    try {
+      const [row] = await query<{ max: number | null }>(
+        "select (meta->>'maxChars')::int as max from socialapp.social_accounts where user_id=$1 and platform='mastodon' and status='active' order by created_at limit 1",
+        [userId],
+      );
+      mastodonMax = row?.max ?? null;
+    } catch {
+      mastodonMax = null;
+    }
+  }
+
   for (const platform of platforms) {
     const text = effectiveCaption(platform, input.caption, input.overrides);
-    if (!text.trim()) {
+    if (!text.trim() && platform !== "pinterest" && platform !== "tiktok") {
       return { ok: false, error: "Add a caption for each selected platform." };
     }
-    const check = checkCaption(platform, text);
+    const check = checkCaption(platform, text, platform === "mastodon" ? mastodonMax : null);
     if (check.errors.length > 0) {
       return { ok: false, error: check.errors[0] ?? "Caption is too long." };
     }
@@ -200,6 +221,18 @@ export async function savePostForUser(
     }
   }
 
+  const scheduling = input.mode === "schedule" || input.mode === "queue";
+  for (const platform of platforms) {
+    if (!isNetworkId(platform)) continue;
+    const netError = networkTargetError(platform, mediaItems, input.netOptions?.[platform], scheduling);
+    if (netError) return { ok: false, error: netError };
+  }
+  if (scheduling && mediaItems.length > 0) {
+    // Uploaded files: plan + every selected network's size / type / length (src/lib/mediaLimits.ts).
+    const mediaError = await scheduledMediaError(userId, platforms, mediaItems, igFormat);
+    if (mediaError) return { ok: false, error: mediaError };
+  }
+
   let scheduledAt: Date | null = null;
   if (input.scheduledAt) {
     const parsed = new Date(input.scheduledAt);
@@ -276,6 +309,17 @@ export async function savePostForUser(
             ok: false,
             error: "Connect a YouTube channel in Settings before scheduling. You can save this post as a draft for now.",
           };
+        }
+      }
+      for (const platform of platforms) {
+        if (!isNetworkId(platform)) continue;
+        const rows = await query(
+          "select 1 from socialapp.social_accounts where user_id=$1 and platform=$2 and status='active' and access_token_enc is not null limit 1",
+          [userId, platform],
+        );
+        if (rows.length === 0) {
+          const label = NETWORK_LABEL[platform];
+          return { ok: false, error: `Connect ${label} first (Connect a channel), or untick ${label}. You can save this post as a draft for now.` };
         }
       }
       const limitError = await scheduledPostLimitError(userId, scheduledAt, input.draftId ?? null);
@@ -433,6 +477,14 @@ export async function savePostForUser(
       const raw = customized ? input.overrides[platform] : undefined;
       const captionOverride = customized ? raw ?? "" : null;
 
+      if (isNetworkId(platform)) {
+        const options = normalizeNetOptions(platform, input.netOptions?.[platform]);
+        await client.query(
+          "insert into post_targets (post_id, platform, caption_override, net_options) values ($1, $2, $3, $4::jsonb)",
+          [id, platform, captionOverride, options ? JSON.stringify(options) : null],
+        );
+        continue;
+      }
       await client.query(
         "insert into post_targets (post_id, platform, caption_override, yt_metadata) values ($1, $2, $3, $4)",
         [id, platform, captionOverride, platform === "youtube" ? ytMetadata : null],

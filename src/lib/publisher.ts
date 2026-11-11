@@ -6,6 +6,9 @@ import { graphBaseFor } from "@/lib/graphHost";
 import { canPublishToFacebook, publishToFacebookPage } from "@/lib/facebookPublish";
 import { RECONNECT_MESSAGE, publishToThreads } from "@/lib/threadsPublish";
 import { refreshYouTubeToken } from "@/lib/youtubeAuth";
+import { isNetworkId } from "@/lib/networks/common";
+import { publishNetworkTargets, type ClaimedNetworkRow } from "@/lib/networks/publish";
+import { releasePostMedia, releasePublishedMediaSweep } from "@/lib/mediaLifecycle";
 
 const PUBLISH_TIMEOUT_MS = 20_000;
 const YT_VIDEO_FETCH_TIMEOUT_MS = 5 * 60_000;
@@ -21,6 +24,7 @@ type ClaimedRow = {
   ig_format: string;
   first_comment: string | null;
   yt_metadata: unknown;
+  net_options?: unknown;
 };
 
 type AccountRow = {
@@ -250,19 +254,23 @@ async function markTargetFailed(
     [targetId, cleaned],
   );
   await refreshPostStatus(postId);
+  // Owner alert e-mail, at most one per post (src/lib/emailNotify.ts). Never blocks publishing.
+  void import("@/lib/emailNotify").then((m) => m.inBackground("post_failed", () => m.notifyPostFailed(postId))).catch(() => undefined);
 }
 
 async function refreshPostStatus(postId: string): Promise<void> {
   const pool = getPool();
-  await pool.query(
+  const updated = await pool.query<{ status: string }>(
     `update socialapp.scheduled_posts p set status = case
       when exists(select 1 from socialapp.post_targets where post_id=p.id and status='failed') then 'failed'
       when not exists(select 1 from socialapp.post_targets where post_id=p.id and status in ('pending','publishing')) then 'published'
       when not exists(select 1 from socialapp.post_targets where post_id=p.id and status='publishing') then 'scheduled'
       else p.status
-    end, updated_at=now() where p.id=$1`,
+    end, updated_at=now() where p.id=$1 returning p.status`,
     [postId],
   );
+  // Every target published: delete the uploaded files now (posters stay). Never throws.
+  if (updated.rows[0]?.status === "published") await releasePostMedia(postId);
 }
 
 /**
@@ -639,7 +647,7 @@ export async function recoverStuckPublishing(staleMs = STUCK_PUBLISHING_MS): Pro
  */
 async function claimDueTargets(
   limit: number,
-  platform: "instagram" | "facebook" | "threads" | "youtube",
+  platform: string,
 ): Promise<ClaimedRow[]> {
   const client = await getPool().connect();
   try {
@@ -667,7 +675,7 @@ async function claimDueTargets(
       `update socialapp.post_targets t set status='publishing'
        from socialapp.scheduled_posts p
        where t.post_id=p.id and p.id = any($1::uuid[]) and t.platform=$2 and t.status='pending'
-       returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment, t.yt_metadata`,
+       returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment, t.yt_metadata${isNetworkId(platform) ? ", t.net_options" : ""}`,
       [ids, platform],
     );
     await client.query("commit");
@@ -1033,6 +1041,18 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
       result.failed += 1;
     }
   }
+
+  // TikTok, Bluesky, Mastodon, LinkedIn, Pinterest and X (src/lib/networks/publish.ts).
+  const more = await publishNetworkTargets(limit, {
+    claim: (n, platform) => claimDueTargets(n, platform) as Promise<ClaimedNetworkRow[]>,
+    markFailed: markTargetFailed,
+    refreshPostStatus,
+  });
+  result.published += more.published;
+  result.failed += more.failed;
+
+  // Files of published posts whose hold ended (TikTok / Facebook / Pinterest processing) or whose release failed.
+  await releasePublishedMediaSweep();
 
   return result;
 }

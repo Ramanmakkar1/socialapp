@@ -23,7 +23,7 @@ export const metadata: Metadata = {
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
 export const dynamic = "force-static";
-const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram, Facebook Pages, Threads and YouTube scheduling work today, plus Instagram auto-DMs. Other networks are on the roadmap, with no date yet."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
+const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram, Facebook Pages, Threads, YouTube, Bluesky and Mastodon scheduling work today, plus Instagram auto-DMs. TikTok, LinkedIn, Pinterest and X are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -240,6 +240,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
         {p.popular ? <span className="tag">Most popular</span> : null}
         <h3>{p.name}</h3>
         <div className="price">{p.price} <small>{p.per}</small></div>
+        {p.yearly && <p className="priceYearly">or {p.yearlyHref ? <a href={p.yearlyHref}>{p.yearly}</a> : p.yearly}</p>}
         <ul>
           {p.items.map((item) => (
             <li key={item.text}>
@@ -249,7 +250,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
             </li>
           ))}
         </ul>
-        <Link className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</Link>
+        {p.ctaHref.startsWith("/upgrade") ? <a className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</a> : <Link className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</Link>}
       </div>
     ))}
   </div>

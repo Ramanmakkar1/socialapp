@@ -41,8 +41,8 @@ function explainError(error: string | null): string | null {
   if (e.includes("disconnected")) return "The Instagram account was disconnected.";
   if (e.includes("7-day")) return "The comment was older than Instagram's 7-day private reply window.";
   if (e.includes("24-hour")) return "Instagram only allows DMs within 24 hours of the person's message.";
-  if (e.includes("rule is not active") || e.includes("rule was deleted") || e.includes("rule is missing")) return "The automation was turned off or deleted before sending.";
-  if (e.includes("different instagram account") || e.includes("does not belong")) return "The automation no longer applies to this Instagram account.";
+  if (e.includes("rule is not active") || e.includes("rule was deleted") || e.includes("rule is missing")) return "The Auto-DM was turned off or deleted before sending.";
+  if (e.includes("different instagram account") || e.includes("does not belong")) return "The Auto-DM no longer applies to this Instagram account.";
   if (e.includes("http 429") || e.includes("rate limit") || e.includes("too many")) return "Instagram's sending limit was reached, so sending paused for a while.";
   if (e.startsWith("network")) return "Instagram could not be reached.";
   if (e.startsWith("http")) return "Instagram did not accept this message.";
@@ -88,7 +88,7 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
         title="Auto-DM"
         accent="activity"
         accentAfter=""
-        lede="The latest DMs your automations tried to send. Pending messages wait while their automation is paused and send after you resume it."
+        lede="The latest DMs your Auto-DMs tried to send. Pending messages wait while their Auto-DM is paused and send after you resume it."
         art="/landing/card-dm.webp"
         artAlt=""
       />
@@ -96,7 +96,7 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
       {loadError ? (
         <div role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>
           <p className="m-0 font-semibold">We couldn&apos;t load your DM activity.</p>
-          <p className="m-0 mt-1">Your automations keep running. Refresh the page in a minute to try again.</p>
+          <p className="m-0 mt-1">Your Auto-DMs keep running. Refresh the page in a minute to try again.</p>
         </div>
       ) : visible.length === 0 ? (
         <div className="mt-6">
@@ -117,14 +117,14 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
             return (
               <li key={row.id} className={`${ui.card} p-4 sm:flex sm:items-start sm:justify-between sm:gap-4`}>
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-[var(--poskoo-ink)]">{row.rule_name ?? "Deleted automation"}</p>
+                  <p className="truncate font-semibold text-[var(--poskoo-ink)]">{row.rule_name ?? "Deleted Auto-DM"}</p>
                   <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                     {row.status === "sent" && row.sent_at ? <>Sent <LocalTime value={row.sent_at} /></> : <>Queued <LocalTime value={row.created_at} /></>}
                     {" · "}
                     {attemptsText(row.status, row.attempts)}
                   </p>
                   {row.status === "pending" && row.rule_paused && (
-                    <p className="mt-2 text-sm text-[var(--poskoo-ink)]">Waiting: this automation is paused.</p>
+                    <p className="mt-2 text-sm text-[var(--poskoo-ink)]">Waiting: this Auto-DM is paused.</p>
                   )}
                   {row.status === "pending" && !row.rule_paused && row.next_attempt_at && (
                     <p className="mt-2 text-sm text-[var(--poskoo-ink)]">Next try: <LocalTime value={row.next_attempt_at} /></p>

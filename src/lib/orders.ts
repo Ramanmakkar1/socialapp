@@ -179,6 +179,7 @@ export async function handleStripeEvent(
         break;
     }
     await client.query("commit");
+    if (event.type.startsWith("checkout.session.")) notifyOrderAfterRecord((object as SessionLike).id);
     return "processed";
   } catch (err) {
     await client.query("rollback").catch(() => undefined);
@@ -199,6 +200,15 @@ export async function recordSessionFromSuccessPage(session: SessionLike, seller:
   } finally {
     client.release();
   }
+  notifyOrderAfterRecord(session.id);
+}
+
+/**
+ * Post-record hook: e-mails the creator ("new order") and the buyer (receipt with the download
+ * link) once the order is paid. Runs after the response, once per session (email_sends), never throws.
+ */
+function notifyOrderAfterRecord(checkoutSessionId: string): void {
+  void import("@/lib/emailNotify").then((m) => m.inBackground("order", () => m.notifyOrderPaid(checkoutSessionId))).catch(() => undefined);
 }
 
 export async function countOrders(userId: string): Promise<number> {

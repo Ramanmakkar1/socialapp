@@ -41,8 +41,8 @@ test("draft opened by URL: the first render already holds every saved field", ()
   assert.equal(state.mainCaption, "Draft one caption");
   assert.equal(state.firstComment, "#tags");
   assert.deepEqual(state.tags, ["Launch"]);
-  assert.deepEqual(state.enabled, { instagram: true, facebook: false, threads: false, youtube: false });
-  assert.deepEqual(state.customize, { instagram: true, facebook: false, threads: false, youtube: false });
+  assert.deepEqual(state.enabled, { instagram: true, facebook: false, threads: false, youtube: false, tiktok: false, bluesky: false, mastodon: false, linkedin: false, pinterest: false, x: false, gbp: false });
+  assert.deepEqual(state.customize, { instagram: true, facebook: false, threads: false, youtube: false, tiktok: false, bluesky: false, mastodon: false, linkedin: false, pinterest: false, x: false, gbp: false });
   assert.equal(state.customCaption.instagram, "IG only text");
   assert.deepEqual(state.mediaUrls, ["https://cdn.example.com/a.jpg", "https://cdn.example.com/b.jpg"]);
   assert.equal(state.igFormat, "feed");
@@ -101,4 +101,14 @@ test("an edited time is read in the user's time zone; DST-gap times and garbage 
     assert.deepEqual(scheduleInstantForSave("not a date", null), { ok: false });
     assert.deepEqual(scheduleInstantForSave("", origin), { ok: true, iso: null });
   });
+});
+
+test("a draft for the new networks reopens with them selected and their custom captions", () => {
+  const state = composerStateFromDraft(draft({ platforms: ["bluesky", "x"], overrides: { x: "short for X" } }));
+  assert.equal(state.enabled.instagram, false);
+  assert.equal(state.enabled.bluesky, true);
+  assert.equal(state.enabled.x, true);
+  assert.equal(state.enabled.tiktok, false);
+  assert.equal(state.customize.x, true);
+  assert.equal(state.customCaption.x, "short for X");
 });

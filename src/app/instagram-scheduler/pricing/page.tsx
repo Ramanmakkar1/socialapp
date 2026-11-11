@@ -10,7 +10,7 @@ import { AnimArt } from "@/components/AnimArt";
 const PATH = "/instagram-scheduler/pricing";
 const title = "Instagram Scheduler Pricing: Plans & Limits | Poskoo";
 const description =
-  "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Free plan today; paid plans coming soon.";
+  "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free, upgrade to Pro or Agency any time.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -31,7 +31,7 @@ function limitFor(plan: Plan, matches: string[]) {
 }
 
 const allRows: { label: string; value: (plan: Plan) => string }[] = [
-  { label: "Price", value: (plan) => `${plan.price} ${plan.per}` },
+  { label: "Price", value: (plan) => `${plan.price} ${plan.per}${plan.yearly ? ` (${plan.yearly})` : ""}` },
   { label: "Social accounts", value: (plan) => limitFor(plan, ["social accounts"]) },
   { label: "Scheduled posts", value: (plan) => limitFor(plan, ["scheduled posts", "unlimited scheduling"]) },
   { label: "Instagram auto-DMs per month", value: (plan) => limitFor(plan, ["auto-DMs"]) },
@@ -60,7 +60,7 @@ const agencyDms = limitFor(agency, ["auto-DMs"]);
 const faqs = [
   {
     q: "How much does the Poskoo Instagram scheduler cost?",
-    a: `The Free plan is ${free.price} ${free.per} and includes ${freeAccounts}, ${freePosts} and ${freeDms}. Paid plans are coming soon: Pro will be ${proPrice} with ${proAccounts}, unlimited scheduling and ${proDms}, and Agency will be ${agency.price} ${agency.per} with ${agencyAccounts} and ${agencyDms}.`,
+    a: `The Free plan is ${free.price} ${free.per} and includes ${freeAccounts}, ${freePosts} and ${freeDms}. Pro is ${proPrice} (or ${pro.yearly}) with ${proAccounts}, unlimited scheduling and ${proDms}, and Agency is ${agency.price} ${agency.per} (or ${agency.yearly}) with ${agencyAccounts} and ${agencyDms}.`,
   },
   {
     q: "Is there a free Instagram scheduler plan?",
@@ -72,7 +72,7 @@ const faqs = [
   },
   {
     q: "Can I upgrade to Pro or Agency today?",
-    a: `Not yet. Paid plans are coming soon, so every account is on the Free plan for now. ${PLANS_NOTE}`,
+    a: `Yes. Press "Choose Pro" or "Choose Agency" on the pricing page, or open Settings > Plan & billing after you log in. You pay by card through Stripe. ${PLANS_NOTE}`,
   },
   {
     q: "Does the pricing table include competitor plan limits?",
@@ -123,7 +123,7 @@ export default function InstagramSchedulerPricingPage() {
         </h1>
         <p className="lede">
           Poskoo&apos;s Instagram scheduler starts on the Free plan at {free.price} {free.per}. The Free plan includes {freeAccounts},{" "}
-          {freePosts} and {freeDms}. Pro ({proPrice}, coming soon) adds {proAccounts}, unlimited scheduling and {proDms}.
+          {freePosts} and {freeDms}. Pro ({proPrice}) adds {proAccounts}, unlimited scheduling and {proDms}.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">

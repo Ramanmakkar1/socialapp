@@ -241,7 +241,7 @@ export function reassignQueueTimes(posts: QueuePostTime[], nowMs: number): Map<s
 }
 
 /** Platforms that have a posting schedule (posting_schedules.platform check). */
-export const SCHEDULABLE_PLATFORMS = ["instagram", "facebook", "threads"] as const;
+export const SCHEDULABLE_PLATFORMS = ["instagram", "facebook", "threads", "tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x"] as const;
 
 /** The default schedule offered and seeded for a new channel: Mon-Fri at 9:00, 12:00 and 18:00. */
 export const DEFAULT_SCHEDULE_DAYS = [1, 2, 3, 4, 5];

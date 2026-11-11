@@ -49,7 +49,7 @@
 .tableHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; padding: 16px 18px 12px; }
 .tableTitle { margin: 0; color: var(--poskoo-ink); font-size: 1.05rem; letter-spacing: -.01em; }
 .tableMeta { color: var(--poskoo-muted); font-size: .82rem; font-weight: 600; }
-.tableScroll { overflow-x: auto; }
+.tableScroll { position: relative; overflow-x: auto; }
 .table { width: 100%; min-width: 760px; border-collapse: collapse; }
 .table th {
   border-top: 1px solid var(--poskoo-line);
