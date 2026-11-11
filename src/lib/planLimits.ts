@@ -3,6 +3,7 @@
 import { isDbConfigured, query } from "@/lib/db";
 import { referralBonusDms } from "@/lib/referrals";
 import { planFromBilling, type BillingRow } from "@/lib/billingState";
+import { isAdminEmail } from "@/lib/admin";
 
 export type PlanName = "Free" | "Pro" | "Agency";
 export type PlanLimits = {
@@ -27,6 +28,16 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
  */
 export async function planForUser(userId: string): Promise<PlanName> {
   if (!userId || !isDbConfigured()) return "Free";
+  try {
+    // Admins (allow-listed AND email verified, same rule as the admin panel) get Agency limits.
+    const admins = await query<{ email: string }>(
+      "select email from socialapp.users where id=$1 and email_verified_at is not null",
+      [userId],
+    );
+    if (admins[0] && isAdminEmail(admins[0].email)) return "Agency";
+  } catch {
+    // Column or table missing: fall through to the billing lookup.
+  }
   try {
     const rows = await query<BillingRow>("select plan, status, past_due_since from socialapp.billing_subscriptions where user_id=$1", [userId]);
     return planFromBilling(rows[0]);
