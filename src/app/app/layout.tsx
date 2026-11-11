@@ -213,7 +213,8 @@ async function AppShell({ children }: { children: ReactNode }) {
   const channels = await getSidebarChannels(user.id);
   // Same rule as planLimits.planForUser (one read gives the plan AND the payment-failed state).
   const billing: StoredBilling | null = isDbConfigured() ? await getBilling(user.id).catch(() => null) : null;
-  const plan: PlanName = planFromBilling(billing);
+  // Admins get Agency limits (same rule as planLimits.planForUser).
+  const plan: PlanName = isAdmin(user) ? "Agency" : planFromBilling(billing);
   const limits = PLAN_LIMITS[plan];
   const upgradeIntent = plan === "Free" ? parseUpgradeIntent((await cookies()).get(UPGRADE_INTENT_COOKIE)?.value) : null;
   const paymentFailed = billing?.status === "past_due" || billing?.status === "unpaid";
