@@ -204,6 +204,13 @@ export default function ThreadsSchedulerPage() {
               />
             </div>
           </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+            New to this? Read the{" "}
+            <Link className={s.vlink} href="/help/schedule-threads-posts">
+              step-by-step guide to scheduling Threads posts
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
