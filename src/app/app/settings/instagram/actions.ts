@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { PICK_COOKIE, decodePick, saveFacebookLoginAccount } from "@/lib/metaAccounts";
 import { MetaApiError, fetchPagesWithInstagram } from "@/lib/metaLogin";
+import { accountLimitError } from "@/lib/planLimits";
 
 // Connects the Instagram account the user picked (re-reads the Page list with the stored user token,
 // so the Page token never passes through the browser).
@@ -15,11 +16,13 @@ export async function connectPickedAccountAction(formData: FormData): Promise<vo
   const store = await cookies();
   const pick = decodePick(store.get(PICK_COOKIE)?.value, user.id);
   if (!pick) redirect("/app/settings?ig=pick_expired");
-  let result: "connected" | "connected_no_webhooks" | "error" | "expired_code" = "error";
+  let result: "connected" | "connected_no_webhooks" | "error" | "expired_code" | "limit" = "error";
   try {
     const pages = await fetchPagesWithInstagram(pick.userToken);
     const page = pages.find((p) => p.igUserId === igUserId);
-    if (page) {
+    if (page && (await accountLimitError(user.id, { kind: "social", platform: "instagram", externalId: page.igUserId }))) {
+      result = "limit";
+    } else if (page) {
       const { subscribed } = await saveFacebookLoginAccount(user.id, page, pick.scopes, pick.metaUserId);
       result = subscribed ? "connected" : "connected_no_webhooks";
     }

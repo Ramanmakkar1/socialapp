@@ -5,11 +5,12 @@ import { BRAND } from "@/lib/brand";
 import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS, type Plan } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-scheduler/pricing";
 const title = "Instagram Scheduler Pricing: Plans & Limits | Poskoo";
 const description =
-  "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits, AI replies and lead capture.";
+  "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Free plan today; paid plans coming soon.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -29,21 +30,19 @@ function limitFor(plan: Plan, matches: string[]) {
   return item.soon ? `${item.text} (coming soon)` : item.text;
 }
 
-const rows: { label: string; value: (plan: Plan) => string }[] = [
+const allRows: { label: string; value: (plan: Plan) => string }[] = [
   { label: "Price", value: (plan) => `${plan.price} ${plan.per}` },
   { label: "Social accounts", value: (plan) => limitFor(plan, ["social accounts"]) },
   { label: "Scheduled posts", value: (plan) => limitFor(plan, ["scheduled posts", "unlimited scheduling"]) },
   { label: "Instagram auto-DMs per month", value: (plan) => limitFor(plan, ["auto-DMs"]) },
   { label: "AI caption and DM ideas", value: (plan) => limitFor(plan, ["AI caption"]) },
-  { label: "AI replies with contact capture", value: (plan) => limitFor(plan, ["AI replies"]) },
-  { label: "Email and phone capture", value: (plan) => limitFor(plan, ["Email & phone"]) },
+  { label: "Email capture in DMs", value: (plan) => limitFor(plan, ["Email capture"]) },
   { label: "Click and lead analytics", value: (plan) => limitFor(plan, ["Click + lead"]) },
   { label: "Link in bio page", value: (plan) => limitFor(plan, ["Link in bio"]) },
-  { label: "Client workspaces", value: (plan) => limitFor(plan, ["Client workspaces"]) },
-  { label: "Approve-before-post", value: (plan) => limitFor(plan, ["Approve-before-post"]) },
-  { label: "Team seats", value: (plan) => limitFor(plan, ["Team seats"]) },
   { label: "Priority support", value: (plan) => limitFor(plan, ["Priority support"]) },
 ];
+// A row that no plan lists says nothing, so it is not shown.
+const rows = allRows.filter((row) => PLANS.some((plan) => row.value(plan) !== "—"));
 
 const free = PLANS.find((plan) => plan.name === "Free") ?? PLANS[0];
 const pro = PLANS.find((plan) => plan.name === "Pro") ?? PLANS[1];
@@ -61,7 +60,7 @@ const agencyDms = limitFor(agency, ["auto-DMs"]);
 const faqs = [
   {
     q: "How much does the Poskoo Instagram scheduler cost?",
-    a: `The Free plan is ${free.price} ${free.per} and includes ${freeAccounts}, ${freePosts} and ${freeDms}. Pro is ${proPrice} with ${proAccounts}, unlimited scheduling and ${proDms}, and Agency is ${agency.price} ${agency.per} with ${agencyAccounts} and ${agencyDms}.`,
+    a: `The Free plan is ${free.price} ${free.per} and includes ${freeAccounts}, ${freePosts} and ${freeDms}. Paid plans are coming soon: Pro will be ${proPrice} with ${proAccounts}, unlimited scheduling and ${proDms}, and Agency will be ${agency.price} ${agency.per} with ${agencyAccounts} and ${agencyDms}.`,
   },
   {
     q: "Is there a free Instagram scheduler plan?",
@@ -72,8 +71,8 @@ const faqs = [
     a: `The Free plan includes ${freeDms}. Pro includes ${proDms}, and Agency includes ${agencyDms}.`,
   },
   {
-    q: "When can I upgrade to Pro or Agency?",
-    a: PLANS_NOTE,
+    q: "Can I upgrade to Pro or Agency today?",
+    a: `Not yet. Paid plans are coming soon, so every account is on the Free plan for now. ${PLANS_NOTE}`,
   },
   {
     q: "Does the pricing table include competitor plan limits?",
@@ -124,7 +123,7 @@ export default function InstagramSchedulerPricingPage() {
         </h1>
         <p className="lede">
           Poskoo&apos;s Instagram scheduler starts on the Free plan at {free.price} {free.per}. The Free plan includes {freeAccounts},{" "}
-          {freePosts} and {freeDms}. Pro costs {proPrice} and adds {proAccounts}, unlimited scheduling and {proDms}.
+          {freePosts} and {freeDms}. Pro ({proPrice}, coming soon) adds {proAccounts}, unlimited scheduling and {proDms}.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">
@@ -134,15 +133,7 @@ export default function InstagramSchedulerPricingPage() {
             Compare plan limits
           </a>
         </div>
-        <div className="hero-art" style={{ maxWidth: 720 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 720px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            alt="A creator pins post cards onto a weekly calendar while an alarm clock shows the scheduled time"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="pricing" label="A happy creator in an armchair holds one membership card while app cards and bills fly away" /></div>
       </header>
 
       <section id="plans" style={{ paddingTop: 20 }}>

@@ -39,11 +39,17 @@ test("non-admins and empty emails are rejected", () => {
   assert.equal(isAdminEmail("   "), false);
 });
 
-test("adminDecision: guest / non_admin / admin", () => {
+test("adminDecision: guest / non_admin / admin (allow-listed AND verified through Google)", () => {
   delete process.env.ADMIN_EMAILS;
   assert.equal(adminDecision(null), "guest");
-  assert.equal(adminDecision({ id: "1", email: "random@user.com", name: null }), "non_admin");
-  assert.equal(adminDecision({ id: "2", email: "TownMediaLabs@gmail.com", name: null }), "admin");
+  assert.equal(adminDecision({ id: "1", email: "random@user.com", name: null, emailVerified: true }), "non_admin");
+  assert.equal(adminDecision({ id: "2", email: "TownMediaLabs@gmail.com", name: null, emailVerified: true }), "admin");
+});
+
+test("an allow-listed email from a password sign-up (never verified) is NOT an admin", () => {
+  delete process.env.ADMIN_EMAILS;
+  assert.equal(adminDecision({ id: "3", email: "townmedialabs@gmail.com", name: null }), "non_admin");
+  assert.equal(adminDecision({ id: "3", email: "townmedialabs@gmail.com", name: null, emailVerified: false }), "non_admin");
 });
 
 test("adminAudit inserts a row with the target and details", async () => {

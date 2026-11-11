@@ -6,6 +6,20 @@ import { getPostPerformance } from "@/lib/analytics";
 import { cleanMediaUrls, ideaInsertStatement, normalizeIdeaStatus } from "@/lib/ideas";
 import { savePostForUser } from "@/lib/savePost";
 import type { PlatformId } from "@/lib/platforms";
+import { createHash } from "node:crypto";
+import { rateLimit, type RateLimitResult } from "@/lib/rateLimit";
+
+// MCP request limits: per API key (authenticated use) and per IP (stops key guessing before the DB lookup).
+export const MCP_KEY_LIMIT_PER_MINUTE = 60;
+export const MCP_IP_LIMIT_PER_MINUTE = 120;
+
+/** Rate limit one MCP request. The raw key is never kept in memory: buckets use a short hash. */
+export function mcpRateLimit(apiKey: string, ip: string, now = Date.now()): RateLimitResult {
+  const byIp = rateLimit(`mcp-ip:${ip}`, MCP_IP_LIMIT_PER_MINUTE, 60_000, now);
+  if (!byIp.ok) return byIp;
+  const keyHash = createHash("sha256").update(apiKey).digest("hex").slice(0, 32);
+  return rateLimit(`mcp-key:${keyHash}`, MCP_KEY_LIMIT_PER_MINUTE, 60_000, now);
+}
 
 export type McpTool = {
   name: string;

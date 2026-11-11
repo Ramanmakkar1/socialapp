@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { Settings } from "lucide-react";
 import EmptyState from "../EmptyState";
@@ -12,12 +13,17 @@ import { isDbConfigured, query } from "@/lib/db";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
+import { facebookPageStatus } from "@/lib/facebookPublish";
+import { accountLimitMessage, PLAN_LIMITS, planForUser } from "@/lib/planLimits";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
 import { createApiKeyAction, deleteMyAccountAction, disconnectAccountAction, disconnectYouTubeAction, revokeApiKeyAction, saveAiReplySettings, saveBrandVoice } from "./actions";
 import AccountProfile from "./AccountProfile";
 import AiReplyPreview from "./AiReplyPreview";
 import ChannelSchedules, { type ChannelScheduleInput } from "./ChannelSchedules";
 import DeleteAccountForm from "./DeleteAccountForm";
+import PaymentsSettings from "./PaymentsSettings";
+import ScheduleSeeder from "./ScheduleSeeder";
+import { SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import styles from "../app-page.module.css";
 
 export const metadata = { title: "Settings" };
@@ -32,6 +38,8 @@ type Account = {
   token_expires_at: Date | null;
   auth_type: string | null;
   page_name: string | null;
+  page_id: string | null;
+  scopes: string[] | null;
 };
 
 function tokenState(a: Account): "ok" | "expiring" | "expired" {
@@ -54,6 +62,8 @@ const TOKEN_PILL: Record<ReturnType<typeof tokenState>, { label: string; classNa
 
 function platformLabel(p: string): string {
   if (p === "threads") return "Threads";
+  if (p === "facebook") return "Facebook";
+  if (p === "instagram") return "Instagram";
   return p;
 }
 
@@ -94,9 +104,9 @@ const YOUTUBE_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
   error: { tone: "warn", text: "We couldn't connect your YouTube channel. Please try again." },
 };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[]; yt?: string | string[]; api_key?: string | string[]; key?: string | string[] }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[]; yt?: string | string[]; api_key?: string | string[]; key?: string | string[]; payments?: string | string[] }> }) {
   const user = await requireUser();
-  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam, api_key: apiKeyParam, key: keyParam } = await searchParams;
+  const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam, api_key: apiKeyParam, key: keyParam, payments: paymentsParam } = await searchParams;
   const apiKey = typeof apiKeyParam === "string" ? apiKeyParam : null;
   const newKey = typeof keyParam === "string" && keyParam.startsWith("poskoo_") ? keyParam : null;
   const voiceSaved = voiceParam === "saved";
@@ -111,10 +121,24 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const youtubeBanner = typeof ytParam === "string" && Object.hasOwn(YOUTUBE_BANNERS, ytParam) ? YOUTUBE_BANNERS[ytParam] : null;
   const accounts = isDbConfigured()
     ? await query<Account>(
-        "select id, external_id, access_token_enc, platform, username, status, token_expires_at, auth_type, page_name from socialapp.social_accounts where user_id=$1 order by created_at",
+        "select id, external_id, access_token_enc, platform, username, status, token_expires_at, auth_type, page_name, page_id, scopes from socialapp.social_accounts where user_id=$1 order by created_at",
         [user.id]
       )
     : [];
+  // Facebook Page posting rides on an Instagram account connected with Facebook Login: the same rule
+  // as the composer decides what the Facebook row shows (facebookPageStatus).
+  const facebook = facebookPageStatus(accounts.map((a) => ({ ...a, has_token: a.access_token_enc !== null })));
+  const limitBanner = [ig, threadsParam, ytParam].includes("limit")
+    ? accountLimitMessage(PLAN_LIMITS[planForUser()].socialAccounts, planForUser())
+    : null;
+  let emailVerifiedAt: Date | null = null;
+  if (isDbConfigured() && user.emailVerified) {
+    try {
+      emailVerifiedAt = (await query<{ email_verified_at: Date | null }>("select email_verified_at from socialapp.users where id=$1", [user.id]))[0]?.email_verified_at ?? null;
+    } catch {
+      emailVerifiedAt = null;
+    }
+  }
   const voiceRows = isDbConfigured()
     ? await query<{ brand_voice: string | null }>("select brand_voice from socialapp.users where id=$1", [user.id])
     : [];
@@ -131,21 +155,32 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   // Per-channel posting schedules, only for channels the user has connected.
   const connectedPlatforms = [...new Set(accounts.filter((a) => a.status === "active").map((a) => a.platform))];
   const channelSchedules: ChannelScheduleInput[] = [];
+  let scheduleRowCount = 0;
+  let schedulesReadable = false;
   if (isDbConfigured()) {
     try {
       const schedRows = await query<{ platform: string; timezone: string; days: number[]; times: string[] }>(
         "select platform, timezone, days, times from socialapp.posting_schedules where user_id=$1",
         [user.id],
       );
+      schedulesReadable = true;
+      scheduleRowCount = schedRows.length;
       for (const row of schedRows) {
         if (connectedPlatforms.includes(row.platform)) {
-          channelSchedules.push({ platform: row.platform, timezone: row.timezone, days: row.days ?? [], times: row.times ?? [] });
+          channelSchedules.push({ platform: row.platform, timezone: row.timezone, days: row.days ?? [], times: row.times ?? [], saved: true });
         }
       }
     } catch {
       // posting_schedules not present yet (migration pending): treat as no schedules set.
     }
   }
+  // Every connected channel gets a schedule form, also before its first save (suggested default).
+  for (const platform of connectedPlatforms) {
+    if ((SCHEDULABLE_PLATFORMS as readonly string[]).includes(platform) && !channelSchedules.some((c) => c.platform === platform)) {
+      channelSchedules.push({ platform, timezone: "UTC", days: [], times: [], saved: false });
+    }
+  }
+  const seedSchedule = schedulesReadable && scheduleRowCount === 0 && channelSchedules.length > 0;
   channelSchedules.sort((a, b) => a.platform.localeCompare(b.platform));
   const youtubeChannel = isDbConfigured()
     ? (
@@ -171,6 +206,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       {threadsBanner && (
         <p role="status" className={`${ui.notice} ${threadsBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{threadsBanner.text}</p>
       )}
+      {limitBanner && (
+        <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>{limitBanner}</p>
+      )}
       {youtubeBanner && (
         <p role="status" className={`${ui.notice} ${youtubeBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{youtubeBanner.text}</p>
       )}
@@ -183,7 +221,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </div>
         <p className={ui.hint}>
           Instagram professional account linked to a Facebook Page required.{" "}
-          <a href="/help/getting-started" className={ui.link}>See the setup steps</a>
+          <Link href="/help/getting-started" className={ui.link}>See the setup steps</Link>
         </p>
         {!connectReady && (
           <p role="status" className={`${ui.notice} ${ui.noticeWarn}`}>
@@ -204,6 +242,34 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         ) : (
           <ul className={styles.accountList}>
             {accounts.map((a, i) => {
+              if (a.platform === "facebook") {
+                const fbOk = a.status !== "disconnected" && facebook.ready;
+                return (
+                  <li key={`facebook-${a.id}`} className={styles.accountCard}>
+                    <div className={styles.accountIdentity}>
+                      <span className={styles.username}>{a.page_name ?? facebook.pageName ?? "Facebook Page"}</span>
+                      <span className={`${ui.pill} ${styles.platform}`}>Facebook</span>
+                    </div>
+                    <div className={styles.accountActions}>
+                      <span className={fbOk ? `${ui.pill} ${ui.pillMint}` : `${ui.pill} ${ui.pillPeach}`}>{fbOk ? "Connected" : "Reconnect needed"}</span>
+                      {!fbOk && (
+                        <>
+                          <p className={`${ui.hint} ${styles.accountNote}`}>
+                            Facebook posting uses your Instagram connection through Facebook. Reconnect Instagram and allow posting to your Page so Facebook posts publish.
+                          </p>
+                          <BtnA href="/api/instagram/connect" size="sm">Reconnect</BtnA>
+                        </>
+                      )}
+                      {a.status !== "disconnected" && (
+                        <form action={disconnectAccountAction}>
+                          <input type="hidden" name="account_id" value={a.id} />
+                          <SubmitButton label="Disconnect" pendingLabel="Disconnecting…" variant="ghost" size="sm" />
+                        </form>
+                      )}
+                    </div>
+                  </li>
+                );
+              }
               const state = tokenState(a);
               const pill = TOKEN_PILL[state];
               return (
@@ -214,7 +280,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         <AccountProfile account={a} fallbackUsername={a.username} />
                       </Suspense>
                     ) : (
-                      <span className={styles.username}>@{a.username ?? "unknown"}</span>
+                      <span className={styles.username}>{a.username ? `@${a.username}` : (a.page_name ?? `${platformLabel(a.platform)} account`)}</span>
                     )}
                     <span className={`${ui.pill} ${styles.platform}`}>{platformLabel(a.platform)}</span>
                   </div>
@@ -384,13 +450,17 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           Pick the days and times each channel should publish. The composer&apos;s “Add to queue” and “Next available” use these slots.
         </p>
         {isDbConfigured() ? (
-          <ChannelSchedules channels={channelSchedules} />
+          <>
+            <ScheduleSeeder needed={seedSchedule} />
+            <ChannelSchedules channels={channelSchedules} />
+          </>
         ) : (
           <p className={ui.hint}>Channel schedules can be saved once the database is set up on this server.</p>
         )}
         {scheduleSaved && <p role="status" className={ui.notice}>Posting schedule saved.</p>}
         {scheduleFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your posting schedule. Please try again.</p>}
       </section>
+      <PaymentsSettings userId={user.id} status={typeof paymentsParam === "string" ? paymentsParam : undefined} />
       <section className={styles.section} aria-labelledby="api-keys-heading">
         <div className={styles.sectionHeader}>
           <h2 id="api-keys-heading" className={styles.sectionTitle}>API keys</h2>
@@ -440,6 +510,26 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             ))}
           </ul>
         )}
+      </section>
+      <section className={styles.section} aria-labelledby="signin-heading">
+        <h2 id="signin-heading" className={styles.sectionTitle}>Sign-in and email</h2>
+        <ul className={styles.accountList}>
+          <li className={styles.accountCard}>
+            <div className={styles.accountIdentity}>
+              <span className={styles.username}>{user.email}</span>
+            </div>
+            <div className={styles.accountActions}>
+              <span className={user.emailVerified ? `${ui.pill} ${ui.pillMint}` : `${ui.pill} ${ui.pillPeach}`}>
+                {user.emailVerified ? "Email verified" : "Email not verified"}
+              </span>
+              <p className={`${ui.hint} ${styles.accountNote}`}>
+                {user.emailVerified
+                  ? `Verified with Google${emailVerifiedAt ? ` on ${new Date(emailVerifiedAt).toLocaleDateString()}` : ""}. Sign in with “Continue with Google”.`
+                  : "To verify this email, log out and sign in with “Continue with Google” using the same address. Your password then stops working and you sign in with Google from then on."}
+              </p>
+            </div>
+          </li>
+        </ul>
       </section>
       <section className={styles.section} aria-labelledby="danger-heading">
         <h2 id="danger-heading" className={styles.sectionTitle}>Delete account</h2>

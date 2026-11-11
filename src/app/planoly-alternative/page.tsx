@@ -4,8 +4,9 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
-import CompareHeroIllustration from "@/components/CompareHeroIllustration";
+import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = {
   title: { absolute: `Planoly Alternative With Instagram Auto-DM | ${BRAND.name}` },
@@ -23,11 +24,11 @@ const whyLook = [
 const compare: [string, string, string][] = [
   ["Instagram scheduling", "Yes", "Yes"],
   ["Calendar view", "Yes", "Yes"],
-  ["Comment→DM keyword automation", "Yes", "No"],
-  ["AI-written DM messages", "Yes", "No"],
-  ["Email capture in DMs", "Yes", "No"],
-  ["Lead CSV export", "Yes", "No"],
-  ["Facebook / Threads publishing", "Yes", "Varies by plan"],
+  ["Comment→DM keyword automation", "Yes", "Check their site"],
+  ["AI DM message ideas", "Yes", "Check their site"],
+  ["Email capture in DMs", "Yes", "Check their site"],
+  ["Lead CSV export", "Yes", "Check their site"],
+  ["Facebook / Threads publishing", "Yes", "Check their site"],
 ];
 
 const switchSteps = [
@@ -40,7 +41,7 @@ const faqs = [
   { q: `Is ${BRAND.name} a Planoly alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram, Facebook Pages and Threads scheduling and publishing today, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
   { q: "Does Planoly send automatic DMs when someone comments?", a: "Planoly is built for planning and publishing visual content. Comment-to-DM automation is not part of Planoly itself; teams usually add a tool like ManyChat for that." },
   { q: "Can I import my Planoly media library or schedule?", a: `There is no Planoly import yet. Download assets from Planoly if needed, then upload them when you create posts in ${BRAND.name}. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
-  { q: "Which platforms does each tool support?", a: `Instagram, Facebook Pages and Threads scheduling and Instagram auto-DMs work today on ${BRAND.name}, with more networks later. Planoly supports additional networks; see their site for the current list.` },
+  { q: "Which platforms does each tool support?", a: `Instagram, Facebook Pages, Threads and YouTube scheduling and Instagram auto-DMs work today on ${BRAND.name}. Other networks are on the roadmap, with no date yet. Planoly supports additional networks; see their site for the current list.` },
   { q: "Is there a free plan?", a: `Yes. The Free plan is $0 forever and includes 2 social accounts, 10 scheduled posts per month and 500 auto-DMs per month. Every account starts on it.` },
 ];
 
@@ -74,10 +75,7 @@ export default function PlanolyAlternative() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
-        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
-        <div className="hero-art">
-          <Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/multichannel.webp" width={1400} height={933} alt="A creator at a laptop sends one post that splits to several phones and screens" />
-        </div>
+        <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
 
       {/* Why people look for a Planoly alternative */}
@@ -126,6 +124,7 @@ export default function PlanolyAlternative() {
               </tbody>
             </table>
           </div>
+          <CompareNote />
           <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Planoly features and plans change over time. Check their site for current details. We do not list their prices here.</p>
         </div>
       </section>

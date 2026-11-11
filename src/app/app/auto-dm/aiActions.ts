@@ -2,6 +2,7 @@
 
 import { requireUser } from "@/lib/auth";
 import { generateDmIdeas, isAiConfigured, type DmIdeasResult } from "@/lib/ai";
+import { consumeAiRequest } from "@/lib/aiQuota";
 import { isDbConfigured, query } from "@/lib/db";
 
 export async function suggestDmMessages(input: {
@@ -32,6 +33,19 @@ export async function suggestDmMessages(input: {
       if (v) brandVoice = v.slice(0, 500);
     } catch {
       /* column may not exist yet; ignore */
+    }
+  }
+  if (!isAiConfigured()) {
+    return { ok: false, error: "AI is not set up on this server yet." };
+  }
+  // Per-user limits: a short burst limit and a monthly quota (src/lib/aiQuota.ts).
+  if (isDbConfigured()) {
+    try {
+      const quota = await consumeAiRequest(user.id, "dm_ideas");
+      if (!quota.ok) return { ok: false, error: quota.error };
+    } catch (err) {
+      console.error("ai quota check failed for user", user.id, err instanceof Error ? err.message : err);
+      return { ok: false, error: "AI suggestions are not available right now. Please try again." };
     }
   }
   return generateDmIdeas({ goal, keyword, hasLink: input.hasLink, emailGate: input.emailGate, tone, brandVoice });

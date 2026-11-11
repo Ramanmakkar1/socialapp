@@ -24,12 +24,20 @@ export function isAdminEmail(email: string | null | undefined): boolean {
 export type AdminDecision = "admin" | "guest" | "non_admin";
 
 // Pure decision used by requireAdmin() so it can be tested without a request context.
+// Admin = allow-listed email AND that email proved through Google sign-in (email_verified_at).
+// A password sign-up with an admin's address is never an admin: sign-up proves nothing.
 export function adminDecision(user: CurrentUser | null): AdminDecision {
   if (!user) return "guest";
-  return isAdminEmail(user.email) ? "admin" : "non_admin";
+  return isAdminEmail(user.email) && user.emailVerified === true ? "admin" : "non_admin";
 }
 
-// The logged-in admin, or a 404 for guests and non-admins alike.
+// For UI (e.g. the "Admin" link): same rule as requireAdmin().
+export function isAdmin(user: CurrentUser | null): boolean {
+  return adminDecision(user) === "admin";
+}
+
+// The logged-in admin, or a 404 for guests and non-admins alike. Call it in the admin layout AND
+// in every admin page, route handler and server action (layouts are not a security boundary).
 export async function requireAdmin(): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user || adminDecision(user) !== "admin") {

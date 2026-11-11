@@ -13,6 +13,7 @@ type QueueRow = {
   id: string;
   user_id: string;
   rule_id: string | null;
+  contact_id?: string | null;
   social_account_id: string;
   status: string;
   created_at: number;
@@ -220,6 +221,12 @@ function inboundEventRow(accountExternalId: string, senderId: string, at: Date) 
   };
 }
 
+/** Refer-and-earn bonus DMs returned for every user by the harness (planLimits.monthlyAutoDmLimit). */
+let harnessReferralBonus = 0;
+
+/** recordLeadMagnetDelivery calls seen by the harness pool (follow_check deliveries). */
+const magnetDeliveries: { userId: string; ruleId: string; contactId: string }[] = [];
+
 function installSendDueDmsHarness(
   accounts: MockSocialAccount[],
   queue: MockDmQueueRow[],
@@ -253,7 +260,14 @@ function installSendDueDmsHarness(
       if (mock == null) return { rows: [] };
       return { rows: [inboundEventRow(accountExternalId, senderId, mock)] };
     }
-    throw new Error(`unexpected pool query: ${sql.slice(0, 80)}`);
+    if (sql.includes("from socialapp.referrals where referrer_user_id=$1 and qualified_at is not null")) {
+      return { rows: [{ n: harnessReferralBonus }] };
+    }
+    if (sql.includes("insert into socialapp.lead_magnet_deliveries")) {
+      magnetDeliveries.push({ userId: String(params?.[0]), ruleId: String(params?.[1]), contactId: String(params?.[2]) });
+      return { rows: [{ delivered: 1 }] };
+    }
+        throw new Error(`unexpected pool query: ${sql.slice(0, 80)}`);
   };
 
   const clientQuery = (clientId: string) => async (sql: string, params?: unknown[]) => {
@@ -319,6 +333,7 @@ function installSendDueDmsHarness(
           id: q.id,
           user_id: q.user_id,
           rule_id: q.rule_id,
+          contact_id: q.contact_id ?? null,
           comment_id: q.comment_id,
           recipient_external_id: q.recipient_external_id,
           message: q.message,
@@ -336,6 +351,14 @@ function installSendDueDmsHarness(
       const row = queue.find((q) => q.id === params?.[0]);
       if (row) {
         row.status = "skipped";
+        row.last_error = params?.[1] as string;
+      }
+      return { rows: [] };
+    }
+    if (sql.startsWith("update socialapp.dm_queue set status='failed', last_error=$2")) {
+      const row = queue.find((q) => q.id === params?.[0]);
+      if (row) {
+        row.status = "failed";
         row.last_error = params?.[1] as string;
       }
       return { rows: [] };
@@ -897,7 +920,7 @@ test("sendDueDms: inbound lookup failure keeps the DM pending via rollback", asy
 // ---- follow_check rows: durable follower re-check with backoff, then a clear give-up (bug g) ----
 
 function followCheckRow(attempts: number) {
-  return dmFollowUpRow({ id: "q-follow", social_account_id: "acc-1", kind: "follow_check", attempts, message: "LINK MESSAGE" });
+  return dmFollowUpRow({ id: "q-follow", social_account_id: "acc-1", kind: "follow_check", attempts, message: "LINK MESSAGE", contact_id: "contact-1" });
 }
 
 async function runFollowCheck(attempts: number, following: boolean | null) {
@@ -961,7 +984,10 @@ test("sendDueDms: follow_check gives up clearly after the last attempt", async (
 });
 
 test("sendDueDms: follow_check sends the link to a follower and a nudge to a non-follower", async () => {
+  magnetDeliveries.length = 0;
   const yes = await runFollowCheck(2, true);
+  // The retried gated link is a lead-magnet delivery too (recorded once it is actually sent).
+  assert.deepEqual(magnetDeliveries, [{ userId: "user-1", ruleId: "rule-active", contactId: "contact-1" }]);
   assert.equal(yes.result.sent, 1);
   assert.match(yes.sentBodies[0], /LINK MESSAGE/);
   assert.ok(yes.updates.some((u) => u.sql.includes("set kind='gated_link'")));
@@ -969,6 +995,13 @@ test("sendDueDms: follow_check sends the link to a follower and a nudge to a non
   assert.equal(no.result.sent, 1);
   assert.match(no.sentBodies[0], /not following yet/);
   assert.ok(no.updates.some((u) => u.sql.includes("set kind='follow_nudge'")));
+  assert.equal(magnetDeliveries.length, 1, "a follow nudge is not a delivery");
+});
+
+test("sendDueDms: a follow_check that is still waiting records no lead-magnet delivery", async () => {
+  magnetDeliveries.length = 0;
+  await runFollowCheck(1, null);
+  assert.equal(magnetDeliveries.length, 0);
 });
 
 test("sendDueDms: the monthly auto-DM plan limit is enforced on the server", async () => {
@@ -998,6 +1031,46 @@ test("sendDueDms: the monthly auto-DM plan limit is enforced on the server", asy
       assert.match(ctx.queue[0]?.last_error ?? "", /Monthly auto-DM limit reached \(500 on the Free plan\)/);
     }
   );
+});
+
+test("sendDueDms: referral bonus DMs raise the monthly limit (500 + 2 x 500), then it is enforced", async () => {
+  let sends = 0;
+  globalThis.fetch = async () => {
+    sends += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  for (const [used, expectSent] of [[500, 1], [1499, 1], [1500, 0]] as const) {
+    sends = 0;
+    harnessReferralBonus = 1000;
+    try {
+      await withSendDueDmsEnv(
+        [{ id: "acc-1", external_id: "ig-1", status: "active", dm_cooldown_until: null, access_token_enc: "", created_at: 1 }],
+        [baseQueueRow({ id: `q-${used}`, social_account_id: "acc-1" })],
+        [{ id: "rule-active", user_id: "user-1", social_account_id: "acc-1", status: "active" }],
+        async (ctx) => {
+          const connect = ctx.pool.connect.bind(ctx.pool);
+          (ctx.pool as unknown as { connect: () => Promise<unknown> }).connect = async () => {
+            const client = (await connect()) as unknown as { query: (sql: string, params?: unknown[]) => Promise<unknown> };
+            const original = client.query;
+            client.query = async (sql: string, params: unknown[] = []) =>
+              sql.includes("kind <> 'manual_reply'") ? { rows: [{ n: used }] } : original(sql, params);
+            return client;
+          };
+          const { sendDueDms } = await import("./sender.ts");
+          const result = await sendDueDms(50);
+          assert.equal(sends, expectSent, `used=${used}`);
+          if (expectSent === 0) {
+            assert.equal(result.skipped, 1);
+            assert.match(ctx.queue[0]?.last_error ?? "", /Monthly auto-DM limit reached \(1,500 on the Free plan\)/);
+          } else {
+            assert.equal(ctx.queue[0]?.status, "sent");
+          }
+        }
+      );
+    } finally {
+      harnessReferralBonus = 0;
+    }
+  }
 });
 
 // Facebook Login for Business accounts: same queue, Graph host = graph.facebook.com with the Page token.
@@ -1082,6 +1155,27 @@ test("sendDueDms (facebook login): 'too many' / code 613 puts the account on coo
       assert.equal(result.retried, 1);
       assert.equal(ctx.queue[0]?.status, "pending");
       assert.ok(ctx.accounts[0].dm_cooldown_until && ctx.accounts[0].dm_cooldown_until.getTime() > Date.now());
+    }
+  );
+});
+
+test("sendDueDms: a message with an unresolved {{link}} is never sent; the item fails with a clear reason", async () => {
+  let sends = 0;
+  globalThis.fetch = async () => {
+    sends += 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  await withSendDueDmsEnv(
+    [{ id: "acc-1", external_id: "ig-1", status: "active", dm_cooldown_until: null, access_token_enc: "", created_at: 1 }],
+    [baseQueueRow({ id: "q-link", social_account_id: "acc-1", message: "Here you go: {{link}}" })],
+    [{ id: "rule-active", user_id: "user-1", social_account_id: "acc-1", status: "active" }],
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(sends, 0);
+      assert.equal(result.failed, 1);
+      assert.equal(ctx.queue[0]?.status, "failed");
+      assert.match(ctx.queue[0]?.last_error ?? "", /still contained \{\{link\}\}/);
     }
   );
 });

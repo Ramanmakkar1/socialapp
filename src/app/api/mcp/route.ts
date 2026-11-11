@@ -3,7 +3,8 @@
 // Authorization: Bearer poskoo_…
 // See the /developers page for setup.
 import { userForApiKey } from "@/lib/apiKeys";
-import { callMcpTool, MCP_TOOLS } from "@/lib/mcp";
+import { callMcpTool, mcpRateLimit, MCP_TOOLS } from "@/lib/mcp";
+import { clientIp } from "@/lib/rateLimit";
 
 const PROTOCOL_VERSION = "2025-06-18";
 
@@ -32,6 +33,14 @@ function unauthorized(): Response {
 export async function POST(req: Request) {
   const key = bearerKey(req);
   if (!key) return unauthorized();
+  const limited = mcpRateLimit(key, clientIp(req.headers));
+  if (!limited.ok) {
+    const retryAfter = Math.max(1, Math.ceil(limited.retryAfterMs / 1000));
+    return Response.json(
+      { jsonrpc: "2.0", id: null, error: { code: -32029, message: `Rate limit reached. Try again in ${retryAfter} seconds.` } },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } },
+    );
+  }
   const userId = await userForApiKey(key);
   if (!userId) return unauthorized();
 

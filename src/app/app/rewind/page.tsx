@@ -1,12 +1,11 @@
-import { History } from "lucide-react";
+import Link from "next/link";
+import { History, RefreshCw } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
-import EmptyState from "../EmptyState";
 import LoadFailed from "../calendar/LoadFailed";
-import RewindFlow from "./RewindFlow";
+import RewindFlow, { type RewindRule } from "./RewindFlow";
 import LocalTime from "@/components/LocalTime";
-import { BtnLink, PageHero } from "@/components/ui/kit";
-import ui from "@/components/ui/ui.module.css";
+import styles from "./rewind.module.css";
 
 export const metadata = {
   title: "Rewind",
@@ -14,7 +13,7 @@ export const metadata = {
     "Send your auto-DM to comments from the past 7 days that your automation missed. Pick an automation, scan recent posts and queue the DMs.",
 };
 
-type Rule = { id: string; name: string };
+type RuleRow = { id: string; name: string; status: string; triggers: string[] | null; keywords: string[] | null; dm_text: string | null };
 
 type Run = {
   id: string;
@@ -25,31 +24,42 @@ type Run = {
   rule_name: string | null;
 };
 
+// Same conditions rewindRule() (src/lib/rewind.ts) checks before scanning.
+function unavailableReason(rule: RuleRow): string | null {
+  if (rule.status !== "active") return "This automation is paused. Turn it on to rewind it.";
+  if (!(rule.triggers ?? []).includes("comment")) return "Rewind replays post comments, and this automation has no comment trigger.";
+  return null;
+}
+
+function Header() {
+  return (
+    <header className={styles.head}>
+      <span className={styles.headIcon} aria-hidden="true"><History width={20} height={20} /></span>
+      <div>
+        <h1 className={styles.h1}>Rewind</h1>
+        <p className={styles.sub}>Send DMs to comments your automation missed</p>
+      </div>
+    </header>
+  );
+}
+
 export default async function RewindPage() {
   const user = await requireUser();
   const configured = isDbConfigured();
   const loadFailure = (
-    <>
-      <PageHero
-        eyebrow="Catch up on past comments"
-        title="Rewind"
-        lede="Send your auto-DM to recent comments it missed."
-        art="/landing/card-leads.webp"
-        artAlt=""
-      />
-      <LoadFailed
-        className="mt-6"
-        message="Rewind could not be loaded. Reload to try again."
-        reloadHref="/app/rewind"
-      />
-    </>
+    <div className={styles.page}>
+      <Header />
+      <LoadFailed className="mt-6" message="Rewind could not be loaded. Reload to try again." reloadHref="/app/rewind" />
+    </div>
   );
-  let rules: Rule[];
+  let rules: RuleRow[];
   try {
-    rules = configured ? await query<Rule>(
-      "select id, name from socialapp.dm_rules where user_id=$1 and status='active' and 'comment' = any(triggers) order by name",
-      [user.id]
-    ) : [];
+    rules = configured
+      ? await query<RuleRow>(
+          "select id, name, status, triggers, keywords, dm_text from socialapp.dm_rules where user_id=$1 order by (status='active' and 'comment' = any(triggers)) desc, name",
+          [user.id]
+        )
+      : [];
   } catch {
     return loadFailure;
   }
@@ -62,74 +72,64 @@ export default async function RewindPage() {
   } catch {
     return loadFailure;
   }
+  const flowRules: RewindRule[] = rules.map((r) => ({ id: r.id, name: r.name, keywords: r.keywords ?? [], dmText: r.dm_text ?? "", unavailable: unavailableReason(r) }));
 
   return (
-    <>
-      <PageHero
-        eyebrow="Catch up on past comments"
-        title="Rewind"
-        lede="Pick an automation and Poskoo scans your latest posts, then queues the DM to comments from the past 7 days it missed."
-        art="/landing/card-leads.webp"
-        artAlt=""
-      />
+    <div className={styles.page}>
+      <Header />
       {rules.length === 0 ? (
-        <div className={`${ui.card} ${ui.mint} mt-6 p-5 text-[.95rem]`}>
-          <p className="m-0 text-[var(--poskoo-ink)]">
-            No comment automations to rewind yet.
-          </p>
-          <p className="mt-2 text-[var(--poskoo-muted)]">
-            Create an automation with a comment trigger and it will appear here, ready to replay on your recent posts.
-          </p>
-          <BtnLink href="/app/auto-dm" size="sm" className="mt-3">
-            Create an automation
-          </BtnLink>
-        </div>
+        <section className={styles.card}>
+          <h2 className={styles.h2}>Choose an automation to rewind</h2>
+          <div className={styles.empty}>
+            <p><b>No comment automations to rewind yet.</b></p>
+            <p>Create an automation with a comment trigger and it will appear here, ready to replay on your recent posts.</p>
+            <Link href="/app/auto-dm" className={styles.primary}>Create an automation</Link>
+          </div>
+        </section>
       ) : (
-        <div className="mt-6">
-          <RewindFlow rules={rules.map((rule) => ({ id: rule.id, name: rule.name }))} />
-        </div>
+        <RewindFlow rules={flowRules} />
       )}
-      <h2 className="mt-10 text-xl font-bold text-[var(--poskoo-ink)]">Recent scans</h2>
-      {runs.length === 0 ? (
-        <p className={`${ui.hint} mt-3`}>
-          No scans yet. Run your first rewind above and it will be listed here with what was queued.
-        </p>
-      ) : (
-        <div className={`mt-4 ${ui.tableWrap}`}>
-          <table className={ui.table}>
-            <thead>
-              <tr>{["When", "Automation", "Comments scanned", "DMs queued", "Status"].map((heading) => <th key={heading} scope="col" className={ui.th}>{heading}</th>)}</tr>
-            </thead>
-            <tbody>{runs.map((run) => (
-              <tr key={run.id} className={ui.tr}>
-                <td className={ui.td}><LocalTime value={run.created_at} style="medium" fallback="-" /></td>
-                <td className={ui.td}>{run.rule_name || "—"}</td>
-                <td className={ui.td}>{run.scanned}</td>
-                <td className={ui.td}>{run.queued}</td>
-                <td className={ui.td}>
-                  {run.failures > 0 ? (
-                    <span className="text-[var(--poskoo-coral)]">Partial scan ({run.failures} failed)</span>
-                  ) : (
-                    <span className="text-[var(--poskoo-green)]">Complete</span>
-                  )}
-                </td>
-              </tr>
-            ))}</tbody>
-          </table>
+
+      <section className={styles.card} aria-labelledby="rewind-history">
+        <div className={styles.cardHead}>
+          <h2 id="rewind-history" className={styles.h2}>Rewind history</h2>
+          <Link href="/app/rewind" className={styles.ghost} prefetch={false}>
+            <RefreshCw width={14} height={14} aria-hidden="true" /> Refresh
+          </Link>
         </div>
-      )}
-      {rules.length === 0 && runs.length === 0 ? (
-        <div className="mt-10">
-          <EmptyState
-            icon={History}
-            title="Nothing to rewind yet"
-            text="Once you have a comment automation and recent posts, you can replay the DM on past comments here."
-            art="/illustrations/empty-leads.webp"
-            artWidth={1536}
-            artHeight={1024}
-          />
-        </div>
-      ) : null}
-    </>
+        {runs.length === 0 ? (
+          <div className={styles.empty}>
+            <History width={22} height={22} aria-hidden="true" className={styles.emptyIcon} />
+            <p><b>No rewind jobs yet</b></p>
+            <p>Run your first rewind above and it will be listed here with what was queued.</p>
+          </div>
+        ) : (
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr>{["When", "Automation", "Comments scanned", "DMs queued", "Status"].map((h) => <th key={h} scope="col">{h}</th>)}</tr>
+              </thead>
+              <tbody>
+                {runs.map((run) => (
+                  <tr key={run.id}>
+                    <td><LocalTime value={run.created_at} style="medium" fallback="-" /></td>
+                    <td>{run.rule_name || "—"}</td>
+                    <td className={styles.num}>{run.scanned}</td>
+                    <td className={styles.num}>{run.queued}</td>
+                    <td>
+                      {run.failures > 0 ? (
+                        <span className={`${styles.pill} ${styles.pillWarn}`}>Partial ({run.failures} failed)</span>
+                      ) : (
+                        <span className={`${styles.pill} ${styles.pillOk}`}>Complete</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
   );
 }

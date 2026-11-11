@@ -18,7 +18,7 @@ export const PERFORMANCE_CSV_HEADERS = [
   "Published (UTC)",
   "Platforms",
   "Reach",
-  "Impressions",
+  "Views",
   "Likes",
   "Comments",
   "Saves",

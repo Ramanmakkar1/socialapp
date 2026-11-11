@@ -5,10 +5,11 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-dm-automation";
 const title = `Instagram DM Automation: Turn Comments Into Leads | ${BRAND.name}`;
-const description = `Instagram DM automation replies to comment keywords, Story replies and incoming DMs, captures emails and sends AI answers. See how ${BRAND.name} works.`;
+const description = `Instagram DM automation replies to comment keywords, Story replies and DM keywords, and captures emails before sending your link. See how ${BRAND.name} works.`;
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -31,28 +32,27 @@ const useCases = [
   },
   {
     no: "03 / Leads",
-    title: "Email and phone capture",
-    text: "Ask for an email or phone number in the chat before you send the link, so each conversation becomes a contact you can follow up with.",
+    title: "Email capture",
+    text: "Ask for an email in the chat before you send the link, so each conversation becomes a contact you can follow up with.",
   },
   {
-    no: "04 / Replies",
-    title: "AI replies",
-    text: "When people ask a question in the DM, AI answers in your voice and can share your link, keeping the conversation moving without manual typing.",
+    no: "04 / DMs",
+    title: "DM keyword triggers",
+    text: "When someone sends you a DM with your keyword, the automation replies once per conversation with your message and link.",
   },
 ];
 
 const compare: [string, string, string][] = [
-  ["Response speed", "As fast as you can type", "Sent in seconds, day or night"],
+  ["Response speed", "As fast as you can type", "Usually within a minute, day or night"],
   ["Coverage", "Only while you are online", "Every matching comment and Story reply"],
-  ["Lead capture", "Copy details by hand", "Email and phone captured in the chat"],
-  ["Follow-up questions", "You write each reply", "AI replies in your voice"],
+  ["Lead capture", "Copy details by hand", "Email captured in the chat"],
   ["Best for", "A handful of replies", "Posts with hundreds of comments"],
 ];
 
 const faqs = [
   {
     q: "What does Instagram DM automation do?",
-    a: "It sends a direct message automatically when someone comments a keyword on your post or reel, replies to your Story with a keyword, or asks a question in a DM. Poskoo handles the reply, can capture an email or phone number, and can answer follow-up questions with AI.",
+    a: "It sends a direct message automatically when someone comments a keyword on your post or reel, replies to your Story with a keyword, or sends you a DM with a keyword. Poskoo sends the reply and can ask for an email before sharing your link.",
   },
   {
     q: "How do comment keyword triggers work?",
@@ -63,8 +63,8 @@ const faqs = [
     a: "Yes. If someone replies to your Story with your keyword, the automation sends the same kind of DM it sends for post comments, so you do not have to watch your inbox all day.",
   },
   {
-    q: "Can it capture emails and phone numbers?",
-    a: "Yes. You can ask for an email or phone number in the chat before sharing your link, so every automated conversation can become a lead instead of a one-off reply.",
+    q: "Can it capture emails?",
+    a: "Yes. You can ask for an email in the chat before sharing your link, so every automated conversation can become a lead instead of a one-off reply.",
   },
   {
     q: "Does Instagram DM automation break the rules?",
@@ -87,8 +87,8 @@ const appJsonLd = {
   featureList: [
     "Instagram comment keyword triggers",
     "Instagram Story reply triggers",
-    "Email and phone capture in DMs",
-    "AI replies in your voice",
+    "Instagram DM keyword triggers",
+    "Email capture in DMs",
     "Click and lead tracking",
   ],
   offers: SOFTWARE_APPLICATION_OFFERS,
@@ -131,8 +131,8 @@ export default function InstagramDmAutomationPage() {
         </h1>
         <p className="lede">
           Instagram DM automation sends a direct message for you when someone comments a keyword on
-          your post or reel, replies to your Story, or messages you. {BRAND.name} replies in seconds,
-          captures their email and lets AI handle the follow-up questions.
+          your post or reel, replies to your Story, or messages you. {BRAND.name} usually replies within a minute
+          and can ask for their email before it sends your link.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">
@@ -147,16 +147,7 @@ export default function InstagramDmAutomationPage() {
             Test your comment keywords free
           </Link>
         </p>
-        <div className="hero-art" style={{ maxWidth: 640 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 640px"
-            src="/landing/card-dm.webp"
-            width={900}
-            height={900}
-            priority
-            alt="A creator relaxing while automated DMs fly from their phone to new followers"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /></div>
       </header>
 
       <section style={{ paddingTop: 20 }}>
@@ -165,8 +156,8 @@ export default function InstagramDmAutomationPage() {
             <p className="eyebrow">What it does</p>
             <h2>What Instagram DM automation <em className="s">handles for you.</em></h2>
             <p>
-              It does the repetitive replies: matching keywords, sending your link, asking for an
-              email and answering common questions. You set the rules once and the DMs keep going
+              It does the repetitive replies: matching keywords, sending your link and asking for an
+              email. You set the rules once and the DMs keep going
               while you create.
             </p>
           </div>

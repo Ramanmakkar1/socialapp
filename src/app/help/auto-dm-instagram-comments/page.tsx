@@ -22,7 +22,7 @@ const steps = [
       <>
         Auto-DM only works with an Instagram professional account (Business or Creator). Connect it through
         Meta&apos;s official Instagram login and allow message access. Follow the{" "}
-        <Link className={linkClass} href="/help/connect-instagram-account">connect your Instagram account guide</Link>{" "}
+        <Link className={linkClass} href="/help/getting-started">getting started guide</Link>{" "}
         if you haven&apos;t done this yet.
       </>
     ),
@@ -172,16 +172,14 @@ export default function AutoDmInstagramCommentsHelpPage() {
       />
       <header className="hero">
         <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
+        <h1>
             How to auto-DM people who comment on your <em className="s">Instagram posts</em>
           </h1>
-          <HelpGuideIllustration variant="autodm" className="w-36 shrink-0 sm:w-48" />
-        </div>
         <p className="lede">
           Send an automatic DM to everyone who comments a keyword. {BRAND.name} uses Meta&apos;s official Instagram
           API, so you set one rule and every matching comment gets your message and link.
         </p>
+        <HelpGuideIllustration variant="autodm" className="hero-art" />
       </header>
 
       {steps.map((st, i) => (

@@ -43,12 +43,18 @@ export default function AuthForm({
   mode,
   googleEnabled = false,
   googleError = null,
+  notice = null,
+  defaultEmail,
 }: {
   mode: "login" | "signup";
   /** Show "Continue with Google" (only when GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set). */
   googleEnabled?: boolean;
   /** Message after a failed Google sign-in (/login?google=...). */
   googleError?: string | null;
+  /** Confirmation shown above the form (e.g. /login?account=deleted). */
+  notice?: string | null;
+  /** Email typed into the landing hero (/signup?email=...). */
+  defaultEmail?: string;
 }) {
   const signup = mode === "signup";
   const [state, formAction, pending] = useActionState(signup ? signupAction : loginAction, undefined);
@@ -83,7 +89,7 @@ export default function AuthForm({
             )}
             <div>
               <label htmlFor="email" className={ui.label}>Email</label>
-              <input id="email" name="email" type="email" autoComplete="email" required className={INPUT} />
+              <input id="email" name="email" type="email" autoComplete="email" required defaultValue={defaultEmail} className={INPUT} />
             </div>
             <div>
               <label htmlFor="password" className={ui.label}>Password</label>
@@ -116,6 +122,9 @@ export default function AuthForm({
               {pending ? "Please wait…" : signup ? "Create account" : "Log in"}
             </button>
           </form>
+          {notice && (
+            <p role="status" className={`${ui.notice} ${a.googleNotice}`}>{notice}</p>
+          )}
           {googleError && (
             <p role="alert" className={`${ui.notice} ${ui.noticeWarn} ${a.googleNotice}`}>{googleError}</p>
           )}
@@ -123,6 +132,7 @@ export default function AuthForm({
             <>
               <p className={a.divider}><span>or</span></p>
               {/* Plain <a>: the OAuth start is a route handler redirect, never prefetched. */}
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth redirect, must not be client-routed */}
               <a href="/api/auth/google/start" className={`btn btn-line ${a.google}`}>
                 <GoogleG />
                 {signup ? "Sign up with Google" : "Continue with Google"}

@@ -1,0 +1,29 @@
+/* Public product buy page and thank-you page. Only --poskoo-* tokens. */
+.page {
+  min-height: 100vh;
+  padding: 40px 16px 56px;
+  background: var(--poskoo-band);
+  color: var(--poskoo-ink);
+}
+.shell {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.card {
+  overflow: hidden;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+}
+.cover { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--poskoo-lilac); }
+.body { display: flex; flex-direction: column; gap: 12px; padding: 22px; }
+.title { margin: 0; font-size: clamp(1.6rem, 5vw, 2.2rem); letter-spacing: -.02em; line-height: 1.1; }
+.price { margin: 0; font-size: 1.35rem; font-weight: 700; }
+.description { margin: 0; color: var(--poskoo-muted); white-space: pre-line; overflow-wrap: anywhere; }
+.fine { margin: 0; color: var(--poskoo-muted); font-size: .82rem; text-align: center; }
+.fine a { color: inherit; }

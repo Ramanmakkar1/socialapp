@@ -1,0 +1,60 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+const FADE_MS = 500;
+
+// Full-bleed looping hero video. The file itself is a seamless loop (its last
+// second crossfades into its first, see public/landing/hero-loop.mp4), so it
+// loops natively; JS only fades it in once on first play (requestAnimationFrame).
+export function HeroVideo({ src, poster }: { src: string; poster: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    let frame: number | null = null;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.pause();
+      video.style.opacity = "1";
+      return;
+    }
+
+    const fadeIn = () => {
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min((now - start) / FADE_MS, 1);
+        video.style.opacity = String(t);
+        frame = t < 1 ? requestAnimationFrame(step) : null;
+      };
+      frame = requestAnimationFrame(step);
+    };
+
+    video.addEventListener("playing", fadeIn, { once: true });
+    video.play().catch(() => {
+      // Autoplay blocked (e.g. low-power mode): show the poster frame instead.
+      video.style.opacity = "1";
+    });
+
+    return () => {
+      video.removeEventListener("playing", fadeIn);
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      className="heroVideo"
+      src={src}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      preload="auto"
+      aria-hidden="true"
+      tabIndex={-1}
+    />
+  );
+}

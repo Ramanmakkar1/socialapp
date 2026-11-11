@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import type { PlatformId } from "@/lib/platforms";
-import { nextSlot, nextSlotForChannel, type ChannelSchedule } from "@/lib/postingSchedule";
+import { nextSlot, nextSlotForChannel, upcomingSlots, type ChannelSchedule } from "@/lib/postingSchedule";
+import { scheduledPostLimitError } from "@/lib/planLimits";
 import { deletePostForUser, reorderQueueForUser, sharePostNow, UUID_RE } from "@/lib/postMutations";
 import { ALLOWED_PLATFORMS, savePostForUser, type SavePostInput } from "@/lib/savePost";
 import { hashtagGroupValidationError, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
@@ -66,6 +67,28 @@ export async function reorderQueue(orderedIds: string[]): Promise<{ ok: boolean;
   }
 }
 
+async function loadSchedules(userId: string, platforms: string[]): Promise<ChannelSchedule[]> {
+  let rows: { platform: string; timezone: string; days: number[]; times: string[] }[];
+  try {
+    rows = await query(
+      "select platform, timezone, days, times from socialapp.posting_schedules where user_id=$1",
+      [userId],
+    );
+  } catch {
+    rows = [];
+  }
+  return rows
+    .filter((row) => platforms.includes(row.platform))
+    .map((row) => ({
+      platform: row.platform as PlatformId,
+      timezone: row.timezone,
+      days: row.days ?? [],
+      times: row.times ?? [],
+    }));
+}
+
+const NO_SCHEDULE_ERROR = "Set a posting schedule in Settings → Channels first, then use “Next available”.";
+
 // "Next available": the next free slot across the user's channel schedules for the given
 // platforms. The composer fills its time picker with the result.
 export async function nextAvailableSlot(
@@ -79,33 +102,44 @@ export async function nextAvailableSlot(
   if (valid.length === 0) {
     return { ok: false, error: "Select at least one platform." };
   }
-  let rows: { platform: string; timezone: string; days: number[]; times: string[] }[];
-  try {
-    rows = await query(
-      "select platform, timezone, days, times from socialapp.posting_schedules where user_id=$1",
-      [user.id],
-    );
-  } catch {
-    rows = [];
-  }
-  const schedules: ChannelSchedule[] = rows
-    .filter((row) => valid.includes(row.platform))
-    .map((row) => ({
-      platform: row.platform as PlatformId,
-      timezone: row.timezone,
-      days: row.days ?? [],
-      times: row.times ?? [],
-    }));
+  const schedules = await loadSchedules(user.id, valid);
   const nowMs = Date.now();
   const slotMs = nextSlot(schedules, nowMs);
   const schedule = schedules.find((candidate) => nextSlotForChannel(candidate, nowMs) === slotMs);
   if (slotMs === null || !schedule) {
-    return {
-      ok: false,
-      error: "Set a posting schedule in Settings → Channels first, then use “Next available”.",
-    };
+    return { ok: false, error: NO_SCHEDULE_ERROR };
   }
   return { ok: true, iso: new Date(slotMs).toISOString(), timeZone: schedule.timezone || "UTC" };
+}
+
+// "Next available ▾" menu: the next few schedule slots that no scheduled post already uses.
+export async function nextAvailableSlots(
+  platforms: string[],
+  count = 3,
+): Promise<{ ok: true; slots: { iso: string; timeZone: string }[] } | { ok: false; error: string }> {
+  if (!isDbConfigured()) {
+    return { ok: false, error: "Database not configured" };
+  }
+  const user = await requireUser();
+  const valid = platforms.filter((p) => (ALLOWED_PLATFORMS as string[]).includes(p));
+  if (valid.length === 0) {
+    return { ok: false, error: "Select at least one platform." };
+  }
+  const schedules = await loadSchedules(user.id, valid);
+  let taken: number[] = [];
+  try {
+    const rows = await query<{ scheduled_at: Date }>(
+      `select scheduled_at from socialapp.scheduled_posts
+       where user_id=$1 and status='scheduled' and scheduled_at > now() and scheduled_at < now() + interval '22 days'`,
+      [user.id],
+    );
+    taken = rows.map((r) => new Date(r.scheduled_at).getTime());
+  } catch {
+    // Without the taken list the menu still offers the schedule's next slots.
+  }
+  const slots = upcomingSlots(schedules, Date.now(), Math.min(Math.max(1, Math.floor(count)), 5), taken);
+  if (slots.length === 0) return { ok: false, error: NO_SCHEDULE_ERROR };
+  return { ok: true, slots: slots.map((slot) => ({ iso: new Date(slot.ms).toISOString(), timeZone: slot.timezone })) };
 }
 
 // "Share now": publish a queued post immediately by making it due for the publisher.
@@ -118,7 +152,8 @@ export async function shareNow(id: string): Promise<{ ok: boolean; error?: strin
   }
   const user = await requireUser();
   try {
-    const result = await sharePostNow(id, user.id);
+    // Same monthly plan limit as scheduling: the post moves into the current UTC month.
+    const result = await sharePostNow(id, user.id, (now) => scheduledPostLimitError(user.id, now, id));
     if (!result.ok) return result;
     revalidatePath("/app/calendar");
     revalidatePath("/app");

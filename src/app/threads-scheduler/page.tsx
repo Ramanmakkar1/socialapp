@@ -6,6 +6,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/threads-scheduler";
 const title = `Threads Scheduler: Plan & Auto-Publish Posts | ${BRAND.name}`;
@@ -151,16 +152,7 @@ export default function ThreadsSchedulerPage() {
           <Link className="btn btn-line" href="/app/calendar">Open the calendar</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
-        <div className="hero-art" style={{ maxWidth: 920 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 920px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            priority
-            alt="A creator schedules one post that is sent to Threads, Instagram and Facebook from a single calendar"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
       </header>
 
       <section>

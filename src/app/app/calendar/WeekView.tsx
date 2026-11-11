@@ -1,224 +1,172 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import type { DragEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { AtSign, ChevronLeft, ChevronRight, Facebook, Instagram, Plus, Youtube } from "lucide-react";
-import { reschedulePost } from "./rescheduleActions";
-import RescheduleControl from "./RescheduleControl";
+import { Plus } from "lucide-react";
 import LoadFailed, { type LoadError } from "./LoadFailed";
+import { CalendarGridSkeleton } from "../Skeleton";
+import PostCard from "./PostCard";
+import PostPopover from "./PostPopover";
+import { addDays, groupByDay, hourLabel, zonedParts, type AccountNames, type CalendarPost } from "./calendarUtils";
+import { useCalendar } from "./useCalendar";
 import styles from "./calendar.module.css";
 
-const PLATFORM_ICON: Record<string, typeof Instagram> = { instagram: Instagram, facebook: Facebook, threads: AtSign, youtube: Youtube };
-
-type WeekViewPost = {
-  id: string;
-  caption: string;
-  scheduled_at: Date | string | null;
-  status: string;
-  platforms: string[];
-};
-
 type WeekViewProps = {
-  posts: WeekViewPost[];
+  posts: CalendarPost[];
+  /** Monday of the week (UTC midnight); the 7 days are shown in the viewer's time zone. */
   weekStart: Date;
-  prevHref: string;
-  nextHref: string;
   /** "/app/calendar?view=week&week=...&compose=1"; "&day=YYYY-MM-DD" is added per day. */
   composeBase?: string;
-  todayHref?: string;
+  accounts?: AccountNames;
   loadError?: LoadError;
 };
 
-function utcDateKey(d: Date): string {
-  return d.toISOString().slice(0, 10);
+const MAX_IN_CELL = 3;
+const DEFAULT_HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+
+function dayLabels(key: string) {
+  const d = new Date(`${key}T12:00:00Z`);
+  return {
+    weekday: d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }),
+    num: d.getUTCDate(),
+    long: d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" }),
+  };
 }
 
-function formatWeekRange(weekStart: Date): string {
-  const weekEnd = new Date(weekStart);
-  weekEnd.setUTCDate(weekEnd.getUTCDate() + 6);
-  const fmt = (d: Date) =>
-    d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-  return `${fmt(weekStart)} – ${fmt(weekEnd)}`;
-}
+export default function WeekView({ posts, weekStart, composeBase, accounts = {}, loadError }: WeekViewProps) {
+  const { tz, error, dragOverKey, dropProps, open, openPost, closePost } = useCalendar(posts);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const todayKey = zonedParts(new Date(), tz).key;
+  const startKey = weekStart.toISOString().slice(0, 10);
+  const days = Array.from({ length: 7 }, (_, i) => addDays(startKey, i));
+  const byDay = groupByDay(posts, tz);
 
-function formatTimeUtc(at: Date | string): string {
-  const d = typeof at === "string" ? new Date(at) : at;
-  const h = d.getUTCHours().toString().padStart(2, "0");
-  const m = d.getUTCMinutes().toString().padStart(2, "0");
-  return `${h}:${m}`;
-}
-
-function formatLocal(at: Date | string): string {
-  const d = typeof at === "string" ? new Date(at) : at;
-  return d.toLocaleString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function formatLocalTime(at: Date | string): string {
-  return new Date(at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-}
-
-function captionPreview(caption: string): string {
-  const t = caption.trim();
-  return t.length > 90 ? `${t.slice(0, 90)}…` : t || "(no caption)";
-}
-
-const STATUS_LABEL: Record<string, string> = { draft: "Draft", failed: "Failed", published: "Published", publishing: "Publishing" };
-
-function isMovable(status: string): boolean {
-  return status === "scheduled" || status === "draft";
-}
-
-export default function WeekView({ posts, weekStart, prevHref, nextHref, composeBase, todayHref = "/app/calendar?view=week", loadError }: WeekViewProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
-  const [tz, setTz] = useState("");
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Read the browser time zone after hydration, matching Composer.
-    setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  }, []);
-  const todayKey = utcDateKey(new Date());
-  const byDay = new Map<string, WeekViewPost[]>();
-
-  for (const post of posts) {
-    if (!post.scheduled_at) continue;
-    const key = utcDateKey(new Date(post.scheduled_at));
-    const list = byDay.get(key);
-    if (list) list.push(post);
-    else byDay.set(key, [post]);
+  // Rows: every hour that has a post this week, or a working-day range when the week is empty.
+  const byCell = new Map<string, CalendarPost[]>();
+  const hourSet = new Set<number>();
+  for (const key of days) {
+    for (const post of byDay.get(key) ?? []) {
+      const { hour } = zonedParts(post.scheduled_at!, tz);
+      hourSet.add(hour);
+      const cell = `${key}|${hour}`;
+      byCell.set(cell, [...(byCell.get(cell) ?? []), post]);
+    }
   }
+  const hours = hourSet.size ? [...hourSet].sort((a, b) => a - b) : DEFAULT_HOURS;
 
-  const days: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(weekStart);
-    d.setUTCDate(d.getUTCDate() + i);
-    days.push(d);
-  }
-
-  function handleDrop(e: DragEvent<HTMLDivElement>, key: string, current: WeekViewPost[]) {
-    e.preventDefault();
-    setDragOverKey(null);
-    const id = e.dataTransfer.getData("text/plain");
-    if (!id || isPending) return;
-    if (current.some((p) => p.id === id)) return;
-    setError(null);
-    startTransition(async () => {
-      try {
-        const res = await reschedulePost(id, key);
-        if (!res.ok) {
-          setError(res.error ?? "Could not move post.");
-          return;
-        }
-        router.refresh();
-      } catch {
-        setError("Could not move post. Please try again.");
-      }
+  const toggle = (cell: string) =>
+    setExpanded((cur) => {
+      const next = new Set(cur);
+      if (next.has(cell)) next.delete(cell);
+      else next.add(cell);
+      return next;
     });
+
+  // Days and hours depend on the browser time zone, which is only known after hydration.
+  if (!tz) {
+    return (
+      <div className={styles.calWrap} role="status" aria-busy="true">
+        <span className={styles.srOnly}>Loading calendar</span>
+        <CalendarGridSkeleton />
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarNav}>
-          <Link href={todayHref} className={styles.todayBtn}>Today</Link>
-          <Link href={prevHref} className={styles.arrowBtn} aria-label="Previous week"><ChevronLeft width={18} height={18} aria-hidden="true" /></Link>
-          <Link href={nextHref} className={styles.arrowBtn} aria-label="Next week"><ChevronRight width={18} height={18} aria-hidden="true" /></Link>
-          <p className={styles.rangeLabel}>{formatWeekRange(weekStart)}</p>
-        </div>
-        <p className={styles.rangeHint}>
-          {tz ? <span className={styles.tzChip}>{tz}</span> : null}
-          <span className={styles.wideOnly}>Days in UTC · drag a post to another day to move it</span>
-        </p>
-      </div>
-      {error && (
-        <p role="alert" className={styles.errorText}>
-          {error}
-        </p>
-      )}
+    <div className={styles.calWrap}>
+      {error && <p role="alert" className={styles.errorText}>{error}</p>}
       {loadError && <LoadFailed {...loadError} className={styles.mb} />}
-      <div className={styles.weekGrid}>
-        {days.map((day) => {
-          const key = utcDateKey(day);
-          const dayPosts = byDay.get(key) ?? [];
-          const isToday = key === todayKey;
-          const weekday = day.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
-          const dateNum = day.getUTCDate();
-          const isPast = key < todayKey;
-          return (
-            <div
-              key={key}
-              onDragOver={(e) => {
-                e.preventDefault();
-                if (dragOverKey !== key) setDragOverKey(key);
-              }}
-              onDragLeave={() => {
-                if (dragOverKey === key) setDragOverKey(null);
-              }}
-              onDrop={(e) => handleDrop(e, key, dayPosts)}
-              className={[styles.weekCol, isToday ? styles.weekColToday : "", isPast ? styles.weekColPast : "", dragOverKey === key ? styles.weekColOver : ""].filter(Boolean).join(" ")}
-            >
-              <div className={styles.weekHead}>
-                <span className={styles.weekDay}>{weekday}</span>
-                <span className={`${styles.weekNum} ${isToday ? styles.weekNumToday : ""}`}>{dateNum}</span>
-                {dayPosts.length > 0 && <span className={styles.weekCount}>{dayPosts.length}</span>}
-              </div>
-              <div className={styles.weekPosts}>
-                {dayPosts.map((post) => {
-                  const movable = isMovable(post.status);
-                  return (
-                    <div key={`${post.id}-${key}`} className="min-w-0">
-                      <div
-                        draggable={movable}
-                        onDragStart={
-                          movable
-                            ? (e) => {
-                                e.dataTransfer.setData("text/plain", post.id);
-                                e.dataTransfer.effectAllowed = "move";
-                              }
-                            : undefined
-                        }
-                        className={[styles.postTile, post.status === "failed" ? styles.postTileFailed : "", post.status === "draft" ? styles.postTileDraft : "", post.status === "published" ? styles.postTilePublished : "", movable ? styles.chipMovable : ""].filter(Boolean).join(" ")}
-                        title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
-                      >
-                        <div className={styles.postTileTop}>
-                          <span className={styles.postTileIcons}>
-                            {(post.platforms.length ? post.platforms : ["instagram"]).map((p) => {
-                              const Icon = PLATFORM_ICON[p] ?? AtSign;
-                              return <Icon key={p} width={13} height={13} aria-label={p} className={styles[`ico_${p}`]} />;
-                            })}
-                          </span>
-                          <span className={styles.postTileTime} suppressHydrationWarning>
-                            {tz ? formatLocalTime(post.scheduled_at!) : `${formatTimeUtc(post.scheduled_at!)} UTC`}
-                          </span>
-                        </div>
-                        <p className={styles.postTileCaption}>{captionPreview(post.caption)}</p>
-                        {STATUS_LABEL[post.status] && <span className={styles.postTileStatus}>{STATUS_LABEL[post.status]}</span>}
-                      </div>
-                      {movable && <RescheduleControl id={post.id} scheduledAt={post.scheduled_at!} caption={post.caption} />}
-                    </div>
-                  );
-                })}
-                {composeBase && !isPast && (
-                  <Link href={`${composeBase}&day=${key}`} scroll={false} className={`${styles.addSlot} ${dayPosts.length ? "" : styles.addSlotEmpty}`} aria-label={`New post on ${weekday} ${dateNum}`}>
-                    <Plus width={16} height={16} aria-hidden="true" />
-                    <span>{dayPosts.length ? "Add" : "New post"}</span>
+
+      {/* Desktop / tablet: hour rows x 7 day columns. */}
+      <div className={styles.weekTable} role="table" aria-label="Posts this week by day and hour" aria-rowcount={hours.length + 1}>
+        <div className={styles.weekRow} role="row">
+          <span className={styles.hourCorner} role="columnheader" aria-label="Time" />
+          {days.map((key) => {
+            const { weekday, num } = dayLabels(key);
+            const isToday = key === todayKey;
+            const count = byDay.get(key)?.length ?? 0;
+            return (
+              <div key={key} role="columnheader" className={`${styles.dayHead} ${isToday ? styles.dayHeadToday : ""}`} aria-current={isToday ? "date" : undefined}>
+                <span className={styles.dayHeadName}>{weekday}</span>
+                <span className={styles.dayHeadNum}>{num}</span>
+                {count > 0 && <span className={styles.srOnly}>, {count} {count === 1 ? "post" : "posts"}</span>}
+                {composeBase && key >= todayKey && (
+                  <Link href={`${composeBase}&day=${key}`} scroll={false} className={styles.dayAdd} aria-label={`New post on ${dayLabels(key).long}`}>
+                    <Plus width={14} height={14} aria-hidden="true" />
                   </Link>
                 )}
-                {!composeBase && dayPosts.length === 0 && !loadError && <p className={styles.dash} aria-label="No posts">—</p>}
               </div>
-            </div>
+            );
+          })}
+        </div>
+        {hours.map((hour) => (
+          <div key={hour} className={styles.weekRow} role="row">
+            <span className={styles.hourLabel} role="rowheader">{hourLabel(hour)}</span>
+            {days.map((key) => {
+              const cell = `${key}|${hour}`;
+              const list = byCell.get(cell) ?? [];
+              const isOpen = expanded.has(cell);
+              const shown = isOpen ? list : list.slice(0, MAX_IN_CELL);
+              const extra = list.length - MAX_IN_CELL;
+              return (
+                <div
+                  key={cell}
+                  role="cell"
+                  {...dropProps(key, byDay.get(key) ?? [])}
+                  className={[styles.cell, key === todayKey ? styles.cellToday : "", key < todayKey ? styles.cellPast : "", dragOverKey === key ? styles.cellOver : ""].filter(Boolean).join(" ")}
+                >
+                  {shown.map((post) => (
+                    <PostCard key={post.id} post={post} tz={tz} onOpen={openPost} />
+                  ))}
+                  {extra > 0 && (
+                    <button type="button" className={styles.moreBtn} aria-expanded={isOpen} onClick={() => toggle(cell)}>
+                      {isOpen ? "Show less" : `${extra} more`}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* Phones: one agenda list per day. */}
+      <ol className={styles.agenda} aria-label="Posts this week">
+        {days.map((key) => {
+          const list = byDay.get(key) ?? [];
+          const isToday = key === todayKey;
+          const { long } = dayLabels(key);
+          return (
+            <li key={key} className={styles.agendaDay}>
+              <div className={styles.agendaHead}>
+                <h3 className={styles.agendaTitle}>
+                  {long}
+                  {isToday && <span className={styles.todayTag}>Today</span>}
+                </h3>
+                {composeBase && key >= todayKey && (
+                  <Link href={`${composeBase}&day=${key}`} scroll={false} className={styles.agendaAdd} aria-label={`New post on ${long}`}>
+                    <Plus width={16} height={16} aria-hidden="true" />
+                  </Link>
+                )}
+              </div>
+              {list.length ? (
+                <div className={styles.agendaList}>
+                  {list.map((post) => <PostCard key={post.id} post={post} tz={tz} onOpen={openPost} />)}
+                </div>
+              ) : (
+                <p className={styles.agendaEmpty}>No posts</p>
+              )}
+            </li>
           );
         })}
-      </div>
+      </ol>
+
+      <p className={styles.calHint}>
+        <span className={styles.wideOnly}>Drag a scheduled post or draft to another day to move it (the time stays the same). </span>
+        Open a post to edit, duplicate, reschedule or delete it.
+      </p>
+
+      {open && <PostPopover key={open.post.id} post={open.post} anchor={open.anchor} tz={tz} accounts={accounts} onClose={closePost} />}
     </div>
   );
 }

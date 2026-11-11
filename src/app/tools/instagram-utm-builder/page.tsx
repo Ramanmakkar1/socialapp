@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import UtmBuilder from "./UtmBuilder";
 import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-utm-builder";
 const description =
@@ -56,16 +57,7 @@ export default function InstagramUtmBuilderPage() {
           Add campaign tags to the links in your bio, Story stickers and auto-DMs so your website analytics can show
           which Instagram placement sent each visit.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-dm.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="analytics" label="A creator waters a growing bar chart while hearts float up" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

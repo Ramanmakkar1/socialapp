@@ -2,6 +2,7 @@ import { maybeQueueAiReply } from "@/lib/aiReplyQueue";
 import { buildCommentDmMessage } from "@/lib/commentMessage";
 import { getPool, query } from "@/lib/db";
 import { accountToken, isFollower } from "@/lib/followCheck";
+import { recordLeadMagnetDelivery } from "@/lib/leadMagnets";
 import { shortLinkFor } from "@/lib/links";
 import { matchComment, type MatchableRule } from "@/lib/match";
 import {
@@ -340,13 +341,17 @@ export async function processMessageEvents(
       };
       const linkMessage = gatedLinkMessage(await linkFor(account.user_id, pending.rule_id, pending.link_url));
       if (!pending.follow_gate) {
-        await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage });
+        if (await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage })) {
+          await recordLeadMagnetDelivery(account.user_id, pending.rule_id, contactId);
+        }
         continue;
       }
       const creds = await accountToken(account.id);
       const following = creds ? await isFollower(event.senderId, creds.token, creds.authType) : null;
       if (following === true) {
-        await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage });
+        if (await enqueueGatedDm({ ...base, kind: "gated_link", message: linkMessage })) {
+          await recordLeadMagnetDelivery(account.user_id, pending.rule_id, contactId);
+        }
       } else if (following === false) {
         await enqueueGatedDm({ ...base, kind: "follow_nudge", message: FOLLOW_NUDGE_MESSAGE });
       } else {

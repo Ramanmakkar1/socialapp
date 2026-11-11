@@ -16,14 +16,19 @@ import {
   toggleCommentHidden,
   withinWindow,
 } from "@/lib/inbox";
+import { inboxReturnParams } from "./returnTo";
 
 function field(formData: FormData, key: string, max = 1000): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }
 
-function back(params: Record<string, string>): never {
-  redirect(`/app/inbox?${new URLSearchParams(params).toString()}`);
+function back(params: Record<string, string>, formData?: FormData): never {
+  // Keep the user on the post/filter/layout they were looking at (selection used to reset to the first post).
+  const merged = { ...(formData ? inboxReturnParams(formData) : {}), ...params };
+  for (const k of Object.keys(merged)) if (!merged[k]) delete merged[k];
+  const qs = new URLSearchParams(merged).toString();
+  redirect(qs ? `/app/inbox?${qs}` : "/app/inbox");
 }
 
 function failMessage(err: unknown): string {
@@ -37,11 +42,11 @@ export async function replyToCommentAction(formData: FormData): Promise<void> {
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
   const message = field(formData, "message", 2200);
-  if (!isDbConfigured() || !accountId || !commentId || !message) back({ error: "Write a reply first." });
+  if (!isDbConfigured() || !accountId || !commentId || !message) back({ error: "Write a reply first." }, formData);
   const account = await userAccount(user.id, accountId);
-  if (!account) back({ error: "Reconnect Instagram in Settings to reply." });
+  if (!account) back({ error: "Reconnect Instagram in Settings to reply." }, formData);
   const comment = await commentReceivedAt(account.external_id, commentId);
-  if (!comment) back({ error: "We couldn't find that comment." });
+  if (!comment) back({ error: "We couldn't find that comment." }, formData);
   let error = "";
   try {
     await replyToCommentPublicly(account, commentId, message);
@@ -56,7 +61,7 @@ export async function replyToCommentAction(formData: FormData): Promise<void> {
       console.error("replyToCommentAction: reply sent but not marked done", commentId, err instanceof Error ? err.message : err);
     }
   }
-  back(error ? { error } : { ok: "comment" });
+  back(error ? { error } : { ok: "comment" }, formData);
 }
 
 // One private DM reply to a comment (allowed within 7 days of the comment).
@@ -65,12 +70,12 @@ export async function privateReplyAction(formData: FormData): Promise<void> {
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
   const message = field(formData, "message", 1000);
-  if (!isDbConfigured() || !accountId || !commentId || !message) back({ error: "Write a message first." });
+  if (!isDbConfigured() || !accountId || !commentId || !message) back({ error: "Write a message first." }, formData);
   const account = await userAccount(user.id, accountId);
-  if (!account) back({ error: "Reconnect Instagram in Settings to send DMs." });
+  if (!account) back({ error: "Reconnect Instagram in Settings to send DMs." }, formData);
   const comment = await commentReceivedAt(account.external_id, commentId);
   if (!comment || !withinWindow(comment.at, PRIVATE_REPLY_WINDOW_MS)) {
-    back({ error: "Instagram only allows a private reply within 7 days of the comment." });
+    back({ error: "Instagram only allows a private reply within 7 days of the comment." }, formData);
   }
   // Claim the comment first so an auto-DM and a manual reply can never both go out.
   const claimed = await query<{ id: string }>(
@@ -79,7 +84,7 @@ export async function privateReplyAction(formData: FormData): Promise<void> {
     [user.id, account.id, commentId, comment.fromId, message]
   );
   const rowId = claimed[0]?.id;
-  if (!rowId) back({ error: "This comment already got a private reply." });
+  if (!rowId) back({ error: "This comment already got a private reply." }, formData);
   const sent = await guardedDmSend(account, async () => {
     await graphCall(account, `${encodeURIComponent(account.external_id)}/messages`, {
       method: "POST",
@@ -99,7 +104,7 @@ export async function privateReplyAction(formData: FormData): Promise<void> {
   } catch (err) {
     console.error("privateReplyAction: could not record reply", rowId, err instanceof Error ? err.message : err);
   }
-  back(sent.ok ? { ok: "private" } : { error: sent.error });
+  back(sent.ok ? { ok: "private" } : { error: sent.error }, formData);
 }
 
 // Reply inside a DM thread (instagram_business_manage_messages), only within 24 h of their last message.
@@ -136,13 +141,13 @@ export async function hideCommentAction(formData: FormData): Promise<void> {
   const user = await requireUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
-  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." });
+  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." }, formData);
   try {
     await toggleCommentHidden(user.id, accountId, commentId);
   } catch {
-    back({ error: "We couldn't update the comment. Please try again." });
+    back({ error: "We couldn't update the comment. Please try again." }, formData);
   }
-  back({ filter: field(formData, "filter", 16) });
+  back({}, formData);
 }
 
 // Like the comment on Instagram (instagram_business_manage_comments, the same permission as replies).
@@ -150,9 +155,9 @@ export async function likeCommentAction(formData: FormData): Promise<void> {
   const user = await requireUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
-  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." });
+  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." }, formData);
   const account = await userAccount(user.id, accountId);
-  if (!account) back({ error: "Reconnect Instagram in Settings to like comments." });
+  if (!account) back({ error: "Reconnect Instagram in Settings to like comments." }, formData);
   let error = "";
   try {
     await likeComment(account, commentId);
@@ -160,8 +165,7 @@ export async function likeCommentAction(formData: FormData): Promise<void> {
   } catch (err) {
     error = failMessage(err);
   }
-  const filter = field(formData, "filter", 16);
-  back(error ? { filter, error } : { filter, ok: "liked" });
+  back(error ? { error } : { ok: "liked" }, formData);
 }
 
 // Mark a comment done (answered) / reopen it.
@@ -169,11 +173,11 @@ export async function toggleDoneAction(formData: FormData): Promise<void> {
   const user = await requireUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
-  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." });
+  if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." }, formData);
   try {
     await toggleCommentDone(user.id, accountId, commentId);
   } catch {
-    back({ error: "We couldn't update the comment. Please try again." });
+    back({ error: "We couldn't update the comment. Please try again." }, formData);
   }
-  back({ filter: field(formData, "filter", 16) });
+  back({}, formData);
 }

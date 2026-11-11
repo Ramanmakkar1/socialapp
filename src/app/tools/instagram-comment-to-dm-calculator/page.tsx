@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import CampaignCalculator from "./CampaignCalculator";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-comment-to-dm-calculator";
 const description =
@@ -64,16 +65,7 @@ export default function InstagramCommentToDmCalculatorPage() {
           Estimate how many comments, DMs and link clicks a comment-keyword campaign could produce from your views and
           conversion rates. Adjust any number to see the estimate change.
         </p>
-        <div className="hero-art" style={{ maxWidth: 640 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 640px"
-            src="/landing/card-dm.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A relaxed creator on a beanbag while DMs fly out of their phone to followers"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="analytics" label="A creator waters a growing bar chart while hearts float up" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

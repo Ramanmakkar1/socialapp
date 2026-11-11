@@ -12,7 +12,9 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 days, in seconds
 const DUMMY_HASH =
   "scrypt$16384$8$1$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
 
-export type CurrentUser = { id: string; email: string; name: string | null };
+// emailVerified: the email was proved through Google sign-in (users.email_verified_at, migration 037).
+// Password sign-ups are never verified (the app sends no e-mail). Missing = not verified.
+export type CurrentUser = { id: string; email: string; name: string | null; emailVerified?: boolean };
 
 // Creates a user; returns null if the email is already taken.
 export async function createUser(email: string, password: string, name?: string): Promise<CurrentUser | null> {
@@ -77,11 +79,22 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     if (!token) {
       return null;
     }
-    const rows = await query<CurrentUser>(
-      "select u.id, u.email, u.name from sessions s join users u on u.id = s.user_id where s.id = $1 and s.expires_at > now()",
-      [hashToken(token)]
-    );
-    return rows[0] ?? null;
+    const id = hashToken(token);
+    try {
+      const rows = await query<CurrentUser>(
+        'select u.id, u.email, u.name, (u.email_verified_at is not null) as "emailVerified" from sessions s join users u on u.id = s.user_id where s.id = $1 and s.expires_at > now()',
+        [id]
+      );
+      return rows[0] ?? null;
+    } catch (err) {
+      // Before migration 037 there is no email_verified_at: keep everyone signed in, unverified.
+      if ((err as { code?: unknown })?.code !== "42703") throw err;
+      const rows = await query<CurrentUser>(
+        "select u.id, u.email, u.name from sessions s join users u on u.id = s.user_id where s.id = $1 and s.expires_at > now()",
+        [id]
+      );
+      return rows[0] ? { ...rows[0], emailVerified: false } : null;
+    }
   } catch {
     return null;
   }

@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
-import CompareHeroIllustration from "@/components/CompareHeroIllustration";
+import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = {
   title: { absolute: `Publer Alternative with Instagram Auto-DM | ${BRAND.name}` },
@@ -15,27 +17,27 @@ export const metadata: Metadata = {
 };
 
 const whySwitch = [
-  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page and Threads posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },
+  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page, Threads and YouTube posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },
   { no: "02 / Free to start", title: "Start on the Free plan", text: `${BRAND.name} Free includes 2 social accounts, 10 scheduled posts / month and 500 auto-DMs / month.` },
-  { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email or phone number in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
+  { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
 const compare: [string, string, string, string][] = [
   ["Social media scheduling", "Yes", "Yes", "Yes"],
   ["Instagram, Facebook Page and Threads publishing", "Yes", "See their site", "Depends on the tools"],
   ["Instagram comment-to-DM automation", "Yes", "See their site", "Depends on the DM tool"],
-  ["Email or phone capture in the DM", "Yes", "See their site", "Depends on the DM tool"],
+  ["Email capture in the DM", "Yes", "See their site", "Depends on the DM tool"],
   ["AI caption ideas", "Yes", "See their site", "See their site"],
-  ["AI-written DM messages", "Yes", "See their site", "Depends on the DM tool"],
+  ["AI DM message ideas", "Yes", "See their site", "Depends on the DM tool"],
   ["Lead tracking from comment to DM", "Yes", "See their site", "Depends on the DM tool"],
-  ["Starting price", "$19 / month", "See their pricing", "Two subscriptions"],
+  ["Price", PRICE_SUMMARY, "See their pricing", "Two subscriptions"],
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Publer alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in. It can also answer DMs with AI replies that collect contact details and share your booking link.` },
+  { q: `Is ${BRAND.name} a Publer alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
   { q: "What is Publer?", a: "Publer is a social media scheduler that supports many social networks. For the details of its features and plans, see their site — this page focuses on what Poskoo does." },
   { q: "Can I import my existing Publer schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
-  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs. YouTube, LinkedIn, Pinterest, TikTok and WhatsApp come later." },
+  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages, Threads and YouTube (videos and Shorts) scheduling work today, plus Instagram auto-DMs. LinkedIn, Pinterest, TikTok and WhatsApp are on the roadmap, with no date yet." },
   { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
@@ -69,10 +71,7 @@ export default function PublerAlternative() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
-        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
-        <div className="hero-art">
-          <Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/multichannel.webp" width={1400} height={933} alt="A creator at a laptop sends one post that splits to several phones and screens" />
-        </div>
+        <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
 
       {/* Why people switch */}
@@ -123,6 +122,7 @@ export default function PublerAlternative() {
               </tbody>
             </table>
           </div>
+          <CompareNote />
         </div>
       </section>
 

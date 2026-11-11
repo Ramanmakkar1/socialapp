@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import HashtagGenerator from "./HashtagGenerator";
 import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-hashtag-generator";
 const title = "Instagram Hashtag Generator: Free Niche Hashtag Sets";
@@ -66,15 +67,7 @@ export default function InstagramHashtagGeneratorPage() {
         <p className="lede">
           Pick your niche, find a useful mix and copy a set for your next post. Hand-curated suggestions, generated entirely in your browser.
         </p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1536}
-            height={1024}
-            alt="A creator at a laptop sends one post that splits to several phones and screens"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="hashtag" label="A creator juggles colourful hashtag balloons above a phone post" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

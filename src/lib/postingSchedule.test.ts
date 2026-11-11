@@ -123,3 +123,46 @@ test("reassignQueueTimes gives unscheduled drafts a one-minute cadence", () => {
 test("reassignQueueTimes handles an empty queue", () => {
   assert.deepEqual(reassignQueueTimes([], Date.now()), new Map());
 });
+
+test("upcomingSlots lists the next slots across channels, earliest first, with each channel's timezone", async () => {
+  const { upcomingSlots } = await import("./postingSchedule.ts");
+  const ig: ChannelSchedule = { platform: "instagram", timezone: "UTC", days: [1, 2, 3, 4, 5], times: ["09:00", "17:00"] };
+  const fb: ChannelSchedule = { platform: "facebook", timezone: "America/New_York", days: [1], times: ["09:00"] };
+  const now = Date.UTC(2026, 10, 9, 8, 0); // Mon 08:00 UTC
+  assert.deepEqual(upcomingSlots([ig, fb], now, 3), [
+    { ms: Date.UTC(2026, 10, 9, 9, 0), timezone: "UTC" },
+    { ms: Date.UTC(2026, 10, 9, 14, 0), timezone: "America/New_York" },
+    { ms: Date.UTC(2026, 10, 9, 17, 0), timezone: "UTC" },
+  ]);
+});
+
+test("upcomingSlots skips slots already taken by scheduled posts and stops when there are none", async () => {
+  const { upcomingSlots } = await import("./postingSchedule.ts");
+  const ig: ChannelSchedule = { platform: "instagram", timezone: "UTC", days: [1, 2, 3, 4, 5], times: ["09:00"] };
+  const now = Date.UTC(2026, 10, 9, 8, 0);
+  const taken = [Date.UTC(2026, 10, 9, 9, 0) + 20_000];
+  assert.deepEqual(upcomingSlots([ig], now, 2, taken).map((s) => s.ms), [Date.UTC(2026, 10, 10, 9, 0), Date.UTC(2026, 10, 11, 9, 0)]);
+  assert.deepEqual(upcomingSlots([{ ...ig, times: [] }], now, 3), []);
+});
+
+test("defaultSchedulesToSeed: Mon-Fri 9/12/18 for each connected schedulable channel, in the browser zone", async () => {
+  const { defaultSchedulesToSeed, nextSlot } = await import("./postingSchedule.ts");
+  const seeded = defaultSchedulesToSeed(["threads", "instagram", "instagram", "youtube"], [], "Asia/Tokyo");
+  assert.deepEqual(seeded.map((s) => s.platform), ["instagram", "threads"]);
+  for (const s of seeded) {
+    assert.equal(s.timezone, "Asia/Tokyo");
+    assert.deepEqual(s.days, [1, 2, 3, 4, 5]);
+    assert.deepEqual(s.times, ["09:00", "12:00", "18:00"]);
+  }
+  // Wed 2026-11-11 10:00 Tokyo (UTC+9, no DST) -> next slot is 12:00 the same day = 03:00 UTC.
+  assert.equal(new Date(nextSlot(seeded, Date.UTC(2026, 10, 11, 1, 0)) ?? 0).toISOString(), "2026-11-11T03:00:00.000Z");
+});
+
+test("defaultSchedulesToSeed: never seeds over an existing schedule; bad zones fall back to UTC", async () => {
+  const { defaultSchedulesToSeed, isValidTimeZone } = await import("./postingSchedule.ts");
+  assert.deepEqual(defaultSchedulesToSeed(["instagram", "threads"], ["instagram"], "UTC"), []);
+  assert.deepEqual(defaultSchedulesToSeed([], [], "UTC"), []);
+  assert.equal(defaultSchedulesToSeed(["instagram"], [], "Not/AZone")[0].timezone, "UTC");
+  assert.equal(isValidTimeZone("Europe/Paris"), true);
+  assert.equal(isValidTimeZone(""), false);
+});

@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { CalendarDays, CalendarRange, Lightbulb, List, Plus } from "lucide-react";
+import { SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
+import ScheduleSeeder from "../settings/ScheduleSeeder";
+import { CalendarDays, Lightbulb, List, Plus } from "lucide-react";
+import CalendarToolbar from "./CalendarToolbar";
+import { weekMonthLabel, type AccountNames, type CalendarPost } from "./calendarUtils";
 import CalendarEmptyState from "./CalendarEmptyState";
 import Composer from "./Composer";
 import ComposerDialog from "./ComposerDialog";
@@ -12,9 +16,10 @@ import PostList, { type Post, type PostFilter } from "./PostList";
 import QueueView from "./QueueView";
 import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
+import { scheduledPostsUsage } from "@/lib/planLimits";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
-import { canPublishToFacebook } from "@/lib/facebookPublish";
+import { facebookPageStatus, type FacebookSourceAccount } from "@/lib/facebookPublish";
 import { IDEA_BY_ID_SQL, IDEAS_LIST_SQL, ideaComposerPrefill, normalizeIdeaStatus, type IdeaRow } from "@/lib/ideas";
 import { allPostTags, hasColumn, postMatchesTag } from "@/lib/tagFilter";
 import ui from "@/components/ui/ui.module.css";
@@ -29,7 +34,32 @@ type WeekPost = {
   status: string;
   platforms: string[];
   tags?: string[];
+  media: unknown;
+  insights: CalendarPost["insights"];
+  fb_post_id: string | null;
+  error: string | null;
 };
+
+const MONTH_FMT = { month: "long", year: "numeric", timeZone: "UTC" } as const;
+
+// Calendar card data: first media item as the thumbnail, a public link when one can be derived.
+function toCalendarPost(row: WeekPost): CalendarPost {
+  const first = Array.isArray(row.media) ? (row.media[0] as { url?: unknown; type?: unknown } | undefined) : undefined;
+  const url = typeof first?.url === "string" ? first.url : null;
+  const isVideo = first?.type === "video" || (url ? /\.(mp4|mov|webm)(\?|$)/i.test(url) : false);
+  return {
+    id: row.id,
+    caption: row.caption ?? "",
+    scheduled_at: row.scheduled_at,
+    status: row.status,
+    platforms: row.platforms,
+    thumb: url && !isVideo ? url : null,
+    thumbIsVideo: isVideo,
+    insights: row.insights ?? null,
+    permalink: row.fb_post_id && /^[0-9_]+$/.test(row.fb_post_id) ? `https://www.facebook.com/${row.fb_post_id}` : null,
+    error: row.error,
+  };
+}
 
 type PublishedPost = {
   id: string;
@@ -88,9 +118,9 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string; channel?: string }>;
 }) {
-  const { week, view: viewParam, month, status, draft, idea, tag = "" } = await searchParams;
+  const { week, view: viewParam, month, status, draft, idea, tag = "", channel = "" } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
   const view: "week" | "month" | "list" | "ideas" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : viewParam === "ideas" ? "ideas" : "week";
   const weekStart = parseWeekParam(week);
@@ -114,8 +144,10 @@ export default async function CalendarPage({
   const monthRangeEnd = new Date(monthGridEndSunday);
   monthRangeEnd.setUTCDate(monthRangeEnd.getUTCDate() + 1);
 
-  const rangeStart = view === "month" ? monthGridStart : weekStart;
-  const rangeEnd = view === "month" ? monthRangeEnd : weekEndExclusive;
+  // One extra day on each side: the calendar groups posts by the viewer's local day, which can
+  // differ from the UTC day near midnight.
+  const rangeStart = new Date((view === "month" ? monthGridStart : weekStart).getTime() - 86_400_000);
+  const rangeEnd = new Date((view === "month" ? monthRangeEnd : weekEndExclusive).getTime() + 86_400_000);
 
   let rows: Post[] = [];
   let weekRows: WeekPost[] = [];
@@ -136,8 +168,11 @@ export default async function CalendarPage({
   let facebookReady = false;
   let threadsReady = false;
   let schedulePlatforms: string[] = [];
+  let scheduleRowCount = -1; // -1 = unknown (table missing / not read)
   let youtubeReady = false;
   let hasTags = false;
+  let accountNames: AccountNames = {};
+  const previewAccountNames: AccountNames = {};
 
   const reloadHref =
     view === "month"
@@ -150,8 +185,10 @@ export default async function CalendarPage({
 
   const queueReloadHref = initialFilter === "all" ? reloadHref : `${reloadHref}&status=${initialFilter}`;
 
+  let scheduledUsage: { used: number; limit: number | null } | null = null;
   if (isDbConfigured()) {
     const user = await requireUser();
+    scheduledUsage = await scheduledPostsUsage(user.id).catch(() => null);
     try {
       const columnRows = await query<{ exists: boolean }>(
         "select exists (select 1 from information_schema.columns where table_schema='socialapp' and table_name='scheduled_posts' and column_name='tags') as exists",
@@ -220,11 +257,11 @@ export default async function CalendarPage({
       }
     }
     try {
-      const [fbRow] = await query<{ scopes: string[] | null; auth_type: string | null }>(
-        "select scopes, auth_type from socialapp.social_accounts where user_id=$1 and platform='instagram' and auth_type='facebook_login' and status='active' and page_id is not null and access_token_enc is not null limit 1",
+      const fbRows = await query<FacebookSourceAccount>(
+        "select platform, status, auth_type, page_id, page_name, (access_token_enc is not null) as has_token, scopes from socialapp.social_accounts where user_id=$1 and platform in ('instagram','facebook')",
         [user.id],
       );
-      facebookReady = fbRow ? canPublishToFacebook(fbRow.scopes, fbRow.auth_type) : false;
+      facebookReady = facebookPageStatus(fbRows).ready;
     } catch {
       facebookReady = false;
     }
@@ -262,6 +299,7 @@ export default async function CalendarPage({
         [user.id],
       );
       schedulePlatforms = [...new Set(schedRows.filter((r) => (r.times ?? []).length > 0).map((r) => r.platform))];
+      scheduleRowCount = schedRows.length;
     } catch {
       schedulePlatforms = [];
     }
@@ -275,7 +313,12 @@ export default async function CalendarPage({
         [user.id],
       ),
       query<WeekPost>(
-        `select p.id, p.caption, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.scheduled_at >= $2 and p.scheduled_at < $3 group by p.id order by p.scheduled_at limit 200`,
+        `select p.id, p.caption, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, p.media,
+           coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms,
+           (array_agg(t.insights) filter (where t.platform = 'instagram' and t.insights is not null))[1] as insights,
+           (array_agg(t.external_post_id) filter (where t.platform = 'facebook' and t.status = 'published'))[1] as fb_post_id,
+           (array_agg(t.error) filter (where t.status = 'failed' and t.error is not null))[1] as error
+         from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.scheduled_at >= $2 and p.scheduled_at < $3 group by p.id order by p.scheduled_at limit 300`,
         [user.id, rangeStart, rangeEnd],
       ),
       query<PublishedPost>(
@@ -287,6 +330,21 @@ export default async function CalendarPage({
     else rulesFailed = true;
     if (upcomingRes.status === "fulfilled") rows = upcomingRes.value;
     else rowsFailed = true;
+    try {
+      const accRows = await query<{ platform: string; username: string | null; page_name: string | null; status: string }>(
+        "select platform, username, page_name, status from socialapp.social_accounts where user_id=$1 and status in ('active','expired') order by (status = 'active') desc, created_at",
+        [user.id],
+      );
+      for (const a of accRows) {
+        const name = a.username ? `@${a.username.replace(/^@/, "")}` : (a.page_name ?? a.platform);
+        // Composer preview: the account the post would go out as, even if it needs reconnecting.
+        if (!previewAccountNames[a.platform]) previewAccountNames[a.platform] = name;
+        if (a.status !== "active" || accountNames[a.platform]) continue;
+        accountNames[a.platform] = name;
+      }
+    } catch {
+      accountNames = {};
+    }
     if (rangeRes.status === "fulfilled") weekRows = rangeRes.value;
     else weekRowsFailed = true;
     if (publishedRes.status === "fulfilled") publishedRows = publishedRes.value;
@@ -295,30 +353,49 @@ export default async function CalendarPage({
 
   const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
   const allTags = allPostTags(weekRows);
-  const filteredWeekRows = weekRows.filter((post) => postMatchesTag(post, tag));
+  const statusFilter = ["scheduled", "draft", "published", "failed"].includes(status ?? "") ? status : "";
+  const filteredWeekRows = weekRows.filter(
+    (post) =>
+      postMatchesTag(post, tag) &&
+      (!channel || post.platforms.includes(channel)) &&
+      (!statusFilter || post.status === statusFilter),
+  );
+  const calendarPosts = filteredWeekRows.map(toCalendarPost);
+  const channelOptions = [...new Set([...Object.keys(accountNames), ...weekRows.flatMap((p) => p.platforms)])].sort();
+  const filterQuery = [channel && `channel=${encodeURIComponent(channel)}`, statusFilter && `status=${statusFilter}`, tag && `tag=${encodeURIComponent(tag)}`].filter(Boolean).map((q) => `&${q}`).join("");
+  const weekEndDay = new Date(weekStart.getTime() + 6 * 86_400_000);
+  const shortDay = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  const now = new Date();
+  const thisWeek = weekQueryParam(mondayUtcStart(now));
+  const thisMonth = now.toISOString().slice(0, 7);
+  const emptyRange = !rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0;
+
+  // First channel connected, no posting schedule yet: seed the default one in the browser's zone.
+  const seedSchedule = scheduleRowCount === 0 && Object.keys(accountNames).some((p) => (SCHEDULABLE_PLATFORMS as readonly string[]).includes(p));
 
   return (
     <div className={styles.calendarPage}>
+      <ScheduleSeeder needed={seedSchedule} />
       <header className={styles.pubHeader}>
         <div className={styles.pubTitleWrap}>
-          <h1 className={styles.pubTitle}>Publish</h1>
-          <p className={styles.pubSub}>Plan, schedule and track posts for Instagram, Facebook, Threads and YouTube.</p>
+          <span className={styles.pubIcon} aria-hidden="true"><CalendarDays width={20} height={20} /></span>
+          <div>
+            <h1 className={styles.pubTitle}>Publish</h1>
+            <p className={styles.pubSub}>Plan, schedule and track posts for Instagram, Facebook, Threads and YouTube.</p>
+          </div>
         </div>
         <div className={styles.pubActions}>
-          <div className={styles.viewSwitch} role="group" aria-label="Calendar view">
-            <Link href="/app/calendar?view=week" aria-current={view === "week" ? "page" : undefined} className={`${styles.viewLink} ${view === "week" ? styles.viewLinkActive : ""}`}>
-              <CalendarRange width={16} height={16} aria-hidden="true" /> Week
-            </Link>
-            <Link href="/app/calendar?view=month" aria-current={view === "month" ? "page" : undefined} className={`${styles.viewLink} ${view === "month" ? styles.viewLinkActive : ""}`}>
-              <CalendarDays width={16} height={16} aria-hidden="true" /> Month
-            </Link>
+          <nav className={styles.viewSwitch} aria-label="Publish view">
             <Link href="/app/calendar?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
               <List width={16} height={16} aria-hidden="true" /> List
+            </Link>
+            <Link href="/app/calendar?view=week" aria-current={view === "week" || view === "month" ? "page" : undefined} className={`${styles.viewLink} ${view === "week" || view === "month" ? styles.viewLinkActive : ""}`}>
+              <CalendarDays width={16} height={16} aria-hidden="true" /> Calendar
             </Link>
             <Link href="/app/calendar?view=ideas" aria-current={view === "ideas" ? "page" : undefined} className={`${styles.viewLink} ${view === "ideas" ? styles.viewLinkActive : ""}`}>
               <Lightbulb width={16} height={16} aria-hidden="true" /> Ideas
             </Link>
-          </div>
+          </nav>
           <Link href={`${reloadHref}&compose=1`} scroll={false} className={styles.newPostBtn}>
             <Plus width={18} height={18} aria-hidden="true" /> New post
           </Link>
@@ -344,69 +421,59 @@ export default async function CalendarPage({
         </section>
       ) : (
         <ComposerDialog title={initialIdea ? "Create post from idea" : initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
-          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} />
+          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} />
         </ComposerDialog>
       )}
-      {(view === "week" || view === "month") && allTags.length > 0 && (
-        <form className={`${styles.filters} mb-4 items-end`}>
-          {view === "month" ? (
-            <>
-              <input type="hidden" name="view" value="month" />
-              <input type="hidden" name="month" value={monthQueryParam(monthStart)} />
-            </>
-          ) : (
-            <>
-              <input type="hidden" name="view" value="week" />
-              <input type="hidden" name="week" value={weekQueryParam(weekStart)} />
-            </>
-          )}
-          <div className={ui.field}>
-            <label htmlFor="calendar-tag-filter" className={ui.label}>Filter by tag</label>
-            <select id="calendar-tag-filter" name="tag" defaultValue={tag} className={ui.input}>
-              <option value="">All tags</option>
-              {allTags.map((availableTag) => (
-                <option key={availableTag} value={availableTag}>{availableTag}</option>
-              ))}
-            </select>
-          </div>
-          <button type="submit" className={styles.filterBtn}>Apply</button>
-          {tag && <Link href={reloadHref} className={styles.todayBtn}>Clear</Link>}
-        </form>
-      )}
       {view === "month" ? (
-        <section className={styles.viewSection} aria-label="Month view">
+        <section className={styles.viewSection} aria-label="Month calendar">
+          <CalendarToolbar
+            view="month"
+            label={monthStart.toLocaleDateString("en-US", MONTH_FMT)}
+            prevHref={`/app/calendar?view=month&month=${monthQueryParam(prevMonth)}${filterQuery}`}
+            nextHref={`/app/calendar?view=month&month=${monthQueryParam(nextMonth)}${filterQuery}`}
+            todayHref={`/app/calendar?view=month${filterQuery}`}
+            isCurrent={monthQueryParam(monthStart) === thisMonth}
+            channels={channelOptions}
+            tags={allTags}
+          />
           <MonthView
-            posts={filteredWeekRows}
+            posts={calendarPosts}
             monthStart={monthStart}
-            prevHref={`/app/calendar?view=month&month=${monthQueryParam(prevMonth)}`}
-            nextHref={`/app/calendar?view=month&month=${monthQueryParam(nextMonth)}`}
+            composeBase={`/app/calendar?view=month&month=${monthQueryParam(monthStart)}&compose=1`}
+            accounts={accountNames}
             loadError={
               weekRowsFailed
                 ? { message: "We couldn’t load the posts scheduled for this month. They may still exist.", reloadHref }
                 : undefined
             }
           />
-          {!rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0 && (
-            <CalendarEmptyState composeHref={`${reloadHref}&compose=1`} />
-          )}
+          {emptyRange && <CalendarEmptyState composeHref={`${reloadHref}&compose=1`} />}
         </section>
       ) : view === "week" ? (
-        <section className={styles.viewSection} aria-label="Week view">
+        <section className={styles.viewSection} aria-label="Week calendar">
+          <CalendarToolbar
+            view="week"
+            label={weekMonthLabel(weekStart, weekEndDay)}
+            subLabel={`${shortDay(weekStart)} – ${shortDay(weekEndDay)}`}
+            prevHref={`/app/calendar?view=week&week=${weekQueryParam(prevStart)}${filterQuery}`}
+            nextHref={`/app/calendar?view=week&week=${weekQueryParam(nextStart)}${filterQuery}`}
+            todayHref={`/app/calendar?view=week${filterQuery}`}
+            isCurrent={weekQueryParam(weekStart) === thisWeek}
+            channels={channelOptions}
+            tags={allTags}
+          />
           <WeekView
-            posts={filteredWeekRows}
+            posts={calendarPosts}
             weekStart={weekStart}
-            prevHref={`/app/calendar?week=${weekQueryParam(prevStart)}`}
-            nextHref={`/app/calendar?week=${weekQueryParam(nextStart)}`}
             composeBase={`/app/calendar?view=week&week=${weekQueryParam(weekStart)}&compose=1`}
+            accounts={accountNames}
             loadError={
               weekRowsFailed
                 ? { message: "We couldn’t load the posts scheduled for this week. They may still exist.", reloadHref }
                 : undefined
             }
           />
-          {!rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0 && (
-            <CalendarEmptyState composeHref={`${reloadHref}&compose=1`} />
-          )}
+          {emptyRange && <CalendarEmptyState composeHref={`${reloadHref}&compose=1`} />}
         </section>
       ) : null}
       {view === "ideas" && (

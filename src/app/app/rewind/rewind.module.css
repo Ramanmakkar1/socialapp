@@ -1,0 +1,80 @@
+/* Rewind: stepper, rule picker and history. Light, Buffer-like; --poskoo-* tokens. */
+.page { display: grid; gap: 18px; color: var(--poskoo-ink); font-family: var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; }
+.head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--poskoo-line); }
+.headIcon { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-tint, var(--poskoo-band)); color: var(--poskoo-violet); }
+.h1 { margin: 0; font-size: 1.6rem; line-height: 1.1; letter-spacing: -.03em; }
+.sub { margin: 4px 0 0; color: var(--poskoo-muted); font-size: .92rem; }
+.card { border: 1px solid var(--poskoo-line); border-radius: 14px; background: var(--poskoo-card); padding: 18px; }
+.cardHead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.h2 { margin: 0; font-size: 1.05rem; letter-spacing: -.01em; }
+
+.stepper { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0 0 20px; padding: 0; list-style: none; counter-reset: step; }
+.step { position: relative; display: flex; align-items: center; gap: 8px; color: var(--poskoo-muted); font-size: .84rem; font-weight: 600; }
+.step:not(:last-child)::after { content: ""; flex: 1; height: 2px; margin-left: 4px; border-radius: 2px; background: var(--poskoo-line); }
+.stepDone:not(:last-child)::after { background: var(--poskoo-violet); }
+.stepDot { display: grid; flex: none; place-items: center; width: 26px; height: 26px; border: 1.5px solid var(--poskoo-line); border-radius: 50%; background: var(--poskoo-card); font-size: .78rem; }
+.stepCurrent { color: var(--poskoo-ink); }
+.stepCurrent .stepDot { border-color: var(--poskoo-violet); color: var(--poskoo-violet); }
+.stepDone .stepDot { border-color: transparent; background: var(--fill-strong, var(--poskoo-violet)); color: #fff; }
+.stepLabel { white-space: nowrap; }
+@media (max-width: 700px) {
+  .stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step::after { display: none; }
+}
+
+.ruleList { display: grid; gap: 8px; margin: 12px 0 0; border: 0; padding: 0; }
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--poskoo-line);
+  border-radius: 12px;
+  background: var(--poskoo-card);
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.rule:hover { border-color: var(--poskoo-pill-border); }
+.rule:focus-within { outline: 3px solid var(--poskoo-violet); outline-offset: 2px; }
+.ruleSelected, .ruleSelected:hover { border-color: var(--poskoo-violet); background: var(--accent-tint, var(--poskoo-band)); }
+.ruleOff { cursor: not-allowed; background: var(--poskoo-paper); }
+.ruleIcon { display: grid; flex: none; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--poskoo-band); color: var(--poskoo-violet); }
+.ruleText { display: grid; min-width: 0; flex: 1; gap: 2px; }
+.ruleText b { font-size: .92rem; }
+.ruleText > span { overflow: hidden; color: var(--poskoo-muted); font-size: .8rem; text-overflow: ellipsis; white-space: nowrap; }
+.ruleText > .why { white-space: normal; color: color-mix(in srgb, #c2410c 85%, var(--poskoo-ink)); }
+.offPill { flex: none; border-radius: 999px; background: color-mix(in srgb, #f97316 14%, var(--poskoo-card)); padding: 3px 9px; color: color-mix(in srgb, #c2410c 85%, var(--poskoo-ink)); font-size: .72rem; font-weight: 700; }
+.radio { flex: none; width: 18px; height: 18px; border: 1.5px solid var(--poskoo-pill-border); border-radius: 50%; }
+.ruleSelected .radio { border: 5px solid var(--poskoo-violet); }
+@media (max-width: 560px) {
+  .rule { flex-wrap: wrap; }
+  .offPill { margin-left: 48px; }
+}
+
+.runRow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-top: 14px; }
+.hint { margin: 0; color: var(--poskoo-muted); font-size: .82rem; }
+.primary { display: inline-flex; min-height: 40px; align-items: center; border: 0; border-radius: 10px; background: var(--fill-strong, var(--poskoo-violet)); padding: 0 1rem; color: #fff; font: 700 .9rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; text-decoration: none; cursor: pointer; }
+.primary:disabled { opacity: .5; cursor: default; }
+.ghost { display: inline-flex; min-height: 34px; align-items: center; gap: 6px; border: 1px solid var(--poskoo-line); border-radius: 10px; padding: 0 .75rem; color: var(--poskoo-ink); font-size: .84rem; font-weight: 600; text-decoration: none; }
+.ghost:hover { border-color: var(--poskoo-muted); }
+.status { margin: 12px 0 0; font-size: .9rem; }
+.statusOk { color: var(--poskoo-ink); }
+.statusErr, .warn { color: var(--poskoo-red); }
+
+.empty { display: grid; justify-items: start; gap: 4px; margin-top: 12px; border: 1px dashed var(--poskoo-line); border-radius: 12px; padding: 18px; color: var(--poskoo-muted); font-size: .9rem; }
+.empty p { margin: 0; }
+.empty b { color: var(--poskoo-ink); }
+.empty .primary { margin-top: 8px; }
+.emptyIcon { color: var(--poskoo-muted); }
+
+.tableWrap { margin-top: 12px; overflow-x: auto; border: 1px solid var(--poskoo-line); border-radius: 12px; }
+.table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.table th { border-bottom: 1px solid var(--poskoo-line); background: var(--poskoo-paper); padding: 10px 14px; color: var(--poskoo-muted); font-size: .76rem; font-weight: 600; text-align: left; white-space: nowrap; }
+.table td { border-bottom: 1px solid var(--poskoo-line); padding: 10px 14px; }
+.table tr:last-child td { border-bottom: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: .74rem; font-weight: 700; white-space: nowrap; }
+.pillOk { background: color-mix(in srgb, var(--poskoo-green) 14%, var(--poskoo-card)); color: color-mix(in srgb, var(--poskoo-green) 70%, var(--poskoo-ink)); }
+.pillWarn { background: color-mix(in srgb, #f59e0b 15%, var(--poskoo-card)); color: color-mix(in srgb, #b45309 85%, var(--poskoo-ink)); }
+.page > * { min-width: 0; }
+.ruleList { min-width: 0; }
+.table { min-width: 560px; }

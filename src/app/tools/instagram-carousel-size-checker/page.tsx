@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import CarouselSizeChecker from "./CarouselSizeChecker";
 import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-carousel-size-checker";
 const title = "Instagram Carousel Size Checker: Check Slide Ratios | Poskoo";
@@ -89,16 +90,7 @@ export default function InstagramCarouselSizeCheckerPage() {
           Instagram carousel slides should all share one aspect ratio. Select your images to see each file&apos;s pixel
           dimensions, aspect ratio and size, and check in seconds whether every slide matches before you schedule.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

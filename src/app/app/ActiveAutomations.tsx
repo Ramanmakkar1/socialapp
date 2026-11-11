@@ -3,7 +3,9 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AtSign, MessageCircle, MoreHorizontal } from "lucide-react";
 import { toggleRule } from "./auto-dm/actions";
+import { formatCtr } from "@/lib/ctr";
 import styles from "./home.module.css";
 
 export type AutomationRow = {
@@ -13,6 +15,8 @@ export type AutomationRow = {
   summary: string;
   dmsSent: number;
   clicks: number;
+  uniqueClicks?: number;
+  triggers?: string[];
 };
 
 // Active automations table with one-tap Pause / Resume (same server action as the Auto-DM page).
@@ -60,21 +64,37 @@ export default function ActiveAutomations({ rows }: { rows: AutomationRow[] }) {
         <tbody>
           {rows.map((r) => {
             const live = r.status === "active";
-            const ctr = r.dmsSent > 0 ? `${Math.round((r.clicks / r.dmsSent) * 100)}%` : "-";
+            const ctr = formatCtr(r.uniqueClicks ?? r.clicks, r.dmsSent);
             return (
               <tr key={r.id}>
                 <td>
-                  <div className={styles.ruleName}>{r.name}</div>
-                  <div className={styles.ruleSub}>{r.summary}</div>
+                  <div className={styles.ruleCell}>
+                    <span className={styles.ruleIcon} aria-hidden="true">
+                      {r.triggers?.includes("story_reply") && !r.triggers.includes("comment") ? <AtSign width={16} height={16} /> : <MessageCircle width={16} height={16} />}
+                    </span>
+                    <div className={styles.ruleText}>
+                      <div className={styles.ruleName}>{r.name}</div>
+                      <div className={styles.ruleSub}>{r.summary}</div>
+                    </div>
+                  </div>
                 </td>
                 <td className={styles.num}>{r.dmsSent}</td>
                 <td className={styles.num}>{r.clicks}</td>
                 <td className={styles.num}>{ctr}</td>
                 <td><span className={live ? styles.live : styles.paused}>{live ? "Live" : "Paused"}</span></td>
                 <td>
-                  <button type="button" className={styles.toggle} disabled={busy === r.id} onClick={() => toggle(r.id)}>
-                    {busy === r.id ? "Saving…" : live ? "Pause" : "Resume"}
-                  </button>
+                  <div className={styles.rowActions}>
+                    <button type="button" className={styles.toggle} disabled={busy === r.id} onClick={() => toggle(r.id)} aria-label={`${live ? "Pause" : "Resume"} ${r.name}`}>
+                      {busy === r.id ? "Saving…" : live ? "Pause" : "Resume"}
+                    </button>
+                    <details className={styles.rowMenu}>
+                      <summary aria-label={`More actions for ${r.name}`}><MoreHorizontal width={16} height={16} aria-hidden="true" /></summary>
+                      <div className={styles.rowMenuList}>
+                        <Link href="/app/auto-dm">Edit automation</Link>
+                        <Link href="/app/auto-dm/activity">View activity</Link>
+                      </div>
+                    </details>
+                  </div>
                 </td>
               </tr>
             );

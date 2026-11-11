@@ -6,6 +6,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import FlowPreview from "./FlowPreview";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-comment-to-dm-preview";
 const description =
@@ -63,16 +64,7 @@ export default function InstagramCommentToDmPreviewPage() {
           edit the keyword, sample comment, match type, DM text and optional email-capture step, and the flow updates in
           your browser without contacting Instagram or saving anything.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-dm.webp"
-            width={900}
-            height={900}
-            priority
-            alt="A creator relaxing while illustrated direct messages fly from a phone to followers"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /></div>
       </header>
 
       <div style={{ marginTop: 28 }}>

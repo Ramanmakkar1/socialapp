@@ -4,9 +4,10 @@ import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { encryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
+import { accountLimitError } from "@/lib/planLimits";
 import { THREADS_SCOPES, exchangeThreadsCode, fetchThreadsProfile, threadsLongLivedToken } from "@/lib/threadsAuth";
 
-type BackResult = "connected" | "error" | "state_error" | "declined";
+type BackResult = "connected" | "error" | "state_error" | "declined" | "limit";
 
 function back(result: BackResult) {
   return NextResponse.redirect(new URL(`/app/settings?threads=${result}`, BRAND.url));
@@ -36,6 +37,8 @@ export async function GET(request: Request) {
       [externalId]
     );
     if (existing[0] && existing[0].user_id !== user.id) return back("error");
+    // Plan limit: a NEW account over the limit is refused; reconnecting an existing one works.
+    if (await accountLimitError(user.id, { kind: "social", platform: "threads", externalId })) return back("limit");
     await query(
       `insert into socialapp.social_accounts (user_id, platform, external_id, username, access_token_enc, token_expires_at, scopes, status)
        values ($1,'threads',$2,$3,$4, now() + ($5 || ' seconds')::interval, $6, 'active')

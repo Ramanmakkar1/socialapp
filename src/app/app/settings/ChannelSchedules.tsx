@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { savePostingSchedule } from "./actions";
 import SubmitButton from "@/components/ui/SubmitButton";
-import { ALL_DAYS, DAY_LABELS, TIMEZONES } from "@/lib/postingSchedule";
+import { ALL_DAYS, DAY_LABELS, DEFAULT_SCHEDULE_DAYS, DEFAULT_SCHEDULE_TIMES, TIMEZONES } from "@/lib/postingSchedule";
 import ui from "@/components/ui/ui.module.css";
 
 export type ChannelScheduleInput = {
@@ -11,6 +11,8 @@ export type ChannelScheduleInput = {
   timezone: string;
   days: number[];
   times: string[];
+  /** false = no row saved yet: the form starts from the suggested default in the browser's zone. */
+  saved?: boolean;
 };
 
 function labelFor(platform: string): string {
@@ -20,9 +22,23 @@ function labelFor(platform: string): string {
 }
 
 function ChannelForm({ channel }: { channel: ChannelScheduleInput }) {
+  const unsaved = channel.saved === false;
   const [timezone, setTimezone] = useState(channel.timezone || "UTC");
-  const [days, setDays] = useState<Set<number>>(() => new Set(channel.days));
-  const [times, setTimes] = useState<string[]>(() => (channel.times.length > 0 ? [...channel.times] : []));
+  const [days, setDays] = useState<Set<number>>(() => new Set(unsaved ? DEFAULT_SCHEDULE_DAYS : channel.days));
+  const [times, setTimes] = useState<string[]>(() => (unsaved ? [...DEFAULT_SCHEDULE_TIMES] : [...channel.times]));
+
+  // A new schedule starts in the browser's time zone (set after hydration so server and client match).
+  useEffect(() => {
+    if (!unsaved) return;
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the browser
+      if (tz) setTimezone(tz);
+    } catch {
+      // keep UTC
+    }
+  }, [unsaved]);
+  const zoneOptions = (TIMEZONES as readonly string[]).includes(timezone) ? TIMEZONES : [timezone, ...TIMEZONES];
 
   function toggleDay(day: number) {
     setDays((prev) => {
@@ -51,7 +67,10 @@ function ChannelForm({ channel }: { channel: ChannelScheduleInput }) {
     <form action={savePostingSchedule} className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
       <input type="hidden" name="platform" value={channel.platform} />
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-[var(--poskoo-ink)]">{name}</span>
+        <span className="text-sm font-semibold text-[var(--poskoo-ink)]">
+          {name}
+          {unsaved && <span className="ml-2 text-xs font-normal text-[var(--poskoo-muted)]">Not saved yet: suggested times shown</span>}
+        </span>
         <label htmlFor={`tz-${channel.platform}`} className={ui.label}>
           Timezone
           <select
@@ -61,7 +80,7 @@ function ChannelForm({ channel }: { channel: ChannelScheduleInput }) {
             onChange={(e) => setTimezone(e.target.value)}
             className={`${ui.input} mt-1`}
           >
-            {TIMEZONES.map((tz) => (
+            {zoneOptions.map((tz) => (
               <option key={tz} value={tz}>{tz}</option>
             ))}
           </select>
@@ -122,6 +141,8 @@ function ChannelForm({ channel }: { channel: ChannelScheduleInput }) {
         {times.length === 0 && <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Add at least one time so “Add to queue” can pick a slot.</p>}
       </div>
 
+      {days.size === 0 && <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Pick at least one day so “Add to queue” can pick a slot.</p>}
+
       <div className="mt-4">
         <SubmitButton label={`Save ${name} schedule`} />
       </div>
@@ -140,7 +161,7 @@ export default function ChannelSchedules({ channels }: { channels: ChannelSchedu
   return (
     <div className="space-y-4">
       {channels.map((channel) => (
-        <ChannelForm key={channel.platform} channel={channel} />
+        <ChannelForm key={`${channel.platform}-${channel.saved === false ? "new" : "saved"}`} channel={channel} />
       ))}
     </div>
   );

@@ -1,5 +1,24 @@
 import type { NextConfig } from "next";
 
+// Security headers for every response. Public pages may only be framed by Poskoo itself;
+// the signed-in app, admin, auth pages and API can never be framed (clickjacking).
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+  // HSTS only on production builds (never on localhost dev, where it would pin http://localhost to https).
+  ...(process.env.NODE_ENV === "production"
+    ? [{ key: "Strict-Transport-Security", value: "max-age=31536000" }]
+    : []),
+];
+
+const noFrameHeaders = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   // Render metadata in <head> for every user agent, so crawlers and audits always see title/description/canonical.
@@ -25,6 +44,12 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      { source: "/:path*", headers: securityHeaders },
+      // Later entries override the same header key from earlier ones.
+      ...["/app", "/app/:path*", "/admin", "/admin/:path*", "/login", "/signup", "/api/:path*"].map((source) => ({
+        source,
+        headers: noFrameHeaders,
+      })),
       {
         source: "/",
         headers: [

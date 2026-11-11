@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-content-planner";
 
@@ -107,16 +108,7 @@ export default function InstagramContentPlannerPage() {
             See the workflow
           </Link>
         </div>
-        <div className="hero-art" style={{ maxWidth: 820 }}>
-          <Image
-            sizes="(max-width: 860px) 100vw, 820px"
-            src="/illustrations/free-tools.webp"
-            width={1536}
-            height={1024}
-            priority
-            alt="A creator lifts a paintbrush out of an open toolbox full of a ruler, scissors, a hashtag, a magnifying glass and photos, with a happy dog in the flowers."
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /></div>
       </header>
 
       <section id="workflow" style={{ paddingTop: 20, scrollMarginTop: 24 }}>

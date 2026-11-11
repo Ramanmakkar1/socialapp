@@ -1,5 +1,6 @@
 import { buildCommentDmMessage } from "@/lib/commentMessage";
 import { query } from "@/lib/db";
+import { recordLeadMagnetDelivery } from "@/lib/leadMagnets";
 import { shortLinkFor } from "@/lib/links";
 import { matchComment, type MatchableRule } from "@/lib/match";
 import { isMissingColumnError, ruleMatchesMedia } from "@/lib/ruleMedia";
@@ -224,6 +225,10 @@ export async function processCommentEvents(
       );
       if (rows.length > 0) {
         inserted += 1;
+        // Returning lead with a known email: the link (a lead magnet's, if attached) goes out now.
+        if (rule.email_gate && !emailGate && !rule.follow_gate) {
+          await recordLeadMagnetDelivery(account.user_id, ruleId, contactId);
+        }
       }
     } catch (err) {
       console.error("processCommentEvents event failed", event.commentId, err instanceof Error ? err.message : err);

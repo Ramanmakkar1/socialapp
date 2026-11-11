@@ -4,8 +4,9 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
-import CompareHeroIllustration from "@/components/CompareHeroIllustration";
+import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = {
   title: { absolute: `Meta Business Suite Alternative for Instagram | ${BRAND.name}` },
@@ -23,7 +24,7 @@ const whyLook = [
   {
     no: "02 / Automation",
     title: "No keyword comment-to-DM",
-    text: `Meta Business Suite has an inbox with basic automated replies, but it does not send a DM with your link when someone comments a keyword. ${BRAND.name} does that on every post you choose.`,
+    text: `Meta Business Suite has an inbox with automated replies; check Meta's help pages for what it can send when someone comments. ${BRAND.name} sends a DM with your link to everyone who comments your keyword, on every post you choose.`,
   },
   {
     no: "03 / Usability",
@@ -35,19 +36,19 @@ const whyLook = [
 const compare: [string, string, string][] = [
   ["Instagram scheduling", "Yes", "Yes"],
   ["Facebook Page publishing", "Yes", "Yes"],
-  ["Comment→DM keyword automation with link delivery", "Yes", "No"],
-  ["Email capture in the DM", "Yes", "No"],
-  ["Lead / email list export (CSV)", "Yes", "No"],
+  ["Comment→DM keyword automation with link delivery", "Yes", "Check their site"],
+  ["Email capture in the DM", "Yes", "Check their site"],
+  ["Lead / email list export (CSV)", "Yes", "Check their site"],
   ["AI caption ideas", "Yes", "See their site"],
   ["Free plan", "Yes", "Yes"],
   ["Made by Meta", "No", "Yes"],
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Meta Business Suite alternative?`, a: `Yes, for Instagram creators and small brands. ${BRAND.name} schedules your Instagram posts on a calendar and also sends an automatic DM with your link to everyone who comments a keyword, with email capture and AI caption ideas built in. Meta Business Suite is free and made by Meta, but it has no keyword comment-to-DM with link delivery.` },
+  { q: `Is ${BRAND.name} a Meta Business Suite alternative?`, a: `Yes, for Instagram creators and small brands. ${BRAND.name} schedules your Instagram posts on a calendar and also sends an automatic DM with your link to everyone who comments a keyword, with email capture and AI caption ideas built in. Meta Business Suite is free and made by Meta; check Meta's help pages for its current automation options.` },
   { q: "Why do scheduled posts fail or get stuck in Meta Business Suite?", a: `Common causes are an expired Facebook or Instagram connection, a photo or video in a size or format Instagram does not accept, or a temporary sync problem between the Facebook Page and the Instagram account. Reconnecting the account and re-uploading the media in a supported format fixes most of them, and ${BRAND.name} publishes through the official Meta APIs.` },
   { q: "Can I use both tools at the same time?", a: `Yes. Many creators keep Meta Business Suite for ads and Page settings and use ${BRAND.name} for scheduling and comment-to-DM automation. Just avoid scheduling the same post in both tools so it is not published twice.` },
-  { q: "Is there a free plan?", a: "Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and you can upgrade to Pro or Agency when you grow." },
+  { q: "Is there a free plan?", a: "Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and paid Pro and Agency plans are coming soon." },
   { q: "Is it safe for my Instagram account?", a: "Yes. We connect through the official Meta login and APIs, never ask for your password, never scrape, and follow Meta's messaging limits." },
 ];
 
@@ -81,10 +82,7 @@ export default function MetaBusinessSuiteAlternative() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
-        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
-        <div className="hero-art">
-          <Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/multichannel.webp" width={1400} height={933} alt="A creator at a laptop sends one post that splits to several phones and screens" />
-        </div>
+        <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
 
       {/* Why people look for a Meta Business Suite alternative */}
@@ -140,6 +138,7 @@ export default function MetaBusinessSuiteAlternative() {
               </tbody>
             </table>
           </div>
+          <CompareNote />
           <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Meta Business Suite features change over time. Check Meta&apos;s site for the current feature list.</p>
         </div>
       </section>

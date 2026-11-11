@@ -6,15 +6,20 @@ import { reschedulePost } from "./rescheduleActions";
 import { Btn } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
+import { formatTime, utcDateForLocalDay, zonedParts } from "./calendarUtils";
 
-export default function RescheduleControl({ id, scheduledAt, caption }: {
+// Date picker for touch devices. Days are shown and picked in the browser's time zone (`tz`,
+// "" = UTC before hydration), the same zone the calendar grid uses; the post keeps its local time.
+export default function RescheduleControl({ id, scheduledAt, caption, tz = "", onMoved }: {
   id: string;
   scheduledAt: Date | string;
   caption: string;
+  tz?: string;
+  onMoved?: () => void;
 }) {
   const router = useRouter();
   const fieldId = useId();
-  const originalDate = new Date(scheduledAt).toISOString().slice(0, 10);
+  const originalDate = zonedParts(scheduledAt, tz).key;
   const [date, setDate] = useState(originalDate);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -38,11 +43,12 @@ export default function RescheduleControl({ id, scheduledAt, caption }: {
           setError(null);
           startTransition(async () => {
             try {
-              const result = await reschedulePost(id, date);
+              const result = await reschedulePost(id, utcDateForLocalDay(scheduledAt, date, tz));
               if (!result.ok) {
                 setError(result.error ?? "Could not move post. Please try again.");
                 return;
               }
+              onMoved?.();
               router.refresh();
             } catch {
               setError("Could not move post. Please try again.");
@@ -50,7 +56,7 @@ export default function RescheduleControl({ id, scheduledAt, caption }: {
           });
         }}
       >
-        <label htmlFor={fieldId}>New date (UTC)</label>
+        <label htmlFor={fieldId}>New date</label>
         <input
           id={fieldId}
           type="date"
@@ -62,7 +68,7 @@ export default function RescheduleControl({ id, scheduledAt, caption }: {
           aria-invalid={!!error}
           className={ui.input}
         />
-        <p id={`${fieldId}-hint`}>Moving preserves the UTC time.</p>
+        <p id={`${fieldId}-hint`}>Keeps the time ({formatTime(scheduledAt, tz)}{tz ? "" : " UTC"}).</p>
         <Btn
           type="submit"
           size="sm"

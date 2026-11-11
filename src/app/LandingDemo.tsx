@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AnimArt } from "@/components/AnimArt";
 import { useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 
@@ -11,70 +12,18 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]["id"];
 
-const calendarDays = [
-  { weekday: "Mon", date: 15 },
-  { weekday: "Tue", date: 16 },
-  { weekday: "Wed", date: 17 },
-  { weekday: "Thu", date: 18, scheduled: true },
-  { weekday: "Fri", date: 19 },
-  { weekday: "Sat", date: 20 },
-  { weekday: "Sun", date: 21 },
-];
-
 function SchedulePreview() {
   return (
     <div
-      className="demoPanel scheduleDemo"
+      className="demoPanel demoScene"
       id="schedule-panel"
       role="tabpanel"
       aria-labelledby="schedule-tab"
       tabIndex={0}
     >
-      <div className="calendarCard">
-        <div className="calendarTop">
-          <div>
-            <span className="previewLabel">Example calendar</span>
-            <h3>September</h3>
-          </div>
-          <span className="scheduleTime">9:00 AM</span>
-        </div>
-        <ol className="calendarWeek" aria-label="Example week, September 15 to 21">
-          {calendarDays.map((day) => (
-            <li
-              className={day.scheduled ? "calendarDay hasPost" : "calendarDay"}
-              key={day.date}
-              aria-label={day.scheduled ? "Thursday 18, one example post scheduled" : undefined}
-            >
-              <span className="calendarDow">{day.weekday}</span>
-              <span className="calendarDate">{day.date}</span>
-              {day.scheduled ? <span className="calendarMarker" aria-hidden="true" /> : null}
-            </li>
-          ))}
-        </ol>
-        <p className="scheduledSlot"><span aria-hidden="true" />Example post · Thu 18, 9:00 AM</p>
-      </div>
-
-      <div className="postPreview">
-        <span className="previewLabel">Example Instagram post</span>
-        <div className="postAuthor"><span className="av" aria-hidden="true" />riya.makes</div>
-        <div className="postArt">
-          <svg viewBox="0 0 240 150" width="240" height="150" role="img" aria-label="Abstract sunrise artwork for the example post">
-            <defs>
-              <linearGradient id="demo-post-background" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="var(--lilac)" />
-                <stop offset="1" stopColor="var(--pink)" />
-              </linearGradient>
-            </defs>
-            <rect width="240" height="150" rx="16" fill="url(#demo-post-background)" />
-            <circle cx="174" cy="48" r="28" fill="var(--lime)" />
-            <path d="M0 126 62 62l42 38 40-32 96 70v12H0z" fill="var(--violet)" opacity=".78" />
-            <path d="M0 136 70 96l48 30 46-22 76 38v8H0z" fill="var(--coral)" opacity=".85" />
-            <path d="m38 30 4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="var(--card)" />
-          </svg>
-        </div>
-        <p className="postCaption">New week, new ideas. Comment LINK for the guide. ✨</p>
-        <span className="exampleStatus">Example schedule · Thursday, 9:00 AM</span>
-      </div>
+      <AnimArt name="demo-schedule" label="A creator relaxes in a beanbag with a coffee while a weekly calendar of posts publishes on its own." />
+      <div className="demoChip chipA"><span className="dot" style={{ background: "var(--violet)" }} aria-hidden="true" />Example: scheduled for Thu 9:00 AM</div>
+      <div className="demoChip chipB"><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>Example: posted to Instagram</div>
     </div>
   );
 }
@@ -82,27 +31,15 @@ function SchedulePreview() {
 function CommentPreview() {
   return (
     <div
-      className="demoPanel demo"
+      className="demoPanel demoScene"
       id="dm-panel"
       role="tabpanel"
       aria-labelledby="dm-tab"
       tabIndex={0}
-      aria-label="Illustrative example: a comment, an automatic DM, and a saved lead"
     >
-      <div className="ui c1">
-        <div className="who"><span className="av" style={{ background: "var(--peach)" }} aria-hidden="true" />riya.makes <span className="t">sample</span></div>
-        <p style={{ marginTop: "6px" }}>LINK please! 😍</p>
-      </div>
-      <svg className="arrow-doodle" viewBox="0 0 70 60" aria-hidden="true"><path d="M8 8c10 30 30 40 52 42" stroke="var(--ink)" strokeWidth="2.5" fill="none" strokeDasharray="5 6" strokeLinecap="round" /><path d="M50 42l11 8-13 3" stroke="var(--ink)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      <div className="ui c2">
-        <div className="who" style={{ color: "#fff" }}>Example Poskoo DM</div>
-        <p style={{ marginTop: "6px" }}>Hey Riya! Here&apos;s the guide you asked for. Want my weekly tips too?</p>
-        <span className="linkbtn">Open the guide</span>
-      </div>
-      <div className="ui c3">
-        <div className="ok"><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>Example: new lead saved</div>
-        <p className="t" style={{ marginTop: "4px" }}>riya@studio.co · from your Reel</p>
-      </div>
+      <AnimArt name="demo-dm" label="A LINK comment on a post sends a paper-plane DM with a link to a happy follower, who is saved in a box of new leads." />
+      <div className="demoChip chipA"><span className="dot" style={{ background: "var(--peach)" }} aria-hidden="true" />riya.makes: &ldquo;LINK please! 😍&rdquo;</div>
+      <div className="demoChip chipB"><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>Example: new lead saved</div>
     </div>
   );
 }

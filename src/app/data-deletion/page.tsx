@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { ldJson } from "@/lib/tool-schema";
@@ -44,6 +45,7 @@ export default function Page() {
       <header className="hero">
         <p className="eyebrow">Legal</p>
         <h1>Delete your data</h1>
+        <div className="hero-art"><AnimArt name="legal" label="A calm creator holds a shield with a check mark next to a padlock, a key and a neat document" /></div>
       </header>
       <section style={{ paddingTop: 20 }}>
         <div className={s.prose}>

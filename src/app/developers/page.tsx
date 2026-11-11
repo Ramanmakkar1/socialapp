@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
+import { AnimArt } from "@/components/AnimArt";
 
 const description =
   "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp. Schedule posts, list channels and read analytics.";
@@ -76,6 +77,7 @@ export default function DevelopersPage() {
           <code style={{ fontFamily: "ui-monospace, monospace" }}>{MCP_URL}</code> with your Poskoo API key, and it
           can schedule posts, list your channels and read your analytics — with the same checks the Poskoo app uses.
         </p>
+        <div className="hero-art"><AnimArt name="developers" label="A developer types code on a laptop while a plug connects to a socket and gears turn" /></div>
       </header>
 
       <section style={{ paddingTop: 40 }}>

@@ -7,6 +7,7 @@ import s from "@/components/site.module.css";
 import { SAFE_ZONES, toPixels } from "@/lib/safeZones";
 import SafeZoneChecker from "./SafeZoneChecker";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-safe-zone-checker";
 const description =
@@ -104,16 +105,7 @@ export default function InstagramSafeZoneCheckerPage() {
           On a 1080×1920 Reel, keep important text and faces out of roughly the top {reelsTop.h} px, bottom {reelsBottom.h} px and right {reelsRight.w} px so Instagram&apos;s caption and buttons do not cover them.
           Load a cover, Story or video frame to check your layout, then download a free template.
         </p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            loading="lazy"
-            alt="A creator at a laptop sends one post that splits to several phones and screens"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

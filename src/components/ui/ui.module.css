@@ -26,7 +26,7 @@
   transition: transform .2s, background .2s, border-color .2s, color .2s;
 }
 .btn:disabled { opacity: .6; cursor: default; transform: none; }
-.btnDark { background: var(--poskoo-ink); color: #fff; }
+.btnDark { background: var(--fill-strong, var(--poskoo-ink)); color: #fff; }
 .btnDark:hover:not(:disabled) { background: var(--poskoo-violet); transform: translateY(-1px); }
 .btnLine { border-color: var(--poskoo-ink); background: transparent; color: var(--poskoo-ink); }
 .btnLine:hover:not(:disabled) { background: var(--poskoo-card); transform: translateY(-1px); }
@@ -42,8 +42,8 @@
    that keep their own size/shape utilities (replaces the old violet-pink
    .btn-primary gradient). */
 .inkFill {
-  border-color: var(--poskoo-ink);
-  background: var(--poskoo-ink);
+  border-color: var(--fill-strong, var(--poskoo-ink));
+  background: var(--fill-strong, var(--poskoo-ink));
   color: #fff;
   font-weight: 600;
   transition: transform .2s, background .2s;
@@ -88,7 +88,7 @@ button.inkFill:disabled { transform: none; }
   font-weight: 600;
   color: var(--poskoo-ink);
 }
-.pillInk { border-color: var(--poskoo-ink); background: var(--poskoo-ink); color: #fff; }
+.pillInk { border-color: var(--fill-strong, var(--poskoo-ink)); background: var(--fill-strong, var(--poskoo-ink)); color: #fff; }
 .pillMint { border-color: var(--poskoo-green); color: var(--poskoo-green); }
 .pillPeach { border-color: var(--poskoo-coral); color: var(--poskoo-coral); }
 

@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import CommentPicker from "./CommentPicker";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-comment-picker";
 const description =
@@ -67,16 +68,7 @@ export default function InstagramCommentPickerPage() {
           Paste the comments from your giveaway post, filter by keyword and tagged friends, and pick a random winner
           in seconds.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/problem.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A tired creator at night buried under phones and chat-bubble notifications"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

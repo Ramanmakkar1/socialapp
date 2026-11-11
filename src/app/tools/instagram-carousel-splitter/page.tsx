@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import CarouselSplitter from "./CarouselSplitter";
 import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-carousel-splitter";
 const title = "Instagram Carousel Splitter: Split a Photo Free | Poskoo";
@@ -69,16 +69,7 @@ export default function InstagramCarouselSplitterPage() {
           Split one image into equal-width Instagram carousel slides. Choose 2 to 10 slides, preview every crop in order,
           and download the PNGs locally — your photo never leaves your browser.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

@@ -1,47 +1,34 @@
-import type { DmTemplate } from "@/lib/dmTemplates";
+import { DM_TEMPLATES, type DmTemplate } from "@/lib/dmTemplates";
 
-export type TemplateCategoryId = "all" | "popular" | "sell" | "engage" | "leads" | "book";
+export type TemplateCategoryId = "all" | "popular" | "leads" | "sell" | "events" | "content";
 
 export const CATEGORIES: { id: TemplateCategoryId; label: string }[] = [
   { id: "all", label: "All" },
-  { id: "popular", label: "Popular" },
-  { id: "sell", label: "Sell & earn" },
-  { id: "engage", label: "Engage audience" },
-  { id: "leads", label: "Capture leads" },
-  { id: "book", label: "Book clients" },
+  { id: "popular", label: "Featured" },
+  { id: "leads", label: "Lead magnets" },
+  { id: "sell", label: "Selling products" },
+  { id: "events", label: "Events and calls" },
+  { id: "content", label: "Content and downloads" },
 ];
 
-const POPULAR = new Set([
-  "send-link",
-  "product-link",
-  "free-guide",
-  "discount-code",
-  "book-a-call",
-  "story-freebie",
-]);
+export type GoalCategory = Exclude<TemplateCategoryId, "all" | "popular">;
 
-const BY_SLUG: Record<string, Exclude<TemplateCategoryId, "all" | "popular">[]> = {
-  "send-link": ["sell"],
-  "product-link": ["sell"],
-  "price-request": ["sell"],
-  "discount-code": ["sell"],
-  "affiliate-links": ["sell"],
-  "story-freebie": ["engage"],
-  "follow-bonus": ["engage"],
-  "dm-auto-reply": ["engage"],
-  "thank-commenters": ["engage"],
-  "recipe-download": ["engage"],
-  "giveaway-entry": ["engage"],
-  "free-guide": ["leads"],
-  "email-checklist": ["leads"],
-  "course-waitlist": ["leads"],
-  "book-a-call": ["book"],
-  "webinar-signup": ["book"],
-  "portfolio": ["book"],
+const POPULAR = new Set(["free-guide", "product-link", "discount-code", "send-link", "book-a-call", "story-freebie"]);
+
+// Each template's own use case decides its section; the two odd ones join the closest section.
+const BY_USE_CASE: Record<string, GoalCategory> = {
+  "Lead magnets": "leads",
+  "Selling products": "sell",
+  "Events and calls": "events",
+  "Booking clients": "events",
+  "Content and downloads": "content",
+  "Engaging your audience": "content",
 };
 
-export function categoriesFor(slug: string): Exclude<TemplateCategoryId, "all" | "popular">[] {
-  return BY_SLUG[slug] ?? [];
+export function categoriesFor(slug: string): GoalCategory[] {
+  const t = DM_TEMPLATES.find((tpl) => tpl.slug === slug);
+  const c = t ? BY_USE_CASE[t.useCase] : undefined;
+  return c ? [c] : [];
 }
 
 export function visibleIn(template: DmTemplate, category: TemplateCategoryId): boolean {
@@ -49,3 +36,5 @@ export function visibleIn(template: DmTemplate, category: TemplateCategoryId): b
   if (category === "popular") return POPULAR.has(template.slug);
   return categoriesFor(template.slug).includes(category);
 }
+
+export const FEATURED_SLUGS = [...POPULAR];

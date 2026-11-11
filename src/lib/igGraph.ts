@@ -130,6 +130,34 @@ export async function fetchIgProfile(account: GraphAccount): Promise<IgProfile> 
   };
 }
 
+/**
+ * Follower count only (for the daily growth snapshot). Asking for a single field keeps the call
+ * working when the token lacks permission for other profile fields.
+ * - facebook_login: graph.facebook.com/{ig-user-id}?fields=followers_count with the Page token
+ *   ("me" there would be the Page, which has no followers_count field and errors with code 100).
+ * - instagram_login: graph.instagram.com/me?fields=followers_count with the IG user token.
+ */
+export async function fetchFollowersCount(account: GraphAccount): Promise<number | null> {
+  const json = await graphCall<{ followers_count?: number }>(
+    account,
+    isFacebookLogin(account.auth_type) ? encodeURIComponent(account.external_id) : "me",
+    { params: { fields: "followers_count" } }
+  );
+  return typeof json.followers_count === "number" ? json.followers_count : null;
+}
+
+/** Safe one-line description of a Graph failure for logs: kind, Meta code and message, never tokens. */
+export function describeGraphError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  const message = raw
+    .replace(/(access_token=)[^&\s"]+/gi, "$1[redacted]")
+    .replace(/(Bearer\s+)[A-Za-z0-9._|-]+/g, "$1[redacted]")
+    .replace(/\b(EAA|IGQ|IGA)[A-Za-z0-9_-]{10,}/g, "[redacted]")
+    .slice(0, 200);
+  if (err instanceof GraphError) return `kind=${err.kind} code=${err.code ?? "none"} message=${message}`;
+  return `message=${message}`;
+}
+
 export type AccountInsights = { reach: number | null; accountsEngaged: number | null; totalInteractions: number | null; profileViews: number | null };
 
 export function parseAccountInsights(json: unknown): AccountInsights {

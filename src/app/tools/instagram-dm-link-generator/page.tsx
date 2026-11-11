@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import DmLinkGenerator from "./DmLinkGenerator";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-dm-link-generator";
 const description =
@@ -54,16 +55,7 @@ export default function InstagramDmLinkGeneratorPage() {
           Turn your @username into an ig.me link that opens a direct message with your account. Copy it for your bio,
           Story sticker, email or website button.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-dm.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

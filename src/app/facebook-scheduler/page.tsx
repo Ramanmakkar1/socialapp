@@ -5,6 +5,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/facebook-scheduler";
 const title = `Facebook Page Scheduler: Plan & Auto-Publish | ${BRAND.name}`;
@@ -149,16 +150,7 @@ export default function FacebookSchedulerPage() {
           <Link className="btn btn-line" href="/pricing">View pricing</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
-        <div className="hero-art" style={{ maxWidth: 920 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 920px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            priority
-            alt="A creator schedules a post that travels from a laptop to several connected social channels"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
       </header>
 
       <section>

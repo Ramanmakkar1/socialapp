@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import HighlightCoverMaker from "./HighlightCoverMaker";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-highlight-cover-maker";
 const description =
@@ -90,16 +91,7 @@ export default function InstagramHighlightCoverMakerPage() {
           Pick a colour and an icon, preview the circle crop, and download a ready-to-use highlight cover PNG.
           No upload, no account, no watermark.
         </p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            loading="lazy"
-            alt="A creator designs circular highlight covers for an Instagram profile"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

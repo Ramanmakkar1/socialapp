@@ -87,3 +87,60 @@ test("buildGrowthSeries handles no snapshots and bad today", () => {
   ]);
   assert.deepEqual(buildGrowthSeries("not-a-date", 3, []), []);
 });
+
+test("parsePeriod: month to date and last month are UTC calendar ranges; day counts keep working", async () => {
+  const { parsePeriod } = await import("./analytics.ts");
+  const now = new Date("2026-11-11T15:30:00Z");
+  const mtd = parsePeriod("mtd", now);
+  assert.equal(mtd.range.from.toISOString(), "2026-11-01T00:00:00.000Z");
+  assert.equal(mtd.range.to.toISOString(), now.toISOString());
+  assert.equal(mtd.days, 11);
+  assert.equal(mtd.lastDay, "2026-11-11");
+
+  const last = parsePeriod("last_month", now);
+  assert.equal(last.range.from.toISOString(), "2026-10-01T00:00:00.000Z");
+  assert.equal(last.range.to.toISOString(), "2026-11-01T00:00:00.000Z");
+  assert.equal(last.days, 31);
+  assert.equal(last.lastDay, "2026-10-31");
+  assert.equal(last.phrase, "October 2026");
+
+  // January → December of the previous year.
+  const jan = parsePeriod("last_month", new Date("2027-01-05T00:00:00Z"));
+  assert.equal(jan.range.from.toISOString(), "2026-12-01T00:00:00.000Z");
+  assert.equal(jan.days, 31);
+
+  const seven = parsePeriod("7", now);
+  assert.equal(seven.key, "7");
+  assert.equal(seven.days, 7);
+  assert.equal(seven.range.to.getTime() - seven.range.from.getTime(), 7 * 86_400_000);
+  assert.equal(parsePeriod("bogus", now).key, "30");
+});
+
+test("growthDays: N days end today; a range covers the UTC days it touches", async () => {
+  const { growthDays, resolveRange } = await import("./analytics.ts");
+  const now = new Date("2026-11-11T15:30:00Z");
+  assert.deepEqual(growthDays(7, now), { firstDay: "2026-11-05", lastDay: "2026-11-11" });
+  assert.deepEqual(growthDays({ from: new Date("2026-10-01T00:00:00Z"), to: new Date("2026-11-01T00:00:00Z") }), { firstDay: "2026-10-01", lastDay: "2026-10-31" });
+  const r = { from: new Date("2026-01-01T00:00:00Z"), to: new Date("2026-01-02T00:00:00Z") };
+  assert.equal(resolveRange(r), r);
+});
+
+test("getPostPerformance / getGrowthSnapshots accept a day count or a range and an optional account", async () => {
+  const { createFakePool, installFakePool } = await import("../test-utils/fakePool.ts");
+  const { pool, calls } = createFakePool([{ match: () => true, reply: () => [] }]);
+  const restore = installFakePool(pool);
+  try {
+    const { getGrowthSnapshots, getPostPerformance } = await import("./analytics.ts");
+    const range = { from: new Date("2026-10-01T00:00:00Z"), to: new Date("2026-11-01T00:00:00Z") };
+    await getPostPerformance("u1", range, "acc-1");
+    await getPostPerformance("u1", 30);
+    await getGrowthSnapshots("u1", range);
+  } finally {
+    restore();
+  }
+  assert.deepEqual(calls[0].params, ["u1", new Date("2026-10-01T00:00:00Z"), new Date("2026-11-01T00:00:00Z"), "acc-1"]);
+  assert.match(calls[0].sql, /t\.published_at >= \$2 and t\.published_at < \$3/);
+  assert.equal(calls[1].params[3], null);
+  assert.equal((calls[1].params[2] as Date).getTime() - (calls[1].params[1] as Date).getTime(), 30 * 86_400_000);
+  assert.deepEqual(calls[2].params, ["u1", "2026-10-01", "2026-10-31", null]);
+});

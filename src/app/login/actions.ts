@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createUser, endSession, startSession, verifyLogin } from "@/lib/auth";
 import { normalizeEmail, validateSignup } from "@/lib/password";
+import { attributeReferralFromCookie } from "@/lib/referralCookie";
 import { clientIp, rateLimit, tooManyMessage } from "@/lib/rateLimit";
 import { reviewerLogin } from "@/lib/reviewer";
 
@@ -31,6 +32,7 @@ export async function signupAction(_prev: AuthState, formData: FormData): Promis
     if (!user) {
       return { error: "An account with this email already exists. Log in instead." };
     }
+    await attributeReferralFromCookie(user.id);
     await startSession(user.id, (await headers()).get("user-agent") ?? undefined);
   } catch {
     return { error: DB_ERROR };

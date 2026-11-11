@@ -4,8 +4,9 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
-import CompareHeroIllustration from "@/components/CompareHeroIllustration";
+import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = {
   title: { absolute: `Later Alternative With Instagram Auto-DM | ${BRAND.name}` },
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 const whyLook = [
-  { no: "01 / One tool", title: "Scheduler plus comment-to-DM", text: "Later plans your grid and calendar well, but turning comments into DMs still means paying for a separate chat automation tool." },
+  { no: "01 / One tool", title: "Scheduler plus comment-to-DM", text: "Later plans your grid and calendar well, but turning comments into DMs often means adding a separate chat automation tool." },
   { no: "02 / One calendar", title: "One calendar for posts and rules", text: `In ${BRAND.name} you attach a comment-to-DM rule to a scheduled post. The rule switches on when the post goes live.` },
   { no: "03 / Leads", title: "Leads from scheduled content", text: "Ask for an email in the DM before the link is sent, so posts you planned weeks ahead can still fill a lead list." },
 ];
@@ -23,10 +24,10 @@ const whyLook = [
 const compare: [string, string, string][] = [
   ["Scheduling for Instagram, Facebook and Threads", "Instagram, Facebook Pages and Threads", "Yes"],
   ["Visual calendar", "Yes", "Yes"],
-  ["Comment→DM keyword automation", "Yes", "No"],
-  ["Email capture in the DM", "Yes", "No"],
+  ["Comment→DM keyword automation", "Yes", "Check their site"],
+  ["Email capture in the DM", "Yes", "Check their site"],
   ["Link click tracking", "Yes", "See their site"],
-  ["Lead CSV export", "Yes", "No"],
+  ["Lead CSV export", "Yes", "Check their site"],
   ["AI caption ideas", "Yes", "See their site"],
 ];
 
@@ -38,9 +39,9 @@ const switchSteps = [
 
 const faqs = [
   { q: `Is ${BRAND.name} a Later alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram, Facebook Pages and Threads scheduling and publishing today, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
-  { q: "Does Later send automatic DMs when someone comments?", a: "Later is built for planning and publishing social content. Comment-to-DM automation is not part of Later itself; teams usually add a tool like ManyChat for that." },
+  { q: "Does Later send automatic DMs when someone comments?", a: "Later is built for planning and publishing social content. Check Later's site for what its current plans include; many teams add a separate tool like ManyChat for comment-to-DM." },
   { q: "Can I import my Later media library or schedule?", a: `There is no Later import yet. Download assets from Later if needed, then upload them when you create posts in ${BRAND.name}. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
-  { q: "Which platforms does each tool support?", a: `Instagram, Facebook Pages and Threads scheduling and Instagram auto-DMs work today on ${BRAND.name}, with more networks later. Later supports additional networks such as Pinterest and TikTok; see their site for the current list.` },
+  { q: "Which platforms does each tool support?", a: `Instagram, Facebook Pages, Threads and YouTube scheduling and Instagram auto-DMs work today on ${BRAND.name}. Other networks are on the roadmap, with no date yet. Later supports additional networks such as Pinterest and TikTok; see their site for the current list.` },
   { q: "Is comment-to-DM allowed on Instagram?", a: `Yes, through the official Instagram API. ${BRAND.name} only messages people who commented first, uses Meta login, and never asks for your password.` },
 ];
 
@@ -74,10 +75,7 @@ export default function LaterAlternative() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
-        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
-        <div className="hero-art">
-          <Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/multichannel.webp" width={1400} height={933} alt="A creator at a laptop sends one post that splits to several phones and screens" />
-        </div>
+        <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
 
       {/* Why people look for a Later alternative */}
@@ -126,6 +124,7 @@ export default function LaterAlternative() {
               </tbody>
             </table>
           </div>
+          <CompareNote />
           <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Later features and plans change over time. Check their site for current details. We do not list their prices here.</p>
         </div>
       </section>

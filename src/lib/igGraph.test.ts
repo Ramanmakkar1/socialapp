@@ -125,3 +125,40 @@ test("token errors still mark the account expired and never expose the token", a
     ctx.restore();
   }
 });
+
+test("fetchFollowersCount: Facebook-login accounts ask graph.facebook.com/{ig-user-id}, Instagram-login accounts ask graph.instagram.com/me", async () => {
+  const urls: string[] = [];
+  const ctx = loadIgGraph((async (url: string) => {
+    urls.push(String(url));
+    return new Response(JSON.stringify({ followers_count: 1234 }), { status: 200 });
+  }) as unknown as typeof fetch);
+  try {
+    assert.equal(await ctx.mod.fetchFollowersCount({ ...account, auth_type: "facebook_login" }), 1234);
+    assert.equal(await ctx.mod.fetchFollowersCount({ ...account, auth_type: "instagram_login" }), 1234);
+    assert.equal(await ctx.mod.fetchFollowersCount({ ...account, auth_type: null }), 1234);
+  } finally {
+    ctx.restore();
+  }
+  assert.equal(urls[0], `${graphHost.FB_GRAPH}/ig-1?fields=followers_count`);
+  assert.equal(urls[1], `${graphHost.IG_GRAPH}/me?fields=followers_count`);
+  assert.equal(urls[2], `${graphHost.IG_GRAPH}/me?fields=followers_count`);
+  assert.ok(urls.every((u) => !u.includes(TOKEN)), "token travels in the Authorization header, never the URL");
+});
+
+test("describeGraphError logs the Meta code and message but never the token", async () => {
+  const ctx = loadIgGraph((async () =>
+    new Response(JSON.stringify({ error: { code: 100, message: `Unsupported get request. access_token=${TOKEN} EAABwzLixnjYBO1234567890abc` } }), { status: 400 })) as unknown as typeof fetch);
+  let line = "";
+  try {
+    await ctx.mod.fetchFollowersCount({ ...account, auth_type: "facebook_login" });
+    assert.fail("should throw");
+  } catch (e) {
+    line = ctx.mod.describeGraphError(e);
+  } finally {
+    ctx.restore();
+  }
+  assert.match(line, /kind=other code=100 message=Unsupported get request/);
+  assert.ok(!line.includes(TOKEN));
+  assert.ok(!line.includes("EAABwzLixnjYBO1234567890abc"));
+  assert.equal(ctx.mod.describeGraphError(new Error("Bearer abc.def-123 failed")), "message=Bearer [redacted] failed");
+});

@@ -164,16 +164,14 @@ export default function ScheduleInstagramStoriesHelpPage() {
       />
       <header className="hero">
         <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
+        <h1>
             How to schedule Instagram <em className="s">Stories</em>
           </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
-        </div>
         <p className="lede">
           Paste one public image or video link, pick the Story format, choose a time and {BRAND.name} publishes it for
           you. Here is exactly what a scheduled Story can and can&apos;t include.
         </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>
@@ -184,8 +182,8 @@ export default function ScheduleInstagramStoriesHelpPage() {
               <li>
                 An Instagram professional account (Business or Creator) connected to {BRAND.name} through Meta&apos;s
                 official login. Follow the{" "}
-                <Link className={s.vlink} href="/help/connect-instagram-account">
-                  connect your Instagram account guide
+                <Link className={s.vlink} href="/help/getting-started">
+                  getting started guide
                 </Link>{" "}
                 or connect it in{" "}
                 <Link className={s.vlink} href="/app/settings">
@@ -284,8 +282,8 @@ export default function ScheduleInstagramStoriesHelpPage() {
             </ul>
             <p>
               For more checks, read{" "}
-              <Link className={s.vlink} href="/help/instagram-scheduled-post-failed">
-                why a scheduled Instagram post failed
+              <Link className={s.vlink} href="/help/schedule-instagram-reels">
+                what to do when a scheduled post did not publish
               </Link>
               . Still stuck?{" "}
               <Link className={s.vlink} href="/contact">

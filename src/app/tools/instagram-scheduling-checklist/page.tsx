@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import SchedulingChecklist from "./SchedulingChecklist";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-scheduling-checklist";
 const description =
@@ -91,16 +92,7 @@ export default function InstagramSchedulingChecklistPage() {
           Tick off the preflight before you schedule: caption limits, media format, channel selection, the scheduled time
           in your timezone, the connected account and the publishing status — then queue the post in {BRAND.name}.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A calendar of scheduled social posts with a phone showing a published post"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

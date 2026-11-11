@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 const description = `Step-by-step guides for ${BRAND.name}: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`;
 
@@ -134,16 +135,7 @@ export default function HelpHubPage() {
         <p className="lede">
           Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
         </p>
-        <div className="hero-art" style={{ maxWidth: 760 }}>
-          <Image
-            sizes="(max-width: 800px) 100vw, 760px"
-            src="/illustrations/help-support.webp"
-            width={1536}
-            height={1024}
-            priority
-            alt="A smiling creator waves and holds out a map next to a life ring, while a happy dog looks up at a speech bubble."
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="help" label="A creator reads on a giant open book under a lightbulb and a signpost" /></div>
       </header>
 
       <section style={{ paddingTop: 40 }}>

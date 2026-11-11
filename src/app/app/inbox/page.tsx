@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Check, EyeOff, Heart, Image as ImageIcon, Inbox, MessageCircle, MessagesSquare } from "lucide-react";
+import { Check, EyeOff, Heart, Image as ImageIcon, Inbox, Instagram, LayoutGrid, List, MessageCircle, MessagesSquare } from "lucide-react";
 import LocalTime from "@/components/LocalTime";
 import { requireUser } from "@/lib/auth";
-import { isDbConfigured } from "@/lib/db";
+import { isDbConfigured, query } from "@/lib/db";
 import {
   DM_WINDOW_MS,
   PRIVATE_REPLY_WINDOW_MS,
@@ -12,12 +12,15 @@ import {
   withinWindow,
   type InboxComment,
   type InboxFilter,
+  type PostGroup,
   type Thread,
 } from "@/lib/inbox";
-import { BtnLink, PageHero } from "@/components/ui/kit";
+import { BtnLink } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import EmptyState from "../EmptyState";
 import { hideCommentAction, likeCommentAction, privateReplyAction, replyToCommentAction, toggleDoneAction } from "./actions";
+import CommentReplyBox from "./CommentReplyBox";
+import { postKeyFor } from "./returnTo";
 import ReplySubmitButton from "./ReplySubmitButton";
 import ThreadReplyComposer from "./ThreadReplyComposer";
 import styles from "./inbox.module.css";
@@ -48,6 +51,59 @@ function statusPillClass(dmStatus: string | null): string {
   return styles.statusPill;
 }
 
+type PostInfo = { caption: string; thumb: string | null; at: Date | null };
+
+const AVATAR_TINTS = ["#e8e1ff", "#ffe4d1", "#d8f3e4", "#ffdcee", "#dbeafe", "#fdf1c7"];
+
+function tintFor(name: string): string {
+  let h = 0;
+  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return AVATAR_TINTS[h % AVATAR_TINTS.length];
+}
+
+function relTime(at: Date | string, now = Date.now()): string {
+  const s = Math.max(0, Math.round((now - new Date(at).getTime()) / 1000));
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+function groupKey(g: PostGroup): string {
+  return postKeyFor(g.accountId, g.mediaId);
+}
+
+// Hidden fields that bring the user back to the same filter, layout and post after an action.
+function ReturnFields({ ret }: { ret: Record<string, string> }) {
+  return (
+    <>
+      {Object.entries(ret).map(([k, v]) => (v ? <input key={k} type="hidden" name={`return_${k}`} value={v} /> : null))}
+    </>
+  );
+}
+
+// Posts this app published, keyed by Instagram media id, so the inbox can show their caption and image.
+async function postInfoByMedia(userId: string, mediaIds: string[]): Promise<Map<string, PostInfo>> {
+  const out = new Map<string, PostInfo>();
+  if (mediaIds.length === 0) return out;
+  try {
+    const rows = await query<{ external_post_id: string; caption: string | null; media: unknown; published_at: Date | null }>(
+      `select t.external_post_id, p.caption, p.media, t.published_at
+         from socialapp.post_targets t join socialapp.scheduled_posts p on p.id = t.post_id
+        where p.user_id = $1 and t.platform = 'instagram' and t.external_post_id = any($2::text[])`,
+      [userId, mediaIds],
+    );
+    for (const r of rows) {
+      const first = Array.isArray(r.media) ? (r.media[0] as { url?: unknown } | undefined) : undefined;
+      const url = typeof first?.url === "string" && !/\.(mp4|mov|webm)(\?|$)/i.test(first.url) ? first.url : null;
+      out.set(r.external_post_id, { caption: r.caption ?? "", thumb: url, at: r.published_at });
+    }
+  } catch {
+    // Unknown posts just show as "Instagram post".
+  }
+  return out;
+}
+
 const STATUS_TEXT: Record<string, string> = {
   sent: "Private reply sent",
   pending: "Auto-DM queued",
@@ -56,7 +112,7 @@ const STATUS_TEXT: Record<string, string> = {
 export default async function InboxPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string | string[]; thread?: string | string[]; ok?: string | string[]; error?: string | string[]; filter?: string | string[] }>;
+  searchParams: Promise<{ tab?: string | string[]; thread?: string | string[]; ok?: string | string[]; error?: string | string[]; filter?: string | string[]; view?: string | string[]; post?: string | string[] }>;
 }) {
   const user = await requireUser();
   const sp = await searchParams;
@@ -83,16 +139,47 @@ export default async function InboxPage({
     hidden: data.comments.filter((c) => c.hidden).length,
   };
   const groups = groupCommentsByPost(filterComments(data.comments, filter), data.accounts);
+  const view = one(sp.view) === "list" ? "list" : "post";
+  const postInfo = await postInfoByMedia(user.id, [...new Set(data.comments.map((c) => c.mediaId).filter((m): m is string => Boolean(m)))]);
+  const selectedKey = one(sp.post);
+  const selected = groups.find((g) => groupKey(g) === selectedKey) ?? groups[0];
+  const account = data.accounts[0];
+  const handle = account?.username ?? null;
+  const hrefWith = (params: Record<string, string>) => {
+    const q = new URLSearchParams();
+    if (filter !== "all") q.set("filter", filter);
+    for (const [k, v] of Object.entries(params)) if (v) q.set(k, v);
+    const str = q.toString();
+    return str ? `/app/inbox?${str}` : "/app/inbox";
+  };
 
   return (
     <>
-      <PageHero
-        eyebrow="Comments and DMs"
-        title="Inbox"
-        lede="Comments on your posts and Instagram DMs, in one place. Auto-DM rules answer most of them for you."
-        art="/landing/card-dm.webp"
-        artAlt="A creator replying to Instagram comments and messages"
-      />
+      <header className={styles.pageHead}>
+        <div className={styles.headWho}>
+          <span className={styles.headAvatar} aria-hidden="true">
+            {(handle ?? "I").slice(0, 1).toUpperCase()}
+            <span className={styles.headBadge}><Instagram width={10} height={10} /></span>
+          </span>
+          <div className="min-w-0">
+            <h1 className={styles.pageTitle}>
+              {handle ? `@${handle}` : "Inbox"}
+              {counts.unanswered > 0 && <span className={styles.unansweredBadge}>{counts.unanswered} unanswered</span>}
+            </h1>
+            <p className={styles.pageSub}>Comments on your posts and Instagram DMs. Auto-DM rules answer most of them for you.</p>
+          </div>
+        </div>
+        {tab === "comments" && data.comments.length > 0 && (
+          <nav className={styles.viewToggle} aria-label="Comment layout">
+            <Link href={hrefWith({})} aria-current={view === "post" ? "page" : undefined} className={`${styles.viewBtn} ${view === "post" ? styles.viewBtnActive : ""}`}>
+              <LayoutGrid width={15} height={15} aria-hidden="true" /> By post
+            </Link>
+            <Link href={hrefWith({ view: "list" })} aria-current={view === "list" ? "page" : undefined} className={`${styles.viewBtn} ${view === "list" ? styles.viewBtnActive : ""}`}>
+              <List width={15} height={15} aria-hidden="true" /> List
+            </Link>
+          </nav>
+        )}
+      </header>
       {ok && <p className={ui.notice} role="status">{ok}</p>}
       {error && <p className={`${ui.notice} ${ui.noticeWarn}`}>{error}</p>}
       {loadFailed ? (
@@ -104,14 +191,14 @@ export default async function InboxPage({
         </p>
       ) : (
         <>
-      <div className={`${styles.tabs} mt-6`} role="tablist">
-        <Link href="/app/inbox" role="tab" aria-selected={tab === "comments"} className={`${styles.tab} ${tab === "comments" ? styles.tabActive : ""}`}>
-          <MessageCircle width={16} height={16} aria-hidden="true" /> Comments ({data.comments.length})
+      <nav className={styles.tabs} aria-label="Inbox sections">
+        <Link href="/app/inbox" aria-current={tab === "comments" ? "page" : undefined} className={`${styles.tab} ${tab === "comments" ? styles.tabActive : ""}`}>
+          <MessageCircle width={16} height={16} aria-hidden="true" /> Comments <span className={styles.tabCount}>{data.comments.length}</span>
         </Link>
-        <Link href="/app/inbox?tab=messages" role="tab" aria-selected={tab === "messages"} className={`${styles.tab} ${tab === "messages" ? styles.tabActive : ""}`}>
-          <MessagesSquare width={16} height={16} aria-hidden="true" /> Messages ({data.threads.length})
+        <Link href="/app/inbox?tab=messages" aria-current={tab === "messages" ? "page" : undefined} className={`${styles.tab} ${tab === "messages" ? styles.tabActive : ""}`}>
+          <MessagesSquare width={16} height={16} aria-hidden="true" /> Messages <span className={styles.tabCount}>{data.threads.length}</span>
         </Link>
-      </div>
+      </nav>
 
       {data.accounts.length === 0 ? (
         <div className="mt-6">
@@ -141,13 +228,13 @@ export default async function InboxPage({
         ) : (
           <>
             <div className={styles.filterTabs} role="tablist" aria-label="Comment filters">
-              <Link href="/app/inbox" role="tab" aria-selected={filter === "all"} className={`${styles.filterTab} ${filter === "all" ? styles.filterTabActive : ""}`}>
+              <Link href={view === "list" ? "/app/inbox?view=list" : "/app/inbox"} role="tab" aria-selected={filter === "all"} className={`${styles.filterTab} ${filter === "all" ? styles.filterTabActive : ""}`}>
                 All ({counts.all})
               </Link>
-              <Link href="/app/inbox?filter=unanswered" role="tab" aria-selected={filter === "unanswered"} className={`${styles.filterTab} ${filter === "unanswered" ? styles.filterTabActive : ""}`}>
+              <Link href={`/app/inbox?filter=unanswered${view === "list" ? "&view=list" : ""}`} role="tab" aria-selected={filter === "unanswered"} className={`${styles.filterTab} ${filter === "unanswered" ? styles.filterTabActive : ""}`}>
                 Unanswered ({counts.unanswered})
               </Link>
-              <Link href="/app/inbox?filter=hidden" role="tab" aria-selected={filter === "hidden"} className={`${styles.filterTab} ${filter === "hidden" ? styles.filterTabActive : ""}`}>
+              <Link href={`/app/inbox?filter=hidden${view === "list" ? "&view=list" : ""}`} role="tab" aria-selected={filter === "hidden"} className={`${styles.filterTab} ${filter === "hidden" ? styles.filterTabActive : ""}`}>
                 Hidden ({counts.hidden})
               </Link>
             </div>
@@ -157,6 +244,36 @@ export default async function InboxPage({
                   ? "No hidden comments. Use Hide on a comment to park it out of the way."
                   : "Nothing unanswered — every comment is answered or hidden."}
               </p>
+            ) : view === "post" && selected ? (
+              <div className={styles.byPost}>
+                <ul className={styles.postGrid} aria-label="Posts with comments">
+                  {groups.map((g) => {
+                    const info = g.mediaId ? postInfo.get(g.mediaId) : undefined;
+                    const key = groupKey(g);
+                    const active = key === groupKey(selected);
+                    return (
+                      <li key={key}>
+                        <Link
+                          href={hrefWith({ post: key })}
+                          scroll={false}
+                          aria-current={active ? "true" : undefined}
+                          aria-label={`${info?.caption ? info.caption.slice(0, 60) : "Instagram post"}: ${g.comments.length} comments, ${g.unanswered} unanswered`}
+                          className={`${styles.postTile} ${active ? styles.postTileActive : ""}`}
+                        >
+                          {info?.thumb ? (
+                            // eslint-disable-next-line @next/next/no-img-element -- user media from arbitrary hosts
+                            <img src={info.thumb} alt="" loading="lazy" />
+                          ) : (
+                            <span className={styles.postTileText}>{info?.caption ? info.caption.slice(0, 70) : <ImageIcon width={20} height={20} aria-hidden="true" />}</span>
+                          )}
+                          {g.unanswered > 0 && <span className={styles.tileCount}>{g.unanswered}</span>}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <SelectedPost group={selected} info={selected.mediaId ? postInfo.get(selected.mediaId) : undefined} filter={filter} />
+              </div>
             ) : (
               <div className="mt-4 grid gap-5">
                 {groups.map((g) => (
@@ -254,6 +371,7 @@ export default async function InboxPage({
 }
 
 function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
+  const ret = { filter: filter === "all" ? "" : filter, view: "list" };
   const canPrivate = !c.dmStatus && withinWindow(c.receivedAt, PRIVATE_REPLY_WINDOW_MS);
   const who = `@${c.fromUsername ?? "instagram user"}`;
   return (
@@ -279,7 +397,7 @@ function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
         <form action={likeCommentAction}>
           <input type="hidden" name="account_id" value={c.accountId} />
           <input type="hidden" name="comment_id" value={c.commentId} />
-          <input type="hidden" name="filter" value={filter} />
+          <ReturnFields ret={ret} />
           <button type="submit" disabled={c.liked} className={styles.actionBtn} aria-label={c.liked ? `Comment by ${who} is liked` : `Like the comment by ${who}`}>
             <Heart width={14} height={14} aria-hidden="true" />
             {c.liked ? "Liked" : "Like"}
@@ -288,7 +406,7 @@ function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
         <form action={toggleDoneAction}>
           <input type="hidden" name="account_id" value={c.accountId} />
           <input type="hidden" name="comment_id" value={c.commentId} />
-          <input type="hidden" name="filter" value={filter} />
+          <ReturnFields ret={ret} />
           <button type="submit" className={styles.actionBtn} aria-pressed={c.done} aria-label={c.done ? `Reopen the comment by ${who}` : `Mark the comment by ${who} done`}>
             <Check width={14} height={14} aria-hidden="true" />
             {c.done ? "Done" : "Mark done"}
@@ -297,7 +415,7 @@ function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
         <form action={hideCommentAction}>
           <input type="hidden" name="account_id" value={c.accountId} />
           <input type="hidden" name="comment_id" value={c.commentId} />
-          <input type="hidden" name="filter" value={filter} />
+          <ReturnFields ret={ret} />
           <button type="submit" className={styles.actionBtn} aria-pressed={c.hidden} aria-label={c.hidden ? `Show the comment by ${who} again` : `Hide the comment by ${who}`}>
             <EyeOff width={14} height={14} aria-hidden="true" />
             {c.hidden ? "Show" : "Hide"}
@@ -309,6 +427,7 @@ function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
         <form action={replyToCommentAction} className="mt-2 flex flex-wrap gap-2">
           <input type="hidden" name="account_id" value={c.accountId} />
           <input type="hidden" name="comment_id" value={c.commentId} />
+          <ReturnFields ret={ret} />
           <label className="sr-only" htmlFor={`pub-${c.commentId}`}>Public reply</label>
           <input id={`pub-${c.commentId}`} name="message" required maxLength={2200} placeholder="Reply publicly under the comment…" className={ui.input} />
           <ReplySubmitButton label="Post reply" />
@@ -317,6 +436,7 @@ function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
           <form action={privateReplyAction} className="mt-2 flex flex-wrap gap-2">
             <input type="hidden" name="account_id" value={c.accountId} />
             <input type="hidden" name="comment_id" value={c.commentId} />
+            <ReturnFields ret={ret} />
             <label className="sr-only" htmlFor={`dm-${c.commentId}`}>Private reply</label>
             <input id={`dm-${c.commentId}`} name="message" required maxLength={1000} placeholder="Send one private DM reply…" className={ui.input} />
             <ReplySubmitButton label="Send DM" />
@@ -325,6 +445,105 @@ function CommentCard({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
           <p className={`mt-2 text-xs ${styles.meta}`}>Private DM reply: Instagram allows one per comment, within 7 days.</p>
         )}
       </details>
+    </li>
+  );
+}
+
+function SelectedPost({ group, info, filter }: { group: PostGroup; info: PostInfo | undefined; filter: InboxFilter }) {
+  const handle = group.username;
+  return (
+    <section className={styles.threadPane} aria-labelledby="selected-post-heading">
+      <article className={styles.selPost}>
+        <p className={styles.selMeta}>
+          <span className={styles.selNet} aria-hidden="true"><Instagram width={12} height={12} /></span>
+          <b>@{handle ?? "your account"}</b>
+          {info?.at && <span className={styles.meta}> · <LocalTime value={info.at} style="medium" /></span>}
+        </p>
+        <h2 id="selected-post-heading" className="sr-only">Selected post</h2>
+        <div className={styles.selBody}>
+          {info?.thumb && (
+            // eslint-disable-next-line @next/next/no-img-element -- user media from arbitrary hosts
+            <img src={info.thumb} alt="Post media" className={styles.selMedia} loading="lazy" />
+          )}
+          <p className={styles.selCaption}>{info?.caption || (info ? "(no caption)" : "A post on Instagram (not published through Poskoo).")}</p>
+        </div>
+      </article>
+      <p className={styles.threadCount}>
+        <b>{group.comments.length} {group.comments.length === 1 ? "comment" : "comments"}</b>
+        <span aria-hidden="true"> | </span>
+        <span>{group.unanswered} unanswered</span>
+      </p>
+      <ul className={styles.commentThread}>
+        {group.comments.map((c) => (
+          <ThreadComment key={c.commentId} c={c} filter={filter} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function ThreadComment({ c, filter }: { c: InboxComment; filter: InboxFilter }) {
+  const name = c.fromUsername ?? "instagram user";
+  const who = `@${name}`;
+  const ret = { filter: filter === "all" ? "" : filter, post: postKeyFor(c.accountId, c.mediaId) };
+  const canPrivate = !c.dmStatus && withinWindow(c.receivedAt, PRIVATE_REPLY_WINDOW_MS);
+  return (
+    <li className={`${styles.tComment} ${c.done ? styles.tCommentDone : ""}`}>
+      <span className={styles.tAvatar} style={{ background: tintFor(name) }} aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>
+      <div className={styles.tMain}>
+        <p className={styles.tHead}>
+          <b>{who}</b>
+          <span className={styles.meta} title={new Date(c.receivedAt).toISOString()}>{relTime(c.receivedAt)}</span>
+          {c.done && <span className={`${styles.statusPill} ${styles.statusSent}`}>Done</span>}
+          {c.dmStatus && <span className={statusPillClass(c.dmStatus)}>{STATUS_TEXT[c.dmStatus] ?? `Auto-DM ${c.dmStatus}`}</span>}
+          {c.liked && <span className={styles.statusPill}>Liked</span>}
+        </p>
+        <p className={styles.tText}>{c.text}</p>
+        <div className={styles.tActions}>
+          <form action={likeCommentAction}>
+            <input type="hidden" name="account_id" value={c.accountId} />
+            <input type="hidden" name="comment_id" value={c.commentId} />
+            <ReturnFields ret={ret} />
+            <button type="submit" disabled={c.liked} className={styles.linkAction} aria-label={c.liked ? `Comment by ${who} is liked` : `Like the comment by ${who}`}>
+              <Heart width={13} height={13} aria-hidden="true" /> {c.liked ? "Liked" : "Like"}
+            </button>
+          </form>
+          <form action={hideCommentAction}>
+            <input type="hidden" name="account_id" value={c.accountId} />
+            <input type="hidden" name="comment_id" value={c.commentId} />
+            <ReturnFields ret={ret} />
+            <button type="submit" className={styles.linkAction} aria-pressed={c.hidden} aria-label={c.hidden ? `Show the comment by ${who} again` : `Hide the comment by ${who}`}>
+              <EyeOff width={13} height={13} aria-hidden="true" /> {c.hidden ? "Show" : "Hide"}
+            </button>
+          </form>
+        </div>
+        <div className={styles.replyRow}>
+          <CommentReplyBox action={replyToCommentAction} accountId={c.accountId} commentId={c.commentId} handle={c.fromUsername} returnTo={ret} />
+          <form action={toggleDoneAction} className={styles.doneForm}>
+            <input type="hidden" name="account_id" value={c.accountId} />
+            <input type="hidden" name="comment_id" value={c.commentId} />
+            <ReturnFields ret={ret} />
+            <button type="submit" className={`${styles.doneBtn} ${c.done ? styles.doneBtnOn : ""}`} aria-pressed={c.done} aria-label={c.done ? `Reopen the comment by ${who}` : `Mark the comment by ${who} done`} title={c.done ? "Reopen" : "Mark as done"}>
+              <Check width={18} height={18} aria-hidden="true" />
+            </button>
+          </form>
+        </div>
+        {canPrivate ? (
+          <details className={styles.privateReply}>
+            <summary className={styles.replyToggle}>Send a private DM instead</summary>
+            <form action={privateReplyAction} className="mt-2 flex flex-wrap gap-2">
+              <input type="hidden" name="account_id" value={c.accountId} />
+              <input type="hidden" name="comment_id" value={c.commentId} />
+              <ReturnFields ret={ret} />
+              <label className="sr-only" htmlFor={`tdm-${c.commentId}`}>Private reply</label>
+              <input id={`tdm-${c.commentId}`} name="message" required maxLength={1000} placeholder="Send one private DM reply…" className={ui.input} />
+              <ReplySubmitButton label="Send DM" />
+            </form>
+          </details>
+        ) : (
+          <p className={`mt-2 text-xs ${styles.meta}`}>Private DM reply: Instagram allows one per comment, within 7 days.</p>
+        )}
+      </div>
     </li>
   );
 }

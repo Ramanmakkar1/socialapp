@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import StoryMaker from "./StoryMaker";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-story-maker";
 const description =
@@ -86,16 +87,7 @@ export default function InstagramStoryMakerPage() {
           guides keep text clear of the profile name and reply bar. Download a PNG — no upload, no account, no
           watermark.
         </p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            loading="lazy"
-            alt="A creator designs 1080×1920 Instagram Stories for a profile grid"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

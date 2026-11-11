@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import CaptionGeneratorTool from "./CaptionGeneratorTool";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-caption-generator";
 const description =
@@ -69,16 +70,7 @@ export default function InstagramCaptionGeneratorPage() {
         <p className="lede">
           Generate high-converting Instagram captions tailored by goal and tone. Complete with attention-grabbing hooks, clean line breaks, and comment CTAs.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-leads.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="Two friends high-five next to a board of contacts with check marks and a rising chart"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

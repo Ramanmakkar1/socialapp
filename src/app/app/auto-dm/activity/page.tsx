@@ -6,6 +6,7 @@ import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../../EmptyState";
 import ui from "@/components/ui/ui.module.css";
 import { PageHero } from "@/components/ui/kit";
+import { attemptsText } from "@/lib/deliveryLabels";
 
 export const metadata = { title: "Auto-DM activity" };
 
@@ -120,7 +121,7 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
                   <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                     {row.status === "sent" && row.sent_at ? <>Sent <LocalTime value={row.sent_at} /></> : <>Queued <LocalTime value={row.created_at} /></>}
                     {" · "}
-                    {row.attempts} {row.attempts === 1 ? "attempt" : "attempts"}
+                    {attemptsText(row.status, row.attempts)}
                   </p>
                   {row.status === "pending" && row.rule_paused && (
                     <p className="mt-2 text-sm text-[var(--poskoo-ink)]">Waiting: this automation is paused.</p>

@@ -169,16 +169,14 @@ export default function InstagramStoryReplyAutoDmHelpPage() {
       />
       <header className="hero">
         <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
+        <h1>
             Auto-DM people who reply to your Instagram <em className="s">Story</em>
           </h1>
-          <HelpGuideIllustration variant="story" className="w-36 shrink-0 sm:w-48" />
-        </div>
         <p className="lede">
           Ask viewers to reply with a keyword like FREE, and {BRAND.name} sends each of them a DM with your link. Here is
           how to set it up, step by step.
         </p>
+        <HelpGuideIllustration variant="story" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

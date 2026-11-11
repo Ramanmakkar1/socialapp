@@ -25,8 +25,7 @@ export const PLANS: Plan[] = [
       { text: "10,000 auto-DMs / month" },
       { text: "AI caption and DM message ideas" },
       { text: "Link in bio page (20 links)" },
-      { text: "AI replies to DMs (collects contact details + booking link)" },
-      { text: "Email & phone capture" },
+      { text: "Email capture in DMs" },
       { text: "Click + lead analytics" },
     ],
     cta: "Start free, upgrade later",
@@ -38,7 +37,12 @@ export const PLANS: Plan[] = [
     per: "/ month",
     items: [
       { text: "25 social accounts" },
+      { text: "Unlimited scheduling" },
       { text: "50,000 auto-DMs / month" },
+      { text: "AI caption and DM message ideas" },
+      { text: "Link in bio page (20 links)" },
+      { text: "Email capture in DMs" },
+      { text: "Click + lead analytics" },
       { text: "Priority support" },
     ],
     cta: "Start free, upgrade later",
@@ -57,3 +61,7 @@ export const SOFTWARE_APPLICATION_OFFERS = [
     priceCurrency: "USD",
   },
 ];
+
+const paidPrices = PLANS.filter((p) => p !== freePlan).map((p) => Number(p.price.replace("$", "")));
+/** One-line price summary for comparison tables: "Free plan; paid plans from $19/mo (coming soon)". */
+export const PRICE_SUMMARY = `${freePlan.name} plan; paid plans from $${Math.min(...paidPrices)}/mo (coming soon)`;

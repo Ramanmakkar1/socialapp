@@ -2,22 +2,24 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
-import CompareHeroIllustration from "@/components/CompareHeroIllustration";
+import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = {
   title: { absolute: "Hootsuite Alternative for Instagram Scheduling & Auto-DM" },
   description:
-    "An Instagram scheduler plus comment-to-DM automation, email capture and AI replies, from $19/month. A simpler Hootsuite alternative for Instagram.",
+    "An Instagram scheduler plus comment-to-DM automation, email capture and AI captions, with a free plan. A simpler Hootsuite alternative for Instagram.",
   alternates: { canonical: "/hootsuite-alternative" },
 };
 
 const whySwitch = [
   { no: "01 / Instagram", title: "Built for Instagram growth", text: "Schedule your posts and reply to every keyword comment with a DM from the same place, instead of a big suite plus a separate chatbot tool." },
-  { no: "02 / Pricing", title: "Simple, clear pricing", text: `Scheduling, comment-to-DM, AI replies and lead capture are all part of ${BRAND.name} Pro at $19 / month.` },
-  { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email or phone number in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
+  { no: "02 / Pricing", title: "Simple, clear pricing", text: `Scheduling, comment-to-DM, AI captions and lead capture live in one ${BRAND.name} account. Start on the Free plan; paid plans are coming soon.` },
+  { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
 const compare: [string, string, string, string][] = [
@@ -28,14 +30,14 @@ const compare: [string, string, string, string][] = [
   ["Threads publishing", "Yes", "Yes", "No"],
   ["Comment-to-DM automation", "Yes", "Check their plans", "Yes"],
   ["Email capture in DMs", "Yes", "Check their plans", "Yes"],
-  ["AI-written DM messages", "Yes", "Check their plans", "Yes"],
-  ["Starting price", "$19 / month", "See their pricing", "See their pricing"],
+  ["AI DM message ideas", "Yes", "Check their plans", "Yes"],
+  ["Price", PRICE_SUMMARY, "See their pricing", "See their pricing"],
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram, Facebook Pages and Threads. ${BRAND.name} schedules and publishes your Instagram, Facebook Page and Threads posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI replies built in. It can also answer DMs with AI replies that collect contact details and share your booking link. Hootsuite covers more networks and team features today.` },
+  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram, Facebook Pages and Threads. ${BRAND.name} schedules and publishes your Instagram, Facebook Page and Threads posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in. Hootsuite covers more networks and team features today.` },
   { q: "Can I import my Hootsuite schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your schedule there.` },
-  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs. YouTube, LinkedIn, Pinterest, TikTok and WhatsApp come later." },
+  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages, Threads and YouTube (videos and Shorts) scheduling work today, plus Instagram auto-DMs. LinkedIn, Pinterest, TikTok and WhatsApp are on the roadmap, with no date yet." },
   { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
@@ -63,16 +65,13 @@ export default function HootsuiteAlternative() {
           The Hootsuite alternative for Instagram that <em className="s">turns comments into leads</em>
         </h1>
         <p className="lede">
-          Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, answer with AI and track every lead, from $19 / month.
+          Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email and track every lead. Start free.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
-        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
-        <div className="hero-art">
-          <Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/multichannel.webp" width={1400} height={933} alt="A creator at a laptop sends one post that splits to several phones and screens" />
-        </div>
+        <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
 
       {/* Why Instagram creators switch */}
@@ -123,6 +122,7 @@ export default function HootsuiteAlternative() {
               </tbody>
             </table>
           </div>
+          <CompareNote />
           <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Competitor features and prices change. Check their websites for current plans.</p>
         </div>
       </section>

@@ -1,0 +1,42 @@
+/* Skeleton screens: light grey blocks shaped like each dashboard page, with a soft shimmer. */
+.wrap { display: grid; gap: 18px; }
+.block {
+  display: block;
+  border-radius: 10px;
+  background: #efede8;
+  background-image: linear-gradient(90deg, transparent 0, rgba(255, 255, 255, .55) 50%, transparent 100%);
+  background-repeat: no-repeat;
+  background-size: 40% 100%;
+  background-position: -60% 0;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer { to { background-position: 160% 0; } }
+@media (prefers-reduced-motion: reduce) { .block { animation: none; background-image: none; } }
+@media (prefers-color-scheme: dark) {
+  .block { background-color: #24212d; background-image: linear-gradient(90deg, transparent 0, rgba(255, 255, 255, .05) 50%, transparent 100%); }
+}
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.between { justify-content: space-between; }
+.card { display: grid; gap: 10px; border: 1px solid var(--poskoo-line); border-radius: 14px; background: var(--poskoo-card); padding: 14px; }
+.grid { display: grid; gap: 12px; }
+.cols4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cols7 { display: none; }
+.agenda { display: grid; gap: 10px; }
+.split { display: grid; gap: 16px; }
+.carousel { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(180px, 1fr); gap: 12px; overflow: hidden; }
+@media (min-width: 760px) {
+  .cols4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cols7 { display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); gap: 0; overflow: hidden; border: 1px solid var(--poskoo-line); border-radius: 14px; }
+  .cols7 > * { border-left: 1px solid var(--poskoo-line); border-bottom: 1px solid var(--poskoo-line); padding: 8px; min-height: 84px; display: grid; align-content: start; gap: 6px; }
+  .agenda { display: none; }
+  .split { grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); }
+}
+/* Shell fallback while the signed-in user loads (sidebar + content). */
+.shell { display: flex; min-height: 100dvh; background: #fff; }
+.side { display: none; width: 256px; flex: none; flex-direction: column; gap: 10px; border-right: 1px solid #ebe9e4; background: #f7f6f3; padding: 18px 14px; }
+.main { flex: 1; min-width: 0; max-width: 1360px; margin-inline: auto; padding: 28px 24px; }
+@media (min-width: 900px) { .side { display: flex; } }
+@media (prefers-color-scheme: dark) {
+  .shell { background: #1b1824; }
+  .side { border-color: #2e2a3a; background: #16141d; }
+}

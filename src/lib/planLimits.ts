@@ -1,6 +1,7 @@
 // Plan limits as numbers, enforced on the server. The numbers mirror the plan cards in
 // src/lib/plans.ts (planLimits.test.ts fails if they drift apart). Prices are not here.
 import { query } from "@/lib/db";
+import { referralBonusDms } from "@/lib/referrals";
 
 export type PlanName = "Free" | "Pro" | "Agency";
 export type PlanLimits = {
@@ -34,6 +35,22 @@ export function scheduledLimitMessage(limit: number, plan: PlanName): string {
   return `The ${plan} plan includes ${limit} scheduled posts per month, and that month is full. Save this one as a draft, pick another month, or delete a scheduled post.`;
 }
 
+/**
+ * Monthly automated-DM limit: the plan's number plus the Refer-and-earn bonus
+ * (REFERRAL_BONUS_DMS per qualified referral, see src/lib/referrals.ts).
+ */
+export function autoDmLimitWithBonus(plan: PlanName, bonusDms: number): number {
+  const bonus = Number.isFinite(bonusDms) && bonusDms > 0 ? Math.floor(bonusDms) : 0;
+  return PLAN_LIMITS[plan].autoDmsPerMonth + bonus;
+}
+
+/** Server-side monthly automated-DM limit for a user (plan + referral bonus; bonus 0 if it cannot be read). */
+export async function monthlyAutoDmLimit(userId: string): Promise<{ plan: PlanName; limit: number; bonus: number }> {
+  const plan = planForUser();
+  const bonus = await referralBonusDms(userId);
+  return { plan, limit: autoDmLimitWithBonus(plan, bonus), bonus };
+}
+
 export function autoDmLimitMessage(limit: number, plan: PlanName): string {
   return `Monthly auto-DM limit reached (${limit.toLocaleString("en-US")} on the ${plan} plan). Auto-DMs start again on the 1st of next month (UTC).`;
 }
@@ -54,4 +71,62 @@ export async function scheduledPostLimitError(userId: string, at: Date, excludeP
     [userId, start.toISOString(), end.toISOString(), excludePostId ?? null],
   );
   return (rows[0]?.n ?? 0) >= limit ? scheduledLimitMessage(limit, plan) : null;
+}
+
+/**
+ * Usage for the "Scheduled this month" meters (sidebar + composer): posts scheduled, publishing or
+ * published in the current UTC month, counted exactly like scheduledPostLimitError. limit null = unlimited.
+ */
+export async function scheduledPostsUsage(userId: string, at: Date = new Date()): Promise<{ used: number; limit: number | null }> {
+  const limit = PLAN_LIMITS[planForUser()].scheduledPostsPerMonth;
+  const { start, end } = utcMonthRange(at);
+  const rows = await query<{ n: number }>(
+    `select count(*)::int as n from socialapp.scheduled_posts
+     where user_id=$1 and status in ('scheduled','publishing','published')
+       and scheduled_at >= $2 and scheduled_at < $3`,
+    [userId, start.toISOString(), end.toISOString()],
+  );
+  return { used: rows[0]?.n ?? 0, limit };
+}
+
+/** Shown in Settings when a NEW account would go over the plan's connected-account limit. */
+export function accountLimitMessage(limit: number, plan: PlanName): string {
+  return `The ${plan} plan includes ${limit} connected accounts and they are all in use. Disconnect one below, then connect the new one. Reconnecting an account you already have always works.`;
+}
+
+/**
+ * Pure decision: may this connect go ahead? Reconnecting an account that is already connected
+ * (same platform + id, not disconnected) is always allowed; a new one only below the limit.
+ */
+export function accountConnectAllowed(input: { alreadyConnected: boolean; connectedCount: number; limit: number }): boolean {
+  if (input.alreadyConnected) return true;
+  return input.connectedCount < input.limit;
+}
+
+export type ConnectTarget =
+  | { kind: "social"; platform: "instagram" | "facebook" | "threads"; externalId: string }
+  | { kind: "youtube"; channelId: string };
+
+/**
+ * Server-side connected-account limit for the OAuth callbacks (Instagram / Meta, Threads, YouTube).
+ * Connected = social_accounts not disconnected (active or expired: an expired one still holds a slot
+ * until it is disconnected) plus YouTube channels not disconnected. Returns the friendly message, or
+ * null when the connect may go ahead.
+ */
+export async function accountLimitError(userId: string, target: ConnectTarget): Promise<string | null> {
+  const plan = planForUser();
+  const limit = PLAN_LIMITS[plan].socialAccounts;
+  const rows = await query<{ social: number; youtube: number; already: boolean }>(
+    `select
+       (select count(*)::int from socialapp.social_accounts where user_id=$1 and status <> 'disconnected') as social,
+       (select count(*)::int from socialapp.youtube_channels where user_id=$1 and status <> 'disconnected') as youtube,
+       (case when $2 = 'youtube'
+          then exists (select 1 from socialapp.youtube_channels where user_id=$1 and channel_id=$4 and status <> 'disconnected')
+          else exists (select 1 from socialapp.social_accounts where user_id=$1 and platform=$3 and external_id=$4 and status <> 'disconnected')
+        end) as already`,
+    [userId, target.kind, target.kind === "social" ? target.platform : null, target.kind === "social" ? target.externalId : target.channelId],
+  );
+  const r = rows[0] ?? { social: 0, youtube: 0, already: false };
+  const allowed = accountConnectAllowed({ alreadyConnected: r.already === true, connectedCount: (r.social ?? 0) + (r.youtube ?? 0), limit });
+  return allowed ? null : accountLimitMessage(limit, plan);
 }

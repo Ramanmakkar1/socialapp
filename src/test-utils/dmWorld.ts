@@ -67,8 +67,15 @@ export function rule(overrides: Partial<WRule> & Pick<WRule, "id">): WRule {
   };
 }
 
-export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; contacts?: WContact[]; queue?: WQueue[]; missingMediaColumn?: boolean }) {
+/** A lead magnet delivered by the rules in `rule_ids` (migration 034). */
+export type WMagnet = { id: string; user_id: string; title: string; rule_ids: string[] };
+export type WDelivery = { lead_magnet_id: string; rule_id: string; contact_id: string };
+
+export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; contacts?: WContact[]; queue?: WQueue[]; missingMediaColumn?: boolean; magnets?: WMagnet[] }) {
   const accounts = init.accounts;
+  const magnets = init.magnets ?? [];
+  const deliveries: WDelivery[] = [];
+  const contactTags = new Map<string, string[]>();
   const rules = init.rules ?? [];
   const contacts = init.contacts ?? [];
   const queue = init.queue ?? [];
@@ -151,6 +158,19 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
           .map((r) => sql.includes(", media_ids from socialapp.dm_rules") ? r : { ...r, media_ids: undefined });
       },
     },
+    {
+      // recordLeadMagnetDelivery (leadMagnets.ts): delivery once per lead + magnet, tag the contact.
+      match: /^with m as \( select lm\.id, lm\.title from socialapp\.dm_rules r join socialapp\.lead_magnets lm/,
+      reply: (p) => {
+        const m = magnets.find((x) => x.user_id === p[0] && x.rule_ids.includes(String(p[1])));
+        if (!m) return [{ delivered: 0 }];
+        const tags = contactTags.get(String(p[2])) ?? [];
+        if (!tags.includes(`lead-magnet:${m.title}`)) contactTags.set(String(p[2]), [...tags, `lead-magnet:${m.title}`]);
+        if (deliveries.some((d) => d.lead_magnet_id === m.id && d.contact_id === p[2])) return [{ delivered: 0 }];
+        deliveries.push({ lead_magnet_id: m.id, rule_id: String(p[1]), contact_id: String(p[2]) });
+        return [{ delivered: 1 }];
+      },
+    },
     { match: /^insert into socialapp\.short_links/, reply: (p) => [{ code: `code${String(p[2]).replace(/\W/g, "")}` }] },
     { match: /pg_advisory_xact_lock/, reply: () => [] },
     {
@@ -206,7 +226,7 @@ export function createDmWorld(init: { accounts: WAccount[]; rules?: WRule[]; con
     },
   ];
 
-  return { accounts, rules, contacts, queue, handlers, barrier };
+  return { accounts, rules, contacts, queue, handlers, barrier, magnets, deliveries, contactTags };
 }
 
 /** A gate prompt that was delivered to `recipient` for `ruleId`. */

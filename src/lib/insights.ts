@@ -1,11 +1,16 @@
 import { decryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
 import { graphBaseFor } from "@/lib/graphHost";
-import { fetchIgProfile, GraphError } from "@/lib/igGraph";
+import { describeGraphError, fetchFollowersCount, GraphError } from "@/lib/igGraph";
 
 export type MediaInsights = {
   reach: number | null;
+  /**
+   * Meta removed the media "impressions" metric (Graph v22+, April 2025) and replaced it with "views".
+   * New data stores the views count here too, so existing readers keep working; `views` is the real name.
+   */
   impressions: number | null;
+  views?: number | null;
   likes: number | null;
   comments: number | null;
   saved: number | null;
@@ -22,10 +27,19 @@ type GraphInsightsResponse = {
   error?: { code?: number; message?: string; type?: string };
 };
 
-const METRIC_NAMES = ["reach", "impressions", "likes", "comments", "saved", "shares"] as const;
+const METRIC_NAMES = ["reach", "impressions", "views", "likes", "comments", "saved", "shares"] as const;
+
+// Currently supported Instagram media insight metrics (Graph API v22+). Stories do not support
+// likes/comments/saved; asking for an unsupported metric fails the whole request.
+const FEED_METRICS = ["reach", "views", "likes", "comments", "saved", "shares"] as const;
+const STORY_METRICS = ["reach", "views", "shares"] as const;
+
+export function insightMetricsFor(format: string | null | undefined): readonly string[] {
+  return format === "story" ? STORY_METRICS : FEED_METRICS;
+}
 
 function emptyInsights(): MediaInsights {
-  return { reach: null, impressions: null, likes: null, comments: null, saved: null, shares: null };
+  return { reach: null, impressions: null, views: null, likes: null, comments: null, saved: null, shares: null };
 }
 
 export function parseInsights(json: unknown): MediaInsights {
@@ -40,31 +54,83 @@ export function parseInsights(json: unknown): MediaInsights {
     const value = typeof raw === "number" && Number.isFinite(raw) ? raw : null;
     out[name as keyof MediaInsights] = value;
   }
+  // "views" replaced "impressions": keep the old field filled for existing charts and exports.
+  if (out.impressions == null && out.views != null) out.impressions = out.views;
   return out;
 }
 
-export async function fetchMediaInsights(mediaId: string, token: string, authType?: string | null): Promise<MediaInsights> {
-  const params = new URLSearchParams({
-    metric: "reach,impressions,likes,comments,saved,shares",
-    access_token: token,
-  });
-  const res = await fetch(`${graphBaseFor(authType)}/${encodeURIComponent(mediaId)}/insights?${params.toString()}`, {
-    cache: "no-store",
-  });
-  const json = (await res.json()) as GraphInsightsResponse;
-  if (!res.ok) {
-    const err = new Error(`Instagram insights failed (${res.status})`);
-    (err as Error & { status: number; body: unknown }).status = res.status;
-    (err as Error & { status: number; body: unknown }).body = json;
-    throw err;
+function mergeInsights(a: MediaInsights, b: MediaInsights): MediaInsights {
+  const out = { ...a };
+  for (const key of Object.keys(b) as (keyof MediaInsights)[]) {
+    if (b[key] != null) out[key] = b[key];
   }
-  if (json.error) {
-    const err = new Error(json.error.message ?? "Instagram insights error");
-    (err as Error & { status: number; body: unknown }).status = res.status;
-    (err as Error & { status: number; body: unknown }).body = json;
+  return out;
+}
+
+type InsightsError = Error & { status: number; body: unknown };
+
+async function requestInsights(
+  mediaId: string,
+  token: string,
+  metrics: readonly string[],
+  authType: string | null | undefined,
+  fetchImpl: typeof fetch,
+): Promise<MediaInsights> {
+  const params = new URLSearchParams({ metric: metrics.join(","), access_token: token });
+  const res = await fetchImpl(`${graphBaseFor(authType)}/${encodeURIComponent(mediaId)}/insights?${params.toString()}`, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
+  });
+  let json: GraphInsightsResponse = {};
+  try {
+    json = (await res.json()) as GraphInsightsResponse;
+  } catch {
+    // non-JSON body
+  }
+  if (!res.ok || json.error) {
+    const err = new Error(json.error?.message ?? `Instagram insights failed (${res.status})`) as InsightsError;
+    err.status = res.status;
+    err.body = json;
     throw err;
   }
   return parseInsights(json);
+}
+
+/**
+ * Fetch media insights with the metrics the current Graph API supports for this media type.
+ * If the combined request is rejected for a non-permission reason (e.g. one metric unsupported
+ * for this media), each metric is fetched on its own and the ones that work are kept.
+ */
+export async function fetchMediaInsights(
+  mediaId: string,
+  token: string,
+  authType?: string | null,
+  format?: string | null,
+  fetchImpl: typeof fetch = fetch,
+): Promise<MediaInsights> {
+  const metrics = insightMetricsFor(format);
+  try {
+    return await requestInsights(mediaId, token, metrics, authType, fetchImpl);
+  } catch (e) {
+    const err = e as InsightsError;
+    if (isInsightsPermissionError(err.status ?? 0, err.body)) throw e;
+    if ((err.status ?? 0) >= 500 || err.status === 429 || !err.status) throw e;
+  }
+  let out = emptyInsights();
+  let ok = 0;
+  let lastError: unknown = null;
+  for (const metric of metrics) {
+    try {
+      out = mergeInsights(out, await requestInsights(mediaId, token, [metric], authType, fetchImpl));
+      ok++;
+    } catch (e) {
+      const err = e as InsightsError;
+      if (isInsightsPermissionError(err.status ?? 0, err.body)) throw e;
+      lastError = e;
+    }
+  }
+  if (ok === 0 && lastError) throw lastError;
+  return out;
 }
 
 function isInsightsPermissionError(status: number, body: unknown): boolean {
@@ -73,7 +139,7 @@ function isInsightsPermissionError(status: number, body: unknown): boolean {
   const err = (body as GraphInsightsResponse).error;
   if (!err) return false;
   const msg = (err.message ?? "").toLowerCase();
-  if (msg.includes("permission") || msg.includes("scope") || msg.includes("insights")) return true;
+  if (msg.includes("permission") || msg.includes("scope")) return true;
   if (err.code === 10 || err.code === 200 || err.code === 190) return true;
   return false;
 }
@@ -83,13 +149,15 @@ type TargetRow = {
   external_post_id: string;
   access_token_enc: string;
   auth_type?: string | null;
+  ig_format?: string | null;
 };
 
-export async function refreshRecentInsights(limit = 50): Promise<{ updated: number }> {
+export async function refreshRecentInsights(limit = 50, fetchImpl: typeof fetch = fetch): Promise<{ updated: number }> {
   const rows = await query<TargetRow>(
-    `select t.id, t.external_post_id, a.access_token_enc, a.auth_type
+    `select t.id, t.external_post_id, a.access_token_enc, a.auth_type, p.ig_format
      from socialapp.post_targets t
      join socialapp.social_accounts a on a.id = t.social_account_id
+     join socialapp.scheduled_posts p on p.id = t.post_id
      where t.platform = 'instagram'
        and t.status = 'published'
        and t.published_at > now() - interval '30 days'
@@ -114,7 +182,7 @@ export async function refreshRecentInsights(limit = 50): Promise<{ updated: numb
     }
 
     try {
-      const insights = await fetchMediaInsights(row.external_post_id, token, row.auth_type);
+      const insights = await fetchMediaInsights(row.external_post_id, token, row.auth_type, row.ig_format, fetchImpl);
       await query(`update socialapp.post_targets set insights=$2::jsonb, insights_at=now() where id=$1`, [
         row.id,
         JSON.stringify(insights),
@@ -156,9 +224,19 @@ export async function snapshotAccountFollowers(limit = 20): Promise<{ snapshotte
 
   let snapshotted = 0;
   for (const row of rows) {
+    let followers: number | null;
     try {
-      const profile = await fetchIgProfile(row);
-      if (profile.followers == null) continue;
+      followers = await fetchFollowersCount(row);
+    } catch (e) {
+      // Rate limits and expired tokens are expected noise (graphCall marks expired accounts); log the rest with the Graph code/message.
+      if (e instanceof GraphError && (e.kind === "rate_limited" || e.kind === "token")) continue;
+      console.error(
+        `snapshotAccountFollowers: profile fetch failed for account ${row.id} (auth_type=${row.auth_type ?? "instagram_login"}): ${describeGraphError(e)}`
+      );
+      continue;
+    }
+    if (followers == null) continue;
+    try {
       await query(
         `insert into socialapp.account_snapshots (user_id, account_id, followers, taken_at)
          select $1, $2, $3, now()
@@ -166,13 +244,11 @@ export async function snapshotAccountFollowers(limit = 20): Promise<{ snapshotte
            select 1 from socialapp.account_snapshots
            where account_id = $2 and taken_at > now() - interval '20 hours'
          )`,
-        [row.user_id, row.id, profile.followers]
+        [row.user_id, row.id, followers]
       );
       snapshotted++;
     } catch (e) {
-      // Rate limits and expired tokens are expected noise; only log the rest.
-      if (e instanceof GraphError && (e.kind === "rate_limited" || e.kind === "token")) continue;
-      console.error("snapshotAccountFollowers: profile fetch failed for account", row.id);
+      console.error(`snapshotAccountFollowers: saving snapshot failed for account ${row.id}: ${e instanceof Error ? e.message.slice(0, 200) : "unknown error"}`);
     }
   }
 

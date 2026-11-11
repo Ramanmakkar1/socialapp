@@ -1,0 +1,32 @@
+/* My content → Posts & Reels. Light, Buffer-like; --poskoo-* tokens. */
+.page { display: grid; gap: 22px; color: var(--poskoo-ink); font-family: var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--poskoo-line); }
+.headIcon { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-tint, var(--poskoo-band)); color: var(--poskoo-violet); }
+.headText { min-width: 0; flex: 1 1 240px; }
+.h1 { margin: 0; font-size: 1.6rem; line-height: 1.1; letter-spacing: -.03em; }
+.sub { margin: 4px 0 0; color: var(--poskoo-muted); font-size: .92rem; }
+.section { display: grid; gap: 12px; min-width: 0; }
+.h2 { display: flex; align-items: baseline; gap: 8px; margin: 0; font-size: 1.1rem; letter-spacing: -.02em; }
+.count { color: var(--poskoo-muted); font-size: .8rem; font-weight: 600; letter-spacing: 0; }
+.muted { margin: 0; color: var(--poskoo-muted); font-size: .84rem; }
+.ghost { display: inline-flex; min-height: 34px; align-items: center; gap: 6px; border: 1px solid var(--poskoo-line); border-radius: 10px; background: var(--poskoo-card); padding: 0 .75rem; color: var(--poskoo-ink); font-size: .84rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.ghost:hover { border-color: var(--poskoo-muted); }
+.primary { display: inline-flex; min-height: 40px; align-items: center; margin-top: 8px; border-radius: 10px; background: var(--fill-strong, var(--poskoo-violet)); padding: 0 1rem; color: #fff; font-weight: 700; text-decoration: none; }
+.empty { display: grid; justify-items: start; gap: 4px; border: 1px dashed var(--poskoo-line); border-radius: 14px; padding: 20px; color: var(--poskoo-muted); font-size: .9rem; }
+.empty p { margin: 0; }
+.empty b { color: var(--poskoo-ink); }
+.tableWrap { overflow-x: auto; border: 1px solid var(--poskoo-line); border-radius: 14px; background: var(--poskoo-card); }
+.table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: .88rem; }
+.table th { border-bottom: 1px solid var(--poskoo-line); background: var(--poskoo-paper); padding: 10px 14px; color: var(--poskoo-muted); font-size: .76rem; font-weight: 600; text-align: left; white-space: nowrap; }
+.table td { border-bottom: 1px solid var(--poskoo-line); padding: 10px 14px; vertical-align: middle; }
+.table tr:last-child td { border-bottom: 0; }
+.num { text-align: right !important; font-variant-numeric: tabular-nums; }
+.contentCell { display: flex; align-items: center; gap: 10px; min-width: 240px; }
+.thumb { flex: none; width: 44px; height: 44px; border-radius: 8px; background: var(--poskoo-band); object-fit: cover; }
+.captionCell { display: grid; min-width: 0; gap: 2px; }
+.caption { display: -webkit-box; overflow: hidden; font-size: .86rem; line-height: 1.35; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.meta { color: var(--poskoo-muted); font-size: .76rem; }
+.pill { display: inline-block; border-radius: 999px; background: var(--poskoo-band); padding: 2px 9px; color: var(--poskoo-muted); font-size: .74rem; font-weight: 700; white-space: nowrap; }
+.pillLive { background: color-mix(in srgb, var(--poskoo-green) 14%, var(--poskoo-card)); color: color-mix(in srgb, var(--poskoo-green) 70%, var(--poskoo-ink)); }
+.actions { text-align: right; }
+.page > * { min-width: 0; }

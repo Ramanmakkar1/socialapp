@@ -146,11 +146,13 @@ export default function QueueView({ posts }: { posts: Post[] }) {
                       {post.status === "draft" ? "Draft" : "Scheduled"}
                     </span>
                   </div>
-                  <div className={styles.postActions}>
-                    <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleShare(post.id)}>
-                      Share now
-                    </Btn>
-                  </div>
+                  {post.status === "scheduled" && (
+                    <div className={styles.postActions}>
+                      <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleShare(post.id)}>
+                        Share now
+                      </Btn>
+                    </div>
+                  )}
                 </div>
                 <p className={styles.postMeta} suppressHydrationWarning>
                   {post.scheduled_at ? new Date(post.scheduled_at).toLocaleString() : "No time set"}

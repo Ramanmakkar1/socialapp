@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import FontTool from "./FontTool";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-font-generator";
 const description =
@@ -35,16 +36,7 @@ export default function InstagramFontGeneratorPage() {
           Instagram font <em className="s mark">generator</em>
         </h1>
         <p className="lede">Turn your text into bold, italic, script and more. Copy a style for your Instagram bio or caption.</p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            loading="lazy"
-            alt="A creator at a laptop sends one post that splits to several phones and screens"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

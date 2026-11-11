@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import EngagementCalculator from "./EngagementCalculator";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-engagement-rate-calculator";
 const description =
@@ -57,16 +58,7 @@ export default function InstagramEngagementRateCalculatorPage() {
           Enter likes, comments, saves and shares for one post, choose followers or reach as the base, and get your
           engagement rate as a percentage.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-leads.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="Two friends high-five next to a board of contacts with check marks and a rising chart"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="analytics" label="A creator waters a growing bar chart while hearts float up" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

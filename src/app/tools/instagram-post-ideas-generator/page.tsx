@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import PostIdeasGenerator from "./PostIdeasGenerator";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-post-ideas-generator";
 const description =
@@ -26,10 +27,10 @@ const steps = [
   </>,
   <>
     Schedule it. Plan the post on your Poskoo calendar with our{" "}
-    <Link className={s.vlink} href="/help/schedule-instagram-posts">
-      Instagram scheduling guide
+    <Link className={s.vlink} href="/instagram-scheduler">
+      Instagram scheduler
     </Link>
-    , and publish it at the best time.
+    , and publish it at the time you pick.
   </>,
 ];
 const faqs = [
@@ -65,16 +66,7 @@ export default function InstagramPostIdeasGeneratorPage() {
         <p className="lede">
           Get 48 ready-to-use post ideas for eight niches, each with a hook and a caption starter. Copy them, make them yours, and schedule the rest in Poskoo.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A calendar of scheduled social posts with a phone showing a published post"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

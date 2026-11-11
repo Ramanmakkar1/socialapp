@@ -186,7 +186,7 @@ test("token job: an invalidated Page token marks the Facebook-login account 'exp
   const restore = installFakePool(pool);
   try {
     const { refreshExpiringTokens } = await import("./tokenRefresh.ts");
-    const result = await refreshExpiringTokens(50, async (token) => (token === "good" ? "valid" : "invalid"));
+    const result = await refreshExpiringTokens(50, { checkPage: async (token) => (token === "good" ? "valid" : "invalid") });
     assert.equal(result.pagesChecked, 2);
     assert.equal(result.pagesInvalid, 1);
     assert.deepEqual(updates.filter((u) => u.sql.includes("status='expired'")).map((u) => u.params[0]), ["a-dead"]);

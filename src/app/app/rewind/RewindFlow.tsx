@@ -1,10 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Check, MessageCircle } from "lucide-react";
 import { rewindRuleAction } from "../auto-dm/actions";
-import ui from "@/components/ui/ui.module.css";
+import styles from "./rewind.module.css";
 
-type Rule = { id: string; name: string };
+export type RewindRule = {
+  id: string;
+  name: string;
+  keywords: string[];
+  dmText: string;
+  /** Why rewindRule() would refuse this rule (paused / no comment trigger); null = can run. */
+  unavailable: string | null;
+};
 
 type Result =
   | { kind: "ok"; queued: number; scanned: number; failures: number }
@@ -12,7 +20,7 @@ type Result =
 
 const STEPS = ["Select automation", "Scan comments", "Processing", "Complete"];
 
-export default function RewindFlow({ rules }: { rules: Rule[] }) {
+export default function RewindFlow({ rules }: { rules: RewindRule[] }) {
   const [ruleId, setRuleId] = useState("");
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<Result | null>(null);
@@ -37,61 +45,79 @@ export default function RewindFlow({ rules }: { rules: Rule[] }) {
   }
 
   return (
-    <div className={`${ui.card} p-5`}>
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1" aria-label="Rewind steps">
-        {STEPS.map((label, index) => (
-          <li
-            key={label}
-            className={`flex items-center gap-2 text-sm ${index <= stepIndex ? "font-semibold text-[var(--poskoo-ink)]" : "text-[var(--poskoo-muted)]"}`}
-          >
-            <span
-              aria-hidden="true"
-              className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${index <= stepIndex ? "bg-[var(--poskoo-ink)] text-white" : "bg-[var(--poskoo-lilac)] text-[var(--poskoo-ink)]"}`}
-            >
-              {index + 1}
-            </span>
-            {label}
-            {index < STEPS.length - 1 && <span aria-hidden="true" className="text-[var(--poskoo-muted)]">→</span>}
-          </li>
-        ))}
+    <section className={styles.card} aria-labelledby="rewind-choose">
+      <ol className={styles.stepper} aria-label="Rewind steps">
+        {STEPS.map((label, index) => {
+          const done = index < stepIndex || (index === 3 && stepIndex === 3);
+          const current = index === stepIndex;
+          return (
+            <li key={label} className={`${styles.step} ${done ? styles.stepDone : ""} ${current ? styles.stepCurrent : ""}`} aria-current={current ? "step" : undefined}>
+              <span className={styles.stepDot} aria-hidden="true">{done ? <Check width={13} height={13} /> : index + 1}</span>
+              <span className={styles.stepLabel}>{label}</span>
+            </li>
+          );
+        })}
       </ol>
+
+      <h2 id="rewind-choose" className={styles.h2}>Choose an automation to rewind</h2>
       <form
-        className="mt-5 flex flex-wrap items-end gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           run();
         }}
       >
-        <div className={ui.field} style={{ minWidth: "min(100%, 260px)" }}>
-          <label htmlFor="rewind-rule" className={ui.label}>Automation</label>
-          <select id="rewind-rule" value={ruleId} onChange={(event) => setRuleId(event.target.value)} className={ui.input} disabled={pending}>
-            <option value="">Choose an automation…</option>
-            {rules.map((rule) => <option key={rule.id} value={rule.id}>{rule.name}</option>)}
-          </select>
+        <fieldset className={styles.ruleList} disabled={pending}>
+          <legend className="sr-only">Automation</legend>
+          {rules.map((rule) => {
+            const off = rule.unavailable !== null;
+            const selected = ruleId === rule.id;
+            return (
+              <label key={rule.id} className={`${styles.rule} ${selected ? styles.ruleSelected : ""} ${off ? styles.ruleOff : ""}`}>
+                <input
+                  type="radio"
+                  name="rewind-rule"
+                  value={rule.id}
+                  checked={selected}
+                  disabled={off}
+                  onChange={() => { setRuleId(rule.id); setResult(null); }}
+                  className="sr-only"
+                  aria-describedby={off ? `why-${rule.id}` : undefined}
+                />
+                <span className={styles.ruleIcon} aria-hidden="true"><MessageCircle width={18} height={18} /></span>
+                <span className={styles.ruleText}>
+                  <b>{rule.name}</b>
+                  <span>
+                    {rule.keywords.length ? `Keywords: ${rule.keywords.join(", ")}` : "Any comment"}
+                    {rule.dmText ? ` · “${rule.dmText.slice(0, 70)}${rule.dmText.length > 70 ? "…" : ""}”` : ""}
+                  </span>
+                  {off && <span id={`why-${rule.id}`} className={styles.why}>{rule.unavailable}</span>}
+                </span>
+                {off ? <span className={styles.offPill}>Not available for Rewind</span> : <span className={styles.radio} aria-hidden="true" />}
+              </label>
+            );
+          })}
+        </fieldset>
+        <div className={styles.runRow}>
+          <p className={styles.hint}>Scans up to 25 latest posts and 50 comments per post; only comments from the past 7 days qualify.</p>
+          <button type="submit" disabled={!ruleId || pending} className={styles.primary}>
+            {pending ? "Scanning…" : "Send to past comments (7 days)"}
+          </button>
         </div>
-        <button type="submit" disabled={!ruleId || pending} className={`${ui.btn} ${ui.btnDark} ${ui.sm}`}>
-          {pending ? "Scanning…" : "Send to past comments (7 days)"}
-        </button>
       </form>
-      <p className={`${ui.hint} mt-3`}>
-        Scans up to 25 latest posts and 50 comments per post; only comments from the past 7 days qualify.
-      </p>
-      <span role="status" aria-live="polite" aria-atomic="true" className="block">
-        {pending && <span className="mt-3 block text-sm text-[var(--poskoo-ink)]">Scanning past comments…</span>}
+      <div role="status" aria-live="polite" aria-atomic="true">
+        {pending && <p className={styles.status}>Scanning past comments…</p>}
         {result?.kind === "ok" && (
-          <span className="mt-3 block text-sm text-[var(--poskoo-ink)]">
+          <p className={`${styles.status} ${styles.statusOk}`}>
             Queued {result.queued} DMs from {result.scanned} recent comments.
             {result.failures > 0 && (
-              <span className="text-[var(--poskoo-coral)]">
+              <span className={styles.warn}>
                 {" "}Partial scan: {result.failures} account or post scans failed. Some comments could not be checked. Please try again.
               </span>
             )}
-          </span>
+          </p>
         )}
-        {result?.kind === "err" && (
-          <span className="mt-3 block text-sm text-[var(--poskoo-coral)]">{result.error}</span>
-        )}
-      </span>
-    </div>
+        {result?.kind === "err" && <p className={`${styles.status} ${styles.statusErr}`}>{result.error}</p>}
+      </div>
+    </section>
   );
 }

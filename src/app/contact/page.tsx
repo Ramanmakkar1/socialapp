@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
+import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = {
@@ -57,6 +58,7 @@ export default function ContactPage() {
             Help center
           </Link>
         </div>
+        <div className="hero-art"><AnimArt name="help" label="A creator reads on a giant open book under a lightbulb and a signpost" /></div>
       </header>
 
       <section style={{ paddingTop: 40 }}>

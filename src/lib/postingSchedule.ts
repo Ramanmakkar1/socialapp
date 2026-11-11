@@ -168,6 +168,37 @@ export function nextSlot(schedules: ChannelSchedule[], nowMs: number): number | 
   return best;
 }
 
+export type UpcomingSlot = { ms: number; timezone: string };
+
+/**
+ * The next `count` slots across the channel schedules, earliest first, skipping instants in
+ * `taken` (already-scheduled posts, compared to the minute). Each slot carries the timezone of
+ * the channel schedule that produced it. Looks at most ~3 weeks ahead.
+ */
+export function upcomingSlots(
+  schedules: ChannelSchedule[],
+  nowMs: number,
+  count: number,
+  taken: Iterable<number> = [],
+): UpcomingSlot[] {
+  const takenMinutes = new Set([...taken].map((t) => Math.floor(t / 60_000)));
+  const out: UpcomingSlot[] = [];
+  let cursor = nowMs;
+  const horizon = nowMs + 21 * DAY_MS;
+  for (let guard = 0; out.length < count && guard < 200; guard++) {
+    let best: UpcomingSlot | null = null;
+    for (const schedule of schedules) {
+      const slot = nextSlotForChannel(schedule, cursor);
+      if (slot !== null && (best === null || slot < best.ms)) best = { ms: slot, timezone: schedule.timezone || "UTC" };
+    }
+    if (!best || best.ms > horizon) break;
+    if (!takenMinutes.has(Math.floor(best.ms / 60_000))) out.push(best);
+    // nextSlotForChannel wants a slot more than one minute after the cursor.
+    cursor = best.ms;
+  }
+  return out;
+}
+
 /** Human label for a slot in the viewer's local time, e.g. "Tue, Nov 10, 9:00 AM". */
 export function slotLabel(slotMs: number): string {
   return new Date(slotMs).toLocaleString(undefined, {
@@ -207,4 +238,44 @@ export function reassignQueueTimes(posts: QueuePostTime[], nowMs: number): Map<s
     cursor += gap;
   }
   return result;
+}
+
+/** Platforms that have a posting schedule (posting_schedules.platform check). */
+export const SCHEDULABLE_PLATFORMS = ["instagram", "facebook", "threads"] as const;
+
+/** The default schedule offered and seeded for a new channel: Mon-Fri at 9:00, 12:00 and 18:00. */
+export const DEFAULT_SCHEDULE_DAYS = [1, 2, 3, 4, 5];
+export const DEFAULT_SCHEDULE_TIMES = ["09:00", "12:00", "18:00"];
+
+/** True for a real IANA zone the runtime knows (e.g. "America/Edmonton"). */
+export function isValidTimeZone(tz: string): boolean {
+  if (!tz || tz.length > 64) return false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Schedules to seed when a user has connected channels but no posting schedule at all yet:
+ * the default schedule for every connected schedulable platform, in `timezone` (the browser's;
+ * UTC when unknown). Empty as soon as the user has any schedule row, so their choices are never
+ * overwritten.
+ */
+export function defaultSchedulesToSeed(
+  connectedPlatforms: string[],
+  existingSchedulePlatforms: string[],
+  timezone: string,
+): ChannelSchedule[] {
+  if (existingSchedulePlatforms.length > 0) return [];
+  const tz = isValidTimeZone(timezone) ? timezone : "UTC";
+  const platforms = [...new Set(connectedPlatforms)].filter((p) => (SCHEDULABLE_PLATFORMS as readonly string[]).includes(p)).sort();
+  return platforms.map((platform) => ({
+    platform: platform as PlatformId,
+    timezone: tz,
+    days: [...DEFAULT_SCHEDULE_DAYS],
+    times: [...DEFAULT_SCHEDULE_TIMES],
+  }));
 }

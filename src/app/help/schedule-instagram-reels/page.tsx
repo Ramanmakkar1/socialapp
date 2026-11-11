@@ -156,16 +156,14 @@ export default function ScheduleInstagramReelsHelpPage() {
       />
       <header className="hero">
         <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
+        <h1>
             How to schedule Instagram <em className="s">Reels</em>
           </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
-        </div>
         <p className="lede">
           Paste one public .mp4 link, write a caption, choose a time and {BRAND.name} publishes your Reel for you. Here
           is exactly what a scheduled Reel needs, step by step.
         </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

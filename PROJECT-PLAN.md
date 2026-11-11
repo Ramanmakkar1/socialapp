@@ -18,5 +18,5 @@ Next.js 16 (App Router, TypeScript, Tailwind v4) · Postgres on the shared Supab
 - Official APIs only. Never scraping, never asking users for passwords.
 - Secrets only in env vars (never commit `.env`). Tokens encrypted at rest.
 - Small, focused changes; keep the design system in `src/app/globals.css` (tokens) and the look of the landing page.
-- No payment code until Phase 4. Keep the site noindex until launch.
+- No payment code until Phase 4 — EXCEPTION approved by Raman 2026-11-11: creator Products/Orders via Stripe Connect (Managed Risk, direct charges, 3% platform fee), lead magnets and refer-and-earn are built. Subscription billing for Pro/Agency is still not built. Keep the site noindex until launch.
 - Every new page: mobile-friendly, dark-mode friendly, accessible (labels, contrast).

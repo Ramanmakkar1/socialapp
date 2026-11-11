@@ -4,12 +4,12 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
-import PricingIllustration from "@/components/PricingIllustration";
+import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
 
 const PATH = "/pricing";
 const title = `${BRAND.name} Pricing: Free Instagram Scheduler & Auto-DM Plans`;
-const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, then upgrade to Pro or Agency when you grow. No credit card needed.`;
+const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, with Pro and Agency plans coming soon. No credit card needed.`;
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -37,7 +37,7 @@ const faqs = [
   },
   {
     q: "Which platforms are included?",
-    a: "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs.",
+    a: "Instagram, Facebook Pages, Threads and YouTube scheduling work today, plus Instagram auto-DMs.",
   },
 ];
 
@@ -46,7 +46,7 @@ const includes = [
   "Instagram scheduling calendar",
   "Comment keyword auto-DMs",
   "Lead capture from your DMs",
-  "Facebook Pages and Threads scheduling",
+  "Facebook Pages, Threads and YouTube scheduling",
 ];
 
 const faqJsonLd = {
@@ -92,22 +92,16 @@ export default function PricingPage() {
         <Link href="/">Home</Link> / Pricing
       </nav>
       <header className="hero">
-        <div className={s.heroGrid}>
-          <div className={s.heroCopy}>
-            <span className="pill">Free plan · no credit card · official Meta API</span>
-            <h1>
+        <span className="pill">Free plan · no credit card · official Meta API</span>
+        <h1>
               Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
             </h1>
-            <p className="lede">Start free today and upgrade only when you need more accounts, posts or DMs.</p>
-            <div className="ctas">
+        <p className="lede">Start free today. Paid plans with more accounts, posts and DMs are coming soon.</p>
+        <div className="ctas">
               <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
               <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
             </div>
-          </div>
-          <div className={s.heroArt}>
-            <PricingIllustration />
-          </div>
-        </div>
+        <div className="hero-art"><AnimArt name="pricing" label="A happy creator in an armchair holds one membership card while app cards and bills fly away" /></div>
       </header>
 
       <section style={{ paddingTop: 40 }}>

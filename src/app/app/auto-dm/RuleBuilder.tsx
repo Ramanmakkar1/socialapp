@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
-import { Check, ChevronRight, ExternalLink, Loader2, MessageCircle, Plus, Send, X } from "lucide-react";
+import { Camera, Check, ChevronRight, ExternalLink, Heart, Loader2, MessageCircle, Plus, Send, X } from "lucide-react";
+import styles from "./auto-dm.module.css";
 import { Btn } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import { buildCommentDmMessage } from "@/lib/commentMessage";
@@ -122,27 +123,21 @@ function StepCard({
 }) {
   const titleId = `automation-step-${number}`;
   return (
-    <section aria-labelledby={titleId} className={`${ui.card} scroll-mt-28 p-5 sm:p-6`}>
-      <div className="flex items-start gap-3">
+    <section aria-labelledby={titleId} className={`${styles.stepCard} scroll-mt-28`}>
+      <div className={styles.stepHead}>
         <span
+          role="img"
           aria-label={valid ? `Step ${number} complete` : `Step ${number} incomplete`}
-          className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-            valid
-              ? "border-[var(--poskoo-lime)] bg-[var(--poskoo-lime)] text-[var(--poskoo-ink)]"
-              : "border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] text-[var(--poskoo-muted)]"
-          }`}
+          className={`${styles.stepCheck} ${valid ? styles.stepDone : ""}`}
         >
-          <Check className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
+          <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
         </span>
-        <div>
-          <p className="m-0 text-xs font-bold uppercase tracking-[0.12em] text-[var(--poskoo-coral)]">Step {number}</p>
-          <h2 id={titleId} className="m-0 mt-1 text-xl leading-tight text-[var(--poskoo-ink)]">
-            {title}
-            {optional && <span className="ml-2 text-sm font-normal tracking-normal text-[var(--poskoo-muted)]">Optional</span>}
-          </h2>
-        </div>
+        <h2 id={titleId} className={styles.stepTitle}>
+          {title}
+          {optional && <span className={styles.stepOptional}>Optional</span>}
+        </h2>
       </div>
-      <div className="mt-5">{children}</div>
+      <div className={styles.stepBody}>{children}</div>
     </section>
   );
 }
@@ -182,63 +177,41 @@ function PhonePreview({
   const firstPublicReply = publicReply.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
 
   return (
-    <div
-      className="rounded-[2rem] p-4 sm:p-6"
-      style={{
-        backgroundColor: "var(--poskoo-paper)",
-        backgroundImage: "radial-gradient(var(--poskoo-line) 1.25px, transparent 1.25px)",
-        backgroundSize: "16px 16px",
-      }}
-    >
-      <div className="mb-4 text-center">
-        <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-[var(--poskoo-coral)]">Live preview</p>
-        <p className="m-0 mt-1 text-sm text-[var(--poskoo-muted)]">What commenters will see</p>
-      </div>
-      <div className="mx-auto w-full max-w-[320px] rounded-[2.8rem] border border-[var(--poskoo-ink)] bg-[var(--poskoo-ink)] p-2.5 shadow-[var(--poskoo-shadow-float)]">
-        <div className="relative min-h-[590px] overflow-hidden rounded-[2.15rem] bg-[var(--poskoo-paper)] px-4 pb-5 pt-11">
-          <div className="absolute left-1/2 top-3 h-5 w-24 -translate-x-1/2 rounded-full bg-[var(--poskoo-ink)]" aria-hidden="true" />
-          <div className="flex items-center justify-between border-b border-[var(--poskoo-line)] pb-3 text-[10px] font-semibold text-[var(--poskoo-muted)]">
-            <span>Instagram</span>
-            <span>Preview</span>
+    <div className={styles.canvas}>
+      <h2 className={styles.canvasTitle}>Preview automation</h2>
+      <div className={styles.phone}>
+        <div className={styles.screen}>
+          <span className={styles.notch} aria-hidden="true" />
+          <div className={styles.statusBar} aria-hidden="true"><span>9:41</span><span>5G</span></div>
+          <div className={styles.dmHeader}>
+            <span className={styles.dmAvatar} aria-hidden="true">JD</span>
+            <span className={styles.dmName}><b>jane_doe</b><span>Instagram</span></span>
           </div>
-
-          <div className="pt-4">
-            <div className="flex items-start gap-2">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--poskoo-peach)] text-[10px] font-bold text-[var(--poskoo-ink)]">JD</span>
-              <div className="min-w-0 text-[11px] leading-relaxed text-[var(--poskoo-ink)]">
-                <p className="m-0"><strong>jane_doe</strong> <span>{comment}</span></p>
-                <p className="m-0 mt-1 text-[9px] text-[var(--poskoo-muted)]">1m &nbsp; Reply</p>
-                {firstPublicReply && (
-                  <div className="mt-3 flex gap-2 border-l-2 border-[var(--poskoo-lilac)] pl-2">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--poskoo-lime)] text-[8px] font-bold">P</span>
-                    <p className="m-0"><strong>yourbrand</strong> <span>{firstPublicReply}</span></p>
-                  </div>
-                )}
+          <div className={styles.thread}>
+            <p className={styles.threadNote}>jane_doe commented “{comment}” on your post</p>
+            {firstPublicReply && <p className={styles.replyNote}>Public reply: {firstPublicReply}</p>}
+            {trimmedLink && !gated ? (
+              <div className={styles.outCard}>
+                <p aria-live="polite" aria-atomic="true">{body.trim() || "Your opening DM will appear here as you type."}</p>
+                <span className={styles.linkBtn}>
+                  {linkLabel.trim() || "Open link"}
+                  <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
+                </span>
               </div>
-            </div>
-          </div>
-
-          <div className="my-4 flex items-center gap-2" aria-hidden="true">
-            <span className="h-px flex-1 bg-[var(--poskoo-line)]" />
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-[var(--poskoo-muted)]">Direct message</span>
-            <span className="h-px flex-1 bg-[var(--poskoo-line)]" />
-          </div>
-
-          <div className="ml-auto max-w-[94%] rounded-2xl rounded-br-md bg-[var(--poskoo-band)] p-3 text-[12px] leading-relaxed text-[var(--poskoo-ink)] shadow-sm">
-            <div aria-live="polite" aria-atomic="true" className="whitespace-pre-wrap [overflow-wrap:anywhere]">
-              {body.trim() || "Your opening DM will appear here as you type."}
-            </div>
-            {trimmedLink && !gated && (
-              <span className="mt-3 flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--poskoo-violet)] px-3 py-2 text-center text-[11px] font-bold text-[var(--poskoo-card)]">
-                {linkLabel.trim() || "Open link"}
-                <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
-              </span>
+            ) : (
+              <div className={styles.outBubble} aria-live="polite" aria-atomic="true">
+                {body.trim() || "Your opening DM will appear here as you type."}
+              </div>
             )}
+            {gated && <p className={styles.threadNote}>The link is sent after they {followGate ? "follow" : ""}{followGate && emailGate ? " and " : ""}{emailGate ? "share their email" : ""}.</p>}
           </div>
-          <p className="m-0 mt-2 text-right text-[9px] text-[var(--poskoo-muted)]">Automated by Poskoo</p>
+          <div className={styles.inputBar} aria-hidden="true">
+            <span><Camera className="h-3 w-3" /></span>
+            <span>Message…</span>
+          </div>
         </div>
       </div>
-      <p className="m-0 mt-4 text-center text-xs text-[var(--poskoo-muted)]">Local preview — nothing is sent</p>
+      <p className={styles.canvasFoot}>Local preview, nothing is sent</p>
     </div>
   );
 }
@@ -410,20 +383,23 @@ export default function RuleBuilder({
       }}
       className="min-w-0"
     >
-      <div className={`${ui.card} sticky top-3 z-30 mb-5 flex flex-wrap items-center justify-between gap-3 bg-[var(--poskoo-paper)]/95 p-3 backdrop-blur sm:px-4`}>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Update is deliberately first in edit mode; Save as new always calls createRule. */}
-          <Btn type="submit" variant="lime" disabled={pending} aria-busy={pending}>
-            {pending ? "Saving…" : mode === "edit" ? "Save" : "Go live"}
-          </Btn>
-          {mode === "edit" && (
-            <Btn type="button" variant="line" disabled={pending} onClick={() => submit(true)}>
-              Save as new
-            </Btn>
-          )}
-          <Btn type="button" variant="ghost" size="sm" disabled={pending} onClick={onClose}>Cancel</Btn>
+      <div className={styles.builderBar}>
+        <div className={styles.builderBarLeft}>
+          <p className={styles.builderTitle}>{mode === "edit" ? "Edit automation" : "New automation"}</p>
+          <Link href="/help/instagram-auto-dm-not-working" className={`${ui.link} px-1 py-2 text-sm`}>Need help?</Link>
         </div>
-        <Link href="/help/instagram-auto-dm-not-working" className={`${ui.link} px-2 py-2 text-sm`}>Need help?</Link>
+        <div className={styles.builderBarRight}>
+          <button type="button" className={styles.lineBtn} disabled={pending} onClick={onClose}>Cancel</button>
+          {/* Save as new always calls createRule; the primary button updates in edit mode. */}
+          {mode === "edit" && (
+            <button type="button" className={styles.lineBtn} disabled={pending} onClick={() => submit(true)}>
+              Save as new automation
+            </button>
+          )}
+          <button type="submit" className={styles.goLive} disabled={pending} aria-busy={pending}>
+            {pending ? "Saving…" : mode === "edit" ? "Update automation" : "Go live"}
+          </button>
+        </div>
       </div>
 
       {matchModeNote && <p className={`${ui.notice} mb-5 text-sm`}>{matchModeNote}</p>}
@@ -433,8 +409,8 @@ export default function RuleBuilder({
         </ul>
       )}
 
-      <div className="grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(300px,0.82fr)_minmax(0,1.18fr)]">
-        <aside className="min-w-0 xl:sticky xl:top-24" aria-label="Live Instagram preview">
+      <div className="grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(300px,0.8fr)_minmax(0,1.2fr)]">
+        <aside className="min-w-0 lg:sticky lg:top-20" aria-label="Live Instagram preview">
           <PhonePreview
             comment={previewComment}
             publicReply={publicReply}
@@ -447,8 +423,8 @@ export default function RuleBuilder({
         </aside>
 
         <fieldset disabled={pending} className="m-0 min-w-0 space-y-4 border-0 p-0">
-          <section className={`${ui.card} p-5 sm:p-6`} aria-labelledby="automation-settings">
-            <h2 id="automation-settings" className="m-0 text-lg text-[var(--poskoo-ink)]">Automation settings</h2>
+          <section className={styles.stepCard} aria-labelledby="automation-settings">
+            <h2 id="automation-settings" className={styles.stepTitle}>Automation settings</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="rule-builder-name" className={ui.label}>Name</label>
@@ -478,29 +454,28 @@ export default function RuleBuilder({
                 <AccountReadiness accounts={instagramAccounts} selectedId={socialAccountId} />
               </div>
             </div>
-            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
-              <label className={ui.checkRow}>
-                <input type="checkbox" checked={triggerComment} onChange={(event) => setTriggerComment(event.target.checked)} />
-                Post and reel comments
-              </label>
-              <label className={ui.checkRow}>
-                <input type="checkbox" checked={triggerStoryReply} onChange={(event) => setTriggerStoryReply(event.target.checked)} />
-                Story replies
-              </label>
-              <label className={ui.checkRow}>
-                <input type="checkbox" checked={triggerDm} onChange={(event) => setTriggerDm(event.target.checked)} />
-                When someone sends a DM with
-              </label>
-            </div>
+            <fieldset className="m-0 mt-4 border-0 p-0">
+              <legend className={ui.label}>Triggers</legend>
+              <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                <label className={`${styles.toggleRow} ${triggerComment ? styles.toggleRowOn : ""}`} style={{ marginTop: 0 }}>
+                  <input type="checkbox" checked={triggerComment} onChange={(event) => setTriggerComment(event.target.checked)} />
+                  Post and reel comments
+                </label>
+                <label className={`${styles.toggleRow} ${triggerStoryReply ? styles.toggleRowOn : ""}`} style={{ marginTop: 0 }}>
+                  <input type="checkbox" checked={triggerStoryReply} onChange={(event) => setTriggerStoryReply(event.target.checked)} />
+                  Story replies
+                </label>
+                <label className={`${styles.toggleRow} ${triggerDm ? styles.toggleRowOn : ""}`} style={{ marginTop: 0 }}>
+                  <input type="checkbox" checked={triggerDm} onChange={(event) => setTriggerDm(event.target.checked)} />
+                  DMs with a keyword
+                </label>
+              </div>
+            </fieldset>
           </section>
 
-          <StepCard number={1} title="When someone comments on" valid={stepOneValid}>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <label className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border-2 p-3 text-sm font-semibold ${postMode === "any" ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-band)]" : "border-[var(--poskoo-line)]"}`}>
-                <input type="radio" name="post-mode" checked={postMode === "any"} onChange={() => { setPostMode("any"); setMediaIds([]); }} className="h-4 w-4 accent-[var(--poskoo-violet)]" />
-                Any post or reel
-              </label>
-              <label className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border-2 p-3 text-sm font-semibold ${postMode === "specific" ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-band)]" : "border-[var(--poskoo-line)]"}`}>
+          <StepCard number={1} title="When a user comments on" valid={stepOneValid}>
+            <div>
+              <label className={`${styles.toggleRow} ${postMode === "specific" ? styles.toggleRowOn : ""}`}>
                 <input
                   type="radio"
                   name="post-mode"
@@ -510,9 +485,12 @@ export default function RuleBuilder({
                     setMediaLoading(Boolean(socialAccountId));
                     setMediaError(socialAccountId ? "" : "Choose one Instagram account above to select its posts.");
                   }}
-                  className="h-4 w-4 accent-[var(--poskoo-violet)]"
                 />
-                A specific post or reel
+                <span>A specific post or reel<span className={styles.toggleHint}>Only comments on the posts you pick</span></span>
+              </label>
+              <label className={`${styles.toggleRow} ${postMode === "any" ? styles.toggleRowOn : ""}`}>
+                <input type="radio" name="post-mode" checked={postMode === "any"} onChange={() => { setPostMode("any"); setMediaIds([]); }} />
+                <span>Any post or reel<span className={styles.toggleHint}>Every post and reel on the account, including future ones</span></span>
               </label>
             </div>
             {postMode === "specific" && triggerComment && (
@@ -523,7 +501,7 @@ export default function RuleBuilder({
                 {!mediaLoading && !mediaError && socialAccountId && media.length === 0 && <p className="text-sm text-[var(--poskoo-muted)]">No recent posts or reels were found on this account.</p>}
                 {media.length > 0 && (
                   <>
-                    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <ul className={`${styles.thumbStrip} m-0 list-none`}>
                       {media.slice(0, visibleMedia).map((item) => {
                         const selected = mediaIds.includes(item.id);
                         return (
@@ -533,7 +511,7 @@ export default function RuleBuilder({
                               aria-pressed={selected}
                               aria-label={`${selected ? "Remove" : "Select"} ${item.isReel ? "reel" : "post"}${item.caption ? `: ${item.caption.slice(0, 80)}` : ""}`}
                               onClick={() => setMediaIds((current) => selected ? current.filter((id) => id !== item.id) : [...current, item.id])}
-                              className={`group relative block aspect-square w-full overflow-hidden rounded-2xl border-3 text-left transition-transform hover:-translate-y-0.5 ${selected ? "border-[var(--poskoo-violet)]" : "border-transparent"}`}
+                              className={`group relative block aspect-[4/5] w-full overflow-hidden rounded-xl border-2 text-left ${selected ? "border-[var(--poskoo-violet)]" : "border-[var(--poskoo-line)]"}`}
                             >
                               {item.imageUrl ? (
                                 // Instagram CDN hosts vary; a plain lazy image does not require remote image configuration.
@@ -542,7 +520,11 @@ export default function RuleBuilder({
                               ) : (
                                 <span className="flex h-full items-center justify-center bg-[var(--poskoo-band)] p-3 text-xs text-[var(--poskoo-muted)]">{item.isReel ? "Reel" : "Instagram post"}</span>
                               )}
-                              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[var(--poskoo-ink)]/90 to-transparent px-2 pb-2 pt-7 text-[10px] font-semibold text-[var(--poskoo-card)]">{item.isReel ? "Reel" : "Post"}</span>
+                              <span className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/80 to-transparent px-2 pb-1.5 pt-6 text-[10px] font-semibold text-white">
+                                <span className="inline-flex items-center gap-0.5"><Heart className="h-3 w-3" aria-hidden="true" />{item.likes ?? "–"}</span>
+                                <span className="inline-flex items-center gap-0.5"><MessageCircle className="h-3 w-3" aria-hidden="true" />{item.comments ?? "–"}</span>
+                                <span className="ml-auto">{item.isReel ? "Reel" : "Post"}</span>
+                              </span>
                               {selected && <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--poskoo-lime)] text-[var(--poskoo-ink)]"><Check className="h-4 w-4" strokeWidth={3} aria-hidden="true" /></span>}
                             </button>
                           </li>
@@ -560,14 +542,20 @@ export default function RuleBuilder({
           </StepCard>
 
           <StepCard number={2} title="And their comment has" valid={stepTwoValid}>
-            <div className="mb-4 flex flex-wrap gap-2">
-              <button type="button" onClick={() => setAnyWord(true)} className={`${ui.pill} min-h-10 ${anyWord ? ui.pillInk : ""}`}>Any word</button>
-              <button type="button" onClick={() => setAnyWord(false)} className={`${ui.pill} min-h-10 ${!anyWord ? ui.pillInk : ""}`}>Specific keywords</button>
+            <div className="mb-4">
+              <label className={`${styles.toggleRow} ${!anyWord ? styles.toggleRowOn : ""}`}>
+                <input type="radio" name="keyword-mode" checked={!anyWord} onChange={() => setAnyWord(false)} />
+                <span>A specific keyword<span className={styles.toggleHint}>Only comments with one of your keywords</span></span>
+              </label>
+              <label className={`${styles.toggleRow} ${anyWord ? styles.toggleRowOn : ""}`}>
+                <input type="radio" name="keyword-mode" checked={anyWord} onChange={() => setAnyWord(true)} />
+                <span>Any word<span className={styles.toggleHint}>Reply to every comment</span></span>
+              </label>
             </div>
             {!anyWord && (
               <>
                 <label htmlFor="rule-builder-keywords" className={ui.label}>Keyword chips</label>
-                <div className="mt-2 flex min-h-14 flex-wrap items-center gap-2 rounded-2xl border-2 border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-2 focus-within:border-[var(--poskoo-violet)]">
+                <div className="mt-2 flex min-h-12 flex-wrap items-center gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1.5 focus-within:border-[var(--poskoo-violet)]">
                   {keywords.map((keyword) => (
                     <span key={keyword} className="inline-flex items-center gap-1 rounded-full bg-[var(--poskoo-band)] py-1.5 pl-3 pr-1.5 text-sm font-semibold text-[var(--poskoo-ink)]">
                       {keyword}
@@ -635,15 +623,15 @@ export default function RuleBuilder({
 
           <StepCard number={4} title="They will optionally get" valid>
             <div className="space-y-2">
-              <div className="flex min-h-14 items-center gap-3 rounded-2xl bg-[var(--poskoo-paper)] px-3 py-2">
+              <div className="flex min-h-14 items-center gap-3 rounded-xl bg-[var(--poskoo-paper)] px-3 py-2">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--poskoo-lime)]"><Send className="h-4 w-4" aria-hidden="true" /></span>
                 <div><p className="m-0 text-sm font-semibold text-[var(--poskoo-ink)]">Opening DM</p><p className="m-0 text-xs text-[var(--poskoo-muted)]">The message in step 5 starts the conversation.</p></div>
               </div>
-              <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-2xl border border-[var(--poskoo-line)] px-3 py-3">
+              <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border border-[var(--poskoo-line)] px-3 py-3">
                 <input type="checkbox" checked={followGate} onChange={(event) => setFollowGate(event.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--poskoo-violet)]" />
                 <span><span className="block text-sm font-semibold text-[var(--poskoo-ink)]">Ask to follow first</span><span className="mt-0.5 block text-xs text-[var(--poskoo-muted)]">Send the link after they follow and reply “done”.</span></span>
               </label>
-              <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-2xl border border-[var(--poskoo-line)] px-3 py-3">
+              <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border border-[var(--poskoo-line)] px-3 py-3">
                 <input type="checkbox" checked={emailGate} onChange={(event) => setEmailGate(event.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--poskoo-violet)]" />
                 <span><span className="block text-sm font-semibold text-[var(--poskoo-ink)]">Ask for email first</span><span className="mt-0.5 block text-xs text-[var(--poskoo-muted)]">Collect an email before the link is delivered.</span></span>
               </label>

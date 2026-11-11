@@ -3,8 +3,10 @@ import type pg from "pg";
 import { decryptToken } from "@/lib/crypto";
 import { getPool, query } from "@/lib/db";
 import { isFollower } from "@/lib/followCheck";
+import { recordLeadMagnetDelivery } from "@/lib/leadMagnets";
 import { FOLLOW_NUDGE_MESSAGE } from "@/lib/messages";
-import { PLAN_LIMITS, autoDmLimitMessage, planForUser } from "@/lib/planLimits";
+import { hasUnresolvedLinkToken } from "@/lib/rules";
+import { autoDmLimitMessage, monthlyAutoDmLimit } from "@/lib/planLimits";
 import { DM_WINDOW_MS, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
 import {
   MAX_ATTEMPTS,
@@ -29,6 +31,7 @@ type QueueRow = {
   id: string;
   user_id: string;
   rule_id: string | null;
+  contact_id?: string | null;
   comment_id: string | null;
   recipient_external_id: string;
   message: string;
@@ -39,6 +42,9 @@ type QueueRow = {
 
 export const FOLLOW_CHECK_GAVE_UP =
   "Gave up: Instagram did not answer the follower check after several tries, so the link was not sent. The person can reply again to retry.";
+
+export const UNRESOLVED_LINK_ERROR =
+  "Not sent: the message still contained {{link}} because the automation has no link. Add an https link to the automation; new comments will then get it.";
 
 export type SendResult = { sent: number; retried: number; failed: number; skipped: number };
 
@@ -173,6 +179,9 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
   let left = Math.max(0, Math.floor(limit));
   // Automated DMs sent this UTC month per user (plan limit), counted once per run.
   const monthlyByUser = new Map<string, number>();
+  // Monthly limit per user (plan + referral bonus), read once per run through the pool,
+  // outside the per-account transaction so a read error can never abort it.
+  const limitByUser = new Map<string, Awaited<ReturnType<typeof monthlyAutoDmLimit>>>();
   for (const account of accounts.rows) {
     if (left <= 0) break;
     if (!account.access_token_enc) continue;
@@ -227,7 +236,7 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
       }
       const dueLimit = Math.min(DUE_ROW_LIMIT, budget);
       const due = await client.query<QueueRow>(
-        `select q.id, q.user_id, q.rule_id, q.comment_id, q.recipient_external_id, q.message, q.attempts, q.kind, q.created_at
+        `select q.id, q.user_id, q.rule_id, q.contact_id, q.comment_id, q.recipient_external_id, q.message, q.attempts, q.kind, q.created_at
          from socialapp.dm_queue q
          where q.social_account_id=$1 and q.status='pending' and q.next_attempt_at <= now()
          and exists (
@@ -263,6 +272,16 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           left -= 1;
           continue;
         }
+        if (hasUnresolvedLinkToken(row.message)) {
+          // Never send a literal {{link}}: fail the item with a reason the user can act on.
+          await client.query(
+            "update socialapp.dm_queue set status='failed', last_error=$2 where id=$1",
+            [row.id, UNRESOLVED_LINK_ERROR]
+          );
+          console.error("sendDueDms: unresolved {{link}} in queue row", row.id);
+          result.failed += 1;
+          continue;
+        }
         const automated = row.kind !== "manual_reply";
         if (automated) {
           let used = monthlyByUser.get(row.user_id);
@@ -276,12 +295,15 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
             used = usedRes.rows[0]?.n ?? 0;
             monthlyByUser.set(row.user_id, used);
           }
-          const plan = planForUser();
-          const monthlyLimit = PLAN_LIMITS[plan].autoDmsPerMonth;
-          if (used >= monthlyLimit) {
+          let limits = limitByUser.get(row.user_id);
+          if (!limits) {
+            limits = await monthlyAutoDmLimit(row.user_id);
+            limitByUser.set(row.user_id, limits);
+          }
+          if (used >= limits.limit) {
             await client.query(
               "update socialapp.dm_queue set status='skipped', last_error=$2 where id=$1",
-              [row.id, autoDmLimitMessage(monthlyLimit, plan)]
+              [row.id, autoDmLimitMessage(limits.limit, limits.plan)]
             );
             result.skipped += 1;
             continue;
@@ -352,6 +374,9 @@ export async function sendDueDms(limit = 50): Promise<SendResult> {
           if (automated) monthlyByUser.set(row.user_id, (monthlyByUser.get(row.user_id) ?? 0) + 1);
           if (sendRow.kind === "follow_check") {
             await client.query("update socialapp.dm_queue set kind='gated_link' where id=$1 and kind='follow_check'", [row.id]);
+            // The follower-gated link finally went out: log the lead-magnet delivery the webhook
+            // path could not (it only records when the link is queued straight away). Best effort, never throws.
+            if (row.rule_id && row.contact_id) await recordLeadMagnetDelivery(row.user_id, row.rule_id, row.contact_id);
           }
           if (shouldPublicReply(sendRow)) {
             try {

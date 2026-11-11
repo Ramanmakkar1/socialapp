@@ -14,6 +14,7 @@ import {
   openFlow,
 } from "@/lib/googleAuth";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
+import { attributeReferralFromCookie } from "@/lib/referralCookie";
 
 function toLogin(reason: string) {
   return NextResponse.redirect(new URL(`/login?google=${reason}`, BRAND.url));
@@ -44,6 +45,7 @@ export async function GET(request: Request) {
   try {
     const identity = await exchangeGoogleCode(code, flow);
     const user = await findOrCreateGoogleUser(identity);
+    await attributeReferralFromCookie(user.id);
     await startSession(user.id, request.headers.get("user-agent") ?? undefined);
   } catch (err) {
     if (err instanceof GoogleSignInError) return toLogin(err.reason);

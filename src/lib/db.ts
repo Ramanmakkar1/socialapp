@@ -1,6 +1,35 @@
 import pg from "pg";
 
-const { Pool } = pg;
+const { Pool, Client } = pg;
+
+type ConnectCb = (err?: Error) => void;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- mixin constructors must take any[]
+type ConnectableClass = new (...args: any[]) => {
+  connect(): Promise<void>;
+  query(text: string): Promise<unknown>;
+};
+
+/**
+ * A pg Client whose connect() resolves only after `SET search_path` has finished.
+ * The old pool.on("connect", c => c.query(...)) fired the SET without awaiting it, so the first
+ * real query on a new client ran while SET was still in flight ("Calling client.query() when the
+ * client is already executing a query is deprecated" in production logs).
+ */
+export function withSearchPath<B extends ConnectableClass>(Base: B, searchPath = "socialapp, public") {
+  return class SearchPathClient extends Base {
+    connect(): Promise<void>;
+    connect(cb: ConnectCb): void;
+    connect(cb?: ConnectCb): Promise<void> | void {
+      const ready = super.connect().then(async () => {
+        await super.query(`SET search_path TO ${searchPath}`);
+      });
+      if (!cb) return ready;
+      ready.then(() => cb(), (err: Error) => cb(err));
+    }
+  };
+}
+
+const SearchPathClient = withSearchPath(Client as unknown as ConnectableClass) as unknown as typeof Client;
 
 declare global {
   var __socialappPool: pg.Pool | undefined;
@@ -18,13 +47,11 @@ export function getPool(): pg.Pool {
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 5,
+      Client: SearchPathClient,
       ssl:
         process.env.DATABASE_SSL === "false"
           ? false
           : { rejectUnauthorized: false },
-    });
-    pool.on("connect", (client) => {
-      client.query("SET search_path TO socialapp, public");
     });
     globalThis.__socialappPool = pool;
   }

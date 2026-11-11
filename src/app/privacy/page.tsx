@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 
@@ -41,6 +42,7 @@ export default function Page() {
       <header className="hero">
         <p className="eyebrow">Legal</p>
         <h1>Privacy policy</h1>
+        <div className="hero-art"><AnimArt name="legal" label="A calm creator holds a shield with a check mark next to a padlock, a key and a neat document" /></div>
       </header>
       <section style={{ paddingTop: 20 }}>
         <div className={s.prose}>
@@ -61,7 +63,7 @@ export default function Page() {
           <p><strong>Storage.</strong> Instagram access tokens are encrypted (AES-256-GCM) before they are stored and are never shown to anyone. Comments, messages and contacts are stored only so the features above work.</p>
           <p><strong>Retention.</strong> We keep this data while your account is connected. When you disconnect, we delete your tokens straight away. When you ask for deletion (or remove the app in Instagram), we delete your connected-account tokens, posts, messages and contacts within 30 days.</p>
           <p><strong>No selling or sharing.</strong> We never sell Instagram or Meta data, never use it for advertising and never share it with third parties, except service providers that host the service for us.</p>
-          <p><strong>Disconnect and delete.</strong> Disconnect any time in Settings → Connected accounts, or remove {BRAND.name} in Instagram (Settings → Website permissions → Apps and websites). See the <a href="/data-deletion">data deletion page</a> for every option.</p>
+          <p><strong>Disconnect and delete.</strong> Disconnect any time in Settings → Connected accounts, or remove {BRAND.name} in Instagram (Settings → Website permissions → Apps and websites). See the <Link href="/data-deletion">data deletion page</Link> for every option.</p>
           <h2 id="youtube">YouTube API Services</h2>
           <p>When you connect a YouTube channel through Google&apos;s official sign-in, you choose to give {BRAND.name} these permissions. We only use them for the features you turn on:</p>
           <ul>
@@ -72,7 +74,7 @@ export default function Page() {
           <p><strong>Revoking access.</strong> Disconnect any time in Settings → Connected accounts. You can also revoke {BRAND.name} from Google directly: go to <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer" target="_blank">myaccount.google.com/permissions</a>, find our app under &ldquo;Third-party apps &amp; add-ons&rdquo; and remove it. When you disconnect, we delete your token straight away.</p>
           <p><strong>Google&apos;s policies.</strong> When you sign in, Google&apos;s <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Privacy Policy</a> and <a href="https://www.youtube.com/intl/en_US/Terms" rel="noopener noreferrer" target="_blank">YouTube Terms of Service</a> apply to how Google and YouTube handle your data. Google does not share your personal data with us except your channel name and avatar and the access you grant above.</p>
           <h2>Deleting your data</h2>
-          <p>You can disconnect an account or delete everything at any time — see our <a href="/data-deletion">data deletion page</a>.</p>
+          <p>You can disconnect an account or delete everything at any time — see our <Link href="/data-deletion">data deletion page</Link>.</p>
           <h2 id="cookies">Cookies</h2>
           <p>
             We use only essential cookies — no advertising or cross-site tracking cookies. Specifically:{" "}

@@ -175,17 +175,39 @@ function isMissingColumn(err: unknown): boolean {
 }
 
 /**
+ * Google proved the person owns this email. If the account was never verified (e.g. a password
+ * sign-up, which proves nothing), it is claimed: the old password is cleared (logging in with it is
+ * impossible from now on), every existing session is revoked (an attacker who pre-registered the
+ * address is signed out) and email_verified_at is set. Already verified accounts are left alone.
+ * Returns true when the account was claimed now.
+ */
+export async function claimVerifiedEmail(userId: string): Promise<boolean> {
+  const rows = await query<{ id: string }>(
+    "update socialapp.users set password_hash=null, email_verified_at=now() where id=$1 and email_verified_at is null returning id",
+    [userId],
+  );
+  if (!rows[0]) return false;
+  await query("delete from socialapp.sessions where user_id=$1", [userId]);
+  return true;
+}
+
+/**
  * Finds or creates the Poskoo user for a verified Google identity:
  * 1. a user already linked to this Google account (sub), else
  * 2. a user with the same (Google-verified) email: the Google account is linked to it, else
  * 3. a new user without a password.
- * Unverified Google emails are rejected. Throws GoogleSignInError("not_ready") until migration 016 runs.
+ * Cases 1 and 2 claim the account when its email was never verified (see claimVerifiedEmail).
+ * Unverified Google emails are rejected. Throws GoogleSignInError("not_ready") until migrations
+ * 016 and 037 run.
  */
 export async function findOrCreateGoogleUser(id: GoogleIdentity): Promise<CurrentUser> {
   if (!id.emailVerified || !id.email) throw new GoogleSignInError("unverified_email");
   try {
     const bySub = await query<CurrentUser>("select id, email, name from socialapp.users where google_sub=$1", [id.sub]);
-    if (bySub[0]) return bySub[0];
+    if (bySub[0]) {
+      await claimVerifiedEmail(bySub[0].id);
+      return { ...bySub[0], emailVerified: true };
+    }
     const byEmail = await query<CurrentUser & { google_sub: string | null }>(
       "select id, email, name, google_sub from socialapp.users where email=$1",
       [id.email],
@@ -194,19 +216,25 @@ export async function findOrCreateGoogleUser(id: GoogleIdentity): Promise<Curren
     if (existing) {
       if (existing.google_sub && existing.google_sub !== id.sub) throw new GoogleSignInError("linked_other");
       await query("update socialapp.users set google_sub=$2 where id=$1 and google_sub is null", [existing.id, id.sub]);
-      return { id: existing.id, email: existing.email, name: existing.name };
+      await claimVerifiedEmail(existing.id);
+      return { id: existing.id, email: existing.email, name: existing.name, emailVerified: true };
     }
     const created = await query<CurrentUser>(
-      "insert into socialapp.users (email, password_hash, name, google_sub) values ($1, null, $2, $3) on conflict do nothing returning id, email, name",
+      "insert into socialapp.users (email, password_hash, name, google_sub, email_verified_at) values ($1, null, $2, $3, now()) on conflict do nothing returning id, email, name",
       [id.email, id.name, id.sub],
     );
-    if (created[0]) return created[0];
-    // Lost a race with a parallel sign-in or sign-up: use the row that won.
-    const again = await query<CurrentUser>("select id, email, name from socialapp.users where google_sub=$1 or email=$2 order by (google_sub=$1) desc nulls last limit 1", [
+    if (created[0]) return { ...created[0], emailVerified: true };
+    // Lost a race with a parallel sign-in or sign-up: use the row that won (and claim it if needed).
+    const again = await query<CurrentUser & { google_sub: string | null }>("select id, email, name, google_sub from socialapp.users where google_sub=$1 or email=$2 order by (google_sub=$1) desc nulls last limit 1", [
       id.sub,
       id.email,
     ]);
-    if (again[0]) return again[0];
+    const won = again[0];
+    if (won) {
+      if (won.google_sub !== id.sub) throw new GoogleSignInError(won.google_sub ? "linked_other" : "exchange_failed");
+      await claimVerifiedEmail(won.id);
+      return { id: won.id, email: won.email, name: won.name, emailVerified: true };
+    }
     throw new GoogleSignInError("exchange_failed");
   } catch (err) {
     if (isMissingColumn(err)) throw new GoogleSignInError("not_ready");

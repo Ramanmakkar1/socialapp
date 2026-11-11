@@ -6,6 +6,8 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
+import { CompareNote } from "@/components/CompareNote";
 
 const PATH = "/social-media-scheduler-comparison";
 const title = "Scheduler Comparison: Instagram, Facebook Pages, Threads";
@@ -137,16 +139,7 @@ export default function SocialMediaSchedulerComparisonPage() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
-        <div className="hero-art" style={{ maxWidth: 920 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 920px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            priority
-            alt="A creator schedules one post that is sent to Instagram, Facebook and Threads from a single calendar"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
 
       <section id="platforms">
@@ -225,6 +218,7 @@ export default function SocialMediaSchedulerComparisonPage() {
           <p className="small" style={{ marginTop: 16, textAlign: "center" }}>
             Compare plans on the <Link className={s.vlink} href="/pricing">Poskoo pricing page</Link>.
           </p>
+          <CompareNote />
         </div>
       </section>
 

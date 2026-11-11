@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download } from "lucide-react";
+import Link from "next/link";
+import { Download, Image as ImageIcon, MoreHorizontal } from "lucide-react";
 import LocalTime from "@/components/LocalTime";
 import {
   PERFORMANCE_CSV_HEADERS,
@@ -13,12 +14,9 @@ import styles from "./analytics.module.css";
 
 type SortKey = "publishedAt" | "reach" | "impressions" | "likes" | "comments" | "saved" | "linkClicks";
 
-const COLUMNS: { key: SortKey | "caption" | "platforms"; label: string; numeric?: boolean }[] = [
-  { key: "caption", label: "Post" },
-  { key: "publishedAt", label: "Published" },
-  { key: "platforms", label: "Platforms" },
+const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
   { key: "reach", label: "Reach", numeric: true },
-  { key: "impressions", label: "Impressions", numeric: true },
+  { key: "impressions", label: "Views", numeric: true },
   { key: "likes", label: "Likes", numeric: true },
   { key: "comments", label: "Comments", numeric: true },
   { key: "saved", label: "Saves", numeric: true },
@@ -34,17 +32,11 @@ function formatMetric(value: number | null): string {
   return value == null ? "—" : value.toLocaleString("en-US");
 }
 
-function shortCaption(caption: string): string {
-  const text = caption.trim();
-  if (!text) return "(no caption)";
-  return text.length > 60 ? `${text.slice(0, 60).trimEnd()}…` : text;
+function platformLabel(p: string): string {
+  return p.charAt(0).toUpperCase() + p.slice(1);
 }
 
-function formatPlatforms(platforms: string[]): string {
-  return platforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(", ");
-}
-
-export default function PostPerformanceTable({ rows }: { rows: PostPerformanceRow[] }) {
+export default function PostPerformanceTable({ rows, thumbs = {} }: { rows: PostPerformanceRow[]; thumbs?: Record<string, string> }) {
   const [sortKey, setSortKey] = useState<SortKey>("publishedAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -79,57 +71,82 @@ export default function PostPerformanceTable({ rows }: { rows: PostPerformanceRo
     URL.revokeObjectURL(url);
   }
 
+  function sortHeader(key: SortKey, label: string, numeric = true) {
+    return (
+      <th
+        key={key}
+        scope="col"
+        className={numeric ? styles.num : undefined}
+        aria-sort={sortKey === key ? (sortDir === "asc" ? "ascending" : "descending") : undefined}
+      >
+        <button type="button" className={styles.sortBtn} onClick={() => toggleSort(key)}>
+          {label}
+          <span aria-hidden="true" className={styles.sortArrow}>
+            {sortKey === key ? (sortDir === "asc" ? "↑" : "↓") : "↕"}
+          </span>
+        </button>
+      </th>
+    );
+  }
+
   return (
     <div>
       <div className={styles.tableToolbar}>
-        <button type="button" className={styles.exportBtn} onClick={exportCsv} disabled={rows.length === 0}>
+        <span className={styles.subtle}>{rows.length} {rows.length === 1 ? "post" : "posts"}</span>
+        <button type="button" className={styles.ghostBtn} onClick={exportCsv} disabled={rows.length === 0}>
           <Download width={15} height={15} aria-hidden="true" />
           Export CSV
         </button>
       </div>
       <div className={styles.tableWrap}>
-        <table className="w-full min-w-[960px] text-left text-sm">
+        <table className={`${styles.table} ${styles.perfTable}`}>
           <thead>
-            <tr className={styles.tableHead}>
-              {COLUMNS.map((col) => (
-                <th
-                  key={col.key}
-                  scope="col"
-                  className={`px-4 py-3 font-medium ${col.numeric ? "text-right" : ""}`}
-                  aria-sort={sortKey === col.key ? (sortDir === "asc" ? "ascending" : "descending") : undefined}
-                >
-                  {col.numeric || col.key === "publishedAt" ? (
-                    <button
-                      type="button"
-                      className={styles.sortBtn}
-                      onClick={() => toggleSort(col.key as SortKey)}
-                    >
-                      {col.label}
-                      <span aria-hidden="true" className={styles.sortArrow}>
-                        {sortKey === col.key ? (sortDir === "asc" ? "↑" : "↓") : "↕"}
-                      </span>
-                    </button>
-                  ) : (
-                    col.label
-                  )}
-                </th>
-              ))}
+            <tr>
+              <th scope="col" className={styles.rankCol}>#</th>
+              {sortHeader("publishedAt", "Post", false)}
+              {COLUMNS.map((col) => sortHeader(col.key, col.label, col.numeric))}
+              <th scope="col"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>
-            {sorted.map((row) => (
-              <tr key={row.id} className={styles.tableRow}>
-                <td className="px-4 py-3">{shortCaption(row.caption)}</td>
-                <td className="px-4 py-3 tabular-nums">
-                  <LocalTime value={row.publishedAt} style="medium" fallback="—" />
+            {sorted.map((row, i) => (
+              <tr key={row.id}>
+                <td className={styles.rankCol}>{i + 1}</td>
+                <td>
+                  <div className={styles.postCell}>
+                    <span className={styles.thumb}>
+                      {thumbs[row.id] ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- user media from arbitrary hosts
+                        <img src={thumbs[row.id]} alt="" loading="lazy" />
+                      ) : (
+                        <ImageIcon width={16} height={16} aria-hidden="true" />
+                      )}
+                    </span>
+                    <div className="min-w-0">
+                      <p className={styles.postCaption}>{row.caption.trim() || "(no caption)"}</p>
+                      <p className={styles.postMeta}>
+                        <LocalTime value={row.publishedAt} style="medium" fallback="—" />
+                        {row.platforms.map((p) => (
+                          <span key={p} className={styles.typeChip}>{platformLabel(p)}</span>
+                        ))}
+                      </p>
+                    </div>
+                  </div>
                 </td>
-                <td className="px-4 py-3">{formatPlatforms(row.platforms)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">{formatMetric(row.reach)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">{formatMetric(row.impressions)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">{formatMetric(row.likes)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">{formatMetric(row.comments)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">{formatMetric(row.saved)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">{row.linkClicks.toLocaleString("en-US")}</td>
+                {COLUMNS.map((col) => (
+                  <td key={col.key} className={`${styles.num} tabular-nums`}>
+                    {col.key === "linkClicks" ? row.linkClicks.toLocaleString("en-US") : formatMetric(row[col.key as Exclude<SortKey, "publishedAt" | "linkClicks">])}
+                  </td>
+                ))}
+                <td>
+                  <details className={styles.rowMenu}>
+                    <summary aria-label={`Actions for post ${i + 1}`}><MoreHorizontal width={16} height={16} aria-hidden="true" /></summary>
+                    <div className={styles.rowMenuList}>
+                      <Link href={`/app/calendar?view=month&month=${(row.publishedAt ?? new Date().toISOString()).slice(0, 7)}`}>View in calendar</Link>
+                      <button type="button" onClick={() => navigator.clipboard?.writeText(row.caption)}>Copy caption</button>
+                    </div>
+                  </details>
+                </td>
               </tr>
             ))}
           </tbody>

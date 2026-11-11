@@ -187,12 +187,12 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
 };
 
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
-  "/": "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, AI replies and free tools. Plan, publish and grow your content in one place.",
-  "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI DM replies, lead capture, free tools and comparisons, all in one workspace.",
-  "/instagram-auto-dm": "Automatically DM anyone who comments a keyword with your link, then capture email or phone with Poskoo auto-DM rules. It works on every post you pick.",
+  "/": "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, AI captions and free tools. Plan, publish and grow your content in one place.",
+  "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI captions, lead capture, free tools and comparisons, all in one workspace.",
+  "/instagram-auto-dm": "Automatically DM anyone who comments a keyword with your link, then capture their email with Poskoo auto-DM rules. It works on every post you pick.",
   "/instagram-auto-dm/templates": "Pre-built auto-DM message templates for giveaways, promotions and lead generation, ready to customise for your brand and send to your audience in Poskoo.",
-  "/instagram-link-in-bio": "Create a free Instagram link-in-bio page at poskoo.com/@yourname. Add up to 5 links on Free or 20 on paid plans, pick a theme and track every click.",
-  "/instagram-dm-automation": "Instagram DM automation replies to comment keywords, Story replies and incoming DMs, captures emails and sends AI answers. See how Poskoo works.",
+  "/instagram-link-in-bio": "Create a free Instagram link-in-bio page at poskoo.com/@yourname. Add up to 5 links on Free (20 on paid plans, coming soon), pick a theme and track every click.",
+  "/instagram-dm-automation": "Instagram DM automation replies to comment keywords, Story replies and DM keywords, and captures emails before sending your link. See how Poskoo works.",
   "/buffer-alternative": "A Buffer alternative with built-in Instagram auto-DM and comment-to-lead conversion, so Poskoo turns your Instagram comments into real contacts.",
   "/publer-alternative": "A Publer alternative with built-in Instagram auto-DM, comment-to-lead conversion and AI captions, all inside one Poskoo workspace for your content.",
   "/manychat-alternative": "A ManyChat alternative for Instagram comments: Poskoo sends auto-DM keyword replies without needing a separate chatbot setup or any extra tool.",
@@ -250,11 +250,11 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/help/schedule-instagram-carousel": "Schedule Instagram carousels: paste 2-10 public image links, write one caption and Poskoo publishes the post for you automatically at your chosen time.",
   "/help/instagram-story-reply-auto-dm": "A step-by-step guide to auto-DM everyone who replies to your Instagram Story with a keyword, using Poskoo story reply rules and keyword triggers.",
   "/instagram-scheduler": "Schedule Instagram posts with a drag-and-drop calendar, feed, Reels and carousel support, all from one Poskoo workspace for your Instagram content.",
-  "/instagram-scheduler/pricing": "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits, AI replies and lead capture.",
+  "/instagram-scheduler/pricing": "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Free plan today; paid plans coming soon.",
   "/threads-scheduler": "Schedule Threads posts on one calendar and publish them automatically through Meta's official API. Plan text, image or video posts and track results.",
   "/social-media-scheduler-comparison": "Compare Poskoo's Instagram, Facebook Pages and Threads scheduling: calendar, media, auto-publishing and Instagram comment-to-DM, plus a free plan.",
   "/facebook-scheduler": "Schedule Facebook Page posts with text, photos or video through Meta's official login, and plan Instagram and Threads content in Poskoo too.",
   "/instagram-content-planner": "Plan an Instagram post step by step with free tools: draft a hook, write a caption, check image dimensions, preview and schedule it in Poskoo.",
-  "/pricing": "Compare Poskoo Free, Pro and Agency plans, see what each includes and choose the plan that best fits your posting and auto-DM needs right now.",
+  "/pricing": "Compare Poskoo Free, Pro and Agency plans and see what each includes. Every account starts on Free today; paid plans are coming soon.",
   "/developers": "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp, then schedule posts and read analytics from your assistant.",
 };

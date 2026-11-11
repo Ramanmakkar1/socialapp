@@ -73,7 +73,7 @@ export default function FlowDemo() {
     keywords.length === 0
       ? "Add a keyword above to see what this comment triggers."
       : match
-        ? `Matched “${match.keyword}”. The DM goes out within seconds, then the public reply posts under the comment so others can see it works.`
+        ? `Matched “${match.keyword}”. The DM goes out, usually within a minute, then the public reply posts under the comment so others can see it works.`
         : "No keyword matched, so this comment gets no DM and no public reply.";
 
   function insertToken(token: string) {
@@ -157,7 +157,7 @@ export default function FlowDemo() {
             />
             <div className="mt-1.5 flex flex-wrap items-start justify-between gap-2">
               <p id={`${dmId}-hint`} className="text-xs leading-relaxed text-[#3d3450]">
-                Sent privately within seconds. The tokens become their name and your link.
+                Sent privately, usually within a minute. The tokens become their name and your link.
               </p>
               <span
                 id={`${dmId}-count`}

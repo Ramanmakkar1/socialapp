@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import ThreadsPostPreview from "./ThreadsPostPreview";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/threads-post-preview";
 const MAX = 500;
@@ -57,16 +58,7 @@ export default function ThreadsPostPreviewPage() {
           Write your Threads post, watch the {MAX}-character count in real time and see how it looks on a phone before
           you publish.
         </p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            loading="lazy"
-            alt="A creator at a laptop sends one post that splits to several phones and screens"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

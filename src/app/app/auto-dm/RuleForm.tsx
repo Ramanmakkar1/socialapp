@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, useTransition, type ComponentType } from "react";
-import { MessageCircleHeart, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Fragment, useEffect, useId, useRef, useState, useTransition, type ComponentType } from "react";
+import { Activity, LifeBuoy, MessageCircle, MessageCircleHeart, MoreHorizontal, Pause, Pencil, Play, Plus, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
 import RuleBuilder, { AccountReadiness } from "./RuleBuilder";
 import TemplatePicker from "./TemplatePicker";
+import styles from "./auto-dm.module.css";
 import AutomationMessagePreview from "@/components/AutomationMessagePreview";
 import CommentKeywordTester from "@/components/CommentKeywordTester";
-import { Btn, PageHero } from "@/components/ui/kit";
+import { Btn } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import {
   createRule,
@@ -20,6 +21,7 @@ import {
 } from "./actions";
 import { dmAiAvailable, suggestDmMessages } from "./aiActions";
 import { PUBLIC_REPLY_MAX } from "@/lib/publicReply";
+import { formatCtr } from "@/lib/ctr";
 
 const INPUT = `${ui.input} mt-1.5`;
 
@@ -605,13 +607,89 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   );
 }
 
+export type RuleStats = { dms: number; clicks: number; uniqueClicks?: number };
+
 type AutoDmViewProps = {
   rules: DbRuleRow[];
   instagramAccounts: InstagramAccountOption[];
   templateDefaults?: RuleFormDefaults;
   templateNote?: string;
   rewindButton?: ComponentType<{ ruleId: string }>;
+  /** DMs sent and link clicks per rule id (missing = unknown). */
+  stats?: Record<string, RuleStats>;
+  /** Opens a blank builder with this trigger preselected (from ?trigger=). */
+  startTrigger?: RuleTrigger;
 };
+
+const TRIGGER_LABEL: Record<string, string> = { comment: "Comments", story_reply: "Story replies", dm: "DM keyword" };
+
+function ruleTypeLabel(rule: DbRuleRow): string {
+  const t = normalizeTriggers(rule.triggers);
+  return `${t.map((x) => TRIGGER_LABEL[x] ?? x).join(" + ")} → DM`;
+}
+
+function ruleSummary(rule: DbRuleRow, accounts: InstagramAccountOption[]): string {
+  const kw = rule.keywords.includes("*") ? "any word" : rule.keywords.map((k) => `“${k}”`).join(", ");
+  const posts = (rule.media_ids?.length ?? 0) > 0 ? `${rule.media_ids!.length} selected ${rule.media_ids!.length === 1 ? "post" : "posts"}` : "any post";
+  // Only comment triggers are scoped to posts; story replies and DMs are not.
+  const where = normalizeTriggers(rule.triggers)
+    .map((t) => (t === "comment" ? `comments on ${posts}` : t === "story_reply" ? "story replies" : "DMs"))
+    .join(" + ");
+  const dm = rule.dm_text.replace(/\s+/g, " ").trim();
+  return `${kw} in ${where} · ${ruleAccountLabel(rule, accounts)} · “${dm.length > 60 ? `${dm.slice(0, 60)}…` : dm}”`;
+}
+
+function RuleIcon({ rule }: { rule: DbRuleRow }) {
+  const t = normalizeTriggers(rule.triggers);
+  const tone = t[0] === "story_reply" ? styles.iconStory : t[0] === "dm" ? styles.iconDm : styles.iconComment;
+  return (
+    <span className={`${styles.ruleIcon} ${tone}`} aria-hidden="true">
+      <MessageCircle width={18} height={18} />
+    </span>
+  );
+}
+
+function RuleMenu({
+  rule,
+  pending,
+  canRewind,
+  onEdit,
+  onRewind,
+  onDelete,
+}: {
+  rule: DbRuleRow;
+  pending: boolean;
+  canRewind: boolean;
+  onEdit: () => void;
+  onRewind: () => void;
+  onDelete: () => void;
+}) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const close = () => ref.current?.removeAttribute("open");
+  return (
+    <details ref={ref} className={styles.menu}>
+      <summary className={styles.iconBtn} aria-label={`More actions for ${rule.name}`}>
+        <MoreHorizontal width={18} height={18} aria-hidden="true" />
+      </summary>
+      <div className={styles.menuList} role="menu">
+        <button type="button" role="menuitem" className={styles.menuItem} disabled={pending} onClick={() => { close(); onEdit(); }}>
+          <Pencil width={15} height={15} aria-hidden="true" /> Edit automation
+        </button>
+        {canRewind && (
+          <button type="button" role="menuitem" className={styles.menuItem} disabled={pending} onClick={() => { close(); onRewind(); }}>
+            <Activity width={15} height={15} aria-hidden="true" /> Send to past comments
+          </button>
+        )}
+        <Link role="menuitem" href={`/app/leads?rule=${encodeURIComponent(rule.id)}`} className={styles.menuItem} onClick={close}>
+          <MessageCircleHeart width={15} height={15} aria-hidden="true" /> View captured leads
+        </Link>
+        <button type="button" role="menuitem" className={`${styles.menuItem} ${styles.menuDanger}`} disabled={pending} onClick={() => { close(); onDelete(); }}>
+          <Trash2 width={15} height={15} aria-hidden="true" /> Delete
+        </button>
+      </div>
+    </details>
+  );
+}
 
 export function AutoDmView({
   rules,
@@ -619,19 +697,31 @@ export function AutoDmView({
   templateDefaults,
   templateNote,
   rewindButton: RewindButton,
+  stats = {},
+  startTrigger,
 }: AutoDmViewProps) {
-  const [formOpen, setFormOpen] = useState(Boolean(templateDefaults));
+  const [formOpen, setFormOpen] = useState(Boolean(templateDefaults) || Boolean(startTrigger));
   const [editing, setEditing] = useState<DbRuleRow | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [rewindId, setRewindId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [actionError, setActionError] = useState<string | null>(null);
   // Picking a template is a client-side navigation, so open the draft when the template changes.
   const templateKey = templateDefaults?.name ?? "";
   const [seenTemplateKey, setSeenTemplateKey] = useState(templateKey);
   const [blankDraft, setBlankDraft] = useState(false);
+  const [seenTrigger, setSeenTrigger] = useState(startTrigger);
   if (templateKey !== seenTemplateKey) {
     setSeenTemplateKey(templateKey);
     if (templateKey) {
+      setEditing(null);
+      setBlankDraft(false);
+      setFormOpen(true);
+    }
+  }
+  if (startTrigger !== seenTrigger) {
+    setSeenTrigger(startTrigger);
+    if (startTrigger) {
       setEditing(null);
       setBlankDraft(false);
       setFormOpen(true);
@@ -647,6 +737,7 @@ export function AutoDmView({
   function openEdit(rule: DbRuleRow) {
     setEditing(rule);
     setFormOpen(true);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function closeForm() {
@@ -682,6 +773,7 @@ export function AutoDmView({
     });
   }
 
+  const triggerDefaults: RuleFormDefaults | undefined = startTrigger ? { triggers: [startTrigger] } : undefined;
   const formDefaults: RuleFormDefaults | undefined = editing
     ? {
         name: editing.name,
@@ -699,43 +791,36 @@ export function AutoDmView({
       }
     : blankDraft
       ? undefined
-      : templateDefaults;
+      : templateDefaults ?? triggerDefaults;
+  const live = rules.filter((r) => r.status === "active").length;
 
   return (
     <>
-      <PageHero
-        eyebrow="Comment-to-DM automation"
-        title="Auto-DM"
-        accent="on autopilot"
-        lede="Send a DM to everyone who comments a keyword."
-        art="/landing/card-dm.webp"
-        artAlt="A creator sending automatic Instagram direct messages"
-        action={
-          <>
-            <p className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              <Link href="/app/auto-dm/activity" className={ui.link}>Activity</Link>
-              <Link href="/help/instagram-auto-dm-not-working" className={ui.link}>DMs not sending?</Link>
-            </p>
-            {instagramAccounts.length > 1 && (
-              <p className={`${ui.hint} mt-4 max-w-xl`}>
-                Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
-              </p>
-            )}
-            {!formOpen && (
-              <div className="mt-4">
-                <Btn onClick={() => openCreate(true)}>
-                  <Plus className="h-4 w-4" aria-hidden="true" /> New automation
-                </Btn>
-              </div>
-            )}
-          </>
-        }
-      />
+      <header className={styles.pageHead}>
+        <div className="min-w-0">
+          <h1 className={styles.pageTitle}>Automations</h1>
+          <p className={styles.pageSub}>Send a DM automatically when someone comments a keyword, replies to your story or messages you.</p>
+        </div>
+        <div className={styles.headActions}>
+          <Link href="/app/auto-dm/activity" className={styles.headLink}><Activity width={16} height={16} aria-hidden="true" /> Activity</Link>
+          <Link href="/help/instagram-auto-dm-not-working" className={styles.headLink}><LifeBuoy width={16} height={16} aria-hidden="true" /> DMs not sending?</Link>
+          {!formOpen && (
+            <button type="button" className={styles.primaryBtn} onClick={() => openCreate(true)}>
+              <Plus width={16} height={16} aria-hidden="true" /> New automation
+            </button>
+          )}
+        </div>
+      </header>
+      {instagramAccounts.length > 1 && !formOpen && (
+        <p className={`${ui.hint} mt-2 max-w-xl`}>
+          Assign each rule to a specific profile or share one rule across all connected Instagram accounts.
+        </p>
+      )}
 
       {formOpen && (
         <div className="mt-6">
           <RuleBuilder
-            key={editing ? `edit:${editing.id}` : blankDraft ? "create:blank" : `create:${templateKey}`}
+            key={editing ? `edit:${editing.id}` : blankDraft ? "create:blank" : `create:${templateKey || startTrigger || ""}`}
             mode={editing ? "edit" : "create"}
             ruleId={editing?.id}
             initial={formDefaults}
@@ -746,8 +831,6 @@ export function AutoDmView({
           />
         </div>
       )}
-
-      {!formOpen && <TemplatePicker activeTitle={templateKey} onReopen={() => openCreate()} />}
 
       {actionError && (
         <p role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-4 max-w-full break-words`}>
@@ -768,65 +851,100 @@ export function AutoDmView({
         </div>
       ) : (
         rules.length > 0 && (
-          <ul className="mt-6 grid gap-4">
-            {rules.map((rule) => (
-              <li key={rule.id} className={`${ui.card} p-5`}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h2 className="m-0 text-lg font-semibold text-[var(--poskoo-ink)]">{rule.name}</h2>
-                    <p className={`mt-1 text-xs text-[var(--poskoo-muted)]`}>
-                      <span className="font-semibold">Account:</span>{" "}
-                      {ruleAccountLabel(rule, instagramAccounts)}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {rule.keywords.map((k) => (
-                        <span key={k} className={`${ui.pill} font-mono text-xs`} style={{ color: "var(--poskoo-violet)" }}>
-                          {k === "*" ? "Any word" : k}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <span className={`${ui.pill} ${rule.status === "active" ? ui.pillMint : ""}`}>
-                    {rule.status === "active" ? "Active" : "Paused"}
-                  </span>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  {rule.status === "active" && rule.triggers.includes("comment") && RewindButton ? (
-                    <RewindButton ruleId={rule.id} />
-                  ) : null}
-                  <Btn variant="ghost" size="sm" disabled={pending} onClick={() => onToggle(rule.id)}>
-                    {rule.status === "active" ? "Pause" : "Activate"}
-                  </Btn>
-                  <Btn variant="ghost" size="sm" onClick={() => openEdit(rule)} disabled={pending}>
-                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Edit
-                  </Btn>
-                  {confirmDeleteId === rule.id ? (
-                    <span className="flex flex-wrap items-center gap-2 text-sm">
-                      <span className="text-[var(--poskoo-ink)]">Delete this rule?</span>
-                      <button type="button" disabled={pending} onClick={() => onDelete(rule.id)} className={`${ui.btn} ${ui.btnDanger} ${ui.sm}`}>
-                        Yes, delete
-                      </button>
-                      <Btn variant="ghost" size="sm" disabled={pending} onClick={() => setConfirmDeleteId(null)}>
-                        Cancel
-                      </Btn>
-                    </span>
-                  ) : (
-                    <Btn variant="ghost" size="sm" disabled={pending} onClick={() => setConfirmDeleteId(rule.id)}>
-                      <Trash2 className="h-3.5 w-3.5" aria-hidden="true" /> Delete
-                    </Btn>
-                  )}
-                  <Link
-                    href={`/app/leads?rule=${encodeURIComponent(rule.id)}`}
-                    className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}
-                  >
-                    View captured leads
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <section className={styles.tableCard} aria-labelledby="your-automations">
+            <div className={styles.tableHead}>
+              <h2 id="your-automations" className={styles.tableTitle}>Your automations</h2>
+              <span className={styles.tableMeta}>{live} live · {rules.length - live} paused</span>
+            </div>
+            <div className={styles.tableScroll}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th scope="col">Automation</th>
+                    <th scope="col" className={styles.num}>DMs</th>
+                    <th scope="col" className={styles.num}>Clicks</th>
+                    <th scope="col" className={styles.num}>CTR</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span className="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rules.map((rule) => {
+                    const st = stats[rule.id];
+                    const ctr = st ? formatCtr(st.uniqueClicks ?? st.clicks, st.dms) : "–";
+                    const active = rule.status === "active";
+                    const canRewind = active && rule.triggers.includes("comment") && Boolean(RewindButton);
+                    return (
+                      <Fragment key={rule.id}>
+                        <tr>
+                          <td>
+                            <div className={styles.ruleCell}>
+                              <RuleIcon rule={rule} />
+                              <div className="min-w-0">
+                                <p className={styles.ruleName}>
+                                  {rule.name}
+                                  <span className={styles.ruleType}>{ruleTypeLabel(rule)}</span>
+                                </p>
+                                <p className={styles.ruleSummary} title={ruleSummary(rule, instagramAccounts)}>{ruleSummary(rule, instagramAccounts)}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className={styles.num} data-label="DMs">{st ? st.dms.toLocaleString("en-US") : "–"}</td>
+                          <td className={styles.num} data-label="Clicks">{st ? st.clicks.toLocaleString("en-US") : "–"}</td>
+                          <td className={styles.num} data-label="CTR">{ctr}</td>
+                          <td data-label="Status">
+                            <span className={`${styles.statusPill} ${active ? styles.statusLive : styles.statusPaused}`}>
+                              <span aria-hidden="true" />{active ? "Live" : "Paused"}
+                            </span>
+                          </td>
+                          <td className={styles.actionsCell}>
+                            <div className={styles.rowActions}>
+                              <button type="button" className={styles.ghostBtn} disabled={pending} onClick={() => onToggle(rule.id)}>
+                                {active ? <Pause width={14} height={14} aria-hidden="true" /> : <Play width={14} height={14} aria-hidden="true" />}
+                                {active ? "Pause" : "Resume"}
+                                <span className="sr-only"> {rule.name}</span>
+                              </button>
+                              <RuleMenu
+                                rule={rule}
+                                pending={pending}
+                                canRewind={canRewind}
+                                onEdit={() => openEdit(rule)}
+                                onRewind={() => setRewindId((cur) => (cur === rule.id ? null : rule.id))}
+                                onDelete={() => setConfirmDeleteId(rule.id)}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                        {(confirmDeleteId === rule.id || (rewindId === rule.id && canRewind && RewindButton)) && (
+                          <tr className={styles.subRow}>
+                            <td colSpan={6}>
+                              {confirmDeleteId === rule.id ? (
+                                <span className="flex flex-wrap items-center gap-2 text-sm">
+                                  <span className="text-[var(--poskoo-ink)]">Delete “{rule.name}”? This cannot be undone.</span>
+                                  <button type="button" disabled={pending} onClick={() => onDelete(rule.id)} className={`${ui.btn} ${ui.btnDanger} ${ui.sm}`}>
+                                    Yes, delete
+                                  </button>
+                                  <Btn variant="ghost" size="sm" disabled={pending} onClick={() => setConfirmDeleteId(null)}>
+                                    Cancel
+                                  </Btn>
+                                </span>
+                              ) : RewindButton ? (
+                                <RewindButton ruleId={rule.id} />
+                              ) : null}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
         )
       )}
+
+      {!formOpen && <TemplatePicker activeTitle={templateKey} onReopen={() => openCreate()} />}
     </>
   );
 }

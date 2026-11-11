@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { DM_TEMPLATES } from '@/lib/dmTemplates';
 import { CATEGORIES, categoriesFor, visibleIn } from './categories';
 
-test('the gallery tabs are All, Popular, Sell & earn, Engage audience, Capture leads and Book clients', () => {
+test('the gallery tabs are All, Featured, Lead magnets, Selling products, Events and calls, Content and downloads', () => {
   assert.deepEqual(
     CATEGORIES.map((c) => c.label),
-    ['All', 'Popular', 'Sell & earn', 'Engage audience', 'Capture leads', 'Book clients'],
+    ['All', 'Featured', 'Lead magnets', 'Selling products', 'Events and calls', 'Content and downloads'],
   );
 });
 

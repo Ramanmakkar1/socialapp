@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
+import { accountLimitError } from "@/lib/planLimits";
 import { getYouTubeChannel, saveYouTubeChannel } from "@/lib/youtubeAccounts";
 import {
   YOUTUBE_COOKIE,
@@ -18,6 +19,7 @@ type BackResult =
   | "needs_reconnect"
   | "channel_not_found"
   | "not_configured"
+  | "limit"
   | "error";
 
 function back(result: BackResult) {
@@ -51,6 +53,8 @@ export async function GET(request: Request) {
     }
     const { accessToken, refreshToken } = await exchangeYouTubeCode(code, flow);
     const channel = await fetchYouTubeChannel(accessToken);
+    // Plan limit: a NEW channel over the limit is refused; reconnecting an existing one works.
+    if (await accountLimitError(user.id, { kind: "youtube", channelId: channel.channelId })) return back("limit");
     if (refreshToken === "") {
       // Google omitted the refresh token: keep the one we already have, or ask for a reconnect.
       const existing = await getYouTubeChannel(user.id);

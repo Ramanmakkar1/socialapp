@@ -54,6 +54,34 @@ export function renderDm(rule: DmRule, input: { username: string }): string {
   return rule.dmMessage.replace(/\{\{username\}\}/g, input.username).replace(/\{\{link\}\}/g, rule.linkUrl ?? '');
 }
 
+export const LINK_TOKEN_MISSING_ERROR =
+  'Your message uses {{link}} but the automation has no link. Add an https link (or attach a lead magnet or product), or remove {{link}} from the message.';
+
+/** True for a usable https link (no username/password), the only kind a DM may carry. */
+export function isValidDmLink(link: string | null | undefined): boolean {
+  const raw = link?.trim();
+  if (!raw) return false;
+  try {
+    const url = new URL(raw);
+    return url.protocol === 'https:' && Boolean(url.hostname) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Save- and activate-time check: a message that uses {{link}} needs a valid https link on the rule
+ * (lead magnets and products supply theirs by copying it into link_url). null = fine.
+ */
+export function linkTokenError(dmText: string, linkUrl: string | null | undefined): string | null {
+  return dmText.includes('{{link}}') && !isValidDmLink(linkUrl) ? LINK_TOKEN_MISSING_ERROR : null;
+}
+
+/** Send-time guard: a rendered message must never still contain the {{link}} placeholder. */
+export function hasUnresolvedLinkToken(message: string | null | undefined): boolean {
+  return typeof message === 'string' && message.includes('{{link}}');
+}
+
 export function validateRule(rule: DmRule): string[] {
   const errors: string[] = [];
   if (rule.matchMode !== 'any' && !rule.keywords.some((keyword) => productionNormalize(keyword))) errors.push('Add at least one keyword with usable text (mentions like @brand and punctuation are removed before matching), or choose “Any comment”.');
@@ -94,6 +122,9 @@ export function validateRule(rule: DmRule): string[] {
   }
   if ((rule.askEmail || rule.requireFollow) && !rule.linkUrl?.trim()) {
     errors.push('Link URL is required when asking for email or requiring a follow.');
+  } else if (!rule.linkUrl?.trim()) {
+    const tokenError = linkTokenError(rule.dmMessage, rule.linkUrl);
+    if (tokenError) errors.push(tokenError);
   }
   if (rule.linkUrl && rule.linkUrl.trim()) {
     try {

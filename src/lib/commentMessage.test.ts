@@ -131,3 +131,8 @@ test("queued-style message: resolved tokens plus email gate prompt", () => {
   assert.ok(!queued.includes("example.com"));
   assert.ok(queued.includes(GATE_EMAIL.trim()));
 });
+
+test("ungated message without any link keeps {{link}} so the send worker refuses it (never a silent blank)", () => {
+  const msg = buildCommentDmMessage({ dmText: "Here it is {{link}}", fromUsername: "sam", linkUrl: null, emailGate: false, followGate: false });
+  assert.equal(msg, "Here it is {{link}}");
+});

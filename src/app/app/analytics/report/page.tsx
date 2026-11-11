@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/auth";
 import { hourBars, topHours } from "@/lib/bestTime";
-import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parseRangeDays, RANGE_OPTIONS } from "@/lib/analytics";
+import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parsePeriod, PERIOD_OPTIONS } from "@/lib/analytics";
 import { isDbConfigured, query } from "@/lib/db";
 import { getCommentActivity } from "@/lib/stats";
 import { BRAND } from "@/lib/brand";
@@ -40,16 +40,15 @@ function formatPlatforms(platforms: string[]): string {
 export default async function AnalyticsReportPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
   const user = await requireUser();
   const { range: rangeParam } = await searchParams;
-  const rangeDays = parseRangeDays(rangeParam);
+  const period = parsePeriod(rangeParam);
 
   const [postPerformance, growthSnapshots, activity] = await Promise.all([
-    getPostPerformance(user.id, rangeDays),
-    getGrowthSnapshots(user.id, rangeDays),
+    getPostPerformance(user.id, period.range),
+    getGrowthSnapshots(user.id, period.range),
     getCommentActivity(user.id),
   ]);
 
-  const todayUtc = new Date().toISOString().slice(0, 10);
-  const growthSeries = buildGrowthSeries(todayUtc, rangeDays, growthSnapshots);
+  const growthSeries = buildGrowthSeries(period.lastDay, period.days, growthSnapshots);
   const growthMax = growthSeries.reduce((max, row) => Math.max(max, row.followers), 0);
   const growthStart = growthSeries[0]?.followers ?? 0;
   const growthEnd = growthSeries[growthSeries.length - 1]?.followers ?? 0;
@@ -95,7 +94,7 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
       <header className={styles.header}>
         <div>
           <p className={styles.eyebrow}>{BRAND.name} · Analytics report</p>
-          <h1 className={styles.title}>Post performance, last {rangeDays} days</h1>
+          <h1 className={styles.title}>Post performance, {period.phrase}</h1>
           <p className={styles.meta}>
             {user.email} · Generated {generatedAt.toLocaleDateString("en-US", { dateStyle: "medium" })}
           </p>
@@ -110,7 +109,7 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
             <p className={styles.summary}>
               {growthEnd.toLocaleString("en-US")} followers now ·{" "}
               {growthEnd - growthStart >= 0 ? "+" : ""}
-              {(growthEnd - growthStart).toLocaleString("en-US")} in the last {rangeDays} days.
+              {(growthEnd - growthStart).toLocaleString("en-US")} over {period.phrase}.
             </p>
             <ul className={styles.growthList}>
               {growthSeries.map((row) => (
@@ -143,7 +142,7 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
                   <th scope="col">Published</th>
                   <th scope="col">Platforms</th>
                   <th scope="col" className={styles.num}>Reach</th>
-                  <th scope="col" className={styles.num}>Impressions</th>
+                  <th scope="col" className={styles.num}>Views</th>
                   <th scope="col" className={styles.num}>Likes</th>
                   <th scope="col" className={styles.num}>Comments</th>
                   <th scope="col" className={styles.num}>Saves</th>
@@ -170,7 +169,7 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
             </table>
           </div>
         ) : (
-          <p className={styles.summary}>No published posts in the last {rangeDays} days.</p>
+          <p className={styles.summary}>No published posts for {period.phrase}.</p>
         )}
       </section>
 
@@ -242,7 +241,7 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
 
       <footer className={styles.footer}>
         <p>
-          {BRAND.name} · {BRAND.url} · Times in UTC · Ranges: {RANGE_OPTIONS.join(" / ")} days
+          {BRAND.name} · {BRAND.url} · Times in UTC · Ranges: {PERIOD_OPTIONS.map((o) => o.label).join(" / ")}
         </p>
       </footer>
     </div>

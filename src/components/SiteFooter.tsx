@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PoskooMark from "./PoskooMark";
@@ -68,6 +69,17 @@ export function SiteFooter() {
           poskoo<b>.</b>
         </Link>
         <p>Schedule Instagram posts and auto-DM every comment, on the official Meta API.</p>
+        <Image className="fart" src="/landing/feat-dm.webp" width={640} height={602} sizes="200px" loading="lazy" alt="" />
+        <ul className="fchannels" aria-label="Works with">
+          <li><i style={{ background: "#E1306C" }} aria-hidden="true" />Instagram</li>
+          <li><i style={{ background: "#1877F2" }} aria-hidden="true" />Facebook</li>
+          <li><i style={{ background: "var(--ink)" }} aria-hidden="true" />Threads</li>
+        </ul>
+        <div className="fctas">
+          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+          <Link className="btn btn-line" href="/login">Log in</Link>
+        </div>
+        <p className="fhelp">Questions? <a href={`mailto:${BRAND.supportEmail}`}>{BRAND.supportEmail}</a></p>
       </div>
       <FooterColumn
         title="Product"
@@ -102,10 +114,13 @@ export function SiteFooter() {
         ]}
       />
       <div className="legal">
-        <span>
-          © 2026 {BRAND.name} · {BRAND.company} ·{" "}
+        <span>© 2026 {BRAND.name} · {BRAND.company}</span>
+        <span className="legalLinks">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/data-deletion">Data deletion</Link>
+          <span>Built on the official Meta API</span>
         </span>
-        <a href={`mailto:${BRAND.supportEmail}`}>{BRAND.supportEmail}</a>
       </div>
     </footer>
   );

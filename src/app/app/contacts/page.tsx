@@ -1,5 +1,6 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { Download, Mail, Search, Users, Zap } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { buildContactQuery, parseContactFilters } from "@/lib/contactsQuery";
@@ -8,7 +9,7 @@ import LoadFailed from "../calendar/LoadFailed";
 import ExportLeadsLink from "../leads/ExportLeadsLink";
 import LeadContactActions from "../leads/LeadContactActions";
 import LocalTime from "@/components/LocalTime";
-import { BtnLink, PageHero } from "@/components/ui/kit";
+import { BtnLink } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./contacts.module.css";
 
@@ -29,6 +30,18 @@ type Contact = {
   tags: string[];
   rule_name: string | null;
 };
+
+function Header({ action }: { action?: ReactNode }) {
+  return (
+    <header className={styles.head}>
+      <div>
+        <h1 className={styles.title}>Contacts</h1>
+        <p className={styles.sub}>Everyone your automations talk to, with the emails and phone numbers they share.</p>
+      </div>
+      {action}
+    </header>
+  );
+}
 
 function initialsFor(contact: Contact): string {
   const source = contact.name?.trim() || contact.username?.trim() || "";
@@ -51,13 +64,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
   const reloadQuery = reloadParams.toString();
   const loadFailure = (
     <>
-      <PageHero
-        eyebrow="Captured from your auto-DMs"
-        title="Contacts"
-        lede="Everyone your auto-DMs talk to, with the emails and phones they share."
-        art="/landing/card-leads.webp"
-        artAlt=""
-      />
+      <Header />
       <LoadFailed
         className="mt-6"
         message="Contacts could not be loaded. Your saved contacts may still exist. Reload to try again."
@@ -131,54 +138,46 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHero
-        eyebrow="Captured from your auto-DMs"
-        title="Contacts"
-        lede={total > 0 ? `${total} ${total === 1 ? "contact" : "contacts"} · showing ${offset + 1}-${offset + contacts.length}` : "0 contacts"}
-        art="/landing/card-leads.webp"
-        artAlt=""
-        action={contacts.length > 0 ? (
-          <div className="flex flex-col items-start gap-2">
+      <Header
+        action={total > 0 ? (
+          <div className={styles.exportWrap}>
             <ExportLeadsLink href={exportHref}>
-              {exportCapped ? "Export latest 10,000" : "Export CSV"}
+              <Download width={15} height={15} aria-hidden="true" /> {exportCapped ? "Export latest 10,000" : "Export to CSV"}
             </ExportLeadsLink>
             {exportCapped ? (
-              <p className={`${ui.hint} m-0 max-w-xs`}>
-                CSV downloads are limited to the 10,000 newest matching contacts. Narrow with search, automation, or email filters.
-              </p>
+              <p className={styles.hint}>CSV downloads are limited to the 10,000 newest matching contacts. Narrow with search, automation, or email filters.</p>
             ) : null}
           </div>
         ) : undefined}
       />
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className={`${ui.card} p-4`}>
-          <p className={`${ui.hint} m-0`}>Total contacts</p>
-          <p className="m-0 text-2xl font-bold text-[var(--poskoo-ink)]">{total}</p>
-        </div>
-        <div className={`${ui.card} p-4`}>
-          <p className={`${ui.hint} m-0`}>With email</p>
-          <p className="m-0 text-2xl font-bold text-[var(--poskoo-ink)]">{withEmail}</p>
-        </div>
-        <div className={`${ui.card} p-4`}>
-          <p className={`${ui.hint} m-0`}>Active today</p>
-          <p className="m-0 text-2xl font-bold text-[var(--poskoo-ink)]">{activeToday}</p>
-        </div>
+      <div className={styles.kpis}>
+        {([
+          ["Total contacts", total, Users],
+          ["With email", withEmail, Mail],
+          ["Active today", activeToday, Zap],
+        ] as const).map(([label, value, Icon]) => (
+          <div key={label} className={styles.kpi}>
+            <p className={styles.kpiLabel}><span className={styles.kpiIcon} aria-hidden="true"><Icon width={15} height={15} /></span>{label}</p>
+            <p className={styles.kpiValue}>{value.toLocaleString("en-US")}</p>
+          </div>
+        ))}
       </div>
-      <form method="get" className="mt-6 flex flex-wrap items-end gap-3">
-        <div className={ui.field} style={{ minWidth: "min(100%, 260px)" }}>
-          <label htmlFor="contacts-search" className={ui.label}>Search</label>
+      <section className={styles.panel} aria-label="Contact list">
+      <form method="get" className={styles.filters}>
+        <div className={styles.searchField}>
+          <label htmlFor="contacts-search" className="sr-only">Search contacts</label>
+          <Search width={16} height={16} aria-hidden="true" />
           <input
             id="contacts-search"
             type="search"
             name="q"
-            placeholder="Username, name, email or phone"
+            placeholder="Search username, name, email or phone"
             defaultValue={filters.search}
-            className={ui.input}
           />
         </div>
         <div className={ui.field}>
-          <label htmlFor="contacts-rule" className={ui.label}>From automation</label>
-          <select id="contacts-rule" name="rule" defaultValue={selectedRule} className={ui.input}>
+          <label htmlFor="contacts-rule" className="sr-only">From automation</label>
+          <select id="contacts-rule" name="rule" defaultValue={selectedRule} className={styles.select}>
             <option value="">All automations</option>
             {rules.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
@@ -187,11 +186,11 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
           <input id="contacts-email" type="checkbox" name="email" value="1" defaultChecked={filters.onlyWithEmail} />
           Only with email
         </label>
-        <button type="submit" className={`${ui.btn} ${ui.btnDark} ${ui.sm}`}>Search</button>
+        <button type="submit" className={styles.searchBtn}>Search</button>
         {filterActive && <Link href="/app/contacts" className={`${ui.hint} underline`}>Clear</Link>}
       </form>
       {selectedRuleName ? (
-        <div className={`${ui.card} ${ui.band} mt-4 flex flex-wrap items-center gap-4 p-4`}>
+        <div className={`${styles.ruleBanner} flex flex-wrap items-center gap-4`}>
           <div className="min-w-0 flex-1">
             <p className={`${ui.eyebrow} m-0`}>Automation</p>
             <p className="m-0 truncate font-semibold text-[var(--poskoo-ink)]">{selectedRuleName}</p>
@@ -204,7 +203,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
       ) : null}
       {contacts.length === 0 ? (
         selectedRuleName ? (
-          <div className={`${ui.card} ${ui.mint} mt-6 p-5 text-[.95rem]`}>
+          <div className={styles.ruleEmpty}>
             <p className="m-0 text-[var(--poskoo-ink)]">
               No contacts captured for <strong>{selectedRuleName}</strong>
               {filters.search || filters.onlyWithEmail ? " with your current filters" : " yet"}.
@@ -217,13 +216,13 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
             </Link>
           </div>
         ) : filterActive ? (
-          <p className={`${ui.hint} mt-6`}>No contacts match your search.</p>
+          <p className={styles.emptyText}>No contacts match your search.</p>
         ) : (
-          <div className="mt-6">
+          <div className={styles.emptyWrap}>
             <EmptyState
               icon={Users}
               title="No contacts yet"
-              text={configured ? "People your auto-DMs talk to will show here, exportable to CSV." : "Connect Instagram in Settings to start collecting contacts."}
+              text={configured ? "Contacts will appear here when users interact with your automations." : "Connect Instagram in Settings to start collecting contacts."}
               art="/illustrations/empty-leads.webp"
               artWidth={1536}
               artHeight={1024}
@@ -236,10 +235,10 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
         )
       ) : (
         <>
-          <ul className={`mt-6 grid gap-4 md:hidden`}>
+          <ul className={styles.mobileList}>
             {contacts.map((contact) => (
               <li key={contact.id}>
-                <article className={`${ui.card} p-4`}>
+                <article className={styles.mobileCard}>
                   <div className="flex items-center gap-3">
                     <span className={styles.avatar} aria-hidden="true">{initialsFor(contact)}</span>
                     <p className={`m-0 break-all font-semibold text-[var(--poskoo-ink)]`}>{contact.username ? `@${contact.username}` : "—"}</p>
@@ -274,14 +273,14 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
               </li>
             ))}
           </ul>
-          <div className={`mt-6 hidden md:block ${ui.tableWrap}`}>
-            <table className={ui.table}>
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
               <thead>
-                <tr>{["Contact", "Email", "From automation", "Last interaction", "Tags"].map((heading) => <th key={heading} scope="col" className={ui.th}>{heading}</th>)}</tr>
+                <tr>{["Contact", "Email", "From automation", "Last interaction", "Tags"].map((heading) => <th key={heading} scope="col">{heading}</th>)}</tr>
               </thead>
               <tbody>{contacts.map((contact) => (
-                <tr key={contact.id} className={ui.tr}>
-                  <td className={ui.td}>
+                <tr key={contact.id}>
+                  <td>
                     <span className="flex items-center gap-3">
                       <span className={styles.avatar} aria-hidden="true">{initialsFor(contact)}</span>
                       <span className="min-w-0">
@@ -290,16 +289,17 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
                       </span>
                     </span>
                   </td>
-                  <td className={ui.td}>{contact.email || "—"}</td>
-                  <td className={ui.td}>{contact.rule_name || "—"}</td>
-                  <td className={ui.td}><LocalTime value={contact.last_seen_at} style="medium" fallback="-" /></td>
-                  <td className={ui.td}>{contact.tags.length > 0 ? contact.tags.join(", ") : "—"}</td>
+                  <td>{contact.email || "—"}</td>
+                  <td>{contact.rule_name || "—"}</td>
+                  <td><LocalTime value={contact.last_seen_at} style="medium" fallback="-" /></td>
+                  <td>{contact.tags.length > 0 ? contact.tags.join(", ") : "—"}</td>
                 </tr>
               ))}</tbody>
             </table>
           </div>
         </>
       )}
+      </section>
       {total > pageSize && (
         <nav aria-label="Contacts pagination" className="mt-6 flex flex-wrap items-center gap-3 text-sm">
           {page > 1 && <Link href={pageHref(page - 1)} className={`${ui.btn} ${ui.btnGhost} ${ui.sm}`}>Previous</Link>}

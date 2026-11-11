@@ -59,8 +59,8 @@ export function buildCommentDmMessage(input: CommentDmMessageInput): string {
     if (!hasLinkToken) {
       message += "\n" + link;
     }
-  } else {
-    message = replaceTokens(message, LINK_TOKEN, "");
   }
+  // No link: {{link}} is left in place on purpose. Saving/activating such a rule is refused, and the
+  // send worker fails any queued message that still contains it (never sends a broken DM).
   return message;
 }

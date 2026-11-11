@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireAdmin } from "@/lib/admin";
 import { isDbConfigured, query } from "@/lib/db";
 import KpiCard from "./ui/KpiCard";
 import Panel from "./ui/Panel";
@@ -218,6 +219,8 @@ function PlanMix({ mix, total }: { mix: Overview["planMix"]; total: number }) {
 }
 
 export default async function AdminOverviewPage() {
+  // The layout checks too, but pages render in parallel with layouts: guard the data here as well.
+  await requireAdmin();
   const data = await getOverview();
   const mrrText = data.mrr === null ? "Not set up" : `$${data.mrr.toLocaleString("en-US")}`;
   const signupTotal = data.signupsPerDay.reduce((a, b) => a + b, 0);

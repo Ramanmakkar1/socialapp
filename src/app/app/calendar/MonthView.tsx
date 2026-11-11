@@ -1,232 +1,118 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import type { DragEvent } from "react";
-import { useRouter } from "next/navigation";
-import { reschedulePost } from "./rescheduleActions";
-import RescheduleControl from "./RescheduleControl";
+import { useState } from "react";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 import LoadFailed, { type LoadError } from "./LoadFailed";
-import { BtnA } from "@/components/ui/kit";
+import { CalendarGridSkeleton } from "../Skeleton";
+import PostCard from "./PostCard";
+import PostPopover from "./PostPopover";
+import { addDays, groupByDay, zonedParts, type AccountNames, type CalendarPost } from "./calendarUtils";
+import { useCalendar } from "./useCalendar";
 import styles from "./calendar.module.css";
 
-const TINTS = [styles.dayTint1, styles.dayTint2, styles.dayTint3];
-
-type MonthViewPost = {
-  id: string;
-  caption: string;
-  scheduled_at: Date | string | null;
-  status: string;
-  platforms: string[];
-};
-
 type MonthViewProps = {
-  posts: MonthViewPost[];
+  posts: CalendarPost[];
+  /** First day of the month (UTC midnight). */
   monthStart: Date;
-  prevHref: string;
-  nextHref: string;
+  /** "/app/calendar?view=month&month=...&compose=1"; "&day=YYYY-MM-DD" is added per day. */
+  composeBase?: string;
+  accounts?: AccountNames;
   loadError?: LoadError;
 };
 
 const MAX_CHIPS = 3;
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-function utcDateKey(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
+export default function MonthView({ posts, monthStart, composeBase, accounts = {}, loadError }: MonthViewProps) {
+  const { tz, error, dragOverKey, dropProps, open, openPost, closePost } = useCalendar(posts);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const todayKey = zonedParts(new Date(), tz).key;
+  const byDay = groupByDay(posts, tz);
+  const monthKey = monthStart.toISOString().slice(0, 7);
 
-function formatTimeUtc(at: Date | string): string {
-  const d = typeof at === "string" ? new Date(at) : at;
-  const h = d.getUTCHours().toString().padStart(2, "0");
-  const m = d.getUTCMinutes().toString().padStart(2, "0");
-  return `${h}:${m}`;
-}
+  // Monday on/before the 1st through the Sunday on/after the last day.
+  const firstKey = `${monthKey}-01`;
+  const startDow = new Date(`${firstKey}T12:00:00Z`).getUTCDay();
+  const gridStart = addDays(firstKey, -(startDow === 0 ? 6 : startDow - 1));
+  const lastKey = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() + 1, 0)).toISOString().slice(0, 10);
+  const endDow = new Date(`${lastKey}T12:00:00Z`).getUTCDay();
+  const gridEnd = addDays(lastKey, endDow === 0 ? 0 : 7 - endDow);
+  const days: string[] = [];
+  for (let k = gridStart; k <= gridEnd; k = addDays(k, 1)) days.push(k);
 
-function formatLocal(at: Date | string): string {
-  const d = typeof at === "string" ? new Date(at) : at;
-  return d.toLocaleString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function formatLocalTime(at: Date | string): string {
-  return new Date(at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-}
-
-function captionPreview(caption: string): string {
-  return caption.trim().slice(0, 30);
-}
-
-function chipColor(status: string): string {
-  switch (status) {
-    case "failed":
-      return styles.chipFailed;
-    case "published":
-      return styles.chipPublished;
-    case "draft":
-      return styles.chipDraft;
-    default:
-      return "";
-  }
-}
-
-function isMovable(status: string): boolean {
-  return status === "scheduled" || status === "draft";
-}
-
-export default function MonthView({ posts, monthStart, prevHref, nextHref, loadError }: MonthViewProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
-  const [tz, setTz] = useState("");
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Read the browser time zone after hydration, matching Composer.
-    setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  }, []);
-  const todayKey = utcDateKey(new Date());
-  const month = monthStart.getUTCMonth();
-  const byDay = new Map<string, MonthViewPost[]>();
-
-  for (const post of posts) {
-    if (!post.scheduled_at) continue;
-    const key = utcDateKey(new Date(post.scheduled_at));
-    const list = byDay.get(key);
-    if (list) list.push(post);
-    else byDay.set(key, [post]);
-  }
-
-  // Grid starts on the Monday on/before the 1st and ends on the Sunday on/after the last day.
-  const gridStart = new Date(monthStart);
-  const startDow = gridStart.getUTCDay();
-  gridStart.setUTCDate(gridStart.getUTCDate() - (startDow === 0 ? 6 : startDow - 1));
-
-  const monthEnd = new Date(Date.UTC(monthStart.getUTCFullYear(), month + 1, 0));
-  const gridEnd = new Date(monthEnd);
-  const endDow = gridEnd.getUTCDay();
-  gridEnd.setUTCDate(gridEnd.getUTCDate() + (endDow === 0 ? 0 : 7 - endDow));
-
-  const days: Date[] = [];
-  for (let d = new Date(gridStart); d <= gridEnd; d.setUTCDate(d.getUTCDate() + 1)) {
-    days.push(new Date(d));
-  }
-
-  const monthLabel = monthStart.toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-
-  function handleDrop(e: DragEvent<HTMLDivElement>, key: string, current: MonthViewPost[]) {
-    e.preventDefault();
-    setDragOverKey(null);
-    const id = e.dataTransfer.getData("text/plain");
-    if (!id || isPending) return;
-    if (current.some((p) => p.id === id)) return;
-    setError(null);
-    startTransition(async () => {
-      try {
-        const res = await reschedulePost(id, key);
-        if (!res.ok) {
-          setError(res.error ?? "Could not move post.");
-          return;
-        }
-        router.refresh();
-      } catch {
-        setError("Could not move post. Please try again.");
-      }
+  const toggle = (key: string) =>
+    setExpanded((cur) => {
+      const next = new Set(cur);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
     });
+
+  // Days and hours depend on the browser time zone, which is only known after hydration.
+  if (!tz) {
+    return (
+      <div className={styles.calWrap} role="status" aria-busy="true">
+        <span className={styles.srOnly}>Loading calendar</span>
+        <CalendarGridSkeleton />
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className={styles.navRow}>
-        <div>
-          <p className={styles.rangeLabel}>{monthLabel}</p>
-          <p className={styles.rangeHint}>
-            Days are grouped in UTC{tz ? `; each post also shows your time (${tz})` : ""}.
-            <span className={styles.wideOnly}> Drag a post to another day to move it.</span>
-          </p>
-        </div>
-        <div className={styles.navBtns}>
-          <BtnA href={prevHref} variant="ghost" size="sm">
-            <span aria-hidden="true">←</span> Previous
-          </BtnA>
-          <BtnA href={nextHref} variant="ghost" size="sm">
-            Next <span aria-hidden="true">→</span>
-          </BtnA>
-        </div>
-      </div>
-      {error && (
-        <p role="alert" className={styles.errorText}>
-          {error}
-        </p>
-      )}
+    <div className={styles.calWrap}>
+      {error && <p role="alert" className={styles.errorText}>{error}</p>}
       {loadError && <LoadFailed {...loadError} className={styles.mb} />}
-      <div>
-        <div className={styles.dayGrid}>
-          {WEEKDAYS.map((name) => (
-            <p key={name} className={styles.weekdayHead}>
-              {name}
-            </p>
-          ))}
-          {days.map((day, index) => {
-            const key = utcDateKey(day);
-            const dayPosts = byDay.get(key) ?? [];
-            const inMonth = day.getUTCMonth() === month;
-            const isToday = key === todayKey;
-            const extra = dayPosts.length - MAX_CHIPS;
-
-            return (
-              <div
-                key={key}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  if (dragOverKey !== key) setDragOverKey(key);
-                }}
-                onDragLeave={() => {
-                  if (dragOverKey === key) setDragOverKey(null);
-                }}
-                onDrop={(e) => handleDrop(e, key, dayPosts)}
-                className={[styles.day, styles.dayCompact, TINTS[index % 3], isToday ? styles.dayToday : "", inMonth ? "" : styles.dayOut, dragOverKey === key ? styles.dayOver : ""].filter(Boolean).join(" ")}
-              >
-                <p className={`${styles.dayLabel} ${inMonth ? styles.dayLabelIn : ""}`}>
-                  <span className={styles.phoneOnly}>{day.toLocaleDateString("en-US", { weekday: "short", month: "short", timeZone: "UTC" })} </span>{day.getUTCDate()}
-                </p>
-                <div className={styles.dayPosts}>
-                  {dayPosts.slice(0, MAX_CHIPS).map((post) => (
-                    <div key={`${post.id}-${utcDateKey(new Date(post.scheduled_at!))}`} className="min-w-0">
-                      <span
-                        draggable={isMovable(post.status)}
-                        onDragStart={
-                          isMovable(post.status)
-                            ? (e) => {
-                                e.dataTransfer.setData("text/plain", post.id);
-                                e.dataTransfer.effectAllowed = "move";
-                              }
-                            : undefined
-                        }
-                        className={[styles.chip, chipColor(post.status), isMovable(post.status) ? styles.chipMovable : ""].filter(Boolean).join(" ")}
-                        title={tz ? `${formatLocal(post.scheduled_at!)} your time — ${post.caption}` : post.caption}
-                      >
-                        {formatTimeUtc(post.scheduled_at!)} UTC · {captionPreview(post.caption)}
-                        {tz && <span className={styles.chipLocal}>{formatLocalTime(post.scheduled_at!)} your time</span>}
-                      </span>
-                      {isMovable(post.status) && (
-                        <RescheduleControl id={post.id} scheduledAt={post.scheduled_at!} caption={post.caption} />
-                      )}
-                    </div>
-                  ))}
-                  {extra > 0 ? <p className={styles.more}>+{extra} more</p> : null}
-                </div>
+      <div className={styles.monthGrid}>
+        {WEEKDAYS.map((name) => (
+          <p key={name} className={styles.monthHead} aria-hidden="true">{name}</p>
+        ))}
+        {days.map((key) => {
+          const list = byDay.get(key) ?? [];
+          const inMonth = key.startsWith(monthKey);
+          const isToday = key === todayKey;
+          const isOpen = expanded.has(key);
+          const shown = isOpen ? list : list.slice(0, MAX_CHIPS);
+          const extra = list.length - MAX_CHIPS;
+          const d = new Date(`${key}T12:00:00Z`);
+          const long = d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" });
+          return (
+            <section
+              key={key}
+              aria-label={`${long}${list.length ? `, ${list.length} ${list.length === 1 ? "post" : "posts"}` : ""}`}
+              {...dropProps(key, list)}
+              className={[styles.monthDay, inMonth ? "" : styles.monthDayOut, isToday ? styles.monthDayToday : "", key < todayKey ? styles.cellPast : "", dragOverKey === key ? styles.cellOver : "", list.length ? "" : styles.monthDayEmpty].filter(Boolean).join(" ")}
+            >
+              <div className={styles.monthDayHead}>
+                <span className={styles.monthNum} aria-current={isToday ? "date" : undefined}>
+                  <span className={styles.phoneOnly}>{d.toLocaleDateString("en-US", { weekday: "short", month: "short", timeZone: "UTC" })} </span>
+                  {d.getUTCDate()}
+                </span>
+                {composeBase && key >= todayKey && (
+                  <Link href={`${composeBase}&day=${key}`} scroll={false} className={styles.dayAdd} aria-label={`New post on ${long}`}>
+                    <Plus width={14} height={14} aria-hidden="true" />
+                  </Link>
+                )}
               </div>
-            );
-          })}
-        </div>
+              <div className={styles.monthPosts}>
+                {shown.map((post) => (
+                  <PostCard key={post.id} post={post} tz={tz} compact onOpen={openPost} />
+                ))}
+                {extra > 0 && (
+                  <button type="button" className={styles.moreBtn} aria-expanded={isOpen} onClick={() => toggle(key)}>
+                    {isOpen ? "Show less" : `${extra} more`}
+                  </button>
+                )}
+              </div>
+            </section>
+          );
+        })}
       </div>
+      <p className={styles.calHint}>
+        <span className={styles.wideOnly}>Drag a scheduled post or draft to another day to move it (the time stays the same). </span>
+        Open a post to edit, duplicate, reschedule or delete it.
+      </p>
+      {open && <PostPopover key={open.post.id} post={open.post} anchor={open.anchor} tz={tz} accounts={accounts} onClose={closePost} />}
     </div>
   );
 }

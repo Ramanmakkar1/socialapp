@@ -2,45 +2,48 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { PRICE_SUMMARY } from "@/lib/plans";
+import { CompareNote } from "@/components/CompareNote";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import AutoDmDemo from "@/components/AutoDmDemo";
 import FlowDemo from "./FlowDemo";
+import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = {
   title: "Instagram Auto DM: DM Everyone Who Comments",
   description:
-    "Auto-DM everyone who comments a keyword on your Instagram posts and reels. Official Meta API, email capture, AI replies and a simpler ManyChat alternative.",
+    "Auto-DM everyone who comments a keyword on your Instagram posts and reels. Official Meta API, email capture, follow gate and a simpler ManyChat alternative.",
   alternates: { canonical: "/instagram-auto-dm" },
 };
 
 const steps = [
   { n: "1", title: "Pick a post or reel", text: "Choose any post or reel on your Instagram Business or Creator account, or one you are about to schedule." },
   { n: "2", title: "Set a keyword like GUIDE", text: "Tell followers to comment a word such as GUIDE, LINK or PRICE. Match it exactly or anywhere in the comment." },
-  { n: "3", title: "The DM goes out in seconds", text: "Everyone who comments the keyword gets your message and link in their DMs, day and night." },
+  { n: "3", title: "The DM goes out within a minute", text: "Everyone who comments the keyword gets your message and link in their DMs, day and night." },
 ];
 
 const automations = [
   { no: "01 / Keywords", title: "Keyword replies", text: "Send a different DM for each keyword, on one post or across all of them." },
-  { no: "02 / Leads", title: "Email + phone capture", text: "Ask for an email or phone number before the link is sent, so every comment becomes a lead." },
+  { no: "02 / Leads", title: "Email capture", text: "Ask for an email before the link is sent, so every comment becomes a lead." },
   { no: "03 / Growth", title: "Follow gate", text: "Only send the freebie once the person follows you, to grow your audience with every post." },
   { no: "04 / Stories", title: "Story replies", text: "Reply automatically when someone answers your story with a keyword." },
-  { no: "05 / AI", title: "AI follow-up replies", text: "When people reply with a question, AI answers in your voice and keeps the chat going." },
+  { no: "05 / DMs", title: "DM keyword replies", text: "Reply automatically when someone sends you a DM with your keyword, once per conversation." },
   { no: "06 / Insights", title: "Click + lead tracking", text: "See DMs sent, link clicks and leads collected for every post." },
 ];
 
 const compare: [string, string, string][] = [
-  ["Price from", "$19 / month", "Varies with contacts"],
+  ["Price", PRICE_SUMMARY, "Varies with contacts"],
   ["Post scheduling included", "Yes", "No"],
   ["Comment-to-DM automation", "Yes", "Yes"],
-  ["AI-written DM messages", "Yes", "Paid add-on"],
+  ["AI-written DM message ideas", "Yes", "Check their site"],
   ["Official Meta API", "Yes", "Yes"],
 ];
 
 const faqs = [
   { q: "How do I auto DM people who comment on Instagram?", a: `Connect your Instagram Business or Creator account to ${BRAND.name}, pick a post, set a keyword and write your message. Everyone who comments that keyword gets the DM automatically.` },
   { q: "Will auto DMs get my Instagram account banned?", a: "Not when you use the official Meta API. We never ask for your password, we respect Meta's rate limits and we only message people who commented first." },
-  { q: `Is ${BRAND.name} a ManyChat alternative?`, a: `Yes. ${BRAND.name} does comment-to-DM automation, email capture and AI replies, and also schedules your posts, so you can use one tool instead of two. It can also answer DMs with AI replies that collect contact details and share your booking link.` },
+  { q: `Is ${BRAND.name} a ManyChat alternative?`, a: `Yes. ${BRAND.name} does comment-to-DM automation, Story-reply and DM-keyword replies and email capture, and also schedules your posts, so you can use one tool instead of two.` },
   { q: "Do I need an Instagram business account?", a: "Yes, Meta only allows DM automation on Business or Creator accounts. Switching is free and takes about a minute in the Instagram app." },
 ];
 
@@ -67,7 +70,7 @@ export default function InstagramAutoDm() {
           They comment. <em className="s mark">You get the lead.</em>
         </h1>
         <p className="lede">
-          Someone comments a keyword on your post or reel, and {BRAND.name} sends them your link in a DM within seconds. Capture their email, answer with AI and track every lead.
+          Someone comments a keyword on your post or reel, and {BRAND.name} sends them your link in a DM, usually within a minute. Capture their email and track every lead.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -78,15 +81,7 @@ export default function InstagramAutoDm() {
             Test your keywords free
           </Link>
         </p>
-        <div className="hero-art" style={{ maxWidth: 640 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 640px"
-            src="/landing/card-dm.webp"
-            width={900}
-            height={900}
-            alt="A relaxed creator on a beanbag while DMs fly out of their phone to followers"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /></div>
       </header>
 
       <section style={{ paddingTop: 40 }}>
@@ -181,7 +176,7 @@ export default function InstagramAutoDm() {
               </Link>
               <Link href="/instagram-dm-automation" className="group min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40">
                 <span className="font-medium">Instagram DM automation explained</span>
-                <p className="text-sm text-ink-2">See what comment keywords, Story replies, email capture and AI replies can automate.</p>
+                <p className="text-sm text-ink-2">See what comment keywords, Story replies, DM keywords and email capture can automate.</p>
               </Link>
             </div>
           </div>
@@ -215,6 +210,7 @@ export default function InstagramAutoDm() {
               </tbody>
             </table>
           </div>
+          <CompareNote />
         </div>
       </section>
 

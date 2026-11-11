@@ -213,7 +213,8 @@ test("get_analytics_summary: totals and top posts for the owner's published post
     {
       match: /with rp as/,
       reply: (params) => {
-        daysParam = params[1];
+        // getPostPerformance takes the day count as a [from, to) range now.
+        daysParam = Math.round(((params[2] as Date).getTime() - (params[1] as Date).getTime()) / 86_400_000);
         return [
           { id: "p1", caption: "big one", publishedAt: "2026-11-01T09:00:00Z", platforms: ["instagram"], reach: 100, impressions: 150, likes: 10, comments: 2, saved: 3, linkClicks: 0 },
           { id: "p2", caption: "small one", publishedAt: "2026-11-02T09:00:00Z", platforms: ["instagram"], reach: 50, impressions: 60, likes: 4, comments: 1, saved: null, linkClicks: 0 },
@@ -314,4 +315,17 @@ test("route: notifications get 202, bad JSON gets 400, GET/DELETE are allowed", 
 
   assert.equal((await GET()).status, 405);
   assert.equal((await DELETE()).status, 204);
+});
+
+test("MCP requests are rate limited per API key, and keys do not share a bucket", async () => {
+  const { mcpRateLimit, MCP_KEY_LIMIT_PER_MINUTE } = await import("./mcp.ts");
+  const { resetRateLimits } = await import("./rateLimit.ts");
+  resetRateLimits();
+  const now = 1_000_000;
+  for (let i = 0; i < MCP_KEY_LIMIT_PER_MINUTE; i++) assert.equal(mcpRateLimit("poskoo_a", "1.1.1.1", now).ok, true);
+  const blocked = mcpRateLimit("poskoo_a", "2.2.2.2", now);
+  assert.equal(blocked.ok, false);
+  assert.equal(mcpRateLimit("poskoo_b", "3.3.3.3", now).ok, true);
+  assert.equal(mcpRateLimit("poskoo_a", "2.2.2.2", now + 61_000).ok, true);
+  resetRateLimits();
 });

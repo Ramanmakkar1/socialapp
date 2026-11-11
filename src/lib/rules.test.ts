@@ -189,3 +189,24 @@ test('skips the keyword check for matchMode any', () => {
   const rule: DmRule = { ...makeRule('Hello'), keywords: ['@brand'], matchMode: 'any' };
   assert.deepEqual(validateRule(rule), []);
 });
+
+test("{{link}} without a link is refused on save; with a valid https link (or a gate's link) it is fine", async () => {
+  const { validateRule, linkTokenError, hasUnresolvedLinkToken, LINK_TOKEN_MISSING_ERROR } = await import("./rules.ts");
+  const base = {
+    id: "r", name: "Guide", keywords: ["guide"], matchMode: "contains" as const, triggers: ["comment" as const],
+    replyPublicly: false, publicReplies: [], dmMessage: "Here it is: {{link}}", askEmail: false, requireFollow: false, active: true,
+  };
+  assert.ok(validateRule({ ...base }).includes(LINK_TOKEN_MISSING_ERROR));
+  assert.ok(validateRule({ ...base, linkUrl: "   " }).includes(LINK_TOKEN_MISSING_ERROR));
+  assert.deepEqual(validateRule({ ...base, linkUrl: "https://example.com/guide" }), []);
+  assert.deepEqual(validateRule({ ...base, dmMessage: "Thanks for commenting!" }), []);
+  // Activate-time check (server side) on stored rows.
+  assert.equal(linkTokenError("Grab it: {{link}}", null), LINK_TOKEN_MISSING_ERROR);
+  assert.equal(linkTokenError("Grab it: {{link}}", "http://insecure.example"), LINK_TOKEN_MISSING_ERROR);
+  assert.equal(linkTokenError("Grab it: {{link}}", "https://poskoo.com/p/guide"), null);
+  assert.equal(linkTokenError("No token here", null), null);
+  // Send-time guard.
+  assert.equal(hasUnresolvedLinkToken("Here: {{link}}"), true);
+  assert.equal(hasUnresolvedLinkToken("Here: https://x.y"), false);
+  assert.equal(hasUnresolvedLinkToken(null), false);
+});

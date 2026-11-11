@@ -112,7 +112,7 @@ test("id_token for another app, wrong nonce, other issuer or expired is rejected
   await assert.rejects(exchangeGoogleCode("c", FLOW, NOW), (e: unknown) => e instanceof GoogleSignInError && e.reason === "exchange_failed");
 });
 
-type U = { id: string; email: string; name: string | null; google_sub: string | null; password_hash: string | null };
+type U = { id: string; email: string; name: string | null; google_sub: string | null; password_hash: string | null; verified?: boolean; sessions?: number };
 
 function usersDb(users: U[], opts: { missingColumn?: boolean } = {}) {
   const missing = () => {
@@ -139,10 +139,28 @@ function usersDb(users: U[], opts: { missingColumn?: boolean } = {}) {
       },
     },
     {
-      match: /^insert into socialapp\.users \(email, password_hash, name, google_sub\) values \(\$1, null, \$2, \$3\)/,
+      match: /^update socialapp\.users set password_hash=null, email_verified_at=now\(\) where id=\$1 and email_verified_at is null returning id/,
+      reply: (p) => {
+        const u = users.find((x) => x.id === p[0] && !x.verified);
+        if (!u) return [];
+        u.password_hash = null;
+        u.verified = true;
+        return [{ id: u.id }];
+      },
+    },
+    {
+      match: /^delete from socialapp\.sessions where user_id=\$1/,
+      reply: (p) => {
+        const u = users.find((x) => x.id === p[0]);
+        if (u) u.sessions = 0;
+        return [];
+      },
+    },
+    {
+      match: /^insert into socialapp\.users \(email, password_hash, name, google_sub, email_verified_at\) values \(\$1, null, \$2, \$3, now\(\)\)/,
       reply: (p) => {
         if (users.some((u) => u.email === p[0] || u.google_sub === p[2])) return [];
-        const u: U = { id: `u-${users.length + 1}`, email: String(p[0]), name: (p[1] as string | null) ?? null, google_sub: String(p[2]), password_hash: null };
+        const u: U = { id: `u-${users.length + 1}`, email: String(p[0]), name: (p[1] as string | null) ?? null, google_sub: String(p[2]), password_hash: null, verified: true };
         users.push(u);
         return [{ id: u.id, email: u.email, name: u.name }];
       },
@@ -166,28 +184,40 @@ test("new Google user: created without a password and linked to the Google sub",
   const users: U[] = [];
   await withUsers(users, async () => {
     const user = await findOrCreateGoogleUser(ID);
-    assert.deepEqual(user, { id: "u-1", email: "jane@example.com", name: "Jane" });
+    assert.deepEqual(user, { id: "u-1", email: "jane@example.com", name: "Jane", emailVerified: true });
   });
   assert.equal(users[0].password_hash, null);
   assert.equal(users[0].google_sub, "g-sub-1");
+  assert.equal(users[0].verified, true);
 });
 
-test("existing email/password user: the verified Google email links the account (password still works)", async () => {
-  const users: U[] = [{ id: "u-7", email: "jane@example.com", name: "Jane P", google_sub: null, password_hash: "scrypt$..." }];
+test("unverified password account (possible pre-registration takeover): Google claims it, clears the password and revokes every session", async () => {
+  const users: U[] = [{ id: "u-7", email: "jane@example.com", name: "Jane P", google_sub: null, password_hash: "scrypt$attacker", sessions: 3 }];
   await withUsers(users, async () => {
-    assert.deepEqual(await findOrCreateGoogleUser(ID), { id: "u-7", email: "jane@example.com", name: "Jane P" });
+    assert.deepEqual(await findOrCreateGoogleUser(ID), { id: "u-7", email: "jane@example.com", name: "Jane P", emailVerified: true });
   });
   assert.equal(users.length, 1);
   assert.equal(users[0].google_sub, "g-sub-1");
-  assert.equal(users[0].password_hash, "scrypt$...");
+  assert.equal(users[0].password_hash, null, "the old password must not work any more");
+  assert.equal(users[0].sessions, 0, "existing sessions must be revoked");
+  assert.equal(users[0].verified, true);
+});
+
+test("already verified account: a later Google sign-in keeps its password and sessions", async () => {
+  const users: U[] = [{ id: "u-8", email: "jane@example.com", name: null, google_sub: "g-sub-1", password_hash: "scrypt$own", verified: true, sessions: 2 }];
+  await withUsers(users, async () => {
+    assert.equal((await findOrCreateGoogleUser(ID)).emailVerified, true);
+  });
+  assert.equal(users[0].password_hash, "scrypt$own");
+  assert.equal(users[0].sessions, 2);
 });
 
 test("existing Google sub: signs in that user even if the Google email changed", async () => {
-  const users: U[] = [{ id: "u-3", email: "old@example.com", name: null, google_sub: "g-sub-1", password_hash: null }];
-  await withUsers(users, async (calls) => {
-    assert.deepEqual(await findOrCreateGoogleUser({ ...ID, email: "new@example.com" }), { id: "u-3", email: "old@example.com", name: null });
-    assert.equal(calls.length, 1);
+  const users: U[] = [{ id: "u-3", email: "old@example.com", name: null, google_sub: "g-sub-1", password_hash: null, verified: true }];
+  await withUsers(users, async () => {
+    assert.deepEqual(await findOrCreateGoogleUser({ ...ID, email: "new@example.com" }), { id: "u-3", email: "old@example.com", name: null, emailVerified: true });
   });
+  assert.equal(users[0].email, "old@example.com");
 });
 
 test("unverified Google email is rejected before any lookup; an email linked to another Google account too", async () => {

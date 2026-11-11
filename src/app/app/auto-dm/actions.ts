@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
-import { validateRule, type DmRule } from "@/lib/rules";
+import { linkTokenError, validateRule, type DmRule } from "@/lib/rules";
 import { RewindError, rewindRule } from "@/lib/rewind";
 import { cleanPublicReply } from "@/lib/publicReply";
+import { detachMagnetIfLinkChanged } from "@/lib/leadMagnets";
 import { fetchRecentMedia, type IgMediaItem } from "@/lib/igMedia";
 import type { GraphAccount } from "@/lib/igGraph";
 import { isMissingColumnError } from "@/lib/ruleMedia";
@@ -281,6 +282,12 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
       return { ok: false, errors: ["Automation not found."] };
     }
     try {
+      // Link edited away from the attached lead magnet: stop tagging leads with that magnet.
+      await detachMagnetIfLinkChanged(user.id, id);
+    } catch (err) {
+      console.error("Could not check lead magnet link for rule", id, err instanceof Error ? err.message : err);
+    }
+    try {
       await query(
         `update socialapp.dm_rules set public_reply=$3 where id=$1 and user_id=$2`,
         [id, user.id, cleanPublicReply(input.publicReply)],
@@ -304,6 +311,18 @@ export async function toggleRule(id: string): Promise<RuleActionResult> {
   }
   const user = await requireUser();
   try {
+    // Going live is validated on the server too: a rule whose message uses {{link}} must have a link.
+    const current = await query<{ status: string; dm_text: string; link_url: string | null }>(
+      "select status, dm_text, link_url from socialapp.dm_rules where id = $1 and user_id = $2",
+      [id, user.id],
+    );
+    if (!current[0]) {
+      return { ok: false, errors: ["Automation not found."] };
+    }
+    if (current[0].status !== "active") {
+      const linkError = linkTokenError(current[0].dm_text ?? "", current[0].link_url);
+      if (linkError) return { ok: false, errors: [linkError] };
+    }
     const rows = await query<{ id: string }>(
       `update socialapp.dm_rules set status = case when status = 'active' then 'paused' else 'active' end, updated_at = now()
        where id = $1 and user_id = $2 returning id`,

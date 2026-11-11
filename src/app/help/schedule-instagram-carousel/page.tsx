@@ -40,8 +40,8 @@ const steps = [
           Settings
         </Link>{" "}
         through Meta&apos;s official login, or follow the{" "}
-        <Link className={s.vlink} href="/help/connect-instagram-account">
-          connect your Instagram account guide
+        <Link className={s.vlink} href="/help/getting-started">
+          getting started guide
         </Link>{" "}
         if you haven&apos;t done this yet.
       </>
@@ -153,16 +153,14 @@ export default function ScheduleInstagramCarouselHelpPage() {
       />
       <header className="hero">
         <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
+        <h1>
             How to schedule an Instagram <em className="s">carousel post</em>
           </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
-        </div>
         <p className="lede">
           Paste 2 to 10 public image links, write one caption, choose a time and {BRAND.name} publishes your carousel
           for you. Here is exactly what a scheduled carousel needs, step by step.
         </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>
@@ -214,8 +212,8 @@ export default function ScheduleInstagramCarouselHelpPage() {
                 Instagram image size guide
               </Link>{" "}
               and plan the slide order with the{" "}
-              <Link className={s.vlink} href="/tools/instagram-grid-maker">
-                Instagram grid maker
+              <Link className={s.vlink} href="/tools/instagram-carousel-maker">
+                Instagram carousel maker
               </Link>
               .
             </p>
@@ -255,8 +253,8 @@ export default function ScheduleInstagramCarouselHelpPage() {
             </ul>
             <p>
               For more checks, read{" "}
-              <Link className={s.vlink} href="/help/instagram-scheduled-post-failed">
-                why a scheduled Instagram post failed
+              <Link className={s.vlink} href="/help/schedule-instagram-reels">
+                what to do when a scheduled post did not publish
               </Link>
               . Still stuck?{" "}
               <Link className={s.vlink} href="/contact">

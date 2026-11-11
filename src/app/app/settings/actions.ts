@@ -6,18 +6,43 @@ import { deleteAccountData, disconnectAccounts } from "@/lib/accountData";
 import { createApiKey, revokeApiKey } from "@/lib/apiKeys";
 import { endSession, requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
-import { TIMEZONES } from "@/lib/postingSchedule";
+import { defaultSchedulesToSeed, isValidTimeZone, SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import { disconnectYouTubeChannel } from "@/lib/youtubeAccounts";
 
-const SCHEDULE_PLATFORMS = ["instagram", "facebook", "threads"] as const;
+const SCHEDULE_PLATFORMS = SCHEDULABLE_PLATFORMS;
+const validTimeZone = isValidTimeZone;
 
-function validTimeZone(tz: string): boolean {
-  if ((TIMEZONES as readonly string[]).includes(tz)) return true;
+// First channel connected and no posting schedule yet: seed Mon-Fri 9:00 / 12:00 / 18:00 in the
+// browser's time zone for every connected channel, so "Add to queue" / "Next available" work at once.
+// Called from the browser (it knows the zone). Never overwrites: a no-op once any schedule exists.
+export async function seedDefaultScheduleAction(timezone: string): Promise<{ seeded: number }> {
+  const user = await requireUser();
+  if (!isDbConfigured()) return { seeded: 0 };
   try {
-    new Intl.DateTimeFormat("en-US", { timeZone: tz });
-    return true;
-  } catch {
-    return false;
+    const [connected, existing] = await Promise.all([
+      query<{ platform: string }>("select distinct platform from socialapp.social_accounts where user_id=$1 and status='active'", [user.id]),
+      query<{ platform: string }>("select platform from socialapp.posting_schedules where user_id=$1", [user.id]),
+    ]);
+    const seeds = defaultSchedulesToSeed(
+      connected.map((r) => r.platform),
+      existing.map((r) => r.platform),
+      typeof timezone === "string" ? timezone.trim() : "UTC",
+    );
+    for (const s of seeds) {
+      await query(
+        `insert into socialapp.posting_schedules (user_id, platform, timezone, days, times)
+         values ($1, $2, $3, $4::int[], $5::text[]) on conflict (user_id, platform) do nothing`,
+        [user.id, s.platform, s.timezone, s.days, s.times],
+      );
+    }
+    if (seeds.length > 0) {
+      revalidatePath("/app/settings");
+      revalidatePath("/app/calendar");
+    }
+    return { seeded: seeds.length };
+  } catch (err) {
+    console.error("seedDefaultScheduleAction failed for user", user.id, err instanceof Error ? err.message : err);
+    return { seeded: 0 };
   }
 }
 
@@ -184,5 +209,6 @@ export async function deleteMyAccountAction(formData: FormData): Promise<void> {
   } catch {
     // The session row is already gone via cascade; we only need the cookie removed.
   }
-  redirect("/?account=deleted");
+  // The home page is public marketing; the confirmation is shown on the login page instead.
+  redirect("/login?account=deleted");
 }

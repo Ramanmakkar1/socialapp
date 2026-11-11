@@ -3,20 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLatestPosts, getPublicBioPage, themeFor } from "@/lib/bioPage";
+import { bioHandleFromParam } from "@/lib/bioPageShared";
 import { isDbConfigured } from "@/lib/db";
 import { BRAND } from "@/lib/brand";
 import styles from "./bio-public.module.css";
 
 type Props = { params: Promise<{ handle: string }> };
 
-function handleFromParam(raw: string): string | null {
-  if (!raw.startsWith("@")) return null;
-  return raw.slice(1);
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
-  const name = handleFromParam(handle);
+  const name = bioHandleFromParam(handle);
   const page = name && isDbConfigured() ? await getPublicBioPage(name) : null;
   if (!page) {
     return { title: "Page not found", robots: { index: false, follow: false } };
@@ -25,13 +21,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${page.display_name} (@${page.handle})`,
     description: page.bio || `Links from ${page.display_name} on Poskoo.`,
     robots: { index: false, follow: false },
-    alternates: { canonical: `${BRAND.url}/${handle}` },
+    alternates: { canonical: `${BRAND.url}/@${page.handle}` },
   };
 }
 
 export default async function PublicBioPage({ params }: Props) {
   const { handle } = await params;
-  const name = handleFromParam(handle);
+  const name = bioHandleFromParam(handle);
   if (!name || !isDbConfigured()) notFound();
   const page = await getPublicBioPage(name);
   if (!page) notFound();

@@ -18,8 +18,8 @@ export default function DeleteAccountForm({ action }: { action: (fd: FormData) =
   return (
     <form action={action}>
       <p className={ui.hint}>
-        This permanently deletes your Poskoo account, connected Instagram tokens, scheduled posts, auto-DM rules, leads
-        and links. It can&apos;t be undone. Export your leads first from Leads → Export CSV.
+        This permanently deletes your Poskoo account, connected account tokens, scheduled posts, auto-DM rules, contacts
+        and links. It can&apos;t be undone. Export your contacts first from Contacts → Export CSV.
       </p>
       <label htmlFor="delete-confirm" className={ui.label}>
         Type DELETE to confirm

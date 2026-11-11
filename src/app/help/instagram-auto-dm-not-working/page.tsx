@@ -106,16 +106,14 @@ export default function InstagramAutoDmNotWorkingPage() {
       </nav>
       <header className="hero">
         <p className="eyebrow">Troubleshooting guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
+        <h1>
             Instagram auto DM <em className="s">not working?</em>
           </h1>
-          <HelpGuideIllustration variant="troubleshoot" className="w-36 shrink-0 sm:w-48" />
-        </div>
         <p className="lede">
           Walk through this checklist in order. Each step reflects how {BRAND.name} actually processes comments, gates,
           and the send queue.
         </p>
+        <HelpGuideIllustration variant="troubleshoot" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

@@ -1,10 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { X } from "lucide-react";
+import { Eye, EyeOff, Maximize2, Minimize2, X } from "lucide-react";
 import { composerOpenFromParams, hrefWithoutComposer } from "@/lib/composerUrl";
 import styles from "./calendar.module.css";
+
+// Lets the composer close its window after a save (unless "Create another" is ticked).
+const ComposerDialogContext = createContext<{ close: (href?: string) => void } | null>(null);
+
+/** The surrounding composer window, or null when the composer is rendered on its own. */
+export function useComposerDialog() {
+  return useContext(ComposerDialogContext);
+}
 
 // The post composer as a centered window over the calendar (stays mounted while closed,
 // so a half-written post is still there when it is opened again).
@@ -14,6 +22,8 @@ export default function ComposerDialog({ title, children }: { title: string; chi
   const router = useRouter();
   const urlOpen = composerOpenFromParams(new URLSearchParams(params.toString()));
   const [open, setOpen] = useState(false);
+  const [wide, setWide] = useState(false);
+  const [preview, setPreview] = useState(true);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,10 +37,14 @@ export default function ComposerDialog({ title, children }: { title: string; chi
     if (window.location.hash === "#new") setOpen(true);
   }, []);
 
-  const close = useCallback(() => {
+  // `href` lets the composer pick where to land (e.g. also dropping ?idea= after a save).
+  const close = useCallback((href?: string) => {
     setOpen(false);
-    if (urlOpen) router.replace(hrefWithoutComposer(pathname, new URLSearchParams(params.toString())), { scroll: false });
+    if (href) router.replace(href, { scroll: false });
+    else if (urlOpen) router.replace(hrefWithoutComposer(pathname, new URLSearchParams(params.toString())), { scroll: false });
   }, [urlOpen, router, pathname, params]);
+
+  const dialogApi = useMemo(() => ({ close }), [close]);
 
   useEffect(() => {
     if (!open) return;
@@ -49,14 +63,33 @@ export default function ComposerDialog({ title, children }: { title: string; chi
 
   return (
     <div className={styles.dialogBackdrop} hidden={!open} onMouseDown={(e) => { if (e.target === e.currentTarget) close(); }}>
-      <div ref={panelRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} className={styles.dialogPanel}>
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className={`${styles.dialogPanel} ${wide ? styles.dialogPanelWide : ""}`}
+        data-preview={preview ? "on" : "off"}
+      >
         <div className={styles.dialogHead}>
           <h2 className={styles.dialogTitle}>{title}</h2>
-          <button type="button" onClick={close} className={styles.dialogClose} aria-label="Close">
-            <X width={20} height={20} aria-hidden="true" />
-          </button>
+          <div className={styles.dialogTools}>
+            <button type="button" onClick={() => setPreview((v) => !v)} className={styles.dialogTool} aria-pressed={preview}>
+              {preview ? <EyeOff width={16} height={16} aria-hidden="true" /> : <Eye width={16} height={16} aria-hidden="true" />}
+              <span>{preview ? "Hide preview" : "Preview"}</span>
+            </button>
+            <button type="button" onClick={() => setWide((v) => !v)} className={`${styles.dialogClose} ${styles.wideOnly}`} aria-label={wide ? "Exit full screen" : "Full screen"} aria-pressed={wide}>
+              {wide ? <Minimize2 width={18} height={18} aria-hidden="true" /> : <Maximize2 width={18} height={18} aria-hidden="true" />}
+            </button>
+            <button type="button" onClick={() => close()} className={styles.dialogClose} aria-label="Close">
+              <X width={20} height={20} aria-hidden="true" />
+            </button>
+          </div>
         </div>
-        <div className={styles.dialogBody}>{children}</div>
+        <div className={styles.dialogBody}>
+          <ComposerDialogContext.Provider value={dialogApi}>{children}</ComposerDialogContext.Provider>
+        </div>
       </div>
     </div>
   );

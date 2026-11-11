@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { isDbConfigured } from "@/lib/db";
+import { qualifyReferrals } from "@/lib/referrals";
 import { sendDueDms } from "@/lib/sender";
 
 function secretMatches(given: string | null, expected: string): boolean {
@@ -18,6 +19,8 @@ export async function POST(request: Request) {
     return Response.json({ status: "not_configured" });
   }
   try {
+    // Refer and earn: stamp referrals whose referred user connected an account (never throws).
+    await qualifyReferrals();
     const result = await sendDueDms();
     return Response.json({ status: "ok", ...result });
   } catch (err) {

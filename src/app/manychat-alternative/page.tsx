@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
-import CompareHeroIllustration from "@/components/CompareHeroIllustration";
+import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = {
   title: { absolute: "ManyChat Alternative: Instagram Comment-to-DM + Scheduler" },
@@ -27,13 +29,13 @@ const compare: [string, string, string][] = [
   ["Post scheduling and calendar", "Yes", "No"],
   ["DM rule attached to a scheduled post", "Yes", "No"],
   ["Leads list with CSV export", "Yes", "Yes"],
-  ["AI-written DM messages", "Yes", "Yes"],
-  ["Visual flow builder", "Coming later", "Yes"],
-  ["WhatsApp", "Coming later", "Yes"],
-  ["Facebook Messenger", "Coming later", "Yes"],
-  ["TikTok", "Coming later", "Yes"],
+  ["AI DM message ideas", "Yes", "Yes"],
+  ["Visual flow builder", "Not yet", "Yes"],
+  ["WhatsApp", "On the roadmap, no date", "Yes"],
+  ["Facebook Messenger", "On the roadmap, no date", "Yes"],
+  ["TikTok", "On the roadmap, no date", "Yes"],
   ["Official Meta API, no password", "Yes", "Yes"],
-  ["Pricing", "Free to start", "See their pricing"],
+  ["Price", PRICE_SUMMARY, "See their pricing"],
 ];
 
 const faqs = [
@@ -42,7 +44,7 @@ const faqs = [
   { q: "Does it work with Reels comments?", a: "Yes. A comment-to-DM rule can watch a feed post or a Reel, and anyone who comments the keyword gets the DM." },
   { q: "Do I need a Business or Creator account?", a: "Yes. Instagram only allows automated messaging through its API for Business and Creator accounts. Switching is free in the Instagram app settings." },
   { q: "Can it collect emails?", a: "Yes. Turn on the email gate in a rule and the DM asks for an email address before it sends your link." },
-  { q: `Does ${BRAND.name} support WhatsApp, Messenger or TikTok?`, a: "Not yet. Instagram comes first. WhatsApp, Messenger and TikTok are planned for later." },
+  { q: `Does ${BRAND.name} support WhatsApp, Messenger or TikTok?`, a: "Not yet. Instagram comes first. WhatsApp, Messenger and TikTok are on the roadmap, with no date yet." },
 ];
 
 const faqJsonLd = {
@@ -75,10 +77,7 @@ export default function ManyChatAlternative() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
           <a className="btn btn-line" href="#compare">Compare features</a>
         </div>
-        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
-        <div className="hero-art" style={{ maxWidth: 720 }}>
-          <Image sizes="(max-width: 720px) 100vw, 720px" src="/landing/card-dm.webp" width={900} height={900} alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers" />
-        </div>
+        <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
 
       {/* Why people switch */}
@@ -127,6 +126,7 @@ export default function ManyChatAlternative() {
               </tbody>
             </table>
           </div>
+          <CompareNote />
           <p className="small" style={{ textAlign: "center", marginTop: 16 }}>ManyChat features and pricing change over time. Check their site for current details.</p>
         </div>
       </section>

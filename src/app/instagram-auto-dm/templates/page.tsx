@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
+import { AnimArt } from "@/components/AnimArt";
 import ui from "@/components/ui/ui.module.css";
 import { DM_TEMPLATES, type DmTemplate } from "@/lib/dmTemplates";
 import TemplateChooser from "./TemplateChooser";
@@ -58,6 +59,7 @@ export default function DmTemplatesPage() {
             </a>
           ))}
         </nav>
+        <div className="hero-art"><AnimArt name="feat-dm" label="A phone post gets a GUIDE comment and a DM with a link flies back with a green check" /></div>
       </header>
 
       <section style={{ paddingTop: 40 }}>

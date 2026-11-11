@@ -55,7 +55,7 @@ const faqs = [
   },
   {
     q: "How many links can I add?",
-    a: `The Free plan includes ${freeLinks} links on your bio page. The Pro and Agency plans include ${paidLinks} links, so you can share more destinations from one page.`,
+    a: `The Free plan includes ${freeLinks} links on your bio page. Paid Pro and Agency plans are coming soon and will include ${paidLinks} links, so you can share more destinations from one page.`,
   },
   {
     q: "Can I see which links people click?",
@@ -246,8 +246,8 @@ export default function InstagramLinkInBioPage() {
               How many links <em className="s">you can add.</em>
             </h2>
             <p>
-              The Free plan includes {freeLinks} links on your bio page. The Pro and Agency plans include {paidLinks}{" "}
-              links, so you can share more destinations from one page.
+              The Free plan includes {freeLinks} links on your bio page. Paid Pro and Agency plans are coming soon and will include{" "}
+              {paidLinks} links, so you can share more destinations from one page.
             </p>
           </div>
           <div className={s.tableWrap}>
@@ -264,11 +264,11 @@ export default function InstagramLinkInBioPage() {
                   <td className={s.td} style={{ fontWeight: 700 }}>{freeLinks} links</td>
                 </tr>
                 <tr className={s.tr}>
-                  <td className={s.td}>Pro</td>
+                  <td className={s.td}>Pro (coming soon)</td>
                   <td className={s.td} style={{ fontWeight: 700 }}>{paidLinks} links</td>
                 </tr>
                 <tr className={s.tr}>
-                  <td className={s.td}>Agency</td>
+                  <td className={s.td}>Agency (coming soon)</td>
                   <td className={s.td} style={{ fontWeight: 700 }}>{PLAN_LIMITS.Agency.bioLinks} links</td>
                 </tr>
               </tbody>

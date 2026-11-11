@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, AtSign, Facebook, Instagram, Link2, Loader2, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
-import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, saveHashtagGroup, savePost, saveTemplate } from "./actions";
+import { ArrowLeft, ArrowRight, AtSign, CalendarClock, ChevronDown, Facebook, Hash, Instagram, Link2, Loader2, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
+import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, nextAvailableSlots, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
+import { useComposerDialog } from "./ComposerDialog";
+import { COMPOSER_EMOJI, insertAtCursor } from "@/lib/captionInsert";
 import { aiAvailable, suggestCaptions } from "./aiActions";
-import { BRAND } from "@/lib/brand";
 import type { CaptionIdea } from "@/lib/ai";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { insertHashtags, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
@@ -23,12 +24,17 @@ import {
   type ComposerDraftInitial,
   type ScheduleOrigin,
 } from "@/lib/composerDraft";
-import { dayPrefill } from "@/lib/composerUrl";
+import { dayPrefill, hrefWithoutComposer } from "@/lib/composerUrl";
 import { instagramAspectWarning, mediaKindFromUrl, validateMediaFile } from "@/lib/mediaUpload";
 import ui from "@/components/ui/ui.module.css";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube"];
-const HANDLE = `@${BRAND.name.toLowerCase()}`;
+/** Preview name for the connected account ("@brew.co" -> "brew.co", "Brew Co" page name as is). */
+function previewName(account: string | undefined): string {
+  return account ? account.replace(/^@/, "") : "Your account";
+}
+
+const NET_COLOR: Record<PlatformId, string> = { instagram: "#d62976", facebook: "#1877f2", threads: "#000", youtube: "#ff0000" };
 
 const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
   instagram: Instagram,
@@ -84,7 +90,7 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false, scheduledUsage = null, accountNames = {} }: { rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean; scheduledUsage?: { used: number; limit: number | null } | null; accountNames?: Record<string, string> }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const livePlatforms: PlatformId[] = ["instagram"];
@@ -163,6 +169,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [aiIdeas, setAiIdeas] = useState<CaptionIdea[]>([]);
   const [aiError, setAiError] = useState("");
   const [aiPending, startAiTransition] = useTransition();
+  const dialog = useComposerDialog();
+  const captionRef = useRef<HTMLTextAreaElement>(null);
+  const scheduleInputRef = useRef<HTMLInputElement>(null);
+  // Which small popover is open: emoji grid, hashtag sets, or the "Next available ▾" slot menu.
+  const [openTool, setOpenTool] = useState<"emoji" | "hashtag" | "slots" | null>(null);
+  const [slotOptions, setSlotOptions] = useState<{ iso: string; timeZone: string }[] | null>(null);
+  const [slotsError, setSlotsError] = useState("");
+  const [createAnother, setCreateAnother] = useState(false);
 
   const calendarHrefWithoutDraft = useCallback(
     (hash = "#new") => {
@@ -264,6 +278,41 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     };
   }, []);
 
+  useEffect(() => {
+    if (!openTool) return;
+    const onDown = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      if (!target?.closest("[data-composer-pop]")) setOpenTool(null);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        // Close just the popover, not the whole composer window.
+        event.stopPropagation();
+        setOpenTool(null);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey, true);
+    };
+  }, [openTool]);
+
+  // Emoji / "#" go in at the caret (or replace the selection), then focus returns to the caption.
+  function insertIntoCaption(piece: string) {
+    const el = captionRef.current;
+    const start = el?.selectionStart ?? mainCaption.length;
+    const end = el?.selectionEnd ?? mainCaption.length;
+    const next = insertAtCursor(mainCaption, start, end, piece);
+    setMainCaption(next.text);
+    requestAnimationFrame(() => {
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(next.caret, next.caret);
+    });
+  }
+
   function togglePlatform(platform: PlatformId) {
     if (!livePlatforms.includes(platform)) return;
     const next = { ...enabled, [platform]: !enabled[platform] };
@@ -325,6 +374,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     };
   }
 
+  const firstNet = selected[0] ?? "instagram";
+  const captionMax = firstNet === "youtube" ? null : PLATFORM_LIMITS[firstNet].max;
   const filledMediaCount = mediaUrls.map((u) => u.trim()).filter((u) => u !== "").length;
   const storyMediaError =
     enabled.instagram && igFormat === "story" && filledMediaCount > 1;
@@ -383,9 +434,12 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             // The server still validates type and size; a preview failure is not fatal.
           }
         }
-        const body = new FormData();
-        body.append("file", file);
-        const response = await fetch("/api/media/upload", { method: "POST", body });
+        // Raw body: the server streams it to disk instead of buffering a multipart form in memory.
+        const response = await fetch("/api/media/upload", {
+          method: "POST",
+          body: file,
+          headers: { "Content-Type": file.type || "application/octet-stream", "X-File-Name": encodeURIComponent(file.name) },
+        });
         const result = (await response.json().catch(() => ({}))) as { url?: string; error?: string };
         if (!response.ok || !result.url) {
           setUploadError(result.error || "Could not upload that file. Please try again.");
@@ -489,7 +543,12 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
         setFeedback({ kind: "ok", text: `Scheduled for ${when}` });
       }
       resetComposerForNewPost();
-      if (editingDraftId || initialIdea) {
+      if (dialog && !createAnother) {
+        // Done: close the window (and drop ?draft / ?idea so it does not reopen on refresh).
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("idea");
+        dialog.close(hrefWithoutComposer("/app/calendar", params));
+      } else if (editingDraftId || initialIdea) {
         router.replace(calendarHrefWithoutDraft());
       }
       router.refresh();
@@ -520,6 +579,44 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
         setFeedback({ kind: "err", text: "Could not find the next available time. Please try again." });
       }
     });
+  }
+
+  function applySlot(iso: string, zone: string) {
+    const slot = new Date(iso);
+    scheduleOriginRef.current = null;
+    setScheduledAt(toLocalInputValue(slot));
+    setNextSlotLabel(`${slot.toLocaleString(undefined, { timeZone: zone, dateStyle: "medium", timeStyle: "short" })} (${zone})`);
+    setOpenTool(null);
+  }
+
+  // "Next available ▾": load the next 3 free schedule slots for the selected channels.
+  function toggleSlotMenu() {
+    if (openTool === "slots") {
+      setOpenTool(null);
+      return;
+    }
+    setOpenTool("slots");
+    setSlotOptions(null);
+    setSlotsError("");
+    const platforms = PLATFORM_ORDER.filter((p) => enabled[p]);
+    nextAvailableSlots(platforms, 3)
+      .then((result) => {
+        if (result.ok) setSlotOptions(result.slots);
+        else setSlotsError(result.error);
+      })
+      .catch(() => setSlotsError("Could not load the next times. Please try again."));
+  }
+
+  function pickDateTime() {
+    setOpenTool(null);
+    const input = scheduleInputRef.current;
+    if (!input) return;
+    input.focus();
+    try {
+      input.showPicker?.();
+    } catch {
+      // Some browsers only open the picker from a direct click; focus is enough there.
+    }
   }
 
   function applyTemplate(template: PostTemplate) {
@@ -615,14 +712,14 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           Cancel editing · New post
         </Link>
       )}
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
-        <div className="space-y-6">
+      <div className="composerPanes grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
+        <div className="composerEditor min-w-0 space-y-5">
           <div>
-            <span className="text-sm font-medium text-[#3d3450]">Platforms</span>
+            <span className="text-sm font-medium text-[var(--poskoo-ink)]">Channels</span>
             <div
               id={platformsFocusId}
               tabIndex={-1}
-              className="mt-2 flex flex-wrap gap-2 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]"
+              className="mt-2 flex flex-wrap gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]"
             >
               {PLATFORM_ORDER.map((platform) => {
                 const Icon = PLATFORM_ICON[platform];
@@ -647,20 +744,19 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     aria-label={live ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}` : disabledLabel}
                     title={disabledLabel}
                     onClick={() => togglePlatform(platform)}
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                    className={`group relative grid h-11 w-11 place-items-center rounded-full border-2 transition ${
                       live
                         ? on
-                          ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 text-[var(--poskoo-violet)]"
-                          : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[var(--poskoo-muted)]"
-                        : "cursor-not-allowed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[var(--poskoo-muted)] opacity-60"
+                          ? "border-[var(--poskoo-violet)] opacity-100"
+                          : "border-transparent opacity-45 grayscale hover:opacity-80"
+                        : "cursor-not-allowed border-dashed border-[var(--poskoo-line)] opacity-40"
                     }`}
                   >
-                    <Icon className="h-4 w-4" aria-hidden />
-                    {PLATFORMS[platform].label}
-                    {!live && (
-                      <span className="rounded-full bg-[var(--poskoo-band)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--poskoo-muted)]">
-                        Soon
-                      </span>
+                    <span className="grid h-9 w-9 place-items-center rounded-full text-white" style={{ background: NET_COLOR[platform] }} aria-hidden>
+                      <Icon className="h-[18px] w-[18px]" />
+                    </span>
+                    {on && live && (
+                      <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-[var(--poskoo-violet)] text-[9px] font-bold text-white" aria-hidden>✓</span>
                     )}
                   </button>
                 );
@@ -669,13 +765,13 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           </div>
 
           <details className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
-            <summary className="cursor-pointer text-sm font-medium text-[#3d3450]">Saved post templates</summary>
+            <summary className="cursor-pointer text-sm font-medium text-[var(--poskoo-ink)]">Saved post templates</summary>
             {templates.length > 0 && (
               <div className="mt-3 space-y-2">
                 {templates.map((template) => (
                   <article key={template.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--poskoo-paper)] p-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-semibold text-[#3d3450]">{template.name}</h3>
+                      <h3 className="text-sm font-semibold text-[var(--poskoo-ink)]">{template.name}</h3>
                       <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-xs text-[var(--poskoo-muted)]">{template.caption}</p>
                     </div>
                     <button type="button" onClick={() => applyTemplate(template)} className="rounded-full border border-[var(--poskoo-violet)] px-3 py-1.5 text-xs font-medium text-[var(--poskoo-violet)]">Insert</button>
@@ -689,22 +785,113 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 <label htmlFor={templateNameId} className="sr-only">New template name</label>
                 <input id={templateNameId} value={templateName} maxLength={80} onChange={(event) => setTemplateName(event.target.value)} placeholder="Template name" className="w-full rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)]" />
               </div>
-              <button type="button" disabled={extrasPending || !templateName.trim()} onClick={handleTemplateSave} className="rounded-full border border-[var(--poskoo-line)] px-3 py-2 text-sm font-medium text-[#3d3450] disabled:opacity-60">Save current as template</button>
+              <button type="button" disabled={extrasPending || !templateName.trim()} onClick={handleTemplateSave} className="rounded-full border border-[var(--poskoo-line)] px-3 py-2 text-sm font-medium text-[var(--poskoo-ink)] disabled:opacity-60">Save current as template</button>
             </div>
           </details>
 
-          <div>
-            <label htmlFor={mainId} className="text-sm font-medium text-[#3d3450]">
-              Caption
-            </label>
+          <div className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 shadow-[0_1px_2px_rgba(30,22,49,.05)] focus-within:border-[var(--poskoo-violet)]">
+            <div className="flex items-center gap-2 px-1 pb-2">
+              {selected.slice(0, 4).map((platform) => {
+                const Icon = PLATFORM_ICON[platform];
+                return <Icon key={platform} className="h-4 w-4" style={{ color: NET_COLOR[platform] }} aria-hidden />;
+              })}
+              <label htmlFor={mainId} className="text-sm font-semibold text-[var(--poskoo-ink)]">
+                Caption
+              </label>
+            </div>
             <textarea
+              ref={captionRef}
               id={mainId}
               value={mainCaption}
               onChange={(e) => setMainCaption(e.target.value)}
-              rows={6}
-              placeholder="Write once — customize per platform below if you need to."
-              className="mt-2 w-full resize-y rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
+              rows={7}
+              placeholder="Start writing or get inspired with Templates. Write once, then customize per network below if you need to."
+              className="w-full resize-y rounded-xl border-0 bg-transparent px-1 py-1 text-[15px] leading-relaxed text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:outline-none"
             />
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--poskoo-line)] px-1 pt-2 text-xs text-[var(--poskoo-muted)]">
+              <div className="flex items-center gap-1">
+                <div className="relative" data-composer-pop>
+                  <button
+                    type="button"
+                    onClick={() => setOpenTool((tool) => (tool === "emoji" ? null : "emoji"))}
+                    aria-expanded={openTool === "emoji"}
+                    aria-haspopup="true"
+                    aria-label="Insert emoji"
+                    title="Emoji"
+                    className="grid h-8 w-8 place-items-center rounded-lg text-[var(--poskoo-muted)] hover:bg-[var(--poskoo-band)] hover:text-[var(--poskoo-ink)]"
+                  >
+                    <Smile className="h-4 w-4" aria-hidden />
+                  </button>
+                  {openTool === "emoji" && (
+                    <div role="group" aria-label="Emoji" className="absolute bottom-full left-0 z-30 mb-2 grid w-[264px] grid-cols-8 gap-0.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-2 shadow-[0_8px_24px_rgba(30,22,49,.12)]">
+                      {COMPOSER_EMOJI.map((emoji) => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => insertIntoCaption(emoji)}
+                          aria-label={`Insert ${emoji}`}
+                          className="grid h-8 w-8 place-items-center rounded-md text-lg hover:bg-[var(--poskoo-band)]"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="relative" data-composer-pop>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (hashtagGroups.length === 0) {
+                        insertIntoCaption("#");
+                        return;
+                      }
+                      setOpenTool((tool) => (tool === "hashtag" ? null : "hashtag"));
+                    }}
+                    aria-expanded={hashtagGroups.length > 0 ? openTool === "hashtag" : undefined}
+                    aria-haspopup={hashtagGroups.length > 0 ? "true" : undefined}
+                    aria-label={hashtagGroups.length > 0 ? "Insert saved hashtags" : "Insert a hashtag"}
+                    title="Hashtags"
+                    className="grid h-8 w-8 place-items-center rounded-lg text-[var(--poskoo-muted)] hover:bg-[var(--poskoo-band)] hover:text-[var(--poskoo-ink)]"
+                  >
+                    <Hash className="h-4 w-4" aria-hidden />
+                  </button>
+                  {openTool === "hashtag" && (
+                    <div role="group" aria-label="Saved hashtag groups" className="absolute bottom-full left-0 z-30 mb-2 w-[260px] rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1.5 shadow-[0_8px_24px_rgba(30,22,49,.12)]">
+                      {hashtagGroups.map((group) => (
+                        <button
+                          key={group.id}
+                          type="button"
+                          onClick={() => {
+                            setMainCaption((caption) => insertHashtags(caption, group.hashtags));
+                            setOpenTool(null);
+                          }}
+                          className="block w-full rounded-lg px-2.5 py-2 text-left hover:bg-[var(--poskoo-band)]"
+                        >
+                          <span className="block text-sm font-medium text-[var(--poskoo-ink)]">{group.name}</span>
+                          <span className="block truncate text-xs text-[var(--poskoo-muted)]">{group.hashtags.map((tag) => `#${tag}`).join(" ")}</span>
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenTool(null);
+                          insertIntoCaption("#");
+                        }}
+                        className="mt-1 block w-full rounded-lg border-t border-[var(--poskoo-line)] px-2.5 py-2 text-left text-sm text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)]"
+                      >
+                        Type a new # hashtag
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <span className={counterClass(countChars(mainCaption), captionMax ?? 2200)} aria-live="polite">
+                {countChars(mainCaption)} / {captionMax ?? "∞"}
+              </span>
+            </div>
+          </div>
+          <div>
             <button
               type="button"
               disabled={aiOn === false}
@@ -718,7 +905,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               <div className="mt-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="min-w-0 flex-1">
-                    <label htmlFor={aiTopicId} className="text-sm font-medium text-[#3d3450]">
+                    <label htmlFor={aiTopicId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                       What is this post about?
                     </label>
                     <input
@@ -731,7 +918,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     />
                   </div>
                   <div className="sm:w-44">
-                    <label htmlFor={aiToneId} className="text-sm font-medium text-[#3d3450]">
+                    <label htmlFor={aiToneId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                       Tone
                     </label>
                     <select
@@ -771,7 +958,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   <div className="mt-3 space-y-2">
                     {aiIdeas.map((idea, index) => (
                       <article key={`${index}-${idea.caption}`} className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3">
-                        <p className="whitespace-pre-wrap text-sm text-[#3d3450]">{idea.caption}</p>
+                        <p className="whitespace-pre-wrap text-sm text-[var(--poskoo-ink)]">{idea.caption}</p>
                         {idea.hashtags.length > 0 && (
                           <p className="mt-2 text-sm text-[var(--poskoo-muted)]">{idea.hashtags.join(" ")}</p>
                         )}
@@ -794,19 +981,19 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           </div>
 
           <div>
-            <label htmlFor={postTagsId} className="text-sm font-medium text-[#3d3450]">Campaign tags (optional)</label>
+            <label htmlFor={postTagsId} className="text-sm font-medium text-[var(--poskoo-ink)]">Campaign tags (optional)</label>
             <input id={postTagsId} value={postTags} onChange={(event) => setPostTags(event.target.value)} placeholder="Spring launch, awareness" aria-describedby={`${postTagsId}-help`} className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none" />
             <p id={`${postTagsId}-help`} className="mt-1 text-xs text-[var(--poskoo-muted)]">Separate up to 10 tags with commas. Use them to filter the queue and calendar.</p>
           </div>
 
           <details className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
-            <summary className="cursor-pointer text-sm font-medium text-[#3d3450]">Saved hashtag groups</summary>
+            <summary className="cursor-pointer text-sm font-medium text-[var(--poskoo-ink)]">Saved hashtag groups</summary>
             {hashtagGroups.length > 0 && (
               <div className="mt-3 space-y-2">
                 {hashtagGroups.map((group) => (
                   <article key={group.id} className="rounded-lg bg-[var(--poskoo-paper)] p-3">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="min-w-0 flex-1 text-sm font-semibold text-[#3d3450]">{group.name}</h3>
+                      <h3 className="min-w-0 flex-1 text-sm font-semibold text-[var(--poskoo-ink)]">{group.name}</h3>
                       <button type="button" onClick={() => setMainCaption((caption) => insertHashtags(caption, group.hashtags))} className="rounded-full border border-[var(--poskoo-violet)] px-3 py-1.5 text-xs font-medium text-[var(--poskoo-violet)]">Insert hashtags</button>
                       <button type="button" disabled={extrasPending} onClick={() => handleHashtagGroupDelete(group.id)} aria-label={`Delete hashtag group ${group.name}`} className="rounded-full border border-[var(--poskoo-line)] px-3 py-1.5 text-xs text-[var(--poskoo-muted)] disabled:opacity-60">Delete</button>
                     </div>
@@ -825,12 +1012,12 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 <input id={hashtagTextId} value={hashtagText} onChange={(event) => setHashtagText(event.target.value)} placeholder="#launch #newproduct" className="w-full rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)]" />
               </div>
             </div>
-            <button type="button" disabled={extrasPending || !hashtagGroupName.trim() || !hashtagText.trim()} onClick={handleHashtagGroupSave} className="mt-2 rounded-full border border-[var(--poskoo-line)] px-3 py-2 text-sm font-medium text-[#3d3450] disabled:opacity-60">Save hashtag group</button>
+            <button type="button" disabled={extrasPending || !hashtagGroupName.trim() || !hashtagText.trim()} onClick={handleHashtagGroupSave} className="mt-2 rounded-full border border-[var(--poskoo-line)] px-3 py-2 text-sm font-medium text-[var(--poskoo-ink)] disabled:opacity-60">Save hashtag group</button>
           </details>
 
           {igFormat !== "story" && (
             <div>
-              <label htmlFor={firstCommentId} className="text-sm font-medium text-[#3d3450]">
+              <label htmlFor={firstCommentId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                 First comment (Instagram) (optional)
               </label>
               <textarea
@@ -851,7 +1038,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           )}
 
           <div>
-            <span className="text-sm font-medium text-[#3d3450]">Media</span>
+            <span className="text-sm font-medium text-[var(--poskoo-ink)]">Media</span>
             <div
               id={imageId}
               tabIndex={-1}
@@ -868,7 +1055,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               }`}
             >
               <UploadCloud className="mx-auto h-8 w-8 text-[var(--poskoo-violet)]" aria-hidden />
-              <p className="mt-2 text-sm font-medium text-[#3d3450]">Drag &amp; drop images or videos</p>
+              <p className="mt-2 text-sm font-medium text-[var(--poskoo-ink)]">Drag &amp; drop images or videos</p>
               <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                 JPG or PNG up to 8 MB · MP4 or MOV up to 100 MB · up to 10 images
               </p>
@@ -942,7 +1129,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                             onClick={() => moveMedia(index, -1)}
                             disabled={index === 0}
                             aria-label="Move media earlier"
-                            className="rounded bg-white/90 p-1 text-[#3d3450] disabled:opacity-40"
+                            className="rounded bg-white/90 p-1 text-[var(--poskoo-ink)] disabled:opacity-40"
                           >
                             <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
                           </button>
@@ -951,7 +1138,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                             onClick={() => moveMedia(index, 1)}
                             disabled={index === mediaUrls.length - 1}
                             aria-label="Move media later"
-                            className="rounded bg-white/90 p-1 text-[#3d3450] disabled:opacity-40"
+                            className="rounded bg-white/90 p-1 text-[var(--poskoo-ink)] disabled:opacity-40"
                           >
                             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
                           </button>
@@ -1026,7 +1213,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             )}
             {enabled.instagram && (
               <fieldset id={igFormatLegendId} tabIndex={-1} className="mt-3 border-0 p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]">
-                <legend className="text-sm font-medium text-[#3d3450]">
+                <legend className="text-sm font-medium text-[var(--poskoo-ink)]">
                   Instagram format:
                 </legend>
                 <div
@@ -1084,10 +1271,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
 
           {enabled.youtube && (
             <div>
-              <span className="text-sm font-medium text-[#3d3450]">YouTube video details</span>
+              <span className="text-sm font-medium text-[var(--poskoo-ink)]">YouTube video details</span>
               <div className="mt-2 space-y-3">
                 <div>
-                  <label htmlFor={ytTitleId} className="text-sm font-medium text-[#3d3450]">
+                  <label htmlFor={ytTitleId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                     Video title
                   </label>
                   <input
@@ -1104,7 +1291,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   </p>
                 </div>
                 <div>
-                  <label htmlFor={ytTagsId} className="text-sm font-medium text-[#3d3450]">
+                  <label htmlFor={ytTagsId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                     Tags (comma separated, optional)
                   </label>
                   <input
@@ -1117,7 +1304,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   />
                 </div>
                 <div>
-                  <label htmlFor={ytPrivacyId} className="text-sm font-medium text-[#3d3450]">
+                  <label htmlFor={ytPrivacyId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                     Visibility
                   </label>
                   <select
@@ -1131,7 +1318,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     <option value="private">Private</option>
                   </select>
                 </div>
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-[#3d3450]">
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--poskoo-ink)]">
                   <input
                     type="checkbox"
                     checked={ytShorts}
@@ -1150,7 +1337,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           <div>
             {rules.length > 0 ? (
               <>
-                <label htmlFor={dmRuleId} className="text-sm font-medium text-[#3d3450]">
+                <label htmlFor={dmRuleId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                   Auto-DM rule (optional)
                 </label>
                 <select
@@ -1173,7 +1360,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               </>
             ) : (
               <>
-                <span className="text-sm font-medium text-[#3d3450]">Auto-DM rule (optional)</span>
+                <span className="text-sm font-medium text-[var(--poskoo-ink)]">Auto-DM rule (optional)</span>
                 <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
                   <Link href="/app/auto-dm" className="text-[var(--poskoo-violet)] hover:underline">
                     Create an auto-DM rule
@@ -1210,7 +1397,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   const check = checkCaption(platform, text);
                   return (
                     <>
-                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[#3d3450]">
+                      <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--poskoo-ink)]">
                         <input
                           type="checkbox"
                           checked={customize[platform]}
@@ -1259,10 +1446,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor={scheduleId} className="text-sm font-medium text-[#3d3450]">
+              <label htmlFor={scheduleId} className="text-sm font-medium text-[var(--poskoo-ink)]">
                 Schedule
               </label>
               <input
+                ref={scheduleInputRef}
                 id={scheduleId}
                 type="datetime-local"
                 value={scheduledAt}
@@ -1270,7 +1458,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm focus:border-[var(--poskoo-violet)] focus:outline-none"
               />
               {selectedScheduleLabel && (
-                <p className="mt-2 text-sm font-medium text-[#3d3450]" aria-live="polite">
+                <p className="mt-2 text-sm font-medium text-[var(--poskoo-ink)]" aria-live="polite">
                   Selected: {selectedScheduleLabel}{timeZone ? ` (${timeZone})` : ""}
                 </p>
               )}
@@ -1290,7 +1478,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                         type="button"
                         aria-label={`Schedule for ${label}`}
                         onClick={() => changeScheduledAt(toLocalInputValue(nextSlotLocal(h)))}
-                        className="rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs text-[#3d3450] hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)]"
+                        className="rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs text-[var(--poskoo-ink)] hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)]"
                       >
                         {label}
                       </button>
@@ -1299,14 +1487,60 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 </div>
               )}
               {queueReady && (
-                <button
-                  type="button"
-                  disabled={isPending}
-                  onClick={handleNextAvailable}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)] disabled:opacity-60"
-                >
-                  Next available
-                </button>
+                <div className="relative mt-2 inline-flex" data-composer-pop>
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={handleNextAvailable}
+                    className="inline-flex items-center gap-1.5 rounded-l-full border border-[var(--poskoo-line)] py-1 pl-3 pr-2.5 text-xs font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)] disabled:opacity-60"
+                  >
+                    Next available
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={toggleSlotMenu}
+                    aria-expanded={openTool === "slots"}
+                    aria-haspopup="menu"
+                    aria-label="More times"
+                    className="-ml-px inline-flex items-center rounded-r-full border border-[var(--poskoo-line)] px-2 py-1 text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)] disabled:opacity-60"
+                  >
+                    <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+                  </button>
+                  {openTool === "slots" && (
+                    <div role="menu" aria-label="Pick a time" className="absolute left-0 top-full z-30 mt-1.5 w-[260px] rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1.5 shadow-[0_8px_24px_rgba(30,22,49,.12)]">
+                      <p className="m-0 px-2.5 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">Next free slots</p>
+                      {slotOptions === null && !slotsError && (
+                        <p className="m-0 flex items-center gap-2 px-2.5 py-2 text-sm text-[var(--poskoo-muted)]">
+                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Finding times…
+                        </p>
+                      )}
+                      {slotsError && <p className="m-0 px-2.5 py-2 text-sm text-[var(--poskoo-coral)]">{slotsError}</p>}
+                      {slotOptions?.map((slot) => {
+                        const at = new Date(slot.iso);
+                        return (
+                          <button
+                            key={slot.iso}
+                            type="button"
+                            role="menuitem"
+                            onClick={() => applySlot(slot.iso, slot.timeZone)}
+                            className="block w-full rounded-lg px-2.5 py-2 text-left text-sm text-[var(--poskoo-ink)] hover:bg-[var(--poskoo-band)]"
+                          >
+                            {at.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                          </button>
+                        );
+                      })}
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={pickDateTime}
+                        className="mt-1 flex w-full items-center gap-2 rounded-lg border-t border-[var(--poskoo-line)] px-2.5 py-2 text-left text-sm font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)]"
+                      >
+                        <CalendarClock className="h-4 w-4" aria-hidden /> Pick date &amp; time
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
               {!queueReady && (
                 <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
@@ -1317,14 +1551,42 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="composerFooter sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center justify-end gap-2 border-t border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-1 py-3">
+            {dialog && (
+              <label className="mr-auto inline-flex cursor-pointer items-center gap-2 text-sm text-[var(--poskoo-ink)]">
+                <input
+                  type="checkbox"
+                  checked={createAnother}
+                  onChange={(e) => setCreateAnother(e.target.checked)}
+                  className="h-4 w-4 accent-[var(--poskoo-violet)]"
+                />
+                Create another
+              </label>
+            )}
+            {scheduledUsage && scheduledUsage.limit !== null && (
+              <span
+                className={`${dialog ? "" : "mr-auto "}text-xs ${scheduledUsage.used >= scheduledUsage.limit ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-muted)]"}`}
+                title="Posts scheduled or published this month (UTC) on your plan. Drafts don't count."
+              >
+                Scheduled this month {scheduledUsage.used}/{scheduledUsage.limit}
+              </span>
+            )}
             <button
               type="button"
               disabled={isPending || uploading || storyMediaError}
               onClick={() => handleSave("draft")}
               className="rounded-full border border-[var(--poskoo-line)] px-4 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:bg-[var(--poskoo-band)] disabled:opacity-60"
             >
-              {isPending ? "Saving…" : "Save draft"}
+              {isPending ? "Saving…" : "Save Draft"}
+            </button>
+            <button
+              type="button"
+              disabled={isPending || uploading || !queueReady || storyMediaError}
+              onClick={() => handleSave("queue")}
+              title={queueReady ? undefined : "Set a posting schedule in Settings → Channels first"}
+              className="rounded-full border border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 px-4 py-2 text-sm font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/20 disabled:opacity-60"
+            >
+              {isPending ? "Saving…" : "Add to Queue"}
             </button>
             <button
               type="button"
@@ -1332,15 +1594,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               onClick={() => handleSave("schedule")}
               className={`${ui.inkFill} rounded-full px-4 py-2 text-sm font-medium disabled:opacity-60`}
             >
-              {isPending ? "Saving…" : "Schedule"}
-            </button>
-            <button
-              type="button"
-              disabled={isPending || uploading || !queueReady || storyMediaError}
-              onClick={() => handleSave("queue")}
-              className="rounded-full border border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)]/10 px-4 py-2 text-sm font-medium text-[var(--poskoo-violet)] transition-colors hover:bg-[var(--poskoo-violet)]/20 disabled:opacity-60"
-            >
-              {isPending ? "Saving…" : "Add to queue"}
+              {isPending ? "Saving…" : "Schedule Post"}
             </button>
           </div>
           {feedback && (
@@ -1354,22 +1608,16 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
 
         </div>
 
-        <div className="space-y-4">
-          <PublishingChecklist
-            enabled={enabled}
-            mainCaption={mainCaption}
-            firstComment={firstComment}
-            customize={customize}
-            customCaption={customCaption}
-            mediaUrls={mediaUrls}
-            igFormat={igFormat}
-            ytTitle={ytTitle}
-            scheduledAt={scheduledAt}
-            timeZone={timeZone}
-            onFix={focusChecklistTarget}
-          />
-          <span className="text-sm font-medium text-[#3d3450]">Preview</span>
-          {selected.map((platform) => {
+        <div className="composerPreview space-y-4 rounded-2xl bg-[var(--poskoo-paper)] p-4 lg:sticky lg:top-20 lg:self-start">
+          <h3 className="m-0 text-sm font-semibold text-[var(--poskoo-ink)]">
+            {selected.length === 1 ? `${PLATFORMS[selected[0]].label} Preview` : "Preview"}
+          </h3>
+          {selected.length === 0 || (!mainCaption.trim() && filledMediaCount === 0) ? (
+            <div className="grid place-items-center rounded-2xl border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-6 py-12 text-center">
+              <p className="m-0 text-sm font-medium text-[var(--poskoo-ink)]">See your post&apos;s preview here</p>
+              <p className="mt-1 text-xs text-[var(--poskoo-muted)]">Pick a channel and start writing.</p>
+            </div>
+          ) : selected.map((platform) => {
             const text = effectiveCaption(platform, mainCaption, customize, customCaption);
             const Icon = PLATFORM_ICON[platform];
             return (
@@ -1386,9 +1634,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 text-sm font-semibold">
                       <Icon className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden />
-                      {BRAND.name}
+                      {previewName(accountNames[platform])}
                     </div>
-                    <div className="truncate text-xs text-[var(--poskoo-muted)]">{HANDLE}</div>
+                    <div className="truncate text-xs text-[var(--poskoo-muted)]">{accountNames[platform] ?? "Connect this channel"}</div>
                   </div>
                 </div>
                 {(() => {
@@ -1416,7 +1664,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     />
                   );
                 })()}
-                <p className="mt-3 whitespace-pre-wrap text-sm text-[#3d3450]">
+                <p className="mt-3 whitespace-pre-wrap text-sm text-[var(--poskoo-ink)]">
                   {previewCaption(platform, text) || (
                     <span className="text-[var(--poskoo-muted)]">Your caption appears here.</span>
                   )}
@@ -1424,6 +1672,19 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               </article>
             );
           })}
+          <PublishingChecklist
+            enabled={enabled}
+            mainCaption={mainCaption}
+            firstComment={firstComment}
+            customize={customize}
+            customCaption={customCaption}
+            mediaUrls={mediaUrls}
+            igFormat={igFormat}
+            ytTitle={ytTitle}
+            scheduledAt={scheduledAt}
+            timeZone={timeZone}
+            onFix={focusChecklistTarget}
+          />
         </div>
       </div>
     </section>

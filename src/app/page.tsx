@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { preload } from "react-dom";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
@@ -9,6 +10,10 @@ import styles from "./landing.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LandingDemo } from "./LandingDemo";
+import { HeroVideo } from "@/components/HeroVideo";
+import { HeroFloaters } from "@/components/HeroFloaters";
+import { AnimArt } from "@/components/AnimArt";
+import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 const canonical = new URL("/", BRAND.url).toString();
@@ -18,7 +23,7 @@ export const metadata: Metadata = {
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
 export const dynamic = "force-static";
-const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram, Facebook Pages and Threads scheduling work today, plus Instagram auto-DMs. More networks come later."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
+const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram, Facebook Pages, Threads and YouTube scheduling work today, plus Instagram auto-DMs. Other networks are on the roadmap, with no date yet."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Paid plans will be month to month with no contract, and you can cancel from settings. Today every account is on the Free plan, so there is nothing to cancel."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -45,124 +50,45 @@ const jsonLd = {
   ],
 };
 
-function HeroVisual() {
-  return (
-    <div className="heroVisual">
-      <svg viewBox="0 0 520 420" width="520" height="420" aria-hidden="true" focusable="false" role="presentation">
-        <defs>
-          <linearGradient id="heroPost" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="var(--lilac)" />
-            <stop offset="1" stopColor="var(--pink)" />
-          </linearGradient>
-        </defs>
-
-        <circle cx="110" cy="80" r="86" fill="var(--lilac)" opacity="0.4" />
-        <circle cx="440" cy="340" r="96" fill="var(--peach)" opacity="0.45" />
-        <circle cx="470" cy="70" r="40" fill="var(--mint)" opacity="0.6" />
-
-        <g>
-          <rect x="268" y="70" width="220" height="196" rx="22" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
-          <path d="M268 92a22 22 0 0 1 22-22h176a22 22 0 0 1 22 22v24H268z" fill="var(--poskoo-band)" />
-          <text x="290" y="99" fontFamily="var(--sans)" fontSize="14" fontWeight="700" fill="var(--ink)">September</text>
-          <circle cx="452" cy="93" r="9" fill="var(--violet)" />
-          <path d="M448 93h8M453 89l4 4-4 4" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          <g fill="var(--poskoo-band)">
-            <rect x="286" y="132" width="22" height="22" rx="6" />
-            <rect x="312" y="132" width="22" height="22" rx="6" />
-            <rect x="338" y="132" width="22" height="22" rx="6" />
-            <rect x="364" y="132" width="22" height="22" rx="6" />
-            <rect x="390" y="132" width="22" height="22" rx="6" />
-            <rect x="416" y="132" width="22" height="22" rx="6" />
-            <rect x="442" y="132" width="22" height="22" rx="6" />
-            <rect x="286" y="166" width="22" height="22" rx="6" />
-            <rect x="312" y="166" width="22" height="22" rx="6" />
-            <rect x="338" y="166" width="22" height="22" rx="6" />
-            <rect x="364" y="166" width="22" height="22" rx="6" />
-            <rect x="416" y="166" width="22" height="22" rx="6" />
-            <rect x="442" y="166" width="22" height="22" rx="6" />
-            <rect x="286" y="200" width="22" height="22" rx="6" />
-            <rect x="312" y="200" width="22" height="22" rx="6" />
-            <rect x="338" y="200" width="22" height="22" rx="6" />
-            <rect x="364" y="200" width="22" height="22" rx="6" />
-            <rect x="390" y="200" width="22" height="22" rx="6" />
-            <rect x="416" y="200" width="22" height="22" rx="6" />
-            <rect x="442" y="200" width="22" height="22" rx="6" />
-          </g>
-          <rect x="312" y="132" width="22" height="22" rx="6" fill="var(--peach)" />
-          <rect x="364" y="166" width="22" height="22" rx="6" fill="var(--mint)" />
-          <rect x="338" y="200" width="22" height="22" rx="6" fill="var(--lime)" />
-          <rect x="390" y="166" width="22" height="22" rx="6" fill="var(--violet)" />
-          <circle cx="401" cy="177" r="3" fill="#fff" />
-          <rect x="300" y="232" width="96" height="20" rx="10" fill="var(--poskoo-band)" />
-          <rect x="308" y="238" width="52" height="8" rx="4" fill="var(--violet)" opacity="0.55" />
-        </g>
-
-        <rect x="58" y="64" width="176" height="312" rx="30" fill="var(--ink)" />
-        <rect x="66" y="72" width="160" height="296" rx="24" fill="var(--card)" />
-        <rect x="126" y="80" width="40" height="6" rx="3" fill="var(--ink)" opacity="0.25" />
-
-        <rect x="78" y="98" width="136" height="150" rx="14" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
-        <circle cx="92" cy="114" r="8" fill="var(--peach)" />
-        <rect x="106" y="109" width="46" height="6" rx="3" fill="var(--ink)" opacity="0.55" />
-        <rect x="106" y="119" width="30" height="5" rx="2.5" fill="var(--muted)" opacity="0.5" />
-        <rect x="86" y="130" width="120" height="82" rx="10" fill="url(#heroPost)" />
-        <circle cx="150" cy="152" r="12" fill="var(--lime)" />
-        <path d="M86 196l30-26 22 18 20-14 48 38v0H86z" fill="var(--violet)" opacity="0.75" />
-        <path d="M86 200l34-20 26 16 24-12 36 22v6H86z" fill="var(--coral)" opacity="0.8" />
-        <path d="M90 222c0-3 2-5 5-5s5 2 5 5-5 7-5 7-5-4-5-7z" fill="var(--coral)" />
-        <circle cx="112" cy="222" r="5" fill="none" stroke="var(--ink)" strokeWidth="2" />
-        <path d="M124 220l10 8-10 8" fill="none" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <rect x="86" y="238" width="100" height="5" rx="2.5" fill="var(--line)" />
-
-        <g className="heroChip">
-          <rect x="24" y="24" width="150" height="40" rx="20" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
-          <circle cx="46" cy="44" r="9" fill="var(--mint)" />
-          <path d="M42 44l3 3 5-6" stroke="var(--ink)" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          <text x="62" y="49" fontFamily="var(--sans)" fontSize="13" fontWeight="700" fill="var(--ink)">Scheduled 9:00</text>
-        </g>
-
-        <g className="heroChip heroChipDelay">
-          <rect x="196" y="250" width="120" height="52" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
-          <path d="M214 302l-6 14 18-10" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
-          <text x="256" y="282" textAnchor="middle" fontFamily="var(--sans)" fontSize="15" fontWeight="700" fill="var(--ink)">GUIDE</text>
-        </g>
-
-        <path d="M330 236l58-24-18 50-11-18-29-8z" fill="var(--coral)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
-        <path d="M370 212l-11 32" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" />
-
-        <g className="heroChip">
-          <rect x="360" y="300" width="120" height="40" rx="20" fill="var(--violet)" />
-          <path d="M380 320l6 6 12-13" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          <text x="404" y="325" fontFamily="var(--sans)" fontSize="13" fontWeight="700" fill="#fff">DM sent</text>
-        </g>
-
-        <path d="M470 34l4 12 12 4-12 4-4 12-4-12-12-4 12-4z" fill="var(--lime)" stroke="var(--ink)" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M40 330l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="var(--pink)" />
-      </svg>
-    </div>
-  );
-}
-
-export default function Home() { return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
+export default function Home() {
+// The hero poster is the first thing painted above the fold (the video fades in over it):
+// fetch it early and at high priority so it, not the lazy art below, is the LCP candidate.
+preload("/landing/hero-poster.webp", { as: "image", fetchPriority: "high" });
+return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
   <symbol id="ok" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--green)"/><path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></symbol>
   <symbol id="no" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--red)"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/></symbol>
 </defs></svg>
 
+<div className="videoHero">
+  <HeroVideo src="/landing/hero-loop.mp4" poster="/landing/hero-poster.webp" />
+  <HeroFloaters />
+  <div className="wrap">
+    <SiteHeader onHome />
+    <header className="hero heroCenter" id="top">
+      <Link className="pill glass" href="#channels"><span>NEW</span>Schedule on Instagram, Facebook, Threads and YouTube, and auto-DM on Instagram <span aria-hidden="true" style={{"background": "none", "color": "inherit", "padding": "0"}}>→</span></Link>
+      <h1>Schedule posts. Auto-DM every comment. <em className="s mark">Grow on Poskoo.</em></h1>
+      <p className="lede">Poskoo plans your posts on one calendar, then sends your link to everyone who comments, usually within a minute. One app, one plan, no copy-paste.</p>
+      <div className="heroSignup">
+        <form className="glassBar glass" action="/signup" method="get">
+          <label className="sr-only" htmlFor="hero-email">Email</label>
+          <input id="hero-email" name="email" type="email" placeholder="Enter your email..." autoComplete="email" required />
+          <button type="submit">Get started free <ArrowRight size={18} aria-hidden="true" /></button>
+        </form>
+        <p className="heroOr"><span>or</span></p>
+        {/* Plain <a>: the OAuth start is a route handler redirect, never prefetched. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth redirect, must not be client-routed */}
+        <a className="googleBtn glass" href="/api/auth/google/start">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+          Continue with Google
+        </a>
+        <p className="heroFine"><svg width="16" height="16" aria-hidden="true"><use href="#ok" /></svg>No credit card required. <b>It&apos;s free!</b> <span className="sep" aria-hidden="true">·</span> Have an account? <Link href="/login">Log in</Link></p>
+      </div>
+    </header>
+  </div>
+</div>
 <div className="wrap">
-  <SiteHeader onHome />
-
-  <header className="hero" id="top">
-    <Link className="pill" href="#channels"><span>NEW</span>Schedule on Instagram, Facebook and Threads, and auto-DM on Instagram <span aria-hidden="true" style={{"background": "none", "color": "inherit", "padding": "0"}}>→</span></Link>
-    <p className="eyebrow">For creators who&apos;d rather create</p>
-    <h1>Schedule posts. Auto-DM every comment. <em className="s mark">Grow on autopilot.</em></h1>
-    <p className="lede">Poskoo plans your posts on one calendar, then sends your link to everyone who comments, within seconds. One app, one plan, no copy-paste.</p>
-    <div className="ctas"><Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link><Link className="btn btn-line" href="#how">See how it works</Link></div>
-    <p className="small">Free plan. No credit card.</p>
-    <HeroVisual />
-    <div className="hero-art"><Image sizes="(max-width: 1140px) 100vw, 1060px" src="/landing/hero.webp" priority width={1400} height={933} alt="A big phone shows a post; a comment saying GUIDE pops out and a paper plane carries a DM with a link. A creator sits on a calendar block and a friend waves with a coffee, with a happy dog and plants below." /></div>
-  </header>
   <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><span>· Built on the official Meta API</span></div>
 </div>
 
@@ -171,49 +97,20 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <div className="head"><p className="eyebrow">Three steps</p><h2>How Poskoo works in 3 steps</h2></div>
     <div className="howGrid">
       <article className="howStep">
-        <svg className="howArt" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
-          <circle cx="60" cy="60" r="52" fill="var(--lilac)" />
-          <circle cx="44" cy="50" r="15" fill="var(--peach)" />
-          <circle cx="44" cy="45" r="6" fill="var(--ink)" />
-          <path d="M34 60c2-7 18-7 20 0" fill="var(--ink)" />
-          <circle cx="78" cy="50" r="15" fill="var(--pink)" />
-          <circle cx="78" cy="45" r="6" fill="var(--ink)" />
-          <path d="M68 60c2-7 18-7 20 0" fill="var(--ink)" />
-          <rect x="46" y="76" width="28" height="12" rx="6" fill="var(--violet)" />
-          <path d="M52 82h16" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-          <path d="M40 82h-6M86 82h-6" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" />
-        </svg>
-        <h3>Connect your Instagram</h3>
-        <p>Log in with Instagram&apos;s own screen through Meta&apos;s official API. We never see your password.</p>
+        <div className="howArt"><Image src="/landing/step-connect.webp" width={640} height={627} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="" /></div>
+        <span className="howNo">Step 1</span>
+        <h3>Connect your social media</h3>
+        <p>Link Instagram, Facebook and Threads with each app&apos;s own official login. We never see your passwords.</p>
       </article>
       <article className="howStep">
-        <svg className="howArt" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
-          <circle cx="60" cy="60" r="52" fill="var(--mint)" />
-          <rect x="28" y="34" width="64" height="58" rx="12" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
-          <path d="M28 50h64" stroke="var(--ink)" strokeWidth="3" />
-          <path d="M42 28v12M78 28v12" stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" />
-          <rect x="38" y="58" width="12" height="10" rx="3" fill="var(--lilac)" />
-          <rect x="54" y="58" width="12" height="10" rx="3" fill="var(--peach)" />
-          <rect x="70" y="58" width="12" height="10" rx="3" fill="var(--pink)" />
-          <rect x="38" y="72" width="12" height="10" rx="3" fill="var(--lime)" />
-          <rect x="54" y="72" width="28" height="10" rx="3" fill="var(--violet)" />
-          <rect x="66" y="80" width="34" height="24" rx="7" fill="var(--coral)" />
-          <path d="M74 88h18M74 94h12" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-        </svg>
+        <div className="howArt"><Image src="/landing/step-schedule.webp" width={640} height={597} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="" /></div>
+        <span className="howNo">Step 2</span>
         <h3>Plan and schedule posts</h3>
         <p>Schedule Reels, carousels and single posts for the time you pick, in your time zone.</p>
       </article>
       <article className="howStep">
-        <svg className="howArt" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
-          <circle cx="60" cy="60" r="52" fill="var(--peach)" />
-          <rect x="24" y="34" width="46" height="30" rx="12" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
-          <path d="M36 64l-4 10 12-6" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" strokeLinejoin="round" />
-          <path d="M34 46h26M34 54h16" stroke="var(--muted)" strokeWidth="3" strokeLinecap="round" />
-          <rect x="52" y="58" width="44" height="28" rx="12" fill="var(--violet)" />
-          <path d="M84 86l4 10-12-6" fill="var(--violet)" />
-          <path d="M64 68h20M64 76h12" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-          <path d="M78 30l18-8-6 18-4-7-8-3z" fill="var(--coral)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
-        </svg>
+        <div className="howArt"><Image src="/landing/step-dm.webp" width={640} height={568} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="" /></div>
+        <span className="howNo">Step 3</span>
         <h3>Auto-DM every keyword comment</h3>
         <p>When someone comments your keyword, Poskoo sends them your link by DM.</p>
       </article>
@@ -224,15 +121,15 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <section id="how"><div className="wrap">
   <div className="head"><p className="eyebrow">Three jobs, one app</p><h2>Everything between <em className="s">posting</em> and <em className="s">getting paid.</em></h2></div>
   <div className="cards">
-    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-schedule.webp" width={900} height={900} loading="lazy" decoding="async" alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /><span className="no">01 / Schedule</span><h3>Plan a month in one sitting.</h3><p>Drag posts onto the calendar and they go live at the time you choose.</p><Link className="go" href="/instagram-scheduler">See the calendar <span aria-hidden="true">→</span></Link></article>
-    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-dm.webp" width={900} height={900} loading="lazy" decoding="async" alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /><span className="no">02 / Auto-DM</span><h3>Every comment gets your link.</h3><p>Pick a word like LINK or PRICE. Anyone who comments it gets a DM in seconds, day or night.</p><Link className="go" href="/instagram-auto-dm">Watch it work <span aria-hidden="true">→</span></Link></article>
-    <article className="pcard"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 27vw, 320px" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" decoding="async" alt="Two friends high-five next to a board of contacts with check marks and a rising chart" /><span className="no">03 / Grow</span><h3>Turn followers into leads.</h3><p>Collect emails and phone numbers right in the DM, then see which posts bring them in.</p><Link className="go" href="/instagram-auto-dm/templates">Start collecting <span aria-hidden="true">→</span></Link></article>
+    <article className="pcard"><AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /><span className="no">01 / Schedule</span><h3>Plan a month in one sitting.</h3><p>Drag posts onto the calendar and they go live at the time you choose.</p><Link className="go" href="/instagram-scheduler">See the calendar <span aria-hidden="true">→</span></Link></article>
+    <article className="pcard"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /><span className="no">02 / Auto-DM</span><h3>Every comment gets your link.</h3><p>Pick a word like LINK or PRICE. Anyone who comments it gets a DM, usually within a minute, day or night.</p><Link className="go" href="/instagram-auto-dm">Watch it work <span aria-hidden="true">→</span></Link></article>
+    <article className="pcard"><AnimArt name="card-leads" label="Two friends high-five next to a board of contacts with check marks and a rising chart" /><span className="no">03 / Grow</span><h3>Turn followers into leads.</h3><p>Collect emails right in the DM, then see which posts bring them in.</p><Link className="go" href="/instagram-auto-dm/templates">Start collecting <span aria-hidden="true">→</span></Link></article>
   </div>
 </div></section>
 
 <section style={{"paddingTop": "20px"}}><div className="wrap">
   <div className="split">
-    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/problem.webp" width={900} height={900} loading="lazy" decoding="async" alt="A tired creator at night buried under phones and chat-bubble notifications" /></div>
+    <div className="art"><AnimArt name="problem" label="A tired creator at night buried under phones and chat-bubble notifications" /></div>
     <div className="copy">
       <p className="eyebrow">Sound familiar?</p>
       <h2>Replying by hand doesn&apos;t scale.</h2>
@@ -252,10 +149,10 @@ export default function Home() { return <main className={`${styles.landing} ${in
       <li><svg width="18" height="18"><use href="#no"/></svg>No email list from your comments</li>
       <li><svg width="18" height="18"><use href="#no"/></svg>Paying for four or five separate tools</li></ul></div>
     <div className="with"><h3>With Poskoo</h3><ul>
-      <li><svg width="18" height="18"><use href="#ok"/></svg>Every comment gets a DM within seconds</li>
+      <li><svg width="18" height="18"><use href="#ok"/></svg>Every keyword comment gets a DM, usually within a minute</li>
       <li><svg width="18" height="18"><use href="#ok"/></svg>Works 24/7 on posts, Reels and carousels</li>
       <li><svg width="18" height="18"><use href="#ok"/></svg>Schedule a month of Instagram posts in one sitting</li>
-      <li><svg width="18" height="18"><use href="#ok"/></svg>Emails and phone numbers saved as leads</li>
+      <li><svg width="18" height="18"><use href="#ok"/></svg>Emails saved as leads</li>
       <li><svg width="18" height="18"><use href="#ok"/></svg>One plan for scheduling, DMs, links and analytics</li></ul></div>
   </div>
 </div></section>
@@ -269,14 +166,16 @@ export default function Home() { return <main className={`${styles.landing} ${in
     <div className="copy">
       <p className="eyebrow">Multi-channel scheduling</p>
       <h2>Write once. <em className="s">Post everywhere.</em></h2>
-      <p>Schedule Instagram, Facebook Pages and Threads posts from one calendar. <Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link> Or read the <Link className="go" href="/social-media-scheduler-comparison">social media scheduler comparison <span aria-hidden="true">→</span></Link></p>
-      <div className="pains">
-        <div className="pain"><b>Instagram</b><span>Feed posts, carousels, Reels and Stories</span></div>
-        <div className="pain"><b>Facebook</b><span>Live</span></div>
-        <div className="pain"><b>Threads</b><span>Live</span></div>
-      </div>
+      <p>Schedule Instagram, Facebook Pages, Threads and YouTube posts from one calendar, each with its own caption.</p>
+      <ul className="channels">
+        <li><span className="chIcon" style={{ background: "#E1306C" }}><Instagram size={20} aria-hidden="true" /></span><span className="chText"><b>Instagram</b><span>Feed posts, carousels, Reels and Stories</span></span><span className="chLive">Live</span></li>
+        <li><span className="chIcon" style={{ background: "#1877F2" }}><Facebook size={20} aria-hidden="true" /></span><span className="chText"><b>Facebook</b><span>Posts to your Facebook Pages</span></span><span className="chLive">Live</span></li>
+        <li><span className="chIcon" style={{ background: "var(--ink)" }}><AtSign size={20} aria-hidden="true" /></span><span className="chText"><b>Threads</b><span>Posts to your Threads profile</span></span><span className="chLive">Live</span></li>
+        <li><span className="chIcon" style={{ background: "#FF0000" }}><Youtube size={20} aria-hidden="true" /></span><span className="chText"><b>YouTube</b><span>Videos and Shorts to your channel</span></span><span className="chLive">Live</span></li>
+      </ul>
+      <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link></p>
     </div>
-    <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/multichannel.webp" width={1400} height={933} loading="lazy" decoding="async" alt="A creator at a laptop sends one post that splits to several phones and screens" /></div>
+    <div className="art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
   </div>
 </div></section>
 
@@ -284,93 +183,35 @@ export default function Home() { return <main className={`${styles.landing} ${in
   <div className="head"><p className="eyebrow">What you get</p><h2>One app for the whole <em className="s">post-to-lead</em> loop.</h2></div>
   <div className="bento">
     <article className="bentoCard">
-      <div className="bentoArt">
-        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
-          <rect x="10" y="18" width="200" height="122" rx="16" fill="var(--card)" stroke="var(--line)" strokeWidth="2" />
-          <path d="M10 50h200" stroke="var(--line)" strokeWidth="2" />
-          <path d="M46 10v16M174 10v16" stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" />
-          <rect x="28" y="30" width="46" height="8" rx="4" fill="var(--ink)" opacity=".18" />
-          <g fill="var(--muted)" opacity=".5">
-            <circle cx="34" cy="64" r="3" /><circle cx="62" cy="64" r="3" /><circle cx="90" cy="64" r="3" /><circle cx="118" cy="64" r="3" /><circle cx="146" cy="64" r="3" /><circle cx="174" cy="64" r="3" />
-          </g>
-          <rect x="24" y="78" width="52" height="18" rx="9" fill="var(--lilac)" />
-          <rect x="84" y="78" width="52" height="18" rx="9" fill="var(--peach)" />
-          <rect x="144" y="78" width="52" height="18" rx="9" fill="var(--pink)" />
-          <rect x="24" y="106" width="52" height="18" rx="9" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
-          <rect x="84" y="106" width="52" height="18" rx="9" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
-          <rect x="144" y="106" width="52" height="18" rx="9" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
-        </svg>
-      </div>
+      <div className="bentoArt"><AnimArt name="feat-calendar" /></div>
       <h3>Calendar</h3>
       <p>Plan a week of Instagram, Facebook and Threads posts on one calendar.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt">
-        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
-          <rect x="82" y="12" width="56" height="126" rx="14" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
-          <rect x="98" y="20" width="24" height="5" rx="2.5" fill="var(--ink)" opacity=".25" />
-          <rect x="90" y="34" width="40" height="34" rx="8" fill="var(--lilac)" />
-          <circle cx="110" cy="51" r="9" fill="var(--violet)" />
-          <rect x="90" y="76" width="40" height="6" rx="3" fill="var(--line)" />
-          <rect x="90" y="88" width="28" height="6" rx="3" fill="var(--line)" />
-          <rect x="8" y="30" width="66" height="30" rx="12" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
-          <path d="M30 60l-4 10 12-6" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
-          <text x="41" y="50" textAnchor="middle" fontFamily="var(--sans)" fontSize="12" fontWeight="700" fill="var(--ink)">GUIDE</text>
-          <rect x="146" y="86" width="66" height="34" rx="12" fill="var(--violet)" />
-          <path d="M190 120l4 10-12-6" fill="var(--violet)" />
-          <text x="179" y="107" textAnchor="middle" fontFamily="var(--sans)" fontSize="11" fontWeight="700" fill="#fff">Sent!</text>
-        </svg>
-      </div>
+      <div className="bentoArt"><AnimArt name="feat-dm" /></div>
       <h3>Comment to DM</h3>
       <p>When someone comments your keyword, Poskoo sends them your link by Instagram DM.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt">
-        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
-          <path d="M60 30l7 18 18 7-18 7-7 18-7-18-18-7 18-7z" fill="var(--violet)" />
-          <path d="M96 18l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="var(--coral)" />
-          <path d="M40 78l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="var(--lime)" />
-          <rect x="96" y="70" width="112" height="52" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
-          <path d="M120 122l-4 12 14-8" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" strokeLinejoin="round" />
-          <rect x="112" y="86" width="80" height="7" rx="3.5" fill="var(--line)" />
-          <rect x="112" y="100" width="56" height="7" rx="3.5" fill="var(--line)" />
-        </svg>
-      </div>
-      <h3>AI replies</h3>
-      <p>Let AI draft replies to the comments and DMs you get, so you can answer faster.</p>
+      <div className="bentoArt"><AnimArt name="feat-ai" /></div>
+      <h3>AI captions</h3>
+      <p>Draft captions in your brand voice with AI, then edit and schedule.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt">
-        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
-          <rect x="24" y="18" width="172" height="114" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="2.5" />
-          <rect x="40" y="34" width="60" height="8" rx="4" fill="var(--ink)" opacity=".2" />
-          <rect x="40" y="54" width="140" height="20" rx="8" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
-          <rect x="40" y="82" width="140" height="20" rx="8" fill="var(--poskoo-band)" stroke="var(--line)" strokeWidth="2" />
-          <rect x="40" y="110" width="72" height="14" rx="7" fill="var(--green)" />
-          <path d="M52 117l4 4 8-8" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </div>
+      <div className="bentoArt"><AnimArt name="feat-leads" /></div>
       <h3>Lead capture</h3>
       <p>Ask for an email in the DM and save every new lead in one place.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt">
-        <svg width="220" height="150" viewBox="0 0 220 150" aria-hidden="true">
-          <rect x="76" y="8" width="68" height="134" rx="16" fill="var(--card)" stroke="var(--ink)" strokeWidth="3" />
-          <rect x="98" y="16" width="24" height="5" rx="2.5" fill="var(--ink)" opacity=".25" />
-          <circle cx="110" cy="40" r="12" fill="var(--violet)" />
-          <rect x="88" y="58" width="44" height="6" rx="3" fill="var(--ink)" opacity=".5" />
-          <rect x="94" y="70" width="32" height="5" rx="2.5" fill="var(--line)" />
-          <rect x="86" y="84" width="48" height="14" rx="7" fill="var(--lilac)" stroke="var(--violet)" strokeWidth="2" />
-          <rect x="86" y="104" width="48" height="14" rx="7" fill="var(--peach)" stroke="var(--violet)" strokeWidth="2" />
-          <rect x="86" y="124" width="48" height="14" rx="7" fill="var(--mint)" stroke="var(--violet)" strokeWidth="2" />
-          <path d="M18 44l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="var(--coral)" />
-          <path d="M190 96l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="var(--lime)" />
-        </svg>
-      </div>
+      <div className="bentoArt"><AnimArt name="feat-linkbio" /></div>
       <h3>Link in bio</h3>
       <p>One page for every link in your Instagram bio, with click tracking and four themes.</p>
-      <Link href="/instagram-link-in-bio" style={{"marginTop": "auto", "fontWeight": 600, "color": "var(--poskoo-violet)"}}>Build your Instagram link-in-bio page <span aria-hidden="true">→</span></Link>
+      <Link className="bentoLink" href="/instagram-link-in-bio">Build your Instagram link-in-bio page <span aria-hidden="true">→</span></Link>
+    </article>
+    <article className="bentoCard">
+      <div className="bentoArt"><AnimArt name="analytics" /></div>
+      <h3>Analytics</h3>
+      <p>See reach, comments, DMs, link clicks and leads for every post, so you know what works.</p>
     </article>
   </div>
 </div></section>
@@ -427,31 +268,22 @@ export default function Home() { return <main className={`${styles.landing} ${in
 <div className="wrap">
   <div className="cta">
     <div className="ctaCopy">
-      <div><h2>Your next post could fill your inbox <em className="s">with leads.</em></h2><p>Start free. Connect your account in one tap.</p><Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link></div>
-      <svg className="ctaArt" viewBox="0 0 320 240" aria-hidden="true" focusable="false">
-        <rect x="64" y="24" width="150" height="200" rx="26" fill="var(--poskoo-pink)" opacity="0.16" stroke="var(--poskoo-pink)" strokeWidth="4" />
-        <rect x="82" y="50" width="114" height="128" rx="12" fill="var(--poskoo-pink)" />
-        <circle cx="96" cy="66" r="7" fill="var(--poskoo-violet)" />
-        <rect x="108" y="63" width="40" height="5" rx="2.5" fill="var(--poskoo-ink)" opacity="0.5" />
-        <rect x="90" y="80" width="98" height="64" rx="8" fill="var(--poskoo-violet)" />
-        <circle cx="112" cy="100" r="8" fill="var(--poskoo-lime)" />
-        <path d="M90 132l24-22 18 16 14-12 42 30v0H90z" fill="var(--poskoo-coral)" />
-        <rect x="90" y="152" width="70" height="5" rx="2.5" fill="var(--poskoo-ink)" opacity="0.4" />
-        <rect x="90" y="162" width="50" height="5" rx="2.5" fill="var(--poskoo-ink)" opacity="0.4" />
-        <g className="ctaBubble">
-          <rect x="190" y="70" width="100" height="44" rx="16" fill="var(--poskoo-lime)" />
-          <path d="M206 114l-4 12 14-12z" fill="var(--poskoo-lime)" />
-          <text x="240" y="98" textAnchor="middle" fill="var(--poskoo-ink)" fontSize="16" fontWeight="700" fontFamily="inherit">LINK</text>
-        </g>
-        <g className="ctaBubble ctaBubbleDelay">
-          <rect x="200" y="150" width="80" height="40" rx="16" fill="var(--poskoo-coral)" />
-          <path d="M240 178c-9-6-14-11-14-16 0-4 3-7 7-7 3 0 5 2 7 4 2-2 4-4 7-4 4 0 7 3 7 7 0 5-5 10-14 16z" fill="var(--poskoo-pink)" />
-        </g>
-        <path d="M40 54l4 12 12 4-12 4-4 12-4-12-12-4 12-4z" fill="var(--poskoo-lime)" />
-        <circle cx="290" cy="40" r="6" fill="var(--poskoo-coral)" />
-      </svg>
+      <p className="ctaEyebrow">Ready when you are</p>
+      <h2>Your next post could fill your inbox <em className="s">with leads.</em></h2>
+      <p>Start free. Connect your social accounts in one tap, pick a keyword, and let Poskoo send the link while you get on with your day.</p>
+      <form className="glassBar ctaBar" action="/signup" method="get">
+        <label className="sr-only" htmlFor="cta-email">Email</label>
+        <input id="cta-email" name="email" type="email" placeholder="Enter your email..." autoComplete="email" required />
+        <button type="submit">Get started free <ArrowRight size={18} aria-hidden="true" /></button>
+      </form>
+      <ul className="ctaChecks">
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>Free plan</li>
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>No credit card</li>
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>Official Meta API</li>
+      </ul>
+      <p className="ctaLogin">Already have an account? <Link href="/login">Log in</Link></p>
     </div>
-    <Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 39vw, 490px" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" decoding="async" alt="Two friends high-five next to a board of new leads" />
+    <AnimArt name="card-leads" label="Two friends high-five next to a board of new leads" />
   </div>
   <SiteFooter />
 </div>

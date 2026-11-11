@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import HashtagStrategyWorksheet from "./HashtagStrategyWorksheet";
 import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-hashtag-strategy";
 const title = "Instagram Hashtag Strategy Worksheet: Plan Tag Sets";
@@ -68,15 +69,7 @@ export default function InstagramHashtagStrategyPage() {
           Use 3 to 5 highly relevant hashtags per post, then add niche and branded tags that genuinely describe it.
           Group your tags into three sets, save each mix by name, and copy a set when you are ready to post.
         </p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1536}
-            height={1024}
-            alt="A creator at a laptop plans a post that splits to several phones and screens"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="hashtag" label="A creator juggles colourful hashtag balloons above a phone post" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

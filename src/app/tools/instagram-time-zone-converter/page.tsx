@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import TimeZoneConverter from "./TimeZoneConverter";
 import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-time-zone-converter";
 const description =
@@ -63,16 +64,7 @@ export default function InstagramTimeZoneConverterPage() {
           Planning a post for followers in another country? Enter the date and time, pick both time zones, and see the
           exact local time — with daylight saving handled on that date.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A calendar of scheduled social posts with a phone showing a post ready to publish"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

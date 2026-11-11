@@ -7,6 +7,7 @@ import { query } from "@/lib/db";
 import { IG_SCOPES, exchangeCode, fetchProfile, longLivedToken } from "@/lib/instagram";
 import { PICK_COOKIE, PICK_MAX_AGE_S, encodePick, saveFacebookLoginAccount } from "@/lib/metaAccounts";
 import { MetaApiError, discoverMetaAccounts, isMetaLoginConfigured, verifyState } from "@/lib/metaLogin";
+import { accountLimitError } from "@/lib/planLimits";
 
 type BackResult =
   | "connected"
@@ -17,7 +18,8 @@ type BackResult =
   | "declined"
   | "missing_permissions"
   | "no_pages"
-  | "no_ig_business";
+  | "no_ig_business"
+  | "limit";
 
 function back(result: BackResult) {
   return NextResponse.redirect(new URL(`/app/settings?ig=${result}`, BRAND.url));
@@ -42,6 +44,8 @@ export async function GET(request: Request) {
       const found = await discoverMetaAccounts(code);
       if (!found.ok) return back(found.reason);
       if (found.pages.length === 1) {
+        // Plan limit: a NEW account over the limit is refused; reconnecting an existing one works.
+        if (await accountLimitError(user.id, { kind: "social", platform: "instagram", externalId: found.pages[0].igUserId })) return back("limit");
         const { subscribed } = await saveFacebookLoginAccount(user.id, found.pages[0], found.scopes, found.metaUserId);
         return back(subscribed ? "connected" : "connected_no_webhooks");
       }
@@ -80,6 +84,7 @@ export async function GET(request: Request) {
     const profile = await fetchProfile(long.access_token);
     const externalId = profile.user_id || short.user_id;
     if (!externalId) return back("error");
+    if (await accountLimitError(user.id, { kind: "social", platform: "instagram", externalId })) return back("limit");
     await query(
       `insert into socialapp.social_accounts (user_id, platform, external_id, username, access_token_enc, token_expires_at, scopes, status)
        values ($1,'instagram',$2,$3,$4, now() + ($5 || ' seconds')::interval, $6, 'active')

@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import UsernameTool from "./UsernameTool";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-username-generator";
 const description =
@@ -54,16 +55,7 @@ export default function InstagramUsernameGeneratorPage() {
           Turn your name and niche into Instagram name ideas with periods, underscores and short add-ons. Copy one
           with a tap.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-dm.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A relaxed creator on a beanbag while messages fly out of a phone to followers"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default function SignupPage() {
-  return <AuthForm mode="signup" googleEnabled={isGoogleConfigured()} />;
+export default async function SignupPage({ searchParams }: { searchParams: Promise<{ email?: string | string[] }> }) {
+  const { email } = await searchParams;
+  const defaultEmail = typeof email === "string" ? email.trim().slice(0, 254) : undefined;
+  return <AuthForm mode="signup" googleEnabled={isGoogleConfigured()} defaultEmail={defaultEmail} />;
 }

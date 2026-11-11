@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import FrequencyCalculator from "./FrequencyCalculator";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-posting-frequency-calculator";
 const description =
@@ -16,68 +17,6 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: PATH },
 };
-
-function CalendarWeekIllustration() {
-  const days = ["M", "T", "W", "T", "F", "S", "S"];
-  const posts: Record<number, number> = { 0: 1, 1: 2, 3: 1, 4: 2, 6: 1 };
-  return (
-    <svg
-      viewBox="0 0 340 170"
-      aria-hidden="true"
-      focusable="false"
-      style={{ width: "100%", maxWidth: 480, display: "block", marginInline: "auto" }}
-    >
-      <ellipse cx="170" cy="158" rx="160" ry="8" fill="var(--poskoo-violet)" opacity=".08" />
-      <rect x="14" y="18" width="240" height="132" rx="16" fill="var(--poskoo-card)" stroke="var(--poskoo-line)" />
-      <rect x="14" y="18" width="240" height="30" rx="14" fill="var(--poskoo-violet)" opacity=".14" />
-      <rect x="30" y="27" width="90" height="7" rx="3.5" fill="var(--poskoo-violet)" />
-      {days.map((d, i) => (
-        <g key={i}>
-          <rect
-            x={26 + i * 32}
-            y="58"
-            width="26"
-            height="80"
-            rx="8"
-            fill="var(--poskoo-paper)"
-            stroke="var(--poskoo-line)"
-          />
-          <text
-            x={39 + i * 32}
-            y="72"
-            textAnchor="middle"
-            fill="#3d3450"
-            opacity=".55"
-            fontSize="10"
-            fontWeight="600"
-          >
-            {d}
-          </text>
-          {(posts[i] ?? 0) > 0 &&
-            Array.from({ length: posts[i] }).map((_, j) => (
-              <rect
-                key={j}
-                x={30 + i * 32}
-                y={82 + j * 16}
-                width="18"
-                height="10"
-                rx="5"
-                fill={j === 0 ? "var(--poskoo-violet)" : "var(--poskoo-coral)"}
-                opacity={j === 0 ? ".85" : ".7"}
-              />
-            ))}
-        </g>
-      ))}
-      <circle cx="288" cy="52" r="30" fill="var(--poskoo-card)" stroke="var(--poskoo-line)" strokeWidth="2" />
-      <circle cx="288" cy="52" r="24" fill="var(--poskoo-band)" />
-      <path d="M288 40v12l8 6" fill="none" stroke="var(--poskoo-violet)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="262" y="96" width="52" height="34" rx="10" fill="var(--poskoo-ink)" />
-      <rect x="268" y="104" width="40" height="5" rx="2.5" fill="var(--poskoo-card)" />
-      <rect x="268" y="114" width="26" height="5" rx="2.5" fill="var(--poskoo-card)" opacity=".6" />
-      <path d="m306 132 2 6 6 2-6 2-2 6-2-6-6-2 6-2Z" fill="var(--poskoo-coral)" />
-    </svg>
-  );
-}
 
 const faqs = [
   {
@@ -131,9 +70,7 @@ export default function InstagramPostingFrequencyCalculatorPage() {
           Pick a weekly time budget and the content formats you make. The calculator turns them into a realistic
           weekly posting range and a sample week — an estimate of what fits your time, not a promise of growth.
         </p>
-        <div className="hero-art" style={{ maxWidth: 480 }}>
-          <CalendarWeekIllustration />
-        </div>
+        <div className="hero-art"><AnimArt name="analytics" label="A creator waters a growing bar chart while hearts float up" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

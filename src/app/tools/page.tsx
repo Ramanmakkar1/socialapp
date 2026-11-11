@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools";
 
@@ -282,16 +283,7 @@ export default function ToolsPage() {
           your media, plan your week and turn comments into DMs. No signup needed — use them before you post or
           schedule with {BRAND.name}.
         </p>
-        <div className="hero-art" style={{ maxWidth: 820 }}>
-          <Image
-            sizes="(max-width: 860px) 100vw, 820px"
-            src="/illustrations/free-tools.webp"
-            width={1536}
-            height={1024}
-            priority
-            alt="A creator lifts a paintbrush out of an open toolbox full of a ruler, scissors, a hashtag, a magnifying glass and photos, with a happy dog in the flowers."
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="features" label="A creator points at an open toolbox of calendar, chat, mail, chart and link tools" /></div>
       </header>
 
       <nav aria-label="What do you want to do?" className="jumprow">

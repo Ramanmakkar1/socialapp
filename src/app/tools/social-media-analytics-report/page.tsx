@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import AnalyticsReportBuilder from "./AnalyticsReportBuilder";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/social-media-analytics-report";
 const description =
@@ -66,16 +67,7 @@ export default function SocialMediaAnalyticsReportPage() {
           engagement, clicks and leads for a date range. Enter two periods below to calculate engagement rate and the
           change between them, then download a CSV for Google Sheets or Excel.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-leads.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A social media analytics dashboard with a rising engagement chart and metric cards"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="analytics" label="A creator waters a growing bar chart while hearts float up" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

@@ -1,6 +1,7 @@
 // Server-only dashboard numbers for one user.
 import { isDbConfigured, query } from "@/lib/db";
 import type { MediaInsights } from "@/lib/insights";
+import { clickCountSql, uniqueClickCountSql } from "./links";
 
 export type DashboardStats = {
   scheduled: number;
@@ -23,6 +24,8 @@ export type RuleStats = {
   dmsFailed: number;
   leads: number;
   clicks: number;
+  /** One per visitor per link; use for CTR. */
+  uniqueClicks: number;
 };
 
 export async function getRuleStats(userId: string): Promise<RuleStats[]> {
@@ -34,7 +37,8 @@ export async function getRuleStats(userId: string): Promise<RuleStats[]> {
       (select count(*)::int from socialapp.dm_queue q where q.rule_id = r.id and q.status = 'sent') as "dmsSent",
       (select count(*)::int from socialapp.dm_queue q where q.rule_id = r.id and q.status = 'failed') as "dmsFailed",
       (select count(*)::int from socialapp.contacts c where c.source_rule_id = r.id) as "leads",
-      (select coalesce(sum(s.clicks), 0)::int from socialapp.short_links s where s.rule_id = r.id) as "clicks"
+      ${clickCountSql("s.rule_id = r.id")} as "clicks",
+      ${uniqueClickCountSql("s.rule_id = r.id")} as "uniqueClicks"
     from socialapp.dm_rules r
     where r.user_id = $1
     order by r.created_at desc

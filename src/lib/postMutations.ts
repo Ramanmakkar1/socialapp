@@ -117,17 +117,31 @@ export async function reschedulePostForUser(
   return { ok: false, error: blockedReason(await postState(id, userId), "moved") };
 }
 
+export const SHARE_DRAFT_ERROR = "Drafts can't be shared right away. Open the draft and schedule it first.";
+
 /**
- * "Share now": make a queued post due immediately so the publisher claims it on its next tick.
+ * "Share now": make a scheduled post due immediately so the publisher claims it on its next tick.
  * One conditional statement, so it cannot race the publisher's claim (which flips status to
- * 'publishing' in the same transaction). A draft is promoted to 'scheduled' so it publishes.
+ * 'publishing' in the same transaction). Only scheduled posts qualify: a draft has not passed the
+ * scheduling checks (connected account, media) yet. `beforeShare` runs the monthly plan-limit check
+ * for "now" (the post moves into the current month), exactly like saving or rescheduling.
  */
-export async function sharePostNow(id: string, userId: string): Promise<MutationResult> {
+export async function sharePostNow(
+  id: string,
+  userId: string,
+  beforeShare?: (now: Date) => Promise<string | null>,
+): Promise<MutationResult> {
   if (!UUID_RE.test(id)) return { ok: false, error: "Invalid post." };
+  const state = await postState(id, userId);
+  if (state?.status === "draft") return { ok: false, error: SHARE_DRAFT_ERROR };
+  if (state && state.status === "scheduled" && beforeShare) {
+    const problem = await beforeShare(new Date());
+    if (problem) return { ok: false, error: problem };
+  }
   const rows = await query<{ id: string }>(
     `update socialapp.scheduled_posts p
      set scheduled_at = now(), status = 'scheduled', updated_at = now()
-     where p.id=$1 and p.user_id=$2 and p.status in ('draft','scheduled')
+     where p.id=$1 and p.user_id=$2 and p.status = 'scheduled'
        and not exists (select 1 from socialapp.post_targets t where t.post_id=p.id and t.status in ('publishing','published'))
      returning p.id`,
     [id, userId],

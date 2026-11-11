@@ -3,134 +3,52 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
-import CompareHeroIllustration from "@/components/CompareHeroIllustration";
-import s from "@/components/site.module.css";
+import { ArrowRight } from "lucide-react";
+import { AnimArt, type AnimName } from "@/components/AnimArt";
+import { LandingDemo } from "@/app/LandingDemo";
 
 export const metadata: Metadata = {
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
   description:
-    "Schedule Instagram posts, reels, carousels and stories, see the best time to post, and auto-DM everyone who comments. Free plan, no credit card.",
+    "Schedule Instagram posts, reels, carousels and stories, see suggested posting times, and auto-DM everyone who comments. Free plan, no credit card.",
   alternates: { canonical: "/instagram-scheduler" },
 };
 
-const capabilities = [
-  {
-    feature: "Schedule & auto-publish",
-    feed: "Yes",
-    reels: "Yes",
-    carousel: "Yes",
-    stories: "Yes",
-    helpHref: null,
-  },
-  {
-    feature: "Best-time suggestions",
-    feed: "Yes",
-    reels: "Yes",
-    carousel: "Yes",
-    stories: "Yes",
-    helpHref: null,
-  },
-  {
-    feature: "First comment (hashtags / CTA)",
-    feed: "Yes",
-    reels: "Yes",
-    carousel: "Yes",
-    stories: "No — API limit",
-    helpHref: null,
-  },
-  {
-    feature: "AI caption assistant",
-    feed: "Yes",
-    reels: "Yes",
-    carousel: "Yes",
-    stories: "Yes",
-    helpHref: null,
-  },
-  {
-    feature: "Comment-to-DM automation",
-    feed: "Yes",
-    reels: "Yes",
-    carousel: "Yes",
-    stories: "Via Story replies",
-    helpHref: "/help/instagram-story-reply-auto-dm",
-  },
-  {
-    feature: "Media type",
-    feed: "Image",
-    reels: "Video (.mp4)",
-    carousel: "2–10 images",
-    stories: "Image or video",
-    helpHref: null,
-  },
-  {
-    feature: "Aspect ratio",
-    feed: "1:1, 4:5, 1.91:1",
-    reels: "9:16 (1080×1920)",
-    carousel: "Match all slides",
-    stories: "9:16 (1080×1920)",
-    helpHref: null,
-  },
-  {
-    feature: "Step-by-step guide",
-    feed: null,
-    reels: "Guide",
-    carousel: "Guide",
-    stories: "Guide",
-    helpHref: null,
-    guideLinks: {
-      reels: "/help/schedule-instagram-reels",
-      carousel: "/help/schedule-instagram-carousel",
-      stories: "/help/schedule-instagram-stories",
-    },
-  },
+type Mark = boolean | string;
+
+// One card per Instagram format: shape preview + what Poskoo can do with it.
+const formats: { name: string; ratio: string; shape: [number, number]; media: string; rows: [string, Mark][]; guide?: string }[] = [
+  { name: "Feed post", ratio: "1:1 · 4:5 · 1.91:1", shape: [4, 5], media: "Image", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]] },
+  { name: "Reel", ratio: "9:16 · 1080×1920", shape: [9, 16], media: "Video (.mp4)", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-reels" },
+  { name: "Carousel", ratio: "Same ratio on all slides", shape: [1, 1], media: "2–10 images", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-carousel" },
+  { name: "Story", ratio: "9:16 · 1080×1920", shape: [9, 16], media: "Image or video", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", "Not on Stories (API limit)"], ["AI captions", "No captions on Stories (API limit)"], ["Comment-to-DM", "Via story replies"]], guide: "/help/schedule-instagram-stories" },
 ];
 
-const benefits = [
-  {
-    no: "01 / Calendar",
-    title: "Week and month calendar",
-    text: "Drag and drop posts across a week or month view so you can plan your feed at a glance.",
-  },
-  {
-    no: "02 / Formats",
-    title: "Posts, reels, carousels and stories",
-    text: "Schedule feed posts, reels, multi-image carousels and stories from one composer.",
-  },
-  {
-    no: "03 / Timing",
-    title: "Best times to post",
-    text: "See suggested publish times based on your own followers' activity, not generic guesses.",
-  },
-  {
-    no: "04 / First comment",
-    title: "First comment with hashtags",
-    text: "Queue a first comment with your hashtags so your caption stays clean while tags still go live.",
-  },
-  {
-    no: "05 / AI",
-    title: "Write with AI",
-    text: "Draft captions in your brand voice with AI, then tweak and schedule in the same flow.",
-  },
-  {
-    no: "06 / Automation",
-    title: "Auto-DM when the post goes live",
-    text: "Attach a comment-to-DM rule to a scheduled post so automation switches on the moment it publishes.",
-  },
+const benefits: { title: string; text: string; art: AnimName }[] = [
+  { title: "Week and month calendar", text: "Drag and drop posts across a week or month view so you can plan your feed at a glance.", art: "feat-calendar" },
+  { title: "Posts, reels, carousels and stories", text: "Schedule feed posts, reels, multi-image carousels and stories from one composer.", art: "visual" },
+  { title: "Suggested times to post", text: "See suggested publish times based on when your audience engaged with your auto-DMs, not generic guesses.", art: "analytics" },
+  { title: "First comment with hashtags", text: "Queue a first comment with your hashtags so your caption stays clean while tags still go live.", art: "hashtag" },
+  { title: "Write with AI", text: "Draft captions in your brand voice with AI, then tweak and schedule in the same flow.", art: "feat-ai" },
+  { title: "Auto-DM when the post goes live", text: "Attach a comment-to-DM rule to a scheduled post so automation switches on the moment it publishes.", art: "feat-dm" },
 ];
 
 const steps = [
   {
     n: "1",
+    art: "/landing/step-connect.webp",
     title: "Connect Instagram",
     text: "Sign in with Meta's official login for Business or Creator accounts. We never ask for your password.",
   },
   {
     n: "2",
+    art: "/landing/step-schedule.webp",
     title: "Write the post and pick a time",
     text: "Compose your caption yourself or with AI, add media, set a first comment if you want, and choose when to publish.",
   },
   {
     n: "3",
+    art: "/landing/step-dm.webp",
     title: "Publish and DM commenters",
     text: `${BRAND.name} publishes at the scheduled time. If you added an auto-DM rule, commenters get your message in their DMs.`,
   },
@@ -147,7 +65,7 @@ const faqs = [
   },
   {
     q: "What is the best time to post on Instagram?",
-    a: `There is no one-size-fits-all answer. ${BRAND.name} shows suggested times from your own followers' activity so you can schedule when your audience is most likely online.`,
+    a: `There is no one-size-fits-all answer. ${BRAND.name} suggests times based on your own engagement history: the hours when people triggered your auto-DMs over the last 30 days. Use them as a starting point and test what works for you.`,
   },
   {
     q: "Can I add a first comment?",
@@ -184,47 +102,38 @@ export default function InstagramScheduler() {
         <span className="pill"><span>NEW</span>Schedule posts · auto-DM on publish</span>
         <p className="eyebrow">Instagram scheduler</p>
         <h1>
-          Plan your posts. <em className="s">Auto-DM every comment.</em>
+          Plan your posts. <em className="s mark">Auto‑DM every comment.</em>
         </h1>
         <p className="lede">
-          Plan and auto-publish posts, reels, carousels and stories, pick the best time from your own audience data,
+          Plan and auto-publish posts, reels, carousels and stories, see suggested times from your own engagement history,
           and attach comment-to-DM automation when each post goes live.
         </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <Link className="btn btn-line" href="#how">How it works</Link>
-        </div>
-        <CompareHeroIllustration className="mx-auto mt-10 w-full max-w-xl" />
-        <div className="hero-art" style={{ maxWidth: 720 }}>
-          <Image
-            sizes="(max-width: 960px) 100vw, 720px"
-            src="/landing/hero.webp"
-            width={1400}
-            height={933}
-            alt="A big phone shows a scheduled Instagram post while a paper plane carries a DM with a link to a commenter"
-          />
+        <form className="glassBar glass schedBar" action="/signup" method="get">
+          <label className="sr-only" htmlFor="sched-email">Email</label>
+          <input id="sched-email" name="email" type="email" placeholder="Enter your email..." autoComplete="email" required />
+          <button type="submit">Get started free <ArrowRight size={18} aria-hidden="true" /></button>
+        </form>
+        <p className="heroFine schedFine"><svg width="16" height="16" aria-hidden="true"><use href="#sched-ok" /></svg>Free plan · 10 scheduled posts a month · no credit card</p>
+        <div className="hero-art">
+          <AnimArt name="demo-schedule" label="A creator relaxes in a beanbag with a coffee while a weekly calendar of posts publishes on its own" />
+          <div className="demoChip chipA" aria-hidden="true"><span className="dot" style={{ background: "var(--violet)" }} />Scheduled · Thu 9:00 AM</div>
+          <div className="demoChip chipB" aria-hidden="true"><svg width="15" height="15"><use href="#sched-ok" /></svg>Posted to Instagram</div>
         </div>
       </header>
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true"><defs>
+        <symbol id="sched-ok" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--green)" /><path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" /></symbol>
+      </defs></svg>
 
-      <section>
+      <section id="features">
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Features</p>
             <h2>Everything you need to <em className="s">schedule Instagram.</em></h2>
           </div>
-          <div className="cards">
-            {benefits.slice(0, 3).map((b) => (
-              <article key={b.title} className="pcard">
-                <span className="no">{b.no}</span>
-                <h3>{b.title}</h3>
-                <p>{b.text}</p>
-              </article>
-            ))}
-          </div>
-          <div className="cards" style={{ marginTop: 26 }}>
-            {benefits.slice(3).map((b) => (
-              <article key={b.title} className="pcard">
-                <span className="no">{b.no}</span>
+          <div className="bento">
+            {benefits.map((b) => (
+              <article key={b.title} className="bentoCard">
+                <div className="bentoArt"><AnimArt name={b.art} /></div>
                 <h3>{b.title}</h3>
                 <p>{b.text}</p>
               </article>
@@ -233,119 +142,70 @@ export default function InstagramScheduler() {
         </div>
       </section>
 
-      <section id="capabilities" style={{ paddingTop: 20 }}>
+      <section id="how" className="howSection">
+        <div className="wrap">
+          <div className="head"><p className="eyebrow">How it works</p><h2>Three steps to your <em className="s mark">first scheduled post.</em></h2></div>
+          <div className="howGrid">
+            {steps.map((st) => (
+              <article key={st.n} className="howStep">
+                <div className="howArt"><Image src={st.art} width={640} height={600} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="" /></div>
+                <span className="howNo">Step {st.n}</span>
+                <h3>{st.title}</h3>
+                <p>{st.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="capabilities">
         <div className="wrap">
           <div className="head">
-            <p className="eyebrow">Capability matrix</p>
+            <p className="eyebrow">Every format</p>
             <h2>What you can schedule for each <em className="s">Instagram format.</em></h2>
           </div>
-          <div className={s.tableWrap}>
-            <table className={s.table}>
-              <thead>
-                <tr>
-                  <th className={s.th} scope="col">Capability</th>
-                  <th className={s.th} scope="col">Feed posts</th>
-                  <th className={s.th} scope="col">Reels</th>
-                  <th className={s.th} scope="col">Carousels</th>
-                  <th className={s.th} scope="col">Stories</th>
-                </tr>
-              </thead>
-              <tbody>
-                {capabilities.map((cap, i) => (
-                  <tr key={cap.feature} className={i === capabilities.length - 1 ? "guide-row" : ""}>
-                    <td className={s.td} style={{ fontWeight: 600 }}>
-                      {cap.feature}
-                    </td>
-                    <td className={s.td}>{cap.feed ?? "—"}</td>
-                    <td className={s.td}>
-                      {cap.guideLinks?.reels ? (
-                        <Link className={s.vlink} href={cap.guideLinks.reels}>
-                          {cap.reels}
-                        </Link>
-                      ) : (
-                        cap.reels
-                      )}
-                    </td>
-                    <td className={s.td}>
-                      {cap.guideLinks?.carousel ? (
-                        <Link className={s.vlink} href={cap.guideLinks.carousel}>
-                          {cap.carousel}
-                        </Link>
-                      ) : (
-                        cap.carousel
-                      )}
-                    </td>
-                    <td className={s.td}>
-                      {cap.helpHref ? (
-                        <Link className={s.vlink} href={cap.helpHref}>
-                          {cap.stories}
-                        </Link>
-                      ) : cap.guideLinks?.stories ? (
-                        <Link className={s.vlink} href={cap.guideLinks.stories}>
-                          {cap.stories}
-                        </Link>
-                      ) : (
-                        cap.stories
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="small" style={{ marginTop: 16, textAlign: "center" }}>
-            Ready to schedule? <Link className={s.vlink} href="/signup">Start free</Link> — no credit card,
-            2 accounts and 10 posts/month included.
-          </p>
-        </div>
-      </section>
-
-      <section id="how" style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="band">
-            <div className="copy">
-              <p className="eyebrow">How it works</p>
-              <h2>Three steps to your <em className="s mark">first scheduled post.</em></h2>
-              <div className="pains">
-                {steps.map((st) => (
-                  <div key={st.n} className="pain">
-                    <b>{st.n}. {st.title}</b>
-                    <span>{st.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="art">
-              <Image
-                sizes="(max-width: 960px) 100vw, 50vw"
-                src="/landing/card-schedule.webp"
-                width={900}
-                height={900}
-                loading="lazy"
-                alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
-              />
-            </div>
+          <div className="formatGrid">
+            {formats.map((f) => (
+              <article key={f.name} className="formatCard">
+                <div className="formatTop">
+                  <span className="formatShape" style={{ aspectRatio: `${f.shape[0]} / ${f.shape[1]}` }} aria-hidden="true"><i /></span>
+                  <div><h3>{f.name}</h3><p>{f.ratio}</p><p>{f.media}</p></div>
+                </div>
+                <ul>
+                  {f.rows.map(([label, v]) => (
+                    <li key={label} className={v === true ? "yes" : "part"}>
+                      <span aria-hidden="true">{v === true ? "✓" : "–"}</span>
+                      {label}{v !== true && <em>{v}</em>}
+                    </li>
+                  ))}
+                </ul>
+                {f.guide && <Link className="go" href={f.guide}>Step-by-step guide <span aria-hidden="true">→</span></Link>}
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      <section style={{ paddingTop: 20 }}>
+      <section id="demo">
         <div className="wrap">
-          <p className="small" style={{ textAlign: "center" }}>
-            Pair scheduling with{" "}
-            <Link href="/instagram-auto-dm" className={s.vlink}>Instagram auto DM</Link>
-            , compare us to{" "}
-            <Link href="/buffer-alternative" className={s.vlink}>Buffer</Link>
-            {" "}and{" "}
-            <Link href="/later-alternative" className={s.vlink}>Later</Link>
-            , check <Link href="/instagram-scheduler/pricing" className={s.vlink}>Instagram scheduler pricing and plan limits</Link>
-            , or try free{" "}
-            <Link href="/tools" className={s.vlink}>Instagram tools</Link>.
-          </p>
+          <LandingDemo />
         </div>
       </section>
 
-      <section style={{ paddingTop: 20 }}>
+      <section>
+        <div className="wrap">
+          <nav className="relChips" aria-label="Related pages">
+            <span>Keep exploring</span>
+            <Link href="/instagram-auto-dm">Instagram auto DM</Link>
+            <Link href="/instagram-scheduler/pricing">Scheduler pricing &amp; limits</Link>
+            <Link href="/buffer-alternative">Poskoo vs Buffer</Link>
+            <Link href="/later-alternative">Poskoo vs Later</Link>
+            <Link href="/tools">Free Instagram tools</Link>
+          </nav>
+        </div>
+      </section>
+
+      <section>
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Questions</p>
@@ -362,15 +222,25 @@ export default function InstagramScheduler() {
         </div>
       </section>
 
-      <section style={{ paddingTop: 20 }}>
+      <section>
         <div className="wrap">
           <div className="cta">
-            <div>
+            <div className="ctaCopy">
+              <p className="ctaEyebrow">Ready when you are</p>
               <h2>Schedule your next post <em className="s">in minutes.</em></h2>
-              <p>Start free. No credit card. Connect Instagram in one tap.</p>
-              <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+              <p>Connect Instagram in one tap, drop your posts on the calendar and let Poskoo publish them, then DM everyone who comments.</p>
+              <form className="glassBar ctaBar" action="/signup" method="get">
+                <label className="sr-only" htmlFor="sched-cta-email">Email</label>
+                <input id="sched-cta-email" name="email" type="email" placeholder="Enter your email..." autoComplete="email" required />
+                <button type="submit">Get started free <ArrowRight size={18} aria-hidden="true" /></button>
+              </form>
+              <ul className="ctaChecks">
+                <li><svg width="18" height="18" aria-hidden="true"><use href="#sched-ok" /></svg>Free plan</li>
+                <li><svg width="18" height="18" aria-hidden="true"><use href="#sched-ok" /></svg>No credit card</li>
+                <li><svg width="18" height="18" aria-hidden="true"><use href="#sched-ok" /></svg>Official Meta API</li>
+              </ul>
             </div>
-            <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
+            <AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" />
           </div>
         </div>
       </section>

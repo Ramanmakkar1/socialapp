@@ -25,6 +25,28 @@ export function canPublishToFacebook(
   );
 }
 
+export type FacebookSourceAccount = {
+  platform: string;
+  status: string;
+  auth_type: string | null;
+  page_id: string | null;
+  page_name: string | null;
+  has_token: boolean;
+  scopes: string[] | null;
+};
+
+/**
+ * Facebook Page posting status from the user's accounts. Facebook publishing goes through an
+ * Instagram account connected with Facebook Login (its Page token), so this is the ONE rule used
+ * by both the composer (can I pick Facebook?) and Settings (what to show on the Facebook row).
+ */
+export function facebookPageStatus(accounts: FacebookSourceAccount[]): { ready: boolean; pageName: string | null } {
+  const viaFacebook = accounts.filter((a) => a.platform === "instagram" && a.auth_type === "facebook_login" && a.page_id);
+  const ready = viaFacebook.find((a) => a.status === "active" && a.has_token && canPublishToFacebook(a.scopes, a.auth_type));
+  const named = ready ?? viaFacebook.find((a) => a.page_name) ?? accounts.find((a) => a.platform === "facebook" && a.page_name);
+  return { ready: Boolean(ready), pageName: named?.page_name ?? null };
+}
+
 /**
  * Plan a Facebook post from the same media JSON shape the publisher uses
  * (array of { type: 'image' | 'video', url }; bad items are ignored).

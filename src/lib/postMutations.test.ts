@@ -45,6 +45,15 @@ function db(posts: Post[], targets: Target[]): FakeHandler[] {
         return [{ id: p.id }];
       },
     },
+    {
+      match: /^update socialapp\.scheduled_posts p set scheduled_at = now\(\), status = 'scheduled'/,
+      reply: (params) => {
+        const p = posts.find((x) => x.id === params[0] && x.user_id === params[1]);
+        if (!p || p.status !== "scheduled" || targetBusy(p.id, ["publishing", "published"])) return [];
+        p.scheduled_at = new Date();
+        return [{ id: p.id }];
+      },
+    },
     { match: /count\(\*\)::int as n from socialapp\.scheduled_posts/, reply: () => [{ n: 0 }] },
   ];
 }
@@ -125,4 +134,29 @@ test("reschedule: a scheduled post moves to the new day and keeps its time of da
     reschedulePostForUser(ID, "u1", target.toISOString().slice(0, 10)));
   assert.deepEqual(result, { ok: true });
   assert.equal(posts[0].scheduled_at?.toISOString(), target.toISOString());
+});
+
+test("share now: a draft is refused (schedule it first) and stays a draft", async () => {
+  const { sharePostNow, SHARE_DRAFT_ERROR } = await import("./postMutations.ts");
+  const posts: Post[] = [{ id: ID, user_id: "u1", status: "draft", scheduled_at: null }];
+  const result = await withDb(posts, [], () => sharePostNow(ID, "u1", async () => null));
+  assert.deepEqual(result, { ok: false, error: SHARE_DRAFT_ERROR });
+  assert.equal(posts[0].status, "draft");
+});
+
+test("share now: the monthly plan limit applies (checked for 'now'); within the limit it is made due", async () => {
+  const { sharePostNow } = await import("./postMutations.ts");
+  const later = new Date(Date.now() + 40 * 86_400_000);
+  const posts: Post[] = [{ id: ID, user_id: "u1", status: "scheduled", scheduled_at: later }];
+  let checkedAt: Date | null = null;
+  const refused = await withDb(posts, [], () => sharePostNow(ID, "u1", async (now) => {
+    checkedAt = now;
+    return "The Free plan includes 10 scheduled posts per month, and that month is full.";
+  }));
+  assert.equal(refused.ok, false);
+  assert.ok(checkedAt && Math.abs((checkedAt as Date).getTime() - Date.now()) < 5_000);
+  assert.equal(posts[0].scheduled_at?.getTime(), later.getTime(), "not moved when the limit is reached");
+  const ok = await withDb(posts, [], () => sharePostNow(ID, "u1", async () => null));
+  assert.deepEqual(ok, { ok: true });
+  assert.ok((posts[0].scheduled_at?.getTime() ?? Infinity) <= Date.now());
 });

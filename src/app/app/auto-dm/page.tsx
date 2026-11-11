@@ -3,20 +3,26 @@ import { BtnA, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import { query } from "@/lib/db";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
-import { AutoDmView, type DbRuleRow, type InstagramAccountOption, type RuleFormDefaults } from "./RuleForm";
+import { AutoDmView, type DbRuleRow, type InstagramAccountOption, type RuleFormDefaults, type RuleStats } from "./RuleForm";
+import type { RuleTrigger } from "./actions";
 import { DmDeliveryStatus, loadDmDeliveryRows, type DmDeliveryRow } from "./DmDeliveryStatus";
 import { RewindPastCommentsButton } from "./RewindPastCommentsButton";
 import { isMissingColumnError } from "@/lib/ruleMedia";
+import { clickCountSql, uniqueClickCountSql } from "@/lib/links";
 
-export const metadata = { title: "Auto-DM" };
+export const metadata = { title: "Automations" };
+
+const TRIGGERS: RuleTrigger[] = ["comment", "story_reply", "dm"];
 
 export default async function AutoDmPage({
   searchParams,
 }: {
-  searchParams: Promise<{ template?: string | string[] }>;
+  searchParams: Promise<{ template?: string | string[]; trigger?: string | string[] }>;
 }) {
   const user = await requireUser();
-  const { template: templateParam } = await searchParams;
+  const { template: templateParam, trigger: triggerParam } = await searchParams;
+  const triggerRaw = typeof triggerParam === "string" ? triggerParam : triggerParam?.[0];
+  const startTrigger = TRIGGERS.find((t) => t === triggerRaw);
   const templateSlug = typeof templateParam === "string" ? templateParam : templateParam?.[0];
 
   let rules: DbRuleRow[];
@@ -57,8 +63,7 @@ export default async function AutoDmPage({
       <>
         <PageHero
           eyebrow="Automation"
-          title="Auto-DM"
-          accent="on autopilot"
+          title="Automations"
           lede="Send a DM to everyone who comments a keyword."
           art="/landing/card-dm.webp"
           artAlt=""
@@ -103,6 +108,22 @@ export default async function AutoDmPage({
     }
   }
 
+  // Per-rule DMs sent and link clicks for the automations table (unknown = dash).
+  let stats: Record<string, RuleStats> = {};
+  try {
+    const statRows = await query<{ id: string; dms: number; clicks: number; uniqueClicks: number }>(
+      `select r.id,
+         (select count(*)::int from socialapp.dm_queue q where q.rule_id = r.id and q.status = 'sent') as dms,
+         ${clickCountSql("s.rule_id = r.id")} as clicks,
+         ${uniqueClickCountSql("s.rule_id = r.id")} as "uniqueClicks"
+       from socialapp.dm_rules r where r.user_id = $1`,
+      [user.id],
+    );
+    stats = Object.fromEntries(statRows.map((r) => [r.id, { dms: r.dms, clicks: r.clicks, uniqueClicks: r.uniqueClicks }]));
+  } catch {
+    stats = {};
+  }
+
   let deliveryRows: DmDeliveryRow[] | null = null;
   let deliveryLoadError = false;
   try {
@@ -119,6 +140,8 @@ export default async function AutoDmPage({
         templateDefaults={templateDefaults}
         templateNote={templateNote}
         rewindButton={RewindPastCommentsButton}
+        stats={stats}
+        startTrigger={templateDefaults ? undefined : startTrigger}
       />
       <DmDeliveryStatus rows={deliveryRows} loadError={deliveryLoadError} asOf={new Date()} />
     </>

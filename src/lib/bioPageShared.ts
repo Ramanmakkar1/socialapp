@@ -136,3 +136,20 @@ export function planBioLinkChanges(existing: BioLinkRow[], incoming: BioLinkInpu
   const deletes = existing.filter((row) => !kept.has(row.id)).map((row) => row.id);
   return { updates, inserts, deletes };
 }
+
+/**
+ * Read the handle from the public "/@handle" route param. Next passes dynamic params
+ * percent-encoded ("%40brewhouse.coffee"), so decode first; a malformed escape is not a handle.
+ * Returns the handle without "@", lowercased, or null when the param is not a bio-page path.
+ */
+export function bioHandleFromParam(raw: string): string | null {
+  let value = raw;
+  try {
+    value = decodeURIComponent(raw);
+  } catch {
+    return null;
+  }
+  if (!value.startsWith("@")) return null;
+  const handle = value.slice(1).toLowerCase();
+  return handle ? handle : null;
+}

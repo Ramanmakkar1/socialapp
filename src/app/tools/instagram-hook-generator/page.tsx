@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import HookGenerator from "./HookGenerator";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-hook-generator";
 const description =
@@ -63,16 +64,7 @@ export default function InstagramHookGeneratorPage() {
         <p className="lede">
           Get ready-to-copy first lines for any Reel topic across eight hook styles — curiosity, mistake, how-to, myth, story, list, contrarian and result. Pick one, film it, then schedule the Reel in Poskoo.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A calendar of scheduled social posts with a phone showing a published post"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

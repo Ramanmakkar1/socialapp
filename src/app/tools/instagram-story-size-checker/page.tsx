@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import StorySizeChecker from "./StorySizeChecker";
 import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-story-size-checker";
 const title = "Instagram Story Size Checker: Is It 1080 × 1920? | Poskoo";
@@ -89,16 +90,7 @@ export default function InstagramStorySizeCheckerPage() {
           The recommended Instagram Story size is 1080 × 1920 pixels (9:16). Load your image to see its exact dimensions
           and aspect ratio, preview it in a 9:16 frame, and find out in seconds whether it matches — or what to fix.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

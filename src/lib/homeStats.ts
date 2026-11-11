@@ -1,5 +1,6 @@
 // Server only: the home "Performance snapshot" - last 7 days vs the 7 days before.
 import { isDbConfigured, query } from "@/lib/db";
+import { clickCountSql, uniqueClickCountSql } from "./links";
 
 export type Snapshot = {
   dmsSent: number;
@@ -28,6 +29,8 @@ export type AutomationSummaryRow = {
   dmText: string;
   dmsSent: number;
   clicks: number;
+  /** One per visitor per link; use for CTR. */
+  uniqueClicks: number;
 };
 
 /** One line like: "Comments · contains 'LINK' +2 more · DM: 'Hey, thanks…'" */
@@ -44,7 +47,8 @@ export async function getAutomationRows(userId: string): Promise<AutomationSumma
     return await query<AutomationSummaryRow>(
       `select r.id, r.name, r.status, r.keywords, r.triggers, r.dm_text as "dmText",
         (select count(*)::int from socialapp.dm_queue q where q.rule_id = r.id and q.status = 'sent') as "dmsSent",
-        (select coalesce(sum(s.clicks), 0)::int from socialapp.short_links s where s.rule_id = r.id) as "clicks"
+        ${clickCountSql("s.rule_id = r.id")} as "clicks",
+      ${uniqueClickCountSql("s.rule_id = r.id")} as "uniqueClicks"
       from socialapp.dm_rules r
       where r.user_id = $1
       order by (r.status = 'active') desc, r.created_at desc

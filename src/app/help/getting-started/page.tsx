@@ -54,15 +54,13 @@ export default function GettingStartedHelpPage() {
       </nav>
       <header className="hero">
         <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
+        <h1>
             Getting started in <em className="s">3 minutes</em>
           </h1>
-          <HelpGuideIllustration variant="start" className="w-36 shrink-0 sm:w-48" />
-        </div>
         <p className="lede">
           These three steps match the checklist on your {BRAND.name} dashboard after you sign in.
         </p>
+        <HelpGuideIllustration variant="start" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

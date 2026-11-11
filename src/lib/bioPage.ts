@@ -41,7 +41,7 @@ export async function saveBioPage(userId: string, input: BioPageInput): Promise<
   const plan = planForUser();
   const maxLinks = PLAN_LIMITS[plan].bioLinks;
   if (input.links.length > maxLinks) {
-    throw new Error(`The ${plan} plan includes ${maxLinks} links on your bio page. Remove a link or upgrade to add more.`);
+    throw new Error(`The ${plan} plan includes ${maxLinks} links on your bio page. Remove a link to save.`);
   }
   const handle = normalizeHandle(input.handle);
   const displayName = input.displayName.trim();
@@ -71,9 +71,8 @@ export async function saveBioPage(userId: string, input: BioPageInput): Promise<
     if (!pageId) throw new Error("bio page save failed");
 
     const existingRows = await client.query<BioLinkRow>(
-      `select l.id, l.label, l.url, l.sort_order, l.short_code, coalesce(s.clicks, 0)::int as clicks
+      `select l.id, l.label, l.url, l.sort_order, l.short_code, (select count(*)::int from socialapp.link_clicks c where c.code = l.short_code) as clicks
        from socialapp.bio_links l
-       left join socialapp.short_links s on s.code = l.short_code
        where l.page_id = $1
        order by l.sort_order, l.created_at`,
       [pageId],
@@ -146,9 +145,8 @@ export async function getBioPage(userId: string): Promise<BioPage | null> {
     const page = pages[0];
     if (!page) return null;
     const links = await query<BioLinkRow>(
-      `select l.id, l.label, l.url, l.sort_order, l.short_code, coalesce(s.clicks, 0)::int as clicks
+      `select l.id, l.label, l.url, l.sort_order, l.short_code, (select count(*)::int from socialapp.link_clicks c where c.code = l.short_code) as clicks
        from socialapp.bio_links l
-       left join socialapp.short_links s on s.code = l.short_code
        where l.page_id = $1
        order by l.sort_order, l.created_at`,
       [page.id],
@@ -172,9 +170,8 @@ export async function getPublicBioPage(handle: string): Promise<BioPage | null> 
     const page = pages[0];
     if (!page) return null;
     const links = await query<BioLinkRow>(
-      `select l.id, l.label, l.url, l.sort_order, l.short_code, coalesce(s.clicks, 0)::int as clicks
+      `select l.id, l.label, l.url, l.sort_order, l.short_code, (select count(*)::int from socialapp.link_clicks c where c.code = l.short_code) as clicks
        from socialapp.bio_links l
-       left join socialapp.short_links s on s.code = l.short_code
        where l.page_id = $1
        order by l.sort_order, l.created_at`,
       [page.id],

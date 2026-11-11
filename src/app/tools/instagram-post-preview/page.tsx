@@ -6,6 +6,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import PostPreviewTool from "./PostPreviewTool";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-post-preview";
 const description =
@@ -42,16 +43,7 @@ export default function InstagramPostPreviewPage() {
           Instagram <em className="s mark">post preview</em>
         </h1>
         <p className="lede">Find your frame. Refine your first line. See how your photo and caption work together before you post.</p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/hero.webp"
-            width={1400}
-            height={933}
-            loading="lazy"
-            alt="A big phone shows a post; a comment saying GUIDE pops out and a paper plane carries a DM with a link. A creator sits on a calendar block and a friend waves with a coffee, with a happy dog and plants below."
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="visual" label="A creator measures a photo frame with a ruler next to phone screens of different shapes" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

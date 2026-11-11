@@ -7,6 +7,7 @@ import s from "@/components/site.module.css";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import LineBreakTool from "./LineBreakTool";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-line-break-generator";
 const ig = PLATFORM_LIMITS.instagram;
@@ -61,16 +62,7 @@ export default function InstagramLineBreakGeneratorPage() {
           Format captions so blank lines and spacing survive in the Instagram app. Copy the result and paste it into
           your post or scheduler.
         </p>
-        <div className="hero-art" style={{ maxWidth: 520 }}>
-          <Image
-            sizes="(max-width: 520px) 100vw, 520px"
-            src="/landing/card-schedule.webp"
-            width={900}
-            height={900}
-            loading="lazy"
-            alt="A creator pins post cards onto a weekly calendar next to a smiling alarm clock"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

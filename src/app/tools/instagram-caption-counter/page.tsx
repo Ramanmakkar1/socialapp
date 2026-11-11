@@ -7,6 +7,7 @@ import s from "@/components/site.module.css";
 import { PLATFORM_LIMITS } from "@/lib/captionLimits";
 import CaptionCounter from "./CaptionCounter";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/tools/instagram-caption-counter";
 const ig = PLATFORM_LIMITS.instagram;
@@ -66,16 +67,7 @@ export default function InstagramCaptionCounterPage() {
         <p className="lede">
           Count characters, hashtags and @mentions as you type, check the {n(ig.max)}-character limit and see where Instagram cuts your caption with &quot;more&quot;.
         </p>
-        <div className="hero-art">
-          <Image
-            sizes="(max-width: 1140px) 100vw, 1060px"
-            src="/landing/multichannel.webp"
-            width={1400}
-            height={933}
-            loading="lazy"
-            alt="A creator at a laptop sends one post that splits to several phones and screens"
-          />
-        </div>
+        <div className="hero-art"><AnimArt name="writing" label="A creator writes with a giant pencil on a phone-shaped card full of lines and emoji" /></div>
       </header>
 
       <div className={s.tile} style={{ padding: 24, marginTop: 28 }}>

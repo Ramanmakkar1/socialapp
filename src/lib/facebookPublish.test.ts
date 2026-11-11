@@ -193,3 +193,19 @@ test("publishToFacebookPage: plan error returns without calling fetch", async ()
   assert.deepEqual(out, { ok: false, error: "Write a caption or add media.", tokenDead: false });
   assert.equal(calls.length, 0);
 });
+
+test("facebookPageStatus: one rule for composer + Settings (active Facebook-login Instagram with pages_manage_posts)", async () => {
+  const { facebookPageStatus } = await import("./facebookPublish.ts");
+  const ig = { platform: "instagram", status: "active", auth_type: "facebook_login", page_id: "p1", page_name: "Brewhouse Coffee", has_token: true, scopes: [FB_PUBLISH_SCOPE] };
+  assert.deepEqual(facebookPageStatus([ig]), { ready: true, pageName: "Brewhouse Coffee" });
+  // Expired Instagram connection: Facebook needs a reconnect too, but the Page name is still known.
+  assert.deepEqual(facebookPageStatus([{ ...ig, status: "expired" }]), { ready: false, pageName: "Brewhouse Coffee" });
+  assert.equal(facebookPageStatus([{ ...ig, scopes: [] }]).ready, false);
+  assert.equal(facebookPageStatus([{ ...ig, has_token: false }]).ready, false);
+  assert.equal(facebookPageStatus([{ ...ig, auth_type: "instagram_login" }]).ready, false);
+  // A stand-alone facebook row only supplies the name; it never makes Facebook ready on its own.
+  assert.deepEqual(
+    facebookPageStatus([{ platform: "facebook", status: "active", auth_type: "facebook_login", page_id: "p1", page_name: "Cafe", has_token: true, scopes: [] }]),
+    { ready: false, pageName: "Cafe" },
+  );
+});

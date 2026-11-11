@@ -132,7 +132,7 @@ export default function CalendarTemplate() {
         Google Sheets or Excel. Nothing is uploaded.
       </p>
 
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-[var(--poskoo-line)]">
+      <div className="relative mt-4 overflow-x-auto rounded-2xl border border-[var(--poskoo-line)]">
         <table className="w-full min-w-[720px] border-collapse text-left text-sm">
           <thead>
             <tr className="bg-[var(--poskoo-band)] text-xs uppercase tracking-wide text-[var(--poskoo-muted)]">

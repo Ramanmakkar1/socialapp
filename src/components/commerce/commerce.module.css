@@ -1,0 +1,90 @@
+/* Lead magnets, products, orders and referrals. Only --poskoo-* tokens (globals.css). */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+.stats {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.stat { padding: 16px; }
+.statLabel { margin: 0; color: var(--poskoo-muted); font-size: .86rem; }
+.statValue { margin: 4px 0 0; color: var(--poskoo-ink); font-size: 1.6rem; font-weight: 700; }
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px 20px;
+  border-top: 1.5px solid var(--poskoo-line);
+  padding: 12px 16px;
+}
+.pagerRows { display: inline-flex; align-items: center; gap: 8px; }
+.pagerSelect { width: auto; padding: .35rem .6rem; }
+.pagerButtons { display: inline-flex; gap: 8px; }
+.disabled { opacity: .45; pointer-events: none; }
+
+.copyRow { display: flex; gap: 8px; }
+.copyRow input { min-width: 0; }
+
+.thumb {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-sm);
+  background: var(--poskoo-band);
+  object-fit: cover;
+}
+.titleCell { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.titleText { display: block; color: var(--poskoo-ink); font-weight: 600; overflow-wrap: anywhere; }
+.subText { display: block; color: var(--poskoo-muted); font-size: .8rem; overflow-wrap: anywhere; }
+.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.form { display: grid; gap: 18px; max-width: 680px; margin-top: 24px; }
+.formRow { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.fieldset { display: grid; gap: 6px; margin: 0; border: 0; padding: 0; }
+.legend { margin-bottom: 4px; color: var(--poskoo-ink); font-size: .92rem; font-weight: 600; }
+.radioRow { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.ruleList { display: grid; gap: 2px; max-height: 260px; overflow-y: auto; border: 1.5px solid var(--poskoo-line); border-radius: var(--poskoo-radius-sm); background: var(--poskoo-card); padding: 4px 12px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-lime);
+  color: var(--poskoo-ink);
+  padding: .12rem .5rem;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+.status { white-space: nowrap; }
+
+.steps { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; counter-reset: step; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.stepItem { padding: 16px; }
+.stepNum { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: var(--poskoo-radius-pill); background: var(--fill-strong, var(--poskoo-ink)); color: #fff; font-size: .85rem; font-weight: 700; }
+.stepTitle { margin: 10px 0 4px; color: var(--poskoo-ink); font-weight: 700; }
+.stepText { margin: 0; color: var(--poskoo-muted); font-size: .9rem; }
+
+.section { margin-top: 32px; }
+.sectionTitle { margin: 0 0 12px; color: var(--poskoo-ink); font-size: 1.35rem; letter-spacing: -.02em; }
+
+/* Mobile: tables become cards (the wide table stays scrollable inside .tableWrap). */
+.cards { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.cardItem { padding: 14px 16px; }
+.cardDl { display: grid; gap: 6px; margin: 10px 0 0; grid-template-columns: auto 1fr; font-size: .9rem; }
+.cardDl dt { color: var(--poskoo-muted); }
+.cardDl dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+@media (min-width: 768px) { .cards { display: none; } }
+@media (max-width: 767px) { .wideOnly { display: none; } }
