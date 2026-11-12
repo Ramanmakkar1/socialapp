@@ -80,8 +80,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-tiktok-posts",
+    no: "10 / Scheduling",
+    title: "Schedule TikTok videos",
+    text: "Connect TikTok with its official login, upload a vertical video, choose who can see it, pick a time and it posts.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "10 / Contact",
+    no: "11 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",
