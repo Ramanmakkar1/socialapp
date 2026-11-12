@@ -159,7 +159,7 @@ function BioPreview() {
 
 export default function InstagramLinkInBioPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Instagram link in bio", path: PATH }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Instagram link in bio", path: PATH }]}>
       {[appJsonLd, faqJsonLd].map((data) => (
         <script
           key={data["@type"]}
@@ -169,25 +169,29 @@ export default function InstagramLinkInBioPage() {
       ))}
 
       <header className="hero">
-        <span className="pill">Free plan · {freeLinks} links</span>
-        <p className="eyebrow">Instagram link in bio</p>
-        <h1>
-          One link in your bio. <em className="s mark">Every link you share</em>
-        </h1>
-        <p className="lede">
-          A link-in-bio page is one public page that holds all the links you want to share from your Instagram bio.
-          {" "}{BRAND.name} builds it for you at poskoo.com/@yourname, so your bio can point to your shop, latest post,
-          offer and contact links at once.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">
-            Create your free page <span aria-hidden="true">→</span>
-          </Link>
-          <Link className="btn btn-line" href="#how">
-            How it works
-          </Link>
+
+        <div className={s.heroText}>
+          <span className="pill">Free plan · {freeLinks} links</span>
+          <p className="eyebrow">Instagram link in bio</p>
+          <h1>
+            One link in your bio. <em className="s mark">Every link you share</em>
+          </h1>
+          <p className="lede">
+            A link-in-bio page is one public page that holds all the links you want to share from your Instagram bio.
+            {" "}{BRAND.name} builds it for you at poskoo.com/@yourname, so your bio can point to your shop, latest post,
+            offer and contact links at once.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">
+              Create your free page <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="btn btn-line" href="#how">
+              How it works
+            </Link>
+          </div>
+          <p className="small">Free plan. No credit card.</p>
+
         </div>
-        <p className="small">Free plan. No credit card.</p>
         <div className="hero-art" style={{ maxWidth: 360 }}>
           <BioPreview />
         </div>
@@ -205,7 +209,7 @@ export default function InstagramLinkInBioPage() {
             {steps.map((step) => (
               <article key={step.n} className="pcard">
                 <span className="no">Step {step.n}</span>
-                <h3>{step.title}</h3>
+                <h3>{step.title.replace(/-/g, "\u2011")}</h3>
                 <p>{step.text}</p>
               </article>
             ))}
@@ -293,7 +297,7 @@ export default function InstagramLinkInBioPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Questions</p>
-            <h2>Link-in-bio questions</h2>
+            <h2><span className={s.nowrap}>Link-in-bio</span> questions</h2>
           </div>
           <div className="faq">
             {faqs.map((faq) => (

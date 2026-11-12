@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Download } from "lucide-react";
+import { Check, Download, ImagePlus, Type } from "lucide-react";
 import {
   STORY_W,
   STORY_H,
   STORY_CLEAR_ZONE,
   STORY_SAFE_ZONES,
+  maxCharsFor,
   storyPhotoFit,
   textBox,
 } from "@/lib/storyLayout";
 import { toPixels } from "@/lib/safeZones";
-import ui from "@/components/ui/ui.module.css";
 
 /** Text colour presets. Colour values from src/app/globals.css brand tokens. */
 const TEXT_PRESETS: { id: string; name: string; bg: string | null; fg: string }[] = [
@@ -28,7 +28,8 @@ const SAFE_ZONE_TINT = "rgba(229, 72, 77, 0.35)"; // --poskoo-red
 
 const sliderClass = "mt-1.5 block w-full min-h-[44px] cursor-pointer accent-[var(--poskoo-violet)]";
 const labelClass = "block text-sm font-semibold text-[var(--poskoo-ink)]";
-const cardClass = "rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 sm:p-5 shadow-sm";
+const kpi = "min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-2.5";
+const kpiLabel = "text-[10px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 interface DrawOpts {
   img: HTMLImageElement | null;
@@ -134,6 +135,7 @@ export default function StoryMaker() {
   const [gradient, setGradient] = useState(false);
   const [guides, setGuides] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const previewRef = useRef<HTMLCanvasElement | null>(null);
   const fileId = useId();
@@ -185,69 +187,47 @@ export default function StoryMaker() {
     const canvas = document.createElement("canvas");
     drawStory(canvas, { img, text, fontSize, presetId, gradient }, false);
     canvas.toBlob((blob) => {
-      if (blob) saveBlob(blob, "instagram-story.png");
+      if (!blob) return;
+      saveBlob(blob, "instagram-story.png");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
     }, "image/png");
   }
 
-  return (
-    <div className="text-left">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start">
-        {/* Live preview */}
-        <div className="flex flex-col items-center">
-          <div className={cardClass}>
-            <div className="flex items-center justify-between border-b border-[var(--poskoo-line)] pb-3 mb-4">
-              <div>
-                <h3 className="font-semibold text-sm sm:text-base text-[var(--poskoo-ink)]">Live preview</h3>
-                <p className="text-xs text-[var(--poskoo-muted)]">1080×1920 Instagram Story</p>
-              </div>
-              <span className="rounded-full bg-[var(--poskoo-band)] px-3 py-1 text-xs font-semibold text-[var(--poskoo-violet)]">
-                {preset.name}
-              </span>
-            </div>
-            <div className="flex flex-col items-center gap-3">
-              <canvas
-                ref={previewRef}
-                role="img"
-                aria-label={
-                  img
-                    ? `Instagram Story preview${text ? ` with the text “${text}”` : ""}`
-                    : "Empty Instagram Story preview. Choose a photo to start."
-                }
-                className="block h-auto rounded-2xl border border-[var(--poskoo-line)] shadow-md"
-                style={{ width: "100%", maxWidth: 320 }}
-              />
-              {guides && (
-                <p className="text-xs text-[var(--poskoo-muted)] max-w-[20rem] text-center">
-                  Tinted areas: Instagram keeps the top ~250 px (profile name and progress bar) and the bottom
-                  ~250 px (reply bar). Keep text inside the clear band. Guides are not saved in the PNG.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+  const { lines } = textBox(text, fontSize, STORY_CLEAR_ZONE);
+  const cut = lines.length > 0 && lines[lines.length - 1].endsWith("…");
 
+  return (
+    <div className="min-w-0 text-left">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         {/* Controls */}
-        <div className="space-y-5">
-          <div className={cardClass}>
+        <div className="min-w-0 space-y-5 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
+          <div>
             <label htmlFor={fileId} className={labelClass}>
               Story photo
             </label>
-            <input
-              id={fileId}
-              type="file"
-              accept="image/*"
-              onChange={onFile}
-              className="mt-1.5 block w-full min-h-[44px] rounded-xl border border-[var(--poskoo-line)] bg-white px-3 py-2.5 text-sm text-[var(--poskoo-ink)] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--poskoo-band)] file:px-3 file:py-1.5 file:font-semibold file:text-[var(--poskoo-violet)]"
-            />
-            <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Your photo stays on your device. Nothing is uploaded.</p>
+            <div className="relative mt-2 flex min-h-20 items-center gap-3 rounded-xl border-2 border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-3 transition hover:border-[var(--poskoo-violet)] has-[:focus-visible]:border-[var(--poskoo-violet)] has-[:focus-visible]:shadow-[0_0_0_3px_var(--poskoo-band)]">
+              <ImagePlus className="pointer-events-none h-7 w-7 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
+              <span className="pointer-events-none min-w-0 text-sm" aria-hidden="true">
+                <b className="block text-[var(--poskoo-ink)]">{img ? "Photo added — choose another" : "Choose a photo or drop it here"}</b>
+                <span className="text-xs text-[#5f5873]">Your photo stays on your device. Nothing is uploaded.</span>
+              </span>
+              <input
+                id={fileId}
+                type="file"
+                accept="image/*"
+                onChange={onFile}
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              />
+            </div>
             {error && (
-              <p className="mt-2 text-xs font-medium text-red-700" role="alert">
+              <p className="mt-2 text-xs font-medium text-[#b42318]" role="alert">
                 {error}
               </p>
             )}
           </div>
 
-          <div className={cardClass}>
+          <div className="border-t border-[var(--poskoo-line)] pt-5">
             <label htmlFor={textId} className={labelClass}>
               Text on Story
             </label>
@@ -257,11 +237,12 @@ export default function StoryMaker() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="e.g. New collection drops Friday"
-              className="mt-1.5 block w-full min-h-[44px] rounded-xl border border-[var(--poskoo-line)] bg-white px-3 py-2.5 text-sm font-medium text-[var(--poskoo-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]"
+              className="mt-2 block min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base font-medium text-[var(--poskoo-ink)] outline-none focus:border-[var(--poskoo-violet)]"
             />
 
-            <label htmlFor={sizeId} className={`${labelClass} mt-4`}>
+            <label htmlFor={sizeId} className={`${labelClass} mt-4 flex justify-between`}>
               Text size: {fontSize}px
+              <span className="rounded-md bg-[var(--poskoo-band)] px-1.5 text-[var(--poskoo-violet)] tabular-nums" aria-hidden="true">{fontSize}</span>
             </label>
             <input
               id={sizeId}
@@ -273,28 +254,38 @@ export default function StoryMaker() {
               onChange={(e) => setFontSize(Number(e.target.value))}
               className={sliderClass}
             />
+            <div className="flex justify-between text-xs text-[#3d3450]" aria-hidden="true"><span>32</span><span>120</span></div>
 
-            <fieldset className="mt-4 border-0 p-0">
-              <legend id={presetLegendId} className={labelClass}>
-                Text colour
-              </legend>
-              <div className="mt-2 grid grid-cols-3 gap-2" role="group" aria-labelledby={presetLegendId}>
-                {TEXT_PRESETS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setPresetId(p.id)}
-                    aria-pressed={presetId === p.id}
-                    className={`min-h-[44px] rounded-xl border-2 px-2 py-2 text-xs font-semibold transition ${presetId === p.id ? "border-[var(--poskoo-violet)]" : "border-[var(--poskoo-line)] hover:border-[var(--poskoo-violet)]"}`}
-                    style={{ backgroundColor: p.bg ?? "#3d3450", color: p.fg }}
-                  >
-                    {p.name}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className={kpi}><p className={kpiLabel}>Lines</p><p className="text-base font-bold tabular-nums">{lines.length}<span className="text-xs font-medium text-[#5f5873]"> / 4</span></p></div>
+              <div className={kpi}><p className={kpiLabel}>Chars / line</p><p className="text-base font-bold tabular-nums">{maxCharsFor(fontSize)}</p></div>
+              <div className={kpi}><p className={kpiLabel}>Fits</p><p className={`text-base font-bold ${cut ? "text-[#b2401a]" : "text-[var(--poskoo-green)]"}`}>{!text ? "—" : cut ? "Cut off" : "Yes"}</p></div>
+            </div>
+            {cut && <p className="mt-2 text-xs text-[#3d3450]">Your text is longer than four lines at this size, so the end is cut. Shorten it or lower the text size.</p>}
+          </div>
 
-            <label htmlFor={gradientId} className="mt-3 flex min-h-[44px] cursor-pointer items-center gap-3 text-sm font-semibold text-[var(--poskoo-ink)]">
+          <fieldset className="border-0 border-t border-[var(--poskoo-line)] p-0 pt-5">
+            <legend id={presetLegendId} className={`${labelClass} float-left w-full`}>
+              Text colour
+            </legend>
+            <div className="clear-both grid grid-cols-3 gap-2 pt-2" role="group" aria-labelledby={presetLegendId}>
+              {TEXT_PRESETS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPresetId(p.id)}
+                  aria-pressed={presetId === p.id}
+                  className={`flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border-2 px-2 py-2 text-xs font-semibold transition ${presetId === p.id ? "border-[var(--poskoo-violet)] shadow-[0_0_0_3px_var(--poskoo-band)]" : "border-[var(--poskoo-line)] hover:border-[var(--poskoo-violet)]"}`}
+                  style={{ backgroundColor: p.bg ?? "#3d3450", color: p.fg }}
+                >
+                  <Type className="h-3.5 w-3.5 flex-none" aria-hidden="true" />{p.name}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="grid gap-1 border-t border-[var(--poskoo-line)] pt-3 sm:grid-cols-2">
+            <label htmlFor={gradientId} className="flex min-h-[44px] cursor-pointer items-center gap-3 text-sm font-semibold text-[var(--poskoo-ink)]">
               <input
                 id={gradientId}
                 type="checkbox"
@@ -305,7 +296,7 @@ export default function StoryMaker() {
               Gradient background
             </label>
 
-            <label htmlFor={guidesId} className="mt-3 flex min-h-[44px] cursor-pointer items-center gap-3 text-sm font-semibold text-[var(--poskoo-ink)]">
+            <label htmlFor={guidesId} className="flex min-h-[44px] cursor-pointer items-center gap-3 text-sm font-semibold text-[var(--poskoo-ink)]">
               <input
                 id={guidesId}
                 type="checkbox"
@@ -316,21 +307,50 @@ export default function StoryMaker() {
               Show safe zone guides
             </label>
           </div>
-
-          <div className={`${cardClass} space-y-3`}>
-            <button
-              type="button"
-              onClick={download}
-              className={`${ui.inkFill} inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold min-h-[44px] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <Download className="h-4 w-4" />
-              Download PNG
-            </button>
-            <p className="text-xs text-[var(--poskoo-muted)] leading-relaxed">
-              Saves instagram-story.png (1080×1920) to your device. Nothing is uploaded and no account is needed.
-            </p>
-          </div>
         </div>
+
+        {/* Live preview + primary action */}
+        <aside aria-label="Story preview and download" className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 max-lg:order-first lg:sticky lg:top-24">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--poskoo-ink)]">Live preview</h3>
+              <p className="text-xs text-[#5f5873]">1080×1920 Instagram Story</p>
+            </div>
+            <span className="rounded-full bg-[var(--poskoo-band)] px-3 py-1 text-xs font-semibold text-[var(--poskoo-violet)]">
+              {preset.name}
+            </span>
+          </div>
+          <div className="mx-auto w-full max-w-[15rem] rounded-[2rem] bg-[#0d0d14] p-2 shadow-[var(--poskoo-shadow-float)] max-lg:max-w-[13rem]">
+            <canvas
+              ref={previewRef}
+              role="img"
+              aria-label={
+                img
+                  ? `Instagram Story preview${text ? ` with the text “${text}”` : ""}`
+                  : "Empty Instagram Story preview. Choose a photo to start."
+              }
+              className="block h-auto w-full rounded-[1.6rem]"
+            />
+          </div>
+          {guides && (
+            <p className="text-center text-xs text-[#5f5873]">
+              Tinted areas: Instagram keeps the top ~250 px (profile name and progress bar) and the bottom
+              ~250 px (reply bar). Keep text inside the clear band. Guides are not saved in the PNG.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={download}
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px"
+          >
+            {saved ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Download className="h-5 w-5" aria-hidden="true" />}
+            {saved ? "Saved" : "Download PNG"}
+          </button>
+          <span className="sr-only" aria-live="polite">{saved ? "instagram-story.png downloaded" : ""}</span>
+          <p className="text-xs leading-relaxed text-[#5f5873]">
+            Saves instagram-story.png (1080×1920) to your device. Nothing is uploaded and no account is needed.
+          </p>
+        </aside>
       </div>
     </div>
   );

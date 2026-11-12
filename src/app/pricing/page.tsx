@@ -37,7 +37,7 @@ const faqs = [
   },
   {
     q: "Which platforms are included?",
-    a: "Instagram, Facebook Pages, Threads, YouTube, Bluesky and Mastodon scheduling work today, plus Instagram auto-DMs. TikTok, LinkedIn, Pinterest and X are coming soon.",
+    a: "Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon scheduling work today, plus Instagram auto-DMs. TikTok and Pinterest are waiting on platform approval, and X is coming later.",
   },
 ];
 
@@ -86,21 +86,23 @@ function Check() {
 
 export default function PricingPage() {
   return (
-    <PublicShell>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       {[faqJsonLd, appJsonLd, breadcrumbJsonLd].map((data) => <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />)}
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/">Home</Link> / Pricing
       </nav>
       <header className="hero">
-        <span className="pill">Free plan · no credit card · official Meta API</span>
-        <h1>
-              Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
-            </h1>
-        <p className="lede">Start free today. Upgrade to Pro or Agency for more accounts, posts and DMs whenever you are ready.</p>
-        <div className="ctas">
-              <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-              <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
-            </div>
+        <div className={s.heroText}>
+          <span className="pill">Free plan · no credit card · official Meta API</span>
+          <h1>
+                Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
+              </h1>
+          <p className="lede">Start free today. Upgrade to Pro or Agency for more accounts, posts and DMs whenever you are ready.</p>
+          <div className="ctas">
+                <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+                <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
+              </div>
+        </div>
         <div className="hero-art"><AnimArt name="pricing" label="A happy creator in an armchair holds one membership card while app cards and bills fly away" /></div>
       </header>
 
@@ -140,7 +142,7 @@ export default function PricingPage() {
             <div className="copy">
               <p className="eyebrow">Every plan</p>
               <h2>What you get, <em className="s">whatever you pay</em></h2>
-              <div className="pains">
+              <div className={`pains ${s.included}`}>
                 {includes.map((t) => (
                   <div key={t} className="pain"><b>Included</b><span>{t}</span></div>
                 ))}

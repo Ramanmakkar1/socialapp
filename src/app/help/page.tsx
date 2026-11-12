@@ -181,7 +181,7 @@ const crumbsJsonLd = breadcrumbJsonLd([
 
 export default function HelpHubPage() {
   return (
-    <PublicShell>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }}
@@ -191,13 +191,15 @@ export default function HelpHubPage() {
         dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <header className="hero">
-        <span className="pill">Guides · troubleshooting · free tools</span>
-        <h1>
-          Help <em className="s">center</em>
-        </h1>
-        <p className="lede">
-          Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
-        </p>
+        <div className={s.heroText}>
+          <span className="pill">Guides · troubleshooting · free tools</span>
+          <h1>
+            Help <em className="s">center</em>
+          </h1>
+          <p className="lede">
+            Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
+          </p>
+        </div>
         <div className="hero-art"><AnimArt name="help" label="A creator reads on a giant open book under a lightbulb and a signpost" /></div>
       </header>
 
@@ -211,7 +213,7 @@ export default function HelpHubPage() {
             {guides.map((g) => (
               <article key={g.href} className="pcard">
                 <span className="no">{g.no}</span>
-                <h3>{g.title}</h3>
+                <h3>{g.title.replace(/-/g, "\u2011")}</h3>
                 <p>{g.text}</p>
                 <Link className="go" href={g.href}>
                   {g.go} <span aria-hidden="true">→</span>

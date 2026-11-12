@@ -115,7 +115,7 @@ function Cell({ value }: { value: string }) {
 
 export default function SocialMediaSchedulerComparisonPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Social media scheduler comparison", path: PATH }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Social media scheduler comparison", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
         <script
           key={data["@type"]}
@@ -125,19 +125,23 @@ export default function SocialMediaSchedulerComparisonPage() {
       ))}
 
       <header className="hero">
-        <span className="pill">Official Meta API · no password needed</span>
-        <p className="eyebrow">Scheduler comparison</p>
-        <h1>
-          Social media scheduler comparison for <em className="s mark">Instagram, Facebook and Threads</em>
-        </h1>
-        <p className="lede">
-          Poskoo schedules Instagram, Facebook Pages and Threads posts from one calendar, auto-publishes them, and adds
-          Instagram comment-to-DM. This page compares those features side by side and marks competitor details we have
-          not verified as “Check the provider”.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <a className="btn btn-line" href="#compare">Compare features</a>
+
+        <div className={s.heroText}>
+          <span className="pill">Official Meta API · no password needed</span>
+          <p className="eyebrow">Scheduler comparison</p>
+          <h1>
+            Social media scheduler comparison for <em className="s mark">Instagram, Facebook and Threads</em>
+          </h1>
+          <p className="lede">
+            Poskoo schedules Instagram, Facebook Pages and Threads posts from one calendar, auto-publishes them, and adds
+            Instagram comment-to-DM. This page compares those features side by side and marks competitor details we have
+            not verified as “Check the provider”.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <a className="btn btn-line" href="#compare">Compare features</a>
+          </div>
+
         </div>
         <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
@@ -191,7 +195,7 @@ export default function SocialMediaSchedulerComparisonPage() {
               table says “Check the provider” instead of guessing.
             </p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 980, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr>

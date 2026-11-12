@@ -75,21 +75,23 @@ function Cell({ v }: { v: string }) {
 
 export default function MetricoolAlternative() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Metricool alternative", path: "/metricool-alternative" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Metricool alternative", path: "/metricool-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
-        <span className="pill">Official Meta API · no password needed</span>
-        <h1>
-          Metricool alternative with Instagram <em className="s">auto-DM</em> built in
-        </h1>
-        <p className="lede">
-          Metricool focuses on scheduling and analytics across many networks. {BRAND.name} schedules your Instagram, Facebook Page, Threads and YouTube posts and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <a className="btn btn-line" href="#compare">Compare features</a>
+        <div className={s.heroText}>
+          <span className="pill">Official Meta API · no password needed</span>
+          <h1>
+            Metricool alternative with Instagram <em className="s">auto-DM</em> built in
+          </h1>
+          <p className="lede">
+            Metricool focuses on scheduling and analytics across many networks. {BRAND.name} schedules your Instagram, Facebook Page, Threads and YouTube posts and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <a className="btn btn-line" href="#compare">Compare features</a>
+          </div>
         </div>
         <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
@@ -105,7 +107,7 @@ export default function MetricoolAlternative() {
             {whyLook.map((c) => (
               <article key={c.title} className="pcard">
                 <span className="no">{c.no}</span>
-                <h3>{c.title}</h3>
+                <h3>{c.title.replace(/-/g, "\u2011")}</h3>
                 <p>{c.text}</p>
               </article>
             ))}

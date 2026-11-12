@@ -131,7 +131,7 @@ const related = [
 
 export default function ScheduleTikTokPostsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule TikTok Videos", path: "/help/schedule-tiktok-posts" },
@@ -150,18 +150,18 @@ export default function ScheduleTikTokPostsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
-            How to schedule TikTok <em className="s">videos</em>
-          </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+            <h1>
+              How to schedule TikTok <em className="s">videos</em>
+            </h1>
+          <p className="lede">
+            To schedule a TikTok video, connect TikTok in {BRAND.name} with TikTok&apos;s official login, upload a
+            vertical video, write a caption and pick a date and time. {BRAND.name} then publishes it, or sends it to your
+            TikTok inbox, at that moment. Here is exactly how it works, step by step.
+          </p>
         </div>
-        <p className="lede">
-          To schedule a TikTok video, connect TikTok in {BRAND.name} with TikTok&apos;s official login, upload a
-          vertical video, write a caption and pick a date and time. {BRAND.name} then publishes it, or sends it to your
-          TikTok inbox, at that moment. Here is exactly how it works, step by step.
-        </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
-import { Bookmark, Download, Heart, MessageCircle, Music2, Send } from "lucide-react";
+import { Bookmark, Check, Download, Frame, Heart, Layers, MessageCircle, Music2, ScanLine, Send, ShieldCheck } from "lucide-react";
 import {
   FRAME_H,
   FRAME_W,
@@ -10,11 +10,28 @@ import {
   toPixels,
   type SafeZoneMode,
 } from "@/lib/safeZones";
-import ui from "@/components/ui/ui.module.css";
 
 type Media = { url: string; kind: "image" | "video"; name: string };
 
 const ZONE_RGB = "225, 29, 72";
+
+/** Percent of the frame covered by at least one zone, counted on a 1% grid so overlaps are not double-counted. */
+function coveredPercent(zones: { x: number; y: number; w: number; h: number }[]): number {
+  let covered = 0;
+  for (let y = 0; y < 100; y++) {
+    for (let x = 0; x < 100; x++) {
+      if (zones.some((z) => x + 0.5 > z.x && x + 0.5 < z.x + z.w && y + 0.5 > z.y && y + 0.5 < z.y + z.h)) covered++;
+    }
+  }
+  return covered / 100;
+}
+
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
+const primaryBtn =
+  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40";
+const toggleRow =
+  "flex min-h-11 items-center gap-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium";
 
 function drawTemplate(mode: SafeZoneMode, showGrid: boolean): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -148,6 +165,7 @@ export default function SafeZoneChecker() {
   const [opacity, setOpacity] = useState(45);
   const [showGrid, setShowGrid] = useState(false);
   const [showReelInterface, setShowReelInterface] = useState(true);
+  const [downloaded, setDownloaded] = useState(false);
   const fileId = useId();
   const modeLegendId = useId();
 
@@ -186,84 +204,64 @@ export default function SafeZoneChecker() {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setDownloaded(true);
+      setTimeout(() => setDownloaded(false), 1800);
     }, "image/png");
   }
 
   const zones = SAFE_ZONES[mode];
   const alpha = opacity / 100;
+  const covered = Math.round(coveredPercent(zones) * 10) / 10;
+  const clear = Math.round((100 - covered) * 10) / 10;
 
   return (
-    <div className="text-left">
-      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:items-start">
-        <div className="flex justify-center">
-          <div className="w-full max-w-[17rem] rounded-[2.25rem] border border-[var(--poskoo-line)] bg-[#0d0d14] p-2.5 shadow-xl">
-            <div
-              className="relative aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] bg-[var(--poskoo-paper)]"
-              aria-label={`${mode === "reels" ? "Reels" : "Story"} safe zone preview`}
-              role="img"
-            >
-              {media ? (
-                media.kind === "video" ? (
-                  <video
-                    key={media.url}
-                    src={`${media.url}#t=0.1`}
-                    muted
-                    playsInline
-                    preload="metadata"
-                    controls={false}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={media.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                )
-              ) : (
-                <div className="absolute inset-0">
-                  <PlaceholderArt />
-                </div>
-              )}
-
-              {showGrid ? (
-                <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-                  <div className="absolute inset-y-0 left-1/3 w-px bg-white/60" />
-                  <div className="absolute inset-y-0 left-2/3 w-px bg-white/60" />
-                  <div className="absolute inset-x-0 top-1/3 h-px bg-white/60" />
-                  <div className="absolute inset-x-0 top-2/3 h-px bg-white/60" />
-                </div>
-              ) : null}
-
-              {zones.map((z) => {
-                const vertical = z.h > z.w;
-                return (
-                  <div
-                    key={`${mode}-${z.id}`}
-                    className="pointer-events-none absolute flex items-center justify-center border border-dashed border-white/70 transition-all duration-300 motion-reduce:transition-none"
-                    style={{
-                      left: `${z.x}%`,
-                      top: `${z.y}%`,
-                      width: `${z.w}%`,
-                      height: `${z.h}%`,
-                      backgroundColor: `rgba(${ZONE_RGB}, ${alpha})`,
-                    }}
-                  >
-                    <span
-                      className="rounded-full bg-[#0d0d14]/80 px-2 py-0.5 text-center text-[11px] font-medium leading-tight text-white"
-                      style={vertical ? { writingMode: "vertical-rl" } : undefined}
-                    >
-                      {z.label}
-                    </span>
-                  </div>
-                );
-              })}
-
-              {mode === "reels" && showReelInterface ? <ReelInterfaceOverlay /> : null}
-            </div>
+    <div className="min-w-0 space-y-5 text-left">
+      {/* At-a-glance summary, from the zone guide for the chosen format */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className={kpi}>
+          <p className={kpiLabel}>
+            <Frame className="h-3 w-3" aria-hidden="true" />
+            Frame
+          </p>
+          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+            {FRAME_W}×{FRAME_H}
+          </p>
+          <p className="mt-1 text-xs text-[#3d3450]">9:16 {mode === "reels" ? "Reel" : "Story"}, in px.</p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}>
+            <ShieldCheck className="h-3 w-3" aria-hidden="true" />
+            Clear area
+          </p>
+          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{clear}%</p>
+          <div className="mt-2 flex h-1.5 overflow-hidden rounded-full" aria-hidden="true">
+            <i className="block h-full bg-[var(--poskoo-green)] transition-[width]" style={{ width: `${clear}%` }} />
+            <i className="block h-full flex-1" style={{ background: `rgba(${ZONE_RGB}, 0.6)` }} />
           </div>
         </div>
+        <div className={kpi}>
+          <p className={kpiLabel}>
+            <ScanLine className="h-3 w-3" aria-hidden="true" />
+            Covered by UI
+          </p>
+          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{covered}%</p>
+          <p className="mt-1 text-xs text-[#3d3450]">Approximate; varies by device.</p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}>
+            <Layers className="h-3 w-3" aria-hidden="true" />
+            Overlay zones
+          </p>
+          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{zones.length}</p>
+          <p className="mt-1 truncate text-xs text-[#3d3450]">{zones.map((z) => z.id).join(" · ")}</p>
+        </div>
+      </div>
 
-        <div className="space-y-5">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+        {/* Controls */}
+        <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
           <div>
-            <label htmlFor={fileId} className="text-sm font-medium">
+            <label htmlFor={fileId} className="text-sm font-semibold">
               Load an image or video
             </label>
             <input
@@ -271,104 +269,184 @@ export default function SafeZoneChecker() {
               type="file"
               accept="image/*,video/*"
               onChange={onFileChange}
-              className="mt-2 block w-full max-w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--poskoo-violet)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
+              className="mt-2 block w-full min-h-11 max-w-full rounded-xl border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-2 text-sm file:mr-3 file:min-h-9 file:rounded-lg file:border-0 file:bg-[var(--poskoo-ink)] file:px-3 file:text-sm file:font-semibold file:text-white hover:border-[var(--poskoo-violet)]"
             />
-            <p className="mt-1 text-xs text-[var(--poskoo-muted)]">
+            <p className="mt-1.5 text-xs text-[var(--poskoo-muted)]">
               {media ? `Showing ${media.name}. ` : ""}Opened locally in your browser; nothing is uploaded.
             </p>
           </div>
 
-          <fieldset className="border-0 p-0">
-            <legend id={modeLegendId} className="text-sm font-medium">
-              Format
-            </legend>
-            <div className="mt-2 inline-flex rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-1" role="radiogroup" aria-labelledby={modeLegendId}>
-              {SAFE_ZONE_MODES.map((m) => (
-                <label
-                  key={m.id}
-                  className={`min-h-10 cursor-pointer rounded-full px-5 py-2 text-sm font-medium transition ${
-                    mode === m.id ? "bg-[var(--poskoo-violet)] text-white" : "text-[#3d3450] hover:text-[var(--poskoo-ink)]"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="safeZoneMode"
-                    value={m.id}
-                    checked={mode === m.id}
-                    onChange={() => setMode(m.id)}
-                    className="sr-only"
-                  />
-                  {m.label}
-                </label>
-              ))}
+          <div className="grid gap-4 border-t border-[var(--poskoo-line)] pt-4 sm:grid-cols-2">
+            <fieldset className="min-w-0 border-0 p-0">
+              <legend id={modeLegendId} className="text-sm font-semibold">
+                Format
+              </legend>
+              <div className="mt-2 grid grid-cols-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1" role="radiogroup" aria-labelledby={modeLegendId}>
+                {SAFE_ZONE_MODES.map((m) => (
+                  <label
+                    key={m.id}
+                    className={`flex min-h-10 cursor-pointer items-center justify-center rounded-lg px-2 text-sm font-medium transition has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-[var(--poskoo-violet)] ${
+                      mode === m.id ? "bg-[var(--poskoo-ink)] text-white" : "text-[#3d3450] hover:bg-[var(--poskoo-band)]"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="safeZoneMode"
+                      value={m.id}
+                      checked={mode === m.id}
+                      onChange={() => setMode(m.id)}
+                      className="sr-only"
+                    />
+                    {m.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <label className="block min-w-0 text-sm font-semibold">
+              <span className="flex justify-between gap-2">
+                Overlay opacity: {opacity}%
+              </span>
+              <input
+                type="range"
+                min={10}
+                max={90}
+                step={5}
+                value={opacity}
+                onChange={(e) => setOpacity(Number(e.target.value))}
+                className="mt-2 min-h-11 w-full accent-[var(--poskoo-violet)]"
+              />
+            </label>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className={`${toggleRow} ${mode === "reels" ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}>
+              <input
+                type="checkbox"
+                checked={showReelInterface}
+                disabled={mode !== "reels"}
+                onChange={(e) => setShowReelInterface(e.target.checked)}
+                className="h-4 w-4 shrink-0 accent-[var(--poskoo-violet)]"
+              />
+              Show Reel interface (caption and buttons)
+            </label>
+            <label className={`${toggleRow} cursor-pointer`}>
+              <input
+                type="checkbox"
+                checked={showGrid}
+                onChange={(e) => setShowGrid(e.target.checked)}
+                className="h-4 w-4 shrink-0 accent-[var(--poskoo-violet)]"
+              />
+              Show grid (rule of thirds)
+            </label>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)]">
+            <p className="border-b border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]">
+              Keep text and logos out of
+            </p>
+            <ul className="divide-y divide-[var(--poskoo-line)] text-xs text-[#3d3450]">
+              {zones.map((z) => {
+                const px = toPixels(z);
+                return (
+                  <li key={z.id} className="flex items-center gap-3 px-3 py-2.5">
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ backgroundColor: `rgb(${ZONE_RGB})` }} />
+                    <span className="min-w-0 flex-1">
+                      <span className="font-medium text-[var(--poskoo-ink)]">{z.label}</span>: about {px.w}×{px.h} px
+                    </span>
+                    <span className="flex-none rounded-md bg-[var(--poskoo-paper)] px-1.5 py-0.5 font-semibold tabular-nums text-[var(--poskoo-ink)]">
+                      {Math.round((z.w * z.h) / 100)}%
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+
+        {/* Phone preview + download */}
+        <aside className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 max-lg:order-first lg:sticky lg:top-24">
+          <div className="flex justify-center">
+            <div className="w-full max-w-[17rem] rounded-[2.25rem] border border-[var(--poskoo-line)] bg-[#0d0d14] p-2.5 shadow-xl">
+              <div
+                className="relative aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] bg-[var(--poskoo-paper)]"
+                aria-label={`${mode === "reels" ? "Reels" : "Story"} safe zone preview`}
+                role="img"
+              >
+                {media ? (
+                  media.kind === "video" ? (
+                    <video
+                      key={media.url}
+                      src={`${media.url}#t=0.1`}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      controls={false}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={media.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  )
+                ) : (
+                  <div className="absolute inset-0">
+                    <PlaceholderArt />
+                  </div>
+                )}
+
+                {showGrid ? (
+                  <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+                    <div className="absolute inset-y-0 left-1/3 w-px bg-white/60" />
+                    <div className="absolute inset-y-0 left-2/3 w-px bg-white/60" />
+                    <div className="absolute inset-x-0 top-1/3 h-px bg-white/60" />
+                    <div className="absolute inset-x-0 top-2/3 h-px bg-white/60" />
+                  </div>
+                ) : null}
+
+                {zones.map((z) => {
+                  const vertical = z.h > z.w;
+                  return (
+                    <div
+                      key={`${mode}-${z.id}`}
+                      className="pointer-events-none absolute flex items-center justify-center border border-dashed border-white/70 transition-all duration-300 motion-reduce:transition-none"
+                      style={{
+                        left: `${z.x}%`,
+                        top: `${z.y}%`,
+                        width: `${z.w}%`,
+                        height: `${z.h}%`,
+                        backgroundColor: `rgba(${ZONE_RGB}, ${alpha})`,
+                      }}
+                    >
+                      <span
+                        className="rounded-full bg-[#0d0d14]/80 px-2 py-0.5 text-center text-[11px] font-medium leading-tight text-white"
+                        style={vertical ? { writingMode: "vertical-rl" } : undefined}
+                      >
+                        {z.label}
+                      </span>
+                    </div>
+                  );
+                })}
+
+                {mode === "reels" && showReelInterface ? <ReelInterfaceOverlay /> : null}
+              </div>
             </div>
-          </fieldset>
+          </div>
+          {!media && (
+            <p className="rounded-xl border border-dashed border-[var(--poskoo-line)] p-2.5 text-center text-xs text-[#5f5873]">
+              Showing sample art. Load your own image or video to check it.
+            </p>
+          )}
 
-          <label
-            className={`flex min-h-10 items-center gap-3 text-sm font-medium ${
-              mode === "reels" ? "cursor-pointer" : "cursor-not-allowed opacity-50"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={showReelInterface}
-              disabled={mode !== "reels"}
-              onChange={(e) => setShowReelInterface(e.target.checked)}
-              className="h-4 w-4 shrink-0 accent-[var(--poskoo-violet)]"
-            />
-            Show Reel interface (caption and buttons)
-          </label>
-
-          <label className="block text-sm font-medium">
-            Overlay opacity: {opacity}%
-            <input
-              type="range"
-              min={10}
-              max={90}
-              step={5}
-              value={opacity}
-              onChange={(e) => setOpacity(Number(e.target.value))}
-              className="mt-2 w-full accent-[var(--poskoo-violet)]"
-            />
-          </label>
-
-          <label className="flex min-h-10 cursor-pointer items-center gap-3 text-sm font-medium">
-            <input
-              type="checkbox"
-              checked={showGrid}
-              onChange={(e) => setShowGrid(e.target.checked)}
-              className="h-4 w-4 accent-[var(--poskoo-violet)]"
-            />
-            Show grid (rule of thirds)
-          </label>
-
-          <ul className="space-y-1.5 text-xs text-[#3d3450]">
-            {zones.map((z) => {
-              const px = toPixels(z);
-              return (
-                <li key={z.id} className="flex items-start gap-2">
-                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-sm" style={{ backgroundColor: `rgb(${ZONE_RGB})` }} />
-                  <span>
-                    <span className="font-medium text-[var(--poskoo-ink)]">{z.label}</span>: about {px.w}×{px.h} px
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-
-          <button
-            type="button"
-            onClick={downloadTemplate}
-            className={`${ui.inkFill} inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium`}
-          >
-            <Download className="h-4 w-4" />
-            Download blank safe-zone template
+          <button type="button" onClick={downloadTemplate} className={`${primaryBtn} !text-sm`}>
+            {downloaded ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Download className="h-5 w-5" aria-hidden="true" />}
+            {downloaded ? "Downloaded" : "Download blank safe-zone template"}
           </button>
+          <span className="sr-only" aria-live="polite">{downloaded ? "Template downloaded" : ""}</span>
           <p className="text-xs text-[var(--poskoo-muted)]">
             A 1080×1920 PNG of the {mode === "reels" ? "Reels" : "Story"} guides to use as a layer in Canva, Figma or
             CapCut. Zones are approximate; Instagram&apos;s layout varies by device.
           </p>
-        </div>
+        </aside>
       </div>
     </div>
   );

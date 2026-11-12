@@ -156,7 +156,7 @@ const faqJsonLd = {
 
 export default function AutoDmInstagramCommentsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Auto-DM Instagram comments", path: "/help/auto-dm-instagram-comments" },
@@ -171,14 +171,16 @@ export default function AutoDmInstagramCommentsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <h1>
-            How to auto-DM people who comment on your <em className="s">Instagram posts</em>
-          </h1>
-        <p className="lede">
-          Send an automatic DM to everyone who comments a keyword. {BRAND.name} uses Meta&apos;s official Instagram
-          API, so you set one rule and every matching comment gets your message and link.
-        </p>
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+          <h1>
+              How to auto-DM people who comment on your <em className="s">Instagram posts</em>
+            </h1>
+          <p className="lede">
+            Send an automatic DM to everyone who comments a keyword. {BRAND.name} uses Meta&apos;s official Instagram
+            API, so you set one rule and every matching comment gets your message and link.
+          </p>
+        </div>
         <HelpGuideIllustration variant="autodm" className="hero-art" />
       </header>
 

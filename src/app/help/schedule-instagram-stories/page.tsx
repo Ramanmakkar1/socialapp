@@ -144,7 +144,7 @@ const related = [
 
 export default function ScheduleInstagramStoriesHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule Instagram Stories", path: "/help/schedule-instagram-stories" },
@@ -163,14 +163,16 @@ export default function ScheduleInstagramStoriesHelpPage() {
         dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd) }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <h1>
-            How to schedule Instagram <em className="s">Stories</em>
-          </h1>
-        <p className="lede">
-          Paste one public image or video link, pick the Story format, choose a time and {BRAND.name} publishes it for
-          you. Here is exactly what a scheduled Story can and can&apos;t include.
-        </p>
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+          <h1>
+              How to schedule Instagram <em className="s">Stories</em>
+            </h1>
+          <p className="lede">
+            Paste one public image or video link, pick the Story format, choose a time and {BRAND.name} publishes it for
+            you. Here is exactly what a scheduled Story can and can&apos;t include.
+          </p>
+        </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 

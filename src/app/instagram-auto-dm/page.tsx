@@ -61,26 +61,28 @@ function Cell({ v }: { v: string }) {
 
 export default function InstagramAutoDm() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Instagram auto-DM", path: "/instagram-auto-dm" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Instagram auto-DM", path: "/instagram-auto-dm" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
       <header className="hero">
-        <span className="pill">Official Meta API · no password needed</span>
-        <p className="eyebrow">Instagram auto DM</p>
-        <h1>
-          They comment. <em className="s mark">You get the lead</em>
-        </h1>
-        <p className="lede">
-          Someone comments a keyword on your post or reel, and {BRAND.name} sends them your link in a DM, usually within a minute. Capture their email and track every lead.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <Link className="btn btn-line" href="#how">How it works</Link>
+        <div className={s.heroText}>
+          <span className="pill">Official Meta API · no password needed</span>
+          <p className="eyebrow">Instagram auto DM</p>
+          <h1>
+            They comment. <em className="s mark">You get the lead</em>
+          </h1>
+          <p className="lede">
+            Someone comments a keyword on your post or reel, and {BRAND.name} sends them your link in a DM, usually within a minute. Capture their email and track every lead.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <Link className="btn btn-line" href="#how">How it works</Link>
+          </div>
+          <p className="small">
+            <Link href="/tools/instagram-comment-keyword-tester" className={s.vlink}>
+              Test your keywords free
+            </Link>
+          </p>
         </div>
-        <p className="small">
-          <Link href="/tools/instagram-comment-keyword-tester" className={s.vlink}>
-            Test your keywords free
-          </Link>
-        </p>
         <div className="hero-art"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /></div>
       </header>
 
@@ -94,13 +96,13 @@ export default function InstagramAutoDm() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">How it works</p>
-            <h2>How comment-to-DM <em className="s">works</em></h2>
+            <h2>How <span className={s.nowrap}>comment-to-DM</span> <em className="s">works</em></h2>
           </div>
           <div className="cards">
             {steps.map((st) => (
               <article key={st.n} className="pcard">
                 <span className="no">Step {st.n}</span>
-                <h3>{st.title}</h3>
+                <h3>{st.title.replace(/-/g, "\u2011")}</h3>
                 <p>{st.text}</p>
               </article>
             ))}
@@ -142,7 +144,7 @@ export default function InstagramAutoDm() {
             {automations.slice(0, 3).map((a) => (
               <article key={a.title} className="pcard">
                 <span className="no">{a.no}</span>
-                <h3>{a.title}</h3>
+                <h3>{a.title.replace(/-/g, "\u2011")}</h3>
                 <p>{a.text}</p>
               </article>
             ))}
@@ -151,7 +153,7 @@ export default function InstagramAutoDm() {
             {automations.slice(3).map((a) => (
               <article key={a.title} className="pcard">
                 <span className="no">{a.no}</span>
-                <h3>{a.title}</h3>
+                <h3>{a.title.replace(/-/g, "\u2011")}</h3>
                 <p>{a.text}</p>
               </article>
             ))}

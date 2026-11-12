@@ -1,17 +1,19 @@
 "use client";
 
 import { useId, useState } from "react";
-import { ArrowDown, Check, Heart, MessageCircle, Send } from "lucide-react";
+import { ArrowDown, Check, Copy, Heart, ListOrdered, Mail, MessageCircle, Send, SlidersHorizontal, Zap } from "lucide-react";
 import { matchComment, type MatchableRule } from "@/lib/match";
 import s from "@/components/site.module.css";
 
 type MatchType = MatchableRule["match_type"];
 
 const INPUT =
-  "mt-1.5 min-h-11 w-full min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]/30";
+  "mt-1.5 min-h-11 w-full min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-base text-[var(--poskoo-ink)] sm:text-sm placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]/30";
 const LABEL = "block text-sm font-medium text-[#3d3450]";
-const HINT = "mt-1.5 text-xs leading-relaxed text-[#3d3450]";
+const HINT = "!mt-1.5 text-xs leading-relaxed text-[#3d3450]";
 const STEP_LABEL = "text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]";
+const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 const MATCH_EXAMPLES: {
   title: string;
@@ -65,6 +67,17 @@ export default function FlowPreview() {
   const [followUpDm, setFollowUpDm] = useState(
     "Thanks! I've sent the guide to your inbox. Reply here if you have questions.",
   );
+  const [copied, setCopied] = useState(false);
+
+  async function copyDm() {
+    try {
+      await navigator.clipboard.writeText(dmText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   const hasKeyword = keyword.trim().length > 0;
   const hasComment = comment.trim().length > 0;
@@ -104,7 +117,8 @@ export default function FlowPreview() {
   }
 
   return (
-    <section aria-labelledby={`${id}-title`} className={s.flowCard}>
+    <section aria-labelledby={`${id}-title`} className="min-w-0 space-y-5 !py-0 text-left">
+      <div className="min-w-0">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="eyebrow">Interactive local preview</p>
@@ -116,14 +130,40 @@ export default function FlowPreview() {
           Preview only · not a live Meta connection
         </span>
       </div>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#3d3450]">
+      <p className="!mt-3 max-w-2xl text-sm leading-relaxed text-[#3d3450]">
         Change the keyword, sample comment, match type or DM text, then switch on the optional email-capture step to
         preview a prompt, a submitted sample email and a follow-up DM. The preview updates in this browser; it does not
         contact Instagram, send a message or save your entries.
       </p>
+      </div>
 
-      <div className={`${s.flowGrid} mt-6`}>
-        <div className={s.flowForm}>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className={`${kpi} ${match ? "border-[var(--poskoo-green)]/40 bg-[var(--poskoo-mint)]/35" : ""}`}>
+          <p className={kpiLabel}><Zap className="h-3.5 w-3.5" aria-hidden="true" />Keyword check</p>
+          <p className={`mt-1 text-2xl font-bold ${match ? "text-[#146b43]" : "text-[var(--poskoo-ink)]"}`}>{match ? "Matched" : "No match"}</p>
+          <p className="mt-1 truncate text-xs text-[#3d3450]">{match ? `On “${matchedKeyword}”` : hasKeyword && hasComment ? "No DM would be sent." : "Add a keyword and comment."}</p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}><SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />Match type</p>
+          <p className="mt-1 text-2xl font-bold capitalize text-[var(--poskoo-ink)]">{matchType}</p>
+          <p className="mt-1 text-xs text-[#3d3450]">{matchType === "contains" ? "Keyword anywhere." : "Whole comment only."}</p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}><MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />DM length</p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{dmText.length}<span className="text-base font-medium text-[#5f5873]"> / 1,000</span></p>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-band)]" aria-hidden="true">
+            <div className="h-full rounded-full bg-[var(--poskoo-violet)] transition-all" style={{ width: `${(dmText.length / 1000) * 100}%` }} />
+          </div>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}><ListOrdered className="h-3.5 w-3.5" aria-hidden="true" />Flow steps</p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{captureEmail ? 5 : 3}</p>
+          <p className="mt-1 text-xs text-[#3d3450]">{captureEmail ? "With email capture." : "Comment, check, DM."}</p>
+        </div>
+      </div>
+
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:items-start 2xl:grid-cols-[minmax(0,1fr)_440px]">
+        <div className="grid min-w-0 content-start gap-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
           <h3 className="text-sm font-semibold text-[var(--poskoo-ink)]">Your example rule</h3>
           <div>
             <label htmlFor={`${id}-keyword`} className={LABEL}>
@@ -206,7 +246,7 @@ export default function FlowPreview() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-3">
+          <div className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3">
             <label htmlFor={`${id}-capture-email`} className="flex min-h-11 cursor-pointer items-center gap-3">
               <input
                 id={`${id}-capture-email`}
@@ -215,6 +255,7 @@ export default function FlowPreview() {
                 onChange={(event) => setCaptureEmail(event.target.checked)}
                 className="h-5 w-5 shrink-0 accent-[var(--poskoo-violet)]"
               />
+              <Mail aria-hidden="true" className="h-4 w-4 shrink-0 text-[var(--poskoo-violet)]" />
               <span className="text-sm font-medium text-[var(--poskoo-ink)]">Add an optional email-capture step</span>
             </label>
             <p className={HINT}>
@@ -284,9 +325,9 @@ export default function FlowPreview() {
           )}
         </div>
 
-        <div className={s.flowPreview}>
+        <div className="grid min-w-0 content-start gap-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 lg:sticky lg:top-24">
           <h3 className="text-sm font-semibold text-[var(--poskoo-ink)]">Your local flow preview</h3>
-          <div className="min-w-0 overflow-hidden rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] shadow-sm">
+          <div className="mx-auto w-full max-w-[400px] min-w-0 overflow-hidden rounded-[28px] border-[6px] border-[var(--poskoo-ink)] bg-[var(--poskoo-card)] shadow-[0_18px_30px_-22px_rgba(30,22,49,0.45)]">
             <div className="flex items-center gap-3 border-b border-[var(--poskoo-line)] px-4 py-3">
               <span
                 aria-hidden="true"
@@ -418,11 +459,21 @@ export default function FlowPreview() {
             </div>
           </div>
 
+          <button
+            type="button"
+            onClick={copyDm}
+            disabled={!hasDm}
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
+          >
+            {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
+            {copied ? "Copied" : "Copy DM text"}
+          </button>
+          <span className="sr-only" aria-live="polite">{copied ? "DM text copied to clipboard" : ""}</span>
           <p
             role="status"
             aria-live="polite"
             aria-atomic="true"
-            className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-2 text-xs leading-relaxed text-[#3d3450]"
+            className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-xs leading-relaxed text-[#3d3450]"
           >
             {status}
           </p>
@@ -433,9 +484,9 @@ export default function FlowPreview() {
         </div>
       </div>
 
-      <div className="mt-8 border-t border-[var(--poskoo-line)] pt-6">
+      <div className="!mt-8 border-t border-[var(--poskoo-line)] pt-6">
         <h3 className="text-xl font-semibold tracking-tight">Contains match versus exact match</h3>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#3d3450]">
+        <p className="!mt-2 max-w-3xl text-sm leading-relaxed text-[#3d3450]">
           These results use the same matching function as the preview and Poskoo&apos;s auto-DM rules. Load an example
           to edit it yourself.
         </p>
@@ -443,9 +494,9 @@ export default function FlowPreview() {
           {MATCH_EXAMPLES.map((example) => {
             const exampleMatch = findMatch(example.comment, example.keyword, example.matchType);
             return (
-              <article key={example.title} className="flex min-w-0 flex-col rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-4">
+              <article key={example.title} className="flex min-w-0 flex-col rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="rounded-full bg-[var(--poskoo-card)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-violet)]">
+                  <span className="rounded-full bg-[var(--poskoo-band)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-violet)]">
                     {example.matchType}
                   </span>
                   <span className={`text-xs font-semibold ${exampleMatch ? "text-[var(--poskoo-green)]" : "text-[#3d3450]"}`}>

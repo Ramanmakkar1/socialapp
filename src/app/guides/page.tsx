@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PublicShell from "@/components/PublicShell";
+import site from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 import { GuidesDirectory } from "@/components/guides/GuidesDirectory";
 import { ToolCta } from "@/components/tools/ToolPageTemplate";
@@ -38,7 +39,7 @@ const itemListJsonLd = {
 
 export default function GuidesPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Guides", path: PATH }]}>
+    <PublicShell className={site.wide} breadcrumbs={[{ name: "Guides", path: PATH }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(itemListJsonLd) }} />
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
         <defs>

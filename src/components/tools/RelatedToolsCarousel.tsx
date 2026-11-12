@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { categoryLabel, toolArt, type ToolEntry } from "./registry";
+import { ToolIcon } from "./ToolIcon";
 import t from "./tools.module.css";
 
 /**
@@ -60,6 +61,7 @@ export function RelatedToolsCarousel({ tools }: { tools: ToolEntry[] }) {
               <Link href={tool.href} className={t.carCard}>
                 <span className={`${t.carArt} ${t[`cat_${tool.category}`]}`}>
                   <Image src={`/landing/anim/${toolArt(tool)}.webp`} alt="" width={480} height={480} sizes="200px" loading="lazy" />
+                  <span className={t.carIcon} aria-hidden="true"><ToolIcon name={tool.icon} size={17} /></span>
                 </span>
                 <span className={t.carChip}>{categoryLabel(tool.category)}</span>
                 <b>{tool.name}</b>

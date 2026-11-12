@@ -149,7 +149,7 @@ const related = [
 
 export default function ScheduleBlueskyPostsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule Bluesky Posts", path: "/help/schedule-bluesky-posts" },
@@ -168,18 +168,18 @@ export default function ScheduleBlueskyPostsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
-            How to schedule Bluesky <em className="s">posts</em>
-          </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+            <h1>
+              How to schedule Bluesky <em className="s">posts</em>
+            </h1>
+          <p className="lede">
+            To schedule a Bluesky post, create an app password, connect your handle in {BRAND.name} Settings → Channels,
+            write up to 300 characters, add up to 4 images if needed and pick a time. {BRAND.name} publishes the post and
+            shows its status; you never need to share your main Bluesky password.
+          </p>
         </div>
-        <p className="lede">
-          To schedule a Bluesky post, create an app password, connect your handle in {BRAND.name} Settings → Channels,
-          write up to 300 characters, add up to 4 images if needed and pick a time. {BRAND.name} publishes the post and
-          shows its status; you never need to share your main Bluesky password.
-        </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

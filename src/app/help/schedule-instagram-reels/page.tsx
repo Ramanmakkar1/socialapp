@@ -136,7 +136,7 @@ const related = [
 
 export default function ScheduleInstagramReelsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule Instagram Reels", path: "/help/schedule-instagram-reels" },
@@ -155,14 +155,16 @@ export default function ScheduleInstagramReelsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <h1>
-            How to schedule Instagram <em className="s">Reels</em>
-          </h1>
-        <p className="lede">
-          Paste one public .mp4 link, write a caption, choose a time and {BRAND.name} publishes your Reel for you. Here
-          is exactly what a scheduled Reel needs, step by step.
-        </p>
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+          <h1>
+              How to schedule Instagram <em className="s">Reels</em>
+            </h1>
+          <p className="lede">
+            Paste one public .mp4 link, write a caption, choose a time and {BRAND.name} publishes your Reel for you. Here
+            is exactly what a scheduled Reel needs, step by step.
+          </p>
+        </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 

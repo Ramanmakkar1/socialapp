@@ -125,7 +125,7 @@ const related = [
 
 export default function ScheduleThreadsPostsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule Threads Posts", path: "/help/schedule-threads-posts" },
@@ -144,17 +144,17 @@ export default function ScheduleThreadsPostsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
-            How to schedule Threads <em className="s">posts</em>
-          </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+            <h1>
+              How to schedule Threads <em className="s">posts</em>
+            </h1>
+          <p className="lede">
+            Connect Threads, open the Calendar, write your post, pick Threads and a time, and {BRAND.name} publishes it
+            automatically. Here is exactly what a scheduled Threads post needs, step by step.
+          </p>
         </div>
-        <p className="lede">
-          Connect Threads, open the Calendar, write your post, pick Threads and a time, and {BRAND.name} publishes it
-          automatically. Here is exactly what a scheduled Threads post needs, step by step.
-        </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

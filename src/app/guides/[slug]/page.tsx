@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PublicShell from "@/components/PublicShell";
+import site from "@/components/site.module.css";
 import PoskooMark from "@/components/PoskooMark";
 import { RelatedTools, ToolCta } from "@/components/tools/ToolPageTemplate";
 import { Takeaways } from "@/components/guides/GuideBlocks";
@@ -114,7 +115,7 @@ export default async function GuidePage({ params }: Props) {
   );
 
   return (
-    <PublicShell
+    <PublicShell className={site.wide}
       breadcrumbs={[
         { name: "Guides", path: "/guides" },
         { name: guide.crumb, path },
@@ -236,8 +237,8 @@ export default async function GuidePage({ params }: Props) {
         <RelatedTools hrefs={guide.tools} self={path} />
         <ToolCta
           cta={{
-            title: "Found your niche?",
-            mark: "Now post it on schedule.",
+            title: guide.category === "auto-dm" ? "Ready to automate?" : guide.category === "money" ? "Ready to earn?" : guide.category === "growth" ? "Found your niche?" : "Ready to grow?",
+            mark: guide.category === "auto-dm" ? "Send your link to every commenter." : "Now post it on schedule.",
             text: `Plan a week of posts in ${BRAND.name}, publish them automatically and DM everyone who comments your keyword.`,
             art: "card-schedule",
           }}

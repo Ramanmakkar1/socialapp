@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, useSyncExternalStore } from "react";
-import { Check, Copy } from "lucide-react";
+import { Briefcase, CalendarDays, CalendarX, Check, Clock, Copy, Globe2, Info, ListChecks, Moon, ShoppingBag, Sparkles, Store, Sunrise, type LucideIcon } from "lucide-react";
 import { convertWallTime } from "../instagram-time-zone-converter/TimeZoneConverter";
 
 const FALLBACK_ZONES = [
@@ -87,6 +87,12 @@ const AUDIENCES: { id: Audience; label: string }[] = [
   { id: "b2b", label: "B2B & professional" },
   { id: "ecommerce", label: "E-commerce" },
 ];
+
+const AUDIENCE_ICON: Record<Audience, LucideIcon> = { local: Store, lifestyle: Sparkles, b2b: Briefcase, ecommerce: ShoppingBag };
+
+const field = "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)]";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpiLabel = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 /**
  * Simple starting-point rules, not measured data. Times are local to the
@@ -176,142 +182,240 @@ export default function BestTimeFinder() {
     setCopyState("idle");
   }
 
-  const inputClass =
-    "mt-2 min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] outline-none ring-[var(--poskoo-violet)] focus:ring-2";
+
+  function setAllDays(pick: (day: (typeof DAYS)[number]) => boolean) {
+    setDays(DAYS.map(pick));
+    setCopyState("idle");
+  }
+
+  const minutes = (hhmm: string) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    return h * 60 + m;
+  };
+  const weekSlots = selectedDays.flatMap((day) => slotsFor(day));
+  const sortedSlots = [...weekSlots].sort((a, b) => minutes(a) - minutes(b));
+  const earliest = sortedSlots[0];
+  const latest = sortedSlots[sortedSlots.length - 1];
+  const AudienceIcon = AUDIENCE_ICON[audience];
+  const plan = planText();
 
   return (
-    <div className="text-left">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor={`${id}-zone`} className="text-sm font-medium">
+    <div className="min-w-0 space-y-5 text-left">
+      {/* Controls */}
+      <div className="grid gap-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1.4fr]">
+        <div className="min-w-0">
+          <label htmlFor={`${id}-zone`} className="text-sm font-semibold">
             Audience time zone
           </label>
-          <select
-            id={`${id}-zone`}
-            value={zone}
-            onChange={(e) => {
-              setZoneChoice(e.target.value);
-              setCopyState("idle");
-            }}
-            className={inputClass}
-          >
-            {zones.map((z) => (
-              <option key={z} value={z}>
-                {zoneLabel(z)}
-              </option>
-            ))}
-          </select>
+          <div className="relative mt-2">
+            <Globe2 aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--poskoo-violet)]" />
+            <select
+              id={`${id}-zone`}
+              value={zone}
+              onChange={(e) => {
+                setZoneChoice(e.target.value);
+                setCopyState("idle");
+              }}
+              className={`${field} pl-10`}
+            >
+              {zones.map((z) => (
+                <option key={z} value={z}>
+                  {zoneLabel(z)}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div>
-          <label htmlFor={`${id}-audience`} className="text-sm font-medium">
+        <div className="min-w-0">
+          <label htmlFor={`${id}-audience`} className="text-sm font-semibold">
             Audience type
           </label>
-          <select
-            id={`${id}-audience`}
-            value={audience}
-            onChange={(e) => {
-              setAudience(e.target.value as Audience);
-              setCopyState("idle");
-            }}
-            className={inputClass}
-          >
-            {AUDIENCES.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="mt-5">
-        <p className="text-sm font-medium">Days you can post</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {DAYS.map((day, i) => (
-            <button
-              key={day.label}
-              type="button"
-              aria-pressed={days[i]}
-              onClick={() => toggleDay(i)}
-              className={`min-h-11 rounded-full border px-4 text-sm font-medium ${
-                days[i]
-                  ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-violet)] text-white"
-                  : "border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] text-[var(--poskoo-ink)]"
-              }`}
+          <div className="relative mt-2">
+            <AudienceIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--poskoo-violet)]" />
+            <select
+              id={`${id}-audience`}
+              value={audience}
+              onChange={(e) => {
+                setAudience(e.target.value as Audience);
+                setCopyState("idle");
+              }}
+              className={`${field} pl-10`}
             >
-              {day.label}
-            </button>
-          ))}
+              {AUDIENCES.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="min-w-0 md:col-span-2 xl:col-span-1">
+          <div className="flex flex-wrap items-center justify-between gap-x-3">
+            <p className="text-sm font-semibold" id={`${id}-days`}>Days you can post</p>
+            <div className="-my-2.5 flex gap-1 text-xs">
+              <button type="button" onClick={() => setAllDays(() => true)} className="min-h-11 rounded-lg px-2 font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)]">Every day</button>
+              <button type="button" onClick={() => setAllDays((d) => !d.weekend)} className="min-h-11 rounded-lg px-2 font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)]">Weekdays</button>
+            </div>
+          </div>
+          <div className="mt-1 grid grid-cols-7 gap-1 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1" role="group" aria-labelledby={`${id}-days`}>
+            {DAYS.map((day, i) => (
+              <button
+                key={day.label}
+                type="button"
+                aria-pressed={days[i]}
+                onClick={() => toggleDay(i)}
+                className={`min-h-11 min-w-0 rounded-lg text-[13px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--poskoo-violet)] ${
+                  days[i]
+                    ? "bg-[var(--poskoo-ink)] text-white"
+                    : "text-[#5f5873] hover:bg-[var(--poskoo-band)]"
+                }`}
+              >
+                {day.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4" aria-live="polite">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <p className="text-sm font-medium">Starting slots in {zoneLabel(zone)}</p>
-          <p className="text-xs text-[var(--poskoo-muted)]">Your time zone: {zoneLabel(localZone)}</p>
+      {/* Summary */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className={kpi}>
+          <p className={kpiLabel}><CalendarDays className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Posting days</p>
+          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{selectedDays.length}<span className="text-base font-medium text-[#5f5873]"> / 7</span></p>
+          <div className="mt-2 flex gap-0.5" aria-hidden="true">
+            {DAYS.map((d, i) => <i key={d.label} className="h-2 flex-1 rounded-full" style={{ background: days[i] ? "var(--poskoo-violet)" : "var(--poskoo-line)" }} />)}
+          </div>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}><ListChecks className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Slots per week</p>
+          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{weekSlots.length}</p>
+          <p className="mt-1 text-xs text-[#3d3450]">Pick one or two a day to test.</p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}><Sunrise className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Earliest slot</p>
+          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{earliest ? formatTime(earliest) : "—"}</p>
+          <p className="mt-1 text-xs text-[#3d3450]">Audience local time.</p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}><Moon className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Latest slot</p>
+          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{latest ? formatTime(latest) : "—"}</p>
+          <p className="mt-1 text-xs text-[#3d3450]">Audience local time.</p>
+        </div>
+      </div>
+
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start 2xl:grid-cols-[minmax(0,1fr)_380px]">
+        {/* Results */}
+        <div className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 sm:p-4" aria-live="polite">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 className="flex items-center gap-2 text-base font-semibold"><Clock className="h-5 w-5 text-[var(--poskoo-violet)]" aria-hidden="true" />Starting slots in {zoneLabel(zone)}</h3>
+            <p className="text-xs text-[var(--poskoo-muted)]">Your time zone: {zoneLabel(localZone)}</p>
+          </div>
+
+          {selectedDays.length === 0 ? (
+            <div className="mt-3 grid place-items-center gap-2 rounded-2xl border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-4 py-10 text-center text-sm text-[var(--poskoo-muted)]">
+              <CalendarX className="h-8 w-8 text-[var(--poskoo-violet)]" aria-hidden="true" />
+              <p>Pick at least one day to see your starting slots.</p>
+              <button type="button" onClick={() => setAllDays(() => true)} className="inline-flex min-h-11 items-center rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium text-[var(--poskoo-ink)] hover:border-[var(--poskoo-ink)]">Select every day</button>
+            </div>
+          ) : (
+            <>
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 2xl:grid-cols-7">
+                {DAYS.map((day, i) => {
+                  const active = days[i];
+                  const slots = slotsFor(day);
+                  return (
+                    <div
+                      key={day.label}
+                      className={`min-w-0 rounded-2xl border p-2.5 ${
+                        active
+                          ? "border-[var(--poskoo-line)] bg-[var(--poskoo-paper)]"
+                          : "border-dashed border-[var(--poskoo-line)] opacity-60"
+                      }`}
+                    >
+                      <p className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
+                        {day.label}
+                        {day.weekend ? <span className="rounded bg-[var(--poskoo-peach)]/50 px-1 text-[10px] normal-case tracking-normal text-[#7a3d0c]">Weekend</span> : null}
+                      </p>
+                      {active ? (
+                        <ul className="mt-2 space-y-1.5">
+                          {slots.map((slot) => {
+                            const other = visitorTime(day.date, slot);
+                            return (
+                              <li key={slot} className="rounded-lg bg-[var(--poskoo-band)] px-2 py-1.5" style={{ boxShadow: "inset 3px 0 0 var(--poskoo-violet)" }}>
+                                <span className="block whitespace-nowrap text-sm font-semibold tabular-nums text-[var(--poskoo-ink)]">{formatTime(slot)}</span>
+                                {other ? (
+                                  <span className="block text-[11px] text-[var(--poskoo-muted)]">{other} your time</span>
+                                ) : null}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Rest day</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 24-hour view */}
+              <figure className="mx-0 mb-0 mt-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-3">
+                <figcaption className="text-sm font-semibold">24-hour view</figcaption>
+                <div className="mt-2 space-y-1.5" aria-hidden="true">
+                  {DAYS.map((day, i) => (
+                    <div key={day.label} className="flex items-center gap-2">
+                      <span className="w-8 flex-none text-[11px] font-semibold uppercase text-[#5f5873]">{day.label}</span>
+                      <div className="relative h-5 flex-1 rounded-full bg-[var(--poskoo-card)] ring-1 ring-[var(--poskoo-line)]">
+                        {[6, 12, 18].map((h) => <i key={h} className="absolute inset-y-0 w-px bg-[var(--poskoo-line)]" style={{ left: `${(h / 24) * 100}%` }} />)}
+                        {days[i] && slotsFor(day).map((slot) => (
+                          <i key={slot} title={formatTime(slot)} className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[var(--poskoo-violet)] shadow" style={{ left: `${(minutes(slot) / 1440) * 100}%` }} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex gap-2 text-[10px] tabular-nums text-[#5f5873]">
+                    <span className="w-8 flex-none" />
+                    <span className="relative h-3 flex-1">
+                      {["12 AM", "6 AM", "12 PM", "6 PM", "12 AM"].map((t, k) => (
+                        <span key={k} className={`absolute whitespace-nowrap ${k === 0 ? "" : k === 4 ? "-translate-x-full" : "-translate-x-1/2"}`} style={{ left: `${k * 25}%` }}>{t}</span>
+                      ))}
+                    </span>
+                  </div>
+                </div>
+              </figure>
+            </>
+          )}
         </div>
 
-        {selectedDays.length === 0 ? (
-          <p className="mt-3 text-sm text-[var(--poskoo-muted)]">Pick at least one day to see your starting slots.</p>
-        ) : (
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
-            {DAYS.map((day, i) => {
-              const active = days[i];
-              const slots = slotsFor(day);
-              return (
-                <div
-                  key={day.label}
-                  className={`rounded-2xl border p-3 ${
-                    active
-                      ? "border-[var(--poskoo-line)] bg-[var(--poskoo-paper)]"
-                      : "border-dashed border-[var(--poskoo-line)] opacity-60"
-                  }`}
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">{day.label}</p>
-                  {active ? (
-                    <ul className="mt-2 space-y-1.5">
-                      {slots.map((slot) => {
-                        const other = visitorTime(day.date, slot);
-                        return (
-                          <li key={slot} className="rounded-lg bg-[var(--poskoo-band)] px-2 py-1.5">
-                            <span className="block text-sm font-semibold text-[var(--poskoo-ink)]">{formatTime(slot)}</span>
-                            {other ? (
-                              <span className="block text-[11px] text-[var(--poskoo-muted)]">{other} your time</span>
-                            ) : null}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Rest day</p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        {/* Primary action + plan preview */}
+        <aside aria-labelledby={`${id}-prev`} className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 lg:sticky lg:top-24">
           <button
             type="button"
             onClick={copyPlan}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[var(--poskoo-violet)] px-4 text-sm font-medium text-white"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
           >
-            {copyState === "ok" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copyState === "ok" ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copyState === "ok" ? "Copied" : "Copy plan"}
           </button>
-          <p aria-live="polite" className="text-xs text-[#3d3450]">
+          <div>
+            <h4 id={`${id}-prev`} className="flex items-center justify-between text-sm font-semibold">
+              Plan preview
+              <span className="text-xs font-medium tabular-nums text-[#5f5873]">{selectedDays.length} days · {weekSlots.length} slots</span>
+            </h4>
+            <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 font-sans text-[13px] leading-relaxed text-[#3d3450]">{plan}</pre>
+          </div>
+          <p aria-live="polite" className="text-xs text-[#3d3450] empty:hidden">
             {copyState === "ok" ? "Your posting plan was copied to the clipboard." : null}
             {copyState === "fail"
               ? "Your browser blocked copying. Select the plan above and press Ctrl+C (⌘C on Mac)."
               : null}
           </p>
-        </div>
+          <p className="flex items-start gap-1.5 text-xs text-[var(--poskoo-muted)]">
+            <Info className="mt-px h-3.5 w-3.5 flex-none" aria-hidden="true" />
+            Starting points to test. Your own Insights beat any general rule.
+          </p>
+        </aside>
       </div>
-
-      <p className="mt-3 text-xs text-[var(--poskoo-muted)]">
-        Starting points to test. Your own Insights beat any general rule.
-      </p>
     </div>
   );
 }

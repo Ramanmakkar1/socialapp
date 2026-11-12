@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Download } from "lucide-react";
-import ui from "@/components/ui/ui.module.css";
+import { Check, Circle, Download, Images, Palette, Type } from "lucide-react";
 import {
   ICONS,
   PALETTES,
@@ -110,6 +109,7 @@ export default function HighlightCoverMaker() {
   const [format, setFormat] = useState<CoverFormat>("square");
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState<string | null>(null);
+  const [downloaded, setDownloaded] = useState(false);
 
   const mainRef = useRef<HTMLCanvasElement | null>(null);
   const roundRef = useRef<HTMLCanvasElement | null>(null);
@@ -153,7 +153,11 @@ export default function HighlightCoverMaker() {
     const canvas = document.createElement("canvas");
     drawCover(canvas, drawOpts);
     const blob = await canvasToPng(canvas);
-    if (blob) saveBlob(blob, `highlight-cover-${icon.id}.png`);
+    if (blob) {
+      saveBlob(blob, `highlight-cover-${icon.id}.png`);
+      setDownloaded(true);
+      setTimeout(() => setDownloaded(false), 1800);
+    }
   }
 
   async function downloadAll() {
@@ -177,51 +181,69 @@ export default function HighlightCoverMaker() {
   }
 
   return (
-    <div className="text-left">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start">
-        {/* Live preview */}
-        <div className="flex flex-col items-center">
-          <div className="w-full rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 sm:p-5 shadow-sm">
-            <div className="flex items-center justify-between border-b border-[var(--poskoo-line)] pb-3 mb-4">
-              <div>
-                <h3 className="font-semibold text-sm sm:text-base text-[var(--poskoo-ink)]">Live preview</h3>
-                <p className="text-xs text-[var(--poskoo-muted)]">
-                  {format === "square" ? "1080×1080 square" : "1080×1920 story"} · circle crop
-                </p>
-              </div>
-              <span className="rounded-full bg-[var(--poskoo-band)] px-3 py-1 text-xs font-semibold text-[var(--poskoo-violet)]">
-                {icon.name}
-              </span>
-            </div>
-
-            <div className="flex flex-col items-center gap-4">
-              <canvas
-                ref={mainRef}
-                role="img"
-                aria-label={`Highlight cover preview: ${icon.name} icon on ${bg} background`}
-                className="block h-auto w-full max-w-[19rem] rounded-2xl border border-[var(--poskoo-line)] shadow-md"
-              />
-              <div className="flex items-center gap-3">
-                <canvas
-                  ref={roundRef}
-                  role="img"
-                  aria-label="Round preview of how the cover looks on a profile"
-                  className="h-16 w-16 rounded-full border-2 border-[var(--poskoo-line)] shadow"
-                />
-                <p className="text-xs text-[var(--poskoo-muted)] max-w-[14rem]">
-                  This is how it appears as a highlight on your profile — keep the icon inside the middle of the circle.
-                </p>
-              </div>
-            </div>
+    <div className="min-w-0 space-y-5 text-left">
+      {/* At-a-glance summary, all from the current settings */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className={kpi}>
+          <p className={kpiLabel}>Export size</p>
+          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+            {layout.width}×{layout.height}
+          </p>
+          <p className="mt-1 text-xs text-[#3d3450]">{format === "square" ? "Square" : "Story"} PNG, in px.</p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}>
+            <Circle className="h-3 w-3" aria-hidden="true" />
+            Icon
+          </p>
+          <p className="mt-1 flex items-center gap-2 whitespace-nowrap text-xl font-bold sm:text-2xl text-[var(--poskoo-ink)]">
+            <svg viewBox="0 0 24 24" className="h-6 w-6 flex-none" fill="var(--poskoo-violet)" aria-hidden="true">
+              <path d={icon.path} />
+            </svg>
+            <span className="truncate">{icon.name}</span>
+          </p>
+          <p className="mt-1 text-xs text-[#3d3450]">
+            {ICONS.indexOf(icon) + 1} of {ICONS.length} · {bgStyle} background
+          </p>
+        </div>
+        <div className={kpi}>
+          <p className={kpiLabel}>
+            <Type className="h-3 w-3" aria-hidden="true" />
+            Label
+          </p>
+          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+            {clampedLabel.length}
+            <span className="text-base font-medium text-[#5f5873]"> / 12</span>
+          </p>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
+            <i className="block h-full rounded-full bg-[var(--poskoo-violet)] transition-[width]" style={{ width: `${(clampedLabel.length / 12) * 100}%` }} />
           </div>
         </div>
+        <div className={kpi}>
+          <p className={kpiLabel}>
+            <Palette className="h-3 w-3" aria-hidden="true" />
+            Colours
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="grid h-8 w-8 flex-none place-items-center rounded-full border border-[var(--poskoo-line)]" style={{ background: bg }} aria-hidden="true">
+              <i className="block h-3.5 w-3.5 rounded-full border border-black/10" style={{ background: fg }} />
+            </span>
+            <span className="min-w-0 text-xs leading-tight text-[#3d3450]">
+              <b className="block truncate text-[var(--poskoo-ink)]">{activePalette ? activePalette.name : "Custom"}</b>
+              <span className="block font-mono uppercase">{bg}</span>
+              <span className="block font-mono uppercase opacity-70">{fg}</span>
+            </span>
+          </div>
+        </div>
+      </div>
 
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         {/* Controls */}
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
           {/* Palette */}
-          <div className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 sm:p-5 shadow-sm">
+          <div>
             <p className="text-sm font-semibold text-[var(--poskoo-ink)]">Colour</p>
-            <div className="mt-3 grid grid-cols-4 gap-2">
+            <div className="mt-2 grid grid-cols-4 gap-2">
               {PALETTES.map((p) => (
                 <button
                   key={p.id}
@@ -229,8 +251,8 @@ export default function HighlightCoverMaker() {
                   onClick={() => setPaletteId(p.id)}
                   aria-pressed={paletteId === p.id}
                   title={p.name}
-                  className={`flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-xl border-2 p-1.5 transition ${
-                    paletteId === p.id ? "border-[var(--poskoo-violet)]" : "border-transparent hover:border-[var(--poskoo-line)]"
+                  className={`flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl p-1.5 ring-offset-2 ring-offset-[var(--poskoo-paper)] transition ${
+                    paletteId === p.id ? "ring-2 ring-[var(--poskoo-violet)]" : "ring-1 ring-[var(--poskoo-line)] hover:ring-[var(--poskoo-ink)]"
                   }`}
                   style={{ backgroundColor: p.bg }}
                 >
@@ -244,7 +266,7 @@ export default function HighlightCoverMaker() {
               ))}
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-3 grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1 text-xs font-semibold text-[var(--poskoo-ink)]">
                 Custom background
                 <input
@@ -255,7 +277,7 @@ export default function HighlightCoverMaker() {
                     setCustomBg(e.target.value);
                     setPaletteId("");
                   }}
-                  className="h-10 w-full cursor-pointer rounded-lg border border-[var(--poskoo-line)] bg-white p-1"
+                  className="h-11 w-full cursor-pointer rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1"
                 />
               </label>
               <label className="flex flex-col gap-1 text-xs font-semibold text-[var(--poskoo-ink)]">
@@ -268,7 +290,7 @@ export default function HighlightCoverMaker() {
                     setCustomFg(e.target.value);
                     setPaletteId("");
                   }}
-                  className="h-10 w-full cursor-pointer rounded-lg border border-[var(--poskoo-line)] bg-white p-1"
+                  className="h-11 w-full cursor-pointer rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1"
                 />
               </label>
             </div>
@@ -278,35 +300,36 @@ export default function HighlightCoverMaker() {
           </div>
 
           {/* Icon picker */}
-          <div className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 sm:p-5 shadow-sm">
-            <fieldset className="border-0 p-0">
-              <legend id={iconLegendId} className="text-sm font-semibold text-[var(--poskoo-ink)]">
-                Icon
-              </legend>
-              <div className="mt-3 grid grid-cols-4 gap-2" role="group" aria-labelledby={iconLegendId}>
-                {ICONS.map((ic) => (
-                  <button
-                    key={ic.id}
-                    type="button"
-                    onClick={() => setIconId(ic.id)}
-                    aria-pressed={iconId === ic.id}
-                    title={ic.name}
-                    className={`flex min-h-[48px] items-center justify-center rounded-xl border-2 transition ${
-                      iconId === ic.id
-                        ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-band)]"
-                        : "border-[var(--poskoo-line)] bg-white hover:border-[var(--poskoo-violet)]"
-                    }`}
-                  >
-                    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="var(--poskoo-ink)" aria-hidden="true">
-                      <path d={ic.path} />
-                    </svg>
-                  </button>
-                ))}
-              </div>
-            </fieldset>
+          <fieldset className="border-0 border-t border-[var(--poskoo-line)] p-0 pt-4">
+            <legend id={iconLegendId} className="float-left w-full text-sm font-semibold text-[var(--poskoo-ink)]">
+              Icon <span className="font-normal text-[#5f5873]">· {icon.name}</span>
+            </legend>
+            <div className="clear-both grid grid-cols-4 gap-2 pt-2 sm:grid-cols-8 lg:grid-cols-4 xl:grid-cols-8" role="group" aria-labelledby={iconLegendId}>
+              {ICONS.map((ic) => (
+                <button
+                  key={ic.id}
+                  type="button"
+                  onClick={() => setIconId(ic.id)}
+                  aria-pressed={iconId === ic.id}
+                  title={ic.name}
+                  className={`flex min-h-12 items-center justify-center rounded-xl border transition ${
+                    iconId === ic.id
+                      ? "border-[var(--poskoo-ink)] bg-[var(--poskoo-ink)]"
+                      : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] hover:border-[var(--poskoo-violet)]"
+                  }`}
+                >
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill={iconId === ic.id ? "#ffffff" : "var(--poskoo-ink)"} aria-hidden="true">
+                    <path d={ic.path} />
+                  </svg>
+                </button>
+              ))}
+            </div>
+          </fieldset>
 
-            <label htmlFor={labelId} className="mt-4 block text-sm font-semibold text-[var(--poskoo-ink)]">
+          <div className="border-t border-[var(--poskoo-line)] pt-4">
+            <label htmlFor={labelId} className="flex justify-between gap-2 text-sm font-semibold text-[var(--poskoo-ink)]">
               Label (optional, max 12 characters)
+              <span aria-hidden="true" className="rounded-md bg-[var(--poskoo-band)] px-1.5 tabular-nums text-[var(--poskoo-violet)]">{label.length}/12</span>
             </label>
             <input
               id={labelId}
@@ -315,24 +338,19 @@ export default function HighlightCoverMaker() {
               maxLength={12}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="e.g. Sale, Q&A, New"
-              className="mt-1.5 block w-full min-h-[44px] rounded-xl border border-[var(--poskoo-line)] bg-white px-3 py-2.5 text-sm font-medium text-[var(--poskoo-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]"
+              className={`${field} mt-2 font-medium`}
             />
           </div>
 
           {/* Background style + format */}
-          <div className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 sm:p-5 shadow-sm space-y-4">
-            <fieldset className="border-0 p-0">
+          <div className="grid gap-4 border-t border-[var(--poskoo-line)] pt-4 sm:grid-cols-[1.4fr_1fr]">
+            <fieldset className="min-w-0 border-0 p-0">
               <legend id={styleLegendId} className="text-sm font-semibold text-[var(--poskoo-ink)]">
                 Background style
               </legend>
-              <div className="mt-2 grid grid-cols-3 gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-1.5" role="radiogroup" aria-labelledby={styleLegendId}>
+              <div className={`${segWrap} grid-cols-3`} role="radiogroup" aria-labelledby={styleLegendId}>
                 {(["solid", "gradient", "ring"] as BgStyle[]).map((st) => (
-                  <label
-                    key={st}
-                    className={`min-h-[44px] cursor-pointer rounded-lg px-2 py-2 text-center text-xs font-semibold capitalize transition ${
-                      bgStyle === st ? "bg-[var(--poskoo-violet)] text-white shadow-sm" : "text-[#3d3450] hover:text-[var(--poskoo-ink)]"
-                    }`}
-                  >
+                  <label key={st} className={`${segItem} capitalize ${bgStyle === st ? segOn : segOff}`}>
                     <input
                       type="radio"
                       name="bgStyle"
@@ -347,18 +365,13 @@ export default function HighlightCoverMaker() {
               </div>
             </fieldset>
 
-            <fieldset className="border-0 p-0">
+            <fieldset className="min-w-0 border-0 p-0">
               <legend id={formatLegendId} className="text-sm font-semibold text-[var(--poskoo-ink)]">
                 Format
               </legend>
-              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-1.5" role="radiogroup" aria-labelledby={formatLegendId}>
+              <div className={`${segWrap} grid-cols-2`} role="radiogroup" aria-labelledby={formatLegendId}>
                 {(["square", "story"] as CoverFormat[]).map((f) => (
-                  <label
-                    key={f}
-                    className={`min-h-[44px] cursor-pointer rounded-lg px-2 py-2 text-center text-xs font-semibold capitalize transition ${
-                      format === f ? "bg-[var(--poskoo-violet)] text-white shadow-sm" : "text-[#3d3450] hover:text-[var(--poskoo-ink)]"
-                    }`}
-                  >
+                  <label key={f} className={`${segItem} capitalize ${format === f ? segOn : segOff}`}>
                     <input
                       type="radio"
                       name="coverFormat"
@@ -373,38 +386,82 @@ export default function HighlightCoverMaker() {
               </div>
             </fieldset>
           </div>
+        </div>
 
-          {/* Download */}
-          <div className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 sm:p-5 shadow-sm space-y-3">
-            <button
-              type="button"
-              onClick={downloadOne}
-              disabled={isDownloading}
-              className={`${ui.inkFill} inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold min-h-[44px] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <Download className="h-4 w-4" />
-              Download PNG
-            </button>
-            <button
-              type="button"
-              onClick={downloadAll}
-              disabled={isDownloading}
-              className={`${ui.btn} ${ui.btnGhost} inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <Download className="h-4 w-4" />
-              Download all 16 icons in this colour
-            </button>
-            {progress && (
-              <p className="text-xs text-center font-medium text-[var(--poskoo-violet)]" aria-live="polite">
-                {progress}
+        {/* Live preview + download */}
+        <aside className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 max-lg:order-first lg:sticky lg:top-24">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-[var(--poskoo-ink)]">Live preview</h3>
+              <p className="text-xs text-[var(--poskoo-muted)]">
+                {format === "square" ? "1080×1080 square" : "1080×1920 story"} · circle crop
               </p>
-            )}
-            <p className="text-xs text-[var(--poskoo-muted)] leading-relaxed">
-              Saves a <code>highlight-cover-{icon.id}.png</code> to your device. Everything runs in your browser — nothing is uploaded.
+            </div>
+            <span className="flex-none rounded-full bg-[var(--poskoo-band)] px-3 py-1 text-xs font-semibold text-[var(--poskoo-violet)]">
+              {icon.name}
+            </span>
+          </div>
+
+          <div className="grid place-items-center rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3">
+            <canvas
+              ref={mainRef}
+              role="img"
+              aria-label={`Highlight cover preview: ${icon.name} icon on ${bg} background`}
+              className={`block h-auto rounded-xl border border-[var(--poskoo-line)] shadow-md ${format === "story" ? "w-full max-w-[9.5rem]" : "w-full max-w-[17rem]"}`}
+            />
+          </div>
+
+          {/* Profile mock: how the round crop sits under the bio */}
+          <div className="flex items-center gap-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3">
+            <div className="flex flex-none flex-col items-center gap-1">
+              <span className="rounded-full p-[2px] ring-1 ring-[var(--poskoo-line)]">
+                <canvas
+                  ref={roundRef}
+                  role="img"
+                  aria-label="Round preview of how the cover looks on a profile"
+                  className="block h-16 w-16 rounded-full"
+                />
+              </span>
+              <span className="max-w-16 truncate text-[11px] font-medium text-[var(--poskoo-ink)]">{clampedLabel || icon.name}</span>
+            </div>
+            <p className="text-xs text-[var(--poskoo-muted)]">
+              This is how it appears as a highlight on your profile — keep the icon inside the middle of the circle.
             </p>
           </div>
-        </div>
+
+          <button type="button" onClick={downloadOne} disabled={isDownloading} className={primaryBtn}>
+            {downloaded ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Download className="h-5 w-5" aria-hidden="true" />}
+            {downloaded ? "Downloaded" : "Download PNG"}
+          </button>
+          <button type="button" onClick={downloadAll} disabled={isDownloading} className={`${ghostBtn} w-full`}>
+            <Images className="h-4 w-4" aria-hidden="true" />
+            Download all 16 icons in this colour
+          </button>
+          <span className="sr-only" aria-live="polite">{downloaded ? "PNG downloaded" : ""}</span>
+          {progress && (
+            <p className="text-center text-xs font-medium text-[var(--poskoo-violet)]" aria-live="polite">
+              {progress}
+            </p>
+          )}
+          <p className="text-xs leading-relaxed text-[var(--poskoo-muted)]">
+            Saves a <code className="break-all">highlight-cover-{icon.id}.png</code> to your device. Everything runs in your browser — nothing is uploaded.
+          </p>
+        </aside>
       </div>
     </div>
   );
 }
+
+const field =
+  "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)]";
+const ghostBtn =
+  "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
+const primaryBtn =
+  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
+const segWrap = "mt-2 grid rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1";
+const segItem =
+  "flex min-h-10 cursor-pointer items-center justify-center rounded-lg px-1 text-center text-[13px] font-medium leading-tight has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-[var(--poskoo-violet)]";
+const segOn = "bg-[var(--poskoo-ink)] text-white";
+const segOff = "text-[#3d3450] hover:bg-[var(--poskoo-band)]";

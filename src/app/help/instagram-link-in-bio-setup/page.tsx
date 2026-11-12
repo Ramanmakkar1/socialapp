@@ -156,7 +156,7 @@ const faqJsonLd = {
 
 export default function InstagramLinkInBioSetupHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Link-in-Bio Setup", path: "/help/instagram-link-in-bio-setup" },
@@ -179,17 +179,17 @@ export default function InstagramLinkInBioSetupHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
-            How to set up your Instagram <em className="s">link-in-bio page</em>
-          </h1>
-          <HelpGuideIllustration variant="start" className="w-36 shrink-0 sm:w-48" />
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+            <h1>
+              How to set up your Instagram <em className="s">link-in-bio page</em>
+            </h1>
+          <p className="lede">
+            A link-in-bio page is one page at poskoo.com/@yourname that holds all your links. You create it in{" "}
+            {BRAND.name}, add your links, pick a theme and paste its URL into your Instagram bio.
+          </p>
         </div>
-        <p className="lede">
-          A link-in-bio page is one page at poskoo.com/@yourname that holds all your links. You create it in{" "}
-          {BRAND.name}, add your links, pick a theme and paste its URL into your Instagram bio.
-        </p>
+        <HelpGuideIllustration variant="start" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

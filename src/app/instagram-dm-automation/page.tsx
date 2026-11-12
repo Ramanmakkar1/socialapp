@@ -113,7 +113,7 @@ function Cell({ v }: { v: string }) {
 
 export default function InstagramDmAutomationPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Instagram DM automation", path: PATH }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Instagram DM automation", path: PATH }]}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }}
@@ -124,29 +124,33 @@ export default function InstagramDmAutomationPage() {
       />
 
       <header className="hero">
-        <span className="pill">Official Meta API · no password needed</span>
-        <p className="eyebrow">Instagram DM automation</p>
-        <h1>
-          Instagram DM automation that <em className="s mark">turns comments into leads</em>
-        </h1>
-        <p className="lede">
-          Instagram DM automation sends a direct message for you when someone comments a keyword on
-          your post or reel, replies to your Story, or messages you. {BRAND.name} usually replies within a minute
-          and can ask for their email before it sends your link.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">
-            Start free <span aria-hidden="true">→</span>
-          </Link>
-          <Link className="btn btn-line" href="/instagram-auto-dm">
-            See how auto-DM works
-          </Link>
+
+        <div className={s.heroText}>
+          <span className="pill">Official Meta API · no password needed</span>
+          <p className="eyebrow">Instagram DM automation</p>
+          <h1>
+            Instagram DM automation that <em className="s mark">turns comments into leads</em>
+          </h1>
+          <p className="lede">
+            Instagram DM automation sends a direct message for you when someone comments a keyword on
+            your post or reel, replies to your Story, or messages you. {BRAND.name} usually replies within a minute
+            and can ask for their email before it sends your link.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">
+              Start free <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="btn btn-line" href="/instagram-auto-dm">
+              See how auto-DM works
+            </Link>
+          </div>
+          <p className="small">
+            <Link href="/tools/instagram-comment-keyword-tester" className={s.vlink}>
+              Test your comment keywords free
+            </Link>
+          </p>
+
         </div>
-        <p className="small">
-          <Link href="/tools/instagram-comment-keyword-tester" className={s.vlink}>
-            Test your comment keywords free
-          </Link>
-        </p>
         <div className="hero-art"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /></div>
       </header>
 

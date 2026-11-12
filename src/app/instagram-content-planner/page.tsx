@@ -79,7 +79,7 @@ for (let i = 0; i < steps.length; i += 3) groups.push(steps.slice(i, i + 3));
 
 export default function InstagramContentPlannerPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Tools", path: "/tools" },
         { name: "Instagram content planner", path: PATH },
@@ -90,23 +90,25 @@ export default function InstagramContentPlannerPage() {
         dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }}
       />
       <header className="hero">
-        <span className="pill">Free planning toolkit</span>
-        <p className="eyebrow">Instagram content planner</p>
-        <h1>
-          From hook to scheduled post, <em className="s mark">in five steps</em>
-        </h1>
-        <p className="lede">
-          This free Instagram content planner walks you through one post in five steps — hook,
-          caption, image size, preview, then schedule — with tools that run in your browser. When
-          you are ready, a free {BRAND.name} account publishes the post at the time you pick.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/instagram-scheduler">
-            Schedule a post <span aria-hidden="true">→</span>
-          </Link>
-          <Link className="btn btn-line" href="#workflow">
-            See the workflow
-          </Link>
+        <div className={s.heroText}>
+          <span className="pill">Free planning toolkit</span>
+          <p className="eyebrow">Instagram content planner</p>
+          <h1>
+            From hook to scheduled post, <em className="s mark">in five steps</em>
+          </h1>
+          <p className="lede">
+            This free Instagram content planner walks you through one post in five steps — hook,
+            caption, image size, preview, then schedule — with tools that run in your browser. When
+            you are ready, a free {BRAND.name} account publishes the post at the time you pick.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/instagram-scheduler">
+              Schedule a post <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="btn btn-line" href="#workflow">
+              See the workflow
+            </Link>
+          </div>
         </div>
         <div className="hero-art"><AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /></div>
       </header>
@@ -123,7 +125,7 @@ export default function InstagramContentPlannerPage() {
             {group.map((st) => (
               <article key={st.href} className="pcard">
                 <span className="no">{st.no}</span>
-                <h3>{st.title}</h3>
+                <h3>{st.title.replace(/-/g, "\u2011")}</h3>
                 <p>{st.text}</p>
                 <Link className="go" href={st.href}>
                   {st.cta} <span aria-hidden="true">→</span>

@@ -149,7 +149,7 @@ const related = [
 
 export default function InstagramStoryReplyAutoDmHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Story reply auto-DM", path: "/help/instagram-story-reply-auto-dm" },
@@ -168,21 +168,23 @@ export default function InstagramStoryReplyAutoDmHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <h1>
-            Auto-DM people who reply to your Instagram <em className="s">Story</em>
-          </h1>
-        <p className="lede">
-          Ask viewers to reply with a keyword like FREE, and {BRAND.name} sends each of them a DM with your link. Here is
-          how to set it up, step by step.
-        </p>
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+          <h1>
+              Auto-DM people who reply to your Instagram <em className="s">Story</em>
+            </h1>
+          <p className="lede">
+            Ask viewers to reply with a keyword like FREE, and {BRAND.name} sends each of them a DM with your link. Here is
+            how to set it up, step by step.
+          </p>
+        </div>
         <HelpGuideIllustration variant="story" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>
         <div className="wrap">
           <div className={s.prose}>
-            <h2>What a story-reply auto-DM is</h2>
+            <h2>What a <span className={s.nowrap}>story-reply</span> <span className={s.nowrap}>auto-DM</span> is</h2>
             <p>
               When someone replies to your Instagram Story, the reply lands in your DMs, not in a public comment thread.
               A story-reply auto-DM watches those replies for your keyword and answers in the same private
@@ -217,7 +219,7 @@ export default function InstagramStoryReplyAutoDmHelpPage() {
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className={s.prose}>
-            <h2>Step-by-step setup</h2>
+            <h2><span className={s.nowrap}>Step-by-step</span> setup</h2>
             {steps.map((st, i) => (
               <div key={st.name}>
                 <h3>

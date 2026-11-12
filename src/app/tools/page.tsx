@@ -5,6 +5,7 @@ import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import { TOOLS, TOOL_CATEGORIES } from "@/components/tools/registry";
 import { ToolsDirectory } from "@/components/tools/ToolsDirectory";
+import { CategoryIcon } from "@/components/tools/ToolIcon";
 import { ToolCta, ToolFaqSection, toolMetadata } from "@/components/tools/ToolPageTemplate";
 import { faqJsonLd, ldJson } from "@/components/tools/seo";
 import t from "@/components/tools/tools.module.css";
@@ -65,7 +66,7 @@ export default function ToolsPage() {
         </defs>
       </svg>
       <div className={t.page}>
-        <header className={`hero ${t.hero}`}>
+        <header className={`hero ${t.hero} ${t.hubHero}`}>
           <span className="pill">Free · no signup · runs in your browser</span>
           <h1>
             {TOOLS.length} free <em className="s mark">Instagram tools</em> for every post
@@ -74,11 +75,18 @@ export default function ToolsPage() {
             Write captions and hashtags, size your photos and carousels, plan your week and test comment-to-DM
             keywords. Use them before you post, or schedule the result with {BRAND.name}.
           </p>
-          <ul className={t.points}>
+          <ul className={t.catTiles} aria-label="Tool categories">
             {TOOL_CATEGORIES.map((c) => (
               <li key={c.id}>
-                <svg width="16" height="16" aria-hidden="true"><use href="#tool-ok" /></svg>
-                {c.label}
+                <a className={t.catTile} href={`#${c.id}`}>
+                  <span className={`${t.cardIcon} ${t[`cat_${c.id}`]}`}>
+                    <CategoryIcon category={c.id} />
+                  </span>
+                  <span>
+                    <b>{TOOLS.filter((tool) => tool.category === c.id).length}</b>
+                    <small>{c.label}</small>
+                  </span>
+                </a>
               </li>
             ))}
           </ul>

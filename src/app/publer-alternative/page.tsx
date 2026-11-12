@@ -55,21 +55,23 @@ function Cell({ v }: { v: string }) {
 
 export default function PublerAlternative() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Publer alternative", path: "/publer-alternative" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Publer alternative", path: "/publer-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
-        <span className="pill">Official Meta API · no password needed</span>
-        <h1>
-          A Publer alternative that also <em className="s">auto-DMs every comment</em>
-        </h1>
-        <p className="lede">
-          Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, write captions with AI and track every lead.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <a className="btn btn-line" href="#compare">Compare features</a>
+        <div className={s.heroText}>
+          <span className="pill">Official Meta API · no password needed</span>
+          <h1>
+            A Publer alternative that also <em className="s">auto-DMs every comment</em>
+          </h1>
+          <p className="lede">
+            Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, write captions with AI and track every lead.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <a className="btn btn-line" href="#compare">Compare features</a>
+          </div>
         </div>
         <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
@@ -85,7 +87,7 @@ export default function PublerAlternative() {
             {whySwitch.map((c) => (
               <article key={c.title} className="pcard">
                 <span className="no">{c.no}</span>
-                <h3>{c.title}</h3>
+                <h3>{c.title.replace(/-/g, "\u2011")}</h3>
                 <p>{c.text}</p>
               </article>
             ))}

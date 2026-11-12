@@ -133,7 +133,7 @@ const related = [
 
 export default function ScheduleInstagramCarouselHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule Instagram carousels", path: "/help/schedule-instagram-carousel" },
@@ -152,14 +152,16 @@ export default function ScheduleInstagramCarouselHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <h1>
-            How to schedule an Instagram <em className="s">carousel post</em>
-          </h1>
-        <p className="lede">
-          Paste 2 to 10 public image links, write one caption, choose a time and {BRAND.name} publishes your carousel
-          for you. Here is exactly what a scheduled carousel needs, step by step.
-        </p>
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+          <h1>
+              How to schedule an Instagram <em className="s">carousel post</em>
+            </h1>
+          <p className="lede">
+            Paste 2 to 10 public image links, write one caption, choose a time and {BRAND.name} publishes your carousel
+            for you. Here is exactly what a scheduled carousel needs, step by step.
+          </p>
+        </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 

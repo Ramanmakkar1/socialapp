@@ -67,21 +67,23 @@ function Cell({ v }: { v: string }) {
 
 export default function MetaBusinessSuiteAlternative() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Meta Business Suite alternative", path: "/meta-business-suite-alternative" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Meta Business Suite alternative", path: "/meta-business-suite-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
-        <span className="pill">Official Meta API · no password needed</span>
-        <h1>
-          Meta Business Suite alternative with Instagram <em className="s">auto-DM</em> built in
-        </h1>
-        <p className="lede">
-          Tired of posts that fail or get stuck in Meta Business Suite? {BRAND.name} schedules your Instagram and Facebook Page posts on a clear calendar and auto-DMs every keyword commenter, so you can capture emails, write captions with AI and export leads in one place.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <a className="btn btn-line" href="#compare">Compare features</a>
+        <div className={s.heroText}>
+          <span className="pill">Official Meta API · no password needed</span>
+          <h1>
+            Meta Business Suite alternative with Instagram <em className="s">auto-DM</em> built in
+          </h1>
+          <p className="lede">
+            Tired of posts that fail or get stuck in Meta Business Suite? {BRAND.name} schedules your Instagram and Facebook Page posts on a clear calendar and auto-DMs every keyword commenter, so you can capture emails, write captions with AI and export leads in one place.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <a className="btn btn-line" href="#compare">Compare features</a>
+          </div>
         </div>
         <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
@@ -97,7 +99,7 @@ export default function MetaBusinessSuiteAlternative() {
             {whyLook.map((c) => (
               <article key={c.title} className="pcard">
                 <span className="no">{c.no}</span>
-                <h3>{c.title}</h3>
+                <h3>{c.title.replace(/-/g, "\u2011")}</h3>
                 <p>{c.text}</p>
               </article>
             ))}

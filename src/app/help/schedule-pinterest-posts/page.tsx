@@ -138,7 +138,7 @@ const related = [
 
 export default function SchedulePinterestPostsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule Pinterest Pins", path: "/help/schedule-pinterest-posts" },
@@ -157,18 +157,18 @@ export default function SchedulePinterestPostsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
-            How to schedule Pinterest <em className="s">Pins</em>
-          </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+            <h1>
+              How to schedule Pinterest <em className="s">Pins</em>
+            </h1>
+          <p className="lede">
+            To schedule a Pinterest Pin, connect Pinterest with its official login in {BRAND.name}, pick a destination
+            board, add an image, title and link, then choose a date and time. {BRAND.name} creates the Pin through the
+            official Pinterest API at that moment. Here is exactly how it works, step by step.
+          </p>
         </div>
-        <p className="lede">
-          To schedule a Pinterest Pin, connect Pinterest with its official login in {BRAND.name}, pick a destination
-          board, add an image, title and link, then choose a date and time. {BRAND.name} creates the Pin through the
-          official Pinterest API at that moment. Here is exactly how it works, step by step.
-        </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

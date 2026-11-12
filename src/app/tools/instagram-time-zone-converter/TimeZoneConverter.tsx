@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, useSyncExternalStore } from "react";
-import { Check, Copy } from "lucide-react";
+import { ArrowDownUp, CalendarDays, Check, Clock, Copy, Globe2, MoveRight } from "lucide-react";
 
 const FALLBACK_ZONES = [
   "UTC",
@@ -202,6 +202,17 @@ function getBrowserZone(): string {
   }
 }
 
+function formatOffset(ms: number): string {
+  const sign = ms < 0 ? "−" : "+";
+  const mins = Math.round(Math.abs(ms) / 60000);
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${sign}${h}h${m ? ` ${m}m` : ""}`;
+}
+
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3";
+const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
+
 export default function TimeZoneConverter() {
   const id = useId();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -222,6 +233,24 @@ export default function TimeZoneConverter() {
     result = { status: "invalid", message: "That time zone isn’t available in this browser. Pick another one." };
   }
 
+  // At-a-glance facts, all from the same instant the converter resolved.
+  let glance: { diff: string; dayShift: string; sourceTime: string } | null = null;
+  if (result.status === "ok" || result.status === "gap") {
+    try {
+      const diffMs = zoneOffsetMs(result.instant, targetZone) - zoneOffsetMs(result.instant, sourceZone);
+      const s = zonedParts(result.instant, sourceZone);
+      const t = zonedParts(result.instant, targetZone);
+      const days = Math.round((Date.UTC(t.year, t.month - 1, t.day) - Date.UTC(s.year, s.month - 1, s.day)) / 86400000);
+      glance = {
+        diff: diffMs === 0 ? "Same time" : formatOffset(diffMs),
+        dayShift: days === 0 ? "Same day" : days > 0 ? "Next day" : "Previous day",
+        sourceTime: new Intl.DateTimeFormat("en-US", { timeZone: sourceZone, hour: "numeric", minute: "2-digit", hourCycle: "h12", timeZoneName: "short" }).format(new Date(result.instant)),
+      };
+    } catch {
+      glance = null;
+    }
+  }
+
   async function copyResult() {
     if (result.status !== "ok" && result.status !== "gap") return;
     try {
@@ -234,127 +263,163 @@ export default function TimeZoneConverter() {
     }
   }
 
+  function fillNow() {
+    const p = zonedParts(Date.now(), sourceZone);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setDate(`${p.year}-${pad(p.month)}-${pad(p.day)}`);
+    setTime(`${pad(p.hour)}:${pad(p.minute)}`);
+    setCopyState("idle");
+  }
+
+  function swap() {
+    setSourceChoice(targetZone);
+    setTargetChoice(sourceZone);
+    setCopyState("idle");
+  }
+
   const inputClass =
-    "mt-2 min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] outline-none ring-[var(--poskoo-violet)] focus:ring-2";
+    "mt-2 min-h-11 w-full min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base text-[var(--poskoo-ink)] outline-none focus:border-[var(--poskoo-violet)]";
+  const ghostBtn = "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)]";
 
   return (
-    <div className="text-left">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor={`${id}-date`} className="text-sm font-medium">
-            Date
-          </label>
-          <input
-            id={`${id}-date`}
-            type="date"
-            value={date}
-            onChange={(e) => {
-              setDate(e.target.value);
-              setCopyState("idle");
-            }}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label htmlFor={`${id}-time`} className="text-sm font-medium">
-            Time
-          </label>
-          <input
-            id={`${id}-time`}
-            type="time"
-            value={time}
-            onChange={(e) => {
-              setTime(e.target.value);
-              setCopyState("idle");
-            }}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label htmlFor={`${id}-source`} className="text-sm font-medium">
-            From time zone
-          </label>
-          <select
-            id={`${id}-source`}
-            value={sourceZone}
-            onChange={(e) => {
-              setSourceChoice(e.target.value);
-              setCopyState("idle");
-            }}
-            className={inputClass}
-          >
-            {zones.map((zone) => (
-              <option key={zone} value={zone}>
-                {zoneLabel(zone)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor={`${id}-target`} className="text-sm font-medium">
-            To time zone
-          </label>
-          <select
-            id={`${id}-target`}
-            value={targetZone}
-            onChange={(e) => {
-              setTargetChoice(e.target.value);
-              setCopyState("idle");
-            }}
-            className={inputClass}
-          >
-            {zones.map((zone) => (
-              <option key={zone} value={zone}>
-                {zoneLabel(zone)}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+    <div className="min-w-0 text-left">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        {/* Inputs */}
+        <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="min-w-0">
+              <label htmlFor={`${id}-date`} className="text-sm font-semibold">Date</label>
+              <input
+                id={`${id}-date`}
+                type="date"
+                value={date}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setCopyState("idle");
+                }}
+                className={inputClass}
+              />
+            </div>
+            <div className="min-w-0">
+              <label htmlFor={`${id}-time`} className="text-sm font-semibold">Time</label>
+              <input
+                id={`${id}-time`}
+                type="time"
+                value={time}
+                onChange={(e) => {
+                  setTime(e.target.value);
+                  setCopyState("idle");
+                }}
+                className={inputClass}
+              />
+            </div>
+          </div>
+          <button type="button" className={ghostBtn} onClick={fillNow}>
+            <Clock className="h-4 w-4" aria-hidden="true" />Use current time
+          </button>
 
-      <div className="mt-5 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4" aria-live="polite">
-        {result.status === "empty" ? (
-          <p className="text-sm text-[var(--poskoo-muted)]">Pick a date and time to see the converted local time.</p>
-        ) : result.status === "invalid" ? (
-          <p className="text-sm text-[var(--poskoo-coral)]" role="alert">
-            {result.message}
+          <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+            <div className="min-w-0">
+              <label htmlFor={`${id}-source`} className="text-sm font-semibold">From time zone</label>
+              <select
+                id={`${id}-source`}
+                value={sourceZone}
+                onChange={(e) => {
+                  setSourceChoice(e.target.value);
+                  setCopyState("idle");
+                }}
+                className={inputClass}
+              >
+                {zones.map((zone) => (
+                  <option key={zone} value={zone}>
+                    {zoneLabel(zone)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button type="button" onClick={swap} aria-label="Swap time zones" title="Swap time zones"
+              className="inline-grid h-11 w-11 place-items-center justify-self-center rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] hover:border-[var(--poskoo-ink)]">
+              <ArrowDownUp className="h-4 w-4 sm:rotate-90" aria-hidden="true" />
+            </button>
+            <div className="min-w-0">
+              <label htmlFor={`${id}-target`} className="text-sm font-semibold">To time zone</label>
+              <select
+                id={`${id}-target`}
+                value={targetZone}
+                onChange={(e) => {
+                  setTargetChoice(e.target.value);
+                  setCopyState("idle");
+                }}
+                className={inputClass}
+              >
+                {zones.map((zone) => (
+                  <option key={zone} value={zone}>
+                    {zoneLabel(zone)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <p className="text-xs text-[#5f5873]">
+            Uses your browser’s time zone data, so daylight saving changes are included. Nothing is uploaded or saved.
           </p>
-        ) : (
-          <>
-            <p className="text-xs font-medium uppercase tracking-wide text-[var(--poskoo-muted)]">
-              Instagram post time in {zoneLabel(targetZone)}
+        </div>
+
+        {/* Result */}
+        <aside aria-label="Converted time" className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 lg:sticky lg:top-24" aria-live="polite">
+          {result.status === "empty" ? (
+            <div className="grid place-items-center gap-2 py-8 text-center">
+              <Globe2 className="h-9 w-9 text-[var(--poskoo-violet)]" aria-hidden="true" />
+              <p className="text-sm text-[#3d3450]">Pick a date and time to see the converted local time.</p>
+            </div>
+          ) : result.status === "invalid" ? (
+            <p className="rounded-xl border border-[var(--poskoo-coral)]/50 bg-[var(--poskoo-coral)]/10 px-3 py-2 text-sm text-[#8a2f12]" role="alert">
+              {result.message}
             </p>
-            <p className="mt-1 text-3xl font-bold leading-tight text-[var(--poskoo-ink)] sm:text-4xl">
-              {result.targetTime}
-            </p>
-            <p className="mt-1 text-sm text-[#3d3450]">{result.targetDate}</p>
-            {result.status === "gap" ? (
-              <p className="mt-3 rounded-xl bg-[var(--poskoo-band)] px-3 py-2 text-sm text-[#3d3450]" role="status">
-                The result uses the offset from before the jump, so it shows one hour earlier (for example 1:30 AM for 2:30 AM); pick a time after the jump for an exact answer.
-              </p>
-            ) : null}
-            <div className="mt-3 flex flex-wrap items-center gap-3">
+          ) : (
+            <>
+              <div className="rounded-xl bg-[var(--poskoo-ink)] p-4 text-white">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+                  Instagram post time in {zoneLabel(targetZone)}
+                </p>
+                <p className="mt-1 text-3xl font-bold leading-tight sm:text-4xl">{result.targetTime}</p>
+                <p className="mt-1 flex items-center gap-1.5 text-sm text-white/80"><CalendarDays className="h-4 w-4 flex-none text-[var(--poskoo-lime)]" aria-hidden="true" />{result.targetDate}</p>
+              </div>
+              {glance && (
+                <>
+                  <p className="flex min-w-0 items-center gap-1.5 text-xs text-[#3d3450]">
+                    <MoveRight className="h-3.5 w-3.5 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
+                    <span className="min-w-0">From <b className="text-[var(--poskoo-ink)]">{glance.sourceTime}</b> in {zoneLabel(sourceZone)}</span>
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className={kpi}><p className={kpiLabel}>Difference</p><p className="mt-0.5 text-lg font-bold tabular-nums">{glance.diff}</p></div>
+                    <div className={kpi}><p className={kpiLabel}>Calendar day</p><p className="mt-0.5 text-lg font-bold">{glance.dayShift}</p></div>
+                  </div>
+                </>
+              )}
+              {result.status === "gap" ? (
+                <p className="rounded-xl bg-[var(--poskoo-band)] px-3 py-2 text-sm text-[#3d3450]" role="status">
+                  The result uses the offset from before the jump, so it shows one hour earlier (for example 1:30 AM for 2:30 AM); pick a time after the jump for an exact answer.
+                </p>
+              ) : null}
               <button
                 type="button"
                 onClick={copyResult}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[var(--poskoo-violet)] px-4 text-sm font-medium text-white"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px"
               >
-                {copyState === "ok" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copyState === "ok" ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
                 {copyState === "ok" ? "Copied" : "Copy result"}
               </button>
-              <p aria-live="polite" className="text-xs text-[#3d3450]">
+              <p aria-live="polite" className="text-xs text-[#3d3450] empty:hidden">
                 {copyState === "ok" ? "Converted time copied to your clipboard." : null}
                 {copyState === "fail"
                   ? "Your browser blocked copying. Select the result above and press Ctrl+C (⌘C on Mac)."
                   : null}
               </p>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </aside>
       </div>
-      <p className="mt-3 text-xs text-[var(--poskoo-muted)]">
-        Uses your browser’s time zone data, so daylight saving changes are included. Nothing is uploaded or saved.
-      </p>
     </div>
   );
 }

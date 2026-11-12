@@ -61,21 +61,23 @@ function Cell({ v }: { v: string }) {
 
 export default function ManyChatAlternative() {
   return (
-    <PublicShell breadcrumbs={[{ name: "ManyChat alternative", path: "/manychat-alternative" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "ManyChat alternative", path: "/manychat-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
-        <span className="pill">Official Instagram API · no password needed</span>
-        <h1>
-          The ManyChat alternative that also <em className="s">schedules your posts</em>
-        </h1>
-        <p className="lede">
-          DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <a className="btn btn-line" href="#compare">Compare features</a>
+        <div className={s.heroText}>
+          <span className="pill">Official Instagram API · no password needed</span>
+          <h1>
+            The ManyChat alternative that also <em className="s">schedules your posts</em>
+          </h1>
+          <p className="lede">
+            DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <a className="btn btn-line" href="#compare">Compare features</a>
+          </div>
         </div>
         <div className="hero-art"><AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" /></div>
       </header>
@@ -91,7 +93,7 @@ export default function ManyChatAlternative() {
             {whySwitch.map((c) => (
               <article key={c.title} className="pcard">
                 <span className="no">{c.no}</span>
-                <h3>{c.title}</h3>
+                <h3>{c.title.replace(/-/g, "\u2011")}</h3>
                 <p>{c.text}</p>
               </article>
             ))}
@@ -176,7 +178,7 @@ export default function ManyChatAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Auto-DM your commenters and <em className="s">schedule your posts</em> in one place</h2>
+              <h2><span className={s.nowrap}>Auto-DM</span> your commenters and <em className="s">schedule your posts</em> in one place</h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

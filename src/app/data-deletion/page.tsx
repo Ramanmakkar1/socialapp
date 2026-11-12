@@ -37,14 +37,16 @@ export const metadata: Metadata = {
 };
 export default function Page() {
   return (
-    <PublicShell>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }} />
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/">Home</Link> / Data deletion
       </nav>
       <header className="hero">
-        <p className="eyebrow">Legal</p>
-        <h1>Delete your data</h1>
+        <div className={s.heroText}>
+          <p className="eyebrow">Legal</p>
+          <h1>Delete your data</h1>
+        </div>
         <div className="hero-art"><AnimArt name="legal" label="A calm creator holds a shield with a check mark next to a padlock, a key and a neat document" /></div>
       </header>
       <section style={{ paddingTop: 20 }}>

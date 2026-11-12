@@ -40,7 +40,7 @@ const crumbsJsonLd = breadcrumbJsonLd([
 
 export default function GettingStartedHelpPage() {
   return (
-    <PublicShell>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
@@ -53,13 +53,15 @@ export default function GettingStartedHelpPage() {
         <Link href="/help">Help center</Link> / Getting started
       </nav>
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <h1>
-            Getting started in <em className="s">3 minutes</em>
-          </h1>
-        <p className="lede">
-          These three steps match the checklist on your {BRAND.name} dashboard after you sign in.
-        </p>
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+          <h1>
+              Getting started in <em className="s">3 minutes</em>
+            </h1>
+          <p className="lede">
+            These three steps match the checklist on your {BRAND.name} dashboard after you sign in.
+          </p>
+        </div>
         <HelpGuideIllustration variant="start" className="hero-art" />
       </header>
 
@@ -102,7 +104,7 @@ export default function GettingStartedHelpPage() {
               your Instagram password.
             </p>
 
-            <h2>Create your first auto-DM rule from a template</h2>
+            <h2>Create your first <span className={s.nowrap}>auto-DM</span> rule from a template</h2>
             <p>
               Pick a template below. It opens{" "}
               <Link className={s.vlink} href="/app/auto-dm">

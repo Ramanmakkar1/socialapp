@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 const description =
@@ -64,19 +65,21 @@ const crumbsJsonLd = breadcrumbJsonLd([
 
 export default function DevelopersPage() {
   return (
-    <PublicShell>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }} />
       <header className="hero">
-        <span className="pill">MCP server · API keys · for builders</span>
-        <h1>
-          Let your <em className="s">AI</em> schedule posts
-        </h1>
-        <p className="lede">
-          Poskoo speaks MCP, the model context protocol. Point Claude, ChatGPT or any other AI assistant at{" "}
-          <code style={{ fontFamily: "ui-monospace, monospace" }}>{MCP_URL}</code> with your Poskoo API key, and it
-          can schedule posts, list your channels and read your analytics — with the same checks the Poskoo app uses.
-        </p>
+        <div className={s.heroText}>
+          <span className="pill">MCP server · API keys · for builders</span>
+          <h1>
+            Let your <em className="s">AI</em> schedule posts
+          </h1>
+          <p className="lede">
+            Poskoo speaks MCP, the model context protocol. Point Claude, ChatGPT or any other AI assistant at{" "}
+            <code style={{ fontFamily: "ui-monospace, monospace" }}>{MCP_URL}</code> with your Poskoo API key, and it
+            can schedule posts, list your channels and read your analytics — with the same checks the Poskoo app uses.
+          </p>
+        </div>
         <div className="hero-art"><AnimArt name="developers" label="A developer types code on a laptop while a plug connects to a socket and gears turn" /></div>
       </header>
 

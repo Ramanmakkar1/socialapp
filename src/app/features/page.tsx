@@ -61,23 +61,25 @@ const jsonLd = {
 
 export default function FeaturesPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Features", path: "/features" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Features", path: "/features" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <header className="hero">
-        <span className="pill"><span>ALL-IN-ONE</span>Schedule · Auto-DM · AI captions · Free tools</span>
-        <p className="eyebrow">Features</p>
-        <h1>
-          Everything Poskoo does, <em className="s mark">in one place</em>
-        </h1>
-        <p className="lede">
-          Poskoo is one app for planning posts, publishing on Instagram, Facebook, Threads and YouTube, and
-          turning comments into leads with automatic DMs.
-        </p>
-        <div className="ctas">
-          <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <Link className="btn btn-line" href="/pricing">View pricing</Link>
+        <div className={s.heroText}>
+          <span className="pill"><span>ALL-IN-ONE</span>Schedule · Auto-DM · AI captions · Free tools</span>
+          <p className="eyebrow">Features</p>
+          <h1>
+            Everything Poskoo does, <em className="s mark">in one place</em>
+          </h1>
+          <p className="lede">
+            Poskoo is one app for planning posts, publishing on Instagram, Facebook, Threads and YouTube, and
+            turning comments into leads with automatic DMs.
+          </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <Link className="btn btn-line" href="/pricing">View pricing</Link>
+          </div>
+          <p className="small">Free plan. No credit card needed.</p>
         </div>
-        <p className="small">Free plan. No credit card needed.</p>
         <div className="hero-art"><AnimArt name="features" label="A creator points at an open toolbox of calendar, chat, mail, chart and link tools" /></div>
       </header>
 

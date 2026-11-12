@@ -1,7 +1,10 @@
 "use client";
 
 import { useId, useMemo, useRef, useState } from "react";
-import { Check, Copy, RefreshCw } from "lucide-react";
+import {
+  Check, Copy, Heart, ImageIcon, Lightbulb, MessageCircle, MessageSquareQuote, PenLine, RefreshCw, Send, Smile, Sparkles, Target,
+} from "lucide-react";
+import { PLATFORM_LIMITS, foldCaption } from "@/lib/captionLimits";
 
 export type Goal =
   | "Engagement"
@@ -1682,6 +1685,25 @@ const TEMPLATES: Record<Goal, Record<Tone, Template[]>> = {
 };
 
 const INSTAGRAM_CAPTION_LIMIT = 2200;
+// Instagram's feed shows roughly the first 125 characters before "… more".
+const FOLD_AT = PLATFORM_LIMITS.instagram.foldAt ?? 125;
+
+const field =
+  "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base outline-none focus:border-[var(--poskoo-violet)] focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]/30";
+const ghostBtn =
+  "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
+const toggle =
+  "flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm font-medium has-[:checked]:border-[var(--poskoo-violet)] has-[:checked]:bg-[var(--poskoo-band)] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-[var(--poskoo-violet)]";
+
+function Switch({ on }: { on: boolean }) {
+  return (
+    <span aria-hidden="true" className={`relative inline-flex h-6 w-10 flex-none rounded-full transition-colors ${on ? "bg-[var(--poskoo-violet)]" : "bg-[var(--poskoo-line)]"}`}>
+      <i className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${on ? "translate-x-[18px]" : "translate-x-0.5"}`} />
+    </span>
+  );
+}
 
 export default function CaptionGeneratorTool() {
   const [topic, setTopic] = useState("");
@@ -1690,6 +1712,8 @@ export default function CaptionGeneratorTool() {
   const [addEmojis, setAddEmojis] = useState(true);
   const [addCommentCta, setAddCommentCta] = useState(false);
   const [shuffleKey, setShuffleKey] = useState(0);
+  const [selected, setSelected] = useState(0);
+  const [expanded, setExpanded] = useState(false);
 
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1699,6 +1723,7 @@ export default function CaptionGeneratorTool() {
   const toneId = useId();
   const emojisId = useId();
   const commentCtaId = useId();
+  const baseId = useId();
 
   // Generate captions based on templates
   const captions = useMemo(() => {
@@ -1755,144 +1780,275 @@ export default function CaptionGeneratorTool() {
 
   function handleRegenerate() {
     setShuffleKey((prev) => prev + 1);
+    setExpanded(false);
   }
 
+  // At-a-glance stats, all derived from the captions above.
+  const current = Math.min(selected, captions.length - 1);
+  const selectedText = captions[current] ?? "";
+  const lengths = captions.map((c) => c.length);
+  const avgLength = lengths.length ? Math.round(lengths.reduce((s, n) => s + n, 0) / lengths.length) : 0;
+  const shortest = lengths.length ? Math.min(...lengths) : 0;
+  const longest = lengths.length ? Math.max(...lengths) : 0;
+  const hookFits = captions.filter((c) => c.split("\n\n")[0].length <= FOLD_AT).length;
+  const fold = foldCaption(selectedText, FOLD_AT);
+  const selectedWords = selectedText.split(/\s+/).filter(Boolean).length;
+  const usingDefaultTopic = !topic.trim();
+
   return (
-    <div className="text-left">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <label htmlFor={topicId} className="text-sm font-medium">
+    <div className="min-w-0 space-y-5 text-left">
+      {/* Controls */}
+      <div className="grid gap-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 sm:grid-cols-2 xl:grid-cols-[1.6fr_1fr_1fr]">
+        <div className="min-w-0 sm:col-span-2 xl:col-span-1">
+          <label htmlFor={topicId} className="block text-sm font-semibold">
             Topic or product
           </label>
-          <input
-            id={topicId}
-            type="text"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="e.g. productivity habits, my new ceramic mugs, digital marketing guide"
-            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
-          />
+          <div className="relative mt-2">
+            <Lightbulb aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--poskoo-violet)]" />
+            <input
+              id={topicId}
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="e.g. productivity habits, my new ceramic mugs, digital marketing guide"
+              className={`${field} pl-10`}
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor={goalId} className="text-sm font-medium">
+        <div className="min-w-0">
+          <label htmlFor={goalId} className="block text-sm font-semibold">
             Goal
           </label>
-          <select
-            id={goalId}
-            value={goal}
-            onChange={(e) => setGoal(e.target.value as Goal)}
-            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
-          >
-            {GOALS.map((g) => (
-              <option key={g} value={g}>
-                {g}
-              </option>
-            ))}
-          </select>
+          <div className="relative mt-2">
+            <Target aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--poskoo-violet)]" />
+            <select
+              id={goalId}
+              value={goal}
+              onChange={(e) => setGoal(e.target.value as Goal)}
+              className={`${field} pl-10`}
+            >
+              {GOALS.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label htmlFor={toneId} className="text-sm font-medium">
+        <div className="min-w-0">
+          <label htmlFor={toneId} className="block text-sm font-semibold">
             Tone
           </label>
-          <select
-            id={toneId}
-            value={tone}
-            onChange={(e) => setTone(e.target.value as Tone)}
-            className="mt-2 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-3 py-2 text-base outline-none focus:border-[var(--poskoo-violet)]"
-          >
-            {TONES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+          <div className="relative mt-2">
+            <MessageSquareQuote aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--poskoo-violet)]" />
+            <select
+              id={toneId}
+              value={tone}
+              onChange={(e) => setTone(e.target.value as Tone)}
+              className={`${field} pl-10`}
+            >
+              {TONES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between pt-1">
-          <div className="flex flex-wrap items-center gap-6">
-            <label
-              htmlFor={emojisId}
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium"
-            >
-              <input
-                id={emojisId}
-                type="checkbox"
-                checked={addEmojis}
-                onChange={(e) => setAddEmojis(e.target.checked)}
-                className="h-4 w-4 rounded border-[var(--poskoo-line)] text-[var(--poskoo-violet)] focus:ring-[var(--poskoo-violet)]"
-              />
+        <div className="grid min-w-0 gap-2 sm:col-span-2 sm:grid-cols-2 xl:col-span-3">
+          <label htmlFor={emojisId} className={toggle}>
+            <span className="inline-flex items-center gap-2">
+              <Smile className="h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
               Add emojis
-            </label>
+            </span>
+            <input
+              id={emojisId}
+              type="checkbox"
+              checked={addEmojis}
+              onChange={(e) => setAddEmojis(e.target.checked)}
+              className="sr-only"
+            />
+            <Switch on={addEmojis} />
+          </label>
 
-            <label
-              htmlFor={commentCtaId}
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium"
-            >
-              <input
-                id={commentCtaId}
-                type="checkbox"
-                checked={addCommentCta}
-                onChange={(e) => setAddCommentCta(e.target.checked)}
-                className="h-4 w-4 rounded border-[var(--poskoo-line)] text-[var(--poskoo-violet)] focus:ring-[var(--poskoo-violet)]"
-              />
+          <label htmlFor={commentCtaId} className={toggle}>
+            <span className="inline-flex min-w-0 items-center gap-2">
+              <MessageCircle className="h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
               Add a comment-keyword CTA (Auto-DM style)
-            </label>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleRegenerate}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-2.5 text-sm font-medium hover:text-[var(--poskoo-violet)] min-h-[44px]"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Regenerate
-          </button>
+            </span>
+            <input
+              id={commentCtaId}
+              type="checkbox"
+              checked={addCommentCta}
+              onChange={(e) => setAddCommentCta(e.target.checked)}
+              className="sr-only"
+            />
+            <Switch on={addCommentCta} />
+          </label>
         </div>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {captions.map((captionText, index) => {
-          const charCount = captionText.length;
-          const isOver = charCount > INSTAGRAM_CAPTION_LIMIT;
-          const isCopied = copiedId === index;
-
-          return (
-            <div
-              key={index}
-              className="flex flex-col justify-between rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 shadow-sm"
-            >
-              <p className="min-h-[7rem] whitespace-pre-line break-words text-[#3d3450] text-sm leading-relaxed">
-                {captionText}
-              </p>
-
-              <div className="mt-4 flex items-center justify-between border-t border-[var(--poskoo-line)] pt-3">
-                <span
-                  className={`text-xs font-medium tabular-nums ${
-                    isOver ? "text-[var(--poskoo-coral)]" : "text-[#3d3450]"
-                  }`}
-                >
-                  {charCount}/{INSTAGRAM_CAPTION_LIMIT} chars
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => handleCopy(index, captionText)}
-                  aria-label={isCopied ? "Copied" : `Copy caption ${index + 1}`}
-                  className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-2 text-xs font-semibold hover:text-[var(--poskoo-violet)]"
-                >
-                  {isCopied ? (
-                    <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" />
-                  ) : (
-                    <Copy className="h-3.5 w-3.5" />
-                  )}
-                  {isCopied ? "Copied" : "Copy"}
-                </button>
-              </div>
+      {/* Summary */}
+      <div role="region" aria-labelledby={`${baseId}-sum`} className="min-w-0">
+        <h3 id={`${baseId}-sum`} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-semibold">
+          <Sparkles className="h-5 w-5 text-[var(--poskoo-violet)]" aria-hidden="true" />
+          Your caption drafts
+          <span className="rounded-md bg-[var(--poskoo-band)] px-2 py-0.5 text-xs font-semibold text-[var(--poskoo-violet)]">{goal} · {tone}</span>
+        </h3>
+        <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className={kpi}>
+            <p className={kpiLabel}>Drafts</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{captions.length}</p>
+            <p className="mt-1 text-xs text-[#3d3450]">Regenerate to reshuffle the order.</p>
+          </div>
+          <div className={kpi}>
+            <p className={kpiLabel}>Avg. length</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{avgLength}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
+            <p className="mt-1 text-xs tabular-nums text-[#3d3450]">Range {shortest}–{longest} of {INSTAGRAM_CAPTION_LIMIT.toLocaleString("en-US")}.</p>
+          </div>
+          <div className={kpi}>
+            <p className={kpiLabel}>Hook before “more”</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{hookFits}<span className="text-base font-medium text-[#5f5873]"> / {captions.length}</span></p>
+            <div className="mt-2 flex gap-0.5" aria-hidden="true">
+              {captions.map((_, i) => (
+                <i key={i} className="h-1.5 flex-1 rounded-full" style={{ background: i < hookFits ? "var(--poskoo-green)" : "var(--poskoo-line)" }} />
+              ))}
             </div>
-          );
-        })}
+          </div>
+          <div className={kpi}>
+            <p className={kpiLabel}>Call to action</p>
+            <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{addCommentCta ? "Keyword" : "Standard"}</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{addCommentCta ? "Comment a word, get a DM." : "Comment, tag or link in bio."}</p>
+          </div>
+        </div>
+        {usingDefaultTopic && (
+          <p className="mt-3 flex items-start gap-2 rounded-xl border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 text-sm text-[#3d3450]">
+            <PenLine className="mt-0.5 h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
+            <span>Add your topic or product above. Until then, the drafts use “my newest project” as a placeholder.</span>
+          </p>
+        )}
+      </div>
+
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start 2xl:grid-cols-[minmax(0,1fr)_380px]">
+        {/* Results */}
+        <div className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 sm:p-4">
+          <p className="mb-3 text-sm text-[#5f5873]">Pick a draft to preview it, or copy any card directly.</p>
+          <ul className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3" aria-label="Generated captions">
+            {captions.map((captionText, index) => {
+              const charCount = captionText.length;
+              const isOver = charCount > INSTAGRAM_CAPTION_LIMIT;
+              const isCopied = copiedId === index;
+              const isSelected = current === index;
+              const [hook, ...rest] = captionText.split("\n\n");
+
+              return (
+                <li
+                  key={index}
+                  className={`flex min-w-0 flex-col justify-between rounded-2xl border bg-[var(--poskoo-paper)] transition ${isSelected ? "border-[var(--poskoo-violet)] shadow-[0_0_0_1px_var(--poskoo-violet)]" : "border-[var(--poskoo-line)] hover:border-[#bdb4cf]"}`}
+                >
+                  <button
+                    type="button"
+                    aria-pressed={isSelected}
+                    aria-label={`Preview caption ${index + 1}`}
+                    onClick={() => { setSelected(index); setExpanded(false); }}
+                    className="block min-h-[7rem] w-full rounded-t-2xl p-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
+                  >
+                    <span className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]">
+                      <span className={`grid h-6 w-6 place-items-center rounded-full text-xs tabular-nums ${isSelected ? "bg-[var(--poskoo-ink)] text-white" : "bg-[var(--poskoo-band)] text-[var(--poskoo-violet)]"}`}>{index + 1}</span>
+                      {isSelected ? "In preview" : "Draft"}
+                    </span>
+                    <span className="block whitespace-pre-line break-words text-sm leading-relaxed text-[#3d3450]">
+                      <b className="font-semibold text-[var(--poskoo-ink)]">{hook}</b>
+                      {rest.length > 0 && `\n\n${rest.join("\n\n")}`}
+                    </span>
+                  </button>
+
+                  <div className="mx-4 flex items-center justify-between gap-3 border-t border-[var(--poskoo-line)] py-3">
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={`text-xs font-medium tabular-nums ${
+                          isOver ? "text-[var(--poskoo-coral)]" : "text-[#3d3450]"
+                        }`}
+                      >
+                        {charCount}/{INSTAGRAM_CAPTION_LIMIT} chars
+                      </span>
+                      <span className="mt-1 block h-1 max-w-[9rem] overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
+                        <i className="block h-full rounded-full bg-[var(--poskoo-green)]" style={{ width: `${Math.min(100, (charCount / INSTAGRAM_CAPTION_LIMIT) * 100)}%` }} />
+                      </span>
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(index, captionText)}
+                      aria-label={isCopied ? "Copied" : `Copy caption ${index + 1}`}
+                      className={`inline-flex min-h-11 flex-none items-center gap-1.5 rounded-xl border px-3.5 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--poskoo-violet)] ${isCopied ? "border-[var(--poskoo-green)] bg-[var(--poskoo-green)]/10" : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] hover:border-[var(--poskoo-ink)]"}`}
+                    >
+                      {isCopied ? (
+                        <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" aria-hidden="true" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                      )}
+                      {isCopied ? "Copied" : "Copy"}
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {/* Primary action + live preview */}
+        <aside aria-labelledby={`${baseId}-prev`} className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 max-lg:order-first lg:sticky lg:top-24">
+          <button
+            type="button"
+            onClick={() => handleCopy(current, selectedText)}
+            disabled={!selectedText}
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
+          >
+            {copiedId === current ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
+            {copiedId === current ? "Copied" : `Copy caption ${current + 1}`}
+          </button>
+          <button type="button" onClick={handleRegenerate} className={`${ghostBtn} w-full`}>
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            Regenerate
+          </button>
+          <span className="sr-only" aria-live="polite">{copiedId !== null ? "Copied to clipboard" : ""}</span>
+
+          <div>
+            <h4 id={`${baseId}-prev`} className="flex items-center justify-between gap-2 text-sm font-semibold">
+              Feed preview
+              <span className="text-xs font-medium tabular-nums text-[#5f5873]">{selectedText.length} chars · {selectedWords} words</span>
+            </h4>
+            <div className="mt-2 overflow-hidden rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-sm">
+              <div className="flex items-center gap-2 p-3">
+                <span className="h-7 w-7 rounded-full bg-[conic-gradient(var(--poskoo-violet),var(--poskoo-pink),var(--poskoo-peach),var(--poskoo-violet))] p-[2px]" aria-hidden="true"><span className="block h-full w-full rounded-full border-2 border-white bg-[var(--poskoo-band)]" /></span>
+                <span className="text-xs font-semibold">your_account</span>
+              </div>
+              <div className="grid aspect-[16/7] place-items-center lg:aspect-[4/3] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--poskoo-violet)_22%,transparent),color-mix(in_srgb,var(--poskoo-peach)_35%,transparent))]" aria-hidden="true">
+                <ImageIcon className="h-8 w-8 text-white/80" />
+              </div>
+              <div className="flex gap-3 px-3 pt-2.5 text-[var(--poskoo-ink)]" aria-hidden="true">
+                <Heart className="h-5 w-5" /><MessageCircle className="h-5 w-5" /><Send className="h-5 w-5" />
+              </div>
+              <p className="max-h-72 overflow-y-auto whitespace-pre-line break-words p-3 pt-2 leading-5" aria-live="polite">
+                <span className="font-semibold">your_account</span>{" "}
+                {expanded || !fold.folded ? selectedText : fold.preview}
+                {fold.folded && !expanded && (
+                  <>
+                    {"… "}
+                    <button type="button" onClick={() => setExpanded(true)} className="min-h-6 font-medium text-[#5f5873] underline-offset-2 hover:underline">more</button>
+                  </>
+                )}
+              </p>
+            </div>
+            <p className="mt-2 text-xs text-[#5f5873]">
+              About the first {FOLD_AT} characters show before “… more” in the feed. That cut-off varies by device.
+            </p>
+          </div>
+        </aside>
       </div>
     </div>
   );

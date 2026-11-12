@@ -88,7 +88,7 @@ const codeStyle: CSSProperties = {
 
 export default function InstagramAutoDmNotWorkingPage() {
   return (
-    <PublicShell>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
@@ -105,14 +105,16 @@ export default function InstagramAutoDmNotWorkingPage() {
         <Link href="/help">Help center</Link> / Instagram auto DM not working
       </nav>
       <header className="hero">
-        <p className="eyebrow">Troubleshooting guide</p>
-        <h1>
-            Instagram auto DM <em className="s">not working?</em>
-          </h1>
-        <p className="lede">
-          Walk through this checklist in order. Each step reflects how {BRAND.name} actually processes comments, gates,
-          and the send queue.
-        </p>
+        <div className={s.heroText}>
+          <p className="eyebrow">Troubleshooting guide</p>
+          <h1>
+              Instagram auto DM <em className="s">not working?</em>
+            </h1>
+          <p className="lede">
+            Walk through this checklist in order. Each step reflects how {BRAND.name} actually processes comments, gates,
+            and the send queue.
+          </p>
+        </div>
         <HelpGuideIllustration variant="troubleshoot" className="hero-art" />
       </header>
 
@@ -203,7 +205,7 @@ export default function InstagramAutoDmNotWorkingPage() {
               extracts it from their message and then queues the link DM.
             </p>
 
-            <h2>6. Queue timing and per-contact limits</h2>
+            <h2>6. Queue timing and <span className={s.nowrap}>per-contact</span> limits</h2>
             <p>
               Matching comments enqueue a send job immediately, but delivery runs in the background with retries and
               per-account send budgeting. Expect most messages within a few minutes, not the second the comment is posted.

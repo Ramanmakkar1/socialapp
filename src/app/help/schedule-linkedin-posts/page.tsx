@@ -129,7 +129,7 @@ const related = [
 
 export default function ScheduleLinkedInPostsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule LinkedIn Posts", path: "/help/schedule-linkedin-posts" },
@@ -148,18 +148,18 @@ export default function ScheduleLinkedInPostsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
-            How to schedule LinkedIn <em className="s">posts</em>
-          </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+            <h1>
+              How to schedule LinkedIn <em className="s">posts</em>
+            </h1>
+          <p className="lede">
+            To schedule a LinkedIn post, connect your profile in {BRAND.name} with LinkedIn&apos;s official sign-in,
+            write the post, add an image, and pick a date and time. {BRAND.name} then publishes it to your personal
+            profile at that moment. Here is exactly how it works, step by step.
+          </p>
         </div>
-        <p className="lede">
-          To schedule a LinkedIn post, connect your profile in {BRAND.name} with LinkedIn&apos;s official sign-in,
-          write the post, add an image, and pick a date and time. {BRAND.name} then publishes it to your personal
-          profile at that moment. Here is exactly how it works, step by step.
-        </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

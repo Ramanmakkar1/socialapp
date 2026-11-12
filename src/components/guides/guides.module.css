@@ -101,6 +101,22 @@
 .card .meta { margin-top: auto; padding-inline: 4px; font-size: .82rem; }
 .cardSoon { border-style: dashed; justify-content: center; }
 .cardSoon .cardArt { background: color-mix(in srgb, var(--peach) 40%, var(--card)); }
+/* Only the "coming soon" card left: one full-width dashed banner, not a lone
+   narrow card with an empty row beside it. */
+.grid:has(> li:only-child) { grid-template-columns: minmax(0, 1fr); }
+.grid > li:only-child .cardSoon {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center;
+  gap: 6px 20px; padding: 22px 26px;
+  background: color-mix(in srgb, var(--lilac) 18%, var(--card));
+}
+.grid > li:only-child .cardSoon .chip { margin: 0; grid-row: 1 / span 2; }
+.grid > li:only-child .cardSoon b { grid-column: 2; }
+.grid > li:only-child .cardSoon p { grid-column: 2; }
+.grid > li:only-child .cardSoon .go { grid-column: 3; grid-row: 1 / span 2; white-space: nowrap; }
+@media (max-width: 640px) {
+  .grid > li:only-child .cardSoon { grid-template-columns: minmax(0, 1fr); padding: 18px; }
+  .grid > li:only-child .cardSoon :is(.chip, b, p, .go) { grid-column: 1; grid-row: auto; justify-self: start; }
+}
 .empty { text-align: center; color: var(--muted); padding: 28px 0; }
 .empty a { color: var(--violet); text-decoration: underline; }
 

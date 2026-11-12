@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowRight, BookOpen } from "lucide-react";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt, type AnimName } from "@/components/AnimArt";
 import { BRAND } from "@/lib/brand";
-import { TOOLS, toolByHref } from "./registry";
+import { TOOLS, toolByHref, type ToolIconName } from "./registry";
+import { ToolIcon } from "./ToolIcon";
 import { RelatedToolsCarousel } from "./RelatedToolsCarousel";
 import { faqJsonLd, howToJsonLd, ldJson, webAppJsonLd, type AppCategory, type ToolFaq } from "./seo";
 import t from "./tools.module.css";
@@ -105,13 +106,34 @@ export function ToolHero({ config }: { config: ToolPageConfig }) {
   );
 }
 
-export function ToolCard({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
+export function ToolCard({
+  title,
+  note,
+  icon,
+  children,
+}: {
+  title: string;
+  note?: string;
+  /** Optional registry icon shown beside the title. */
+  icon?: ToolIconName;
+  children: ReactNode;
+}) {
   return (
     <section id="tool" className={t.toolSection} aria-labelledby="tool-title">
       <div className={t.toolCard}>
         <div className={t.toolHead}>
-          <h2 id="tool-title">{title}</h2>
-          <span className={t.toolBadge}>{note ?? "Free · runs in your browser"}</span>
+          <div className={t.toolTitle}>
+            {icon && (
+              <span className={t.toolIcon} aria-hidden="true">
+                <ToolIcon name={icon} size={18} />
+              </span>
+            )}
+            <h2 id="tool-title">{title}</h2>
+          </div>
+          <span className={t.toolBadge}>
+            <i className={t.liveDot} aria-hidden="true" />
+            {note ?? "Free · runs in your browser"}
+          </span>
         </div>
         <div className={t.toolBody}>{children}</div>
       </div>
@@ -193,17 +215,23 @@ export function ToolGuide({ guide }: { guide: ToolPageConfig["guide"] }) {
 export function ToolFaqSection({ title, faqs }: { title: string; faqs: ToolFaq[] }) {
   return (
     <section id="faq" className={t.section}>
-      <div className="head">
-        <p className="eyebrow">Questions</p>
-        <h2>{title}</h2>
-      </div>
-      <div className="faq">
-        {faqs.map((f) => (
-          <details key={f.q}>
-            <summary>{f.q}</summary>
-            <p>{f.a}</p>
-          </details>
-        ))}
+      <div className={t.faqLayout}>
+        <div className="head">
+          <p className="eyebrow">Questions</p>
+          <h2>{title}</h2>
+          <p className={t.faqNote}>
+            <BookOpen size={16} aria-hidden="true" />
+            {faqs.length} quick answers. Tap a question to open it.
+          </p>
+        </div>
+        <div className="faq">
+          {faqs.map((f) => (
+            <details key={f.q}>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -322,7 +350,9 @@ export function ToolPageTemplate({
       </svg>
       <div className={t.page}>
         <ToolHero config={config} />
-        <ToolCard title={config.toolTitle} note={config.toolNote}>{children}</ToolCard>
+        <ToolCard title={config.toolTitle} note={config.toolNote} icon={toolByHref(config.path)?.icon}>
+          {children}
+        </ToolCard>
         {afterTool}
         <HowItWorks title={config.stepsTitle} steps={config.steps} />
         <ToolFeatures title={config.featuresTitle} features={config.features} />

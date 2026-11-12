@@ -129,7 +129,7 @@ const related = [
 
 export default function ScheduleFacebookPostsHelpPage() {
   return (
-    <PublicShell
+    <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
         { name: "Help center", path: "/help" },
         { name: "Schedule Facebook Posts", path: "/help/schedule-facebook-posts" },
@@ -148,18 +148,18 @@ export default function ScheduleFacebookPostsHelpPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
-        <p className="eyebrow">Guide</p>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1>
-            How to schedule Facebook Page <em className="s">posts</em>
-          </h1>
-          <HelpGuideIllustration variant="schedule" className="w-36 shrink-0 sm:w-48" />
+        <div className={s.heroText}>
+          <p className="eyebrow">Guide</p>
+            <h1>
+              How to schedule Facebook Page <em className="s">posts</em>
+            </h1>
+          <p className="lede">
+            Connect your Facebook Page through Meta&apos;s official login in {BRAND.name}, write the post, add an image or
+            video link, pick a date and time, and {BRAND.name} publishes it to the Page at that time. Here is exactly how
+            it works, step by step.
+          </p>
         </div>
-        <p className="lede">
-          Connect your Facebook Page through Meta&apos;s official login in {BRAND.name}, write the post, add an image or
-          video link, pick a date and time, and {BRAND.name} publishes it to the Page at that time. Here is exactly how
-          it works, step by step.
-        </p>
+        <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
 
       <section style={{ paddingTop: 40 }}>

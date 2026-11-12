@@ -33,7 +33,7 @@ const crumbsJsonLd = breadcrumbJsonLd([
 
 export default function ContactPage() {
   return (
-    <PublicShell>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(contactJsonLd) }}
@@ -43,20 +43,22 @@ export default function ContactPage() {
         dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <header className="hero">
-        <span className="pill">We reply within one business day</span>
-        <h1>
-          Contact <em className="s">support</em>
-        </h1>
-        <p className="lede">
-          Need a hand with scheduling, Instagram auto-DM or your account? Choose the support option that fits.
-        </p>
-        <div className="ctas">
-          <a className="btn btn-dark" href={`mailto:${BRAND.supportEmail}`}>
-            Email us <span aria-hidden="true">→</span>
-          </a>
-          <Link className="btn btn-line" href="/help">
-            Help center
-          </Link>
+        <div className={s.heroText}>
+          <span className="pill">We reply within one business day</span>
+          <h1>
+            Contact <em className="s">support</em>
+          </h1>
+          <p className="lede">
+            Need a hand with scheduling, Instagram auto-DM or your account? Choose the support option that fits.
+          </p>
+          <div className="ctas">
+            <a className="btn btn-dark" href={`mailto:${BRAND.supportEmail}`}>
+              Email us <span aria-hidden="true">→</span>
+            </a>
+            <Link className="btn btn-line" href="/help">
+              Help center
+            </Link>
+          </div>
         </div>
         <div className="hero-art"><AnimArt name="help" label="A creator reads on a giant open book under a lightbulb and a signpost" /></div>
       </header>
