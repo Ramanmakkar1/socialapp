@@ -79,11 +79,11 @@ export function GuidesDirectory() {
           </li>
         ))}
         <li>
-          <Link className={`${g.card} ${g.cardSoon}`} href="/tools">
-            <span className={g.chip}>Coming soon</span>
-            <b>More guides are on the way</b>
-            <p>New articles on scheduling, auto-DM and content ideas. Meanwhile, the free tools are ready to use.</p>
-            <span className={g.go}>Browse free tools <span aria-hidden="true">→</span></span>
+          <Link className={`${g.card} ${g.cardSoon}`} href="/help">
+            <span className={g.chip}>Help center</span>
+            <b>Step-by-step help for every network</b>
+            <p>Short how-tos for scheduling on Instagram, Facebook, Threads, YouTube, Bluesky and more, plus auto-DM setup and fixes.</p>
+            <span className={g.go}>Open the help center <span aria-hidden="true">→</span></span>
           </Link>
         </li>
       </ul>
