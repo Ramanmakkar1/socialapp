@@ -156,6 +156,9 @@ export default function YouTubeSchedulerPage() {
               </article>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Check the title, description and combined tag limits with the <Link className={s.vlink} href="/tools/youtube-title-counter">free YouTube title and description counter</Link>.
+          </p>
         </div>
       </section>
 
