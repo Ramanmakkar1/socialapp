@@ -17,8 +17,8 @@ test("sitemap stays empty while BRAND.indexable is false", () => {
 
 test("home page canonical and description match the shared values", () => {
   assert.ok(
-    pageSource.includes('const canonical = new URL("/", BRAND.url).toString();'),
-    "home page must build an absolute canonical from BRAND.url",
+    pageSource.includes("const canonical = `${BRAND.url}/`;"),
+    "home page must build an absolute canonical from BRAND.url with a trailing slash",
   );
   assert.ok(
     pageSource.includes("alternates: { canonical }"),
@@ -32,10 +32,17 @@ test("home page canonical and description match the shared values", () => {
 });
 
 test("home page canonical is an absolute https URL on the final domain with no query string", () => {
-  const canonical = new URL("/", BRAND.url).toString();
-  assert.equal(canonical, `${BRAND.url}/`, "canonical must be the final domain root");
+  // The canonical must end with the trailing slash. new URL("/", base) drops it
+  // (it returns the bare origin), and the audit compares the tag against the
+  // audited URL https://poskoo.com/ — so the source writes it explicitly.
+  const canonical = `${BRAND.url}/`;
+  assert.equal(canonical, `${BRAND.url}/`, "canonical must be the final domain root with a trailing slash");
   assert.ok(canonical.startsWith("https://"), "canonical must be https");
   assert.ok(!canonical.includes("?"), "canonical must have no query string");
+  assert.ok(
+    pageSource.includes("const canonical = `${BRAND.url}/`;"),
+    "home page must write the canonical with an explicit trailing slash (new URL normalises it away)",
+  );
 });
 
 test("home page canonical is a self-reference on the final domain, not the staging host", () => {
