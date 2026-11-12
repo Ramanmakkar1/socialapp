@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PoskooMark from "./PoskooMark";
 import { MobileMenu } from "./MobileMenu";
+import { AuthNav } from "./AuthNav";
 
 // The one site header, used by the landing page and every public page (via
 // PublicShell). Must be rendered inside a .landing wrapper (landing.module.css)
@@ -33,12 +34,7 @@ export function SiteHeader({ onHome = false }: { onHome?: boolean }) {
           ))}
         </div>
         <div className="navr">
-          <Link className="login" href="/login">
-            Log in
-          </Link>
-          <Link className="btn btn-dark" href="/signup">
-            Start free <span aria-hidden="true">→</span>
-          </Link>
+          <AuthNav />
           <MobileMenu links={links} />
         </div>
       </nav>

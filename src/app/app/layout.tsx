@@ -1,4 +1,5 @@
 import { Suspense, type ReactNode } from "react";
+import { MarkLoggedIn } from "@/components/AuthNav";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { isAdmin } from "@/lib/admin";
@@ -343,6 +344,7 @@ async function AppShell({ children }: { children: ReactNode }) {
       >
         <AlertBar alerts={alerts} />
         <div className={styles.content}>{children}</div>
+        <MarkLoggedIn />
       </ShellFrame>
     </div>
   );

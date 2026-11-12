@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { hasLoginHint } from "./AuthNav";
 
 // Mobile/tablet menu for SiteHeader (shown below 960px). A native modal
 // <dialog>: showModal() makes the rest of the page inert (focus stays inside)
 // and Escape closes it for free.
 export function MobileMenu({ links }: { links: { href: string; label: string }[] }) {
+  const [loggedIn, setLoggedIn] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a browser-only value
+    setLoggedIn(hasLoginHint(document.cookie));
+  }, []);
   const ref = useRef<HTMLDialogElement>(null);
   const pathname = usePathname();
 
@@ -62,12 +68,20 @@ export function MobileMenu({ links }: { links: { href: string; label: string }[]
             </ul>
           </nav>
           <div className="menuCtas">
-            <Link className="btn btn-line" href="/login" onClick={close}>
-              Log in
-            </Link>
-            <Link className="btn btn-dark" href="/signup" onClick={close}>
-              Start free <span aria-hidden="true">→</span>
-            </Link>
+            {loggedIn ? (
+              <Link className="btn btn-dark" href="/app" onClick={close}>
+                Open dashboard <span aria-hidden="true">→</span>
+              </Link>
+            ) : (
+              <>
+                <Link className="btn btn-line" href="/login" onClick={close}>
+                  Log in
+                </Link>
+                <Link className="btn btn-dark" href="/signup" onClick={close}>
+                  Start free <span aria-hidden="true">→</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </dialog>

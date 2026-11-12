@@ -64,6 +64,8 @@ export async function startSession(userId: string, userAgent?: string): Promise<
     path: "/",
     maxAge: MAX_AGE,
   });
+  // Non-secret hint for cached public pages (see src/components/AuthNav.tsx).
+  jar.set("pf_in", "1", { sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: MAX_AGE });
 }
 
 // The logged-in user, or null. Never throws.
@@ -118,4 +120,5 @@ export async function endSession(): Promise<void> {
     await query("delete from sessions where id = $1", [hashToken(token)]);
   }
   jar.delete(COOKIE);
+  jar.delete("pf_in");
 }
