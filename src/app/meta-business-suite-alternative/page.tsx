@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,12 +10,12 @@ import { StaySection } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: `Meta Business Suite Alternative for Instagram | ${BRAND.name}` },
   description:
     "Meta Business Suite alternative for Instagram: schedule posts on a calendar, auto-DM every keyword commenter, capture emails and write captions with AI.",
   alternates: { canonical: `${BRAND.url}/meta-business-suite-alternative` },
-};
+});
 
 const whyLook = [
   {

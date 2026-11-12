@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -8,12 +9,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Getting Started: Set Up Instagram Auto-DMs in 3 Minutes" },
   description:
     `Connect Instagram, create your first comment-to-DM rule from a template, and schedule a post in ${BRAND.name} — the same three steps as the dashboard checklist.`,
   alternates: { canonical: "/help/getting-started" },
-};
+});
 
 const STARTER_SLUGS = ["free-guide", "email-checklist", "follow-bonus"] as const;
 

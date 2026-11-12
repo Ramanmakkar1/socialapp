@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -6,12 +7,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Auto-DM Instagram Story Replies: Step-by-Step Guide" },
   description:
     "Send an automatic DM with your link to everyone who replies FREE to your Instagram Story. Set up a story-reply rule step by step and turn it on.",
   alternates: { canonical: "/help/instagram-story-reply-auto-dm" },
-};
+});
 
 const articleJsonLd = {
   "@context": "https://schema.org",

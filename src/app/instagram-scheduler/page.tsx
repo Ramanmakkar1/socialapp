@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -8,12 +9,12 @@ import { ArrowRight } from "lucide-react";
 import { AnimArt, type AnimName } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
   description:
     "Schedule Instagram posts, reels, carousels and stories, see suggested posting times, and auto-DM everyone who comments. Free plan, no credit card.",
   alternates: { canonical: "/instagram-scheduler" },
-};
+});
 
 type Mark = boolean | string;
 

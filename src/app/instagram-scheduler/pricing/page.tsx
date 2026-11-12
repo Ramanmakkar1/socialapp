@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -13,15 +14,15 @@ const PATH = "/instagram-scheduler/pricing";
 export const revalidate = 600;
 const title = "Instagram Scheduler Pricing: Plans & Limits | Poskoo";
 const description =
-  "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free; Pro and Agency add more accounts, posts and DMs.";
+  "What each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free; Pro and Agency add more.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 function itemFor(plan: Plan, matches: string[]) {
   return plan.items.find((item) => matches.some((match) => item.text.toLowerCase().includes(match.toLowerCase())));

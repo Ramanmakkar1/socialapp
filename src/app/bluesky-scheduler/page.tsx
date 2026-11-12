@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -12,13 +14,13 @@ const PATH = "/bluesky-scheduler";
 const title = `Bluesky Scheduler: Schedule Bluesky Posts | ${BRAND.name}`;
 const description = "Schedule Bluesky posts with your handle and an app password. Add text and up to 4 images, pick a time, and Poskoo publishes with a clear status.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: new URL(PATH, BRAND.url).toString() },
   openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const features = [
   {
@@ -102,7 +104,8 @@ const appJsonLd = {
     "Mentions and links as real facets",
     "Published or failed status for each post",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
 };
 
 export default function BlueskySchedulerPage() {

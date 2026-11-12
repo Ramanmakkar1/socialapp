@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -11,12 +12,12 @@ const title = "How to Schedule X (Twitter) Posts: Step-by-Step | Poskoo";
 const description =
   "Schedule X (Twitter) posts in Poskoo: connect your X account, write the post, add images or one video, pick a time and Poskoo publishes it for you.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: new URL(PATH, BRAND.url).toString() },
   openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
-};
+});
 
 const crumbsJsonLd = breadcrumbJsonLd([
   { name: "Home", url: `${BRAND.url}/` },

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -10,12 +11,12 @@ import AutoDmDemo from "@/components/AutoDmDemo";
 import FlowDemo from "./FlowDemo";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: "Instagram Auto DM: DM Everyone Who Comments",
   description:
     "Auto-DM everyone who comments a keyword on your Instagram posts and reels. Official Meta API, email capture, follow gate and a simpler ManyChat alternative.",
   alternates: { canonical: "/instagram-auto-dm" },
-};
+});
 
 const steps = [
   { n: "1", title: "Pick a post or reel", text: "Choose any post or reel on your Instagram Business or Creator account, or one you are about to schedule." },

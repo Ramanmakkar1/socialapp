@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -7,11 +8,11 @@ import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: `Contact ${BRAND.name} Support: Help With Scheduling and Auto-DMs` },
   description: `Questions about scheduling posts, Instagram auto-DM rules or your ${BRAND.name} account? Email the support team or browse step-by-step help guides.`,
   alternates: { canonical: "/contact" },
-};
+});
 
 const contactJsonLd = {
   "@context": "https://schema.org",

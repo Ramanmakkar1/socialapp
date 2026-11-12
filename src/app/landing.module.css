@@ -859,7 +859,7 @@
   position:relative;overflow:hidden;min-height:100svh;background:#fffae9;display:flex;flex-direction:column;
   margin-left:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));margin-right:calc(-1 * max(16px, env(safe-area-inset-right, 0px)));padding-inline:max(16px, env(safe-area-inset-left, 0px))}
 .landing :global(.heroVideoFrame){
-  position:absolute;inset:0;overflow:hidden;pointer-events:none}
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;background-repeat:no-repeat;background-size:cover;background-position:center bottom}
 .landing :global(.heroVideo){
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center bottom;opacity:0;pointer-events:none}
 .landing :global(.videoHero > .wrap){
@@ -976,6 +976,7 @@
   /* Phones: the full-width bottom strip of the video (creator, link-comments, DM plane, followers). */
   .landing :global(.heroVideoFrame){ position:relative;inset:auto;aspect-ratio:1920/600;height:auto;order:2;margin-top:4px;width:calc(100% + 2 * max(16px, env(safe-area-inset-left, 0px)));margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
   .landing :global(.heroVideoFrame .heroVideo){ inset:auto;left:0;bottom:0;width:100%;height:auto;max-width:none;object-fit:contain; }
+  .landing :global(.heroVideoFrame){ background-size:100% auto;background-position:left bottom; }
   .landing :global(.hero.heroCenter){ padding-block:28px 8px; }
   .landing :global(.videoHero nav.top){ margin-top:10px;padding-left:16px; }
 }

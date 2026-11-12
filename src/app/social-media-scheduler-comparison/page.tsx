@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 import { CompareNote } from "@/components/CompareNote";
@@ -14,13 +16,13 @@ const title = "Scheduler Comparison: Instagram, Facebook Pages, Threads";
 const description =
   "Compare Poskoo's Instagram, Facebook Pages and Threads scheduling: calendar, media, auto-publishing and Instagram comment-to-DM, plus a free plan.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const platformRows = [
   {
@@ -99,7 +101,8 @@ const appJsonLd = {
     "Publishing status and retries",
     "Instagram comment-to-DM automation",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
   publisher: { "@type": "Organization", name: BRAND.company },
 };
 

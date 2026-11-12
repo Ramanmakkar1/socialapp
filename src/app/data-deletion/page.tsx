@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
@@ -30,11 +31,11 @@ const jsonLd = {
   ],
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: `Delete Your ${BRAND.name} Account Data and Disconnect Instagram` },
   description: "Learn how to disconnect Instagram or Facebook from Poskoo and request deletion of all stored account data, including posts, messages and contacts.",
   alternates: { canonical: "/data-deletion" },
-};
+});
 export default function Page() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`}>

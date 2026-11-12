@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -10,12 +11,12 @@ import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Metricool Alternative for Instagram Scheduling + Auto-DM" },
   description:
     "Metricool alternative for Instagram scheduling with comment-to-DM automation, lead capture and an inbox — schedule posts and turn commenters into leads.",
   alternates: { canonical: "/metricool-alternative" },
-};
+});
 
 const whyLook = [
   {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,12 +10,12 @@ import { DM_TEMPLATES, type DmTemplate } from "@/lib/dmTemplates";
 import TemplateChooser from "./TemplateChooser";
 import CopyButton from "./CopyButton";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: "Instagram Comment-to-DM Templates (Copy & Paste)",
   description:
     "Copy-and-paste Instagram auto DM templates for comment keywords like GUIDE, LINK, PRICE and CODE, with public replies, email and follow gates.",
   alternates: { canonical: "/instagram-auto-dm/templates" },
-};
+});
 
 const anchor = (useCase: string) => useCase.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -41,7 +42,7 @@ const faqJsonLd = {
 
 export default function DmTemplatesPage() {
   return (
-    <PublicShell>
+    <PublicShell breadcrumbs={[{ name: "Instagram auto-DM", path: "/instagram-auto-dm" }, { name: "DM templates", path: "/instagram-auto-dm/templates" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
       <header className="hero">
         <span className="pill">Copy &amp; paste · {DM_TEMPLATES.length} templates</span>

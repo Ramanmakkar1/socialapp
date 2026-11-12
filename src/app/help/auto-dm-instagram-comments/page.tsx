@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: "How to Auto DM Instagram Comments (Step by Step)",
   description:
     `Send an automatic Instagram DM to everyone who comments a keyword. Set up a comment-to-DM rule in ${BRAND.name} with the official Meta API, step by step.`,
   alternates: { canonical: "/help/auto-dm-instagram-comments" },
-};
+});
 
 const linkClass = s.vlink;
 

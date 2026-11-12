@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,12 +10,12 @@ import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: `Publer Alternative with Instagram Auto-DM | ${BRAND.name}` },
   description:
     "Poskoo is a Publer alternative that schedules Instagram, Facebook and Threads posts and auto-DMs every keyword commenter to capture leads. Free plan.",
   alternates: { canonical: `${BRAND.url}/publer-alternative` },
-};
+});
 
 const whySwitch = [
   { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page, Threads and YouTube posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },

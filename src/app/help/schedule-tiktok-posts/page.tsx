@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -6,12 +7,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule TikTok Videos (Step-by-Step Guide)" },
   description:
     `Schedule TikTok videos in ${BRAND.name}: connect TikTok with its official login, upload a vertical video, choose who can see it, pick a time and it posts for you.`,
   alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.url).toString() },
-};
+});
 
 const crumbsJsonLd = breadcrumbJsonLd([
   { name: "Home", url: `${BRAND.url}/` },

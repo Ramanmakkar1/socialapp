@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,12 +10,12 @@ import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-content-planner";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Instagram Content Planner: Hook to Scheduled Post" },
   description:
     "Plan one Instagram post in five steps: draft a hook, write the caption, check image dimensions, preview the post, then schedule it with Poskoo.",
   alternates: { canonical: PATH },
-};
+});
 
 const steps = [
   {

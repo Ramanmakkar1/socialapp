@@ -157,6 +157,7 @@ export default async function GuidePage({ params }: Props) {
               height={guide.cover.height}
               alt={guide.cover.alt}
               priority
+              fetchPriority="high"
               sizes="(max-width: 899px) 92vw, 520px"
             />
           </figure>

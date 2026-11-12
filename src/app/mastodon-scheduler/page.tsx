@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -12,13 +14,13 @@ const PATH = "/mastodon-scheduler";
 const title = `Mastodon Scheduler: Schedule Toots on Any Server | ${BRAND.name}`;
 const description = "Schedule Mastodon posts on any server with OAuth. Write up to 500 characters or your server's limit, add images or video, and pick a time with Poskoo.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: new URL(PATH, BRAND.url).toString() },
   openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const features = [
   {
@@ -94,7 +96,8 @@ const appJsonLd = {
     "One MP4 or MOV video up to 99 MB",
     "Published or failed status for each post",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
 };
 
 export default function MastodonSchedulerPage() {

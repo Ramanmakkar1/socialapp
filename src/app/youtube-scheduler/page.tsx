@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -12,13 +14,13 @@ const PATH = "/youtube-scheduler";
 const title = `YouTube Scheduler: Schedule Videos & Shorts | ${BRAND.name}`;
 const description = "Schedule YouTube videos and Shorts with titles, descriptions, tags and privacy settings. Poskoo uploads at your chosen time and shows clear status.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: new URL(PATH, BRAND.url).toString() },
   openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const features = [
   {
@@ -107,7 +109,8 @@ const appJsonLd = {
     "Scheduled resumable video uploads",
     "Published or failed status with retries",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
 };
 
 export default function YouTubeSchedulerPage() {

@@ -133,7 +133,7 @@ export default function ImageSizeFinder() {
           </div>
           <div>
             <p className={kpiLabel}>{platform.name}</p>
-            <h4 id={`${id}-sel`} className="text-lg font-bold text-[var(--poskoo-ink)]">{row.format}</h4>
+            <h3 id={`${id}-sel`} className="text-lg font-bold text-[var(--poskoo-ink)]">{row.format}</h3>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className={`${kpi} col-span-2`}>

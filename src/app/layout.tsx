@@ -36,10 +36,16 @@ const jsonLd = {
     {
       "@type": "Organization",
       "@id": BRAND.url + "#org",
-      name: BRAND.company,
+      name: BRAND.name,
+      legalName: BRAND.company,
       url: BRAND.url,
       email: BRAND.supportEmail,
-      logo: BRAND.url + "/icon.svg",
+      logo: {
+        "@type": "ImageObject",
+        url: BRAND.url + "/brand/poskoo-icon-1024.png",
+        width: 1024,
+        height: 1024,
+      },
       description: BRAND.description,
       contactPoint: {
         "@type": "ContactPoint",
@@ -66,7 +72,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\u003c") }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
         {children}
         <CookieNoticeGate />

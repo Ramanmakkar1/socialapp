@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -6,12 +7,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule Pinterest Pins (Step by Step) | Poskoo" },
   description:
     "Schedule Pinterest Pins: connect with Pinterest's official login, pick a board, add a JPG or PNG image, title and link, choose a time and it pins.",
   alternates: { canonical: new URL("/help/schedule-pinterest-posts", BRAND.url).toString() },
-};
+});
 
 const crumbsJsonLd = breadcrumbJsonLd([
   { name: "Home", url: `${BRAND.url}/` },

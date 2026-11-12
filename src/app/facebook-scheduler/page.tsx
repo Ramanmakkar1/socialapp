@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/facebook-scheduler";
 const title = `Facebook Page Scheduler: Plan & Auto-Publish | ${BRAND.name}`;
 const description = `Schedule Facebook Page posts with text, photos or video through Meta's official login. Plan Instagram and Threads content on the same calendar with ${BRAND.name}.`;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const benefits = [
   {
@@ -97,7 +99,8 @@ const appJsonLd = {
     "Week and month calendar",
     "Publishing status and retries",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
   publisher: { "@type": "Organization", name: BRAND.company },
 };
 

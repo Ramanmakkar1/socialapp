@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -12,13 +14,13 @@ const PATH = "/x-scheduler";
 const title = `X Scheduler: Schedule Tweets and Posts on X | ${BRAND.name}`;
 const description = "Poskoo schedules posts to X through X's official API: connect your account, write the post, add up to 4 images or one video, and pick a time.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: new URL(PATH, BRAND.url).toString() },
   openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const features = [
   {
@@ -98,7 +100,8 @@ const appJsonLd = {
     "Week and month content calendar",
     "Published or failed status with retries",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
 };
 
 export default function XSchedulerPage() {

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -12,13 +14,13 @@ const PATH = "/threads-scheduler";
 const title = `Threads Scheduler: Plan & Auto-Publish Posts | ${BRAND.name}`;
 const description = `Schedule Threads posts on one calendar and publish them automatically through Meta's official API. Plan text, image or video posts and track results.`;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const features = [
   {
@@ -118,7 +120,8 @@ const appJsonLd = {
     "Publishing status and retries",
     "Instagram and Facebook Page scheduling in the same queue",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
 };
 
 export default function ThreadsSchedulerPage() {

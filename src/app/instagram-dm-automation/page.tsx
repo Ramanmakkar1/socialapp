@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-dm-automation";
 const title = `Instagram DM Automation: Turn Comments Into Leads | ${BRAND.name}`;
 const description = `Instagram DM automation replies to comment keywords, Story replies and DM keywords, and captures emails before sending your link. See how ${BRAND.name} works.`;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const useCases = [
   {
@@ -91,7 +93,8 @@ const appJsonLd = {
     "Email capture in DMs",
     "Click and lead tracking",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
   publisher: { "@type": "Organization", name: BRAND.company },
 };
 

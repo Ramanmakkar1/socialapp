@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -10,12 +11,12 @@ import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Sprout Social Alternative for Instagram DMs & Scheduling" },
   description:
     "A Sprout Social alternative that schedules Instagram posts and auto-DMs every keyword comment, with email capture, AI captions and lead export in one tool.",
   alternates: { canonical: "/sprout-social-alternative" },
-};
+});
 
 const whyLook = [
   { no: "01 / One tool", title: "Scheduler plus comment-to-DM", text: "Sprout Social is priced per seat. If your plan does not cover comment-to-DM keyword automation, turning comments into DMs means adding a separate chatbot tool." },

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -9,11 +10,11 @@ import { AnimArt } from "@/components/AnimArt";
 const description =
   "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp. Schedule posts, list channels and read analytics.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Poskoo API and MCP Server: Let AI Assistants Schedule Posts" },
   description,
   alternates: { canonical: "/developers" },
-};
+});
 
 const MCP_URL = `${BRAND.url}/api/mcp`;
 

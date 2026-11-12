@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,12 +10,12 @@ import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: `Planoly Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
     "A Planoly alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export. Facebook Pages and Threads too.",
   alternates: { canonical: "/planoly-alternative" },
-};
+});
 
 const whyLook = [
   { no: "01 / One tool", title: "Scheduler plus comment-to-DM", text: "Planoly plans your grid and calendar well, but turning comments into DMs still means paying for a separate chat automation tool." },

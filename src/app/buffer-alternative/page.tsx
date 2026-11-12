@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,12 +10,12 @@ import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: `Buffer Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
     "A Buffer alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and AI captions. Facebook Pages, Threads and YouTube too.",
   alternates: { canonical: "/buffer-alternative" },
-};
+});
 
 const whySwitch = [
   { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish your posts, then reply to every comment with a DM, without juggling a scheduler and a separate chatbot tool." },

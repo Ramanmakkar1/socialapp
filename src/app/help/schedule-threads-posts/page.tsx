@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -6,12 +7,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule Threads Posts: A Step-by-Step Guide" },
   description:
     `Schedule Threads posts: connect Threads with Meta's login, write up to 500 characters, add one image or video link, pick a time and ${BRAND.name} publishes it.`,
   alternates: { canonical: "/help/schedule-threads-posts" },
-};
+});
 
 const articleJsonLd = {
   "@context": "https://schema.org",

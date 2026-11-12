@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -6,12 +7,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule Instagram Reels: A Step-by-Step Guide" },
   description:
     `Schedule Instagram Reels: paste one public .mp4 link, write a caption, pick a date and time and ${BRAND.name} publishes it for you. Specs, tips and fixes inside.`,
   alternates: { canonical: "/help/schedule-instagram-reels" },
-};
+});
 
 const articleJsonLd = {
   "@context": "https://schema.org",

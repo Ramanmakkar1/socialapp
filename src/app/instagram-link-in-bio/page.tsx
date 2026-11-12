@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { PLAN_LIMITS } from "@/lib/planLimits";
-import { SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 
 const PATH = "/instagram-link-in-bio";
 const title = "Instagram Link in Bio Page: Add Links & Track Clicks";
 const description =
   "Create a free Instagram link-in-bio page at poskoo.com/@yourname. Add up to 5 links on Free or 20 on paid plans, pick a theme and track every click.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const freeLinks = PLAN_LIMITS.Free.bioLinks;
 const paidLinks = PLAN_LIMITS.Pro.bioLinks;
@@ -87,7 +89,8 @@ const appJsonLd = {
     "Click tracking for every link",
     "Latest published posts on the page",
   ],
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+  offers: softwareOffers(planReadiness()),
   publisher: { "@type": "Organization", name: BRAND.company },
 };
 

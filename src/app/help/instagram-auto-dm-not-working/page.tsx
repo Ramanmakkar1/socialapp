@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -8,12 +9,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: "Instagram auto DM not working? Fix it step by step",
   description:
     `Troubleshoot ${BRAND.name} comment-to-DM: Instagram connection, message access, active rules, keyword match, follow and email gates, send queue timing, and reconnect.`,
   alternates: { canonical: "/help/instagram-auto-dm-not-working" },
-};
+});
 
 const faqs = [
   {

@@ -57,7 +57,7 @@ export default function CookieNotice() {
     <div role="region" aria-label="Cookie notice" className={`${instrumentSans.variable} ${c.bar}`}>
       <p className={c.text}>Essential cookies only.</p>
       <Link href="/privacy#cookies" className={c.more}>
-        Learn more
+        Cookie policy
       </Link>
       <button type="button" onClick={dismiss} className={c.ok}>
         OK

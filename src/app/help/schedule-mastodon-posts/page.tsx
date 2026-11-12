@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
@@ -6,12 +7,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule Mastodon Posts (Step by Step) | Poskoo" },
   description:
     "Schedule Mastodon posts on any server: connect with OAuth, write to your server's limit, add images or video, pick a time and track the publishing status.",
   alternates: { canonical: new URL("/help/schedule-mastodon-posts", BRAND.url).toString() },
-};
+});
 
 const crumbsJsonLd = breadcrumbJsonLd([
   { name: "Home", url: `${BRAND.url}/` },

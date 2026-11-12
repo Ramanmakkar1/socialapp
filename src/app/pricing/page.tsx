@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -14,15 +15,15 @@ const PATH = "/pricing";
 // the page stays static and regenerates in the background at most every 10 minutes.
 export const revalidate = 600;
 const title = `${BRAND.name} Pricing: Free Instagram Scheduler & Auto-DM Plans`;
-const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, then upgrade to Pro or Agency when you need more. No credit card needed to start.`;
+const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, then upgrade to Pro or Agency when you need more. No card needed to start.`;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
-};
+});
 
 const free = PLANS[0];
 const freeLimits = free.items.filter((i) => !i.soon).map((i) => i.text).join(", ");
@@ -116,6 +117,7 @@ export default function PricingPage() {
 
       <section style={{ paddingTop: 40 }}>
         <div className="wrap">
+          <h2 className="sr-only">{BRAND.name} plans and prices</h2>
           <div className="plans">
             {plans.map((p) => (
               <div key={p.name} className={p.popular ? "plan pop" : "plan"}>

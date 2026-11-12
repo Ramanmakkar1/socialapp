@@ -46,7 +46,8 @@ export function HeroVideo({ src, poster }: { src: string; poster: string }) {
   // The frame crops the panorama: full-bleed behind the hero on desktop, a
   // full-width bottom strip (the whole comment-to-DM story) under the copy on phones.
   return (
-    <div className="heroVideoFrame" aria-hidden="true">
+    // The poster is painted as the frame background straight away (fast LCP); the video fades in over it.
+    <div className="heroVideoFrame" aria-hidden="true" style={{ backgroundImage: `url(${poster})` }}>
       <video
         ref={videoRef}
         className="heroVideo"

@@ -3,12 +3,14 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import robots from "./robots.ts";
+import { GET as llmsTxt } from "./llms.txt/route.ts";
 import sitemap from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
 import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS } from "@/lib/public-pages";
 import { toolMetadata } from "@/components/tools/seo";
 import { GUIDES, guidePath } from "@/content/guides/registry";
+import { INDEXNOW_KEY } from "@/lib/indexnow";
 
 // Route file for a public path. Guide articles share one statically generated template
 // (src/app/guides/[slug]/page.tsx), so a /guides/<slug> path maps to it only when the slug is in the registry.
@@ -101,10 +103,23 @@ test("robots omits the sitemap while staging is noindex", () => {
   whileNoindex(() => assert.equal("sitemap" in robots(), false));
 });
 
-test("robots disallows app pages", () => {
+test("robots disallows app pages for every crawler group", () => {
   const result = robots();
-  assert.ok(!Array.isArray(result.rules));
-  assert.ok(result.rules.disallow?.includes("/app/"));
+  const rules = Array.isArray(result.rules) ? result.rules : [result.rules];
+  assert.ok(rules.length > 0);
+  for (const rule of rules) {
+    for (const path of ["/app/", "/api/", "/l/"]) assert.ok(rule.disallow?.includes(path), `${path} must be disallowed`);
+  }
+});
+
+test("robots names the major AI and search crawlers and allows public pages", () => {
+  const result = robots();
+  const rules = Array.isArray(result.rules) ? result.rules : [result.rules];
+  const agents = rules.flatMap((r) => [r.userAgent].flat());
+  for (const bot of ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-User", "PerplexityBot", "Google-Extended", "Bingbot", "Applebot-Extended"]) {
+    assert.ok(agents.includes(bot), `${bot} missing from robots.txt`);
+  }
+  for (const rule of rules) assert.equal(rule.allow, "/");
 });
 
 test("sitemap lists only indexable pages once BRAND.indexable is true", () => {
@@ -214,4 +229,29 @@ test("every guide is a public page with a unique title (max 60) and description 
     descriptions.add(guide.description);
     assert.ok(existsSync(join("public", guide.cover.src)), `${guide.slug} cover ${guide.cover.src} is missing`);
   }
+});
+
+test("llms.txt groups indexable pages and states plan prices from PLANS", async () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const text = await (await llmsTxt()).text();
+    for (const heading of ["## Product", "## Schedulers", "## Free tools", "## Guides", "## Help", "## Alternatives", "## Plans (USD)"]) {
+      assert.ok(text.includes(heading), `${heading} missing from llms.txt`);
+    }
+    assert.ok(text.includes("- Free: free forever."));
+    assert.ok(text.includes("- Pro: $17 USD per month"));
+    assert.ok(text.includes("- Agency: $35 USD per month"));
+    assert.ok(text.includes("auto-DM works on Instagram only"));
+    assert.ok(!/\]\([^)]*\/(app|api|l)\//.test(text), "llms.txt must not link private paths");
+    for (const p of PUBLIC_PATHS) if (isPathIndexable(p)) assert.ok(text.includes(`](${BRAND.url}${p})`), `${p} missing from llms.txt`);
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
+test("IndexNow key file is served from public/ and holds the key", () => {
+  const body = readFileSync(join("public", `${INDEXNOW_KEY}.txt`), "utf8").trim();
+  assert.match(INDEXNOW_KEY, /^[0-9a-f]{32}$/);
+  assert.equal(body, INDEXNOW_KEY);
 });

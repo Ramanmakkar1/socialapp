@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "node scripts/migrate.mjs",
+    "indexnow": "node scripts/indexnow-submit.mjs",
     "test": "npx --yes tsx@4 --test \"src/**/*.test.ts\" src/lib/rewind.test.mjs"
   },
   "dependencies": {

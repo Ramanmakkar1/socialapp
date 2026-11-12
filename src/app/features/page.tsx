@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -8,12 +9,12 @@ import ToolsHeroIllustration from "@/components/ToolsHeroIllustration";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "Poskoo Features: Scheduling, Auto-DM & AI Captions" },
   description:
     "Explore every Poskoo feature in one place: schedule Instagram, Facebook, Threads and YouTube posts, auto-DM commenters, capture leads and use free Instagram tools.",
   alternates: { canonical: "/features" },
-};
+});
 
 const schedulerBullets = [
   "Plan feed posts, reels, carousels and stories on a week or month calendar.",

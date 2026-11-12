@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { PLAN_LIMITS } from "@/lib/planLimits";
@@ -7,12 +8,12 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "How to Set Up an Instagram Link-in-Bio Page: Easy Guide" },
   description:
     `Set up your Instagram link-in-bio page in ${BRAND.name}: claim your page, add your links, pick a theme, paste the URL in your Instagram bio and track clicks.`,
   alternates: { canonical: "/help/instagram-link-in-bio-setup" },
-};
+});
 
 const freeLinks = PLAN_LIMITS.Free.bioLinks;
 const paidLinks = PLAN_LIMITS.Pro.bioLinks;

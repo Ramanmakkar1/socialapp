@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,11 +10,11 @@ import { AnimArt } from "@/components/AnimArt";
 
 const description = `Step-by-step guides for ${BRAND.name}: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: `Instagram Scheduling & Auto-DM Help Guides | ${BRAND.name}` },
   description,
   alternates: { canonical: "/help" },
-};
+});
 
 const guides = [
   {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -9,12 +10,12 @@ import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocial({
   title: { absolute: "ManyChat Alternative: Instagram Comment-to-DM + Scheduler" },
   description:
     "A ManyChat alternative with Instagram comment-to-DM automation, post scheduling and lead capture in one tool, built on the official Meta API.",
   alternates: { canonical: "/manychat-alternative" },
-};
+});
 
 const whySwitch = [
   { no: "01 / One tool", title: "Chat automation + scheduler in one", text: "ManyChat automates DMs, but you still need a separate tool to plan and publish posts. Here both live in one place." },

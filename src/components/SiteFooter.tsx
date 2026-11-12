@@ -92,10 +92,13 @@ export function SiteFooter() {
       <FooterColumn
         title="Product"
         links={[
+          { href: "/features", label: "Features" },
           { href: "/instagram-scheduler", label: "Instagram scheduler" },
           { href: "/instagram-auto-dm", label: "Instagram auto DM" },
           { href: "/instagram-auto-dm/templates", label: "Auto-DM templates" },
+          { href: "/instagram-link-in-bio", label: "Link in bio" },
           { href: "/pricing", label: "Pricing" },
+          { href: "/developers", label: "API and MCP" },
         ]}
         extra={{ title: "Company", links: [
             { href: "/guides", label: "Guides" },
