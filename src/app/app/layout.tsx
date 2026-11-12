@@ -34,6 +34,10 @@ import ShellFrame from "./ShellFrame";
 import NewAutomationDialog from "./NewAutomationDialog";
 import { ShellSkeleton } from "./Skeleton";
 import styles from "./shell.module.css";
+import type { Metadata } from "next";
+
+// The dashboard is private: never indexed (robots.txt also disallows /app).
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 // Every /app page is per-user: never prerender or cache it at build time.
 export const dynamic = "force-dynamic";
