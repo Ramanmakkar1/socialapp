@@ -854,9 +854,9 @@
 }
 
 /* 2026-11-11 illustration pass: hero, 3 steps, demo and bento use the same doodle art as the rest of the page. */
-/* Full-screen hero over a looping Grok doodle video (public/landing/hero-loop.mp4, cream #fff7e5 sky). */
+/* Full-screen hero over a looping Grok doodle video (public/landing/hero-loop.mp4, cream #fffae9 sky). */
 .landing :global(.videoHero){
-  position:relative;overflow:hidden;min-height:100svh;background:#fff7e5;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;min-height:100svh;background:#fffae9;display:flex;flex-direction:column;
   margin-left:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));margin-right:calc(-1 * max(16px, env(safe-area-inset-right, 0px)));padding-inline:max(16px, env(safe-area-inset-left, 0px))}
 .landing :global(.heroVideoFrame){
   position:absolute;inset:0;overflow:hidden;pointer-events:none}
@@ -950,8 +950,9 @@
 
 @media (max-width: 760px) {
   .landing :global(.videoHero){ min-height:0; }
-  .landing :global(.heroVideoFrame){ position:relative;inset:auto;height:260px;order:2;margin-top:-8px;width:calc(100% + 2 * max(16px, env(safe-area-inset-left, 0px)));margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
-  .landing :global(.heroVideoFrame .heroVideo){ inset:auto;left:-12px;bottom:0;width:max(780px, 100%);height:auto;max-width:none;object-fit:contain; }
+  /* Phones: the full-width bottom strip of the video (creator, link-comments, DM plane, followers). */
+  .landing :global(.heroVideoFrame){ position:relative;inset:auto;aspect-ratio:1920/600;height:auto;order:2;margin-top:4px;width:calc(100% + 2 * max(16px, env(safe-area-inset-left, 0px)));margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
+  .landing :global(.heroVideoFrame .heroVideo){ inset:auto;left:0;bottom:0;width:100%;height:auto;max-width:none;object-fit:contain; }
   .landing :global(.hero.heroCenter){ padding-block:28px 8px; }
   .landing :global(.videoHero nav.top){ margin-top:10px;padding-left:16px; }
 }

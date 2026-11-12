@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 const FADE_MS = 500;
 
-// Full-bleed looping hero video. The file itself is a seamless loop (its last
+// Full-bleed looping hero video. The 13 s file itself is a seamless loop (its last
 // second crossfades into its first, see public/landing/hero-loop.mp4), so it
 // loops natively; JS only fades it in once on first play (requestAnimationFrame).
 export function HeroVideo({ src, poster }: { src: string; poster: string }) {
@@ -44,7 +44,7 @@ export function HeroVideo({ src, poster }: { src: string; poster: string }) {
   }, []);
 
   // The frame crops the panorama: full-bleed behind the hero on desktop, a
-  // zoomed ~260px vignette (the creator on the phone) under the copy on phones.
+  // full-width bottom strip (the whole comment-to-DM story) under the copy on phones.
   return (
     <div className="heroVideoFrame" aria-hidden="true">
       <video

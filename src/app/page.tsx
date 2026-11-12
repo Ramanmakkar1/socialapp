@@ -58,7 +58,7 @@ const jsonLd = {
 export default function Home() {
 // The hero poster is the first thing painted above the fold (the video fades in over it):
 // fetch it early and at high priority so it, not the lazy art below, is the LCP candidate.
-preload("/landing/hero-poster.webp", { as: "image", fetchPriority: "high" });
+preload("/landing/hero-poster.webp?v=2", { as: "image", fetchPriority: "high" });
 return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
@@ -67,7 +67,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 </defs></svg>
 
 <div className="videoHero">
-  <HeroVideo src="/landing/hero-loop.mp4" poster="/landing/hero-poster.webp" />
+  <HeroVideo src="/landing/hero-loop.mp4?v=2" poster="/landing/hero-poster.webp?v=2" />
   <HeroFloaters />
   <div className="wrap">
     <SiteHeader onHome />
