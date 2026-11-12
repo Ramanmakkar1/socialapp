@@ -243,6 +243,10 @@ export default function LinkedInSchedulerPage() {
               </details>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            New to it? Follow our step-by-step guide:{" "}
+            <Link className={s.vlink} href="/help/schedule-linkedin-posts">how to schedule LinkedIn posts</Link>.
+          </p>
         </div>
       </section>
 

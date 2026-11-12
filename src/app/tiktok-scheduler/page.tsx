@@ -239,6 +239,10 @@ export default function TikTokSchedulerPage() {
               </details>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            New to it? Follow our step-by-step guide:{" "}
+            <Link className={s.vlink} href="/help/schedule-tiktok-posts">how to schedule TikTok videos</Link>.
+          </p>
         </div>
       </section>
 
