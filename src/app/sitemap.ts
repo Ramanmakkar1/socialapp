@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BRAND } from "@/lib/brand";
-import { PUBLIC_PATHS, META } from "@/lib/public-pages";
+import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
 
 // Always-noindex pages (auth + app). PUBLIC_PATHS already excludes them, so this is
 // a safety net: if one is ever added to PUBLIC_PATHS it must not leak into the sitemap.
@@ -16,7 +16,7 @@ const isNoindex = (path: string) =>
 
 // Only indexable paths can become sitemap candidates. While staging is noindex
 // this is empty, including for the home page on every host alias.
-function getSitemapPaths(): string[] {
+function getSitemapPaths(): PublicPath[] {
   return PUBLIC_PATHS.filter((path) => !isNoindex(path));
 }
 
