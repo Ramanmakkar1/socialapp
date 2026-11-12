@@ -173,6 +173,9 @@ export default function ThreadsSchedulerPage() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Check your caption against the 500-character and 5-link limits with the <Link className={s.vlink} href="/tools/threads-character-counter">Threads character counter</Link>.
+          </p>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             Also planning Instagram or Facebook? See the{" "}
             <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>
             {" "}and the <Link className={s.vlink} href="/facebook-scheduler">Facebook Page scheduler</Link>.

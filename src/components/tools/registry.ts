@@ -43,6 +43,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-username-generator", name: "Username generator", summary: "Up to 30 username ideas from your name and niche that follow Instagram's rules.", category: "create", icon: "at" },
   { href: "/tools/linkedin-text-formatter", name: "LinkedIn Text Formatter", summary: "Copy bold, italic and bulleted Unicode text for LinkedIn posts and profiles.", category: "create", icon: "type" },
   { href: "/tools/linkedin-character-counter", name: "LinkedIn character counter", summary: "Check LinkedIn post, comment, headline and About limits, with a live See more preview.", category: "create", icon: "type" },
+  { href: "/tools/threads-character-counter", name: "Threads character counter", summary: "Check the 500-character post and 150-character bio limits, with hashtag and 5-link checks.", category: "create", icon: "type" },
   { href: "/tools/tiktok-caption-counter", name: "TikTok caption counter", summary: "Check the 4,000-character caption limit, unique hashtags and mentions, and the preview before more.", category: "create", icon: "type" },
   // Images & video
   { href: "/tools/instagram-post-preview", name: "Post preview", summary: "Preview a photo and caption in a feed mockup with square and portrait crops.", category: "media", icon: "eye" },
