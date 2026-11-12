@@ -19,6 +19,18 @@ test("sitemap excludes both audited noindex home URLs", () => {
   }
 });
 
+test("sitemap is empty for both audited host aliases while staging is noindex", () => {
+  const wasUrl = BRAND.url;
+  try {
+    for (const url of ["https://poskoo.com", "https://socialapp.splitforms.com"]) {
+      BRAND.url = url;
+      assert.deepEqual(sitemap(), [], `${url} must not list any noindex page`);
+    }
+  } finally {
+    BRAND.url = wasUrl;
+  }
+});
+
 test("robots omits the sitemap while staging is noindex", () => {
   assert.equal("sitemap" in robots(), false);
 });

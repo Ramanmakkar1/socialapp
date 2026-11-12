@@ -14,17 +14,18 @@ const NOINDEX_PATHS = new Set(["/login", "/signup", "/forgot-password", "/reset-
 const isNoindex = (path: string) =>
   !BRAND.indexable || NOINDEX_PATHS.has(path) || path.startsWith("/app/");
 
+// Only indexable paths can become sitemap candidates. While staging is noindex
+// this is empty, including for the home page on every host alias.
+function getSitemapPaths(): string[] {
+  return PUBLIC_PATHS.filter((path) => !isNoindex(path));
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Only indexable paths can become sitemap candidates. While staging is
-  // noindex this is empty, including for the home page on every host alias.
-  const candidates = BRAND.indexable ? PUBLIC_PATHS : [];
   const lastModified = new Date();
-  return candidates
-    .filter((path) => !isNoindex(path))
-    .map((path) => ({
-      url: `${BRAND.url}${path}`,
-      lastModified,
-      changeFrequency: META[path]?.changeFrequency ?? ("yearly" as const),
-      priority: META[path]?.priority ?? 0.3,
-    }));
+  return getSitemapPaths().map((path) => ({
+    url: `${BRAND.url}${path}`,
+    lastModified,
+    changeFrequency: META[path]?.changeFrequency ?? ("yearly" as const),
+    priority: META[path]?.priority ?? 0.3,
+  }));
 }
