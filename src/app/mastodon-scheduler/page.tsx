@@ -248,8 +248,8 @@ export default function MastodonSchedulerPage() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            Need more detail? Visit the{" "}
-            <Link className={s.vlink} href="/help">Poskoo Help Center for scheduling guides</Link>.
+            Need more detail? Read the{" "}
+            <Link className={s.vlink} href="/help/schedule-mastodon-posts">step-by-step guide to scheduling Mastodon posts</Link>.
           </p>
         </div>
       </section>
