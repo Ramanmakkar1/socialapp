@@ -217,7 +217,7 @@ export default function MastodonSchedulerPage() {
             <article className="pcard">
               <span className="no">01 / Text</span>
               <h3>Write to your server&apos;s character limit</h3>
-              <p>Use Mastodon&apos;s 500-character default or the higher limit set by your server, which Poskoo reads for your connected account.</p>
+              <p>Use Mastodon&apos;s 500-character default or the higher limit set by your server, which Poskoo reads for your connected account. Check your draft with the <Link className={s.vlink} href="/tools/mastodon-character-counter">free Mastodon character counter</Link>.</p>
             </article>
             <article className="pcard">
               <span className="no">02 / Media</span>
