@@ -62,12 +62,16 @@ function log(...a) {
   console.log(...a);
 }
 
+// Stripe Managed Payments (on by default) rejects Checkout for products without a tax code.
+// txcd_10103001 = Software as a service (SaaS), business use.
+const SAAS_TAX_CODE = "txcd_10103001";
+
 async function ensureProduct(p) {
   try {
     const existing = await stripe.products.retrieve(p.product);
-    if (!existing.active || existing.metadata?.poskoo_plan !== p.plan) {
-      if (!DRY) await stripe.products.update(p.product, { active: true, metadata: { poskoo_plan: p.plan } });
-      log(`  product ${p.product}: re-activated / metadata fixed`);
+    if (!existing.active || existing.metadata?.poskoo_plan !== p.plan || existing.tax_code !== SAAS_TAX_CODE) {
+      if (!DRY) await stripe.products.update(p.product, { active: true, metadata: { poskoo_plan: p.plan }, tax_code: SAAS_TAX_CODE });
+      log(`  product ${p.product}: re-activated / metadata / tax code fixed`);
     } else {
       log(`  product ${p.product}: ok`);
     }
@@ -83,6 +87,7 @@ async function ensureProduct(p) {
       name: p.name,
       description: p.description,
       metadata: { poskoo_plan: p.plan },
+      tax_code: SAAS_TAX_CODE,
     });
     log(`  product ${p.product}: created`);
     return created.id;
