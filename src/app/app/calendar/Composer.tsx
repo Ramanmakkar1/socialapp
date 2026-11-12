@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, AtSign, CalendarClock, ChevronDown, Facebook, Hash, Info, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Bell, CalendarClock, ChevronDown, Facebook, Hash, Info, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
 import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, nextAvailableSlots, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import PostPreview from "./PostPreview";
 import { useComposerDialog } from "./ComposerDialog";
 import { COMPOSER_EMOJI, insertAtCursor } from "@/lib/captionInsert";
+import { isReminderNetwork } from "@/lib/networks/reminder";
 import { aiAvailable, suggestCaptions } from "./aiActions";
 import type { CaptionIdea } from "@/lib/ai";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
@@ -34,8 +35,8 @@ import ui from "@/components/ui/ui.module.css";
 import { NEW_NETWORK_COLOR, NEW_NETWORK_ICON } from "@/components/brandIcons";
 import NetworkOptionsPanel, { type NetworkPanelData } from "./NetworkOptionsPanel";
 
-const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp"];
-const NEW_NETWORKS = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp"] as const;
+const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group"];
+const NEW_NETWORKS = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group"] as const;
 const NET_COLOR: Record<PlatformId, string> = { instagram: "#d62976", facebook: "#1877f2", threads: "#000", youtube: "#ff0000", ...NEW_NETWORK_COLOR };
 
 const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {
@@ -792,7 +793,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     disabled={!live}
                     aria-disabled={!live || undefined}
                     aria-pressed={live ? on : undefined}
-                    aria-label={live ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}` : disabledLabel}
+                    aria-label={live ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}${isReminderNetwork(platform) ? " (reminder: Poskoo e-mails you to post it)" : ""}` : disabledLabel}
                     title={disabledLabel}
                     onClick={() => togglePlatform(platform)}
                     className={`group relative grid place-items-center rounded-full border-2 transition ${live ? "h-11 w-11" : "h-9 w-9 self-center"} ${
@@ -809,6 +810,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     {on && live && (
                       <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-[var(--poskoo-violet)] text-[11px] font-bold leading-none text-white" aria-hidden>✓</span>
                     )}
+                    {live && isReminderNetwork(platform) && (
+                      <span className="absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border border-[var(--poskoo-card)] bg-[var(--poskoo-lime)] text-[#1e1631]" aria-hidden>
+                        <Bell className="h-2.5 w-2.5" />
+                      </span>
+                    )}
                   </button>
                   </span>
                 );
@@ -819,6 +825,15 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 </a>
               )}
             </div>
+            {PLATFORM_ORDER.some((p) => enabled[p] && isReminderNetwork(p) && livePlatforms.includes(p)) && (
+              <p className="mt-2 flex items-start gap-2 rounded-xl bg-[var(--poskoo-band)] px-3 py-2 text-xs text-[var(--poskoo-ink)]">
+                <Bell className="mt-0.5 h-3.5 w-3.5 flex-none text-[var(--poskoo-violet)]" aria-hidden />
+                <span>
+                  Poskoo will remind you to post this to{" "}
+                  {PLATFORM_ORDER.filter((p) => enabled[p] && isReminderNetwork(p)).map((p) => PLATFORMS[p].label).join(" and ")}. At the scheduled time you get an e-mail with the caption and files, ready to post.
+                </span>
+              </p>
+            )}
           </div>
 
           <details className="group rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-3">

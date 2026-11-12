@@ -2,7 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { isDbConfigured } from "@/lib/db";
+import { isDbConfigured, query } from "@/lib/db";
+import { cleanChannelRequest } from "@/lib/channelStatus";
+import { isReminderNetwork, parseReminderChannel } from "@/lib/networks/reminder";
+import { updateAccountMeta } from "@/lib/networks/store";
 import { NetworkAuthError } from "@/lib/networks/common";
 import { createBlueskySession, jwtExpiresIn, normalizeHandle, normalizeService } from "@/lib/networks/bluesky";
 import { completeConnect, settingsResultUrl } from "@/lib/networks/routes";
@@ -77,4 +80,123 @@ export async function connectGbpLocationsAction(_prev: { error: string } | null,
 
 function connectErrorPlan(): string {
   return "Your plan's connected channels are all in use. Disconnect one in Settings, then try again.";
+}
+
+// ---- Reminder channels (Instagram personal account, Facebook Group): no OAuth ---------------------
+
+export type ReminderConnectState = { error: string } | null;
+
+/**
+ * Adds a reminder channel from the @handle or the group link/name. Counts toward the plan's
+ * connected channels like any other (completeConnect -> accountLimitError).
+ */
+export async function connectReminderAction(_prev: ReminderConnectState, formData: FormData): Promise<ReminderConnectState> {
+  const user = await requireUser();
+  if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
+  const platform = String(formData.get("platform") ?? "");
+  if (!isReminderNetwork(platform)) return { error: "Choose Instagram or a Facebook group." };
+  const parsed = parseReminderChannel(platform, String(formData.get("target") ?? "").slice(0, 300), String(formData.get("name") ?? ""));
+  if ("error" in parsed) return { error: parsed.error };
+  let target: URL;
+  try {
+    target = await completeConnect(user.id, platform, {
+      externalId: parsed.externalId,
+      // Instagram: the handle without "@" (the sidebar adds it); groups: the group name.
+      username: platform === "ig_personal" ? parsed.externalId : parsed.name,
+      // No OAuth: a placeholder token keeps the shared account code paths uniform.
+      tokens: { accessToken: "reminder" },
+      scopes: ["reminder"],
+      meta: { openUrl: parsed.openUrl, reminder: true },
+    });
+  } catch {
+    console.error("reminder connect failed", platform);
+    return { error: "Could not add that channel. Please try again." };
+  }
+  redirect(`${target.pathname}${target.search}${target.hash}`);
+}
+
+// ---- "Notify me when it's ready" + "Request a channel" (channel_requests, migration 047) ---------
+
+export type ChannelInterestState = { ok: true; message: string } | { ok: false; error: string } | null;
+
+export async function channelInterestAction(_prev: ChannelInterestState, formData: FormData): Promise<ChannelInterestState> {
+  const user = await requireUser();
+  if (!isDbConfigured()) return { ok: false, error: "The database is not set up on this server yet." };
+  const kind = formData.get("kind") === "notify" ? "notify" : "request";
+  const clean = cleanChannelRequest(String(formData.get("channel") ?? ""), kind === "request" ? String(formData.get("note") ?? "") : "");
+  if (!clean) return { ok: false, error: kind === "request" ? "Tell us which channel you'd like (at least 2 characters)." : "Unknown channel." };
+  if (kind === "notify" && !/^[a-z_]{1,40}$/.test(clean.channel)) return { ok: false, error: "Unknown channel." };
+  try {
+    if (kind === "notify") {
+      await query(
+        `insert into socialapp.channel_requests (user_id, kind, channel) values ($1, 'notify', $2)
+         on conflict (user_id, channel) where kind = 'notify' do nothing`,
+        [user.id, clean.channel],
+      );
+      return { ok: true, message: "You're on the list. We'll let you know as soon as it's ready." };
+    }
+    // At most 20 requests a day per user, so the table can't be flooded.
+    const recent = await query<{ n: number }>(
+      "select count(*)::int as n from socialapp.channel_requests where user_id=$1 and kind='request' and created_at > now() - interval '1 day'",
+      [user.id],
+    );
+    if ((recent[0]?.n ?? 0) >= 20) return { ok: false, error: "Thanks, we've got your requests for today." };
+    await query("insert into socialapp.channel_requests (user_id, kind, channel, note) values ($1, 'request', $2, $3)", [user.id, clean.channel, clean.note]);
+    return { ok: true, message: `Thanks! We've noted your request for ${clean.channel}.` };
+  } catch {
+    return { ok: false, error: "Could not save that right now. Please try again." };
+  }
+}
+
+// ---- LinkedIn Pages picker (LINKEDIN_PAGES_ENABLED) ------------------------------------------------
+
+export type LinkedInPagesResult =
+  | { ok: true; profile: string; pages: { urn: string; name: string; selected: boolean }[] }
+  | { ok: false; error: string };
+
+type OrgRow = { urn?: unknown; name?: unknown };
+function orgList(v: unknown): { urn: string; name: string }[] {
+  return (Array.isArray(v) ? (v as OrgRow[]) : [])
+    .filter((o) => typeof o?.urn === "string" && o.urn.startsWith("urn:li:organization:"))
+    .map((o) => ({ urn: String(o.urn), name: typeof o.name === "string" && o.name ? o.name : String(o.urn).split(":").pop() ?? "" }));
+}
+
+async function linkedinAccountMeta(userId: string): Promise<{ id: string; username: string | null; meta: Record<string, unknown> } | null> {
+  const rows = await query<{ id: string; username: string | null; meta: Record<string, unknown> | null }>(
+    "select id, username, meta from socialapp.social_accounts where user_id=$1 and platform='linkedin' and status='active' order by created_at limit 1",
+    [userId],
+  );
+  return rows[0] ? { id: rows[0].id, username: rows[0].username, meta: rows[0].meta ?? {} } : null;
+}
+
+export async function linkedinPagesListAction(): Promise<LinkedInPagesResult> {
+  const user = await requireUser();
+  try {
+    const acc = await linkedinAccountMeta(user.id);
+    if (!acc) return { ok: false, error: "Connect LinkedIn first." };
+    const chosen = new Set(orgList(acc.meta.orgs).map((o) => o.urn));
+    const available = orgList(acc.meta.orgsAvailable);
+    if (available.length === 0) return { ok: false, error: "We didn't find a LinkedIn Page you administer. Ask a Page admin to make you an Administrator or Content admin, then reconnect." };
+    // Nothing chosen yet (fresh connect): every Page starts ticked, like the Google locations picker.
+    return { ok: true, profile: acc.username ?? "your profile", pages: available.map((o) => ({ ...o, selected: chosen.size === 0 || chosen.has(o.urn) })) };
+  } catch {
+    return { ok: false, error: "Could not load your LinkedIn Pages. Try again." };
+  }
+}
+
+export async function saveLinkedInPagesAction(_prev: { error: string } | null, formData: FormData): Promise<{ error: string } | null> {
+  const user = await requireUser();
+  let target = "";
+  try {
+    const acc = await linkedinAccountMeta(user.id);
+    if (!acc) return { error: "Connect LinkedIn first." };
+    const wanted = new Set(formData.getAll("page").map(String));
+    const orgs = orgList(acc.meta.orgsAvailable).filter((o) => wanted.has(o.urn));
+    await updateAccountMeta(acc.id, { orgs });
+    const name = orgs.length === 0 ? acc.username ?? "LinkedIn" : orgs.length === 1 ? orgs[0].name : `${orgs.length} LinkedIn Pages`;
+    target = `/app/calendar?connected=linkedin&handle=${encodeURIComponent(name)}`;
+  } catch {
+    return { error: "Could not save your Pages. Try again." };
+  }
+  redirect(target);
 }

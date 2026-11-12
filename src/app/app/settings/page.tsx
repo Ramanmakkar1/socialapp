@@ -75,7 +75,7 @@ const TOKEN_PILL: Record<ReturnType<typeof tokenState>, { label: string; classNa
   expired: { label: "Reconnect needed", className: `${ui.pill} ${ui.pillPeach}` },
 };
 
-const NEW_NETWORK_LABEL: Record<string, string> = { tiktok: "TikTok", bluesky: "Bluesky", mastodon: "Mastodon", linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", gbp: "Google Business Profile" };
+const NEW_NETWORK_LABEL: Record<string, string> = { tiktok: "TikTok", bluesky: "Bluesky", mastodon: "Mastodon", linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", gbp: "Google Business Profile", ig_personal: "Instagram (personal, reminders)", fb_group: "Facebook Group (reminders)" };
 
 function platformLabel(p: string): string {
   if (NEW_NETWORK_LABEL[p]) return NEW_NETWORK_LABEL[p];

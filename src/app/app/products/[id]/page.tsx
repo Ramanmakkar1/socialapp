@@ -12,6 +12,8 @@ import { centsToInput, formatMoney, platformFeeCents } from "@/lib/money";
 import { isStripeConfigured } from "@/lib/payments";
 import { buyLink, getProduct } from "@/lib/products";
 import { connectedAccountForPage } from "@/lib/stripeConnect";
+import { payoutRoute } from "@/lib/upi";
+import { getSellerPayout } from "@/lib/upiOrders";
 import { rulePicks } from "../../lead-magnets/rulePicks";
 import { deleteProductAction } from "../actions";
 import PaymentsNotice from "../PaymentsNotice";
@@ -26,13 +28,18 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
   const product = await getProduct(user.id, id);
   if (!product) notFound();
   const configured = isStripeConfigured();
-  const [rules, account] = await Promise.all([listRuleOptions(user.id), configured ? connectedAccountForPage(user.id) : Promise.resolve(null)]);
+  const [rules, account, payout] = await Promise.all([
+    listRuleOptions(user.id),
+    configured ? connectedAccountForPage(user.id) : Promise.resolve(null),
+    getSellerPayout(user.id).catch(() => null),
+  ]);
+  const upi = payoutRoute(payout?.country) === "upi";
   const link = buyLink(product.slug);
   const fee = platformFeeCents(product.price_cents);
   return (
     <>
       <PageHero icon={<Package width={20} height={20} />} eyebrow="Product" title={product.title} lede={<Link href="/app/products" className={ui.link}>All products</Link>} />
-      <PaymentsNotice configured={configured} account={account} />
+      <PaymentsNotice configured={configured} account={account} payout={payout} />
       {saved ? <p role="status" className={`${ui.notice} mt-6`}>Saved.</p> : null}
       {error ? <p role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>Could not delete it. Please try again.</p> : null}
       <section className={styles.section} aria-labelledby="share-heading">
@@ -41,7 +48,9 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
         <div className={`${styles.actions} mt-3`}>
           <BtnA href={link} target="_blank" rel="noopener" variant="ghost" size="sm">Open buy page</BtnA>
           <span className={ui.hint}>
-            {formatMoney(product.price_cents, product.currency)} per sale · Poskoo fee {formatMoney(fee, product.currency)} · Stripe processing fees apply
+            {upi
+              ? `${formatMoney(product.price_cents, product.currency)} per sale · paid by UPI straight to you · no Poskoo fee`
+              : `${formatMoney(product.price_cents, product.currency)} per sale · Poskoo fee ${formatMoney(fee, product.currency)} · Stripe processing fees apply`}
           </span>
         </div>
       </section>
@@ -52,6 +61,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
           defaults={{ ...product, price: centsToInput(product.price_cents) }}
           rules={rulePicks(rules, { productId: product.id })}
           selectedRules={product.rule_ids}
+          upi={upi}
         />
       </section>
       <section className={styles.section} aria-labelledby="delete-heading">

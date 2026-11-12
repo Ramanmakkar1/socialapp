@@ -4,8 +4,10 @@
 import { createHash, randomBytes } from "node:crypto";
 import { decryptToken, encryptToken } from "@/lib/crypto";
 
-export type NetworkId = "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp";
-export const NETWORK_IDS: NetworkId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp"];
+// ig_personal / fb_group are reminder channels (no posting API): Poskoo e-mails the user at the
+// scheduled time instead of publishing (src/lib/networks/reminder.ts).
+export type NetworkId = "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp" | "ig_personal" | "fb_group";
+export const NETWORK_IDS: NetworkId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group"];
 
 export const NETWORK_LABEL: Record<NetworkId, string> = {
   tiktok: "TikTok",
@@ -15,6 +17,8 @@ export const NETWORK_LABEL: Record<NetworkId, string> = {
   pinterest: "Pinterest",
   x: "X",
   gbp: "Google Business Profile",
+  ig_personal: "Instagram (personal)",
+  fb_group: "Facebook Group",
 };
 
 export function isNetworkId(value: unknown): value is NetworkId {
@@ -47,7 +51,15 @@ export type TokenSet = {
 };
 
 export type PublishOutcome =
-  | { ok: true; id: string; url?: string; /** Accepted but not confirmed yet (still processing): keep the uploaded file for a while. */ mediaPending?: boolean }
+  | {
+      ok: true;
+      id: string;
+      url?: string;
+      /** Accepted but not confirmed yet (still processing): keep the uploaded file for a while. */
+      mediaPending?: boolean;
+      /** Reminder channels: the e-mail went out, the user still has to post it themselves. */
+      reminded?: boolean;
+    }
   | { ok: false; error: string; tokenDead?: boolean };
 
 export type PublishInput = {

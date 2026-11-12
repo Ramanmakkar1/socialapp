@@ -24,6 +24,16 @@ export function isSupportedCurrency(value: string): value is Currency {
   return (SUPPORTED_CURRENCIES as readonly string[]).includes(value);
 }
 
+/**
+ * Product currencies: the Stripe ones plus INR, which is only for sellers paid by Direct UPI
+ * (src/lib/upi.ts). INR is also two-decimal (paise), so the cents math is unchanged.
+ */
+export type ProductCurrency = Currency | "inr";
+
+export function isProductCurrency(value: string): value is ProductCurrency {
+  return value === "inr" || isSupportedCurrency(value);
+}
+
 /** "19.99" / "19" / "19.9" -> 1999 / 1900 / 1990. Null for anything else (no floats involved). */
 export function parsePriceToCents(input: string): number | null {
   const m = input.trim().replace(/,/g, "").match(/^(\d{1,7})(?:\.(\d{1,2}))?$/);

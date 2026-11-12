@@ -699,3 +699,8 @@ a.connectCard:hover { border-color: var(--poskoo-pill-border); box-shadow: 0 6px
 .connectPickText { display: grid; min-width: 0; }
 .connectPickText b { overflow: hidden; font-size: .92rem; text-overflow: ellipsis; white-space: nowrap; }
 .connectPickText span { overflow: hidden; color: var(--poskoo-muted); font-size: .8rem; text-overflow: ellipsis; white-space: nowrap; }
+/* Reminder channels (Instagram personal, Facebook Groups). */
+.netBg_ig_personal { background: linear-gradient(135deg, #feda75, #d62976 50%, #4f5bd5); }
+.netBg_fb_group { background: #1877f2; }
+.badge_ig_personal { background: #d62976; }
+.badge_fb_group { background: #1877f2; }

@@ -35,3 +35,11 @@ test("connected accounts are Managed Risk + direct charges: Stripe collects fees
   // Express Dashboard + Stripe as losses collector needs a preview API version for creation.
   assert.match(ACCOUNT_CREATE_API_VERSION, /\.preview$/);
 });
+
+test("UPI routing knows exactly the Stripe Connect countries", async () => {
+  const { CONNECT_COUNTRIES } = await import("./stripeConnect.ts");
+  const { STRIPE_COUNTRY_CODES, payoutRoute } = await import("./upi.ts");
+  assert.deepEqual([...STRIPE_COUNTRY_CODES].sort(), CONNECT_COUNTRIES.map((c) => c.code).sort());
+  for (const c of CONNECT_COUNTRIES) assert.equal(payoutRoute(c.code), "stripe");
+  assert.ok(!CONNECT_COUNTRIES.some((c) => c.code === "IN"));
+});

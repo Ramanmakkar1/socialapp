@@ -25,7 +25,7 @@ export type AccountNames = Record<string, string>;
 export const PLATFORM_ICON: Record<string, typeof Instagram> = { instagram: Instagram, facebook: Facebook, threads: AtSign, youtube: Youtube, ...NEW_NETWORK_ICON };
 export const PLATFORM_LABEL: Record<string, string> = {
   instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube",
-  tiktok: "TikTok", bluesky: "Bluesky", mastodon: "Mastodon", linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", gbp: "Google Business Profile",
+  tiktok: "TikTok", bluesky: "Bluesky", mastodon: "Mastodon", linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", gbp: "Google Business Profile", ig_personal: "Instagram (personal)", fb_group: "Facebook Group",
 };
 
 export const STATUS_LABEL: Record<string, string> = {

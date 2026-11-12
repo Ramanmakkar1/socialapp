@@ -35,7 +35,7 @@ const aiBullets = [
 
 const growBullets = [
   "Lead magnets: hand out a free file or link once someone gives their email in the DM.",
-  "Digital products: sell downloads from your own product page, paid through your own Stripe account. Payments switch on soon.",
+  "Digital products: sell downloads from your own product page, paid through your own Stripe account (or, in India, by UPI straight to you). Payments switch on soon.",
   "Refer and earn: get 500 bonus auto-DMs a month for each friend who signs up and connects an account.",
 ];
 

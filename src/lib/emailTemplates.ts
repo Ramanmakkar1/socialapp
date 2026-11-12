@@ -437,7 +437,7 @@ View orders: ${link}${textFooter()}`;
   return { subject, preheader, html, text };
 }
 
-export function buyerReceiptEmail(d: { product: string; amountCents: number; currency: string; accessUrl: string; delivery: "file" | "link"; seller?: string | null }): RenderedEmail {
+export function buyerReceiptEmail(d: { product: string; amountCents: number; currency: string; accessUrl: string; delivery: "file" | "link"; seller?: string | null; method?: "stripe" | "upi" }): RenderedEmail {
   const amount = formatMoney(d.amountCents, d.currency);
   const verb = d.delivery === "file" ? "Download" : "Open";
   const subject = `Your receipt: ${d.product}`;
@@ -454,7 +454,11 @@ ${details([
 ])}
 ${button(`${verb} ${d.product}`, d.accessUrl)}
 ${fallbackLink(d.accessUrl)}
-${note("Payments are processed by Stripe; your card statement shows the seller. Questions about the product? Reply to the seller’s message or write to us.")}`,
+${note(
+  d.method === "upi"
+    ? "You paid the seller directly by UPI and they confirmed your payment. Poskoo does not hold or process UPI payments. Questions about the product? Contact the seller."
+    : "Payments are processed by Stripe; your card statement shows the seller. Questions about the product? Reply to the seller’s message or write to us.",
+)}`,
     footerNote: "You got this receipt because you bought a product sold with Poskoo.",
   });
   const text = `Thanks for your purchase!
@@ -463,6 +467,121 @@ Product: ${d.product}
 Paid: ${amount}
 
 ${verb} it here (keep this email): ${d.accessUrl}${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
+// ---- Direct UPI (sellers in India; buyer pays the seller directly, seller confirms) ----------
+
+const UPI_DIRECT_NOTE =
+  "You paid the seller directly by UPI. Poskoo does not hold or process this money, so refunds and payment questions go to the seller.";
+
+/** Buyer: "we got your UTR; the seller will confirm". Nothing is delivered yet. */
+export function upiAwaitingEmail(d: { product: string; amountCents: number; currency: string; utr: string; orderRef: string; statusUrl: string; seller?: string | null; supportContact?: string | null }): RenderedEmail {
+  const amount = formatMoney(d.amountCents, d.currency);
+  const subject = `Payment received for confirmation: ${d.product}`;
+  const preheader = `${d.seller ?? "The seller"} will confirm your UPI payment, usually within a few hours.`;
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.receipt,
+    body: `${h1("Thanks! Your payment is being confirmed.")}
+${p(`${d.seller ? `<strong>${esc(d.seller)}</strong>` : "The seller"} will check your UPI payment and confirm it, usually within a few hours. As soon as they do, we’ll e-mail you your ${esc(d.product)} access link.`)}
+${details([
+  ["Product", d.product],
+  ["Amount", amount],
+  ["UPI reference (UTR)", d.utr],
+  ["Order", d.orderRef],
+  ...(d.supportContact ? ([["Seller contact", d.supportContact]] as [string, string][]) : []),
+])}
+${button("Check order status", d.statusUrl)}
+${fallbackLink(d.statusUrl)}
+${note(esc(UPI_DIRECT_NOTE))}`,
+    footerNote: "You got this e-mail because you submitted a UPI payment for a product sold with Poskoo.",
+  });
+  const text = `Thanks! Your payment is being confirmed.
+
+${d.seller ?? "The seller"} will check your UPI payment and confirm it, usually within a few hours. We'll e-mail you the access link as soon as they do.
+
+Product: ${d.product}
+Amount: ${amount}
+UPI reference (UTR): ${d.utr}
+Order: ${d.orderRef}${d.supportContact ? `\nSeller contact: ${d.supportContact}` : ""}
+
+Order status: ${d.statusUrl}
+
+${UPI_DIRECT_NOTE}${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
+/** Buyer: the seller could not match the payment. */
+export function upiRejectedEmail(d: { product: string; amountCents: number; currency: string; utr: string; orderRef: string; reason: string; seller?: string | null; supportContact?: string | null }): RenderedEmail {
+  const amount = formatMoney(d.amountCents, d.currency);
+  const subject = `Payment not confirmed: ${d.product}`;
+  const preheader = `${d.seller ?? "The seller"} could not confirm your UPI payment.`;
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.postFailed,
+    body: `${h1("Your payment wasn’t confirmed")}
+${p(`${d.seller ? `<strong>${esc(d.seller)}</strong>` : "The seller"} could not match your UPI payment to this order.`)}
+${details([
+  ["Reason from the seller", d.reason],
+  ["Product", d.product],
+  ["Amount", amount],
+  ["UPI reference (UTR)", d.utr],
+  ["Order", d.orderRef],
+])}
+${p(`If money left your account, contact the seller${d.supportContact ? ` (${esc(d.supportContact)})` : ""} with your UTR, or ask your bank or UPI app about the transaction.`)}
+${note(esc(UPI_DIRECT_NOTE))}`,
+    footerNote: "You got this e-mail because you submitted a UPI payment for a product sold with Poskoo.",
+  });
+  const text = `Your payment wasn't confirmed
+
+Reason from the seller: ${d.reason}
+Product: ${d.product}
+Amount: ${amount}
+UPI reference (UTR): ${d.utr}
+Order: ${d.orderRef}
+
+If money left your account, contact the seller${d.supportContact ? ` (${d.supportContact})` : ""} with your UTR, or ask your bank or UPI app.
+
+${UPI_DIRECT_NOTE}${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
+/** Seller: a buyer says they paid; check the UPI app and confirm or reject. */
+export function upiOrderToConfirmEmail(d: { name?: string | null; buyerEmail: string; buyerName: string | null; product: string; amountCents: number; currency: string; utr: string; orderRef: string }): RenderedEmail {
+  const amount = formatMoney(d.amountCents, d.currency);
+  const subject = `Confirm a UPI payment: ${d.product} (${amount})`;
+  const preheader = `UTR ${d.utr}. Check your UPI app, then confirm or reject.`;
+  const link = absoluteUrl("/app/orders");
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.order,
+    body: `${h1("New UPI order to confirm")}
+${p(`${esc(greet(d.name))} a buyer says they paid you by UPI. Check that the payment with this UTR arrived in your bank or UPI app, then confirm it. The buyer gets their access link only after you confirm.`)}
+${details([
+  ["Product", d.product],
+  ["Amount", amount],
+  ["UPI reference (UTR)", d.utr],
+  ["Order", d.orderRef],
+  ["Buyer", d.buyerName ? `${d.buyerName} (${d.buyerEmail})` : d.buyerEmail],
+])}
+${button("Confirm or reject", link)}
+${p("Never confirm on a screenshot alone: match the UTR and amount in your bank or UPI app.", { muted: true, size: 13 })}`,
+  });
+  const text = `${greet(d.name)}
+
+A buyer says they paid you by UPI. Check the UTR in your bank or UPI app, then confirm or reject. The buyer gets their access link only after you confirm.
+
+Product: ${d.product}
+Amount: ${amount}
+UPI reference (UTR): ${d.utr}
+Order: ${d.orderRef}
+Buyer: ${d.buyerName ? `${d.buyerName} (${d.buyerEmail})` : d.buyerEmail}
+
+Confirm or reject: ${link}${textFooter()}`;
   return { subject, preheader, html, text };
 }
 
@@ -494,6 +613,65 @@ Poskoo tried to publish one of your scheduled posts, but ${d.platform} said no.
 ${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}
 
 Fix the reason, then press Retry on the post: ${link}${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
+// ---- Reminder channels (Instagram personal, Facebook Groups) ----------------------------------
+
+/** The caption in a copy-friendly box (pre-wrap, select-all on tap in most clients). */
+function captionBox(caption: string): string {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.paper}" class="pk-panel" style="margin:16px 0 0;background-color:${C.paper};border:1.5px solid ${C.line};border-radius:16px;border-collapse:separate;">
+<tr><td class="pk-ink" style="padding:16px 18px;font-family:${FONT};font-size:15px;line-height:1.6;color:${C.ink};white-space:pre-wrap;word-break:break-word;-webkit-user-select:all;user-select:all;">${esc(caption)}</td></tr></table>`;
+}
+
+export function reminderEmail(d: {
+  name?: string | null;
+  /** "Instagram (personal)" / "Facebook Group". */
+  channel: string;
+  /** "@yourname" / the group name. */
+  account: string;
+  caption: string;
+  media: { label: string; url: string }[];
+  /** "Open Instagram" / "Open group". */
+  openLabel: string;
+  openUrl: string;
+  doneUrl: string;
+  scheduledFor?: Date | null;
+  holdDays: number;
+}): RenderedEmail {
+  const subject = `Time to post to ${d.account}`;
+  const preheader = "Your caption and files are ready to copy. Post it, then tap Mark as posted.";
+  const caption = d.caption.trim() || "(no caption)";
+  const mediaHtml = d.media.length
+    ? p(
+        `<b>Files:</b> ${d.media.map((m) => `<a href="${esc(m.url)}" style="color:${C.violet};font-weight:600;">${esc(m.label)}</a>`).join(" &middot; ")}<br><span style="font-size:13px;">Download them to your phone first, then post. Links work for ${d.holdDays} days or until you mark this as posted.</span>`,
+        { size: 15 },
+      )
+    : "";
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.verify,
+    body: `${h1("Time to post.")}
+${p(`${esc(greet(d.name))} ${esc(d.channel)} has no posting API, so Poskoo can’t publish this for you. Here’s everything to post it to <b>${esc(d.account)}</b> in a minute.`)}
+${p("<b>Caption</b> (tap and hold to copy):", { size: 15, top: 20 })}
+${captionBox(caption)}
+${mediaHtml}
+${button(d.openLabel, d.openUrl)}
+${p(`Posted it? <a href="${esc(d.doneUrl)}" style="color:${C.violet};font-weight:700;">Mark as posted</a> so your calendar shows it as published.`, { top: 22 })}`,
+    footerNote: "You get this because you scheduled a post to a reminder channel in Poskoo.",
+  });
+  const text = `${greet(d.name)}
+
+${d.channel} has no posting API, so Poskoo can't publish this for you. Post it to ${d.account}:
+
+--- Caption ---
+${caption}
+---------------
+${d.media.length ? `\nFiles (work for ${d.holdDays} days or until you mark it as posted):\n${d.media.map((m) => `${m.label}: ${m.url}`).join("\n")}\n` : ""}
+${d.openLabel}: ${d.openUrl}
+
+Posted it? Mark as posted: ${d.doneUrl}${textFooter()}`;
   return { subject, preheader, html, text };
 }
 
@@ -601,6 +779,12 @@ export const PREVIEWS: Record<string, () => RenderedEmail> = {
   "subscription-payment-failed": () => subscriptionPaymentFailedEmail({ name: "Jamie", plan: "Pro", amountCents: 1700, currency: "usd", graceEnds: new Date("2026-12-18T00:00:00Z") }),
   "subscription-canceled": () => subscriptionCanceledEmail({ name: "Jamie", plan: "Pro", endsOn: new Date("2026-12-11T00:00:00Z"), ended: false }),
   "subscription-ended": () => subscriptionCanceledEmail({ name: "Jamie", plan: "Pro", endsOn: null, ended: true }),
+  "upi-awaiting": () => upiAwaitingEmail({ product: "Reels Hook Guide", amountCents: 49900, currency: "inr", utr: "412345678901", orderRef: "PK7XQ2M9AB", statusUrl: absoluteUrl("/p/reels-hook-guide/order/sample?t=sample"), seller: "Priya Sharma", supportContact: "+91 98765 43210" }),
+  "upi-confirmed": () => buyerReceiptEmail({ product: "Reels Hook Guide", amountCents: 49900, currency: "inr", accessUrl: absoluteUrl("/p/reels-hook-guide/order/sample?t=sample"), delivery: "file", seller: "Priya Sharma", method: "upi" }),
+  "upi-rejected": () => upiRejectedEmail({ product: "Reels Hook Guide", amountCents: 49900, currency: "inr", utr: "412345678901", orderRef: "PK7XQ2M9AB", reason: "No payment with this UTR reached my account.", seller: "Priya Sharma" }),
+  "upi-to-confirm": () => upiOrderToConfirmEmail({ name: "Priya", buyerEmail: "buyer@example.com", buyerName: "Ravi Kumar", product: "Reels Hook Guide", amountCents: 49900, currency: "inr", utr: "412345678901", orderRef: "PK7XQ2M9AB" }),
+  reminder: () =>
+    reminderEmail({ name: "Jamie", channel: "Instagram (personal)", account: "@jamie.makes", caption: "Sunday market haul 🌿\n\nWhich one should I style first?\n\n#slowliving #markethaul", media: [{ label: "Photo 1", url: absoluteUrl("/media/image-placeholder.svg") }], openLabel: "Open Instagram", openUrl: "https://www.instagram.com/jamie.makes/", doneUrl: absoluteUrl("/api/reminders/done?t=sample"), holdDays: 7 }),
   "post-failed": () =>
     postFailedEmail({ name: "Jamie", platform: "Instagram", caption: "5 hooks that doubled my reel views this month (save this!)", error: "Instagram needs an image or video", scheduledFor: new Date("2026-11-12T15:00:00Z") }),
 };

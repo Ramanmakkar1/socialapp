@@ -2,9 +2,24 @@
 
 import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { ArrowLeft, AtSign, Facebook, Instagram, Loader2, PartyPopper, Plus, RotateCcw, Youtube, X } from "lucide-react";
+import { ArrowLeft, AtSign, Bell, Check, Facebook, Instagram, Loader2, PartyPopper, Plus, RotateCcw, Youtube, X } from "lucide-react";
 import { BlueskyIcon, GbpIcon, LinkedInIcon, MastodonIcon, PinterestIcon, TikTokIcon, XIcon } from "@/components/brandIcons";
-import { connectBlueskyAction, connectGbpLocationsAction, gbpPickListAction, type BlueskyConnectState, type GbpPickResult } from "./connectActions";
+import { unavailableStatus, type ChannelStatus, type ComingChannel } from "@/lib/channelStatus";
+import type { ReminderNetworkId } from "@/lib/networks/reminder";
+import {
+  channelInterestAction,
+  connectBlueskyAction,
+  connectGbpLocationsAction,
+  connectReminderAction,
+  gbpPickListAction,
+  linkedinPagesListAction,
+  saveLinkedInPagesAction,
+  type BlueskyConnectState,
+  type ChannelInterestState,
+  type GbpPickResult,
+  type LinkedInPagesResult,
+  type ReminderConnectState,
+} from "./connectActions";
 import styles from "./shell.module.css";
 import cc from "./connectChannel.module.css";
 
@@ -19,50 +34,65 @@ export type ConnectAvailability = {
   instagramLogin?: boolean;
   tiktok?: boolean;
   linkedin?: boolean;
+  /** LinkedIn company Pages (LINKEDIN_PAGES_ENABLED + LinkedIn's Community Management API approval). */
+  linkedinPages?: boolean;
   pinterest?: boolean;
   x?: boolean;
   gbp?: boolean;
   /** Keyless networks: always available. */
   bluesky?: boolean;
   mastodon?: boolean;
+  /** Pills + explanations for channels that are built but not switched on (src/lib/channelStatus.ts). */
+  statuses?: Partial<Record<ComingChannel, ChannelStatus>>;
 };
 
 type NetworkId = "instagram" | "facebook" | "threads" | "youtube" | "tiktok" | "linkedin" | "pinterest" | "x" | "bluesky" | "mastodon" | "gbp";
+type Step = "instagram" | "facebook" | "linkedin" | "bluesky" | "mastodon";
 
-type Network = {
+export type Network = {
   id: NetworkId;
   name: string;
   sub: string;
   icon: ReactNode;
+  /** One click to the network's consent screen. */
   href?: string;
   /** Opens a step inside the dialog instead of a link. */
-  step?: "instagram" | "bluesky" | "mastodon";
-  /** Supported by the app, but the server keys are missing. */
-  off?: boolean;
+  step?: Step;
+  /** Not switched on yet: the card shows a pill and opens an explanation with "Notify me". */
+  status?: ChannelStatus;
 };
 
-const icon = (I: typeof Instagram) => <I width={22} height={22} aria-hidden="true" />;
+const icon = (I: typeof Instagram) => <I width={24} height={24} aria-hidden="true" />;
 
+function coming(a: ConnectAvailability, id: ComingChannel, name: string): ChannelStatus | undefined {
+  const s = a.statuses?.[id];
+  if (s) return s.state === "ready" ? undefined : s;
+  const on = id === "linkedin_pages" ? a.linkedinPages : a[id];
+  return on ? undefined : unavailableStatus(name);
+}
+
+/** The Connect grid, in Buffer's order. Substack is left out on purpose: it has no public posting API. */
 export function networks(a: ConnectAvailability): Network[] {
-  const bothIg = a.facebook && a.instagramLogin;
+  const off = (on: boolean | undefined, name: string) => (on === false ? unavailableStatus(name) : undefined);
   return [
-    { id: "instagram", name: "Instagram", sub: "Business or Creator", icon: icon(Instagram), ...(bothIg ? { step: "instagram" as const } : { href: "/api/instagram/connect" }), off: !a.instagram },
-    { id: "facebook", name: "Facebook", sub: "Page", icon: icon(Facebook), href: "/api/instagram/connect?via=facebook", off: !a.facebook },
-    { id: "tiktok", name: "TikTok", sub: "Creator or Business", icon: icon(TikTokIcon), href: "/api/tiktok/connect", off: !a.tiktok },
-    { id: "youtube", name: "YouTube", sub: "Channel", icon: icon(Youtube), href: "/api/youtube/connect", off: !a.youtube },
-    { id: "linkedin", name: "LinkedIn", sub: "Profile", icon: icon(LinkedInIcon), href: "/api/linkedin/connect", off: !a.linkedin },
-    { id: "x", name: "X", sub: "Profile", icon: icon(XIcon), href: "/api/x/connect", off: !a.x },
-    { id: "threads", name: "Threads", sub: "Profile", icon: icon(AtSign), href: "/api/threads/connect", off: !a.threads },
-    { id: "pinterest", name: "Pinterest", sub: "Business or personal", icon: icon(PinterestIcon), href: "/api/pinterest/connect", off: !a.pinterest },
-    { id: "gbp", name: "Google Business Profile", sub: "Locations", icon: icon(GbpIcon), href: "/api/gbp/connect", off: !a.gbp },
-    { id: "bluesky", name: "Bluesky", sub: "Profile", icon: icon(BlueskyIcon), step: "bluesky", off: a.bluesky === false },
-    { id: "mastodon", name: "Mastodon", sub: "Any server", icon: icon(MastodonIcon), step: "mastodon", off: a.mastodon === false },
+    { id: "instagram", name: "Instagram", sub: "Business, Creator, or Personal", icon: icon(Instagram), step: "instagram" },
+    { id: "threads", name: "Threads", sub: "Profile", icon: icon(AtSign), href: "/api/threads/connect", status: off(a.threads, "Threads") },
+    { id: "linkedin", name: "LinkedIn", sub: "Page or Profile", icon: icon(LinkedInIcon), step: "linkedin", status: a.linkedin ? undefined : unavailableStatus("LinkedIn") },
+    { id: "facebook", name: "Facebook", sub: "Page or Group", icon: icon(Facebook), step: "facebook" },
+    { id: "bluesky", name: "Bluesky", sub: "Profile", icon: icon(BlueskyIcon), step: "bluesky", status: off(a.bluesky, "Bluesky") },
+    { id: "youtube", name: "YouTube", sub: "Channel", icon: icon(Youtube), href: "/api/youtube/connect", status: off(a.youtube, "YouTube") },
+    { id: "tiktok", name: "TikTok", sub: "Business or Personal", icon: icon(TikTokIcon), href: "/api/tiktok/connect", status: coming(a, "tiktok", "TikTok") },
+    { id: "mastodon", name: "Mastodon", sub: "Profile", icon: icon(MastodonIcon), step: "mastodon", status: off(a.mastodon, "Mastodon") },
+    { id: "pinterest", name: "Pinterest", sub: "Business or Profile", icon: icon(PinterestIcon), href: "/api/pinterest/connect", status: coming(a, "pinterest", "Pinterest") },
+    { id: "gbp", name: "Google Business", sub: "Profile", icon: icon(GbpIcon), href: "/api/gbp/connect", status: coming(a, "gbp", "Google Business Profile") },
+    { id: "x", name: "Twitter / X", sub: "Profile", icon: icon(XIcon), href: "/api/x/connect", status: coming(a, "x", "X") },
   ];
 }
 
 const LABEL: Record<string, string> = {
   instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube", tiktok: "TikTok",
   linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", bluesky: "Bluesky", mastodon: "Mastodon", gbp: "Google Business Profile",
+  ig_personal: "Instagram (personal)", fb_group: "Facebook Group",
 };
 
 /** Plain-words message for a failed connect (?connect_error=<code>&net=<network>). */
@@ -94,25 +124,26 @@ export function connectErrorText(code: string, net: string): string {
 
 type View =
   | { kind: "grid" }
-  | { kind: "instagram" }
-  | { kind: "bluesky" }
-  | { kind: "mastodon" }
+  | { kind: Step }
+  | { kind: "status"; id: string; name: string; icon: ReactNode; bg: string; status: ChannelStatus }
+  | { kind: "reminder"; platform: ReminderNetworkId }
+  | { kind: "request" }
   | { kind: "pick" }
+  | { kind: "pickLinkedin" }
   | { kind: "success"; net: string; handle: string }
   | { kind: "error"; net: string; code: string };
 
 const IG_FLOW_KEY = "poskoo.igFlow";
 
 function retryHref(net: string): string | null {
-  if (net === "bluesky" || net === "mastodon") return null;
+  if (net === "bluesky" || net === "mastodon" || net === "ig_personal" || net === "fb_group") return null;
   if (net === "facebook") return "/api/instagram/connect?via=facebook";
   return `/api/${net}/connect`;
 }
 
-const CORE: NetworkId[] = ["instagram", "facebook", "threads", "youtube", "tiktok"];
-function coreRank(id: NetworkId): number {
-  const i = CORE.indexOf(id);
-  return i === -1 ? CORE.length : i;
+function retryView(net: string): View {
+  if (net === "ig_personal" || net === "fb_group") return { kind: "reminder", platform: net };
+  return { kind: net === "bluesky" ? "bluesky" : "mastodon" };
 }
 
 // Opens the modal and puts focus on its title (not the close button), so the first Tab reaches the cards.
@@ -125,19 +156,19 @@ function showDialog(dialog: HTMLDialogElement | null, title: HTMLElement | null)
 function CardBody({ n }: { n: Network }) {
   return (
     <>
-      <span className={`${styles.connectIcon} ${styles[`netBg_${n.id}`] ?? ""}`}>{n.icon}</span>
-      <span className={styles.connectText}>
-        <b>{n.name}</b>
-        <span>{n.sub}</span>
-      </span>
+      <span className={`${cc.tile} ${styles[`netBg_${n.id}`] ?? ""}`}>{n.icon}</span>
+      <span className={cc.name}>{n.name}</span>
+      <span className={cc.sub}>{n.sub}</span>
+      {n.status && <span className={`${cc.pill} ${n.status.state === "awaiting" ? cc.pillAwaiting : ""}`}>{n.status.pill}</span>}
     </>
   );
 }
 
-// "Connect a new channel" window (Buffer-style). Every card is one click: straight to the network's
-// own consent screen, or a one-step form inside the dialog (Instagram flow choice, Bluesky handle +
-// app password, Mastodon server). After the round trip the dialog reopens on success or on a
-// plain-words error with Retry.
+// "Connect a new channel" window (Buffer-style grid). Every card is one click: straight to the
+// network's own consent screen, or a one-step form inside the dialog (Instagram / Facebook / LinkedIn
+// account type, Bluesky handle + app password, Mastodon server, reminder channels). Channels that
+// are built but not switched on show a status pill and an honest explanation with "Notify me".
+// After the round trip the dialog reopens on success or on a plain-words error with Retry.
 export default function ConnectChannelDialog({
   availability,
   label,
@@ -153,9 +184,6 @@ export default function ConnectChannelDialog({
   const ref = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const list = networks(availability);
-  // Core channels first (in colour); channels whose server keys are missing go in a separate muted group.
-  const ready = list.filter((n) => !n.off).sort((a, b) => coreRank(a.id) - coreRank(b.id));
-  const notReady = list.filter((n) => n.off);
   const [view, setView] = useState<View>({ kind: "grid" });
   const [igFlow, setIgFlow] = useState<"instagram" | "facebook">("instagram");
   const [bsState, bsAction, bsPending] = useActionState<BlueskyConnectState, FormData>(connectBlueskyAction, null);
@@ -164,13 +192,15 @@ export default function ConnectChannelDialog({
     // ?connected=<net>[&handle=], ?connect_error=<code>&net=<net>, ?connect=<net> or #connect open the window.
     const url = new URL(window.location.href);
     const p = url.searchParams;
+    const c = p.get("connect");
     let next: View | null = null;
     if (p.get("connected")) next = { kind: "success", net: p.get("connected") ?? "", handle: p.get("handle") ?? "" };
     else if (p.get("connect_pick") === "gbp") next = { kind: "pick" };
+    else if (p.get("connect_pick") === "linkedin") next = { kind: "pickLinkedin" };
     else if (p.get("connect_error")) next = { kind: "error", net: p.get("net") ?? "", code: p.get("connect_error") ?? "" };
-    else if (p.get("connect") === "bluesky" || p.get("connect") === "mastodon") next = { kind: p.get("connect") as "bluesky" | "mastodon" };
-    else if (p.get("connect") === "instagram") next = { kind: "instagram" };
-    else if (url.hash === "#connect" || p.get("connect") === "1") next = { kind: "grid" };
+    else if (c === "bluesky" || c === "mastodon" || c === "instagram" || c === "facebook" || c === "linkedin") next = { kind: c };
+    else if (c === "ig_personal" || c === "fb_group") next = { kind: "reminder", platform: c };
+    else if (url.hash === "#connect" || c === "1") next = { kind: "grid" };
     try {
       const saved = window.localStorage.getItem(IG_FLOW_KEY);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- remembered choice lives in the browser only
@@ -217,17 +247,39 @@ export default function ConnectChannelDialog({
     }
   }
 
+  const go = (next: View) => {
+    setView(next);
+    titleRef.current?.focus({ preventScroll: true });
+  };
+
   const open = () => {
     setView({ kind: "grid" });
     showDialog(ref.current, titleRef.current);
   };
 
+  const openStatus = (n: Network, status: ChannelStatus, id: string = n.id) =>
+    go({ kind: "status", id, name: n.name, icon: n.icon, bg: styles[`netBg_${n.id}`] ?? "", status });
+
   const full = slots ? slots.used >= slots.limit : false;
   const back = (
-    <button type="button" className={styles.connectBack} onClick={() => setView({ kind: "grid" })}>
+    <button type="button" className={styles.connectBack} onClick={() => go({ kind: "grid" })}>
       <ArrowLeft width={16} height={16} aria-hidden="true" /> All channels
     </button>
   );
+  const net = (id: NetworkId) => list.find((n) => n.id === id)!;
+  const a = availability;
+  const bothIg = a.facebook && a.instagramLogin;
+  const igAuto = a.instagram;
+  const pagesStatus = coming(a, "linkedin_pages", "LinkedIn Pages");
+
+  const title =
+    view.kind === "success" ? "Channel connected"
+    : view.kind === "error" ? "Couldn't connect"
+    : view.kind === "pick" ? "Select the locations to connect"
+    : view.kind === "pickLinkedin" ? "Select the LinkedIn Pages to connect"
+    : view.kind === "request" ? "Request a channel"
+    : view.kind === "reminder" ? (view.platform === "ig_personal" ? "Add an Instagram personal account" : "Add a Facebook Group")
+    : "Connect a new channel";
 
   return (
     <>
@@ -246,9 +298,7 @@ export default function ConnectChannelDialog({
       >
         <div className={styles.connectInner}>
           <div className={styles.connectHead}>
-            <h2 id="connect-title" ref={titleRef} tabIndex={-1} className={`${styles.connectTitle} ${cc.title}`}>
-              {view.kind === "success" ? "Channel connected" : view.kind === "error" ? "Couldn't connect" : view.kind === "pick" ? "Select the locations to connect" : "Connect a new channel"}
-            </h2>
+            <h2 id="connect-title" ref={titleRef} tabIndex={-1} className={`${styles.connectTitle} ${cc.title}`}>{title}</h2>
             <button type="button" className={`${styles.connectClose} ${cc.close}`} onClick={() => ref.current?.close()} aria-label="Close">
               <X width={18} height={18} aria-hidden="true" />
             </button>
@@ -263,61 +313,156 @@ export default function ConnectChannelDialog({
                   {full && slots.limit < 25 ? <> <Link href="/app/settings/billing" className="underline underline-offset-2">Upgrade for more channels</Link></> : null}
                 </p>
               )}
-              <ul className={`${styles.connectGrid} ${cc.grid}`}>
-                {ready.map((n) => (
+              <ul className={cc.grid}>
+                {list.map((n) => (
                   <li key={n.id}>
-                    {n.step ? (
-                      <button type="button" className={`${styles.connectCard} ${styles.connectCardBtn} ${cc.card}`} onClick={() => setView({ kind: n.step! })}><CardBody n={n} /></button>
+                    {n.status ? (
+                      <button type="button" className={`${cc.card} ${cc.cardSoon}`} onClick={() => openStatus(n, n.status!)} aria-label={`${n.name}: ${n.status.pill}. Learn more`}>
+                        <CardBody n={n} />
+                      </button>
+                    ) : n.step ? (
+                      <button type="button" className={cc.card} onClick={() => go({ kind: n.step! })}><CardBody n={n} /></button>
                     ) : (
-                      <a href={n.href} className={`${styles.connectCard} ${cc.card}`}><CardBody n={n} /></a>
+                      <a href={n.href} className={cc.card}><CardBody n={n} /></a>
                     )}
                   </li>
                 ))}
+                <li>
+                  <button type="button" className={`${cc.card} ${cc.cardRequest}`} onClick={() => go({ kind: "request" })}>
+                    <span className={`${cc.tile} ${cc.tileRequest}`}><Plus width={24} height={24} aria-hidden="true" /></span>
+                    <span className={cc.name}>Can&apos;t find it?</span>
+                    <span className={cc.sub}>Request a channel</span>
+                  </button>
+                </li>
               </ul>
-              {notReady.length > 0 && (
-                <section className={cc.offGroup} aria-labelledby="connect-off-heading">
-                  <h3 id="connect-off-heading" className={cc.offTitle}>Not available yet</h3>
-                  <ul className={cc.offGrid}>
-                    {notReady.map((n) => (
-                      <li key={n.id}>
-                        <span className={cc.offCard} aria-disabled="true" title={`Connecting ${n.name} isn't switched on yet`}>
-                          <span className={cc.offIcon}>{n.icon}</span>
-                          <span className={cc.offName}>{n.name}</span>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-              <p className={styles.connectFoot}>Instagram needs a professional (Business or Creator) account. <Link href="/help/getting-started">See the setup steps</Link></p>
-              <details className={styles.connectMore}>
-                <summary>Facebook profile or Group?</summary>
-                <p className={styles.connectFoot}>
-                  Poskoo can post to Facebook <b>Pages</b> only. Meta removed posting to personal profiles from its API in 2018 and to Groups in 2024, so no app can publish there.
-                </p>
-              </details>
+              <p className={styles.connectFoot}>
+                <Bell width={13} height={13} aria-hidden="true" className={cc.inlineIcon} /> Instagram personal accounts and Facebook Groups have no posting API, so Poskoo reminds you to post them.{" "}
+                <Link href="/help/getting-started">Setup help</Link>
+              </p>
             </>
+          )}
+
+          {view.kind === "status" && (
+            <div className={styles.connectStep}>
+              {back}
+              <div className={cc.statusHead}>
+                <span className={`${cc.tile} ${view.bg}`}>{view.icon}</span>
+                <span className={`${cc.pill} ${view.status.state === "awaiting" ? cc.pillAwaiting : ""}`}>{view.status.pill}</span>
+              </div>
+              <p className={styles.connectLead}><b>{view.status.title}</b></p>
+              <p className={cc.body}>{view.status.body}</p>
+              <NotifyForm channel={view.id} />
+            </div>
           )}
 
           {view.kind === "instagram" && (
             <div className={styles.connectStep}>
               {back}
-              <p className={styles.connectLead}>Is it an Instagram <b>Business</b> or <b>Creator</b> account?</p>
-              <div className={styles.connectBtnCol}>
-                {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation */}
-                <a href="/api/instagram/connect?via=instagram" className={igFlow === "instagram" ? styles.connectPrimary : styles.connectSecondary} onClick={() => rememberIg("instagram")}>
-                  <Instagram width={18} height={18} aria-hidden="true" /> Continue with Instagram <span className={styles.connectHint}>Recommended</span>
-                </a>
-                {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation */}
-                <a href="/api/instagram/connect?via=facebook" className={igFlow === "facebook" ? styles.connectPrimary : styles.connectSecondary} onClick={() => rememberIg("facebook")}>
-                  <Facebook width={18} height={18} aria-hidden="true" /> Connect via Facebook Page
-                </a>
+              <p className={styles.connectLead}>Which kind of Instagram account is it?</p>
+              <div className={cc.options}>
+                <div className={cc.option}>
+                  <p className={cc.optionTitle}>Business or Creator <span className={cc.tag}>Posts automatically</span></p>
+                  {igAuto ? (
+                    <div className={styles.connectBtnCol}>
+                      {(bothIg || a.instagramLogin) && (
+                        // eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation
+                        <a href="/api/instagram/connect?via=instagram" className={!bothIg || igFlow === "instagram" ? styles.connectPrimary : styles.connectSecondary} onClick={() => rememberIg("instagram")}>
+                          <Instagram width={18} height={18} aria-hidden="true" /> Continue with Instagram {bothIg && <span className={styles.connectHint}>Recommended</span>}
+                        </a>
+                      )}
+                      {a.facebook && (
+                        // eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation
+                        <a href="/api/instagram/connect?via=facebook" className={!bothIg || igFlow === "facebook" ? styles.connectPrimary : styles.connectSecondary} onClick={() => rememberIg("facebook")}>
+                          <Facebook width={18} height={18} aria-hidden="true" /> Connect via Facebook Page
+                        </a>
+                      )}
+                      {!a.facebook && !a.instagramLogin && (
+                        // eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation
+                        <a href="/api/instagram/connect" className={styles.connectPrimary}><Instagram width={18} height={18} aria-hidden="true" /> Connect Instagram</a>
+                      )}
+                    </div>
+                  ) : (
+                    <button type="button" className={styles.connectSecondary} onClick={() => openStatus(net("instagram"), unavailableStatus("Instagram auto-publishing"), "instagram")}>
+                      Not switched on yet. Learn more
+                    </button>
+                  )}
+                </div>
+                <div className={cc.option}>
+                  <p className={cc.optionTitle}>Personal account <span className={`${cc.tag} ${cc.tagRemind}`}><Bell width={11} height={11} aria-hidden="true" /> Reminders</span></p>
+                  <p className={cc.optionText}>Instagram has no posting API for personal accounts. Poskoo e-mails you the caption and files at the scheduled time; you post it in the app.</p>
+                  <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "ig_personal" })}>
+                    <Bell width={16} height={16} aria-hidden="true" /> Get reminders for a personal account
+                  </button>
+                </div>
               </div>
               <p className={styles.connectFoot}>
-                Personal account? <a href="https://help.instagram.com/502981923235522" target="_blank" rel="noreferrer">How to switch to a professional account</a> (free, takes a minute).
+                Want auto-publishing? <a href="https://help.instagram.com/502981923235522" target="_blank" rel="noreferrer">Switch to a professional account</a> (free, takes a minute).
               </p>
             </div>
           )}
+
+          {view.kind === "facebook" && (
+            <div className={styles.connectStep}>
+              {back}
+              <p className={styles.connectLead}>Where do you want to post on Facebook?</p>
+              <div className={cc.options}>
+                <div className={cc.option}>
+                  <p className={cc.optionTitle}>Facebook Page <span className={cc.tag}>Posts automatically</span></p>
+                  {a.facebook ? (
+                    // eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation
+                    <a href="/api/instagram/connect?via=facebook" className={styles.connectPrimary}><Facebook width={18} height={18} aria-hidden="true" /> Connect a Page</a>
+                  ) : (
+                    <button type="button" className={styles.connectSecondary} onClick={() => openStatus(net("facebook"), unavailableStatus("Facebook Pages"), "facebook")}>
+                      Not switched on yet. Learn more
+                    </button>
+                  )}
+                </div>
+                <div className={cc.option}>
+                  <p className={cc.optionTitle}>Facebook Group <span className={`${cc.tag} ${cc.tagRemind}`}><Bell width={11} height={11} aria-hidden="true" /> Reminders</span></p>
+                  <p className={cc.optionText}>Meta removed posting to Groups from its API in April 2024, so no app can publish there. Poskoo e-mails you the post at the scheduled time, ready to paste.</p>
+                  <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "fb_group" })}>
+                    <Bell width={16} height={16} aria-hidden="true" /> Get reminders for a Group
+                  </button>
+                </div>
+              </div>
+              <p className={styles.connectFoot}>Personal profiles can&apos;t be connected: Meta doesn&apos;t let apps post to them.</p>
+            </div>
+          )}
+
+          {view.kind === "linkedin" && (
+            <div className={styles.connectStep}>
+              {back}
+              <p className={styles.connectLead}>Post to your LinkedIn profile or a company Page?</p>
+              <div className={cc.options}>
+                <div className={cc.option}>
+                  <p className={cc.optionTitle}>Profile <span className={cc.tag}>Posts automatically</span></p>
+                  {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation */}
+                  <a href="/api/linkedin/connect" className={styles.connectPrimary}><LinkedInIcon width={18} height={18} aria-hidden="true" /> Connect your profile</a>
+                </div>
+                <div className={cc.option}>
+                  <p className={cc.optionTitle}>
+                    Company Page {pagesStatus ? <span className={`${cc.pill} ${cc.pillAwaiting}`}>{pagesStatus.pill}</span> : <span className={cc.tag}>Posts automatically</span>}
+                  </p>
+                  {pagesStatus ? (
+                    <>
+                      <p className={cc.optionText}>{pagesStatus.body}</p>
+                      <NotifyForm channel="linkedin_pages" />
+                    </>
+                  ) : (
+                    <>
+                      <p className={cc.optionText}>Sign in with LinkedIn, then pick the Pages you&apos;re an admin or content admin of.</p>
+                      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth start is a route handler: full navigation */}
+                      <a href="/api/linkedin/connect" className={styles.connectSecondary}><LinkedInIcon width={18} height={18} aria-hidden="true" /> Connect Pages</a>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {view.kind === "reminder" && <ReminderForm platform={view.platform} back={back} />}
+
+          {view.kind === "request" && <RequestForm back={back} />}
 
           {view.kind === "bluesky" && (
             <form action={bsAction} className={styles.connectStep}>
@@ -363,20 +508,27 @@ export default function ConnectChannelDialog({
             </form>
           )}
 
-          {view.kind === "pick" && <GbpPicker onBack={() => setView({ kind: "grid" })} />}
+          {view.kind === "pick" && <GbpPicker onBack={() => go({ kind: "grid" })} />}
+
+          {view.kind === "pickLinkedin" && <LinkedInPagesPicker onBack={() => go({ kind: "grid" })} />}
 
           {view.kind === "success" && (
             <div className={styles.connectStep}>
               <p className={styles.connectSuccess}>
                 <PartyPopper width={22} height={22} aria-hidden="true" />
                 <span>
-                  <b>{view.handle ? (view.handle.includes(" ") || view.handle.startsWith("@") ? view.handle : `@${view.handle}`) : (LABEL[view.net] ?? "Your channel")}</b> is connected
+                  <b>{view.handle ? (view.handle.includes(" ") || view.handle.startsWith("@") || view.net === "fb_group" ? view.handle : `@${view.handle}`) : (LABEL[view.net] ?? "Your channel")}</b> is connected
                   {view.handle && LABEL[view.net] ? ` to ${LABEL[view.net]}` : ""}.
                 </span>
               </p>
+              {(view.net === "ig_personal" || view.net === "fb_group") && (
+                <p className={cc.body}>
+                  <Bell width={14} height={14} aria-hidden="true" className={cc.inlineIcon} /> Posts you schedule here aren&apos;t published automatically: at the scheduled time Poskoo e-mails you the caption and files, plus a “Mark as posted” link.
+                </p>
+              )}
               <div className={styles.connectBtnCol}>
                 <a href={`/app/calendar?compose=1&with=${encodeURIComponent(view.net)}`} className={styles.connectPrimary}>Create your first post</a>
-                <button type="button" className={styles.connectSecondary} onClick={() => setView({ kind: "grid" })}>Connect another channel</button>
+                <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "grid" })}>Connect another channel</button>
               </div>
             </div>
           )}
@@ -389,19 +541,176 @@ export default function ConnectChannelDialog({
                   retryHref(view.net) ? (
                     <a href={retryHref(view.net)!} className={styles.connectPrimary}><RotateCcw width={16} height={16} aria-hidden="true" /> Retry</a>
                   ) : (
-                    <button type="button" className={styles.connectPrimary} onClick={() => setView({ kind: view.net === "bluesky" ? "bluesky" : "mastodon" })}>
+                    <button type="button" className={styles.connectPrimary} onClick={() => go(retryView(view.net))}>
                       <RotateCcw width={16} height={16} aria-hidden="true" /> Retry
                     </button>
                   )
                 )}
                 {view.code === "limit" && <Link href="/app/settings#accounts-heading" className={styles.connectPrimary} onClick={() => ref.current?.close()}>Manage channels</Link>}
-                <button type="button" className={styles.connectSecondary} onClick={() => setView({ kind: "grid" })}>All channels</button>
+                <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "grid" })}>All channels</button>
               </div>
             </div>
           )}
         </div>
       </dialog>
     </>
+  );
+}
+
+// "Notify me when it's ready" (channel_requests, kind = notify). Honest: it only records interest.
+function NotifyForm({ channel }: { channel: string }) {
+  const [state, action, pending] = useActionState<ChannelInterestState, FormData>(channelInterestAction, null);
+  if (state?.ok) {
+    return (
+      <p className={cc.thanks} role="status">
+        <Check width={16} height={16} aria-hidden="true" /> {state.message}
+      </p>
+    );
+  }
+  return (
+    <form action={action} className={styles.connectBtnCol}>
+      <input type="hidden" name="kind" value="notify" />
+      <input type="hidden" name="channel" value={channel} />
+      {state && !state.ok && <p role="alert" className={styles.connectError}>{state.error}</p>}
+      <button type="submit" className={styles.connectPrimary} disabled={pending}>
+        {pending ? <Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> : <Bell width={16} height={16} aria-hidden="true" />} Notify me when it&apos;s ready
+      </button>
+    </form>
+  );
+}
+
+// "Can't find it? Request a channel": channel name + optional note, then a thank-you state.
+function RequestForm({ back }: { back: ReactNode }) {
+  const [state, action, pending] = useActionState<ChannelInterestState, FormData>(channelInterestAction, null);
+  if (state?.ok) {
+    return (
+      <div className={styles.connectStep}>
+        {back}
+        <p className={cc.thanks} role="status">
+          <PartyPopper width={18} height={18} aria-hidden="true" /> {state.message} We read every request and use them to decide what to build next.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <form action={action} className={styles.connectStep}>
+      {back}
+      <p className={styles.connectLead}>Which channel should Poskoo support next?</p>
+      <input type="hidden" name="kind" value="request" />
+      <label className={styles.connectLabel}>
+        Channel name
+        <input name="channel" required minLength={2} maxLength={80} placeholder="e.g. Reddit, Tumblr, WhatsApp Channels" className={styles.connectInput} />
+      </label>
+      <label className={styles.connectLabel}>
+        Anything we should know? <span className={cc.optional}>(optional)</span>
+        <textarea name="note" rows={3} maxLength={500} placeholder="How you'd use it, account type…" className={`${styles.connectInput} ${cc.textarea}`} />
+      </label>
+      {state && !state.ok && <p role="alert" className={styles.connectError}>{state.error}</p>}
+      <button type="submit" className={styles.connectPrimary} disabled={pending}>
+        {pending ? <Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> : null} Send request
+      </button>
+    </form>
+  );
+}
+
+// Reminder channel: the @handle or the group, no OAuth. Explains the e-mail flow before adding.
+function ReminderForm({ platform, back }: { platform: ReminderNetworkId; back: ReactNode }) {
+  const [state, action, pending] = useActionState<ReminderConnectState, FormData>(connectReminderAction, null);
+  const ig = platform === "ig_personal";
+  return (
+    <form action={action} className={styles.connectStep}>
+      {back}
+      <input type="hidden" name="platform" value={platform} />
+      <ol className={cc.howList}>
+        <li>Schedule posts to {ig ? "this account" : "this group"} like any other channel.</li>
+        <li>At the scheduled time Poskoo e-mails you the caption (ready to copy) and the photos or video.</li>
+        <li>Post it in {ig ? "Instagram" : "Facebook"}, then tap “Mark as posted”.</li>
+      </ol>
+      {ig ? (
+        <label className={styles.connectLabel}>
+          Instagram username
+          <input name="target" required autoCapitalize="none" autoComplete="off" spellCheck={false} placeholder="@yourname" className={styles.connectInput} />
+        </label>
+      ) : (
+        <>
+          <label className={styles.connectLabel}>
+            Group link or name
+            <input name="target" required autoCapitalize="none" autoComplete="off" placeholder="facebook.com/groups/yourgroup" className={styles.connectInput} />
+          </label>
+          <label className={styles.connectLabel}>
+            Group name <span className={cc.optional}>(optional, shown in Poskoo)</span>
+            <input name="name" maxLength={80} placeholder="Edmonton Plant Swap" className={styles.connectInput} />
+          </label>
+        </>
+      )}
+      <p className={styles.connectFoot}>No password or login needed. It counts as one channel on your plan.</p>
+      {state?.error && <p role="alert" className={styles.connectError}>{state.error}</p>}
+      <button type="submit" className={styles.connectPrimary} disabled={pending}>
+        {pending ? <Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> : <Bell width={16} height={16} aria-hidden="true" />} Add {ig ? "Instagram account" : "group"} with reminders
+      </button>
+    </form>
+  );
+}
+
+// LinkedIn Pages picker (LINKEDIN_PAGES_ENABLED): Pages the member administers, all ticked on a fresh connect.
+function LinkedInPagesPicker({ onBack }: { onBack: () => void }) {
+  const [list, setList] = useState<LinkedInPagesResult | null>(null);
+  const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [state, action, pending] = useActionState(saveLinkedInPagesAction, null);
+  useEffect(() => {
+    let active = true;
+    linkedinPagesListAction()
+      .then((r) => {
+        if (!active) return;
+        setList(r);
+        if (r.ok) setChecked(new Set(r.pages.filter((p) => p.selected).map((p) => p.urn)));
+      })
+      .catch(() => active && setList({ ok: false, error: "Could not load your LinkedIn Pages. Try again." }));
+    return () => {
+      active = false;
+    };
+  }, []);
+  if (list === null) return <p className={styles.connectLead}><Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> Loading your Pages…</p>;
+  if (!list.ok) {
+    return (
+      <div className={styles.connectStep}>
+        <p role="alert" className={styles.connectError}>{list.error}</p>
+        <div className={styles.connectBtnCol}>
+          <button type="button" className={styles.connectSecondary} onClick={onBack}>All channels</button>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <form action={action} className={styles.connectStep}>
+      <p className={styles.connectSlots}>Your profile ({list.profile}) is connected. Pick the Pages you also want to post to; you choose the author per post in the composer.</p>
+      <ul className={styles.connectPickList}>
+        {list.pages.map((pg) => (
+          <li key={pg.urn}>
+            <label className={styles.connectPickItem}>
+              <input
+                type="checkbox"
+                name="page"
+                value={pg.urn}
+                checked={checked.has(pg.urn)}
+                onChange={(e) => {
+                  const next = new Set(checked);
+                  if (e.target.checked) next.add(pg.urn);
+                  else next.delete(pg.urn);
+                  setChecked(next);
+                }}
+              />
+              <span className={`${styles.connectIcon} ${styles.netBg_linkedin}`}><LinkedInIcon width={18} height={18} aria-hidden="true" /></span>
+              <span className={styles.connectPickText}><b>{pg.name}</b><span>Company Page</span></span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      {state?.error && <p role="alert" className={styles.connectError}>{state.error}</p>}
+      <button type="submit" className={styles.connectPrimary} disabled={pending}>
+        {pending ? <Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> : null} {checked.size === 0 ? "Profile only" : `Connect ${checked.size === 1 ? "1 Page" : `${checked.size} Pages`}`}
+      </button>
+    </form>
   );
 }
 

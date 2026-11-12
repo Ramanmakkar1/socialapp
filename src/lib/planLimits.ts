@@ -132,7 +132,8 @@ export function accountConnectAllowed(input: { alreadyConnected: boolean; connec
 export type ConnectTarget =
   | {
       kind: "social";
-      platform: "instagram" | "facebook" | "threads" | "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp";
+      /** ig_personal / fb_group are reminder channels: they hold a slot like any other channel. */
+      platform: "instagram" | "facebook" | "threads" | "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp" | "ig_personal" | "fb_group";
       externalId: string;
     }
   | { kind: "youtube"; channelId: string };

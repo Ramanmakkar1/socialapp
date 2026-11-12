@@ -1,8 +1,9 @@
 // Server only: LinkedIn. "Sign In with LinkedIn using OpenID Connect" (openid profile email) +
 // "Share on LinkedIn" (w_member_social): posts to the member's own profile through the versioned
 // Posts API (rest/posts) with text and images (Images API upload).
-// Company pages need the Community Management API (w_organization_social, r_organization_admin),
-// which LinkedIn grants only after a separate review: built behind LINKEDIN_COMPANY_PAGES=1.
+// Company pages need the Community Management API (w_organization_social, r_organization_social),
+// which LinkedIn grants only after a separate review: built behind LINKEDIN_PAGES_ENABLED=1
+// (LINKEDIN_COMPANY_PAGES=1 still works). Off by default.
 import { BRAND } from "@/lib/brand";
 import {
   NetworkAuthError,
@@ -29,8 +30,14 @@ export function linkedinConfig() {
     redirectUri: `${BRAND.url}/api/linkedin/callback`,
     /** YYYYMM. LinkedIn supports each version for at least a year; override when it is sunset. */
     apiVersion: process.env.LINKEDIN_API_VERSION || "202605",
-    companyPages: process.env.LINKEDIN_COMPANY_PAGES === "1",
+    companyPages: linkedinPagesFlag(process.env),
   };
+}
+
+/** LINKEDIN_PAGES_ENABLED=1/true (or the older LINKEDIN_COMPANY_PAGES=1) turns company Pages on. */
+export function linkedinPagesFlag(env: Record<string, string | undefined>): boolean {
+  const v = (env.LINKEDIN_PAGES_ENABLED ?? "").trim().toLowerCase();
+  return v === "1" || v === "true" || env.LINKEDIN_COMPANY_PAGES === "1";
 }
 
 export function isLinkedInConfigured(): boolean {
@@ -40,7 +47,7 @@ export function isLinkedInConfigured(): boolean {
 
 export function linkedinScopes(): string[] {
   const base = ["openid", "profile", "email", "w_member_social"];
-  return linkedinConfig().companyPages ? [...base, "w_organization_social", "r_organization_admin"] : base;
+  return linkedinConfig().companyPages ? [...base, "w_organization_social", "r_organization_social"] : base;
 }
 
 export function linkedinAuthorizeUrl(state: string): string {
@@ -104,22 +111,36 @@ export async function fetchLinkedInProfile(token: string, fetchImpl: Fetch = fet
 
 export type LinkedInOrg = { urn: string; name: string };
 
+/** Page roles that may post as the organization (organizationAcls role values). */
+export const LINKEDIN_POSTING_ROLES = ["ADMINISTRATOR", "CONTENT_ADMINISTRATOR", "CONTENT_ADMIN"];
+
+/** Organization URNs from an organizationAcls response where the member may post (approved admin / content admin). */
+export function postableOrgUrns(elements: unknown): string[] {
+  const out: string[] = [];
+  for (const el of Array.isArray(elements) ? elements : []) {
+    const o = obj(el);
+    const urn = str(o.organization) || str(o.organizationTarget);
+    if (!urn.startsWith("urn:li:organization:")) continue;
+    if (o.state !== undefined && str(o.state) !== "APPROVED") continue;
+    if (!LINKEDIN_POSTING_ROLES.includes(str(o.role))) continue;
+    if (!out.includes(urn)) out.push(urn);
+  }
+  return out;
+}
+
 /** Organizations the member administers (Community Management API only). Empty on any error. */
 export async function fetchLinkedInOrgs(token: string, fetchImpl: Fetch = fetch): Promise<LinkedInOrg[]> {
   const c = linkedinConfig();
   try {
-    const res = await fetchImpl(`${API}/rest/organizationAcls?q=roleAssignee&role=ADMINISTRATOR&state=APPROVED`, {
+    const res = await fetchImpl(`${API}/rest/organizationAcls?q=roleAssignee&state=APPROVED&count=100`, {
       headers: { Authorization: `Bearer ${token}`, "LinkedIn-Version": c.apiVersion, "X-Restli-Protocol-Version": "2.0.0" },
       cache: "no-store",
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) return [];
     const json = obj(await readBody(res));
-    const elements = Array.isArray(json.elements) ? json.elements : [];
     const orgs: LinkedInOrg[] = [];
-    for (const el of elements) {
-      const urn = str(obj(el).organization);
-      if (!urn.startsWith("urn:li:organization:")) continue;
+    for (const urn of postableOrgUrns(json.elements).slice(0, 50)) {
       let name = urn.split(":").pop() ?? urn;
       const id = urn.split(":").pop();
       const orgRes = await fetchImpl(`${API}/rest/organizations/${id}`, {

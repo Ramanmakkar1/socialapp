@@ -7,7 +7,10 @@ import { BRAND } from "@/lib/brand";
 import { isDbConfigured } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { isStripeConfigured } from "@/lib/payments";
-import { getPublicProduct } from "@/lib/products";
+import { checkoutMethod, getPublicProduct } from "@/lib/products";
+import { newOrderRef, upiAmount, upiDeepLink, upiNote } from "@/lib/upi";
+import { randomBytes } from "node:crypto";
+import UpiCheckout from "./UpiCheckout";
 import { getBioPage } from "@/lib/bioPage";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import PoskooMark from "@/components/PoskooMark";
@@ -33,7 +36,17 @@ export default async function ProductBuyPage({ params, searchParams }: Props) {
   if (!isDbConfigured()) notFound();
   const product = await getPublicProduct(slug);
   if (!product || !product.active) notFound();
-  const canBuy = isStripeConfigured() && product.charges_enabled && Boolean(product.stripe_account_id);
+  // Seller's country routes the checkout: India -> Direct UPI, Stripe countries -> Stripe.
+  const method = checkoutMethod(product, isStripeConfigured());
+  const orderRef = newOrderRef(randomBytes(8));
+  const upi =
+    method === "upi" && product.upi_vpa && product.upi_payee_name
+      ? {
+          vpa: product.upi_vpa,
+          payeeName: product.upi_payee_name,
+          note: upiNote(orderRef, product.title),
+        }
+      : null;
   // Creator card: only from a published link-in-bio page (never private account data).
   const bio = await getBioPage(product.user_id).catch(() => null);
   const creator = bio?.published ? bio : null;
@@ -60,18 +73,37 @@ export default async function ProductBuyPage({ params, searchParams }: Props) {
           {error ? (
             <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>Checkout could not start. Please try again in a moment.</p>
           ) : null}
-          {canBuy ? (
+          {upi ? (
+            <UpiCheckout
+              slug={product.slug}
+              amountLabel={formatMoney(product.price_cents, product.currency)}
+              amountPlain={upiAmount(product.price_cents)}
+              payeeName={upi.payeeName}
+              vpa={upi.vpa}
+              note={upi.note}
+              orderRef={orderRef}
+              deepLink={upiDeepLink({ vpa: upi.vpa, payeeName: upi.payeeName, amountPaise: product.price_cents, note: upi.note })}
+              supportContact={product.upi_support_contact}
+            />
+          ) : method === "stripe" ? (
             <form action={`/p/${product.slug}/checkout`} method="post">
               <Btn type="submit" className={`w-full ${styles.buy}`}>Buy now · {formatMoney(product.price_cents, product.currency)}</Btn>
             </form>
           ) : (
             <p role="status" className={styles.unavailable}>This product is not available for purchase right now.</p>
           )}
-          <ul className={styles.trust}>
-            <li>Secure card payment by Stripe</li>
-            <li>Instant {delivery} right after paying</li>
-            <li>Your {delivery} page keeps working, so bookmark it</li>
-          </ul>
+          {upi ? (
+            <ul className={styles.trust}>
+              <li>Pay with any UPI app: GPay, PhonePe, Paytm, BHIM</li>
+              <li>Your {delivery} is e-mailed once the seller confirms your payment</li>
+            </ul>
+          ) : (
+            <ul className={styles.trust}>
+              <li>Secure card payment by Stripe</li>
+              <li>Instant {delivery} right after paying</li>
+              <li>Your {delivery} page keeps working, so bookmark it</li>
+            </ul>
+          )}
           {creator ? (
             <Link href={`/@${creator.handle}`} className={styles.creator}>
               {creator.avatar_url ? (

@@ -91,6 +91,8 @@ export async function finishOAuth(
   request: Request,
   network: NetworkId,
   connect: (code: string, flow: OAuthFlow) => Promise<SaveAccountInput>,
+  /** Optional next step after a successful connect (LinkedIn Pages: the page picker). */
+  next?: (input: SaveAccountInput, done: URL) => URL,
 ): Promise<NextResponse> {
   // Outside the try so the /login redirect is not swallowed.
   const user = await requireUser();
@@ -105,7 +107,8 @@ export async function finishOAuth(
     if (error) return NextResponse.redirect(settingsResultUrl(network, error === "access_denied" || error === "user_cancelled" ? "declined" : "error"));
     if (!code || !state || !flow || state !== flow.state) return NextResponse.redirect(settingsResultUrl(network, "state_error"));
     const input = await connect(code, flow);
-    return NextResponse.redirect(await completeConnect(user.id, network, input));
+    const done = await completeConnect(user.id, network, input);
+    return NextResponse.redirect(next && done.searchParams.get("connected") === network ? next(input, done) : done);
   } catch (err) {
     console.error(`${network} callback failed`, err instanceof NetworkAuthError ? err.reason : "unexpected");
     return NextResponse.redirect(settingsResultUrl(network, err instanceof NetworkAuthError && err.reason === "instance_unreachable" ? "instance_unreachable" : "error"));

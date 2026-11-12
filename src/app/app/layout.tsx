@@ -17,6 +17,8 @@ import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
 import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { connectHref, networkAvailability } from "@/lib/networks/registry";
+import { linkedinConfig } from "@/lib/networks/linkedin";
+import { channelStatuses } from "@/lib/channelStatus";
 import { logoutAction } from "../login/actions";
 import PoskooMark from "@/components/PoskooMark";
 import { VERIFY_DISMISS_COOKIE } from "@/lib/emailCodes";
@@ -186,14 +188,16 @@ async function AppShell({ children }: { children: ReactNode }) {
   let needsReconnect = false;
   let failedPosts = 0;
   let scheduledPosts = 0;
+  let pendingOrders = 0;
   let dmsThisMonth = 0;
   let scheduledThisMonth = 0;
   if (isDbConfigured()) {
     try {
-      const rows = await query<{ expired: number; failed: number; scheduled: number; dms: number; scheduled_month: number }>(
+      const rows = await query<{ expired: number; failed: number; scheduled: number; dms: number; scheduled_month: number; pending_orders: number }>(
         `select (select count(*)::int from socialapp.social_accounts where user_id=$1 and platform='instagram' and status='expired') as expired,
                 (select count(*)::int from socialapp.scheduled_posts where user_id=$1 and status='failed') as failed,
                 (select count(*)::int from socialapp.scheduled_posts where user_id=$1 and status='scheduled') as scheduled,
+                (select count(*)::int from socialapp.orders where user_id=$1 and status='awaiting_confirmation') as pending_orders,
                 (select count(*)::int from socialapp.dm_queue where user_id=$1 and status='sent' and kind <> 'manual_reply'
                    and sent_at >= (date_trunc('month', now() at time zone 'UTC') at time zone 'UTC')) as dms,
                 (select count(*)::int from socialapp.scheduled_posts where user_id=$1 and status in ('scheduled','publishing','published')
@@ -204,6 +208,7 @@ async function AppShell({ children }: { children: ReactNode }) {
       needsReconnect = (rows[0]?.expired ?? 0) > 0;
       failedPosts = rows[0]?.failed ?? 0;
       scheduledPosts = rows[0]?.scheduled ?? 0;
+      pendingOrders = rows[0]?.pending_orders ?? 0;
       dmsThisMonth = rows[0]?.dms ?? 0;
       scheduledThisMonth = rows[0]?.scheduled_month ?? 0;
     } catch {
@@ -231,6 +236,12 @@ async function AppShell({ children }: { children: ReactNode }) {
     instagramLogin: isIgConfigured(),
     ...networkAvailability(),
   };
+  // "Awaiting approval" / "Coming soon" pills for channels whose keys or approval are missing.
+  availability.linkedinPages = Boolean(availability.linkedin) && linkedinConfig().companyPages;
+  availability.statuses = channelStatuses(
+    { tiktok: Boolean(availability.tiktok), pinterest: Boolean(availability.pinterest), x: Boolean(availability.x), gbp: Boolean(availability.gbp), linkedin_pages: availability.linkedinPages },
+    process.env,
+  );
   const displayName = user.name?.trim() || user.email.split("@")[0];
   const mediaPending = await mediaPendingPromise;
   // Same rule as the connect callbacks (planLimits.accountLimitError): anything not disconnected holds a slot.
@@ -295,7 +306,7 @@ async function AppShell({ children }: { children: ReactNode }) {
             <AccountMenu name={displayName} email={user.email} plan={plan} />
             <NewButtons />
             <div className={styles.sideScroll}>
-              <SidebarNav failedPosts={failedPosts} scheduledPosts={scheduledPosts} />
+              <SidebarNav failedPosts={failedPosts} scheduledPosts={scheduledPosts} pendingOrders={pendingOrders} />
               <Channels channels={channels} availability={availability} slots={{ used: connectedAccounts, limit: limits.socialAccounts }} />
               <details className={styles.usage}>
                 <summary className={styles.usageSummary}>

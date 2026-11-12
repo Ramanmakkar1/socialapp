@@ -14,7 +14,9 @@ import { networkTargetError, normalizeNetOptions } from "@/lib/networks/validate
 import { scheduledMediaError } from "@/lib/mediaLifecycle";
 
 export const ALLOWED_PLATFORMS: PlatformId[] = [
-  "instagram", "facebook", "threads", "youtube", "tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x",
+  "instagram", "facebook", "threads", "youtube", "tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp",
+  // Reminder channels (src/lib/networks/reminder.ts).
+  "ig_personal", "fb_group",
 ];
 
 export type SavePostInput = {

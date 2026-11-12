@@ -34,7 +34,7 @@ export type ComposerState = {
 };
 
 /** Networks added 2026-11-11: restored from a draft like YouTube (enabled + custom caption). */
-const NEW_NETWORKS: PlatformId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp"];
+const NEW_NETWORKS: PlatformId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group"];
 const LIVE: PlatformId[] = ["instagram", "youtube", ...NEW_NETWORKS];
 
 function fill<T>(value: T, over: Partial<Record<PlatformId, T>> = {}): Record<PlatformId, T> {

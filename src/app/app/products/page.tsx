@@ -12,6 +12,7 @@ import { formatMoney } from "@/lib/money";
 import { isStripeConfigured } from "@/lib/payments";
 import { countProducts, listProducts, type ProductRow } from "@/lib/products";
 import { connectedAccountForPage, type ConnectedAccount } from "@/lib/stripeConnect";
+import { getSellerPayout, type SellerPayout } from "@/lib/upiOrders";
 import PaymentsNotice from "./PaymentsNotice";
 
 export const metadata = {
@@ -26,6 +27,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   let total = 0;
   let products: ProductRow[] = [];
   let account: ConnectedAccount | null = null;
+  let payout: SellerPayout | null = null;
   let failed = false;
   let paging = readPaging(params, 0);
   if (isDbConfigured()) {
@@ -34,6 +36,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       paging = readPaging(params, total);
       products = await listProducts(user.id, paging.perPage, paging.offset);
       if (configured) account = await connectedAccountForPage(user.id);
+      payout = await getSellerPayout(user.id);
     } catch (err) {
       console.error("products load failed for user", user.id, err instanceof Error ? err.message : err);
       failed = true;
@@ -48,7 +51,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         lede="Sell ebooks, presets, templates and courses. Share the buy link in your bio or let an auto-DM send it."
         action={total > 0 ? create : undefined}
       />
-      <PaymentsNotice configured={configured} account={account} />
+      <PaymentsNotice configured={configured} account={account} payout={payout} />
       {params.deleted ? <p role="status" className={`${ui.notice} mt-6`}>Product deleted.</p> : null}
       {failed ? (
         <p role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>Products could not be loaded. Reload to try again.</p>

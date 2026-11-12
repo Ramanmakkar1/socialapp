@@ -44,7 +44,7 @@ export async function GET() {
     "- Draft captions and DM message ideas with AI.",
     "- Capture leads: ask for an email in the DM before the link is sent.",
     "- Lead magnets: hand out a free file or link after the email gate.",
-    "- Digital products with Stripe checkout (payments switching on soon).",
+    "- Digital products with Stripe checkout, or direct UPI payments to the seller for sellers in India (payments switching on soon).",
     "- Refer and earn: +500 bonus auto-DMs a month for each referred user who connects an account.",
     "",
     "## Not available yet",

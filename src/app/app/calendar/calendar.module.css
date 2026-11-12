@@ -924,3 +924,9 @@
   .queueActions { grid-column: 2; justify-content: flex-start; }
   .queueActions:empty { display: none; }
 }
+/* Reminder channels (Instagram personal, Facebook Groups). */
+.ico_ig_personal { color: #d62976; }
+.ico_fb_group { color: #1877f2; }
+.tile_ig_personal { background: #d62976; }
+.tile_fb_group { background: #1877f2; }
+.cardBell { display: inline-grid; flex: none; place-items: center; width: 16px; height: 16px; border-radius: 999px; background: var(--poskoo-lime); color: #1e1631; }

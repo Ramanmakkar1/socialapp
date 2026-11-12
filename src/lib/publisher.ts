@@ -8,6 +8,7 @@ import { RECONNECT_MESSAGE, publishToThreads } from "@/lib/threadsPublish";
 import { refreshYouTubeToken } from "@/lib/youtubeAuth";
 import { isNetworkId } from "@/lib/networks/common";
 import { publishNetworkTargets, type ClaimedNetworkRow } from "@/lib/networks/publish";
+import { expireReminders } from "@/lib/networks/reminderSend";
 import { releasePostMedia, releasePublishedMediaSweep } from "@/lib/mediaLifecycle";
 
 const PUBLISH_TIMEOUT_MS = 20_000;
@@ -34,7 +35,7 @@ type AccountRow = {
   auth_type?: string | null;
 };
 
-export type PublishResult = { published: number; failed: number; skipped: number; recovered: number };
+export type PublishResult = { published: number; failed: number; skipped: number; recovered: number; /** Reminder e-mails sent (Instagram personal, Facebook Groups). */ reminded?: number };
 
 /** A claim older than this is treated as an interrupted run (worst real publish is ~10 min: video polling / 10-slide carousel). */
 export const STUCK_PUBLISHING_MS = 20 * 60 * 1000;
@@ -258,11 +259,15 @@ async function markTargetFailed(
   void import("@/lib/emailNotify").then((m) => m.inBackground("post_failed", () => m.notifyPostFailed(postId))).catch(() => undefined);
 }
 
-async function refreshPostStatus(postId: string): Promise<void> {
+export async function refreshPostStatus(postId: string): Promise<void> {
   const pool = getPool();
+  // A reminder target ('reminded': e-mail sent, owner still has to post it) keeps the post in
+  // 'publishing' until it is marked as posted or its 7-day hold ends (src/lib/networks/reminderSend.ts).
   const updated = await pool.query<{ status: string }>(
     `update socialapp.scheduled_posts p set status = case
       when exists(select 1 from socialapp.post_targets where post_id=p.id and status='failed') then 'failed'
+      when not exists(select 1 from socialapp.post_targets where post_id=p.id and status in ('pending','publishing'))
+        and exists(select 1 from socialapp.post_targets where post_id=p.id and status='reminded') then 'publishing'
       when not exists(select 1 from socialapp.post_targets where post_id=p.id and status in ('pending','publishing')) then 'published'
       when not exists(select 1 from socialapp.post_targets where post_id=p.id and status='publishing') then 'scheduled'
       else p.status
@@ -1050,6 +1055,14 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   });
   result.published += more.published;
   result.failed += more.failed;
+  if (more.reminded) result.reminded = more.reminded;
+
+  // Reminder channels: close reminders nobody confirmed within the hold so their files can go.
+  try {
+    await expireReminders(refreshPostStatus);
+  } catch (err) {
+    console.error("publisher: reminder expiry failed", err instanceof Error ? err.message : err);
+  }
 
   // Files of published posts whose hold ended (TikTok / Facebook / Pinterest processing) or whose release failed.
   await releasePublishedMediaSweep();

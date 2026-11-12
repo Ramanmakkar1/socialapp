@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { checkoutSessionParams, newSlug, slugBase } from "./products.ts";
+import { checkoutMethod, checkoutSessionParams, newSlug, slugBase } from "./products.ts";
 
 const product = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -42,4 +42,20 @@ test("slugs are url-safe, readable and unique-ish", () => {
   assert.match(a, /^my-ebook-[a-z0-9]{6}$/);
   assert.notEqual(a, newSlug("My Ebook"));
   assert.match(newSlug("x".repeat(200)), /^[a-z0-9][a-z0-9-]{2,80}$/);
+});
+
+test("checkout routing: India sellers -> UPI (INR only), others -> Stripe when enabled, never INR on Stripe", () => {
+  const base = { active: true, currency: "inr", payout_country: "IN", upi_vpa: "priya@okhdfcbank", upi_payee_name: "Priya", upi_support_contact: null, stripe_account_id: null, charges_enabled: false };
+  assert.equal(checkoutMethod(base, true), "upi");
+  assert.equal(checkoutMethod({ ...base, active: false }, true), null);
+  assert.equal(checkoutMethod({ ...base, currency: "usd" }, true), null);
+  assert.equal(checkoutMethod({ ...base, upi_vpa: null }, true), null);
+  // An India seller with an old Stripe account still goes through UPI, never Stripe.
+  assert.equal(checkoutMethod({ ...base, currency: "usd", stripe_account_id: "acct_1", charges_enabled: true }, true), null);
+  const stripe = { ...base, currency: "usd", payout_country: "US", upi_vpa: null, upi_payee_name: null, stripe_account_id: "acct_1", charges_enabled: true };
+  assert.equal(checkoutMethod(stripe, true), "stripe");
+  assert.equal(checkoutMethod(stripe, false), null);
+  assert.equal(checkoutMethod({ ...stripe, payout_country: null }, true), "stripe");
+  assert.equal(checkoutMethod({ ...stripe, currency: "inr" }, true), null);
+  assert.equal(checkoutMethod({ ...stripe, charges_enabled: false }, true), null);
 });

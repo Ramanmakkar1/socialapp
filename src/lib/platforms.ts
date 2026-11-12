@@ -49,6 +49,17 @@ export const PLATFORMS = {
     label: "Google Business Profile",
     captionMax: 1500,
   },
+  ig_personal: {
+    // Reminder channel: the user pastes the caption into Instagram (same 2,200 limit).
+    label: "Instagram (personal)",
+    captionMax: 2200,
+    hashtagMax: 30,
+  },
+  fb_group: {
+    // Reminder channel: the user posts it to the group themselves.
+    label: "Facebook Group",
+    captionMax: 63206,
+  },
   x: {
     // 280 weighted characters (links count as 23, most CJK and emoji count as 2).
     label: "X",

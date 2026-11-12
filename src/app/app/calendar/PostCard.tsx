@@ -1,7 +1,8 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent } from "react";
-import { AlertCircle, CheckCircle2, Clock3, Loader2, PencilLine, Play } from "lucide-react";
+import { AlertCircle, Bell, CheckCircle2, Clock3, Loader2, PencilLine, Play } from "lucide-react";
+import { isReminderNetwork } from "@/lib/networks/reminder";
 import { PLATFORM_ICON, STATUS_LABEL, formatDayTime, formatTime, isMovable, type CalendarPost } from "./calendarUtils";
 import styles from "./calendar.module.css";
 
@@ -21,10 +22,13 @@ export default function PostCard({ post, tz, compact = false, row = false, onOpe
 }) {
   const movable = isMovable(post.status);
   const platforms = post.platforms.length ? post.platforms : ["instagram"];
-  const StatusIcon = STATUS_ICON[post.status] ?? Clock3;
+  // Reminder channels (Instagram personal, Facebook Groups): Poskoo e-mails the owner instead of publishing.
+  const reminder = platforms.some(isReminderNetwork);
+  const waiting = reminder && post.status === "publishing";
+  const StatusIcon = waiting ? Bell : (STATUS_ICON[post.status] ?? Clock3);
   const time = post.scheduled_at ? (row ? formatDayTime(post.scheduled_at, tz) : formatTime(post.scheduled_at, tz)) : "No time set";
-  const statusLabel = STATUS_LABEL[post.status] ?? post.status;
-  const label = `${statusLabel} post${post.scheduled_at ? ` at ${time}` : ""} on ${platforms.join(", ")}: ${post.caption.slice(0, 80) || "no caption"}`;
+  const statusLabel = waiting ? "Reminder sent: waiting for you to post" : (STATUS_LABEL[post.status] ?? post.status);
+  const label = `${waiting ? "Reminder sent, waiting for you to post" : `${statusLabel} post`}${post.scheduled_at ? ` at ${time}` : ""} on ${platforms.join(", ")}: ${post.caption.slice(0, 80) || "no caption"}`;
   const TileIcon = PLATFORM_ICON[platforms[0]] ?? PLATFORM_ICON.threads;
 
   const open = (e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>) => onOpen(post, e.currentTarget);
@@ -74,6 +78,12 @@ export default function PostCard({ post, tz, compact = false, row = false, onOpe
               return <Icon key={p} width={13} height={13} className={styles[`ico_${p}`]} />;
             })}
           </span>
+          {reminder && !compact && (
+            <span className={styles.cardBell} title="Poskoo will remind you to post this">
+              <Bell width={11} height={11} aria-hidden="true" />
+              <span className="sr-only">Reminder</span>
+            </span>
+          )}
           <span className={styles.cardTime} suppressHydrationWarning>{time}</span>
           {row && <span className={`${styles.statusTag} ${styles[`status_${post.status}`] ?? ""}`}>{statusLabel}</span>}
         </p>

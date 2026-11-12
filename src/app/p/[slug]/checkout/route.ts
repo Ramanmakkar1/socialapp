@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured } from "@/lib/db";
 import { isStripeConfigured } from "@/lib/payments";
-import { createCheckoutUrl, getPublicProduct } from "@/lib/products";
+import { checkoutMethod, createCheckoutUrl, getPublicProduct } from "@/lib/products";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request, ctx: { params: Promise<{ slug: string }> }) {
@@ -15,7 +15,7 @@ export async function POST(request: Request, ctx: { params: Promise<{ slug: stri
   if (!limited.ok) return back("?error=busy");
   try {
     const product = await getPublicProduct(slug);
-    if (!product || !product.active || !product.charges_enabled || !product.stripe_account_id) return back();
+    if (!product || checkoutMethod(product, true) !== "stripe" || !product.stripe_account_id) return back();
     return NextResponse.redirect(await createCheckoutUrl(product, product.stripe_account_id), 303);
   } catch (err) {
     console.error("checkout session failed for product", slug, err instanceof Error ? err.message : err);

@@ -1,6 +1,6 @@
 // Simple line marks for networks lucide has no icon for. Built with createLucideIcon so they are
 // drop-in replacements wherever a lucide icon is used (same props, same `typeof Instagram` type).
-import { createLucideIcon, Linkedin, Store } from "lucide-react";
+import { createLucideIcon, Facebook, Instagram, Linkedin, Store } from "lucide-react";
 
 export const TikTokIcon = createLucideIcon("tiktok", [
   ["path", { d: "M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5", key: "tk1" }],
@@ -46,6 +46,9 @@ export const NEW_NETWORK_ICON = {
   pinterest: PinterestIcon,
   x: XIcon,
   gbp: GbpIcon,
+  // Reminder channels (no posting API, Poskoo e-mails a reminder).
+  ig_personal: Instagram,
+  fb_group: Facebook,
 };
 
 export const NEW_NETWORK_COLOR = {
@@ -56,4 +59,6 @@ export const NEW_NETWORK_COLOR = {
   pinterest: "#e60023",
   x: "#000000",
   gbp: "#4285f4",
+  ig_personal: "#d62976",
+  fb_group: "#1877f2",
 };

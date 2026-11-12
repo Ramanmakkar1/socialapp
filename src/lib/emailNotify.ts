@@ -15,6 +15,9 @@ import {
   subscriptionCanceledEmail,
   subscriptionPaymentFailedEmail,
   subscriptionStartedEmail,
+  upiAwaitingEmail,
+  upiOrderToConfirmEmail,
+  upiRejectedEmail,
   verifyEmail,
   welcomeEmail,
   type RenderedEmail,
@@ -104,6 +107,84 @@ export async function notifyOrderPaid(checkoutSessionId: string): Promise<void> 
       o.buyer_email,
       buyerReceiptEmail({ product: o.product_title, amountCents: o.amount_cents, currency: o.currency, accessUrl, delivery: o.delivery_type ?? "link", seller: o.seller_name }),
       "receipt",
+    );
+  }
+}
+
+type UpiOrderMail = {
+  status: string;
+  buyer_email: string | null;
+  buyer_name: string | null;
+  product_title: string;
+  amount_cents: number;
+  currency: string;
+  upi_utr: string;
+  order_ref: string;
+  access_token: string;
+  reject_reason: string | null;
+  seller_email: string;
+  seller_name: string | null;
+  payee_name: string | null;
+  support_contact: string | null;
+  slug: string | null;
+  delivery_type: "file" | "link" | null;
+};
+
+async function upiOrderMail(orderId: string): Promise<UpiOrderMail | null> {
+  const rows = await query<UpiOrderMail>(
+    `select o.status, o.buyer_email, o.buyer_name, o.product_title, o.amount_cents, o.currency, o.upi_utr, o.order_ref,
+            o.access_token, o.reject_reason, u.email as seller_email, u.name as seller_name,
+            sp.upi_payee_name as payee_name, sp.upi_support_contact as support_contact, p.slug, p.delivery_type
+     from socialapp.orders o join socialapp.users u on u.id = o.user_id
+     left join socialapp.products p on p.id = o.product_id
+     left join socialapp.seller_payouts sp on sp.user_id = o.user_id
+     where o.id=$1 and o.payment_method='upi'`,
+    [orderId],
+  );
+  return rows[0] ?? null;
+}
+
+/** Buyer status/access page for a UPI order (bearer token in the link). */
+export function upiOrderUrl(slug: string, orderId: string, token: string): string {
+  return absoluteUrl(`/p/${slug}/order/${orderId}?t=${encodeURIComponent(token)}`);
+}
+
+/** New UPI order: buyer "awaiting confirmation" + seller "confirm this payment", each once. */
+export async function notifyUpiSubmitted(orderId: string): Promise<void> {
+  const o = await upiOrderMail(orderId);
+  if (!o || o.status !== "awaiting_confirmation") return;
+  if (await claimEmailKey(`upi-seller:${orderId}`)) {
+    await send(
+      o.seller_email,
+      upiOrderToConfirmEmail({ name: o.seller_name, buyerEmail: o.buyer_email ?? "", buyerName: o.buyer_name, product: o.product_title, amountCents: o.amount_cents, currency: o.currency, utr: o.upi_utr, orderRef: o.order_ref }),
+      "upi_to_confirm",
+    );
+  }
+  if (o.buyer_email && o.slug && (await claimEmailKey(`upi-buyer-awaiting:${orderId}`))) {
+    await send(
+      o.buyer_email,
+      upiAwaitingEmail({ product: o.product_title, amountCents: o.amount_cents, currency: o.currency, utr: o.upi_utr, orderRef: o.order_ref, statusUrl: upiOrderUrl(o.slug, orderId, o.access_token), seller: o.payee_name, supportContact: o.support_contact }),
+      "upi_awaiting",
+    );
+  }
+}
+
+/** Seller decided: confirmed -> the usual receipt with the access link; rejected -> reason. Once each. */
+export async function notifyUpiDecided(orderId: string): Promise<void> {
+  const o = await upiOrderMail(orderId);
+  if (!o || !o.buyer_email) return;
+  if (o.status === "paid" && o.slug && (await claimEmailKey(`upi-buyer-paid:${orderId}`))) {
+    await send(
+      o.buyer_email,
+      buyerReceiptEmail({ product: o.product_title, amountCents: o.amount_cents, currency: o.currency, accessUrl: upiOrderUrl(o.slug, orderId, o.access_token), delivery: o.delivery_type ?? "link", seller: o.payee_name, method: "upi" }),
+      "receipt",
+    );
+  }
+  if (o.status === "rejected" && (await claimEmailKey(`upi-buyer-rejected:${orderId}`))) {
+    await send(
+      o.buyer_email,
+      upiRejectedEmail({ product: o.product_title, amountCents: o.amount_cents, currency: o.currency, utr: o.upi_utr, orderRef: o.order_ref, reason: o.reject_reason ?? "The seller could not find this payment.", seller: o.payee_name, supportContact: o.support_contact }),
+      "upi_rejected",
     );
   }
 }

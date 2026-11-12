@@ -5,7 +5,7 @@ import type Stripe from "stripe";
 import { getPool, query } from "@/lib/db";
 import { csvField, localTimestamp, validTimeZone } from "@/lib/leadsCsv";
 
-export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "partially_refunded" | "disputed" | "dispute_lost";
+export type OrderStatus = "pending" | "paid" | "failed" | "refunded" | "partially_refunded" | "disputed" | "dispute_lost" | "awaiting_confirmation" | "rejected";
 
 export type OrderRow = {
   id: string;
@@ -17,6 +17,10 @@ export type OrderRow = {
   amount_refunded_cents: number;
   currency: string;
   status: OrderStatus;
+  payment_method: "stripe" | "upi";
+  buyer_name: string | null;
+  upi_utr: string | null;
+  order_ref: string | null;
 };
 
 type Db = Pick<pg.PoolClient, "query">;
@@ -218,7 +222,8 @@ export async function countOrders(userId: string): Promise<number> {
 
 export async function listOrders(userId: string, limit: number, offset: number): Promise<OrderRow[]> {
   return query<OrderRow>(
-    `select id, created_at, buyer_email, product_title, amount_cents, fee_cents, amount_refunded_cents, currency, status
+    `select id, created_at, buyer_email, product_title, amount_cents, fee_cents, amount_refunded_cents, currency, status,
+            payment_method, buyer_name, upi_utr, order_ref
      from socialapp.orders where user_id=$1 order by created_at desc, id limit $2 offset $3`,
     [userId, limit, offset],
   );
@@ -232,12 +237,14 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   partially_refunded: "Partly refunded",
   disputed: "Disputed",
   dispute_lost: "Dispute lost",
+  awaiting_confirmation: "Awaiting your confirmation",
+  rejected: "Rejected",
 };
 
 /** Same conventions as the contacts export: formula-safe, BOM, UTC + optional local time. */
 export function ordersCsv(orders: OrderRow[], timeZone?: string | null): string {
   const tz = validTimeZone(timeZone ?? null);
-  const header = ["date_utc", "buyer_email", "product", "amount", "platform_fee", "refunded", "currency", "status"];
+  const header = ["date_utc", "buyer_email", "product", "amount", "platform_fee", "refunded", "currency", "status", "payment_method", "upi_utr"];
   if (tz) header.splice(1, 0, `date_local (${tz})`);
   const money = (cents: number) => (cents / 100).toFixed(2);
   const rows = orders.map((o) => {
@@ -252,6 +259,8 @@ export function ordersCsv(orders: OrderRow[], timeZone?: string | null): string 
       money(o.amount_refunded_cents),
       o.currency.toUpperCase(),
       ORDER_STATUS_LABEL[o.status] ?? o.status,
+      o.payment_method === "upi" ? "UPI (direct)" : "Stripe",
+      o.upi_utr,
     ];
     if (tz) row.splice(1, 0, valid ? localTimestamp(at, tz) : null);
     return row;

@@ -7,6 +7,7 @@ import { isPinterestConfigured, publishToPinterest, refreshPinterestToken } from
 import { isTikTokConfigured, publishToTikTok, refreshTikTokToken } from "@/lib/networks/tiktok";
 import { isXConfigured, publishToX, refreshXToken } from "@/lib/networks/x";
 import { isGbpConfigured, publishToGbp, refreshGbpToken } from "@/lib/networks/gbp";
+import { publishReminder } from "@/lib/networks/reminderSend";
 
 export type NetworkAdapter = {
   configured: () => boolean;
@@ -48,6 +49,9 @@ export const NETWORKS: Record<NetworkId, NetworkAdapter> = {
   pinterest: { configured: isPinterestConfigured, publish: publishToPinterest, refresh: needsRefreshToken(refreshPinterestToken, "Pinterest"), refreshSkewSec: 60 * 60 },
   x: { configured: isXConfigured, publish: publishToX, refresh: needsRefreshToken(refreshXToken, "X"), refreshSkewSec: 10 * 60 },
   gbp: { configured: isGbpConfigured, publish: publishToGbp, refresh: needsRefreshToken(refreshGbpToken, "Google Business Profile"), refreshSkewSec: 5 * 60 },
+  // Reminder channels (no posting API): an e-mail to the owner instead of a publish. Need no keys.
+  ig_personal: { configured: () => true, publish: publishReminder, refreshSkewSec: 0 },
+  fb_group: { configured: () => true, publish: publishReminder, refreshSkewSec: 0 },
 };
 
 /** Which new networks can be connected on this server (Bluesky / Mastodon need no keys). */
@@ -72,6 +76,8 @@ export function connectHref(platform: string): string {
       return `/api/${platform}/connect`;
     case "bluesky":
     case "mastodon":
+    case "ig_personal":
+    case "fb_group":
       return `/app/settings?connect=${platform}#connect`;
     default:
       return "/api/instagram/connect";

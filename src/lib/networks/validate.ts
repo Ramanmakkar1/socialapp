@@ -52,5 +52,9 @@ export function networkTargetError(platform: NetworkId, media: MediaItem[], rawO
     case "linkedin":
       if (videos > 0) return "LinkedIn posts from Poskoo support text and images for now. Remove the video or untick LinkedIn.";
       return null;
+    case "ig_personal":
+    case "fb_group":
+      // Reminder channels: the owner posts it by hand, so any caption / media mix is fine.
+      return null;
   }
 }

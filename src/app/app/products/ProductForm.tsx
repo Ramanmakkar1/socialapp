@@ -11,7 +11,8 @@ import { saveProductAction } from "./actions";
 
 export type ProductDefaults = FieldDefaults & { price: string; currency: string; active: boolean };
 
-export default function ProductForm({ id, defaults, rules, selectedRules }: { id: string | null; defaults: ProductDefaults; rules: RulePick[]; selectedRules: string[] }) {
+/** `upi`: the seller is paid by Direct UPI (India), so the price is always in INR. */
+export default function ProductForm({ id, defaults, rules, selectedRules, upi = false }: { id: string | null; defaults: ProductDefaults; rules: RulePick[]; selectedRules: string[]; upi?: boolean }) {
   const [state, action] = useActionState(saveProductAction, undefined);
   return (
     <form action={action} className={styles.form}>
@@ -29,9 +30,16 @@ export default function ProductForm({ id, defaults, rules, selectedRules }: { id
         </div>
         <div className={ui.field}>
           <label htmlFor="product-currency" className={ui.label}>Currency</label>
-          <select id="product-currency" name="currency" defaultValue={defaults.currency} className={ui.input}>
-            {SUPPORTED_CURRENCIES.map((c) => <option key={c} value={c}>{c.toUpperCase()}</option>)}
-          </select>
+          {upi ? (
+            <select id="product-currency" name="currency" defaultValue="inr" className={ui.input} aria-describedby="product-currency-hint">
+              <option value="inr">INR (₹)</option>
+            </select>
+          ) : (
+            <select id="product-currency" name="currency" defaultValue={defaults.currency} className={ui.input}>
+              {SUPPORTED_CURRENCIES.map((c) => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+            </select>
+          )}
+          {upi ? <span id="product-currency-hint" className={ui.hint}>UPI payments are always in rupees.</span> : null}
         </div>
       </div>
       <label className={ui.checkRow}>

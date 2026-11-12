@@ -5,6 +5,7 @@ import { NETWORK_IDS, NETWORK_LABEL, NetworkAuthError, mediaItems, obj, type Net
 import { NETWORKS } from "@/lib/networks/registry";
 import { holdTargetMedia } from "@/lib/mediaLifecycle";
 import { expiresWithin, loadActiveAccount, markAccountExpired, refreshUnderLock } from "@/lib/networks/store";
+import { markReminded } from "@/lib/networks/reminderSend";
 
 export type ClaimedNetworkRow = {
   id: string;
@@ -27,6 +28,7 @@ export type NetworkPublishDeps = {
   markPublished?: (targetId: string, externalId: string, accountId: string) => Promise<void>;
   markExpired?: (accountId: string) => Promise<void>;
   holdMedia?: (targetId: string) => Promise<void>;
+  markReminded?: (targetId: string, accountId: string) => Promise<void>;
 };
 
 function reconnect(label: string): string {
@@ -51,7 +53,7 @@ async function defaultMarkPublished(targetId: string, externalId: string, accoun
   );
 }
 
-export type NetworkPublishResult = { published: number; failed: number };
+export type NetworkPublishResult = { published: number; failed: number; reminded?: number };
 
 export async function publishNetworkTargets(limit: number, deps: NetworkPublishDeps, platforms: NetworkId[] = NETWORK_IDS): Promise<NetworkPublishResult> {
   const result: NetworkPublishResult = { published: 0, failed: 0 };
@@ -98,7 +100,12 @@ export async function publishNetworkTargets(limit: number, deps: NetworkPublishD
           options,
           idempotencyKey: row.id,
         });
-        if (outcome.ok) {
+        if (outcome.ok && outcome.reminded) {
+          // Reminder channels: the e-mail went out; the owner posts it and marks it as posted.
+          await (deps.markReminded ?? markReminded)(row.id, account.id);
+          await deps.refreshPostStatus(row.post_id);
+          result.reminded = (result.reminded ?? 0) + 1;
+        } else if (outcome.ok) {
           await markPublished(row.id, outcome.url ?? outcome.id, account.id);
           if (outcome.mediaPending) await (deps.holdMedia ?? holdTargetMedia)(row.id);
           await deps.refreshPostStatus(row.post_id);

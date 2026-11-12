@@ -220,10 +220,32 @@ function PlanMix({ mix, total }: { mix: Overview["planMix"]; total: number }) {
   );
 }
 
+type ChannelInterest = { notify: { channel: string; n: number }[]; requests: { channel: string; note: string | null; email: string; at: string }[] };
+
+/** "Notify me" counts per channel + the latest "Request a channel" entries (migration 047). */
+async function getChannelInterest(): Promise<ChannelInterest> {
+  if (!isDbConfigured()) return { notify: [], requests: [] };
+  try {
+    const [notify, requests] = await Promise.all([
+      query<{ channel: string; n: number }>(
+        "select channel, count(*)::int as n from socialapp.channel_requests where kind='notify' and notified_at is null group by 1 order by 2 desc limit 12",
+      ),
+      query<{ channel: string; note: string | null; email: string; at: string }>(
+        `select r.channel, r.note, u.email, to_char(r.created_at, 'YYYY-MM-DD HH24:MI') as at
+         from socialapp.channel_requests r join socialapp.users u on u.id = r.user_id
+         where r.kind='request' order by r.created_at desc limit 10`,
+      ),
+    ]);
+    return { notify, requests };
+  } catch {
+    return { notify: [], requests: [] };
+  }
+}
+
 export default async function AdminOverviewPage() {
   // The layout checks too, but pages render in parallel with layouts: guard the data here as well.
   await requireAdmin();
-  const [data, mediaSize, mediaDisk] = await Promise.all([getOverview(), mediaDirSize(), mediaDiskSpace()]);
+  const [data, mediaSize, mediaDisk, interest] = await Promise.all([getOverview(), mediaDirSize(), mediaDiskSpace(), getChannelInterest()]);
   const mediaLow = mediaDisk !== null && mediaDisk.freeBytes < minFreeBytes() * 2;
   const mrrText = data.mrr === null ? "Not set up" : `$${data.mrr.toLocaleString("en-US")}`;
   const signupTotal = data.signupsPerDay.reduce((a, b) => a + b, 0);
@@ -319,6 +341,38 @@ export default async function AdminOverviewPage() {
             empty="No signups yet."
             emptyAction={<Button size="sm" href="/admin/users">View users</Button>}
           />
+        </Panel>
+      </div>
+
+      <div className={styles.row2}>
+        <Panel title="Waiting for channels" subtitle="“Notify me when it's ready” in the Connect dialog">
+          {interest.notify.length === 0 ? (
+            <p className={styles.panelSub}>Nobody is waiting on a channel yet.</p>
+          ) : (
+            <ul className={styles.att}>
+              {interest.notify.map((r) => (
+                <li key={r.channel}>
+                  <StatusPill tone="info">{String(r.n)}</StatusPill>
+                  {r.channel}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+        <Panel title="Channel requests" subtitle="latest 10 from “Can't find it?”">
+          {interest.requests.length === 0 ? (
+            <p className={styles.panelSub}>No channel requests yet.</p>
+          ) : (
+            <ul className={styles.att}>
+              {interest.requests.map((r, i) => (
+                <li key={i}>
+                  <StatusPill tone="warn">{r.channel}</StatusPill>
+                  <span>{r.note ?? "(no note)"} · {r.email}</span>
+                  <span title={r.at}>{relativeTime(r.at)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </Panel>
       </div>
     </>

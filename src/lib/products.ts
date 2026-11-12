@@ -6,7 +6,7 @@ import { BRAND } from "@/lib/brand";
 import { getPool, query } from "@/lib/db";
 import type { DeliveryFields } from "@/lib/digitalDelivery";
 import { isUuid } from "@/lib/leadMagnets";
-import { platformFeeBps, platformFeeCents, type Currency } from "@/lib/money";
+import { platformFeeBps, platformFeeCents, type ProductCurrency } from "@/lib/money";
 import { getStripe } from "@/lib/payments";
 
 export type Product = {
@@ -27,7 +27,7 @@ export type Product = {
 
 export type ProductRow = Product & { orders: number; revenue_cents: number };
 
-export type ProductInput = DeliveryFields & { priceCents: number; currency: Currency; active: boolean };
+export type ProductInput = DeliveryFields & { priceCents: number; currency: ProductCurrency; active: boolean };
 
 const COLS = "p.id, p.user_id, p.slug, p.title, p.description, p.price_cents, p.currency, p.cover_url, p.delivery_type, p.delivery_url, p.active, p.created_at, p.updated_at";
 
@@ -79,17 +79,42 @@ export async function getProduct(userId: string, id: string): Promise<(Product &
   return { ...product, rule_ids: rules.map((r) => r.id) };
 }
 
-/** Public buy page: the product plus whether its creator can take payments right now. */
-export async function getPublicProduct(slug: string): Promise<(Product & { stripe_account_id: string | null; charges_enabled: boolean }) | null> {
+/** Seller payout fields on the public buy page (Direct UPI for sellers in India, migration 046). */
+export type PublicPayout = {
+  payout_country: string | null;
+  upi_vpa: string | null;
+  upi_payee_name: string | null;
+  upi_support_contact: string | null;
+};
+
+/** Public buy page: the product plus whether (and how) its creator can take payments right now. */
+export async function getPublicProduct(slug: string): Promise<(Product & PublicPayout & { stripe_account_id: string | null; charges_enabled: boolean }) | null> {
   if (!/^[a-z0-9][a-z0-9-]{2,80}$/.test(slug)) return null;
-  const rows = await query<Product & { stripe_account_id: string | null; charges_enabled: boolean | null }>(
-    `select ${COLS}, a.stripe_account_id, a.charges_enabled
+  const rows = await query<Product & PublicPayout & { stripe_account_id: string | null; charges_enabled: boolean | null }>(
+    `select ${COLS}, a.stripe_account_id, a.charges_enabled,
+            sp.country as payout_country, sp.upi_vpa, sp.upi_payee_name, sp.upi_support_contact
      from socialapp.products p left join socialapp.stripe_accounts a on a.user_id = p.user_id
+     left join socialapp.seller_payouts sp on sp.user_id = p.user_id
      where p.slug=$1`,
     [slug],
   );
   const row = rows[0];
   return row ? { ...row, charges_enabled: Boolean(row.charges_enabled) } : null;
+}
+
+/**
+ * How this product can be bought right now. "upi": seller in India with a UPI ID and an INR
+ * price; "stripe": seller's connected account takes card payments (never for an India seller);
+ * null: not purchasable.
+ */
+export function checkoutMethod(
+  p: Pick<Product, "active" | "currency"> & PublicPayout & { stripe_account_id: string | null; charges_enabled: boolean },
+  stripeConfigured: boolean,
+): "upi" | "stripe" | null {
+  if (!p.active) return null;
+  if (p.payout_country === "IN") return p.upi_vpa && p.upi_payee_name && p.currency === "inr" ? "upi" : null;
+  if (p.currency === "inr") return null;
+  return stripeConfigured && p.charges_enabled && p.stripe_account_id ? "stripe" : null;
 }
 
 /** Create or update; points exactly `ruleIds` at the product's buy link. Null when not this user's product. */

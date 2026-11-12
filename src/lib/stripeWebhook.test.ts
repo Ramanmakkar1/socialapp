@@ -239,9 +239,9 @@ test("refunds and disputes from another creator's account never touch this selle
 });
 
 test("orders CSV is formula-safe with amounts, fee and status", () => {
-  const rows: OrderRow[] = [{ id: "o1", created_at: new Date("2026-11-11T10:00:00Z"), buyer_email: "=evil@x.com", product_title: "Ebook", amount_cents: 1999, fee_cents: 60, amount_refunded_cents: 0, currency: "usd", status: "paid" }];
+  const rows: OrderRow[] = [{ id: "o1", created_at: new Date("2026-11-11T10:00:00Z"), buyer_email: "=evil@x.com", product_title: "Ebook", amount_cents: 1999, fee_cents: 60, amount_refunded_cents: 0, currency: "usd", status: "paid", payment_method: "stripe", buyer_name: null, upi_utr: null, order_ref: null }];
   const csv = ordersCsv(rows, "Asia/Kolkata");
   const lines = csv.replace(/^﻿/, "").trim().split("\r\n");
-  assert.equal(lines[0], '"date_utc","date_local (Asia/Kolkata)","buyer_email","product","amount","platform_fee","refunded","currency","status"');
-  assert.equal(lines[1], '"2026-11-11T10:00:00.000Z","2026-11-11 15:30:00","\'=evil@x.com","Ebook","19.99","0.60","0.00","USD","Paid"');
+  assert.equal(lines[0], '"date_utc","date_local (Asia/Kolkata)","buyer_email","product","amount","platform_fee","refunded","currency","status","payment_method","upi_utr"');
+  assert.equal(lines[1], '"2026-11-11T10:00:00.000Z","2026-11-11 15:30:00","\'=evil@x.com","Ebook","19.99","0.60","0.00","USD","Paid","Stripe",""');
 });

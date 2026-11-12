@@ -6,6 +6,9 @@
 // - A file is only deleted when no unpublished post (draft / scheduled / publishing / failed) and
 //   no idea, automation, bio page, lead magnet or product still mentions it (reference count by key).
 // - Failed or pending targets keep the files so Retry works.
+// - Reminder channels (Instagram personal, Facebook Groups): a 'reminded' target keeps its post in
+//   'publishing', so the files stay for the e-mail's download links until the owner marks it as
+//   posted or the 7-day hold ends (src/lib/networks/reminderSend.ts expireReminders).
 // - Deleting a post / draft releases its files the same way.
 // - Storage quota counts only files waiting to be posted (see pendingBytesFor).
 import { getPool, query } from "@/lib/db";

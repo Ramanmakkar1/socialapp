@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard } from "lucide-react";
+import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard, Flame } from "lucide-react";
 import styles from "./shell.module.css";
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; badge?: string };
@@ -22,7 +22,7 @@ const groups: { title: string | null; items: NavItem[] }[] = [
     ],
   },
   { title: "Create", items: [{ href: "/app/content", icon: Clapperboard, label: "Posts & Reels" }, { href: "/app/templates", icon: LayoutTemplate, label: "Templates" }, { href: "/app/bio", icon: Link2, label: "Link in bio" }] },
-  { title: "Analyze", items: [{ href: "/app/analytics", icon: BarChart3, label: "Analytics" }] },
+  { title: "Analyze", items: [{ href: "/app/analytics", icon: BarChart3, label: "Analytics" }, { href: "/app/trends", icon: Flame, label: "Trends", badge: "New" }] },
   {
     title: "Grow",
     items: [
@@ -68,11 +68,13 @@ export function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function Item({ item, pathname, failedPosts, scheduledPosts = 0 }: { item: NavItem; pathname: string; failedPosts: number; scheduledPosts?: number }) {
+function Item({ item, pathname, failedPosts, scheduledPosts = 0, pendingOrders = 0 }: { item: NavItem; pathname: string; failedPosts: number; scheduledPosts?: number; pendingOrders?: number }) {
   const { href, icon: Icon, label, badge } = item;
   const active = isActive(pathname, href);
   const showBadge = href === "/app/calendar" && failedPosts > 0;
   const showCount = href === "/app/calendar" && !showBadge && scheduledPosts > 0;
+  // UPI payments waiting for the seller to confirm (Direct UPI, sellers in India).
+  const showOrders = href === "/app/orders" && pendingOrders > 0;
   return (
     <Link
       href={href}
@@ -85,6 +87,11 @@ function Item({ item, pathname, failedPosts, scheduledPosts = 0 }: { item: NavIt
       {showBadge && (
         <span className={styles.navBadge} aria-label={`${failedPosts} failed ${failedPosts === 1 ? "post" : "posts"}`}>
           {failedPosts > 99 ? "99+" : failedPosts}
+        </span>
+      )}
+      {showOrders && (
+        <span className={styles.navBadge} aria-label={`${pendingOrders} ${pendingOrders === 1 ? "payment" : "payments"} to confirm`}>
+          {pendingOrders > 99 ? "99+" : pendingOrders}
         </span>
       )}
       {showCount && (
@@ -102,11 +109,13 @@ export default function SidebarNav({
   variant = "sidebar",
   failedPosts = 0,
   scheduledPosts = 0,
+  pendingOrders = 0,
   showAdmin = false,
 }: {
   variant?: "sidebar" | "footer";
   failedPosts?: number;
   scheduledPosts?: number;
+  pendingOrders?: number;
   showAdmin?: boolean;
 }) {
   const pathname = usePathname() ?? "";
@@ -139,7 +148,7 @@ export default function SidebarNav({
         <div key={g.title ?? "top"} className={styles.navGroup}>
           {g.title && <p className={styles.navGroupTitle}>{g.title}</p>}
           {g.items.map((item) => (
-            <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} scheduledPosts={scheduledPosts} />
+            <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} scheduledPosts={scheduledPosts} pendingOrders={pendingOrders} />
           ))}
         </div>
       ))}
