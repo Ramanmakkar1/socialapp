@@ -106,6 +106,7 @@ export function SiteFooter() {
           { href: "/tiktok-scheduler", label: "TikTok scheduler" },
           { href: "/linkedin-scheduler", label: "LinkedIn scheduler" },
           { href: "/pinterest-scheduler", label: "Pinterest scheduler" },
+          { href: "/x-scheduler", label: "X (Twitter) scheduler" },
           { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
         ]}
       />
