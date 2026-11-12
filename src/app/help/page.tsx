@@ -115,8 +115,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-bluesky-posts",
+    no: "15 / Scheduling",
+    title: "Schedule Bluesky posts",
+    text: "Create an app password, connect your handle, write up to 300 characters, add up to 4 images and pick a time.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "15 / Contact",
+    no: "16 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",

@@ -256,6 +256,10 @@ export default function BlueskySchedulerPage() {
               </details>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Need more detail? Read the{" "}
+            <Link className={s.vlink} href="/help/schedule-bluesky-posts">step-by-step guide to scheduling Bluesky posts</Link>.
+          </p>
         </div>
       </section>
 
