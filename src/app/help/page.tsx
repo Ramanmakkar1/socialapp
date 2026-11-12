@@ -108,8 +108,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-youtube-videos",
+    no: "14 / Scheduling",
+    title: "Schedule YouTube videos and Shorts",
+    text: "Connect with Google, add a video, title, description and tags, choose privacy and a time, then track its status.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "14 / Contact",
+    no: "15 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",
