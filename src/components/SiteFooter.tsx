@@ -116,6 +116,7 @@ export function SiteFooter() {
           { href: "/youtube-scheduler", label: "YouTube scheduler" },
           { href: "/x-scheduler", label: "X (Twitter) scheduler" },
           { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
+          { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
           { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
         ]}
       />
