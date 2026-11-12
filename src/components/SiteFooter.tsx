@@ -43,6 +43,7 @@ const TOOLS: FooterLink[] = [
   { href: "/tools/x-character-counter", label: "X character counter" },
   { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
   { href: "/tools/threads-character-counter", label: "Threads character counter" },
+  { href: "/tools/bluesky-character-counter", label: "Bluesky character counter" },
   { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
   { href: "/tools/youtube-title-counter", label: "YouTube title counter" },
   { href: "/tools/facebook-character-counter", label: "Facebook character counter" },

@@ -151,6 +151,9 @@ export default function BlueskySchedulerPage() {
               </article>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Check your post against the 300-character limit with the <Link className={s.vlink} href="/tools/bluesky-character-counter">free Bluesky character counter</Link>.
+          </p>
         </div>
       </section>
 
