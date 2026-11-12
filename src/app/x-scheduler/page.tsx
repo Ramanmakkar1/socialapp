@@ -252,6 +252,10 @@ export default function XSchedulerPage() {
               </details>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            New to it? Read the{" "}
+            <Link className={s.vlink} href="/help/schedule-x-posts">step-by-step guide to scheduling X posts</Link>.
+          </p>
         </div>
       </section>
 
