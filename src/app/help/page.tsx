@@ -73,8 +73,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-linkedin-posts",
+    no: "09 / Scheduling",
+    title: "Schedule LinkedIn posts",
+    text: "Connect your profile with LinkedIn's official sign-in, write the post, add images, pick a time and it publishes.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "09 / Contact",
+    no: "10 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",
