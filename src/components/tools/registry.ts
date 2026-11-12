@@ -46,6 +46,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-post-preview", name: "Post preview", summary: "Preview a photo and caption in a feed mockup with square and portrait crops.", category: "media", icon: "eye" },
   { href: "/tools/threads-post-preview", name: "Threads post preview", summary: "Write a Threads post, count against 500 characters and preview it on mobile.", category: "media", icon: "message" },
   { href: "/tools/instagram-image-size", name: "Image size guide", summary: "Every Instagram size in pixels, plus a crop preview and exact-size JPG download.", category: "media", icon: "image" },
+  { href: "/tools/social-media-image-sizes", name: "Social media image sizes", summary: "Every 2026 image and video size for 9 platforms in one cheat sheet.", category: "media", icon: "image" },
   { href: "/tools/instagram-carousel-size-checker", name: "Carousel size checker", summary: "Check each slide's dimensions, ratio and file size before you schedule.", category: "media", icon: "square-stack" },
   { href: "/tools/instagram-carousel-splitter", name: "Carousel splitter", summary: "Split one wide image into equal carousel slides and download the PNGs.", category: "media", icon: "scissors" },
   { href: "/tools/instagram-carousel-maker", name: "Carousel maker", summary: "Design text-and-colour carousel slides and download 1080×1350 PNGs.", category: "media", icon: "gallery" },

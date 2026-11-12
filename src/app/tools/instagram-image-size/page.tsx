@@ -201,16 +201,21 @@ const config: ToolPageConfig = {
       {
         title: "Common image size mistakes",
         body: (
-          <ul>
-            <li>Uploading a landscape photo as a Story and letting Instagram decide the crop.</li>
-            <li>Mixing square and portrait slides in one carousel.</li>
-            <li>Exporting below 1080 px wide, which can look soft on modern phones.</li>
-            <li>Placing text or logos at the very top or bottom of a 9:16 frame, where the interface covers them.</li>
-            <li>
-              Putting a face near the edge of a profile photo, where the circle cuts it off. When the image is ready,
-              plan the post with the <Link href="/instagram-scheduler">Instagram scheduler</Link>.
-            </li>
-          </ul>
+          <>
+            <ul>
+              <li>Uploading a landscape photo as a Story and letting Instagram decide the crop.</li>
+              <li>Mixing square and portrait slides in one carousel.</li>
+              <li>Exporting below 1080 px wide, which can look soft on modern phones.</li>
+              <li>Placing text or logos at the very top or bottom of a 9:16 frame, where the interface covers them.</li>
+              <li>
+                Putting a face near the edge of a profile photo, where the circle cuts it off. When the image is ready,
+                plan the post with the <Link href="/instagram-scheduler">Instagram scheduler</Link>.
+              </li>
+            </ul>
+            <p>
+              Posting to other networks too? See the <Link href="/tools/social-media-image-sizes">image sizes for every social platform</Link>.
+            </p>
+          </>
         ),
       },
     ],
