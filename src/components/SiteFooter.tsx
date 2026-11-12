@@ -97,6 +97,18 @@ export function SiteFooter() {
             { href: "/data-deletion", label: "Data deletion" },
           ] }}
       />
+      <FooterColumn
+        title="Schedulers"
+        links={[
+          { href: "/instagram-scheduler", label: "Instagram scheduler" },
+          { href: "/facebook-scheduler", label: "Facebook scheduler" },
+          { href: "/threads-scheduler", label: "Threads scheduler" },
+          { href: "/tiktok-scheduler", label: "TikTok scheduler" },
+          { href: "/linkedin-scheduler", label: "LinkedIn scheduler" },
+          { href: "/pinterest-scheduler", label: "Pinterest scheduler" },
+          { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
+        ]}
+      />
       <FooterColumn title="Free tools" links={TOOLS.slice(0, 10)} />
       <FooterColumn title="More free tools" links={[...TOOLS.slice(10), { href: "/tools", label: "All free tools →" }]} />
       <FooterColumn

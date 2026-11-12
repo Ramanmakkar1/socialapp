@@ -277,7 +277,7 @@
 .landing :global(footer a){
   text-decoration:none}
 .landing :global(footer.rich){
-  display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:32px;border-top:1px solid var(--line,rgba(0,0,0,.08));padding-block:48px 32px;align-items:start}
+  display:grid;grid-template-columns:1.4fr repeat(5,1fr);gap:32px;border-top:1px solid var(--line,rgba(0,0,0,.08));padding-block:48px 32px;align-items:start}
 .landing :global(footer.rich ul){
   list-style:none;padding:0;margin:0;display:grid;gap:4px}
 .landing :global(footer.rich a){
