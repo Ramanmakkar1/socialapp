@@ -44,6 +44,14 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      {
+        // Old staging host: send every page to the same path on poskoo.com.
+        // /api/* is excluded so webhooks or OAuth callbacks still registered on the old host keep working.
+        source: "/:path((?!api/).*)",
+        has: [{ type: "host", value: "socialapp.splitforms.com" }],
+        destination: "https://poskoo.com/:path",
+        permanent: true,
+      },
       // Google crawled /Home and got a 404. Send every capitalisation of the
       // old home path to the real home page with a permanent 301.
       { source: "/Home", destination: "/", permanent: true },
