@@ -41,6 +41,12 @@ const TOOLS: FooterLink[] = [
   { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
   { href: "/tools/instagram-caption-counter", label: "Caption counter" },
   { href: "/tools/x-character-counter", label: "X character counter" },
+  { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
+  { href: "/tools/threads-character-counter", label: "Threads character counter" },
+  { href: "/tools/bluesky-character-counter", label: "Bluesky character counter" },
+  { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
+  { href: "/tools/youtube-title-counter", label: "YouTube title counter" },
+  { href: "/tools/facebook-character-counter", label: "Facebook character counter" },
   { href: "/tools/instagram-font-generator", label: "Font generator" },
   { href: "/tools/instagram-bio-generator", label: "Bio generator" },
   { href: "/tools/instagram-username-generator", label: "Username generator" },
@@ -111,6 +117,7 @@ export function SiteFooter() {
           { href: "/youtube-scheduler", label: "YouTube scheduler" },
           { href: "/x-scheduler", label: "X (Twitter) scheduler" },
           { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
+          { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
           { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
         ]}
       />

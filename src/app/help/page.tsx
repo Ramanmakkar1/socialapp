@@ -129,8 +129,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-mastodon-posts",
+    no: "17 / Scheduling",
+    title: "Schedule Mastodon posts",
+    text: "Connect your server with OAuth, write to its character limit, add images or video and pick a time.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "17 / Contact",
+    no: "18 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",
