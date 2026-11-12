@@ -32,6 +32,11 @@ test("sitemap is empty for both audited host aliases while staging is noindex", 
   }
 });
 
+test("llms.txt uses the same isPathIndexable helper as the sitemap", () => {
+  const llmsSource = readFileSync("src/app/llms.txt/route.ts", "utf8");
+  assert.ok(llmsSource.includes("isPathIndexable"), "llms.txt must use isPathIndexable");
+});
+
 test("every sitemap URL is indexable", () => {
   const was = BRAND.indexable;
   BRAND.indexable = true;
