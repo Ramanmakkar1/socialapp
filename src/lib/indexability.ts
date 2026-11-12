@@ -18,6 +18,6 @@ export const ALWAYS_NOINDEX_PATHS = new Set([
 export function isPathIndexable(path: string): boolean {
   if (!BRAND.indexable) return false;
   if (ALWAYS_NOINDEX_PATHS.has(path)) return false;
-  if (path.startsWith("/app/")) return false;
+  if (path === "/app" || path.startsWith("/app/")) return false;
   return true;
 }
