@@ -31,6 +31,14 @@ test("sitemap excludes both audited noindex home URLs", () => {
   }
 });
 
+test("sitemap filters the audited home path out even though it is a public path", () => {
+  // Regression for the two audited URLs: "/" is listed in PUBLIC_PATHS, so the
+  // only thing keeping it out of the sitemap is the isPathIndexable filter.
+  assert.ok(PUBLIC_PATHS.includes("/"), "home must be a public path for this regression to be meaningful");
+  assert.equal(isPathIndexable("/"), false, "home is noindex while staging");
+  assert.deepEqual(sitemap(), [], "noindex home must not be listed in the sitemap");
+});
+
 test("sitemap is empty for both audited host aliases while staging is noindex", () => {
   const wasUrl = BRAND.url;
   try {
