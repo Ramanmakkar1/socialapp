@@ -40,6 +40,7 @@ function FooterColumn({ title, links, extra }: { title: string; links: FooterLin
 const TOOLS: FooterLink[] = [
   { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
   { href: "/tools/instagram-caption-counter", label: "Caption counter" },
+  { href: "/tools/x-character-counter", label: "X character counter" },
   { href: "/tools/instagram-font-generator", label: "Font generator" },
   { href: "/tools/instagram-bio-generator", label: "Bio generator" },
   { href: "/tools/instagram-username-generator", label: "Username generator" },

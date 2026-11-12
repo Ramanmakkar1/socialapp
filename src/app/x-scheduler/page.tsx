@@ -254,7 +254,8 @@ export default function XSchedulerPage() {
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             New to it? Read the{" "}
-            <Link className={s.vlink} href="/help/schedule-x-posts">step-by-step guide to scheduling X posts</Link>.
+            <Link className={s.vlink} href="/help/schedule-x-posts">step-by-step guide to scheduling X posts</Link>, or
+            check your post with the <Link className={s.vlink} href="/tools/x-character-counter">X character counter</Link>.
           </p>
         </div>
       </section>
