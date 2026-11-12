@@ -66,8 +66,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-threads-posts",
+    no: "08 / Scheduling",
+    title: "Schedule Threads posts",
+    text: "Write up to 500 characters, add one image or video, pick a time and Poskoo publishes it to Threads.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "08 / Contact",
+    no: "09 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",

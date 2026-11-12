@@ -210,6 +210,13 @@ export default function InstagramLinkInBioPage() {
               </article>
             ))}
           </div>
+          <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+            Need more detail? Follow the{" "}
+            <Link className={s.vlink} href="/help/instagram-link-in-bio-setup">
+              step-by-step link-in-bio setup guide
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
