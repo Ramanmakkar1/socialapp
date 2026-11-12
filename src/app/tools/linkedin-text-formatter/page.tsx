@@ -163,7 +163,7 @@ export default function LinkedInTextFormatterPage() {
         <HowItWorks title={config.stepsTitle} steps={config.steps} />
         <ToolFeatures title={config.featuresTitle} features={config.features} />
         <ToolGuide guide={config.guide} />
-        <ToolFaqSection title={config.faqTitle} faqs={config.faqs} />
+        <ToolFaqSection title={config.faqTitle ?? `${config.name} FAQ`} faqs={config.faqs} />
         <section className={t.section}>
           <div className="cta">
             <div className="ctaCopy">
