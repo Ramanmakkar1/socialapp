@@ -80,7 +80,24 @@ export function clearPriceCache(): void {
 /** The user's Stripe customer on the platform account, created once (idempotency key per user). */
 export async function ensureCustomer(user: { id: string; email: string; name: string | null }, stripe: Pick<Stripe, "customers"> = getStripe()): Promise<string> {
   const existing = await getBilling(user.id);
-  if (existing) return existing.stripe_customer_id;
+  if (existing) {
+    // A customer saved under the other mode (sandbox id after switching to live keys, or deleted in
+    // Stripe) can't be used: replace it with a fresh one, but only while there is no subscription on it.
+    const usable = await stripe.customers.retrieve(existing.stripe_customer_id).then(
+      (c) => !("deleted" in c && c.deleted),
+      (err: { code?: string; statusCode?: number }) => {
+        if (err?.code === "resource_missing" || err?.statusCode === 404) return false;
+        throw err;
+      },
+    );
+    if (usable || existing.stripe_subscription_id) return existing.stripe_customer_id;
+    const fresh = await stripe.customers.create(
+      { email: user.email, name: user.name ?? undefined, metadata: { poskoo_user_id: user.id } },
+      { idempotencyKey: `poskoo-billing-customer-${user.id}-replace-${existing.stripe_customer_id}` },
+    );
+    await query("update socialapp.billing_subscriptions set stripe_customer_id=$2, updated_at=now() where user_id=$1", [user.id, fresh.id]);
+    return fresh.id;
+  }
   const customer = await stripe.customers.create(
     { email: user.email, name: user.name ?? undefined, metadata: { poskoo_user_id: user.id } },
     { idempotencyKey: `poskoo-billing-customer-${user.id}` },
