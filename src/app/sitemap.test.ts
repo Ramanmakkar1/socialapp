@@ -5,6 +5,7 @@ import { test } from "node:test";
 import robots from "./robots.ts";
 import sitemap from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
+import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS } from "@/lib/public-pages";
 import { toolMetadata } from "@/components/tools/seo";
 
@@ -29,6 +30,26 @@ test("sitemap is empty for both audited host aliases while staging is noindex", 
   } finally {
     BRAND.url = wasUrl;
   }
+});
+
+test("every sitemap URL is indexable", () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    for (const entry of sitemap()) {
+      const path = entry.url.slice(BRAND.url.length) || "/";
+      assert.ok(isPathIndexable(path), `${entry.url} is noindex but listed in the sitemap`);
+    }
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
+test("sitemap and layout share the same indexability helper", () => {
+  const sitemapSource = readFileSync("src/app/sitemap.ts", "utf8");
+  const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
+  assert.ok(sitemapSource.includes("isPathIndexable"), "sitemap must use isPathIndexable");
+  assert.ok(layoutSource.includes("isPathIndexable"), "layout robots meta must use isPathIndexable");
 });
 
 test("robots omits the sitemap while staging is noindex", () => {

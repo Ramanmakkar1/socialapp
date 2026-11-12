@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { BRAND } from "@/lib/brand";
+import { isPathIndexable } from "@/lib/indexability";
 import CookieNotice from "@/components/CookieNotice";
 import Analytics from "@/components/Analytics";
 import "./globals.css";
@@ -25,8 +26,8 @@ export const metadata: Metadata = {
     title: `${BRAND.name} — Social media scheduler + Instagram auto-DM`,
     description: BRAND.description,
   },
-  // Staging only until launch: robots value comes from BRAND.indexable.
-  robots: BRAND.indexable ? { index: true, follow: true } : { index: false, follow: false },
+  // Staging only until launch: the same isPathIndexable helper gates the sitemap.
+  robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },
 };
 
 const jsonLd = {
