@@ -101,8 +101,15 @@ const guides = [
     go: "Read guide",
   },
   {
+    href: "/help/schedule-pinterest-posts",
+    no: "13 / Scheduling",
+    title: "Schedule Pinterest Pins",
+    text: "Connect Pinterest with its official login, pick a board, add an image and link, choose a time and it pins.",
+    go: "Read guide",
+  },
+  {
     href: "/contact",
-    no: "13 / Contact",
+    no: "14 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",

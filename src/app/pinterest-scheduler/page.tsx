@@ -253,6 +253,10 @@ export default function PinterestSchedulerPage() {
               </details>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            New to it? Read{" "}
+            <Link className={s.vlink} href="/help/schedule-pinterest-posts">how to schedule Pinterest Pins</Link>.
+          </p>
         </div>
       </section>
 
