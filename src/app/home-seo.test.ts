@@ -49,6 +49,16 @@ test("home page canonical is a self-reference on the final domain, not the stagi
   assert.equal(canonical, `${BRAND.url}/`);
   assert.ok(!canonical.includes("splitforms.com"), "canonical must not point at the staging host");
   assert.ok(!/\?|#/.test(canonical), "canonical must contain no query string or fragment");
+  // The Open Graph URL must be the same final-domain self-reference, and the
+  // staging host must never leak into the home page metadata source.
+  assert.ok(
+    pageSource.includes("url: canonical"),
+    "home page openGraph.url must reuse the absolute canonical",
+  );
+  assert.ok(
+    !pageSource.includes("splitforms.com"),
+    "home page metadata must not hard-code the staging host",
+  );
 });
 
 test("home page JSON-LD includes SoftwareApplication and FAQPage", () => {
