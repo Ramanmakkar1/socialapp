@@ -20,35 +20,56 @@ function routeFile(p: string) {
   return direct;
 }
 
+// Runs fn with the site taken out of search (BRAND.indexable=false), restoring the launch value after.
+function whileNoindex(fn: () => void) {
+  const was = BRAND.indexable;
+  BRAND.indexable = false;
+  try {
+    fn();
+  } finally {
+    BRAND.indexable = was;
+  }
+}
+
 test("sitemap stays empty while staging is noindex", () => {
-  assert.deepEqual(sitemap(), []);
+  whileNoindex(() => assert.deepEqual(sitemap(), []));
 });
 
-test("sitemap excludes both audited noindex home URLs", () => {
-  const urls = new Set(sitemap().map((entry) => entry.url));
-  for (const url of ["https://poskoo.com/", "https://socialapp.splitforms.com/"]) {
-    assert.equal(urls.has(url), false, `${url} must not be listed while it is noindex`);
-  }
+test("sitemap excludes both audited noindex home URLs while noindex", () => {
+  whileNoindex(() => {
+    const urls = new Set(sitemap().map((entry) => entry.url));
+    for (const url of ["https://poskoo.com/", "https://socialapp.splitforms.com/"]) {
+      assert.equal(urls.has(url), false, `${url} must not be listed while it is noindex`);
+    }
+  });
 });
 
 test("sitemap filters the audited home path out even though it is a public path", () => {
-  // Regression for the two audited URLs: "/" is listed in PUBLIC_PATHS, so the
-  // only thing keeping it out of the sitemap is the isPathIndexable filter.
   assert.ok(PUBLIC_PATHS.includes("/"), "home must be a public path for this regression to be meaningful");
-  assert.equal(isPathIndexable("/"), false, "home is noindex while staging");
-  assert.deepEqual(sitemap(), [], "noindex home must not be listed in the sitemap");
+  whileNoindex(() => {
+    assert.equal(isPathIndexable("/"), false, "home is noindex while staging");
+    assert.deepEqual(sitemap(), [], "noindex home must not be listed in the sitemap");
+  });
 });
 
 test("sitemap is empty for both audited host aliases while staging is noindex", () => {
   const wasUrl = BRAND.url;
   try {
-    for (const url of ["https://poskoo.com", "https://socialapp.splitforms.com"]) {
-      BRAND.url = url;
-      assert.deepEqual(sitemap(), [], `${url} must not list any noindex page`);
-    }
+    whileNoindex(() => {
+      for (const url of ["https://poskoo.com", "https://socialapp.splitforms.com"]) {
+        BRAND.url = url;
+        assert.deepEqual(sitemap(), [], `${url} must not list any noindex page`);
+      }
+    });
   } finally {
     BRAND.url = wasUrl;
   }
+});
+
+test("launched: sitemap lists the home page and robots points to the sitemap", () => {
+  assert.equal(BRAND.indexable, true);
+  assert.ok(sitemap().some((e) => e.url === `${BRAND.url}/`));
+  assert.equal(robots().sitemap, `${BRAND.url}/sitemap.xml`);
 });
 
 test("llms.txt uses the same isPathIndexable helper as the sitemap", () => {
@@ -77,7 +98,7 @@ test("sitemap and layout share the same indexability helper", () => {
 });
 
 test("robots omits the sitemap while staging is noindex", () => {
-  assert.equal("sitemap" in robots(), false);
+  whileNoindex(() => assert.equal("sitemap" in robots(), false));
 });
 
 test("robots disallows app pages", () => {

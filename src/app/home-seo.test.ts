@@ -10,9 +10,11 @@ import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 const pageSource = readFileSync("src/app/page.tsx", "utf8");
 const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
 
-test("sitemap stays empty while BRAND.indexable is false", () => {
-  assert.equal(BRAND.indexable, false);
-  assert.deepEqual(sitemap(), []);
+test("site is launched: indexable, sitemap lists the home page", () => {
+  assert.equal(BRAND.indexable, true);
+  const urls = sitemap().map((e) => e.url);
+  assert.ok(urls.includes(`${BRAND.url}/`), "sitemap must include the home page");
+  assert.ok(!urls.some((u) => u.includes("/app/") || u.endsWith("/login") || u.endsWith("/signup")), "private pages must stay out");
 });
 
 test("home page canonical and description match the shared values", () => {

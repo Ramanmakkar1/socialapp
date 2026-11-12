@@ -7,9 +7,9 @@ export const BRAND = {
   description:
     "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
-  // Raman must authorize the new-domain launch before this value changes.
-  // indexable stays false (staging noindex, empty sitemap) until Raman authorizes the new-domain launch. No env var changes it.
-  indexable: false,
+  // Search launch authorized by Raman on 2026-11-12: pages are indexable and the sitemap is live.
+  // Set back to false only to take the whole site out of search (noindex everywhere, empty sitemap).
+  indexable: true,
   supportEmail: "hello@poskoo.com",
   company: "Town Media Labs",
 };
