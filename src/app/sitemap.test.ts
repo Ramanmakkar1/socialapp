@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import robots from "./robots.ts";
 import sitemap from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
+import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS } from "@/lib/public-pages";
 import { toolMetadata } from "@/components/tools/seo";
 import { GUIDES, guidePath } from "@/content/guides/registry";
@@ -21,6 +22,50 @@ function routeFile(p: string) {
 
 test("sitemap stays empty while staging is noindex", () => {
   assert.deepEqual(sitemap(), []);
+});
+
+test("sitemap excludes both audited noindex home URLs", () => {
+  const urls = new Set(sitemap().map((entry) => entry.url));
+  for (const url of ["https://poskoo.com/", "https://socialapp.splitforms.com/"]) {
+    assert.equal(urls.has(url), false, `${url} must not be listed while it is noindex`);
+  }
+});
+
+test("sitemap is empty for both audited host aliases while staging is noindex", () => {
+  const wasUrl = BRAND.url;
+  try {
+    for (const url of ["https://poskoo.com", "https://socialapp.splitforms.com"]) {
+      BRAND.url = url;
+      assert.deepEqual(sitemap(), [], `${url} must not list any noindex page`);
+    }
+  } finally {
+    BRAND.url = wasUrl;
+  }
+});
+
+test("llms.txt uses the same isPathIndexable helper as the sitemap", () => {
+  const llmsSource = readFileSync("src/app/llms.txt/route.ts", "utf8");
+  assert.ok(llmsSource.includes("isPathIndexable"), "llms.txt must use isPathIndexable");
+});
+
+test("every sitemap URL is indexable", () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    for (const entry of sitemap()) {
+      const path = entry.url.slice(BRAND.url.length) || "/";
+      assert.ok(isPathIndexable(path), `${entry.url} is noindex but listed in the sitemap`);
+    }
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
+test("sitemap and layout share the same indexability helper", () => {
+  const sitemapSource = readFileSync("src/app/sitemap.ts", "utf8");
+  const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
+  assert.ok(sitemapSource.includes("isPathIndexable"), "sitemap must use isPathIndexable");
+  assert.ok(layoutSource.includes("isPathIndexable"), "layout robots meta must use isPathIndexable");
 });
 
 test("robots omits the sitemap while staging is noindex", () => {
@@ -89,6 +134,34 @@ test("toolMetadata sets the canonical, title, description and social card", () =
   assert.equal(meta.description, "D");
   assert.equal((meta.openGraph as { url?: string } | undefined)?.url, "/tools/x");
   assert.ok(meta.openGraph?.images, "tool pages carry an Open Graph image");
+});
+
+test("sitemap excludes every static route whose metadata is noindex", () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const urls = new Set(sitemap().map((entry) => entry.url));
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const full = join(dir, entry.name);
+        return entry.isDirectory() ? walk(full) : [full];
+      });
+    for (const file of walk("src/app")) {
+      if (!file.endsWith("page.tsx")) continue;
+      if (readFileSync(file, "utf8").includes("index: false") === false) continue;
+      const route = file
+        .slice("src/app".length)
+        .replace(/[\\/]page\.tsx$/, "")
+        .replace(/\\/g, "/");
+      if (route.includes("[") || route.split("/").some((part) => part.startsWith("("))) continue;
+      assert.ok(
+        !urls.has(`${BRAND.url}${route}`),
+        `${route} sets noindex but is listed in the sitemap`,
+      );
+    }
+  } finally {
+    BRAND.indexable = was;
+  }
 });
 
 test("no PUBLIC_PATHS entry is noindex", () => {

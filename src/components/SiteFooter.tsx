@@ -40,6 +40,7 @@ function FooterColumn({ title, links, extra }: { title: string; links: FooterLin
 const TOOLS: FooterLink[] = [
   { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
   { href: "/tools/instagram-caption-counter", label: "Caption counter" },
+  { href: "/tools/x-character-counter", label: "X character counter" },
   { href: "/tools/instagram-font-generator", label: "Font generator" },
   { href: "/tools/instagram-bio-generator", label: "Bio generator" },
   { href: "/tools/instagram-username-generator", label: "Username generator" },
@@ -97,6 +98,21 @@ export function SiteFooter() {
             { href: "/terms", label: "Terms" },
             { href: "/data-deletion", label: "Data deletion" },
           ] }}
+      />
+      <FooterColumn
+        title="Schedulers"
+        links={[
+          { href: "/instagram-scheduler", label: "Instagram scheduler" },
+          { href: "/facebook-scheduler", label: "Facebook scheduler" },
+          { href: "/threads-scheduler", label: "Threads scheduler" },
+          { href: "/tiktok-scheduler", label: "TikTok scheduler" },
+          { href: "/linkedin-scheduler", label: "LinkedIn scheduler" },
+          { href: "/pinterest-scheduler", label: "Pinterest scheduler" },
+          { href: "/youtube-scheduler", label: "YouTube scheduler" },
+          { href: "/x-scheduler", label: "X (Twitter) scheduler" },
+          { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
+          { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
+        ]}
       />
       <FooterColumn title="Free tools" links={TOOLS.slice(0, 10)} />
       <FooterColumn title="More free tools" links={[...TOOLS.slice(10), { href: "/tools", label: "All free tools →" }]} />

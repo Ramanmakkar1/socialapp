@@ -1,4 +1,5 @@
 import { BRAND } from "@/lib/brand";
+import { isPathIndexable } from "@/lib/indexability";
 import {
   META,
   PAGE_DESCRIPTIONS,
@@ -7,10 +8,7 @@ import {
 } from "@/lib/public-pages";
 import { networkAvailability } from "@/lib/networks/registry";
 
-const NOINDEX_PATHS = new Set(["/login", "/signup", "/data-deletion/status", "/app/review-guide"]);
-
-const isNoindex = (path: string) =>
-  !BRAND.indexable || NOINDEX_PATHS.has(path) || path.startsWith("/app/");
+const isNoindex = (path: string) => !isPathIndexable(path);
 
 export async function GET() {
   if (!BRAND.indexable) {

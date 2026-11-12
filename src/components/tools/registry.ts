@@ -31,6 +31,7 @@ export const TOOLS: ToolEntry[] = [
   // Write & format
   { href: "/tools/instagram-caption-generator", name: "Caption generator", summary: "Caption drafts with a hook, clean line breaks and a comment CTA for any niche.", category: "create", icon: "sparkles" },
   { href: "/tools/instagram-caption-counter", name: "Caption counter", summary: "Count characters and hashtags as you type against Instagram's caption limits.", category: "create", icon: "type" },
+  { href: "/tools/x-character-counter", name: "X character counter", summary: "Count characters the way X does: links as 23, emoji as 2, against the 280 limit.", category: "create", icon: "type" },
   { href: "/tools/instagram-caption-formatter", name: "Caption formatter", summary: "Keep blank lines and spacing in a caption, with live counts and copy.", category: "create", icon: "align" },
   { href: "/tools/instagram-line-break-generator", name: "Line break generator", summary: "Stop paragraphs collapsing into one block of text in your captions.", category: "create", icon: "pilcrow" },
   { href: "/tools/instagram-font-generator", name: "Font generator", summary: "Copy Unicode font styles for your Instagram bio and captions.", category: "create", icon: "type" },
@@ -40,10 +41,12 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-post-ideas-generator", name: "Post ideas generator", summary: "Six post ideas for your niche: Reels, carousels and Stories with caption starters.", category: "create", icon: "lightbulb" },
   { href: "/tools/instagram-bio-generator", name: "Bio generator", summary: "Instagram bio ideas for your niche with emojis, line breaks and a call to action.", category: "create", icon: "user" },
   { href: "/tools/instagram-username-generator", name: "Username generator", summary: "Up to 30 username ideas from your name and niche that follow Instagram's rules.", category: "create", icon: "at" },
+  { href: "/tools/linkedin-text-formatter", name: "LinkedIn Text Formatter", summary: "Copy bold, italic and bulleted Unicode text for LinkedIn posts and profiles.", category: "create", icon: "type" },
   // Images & video
   { href: "/tools/instagram-post-preview", name: "Post preview", summary: "Preview a photo and caption in a feed mockup with square and portrait crops.", category: "media", icon: "eye" },
   { href: "/tools/threads-post-preview", name: "Threads post preview", summary: "Write a Threads post, count against 500 characters and preview it on mobile.", category: "media", icon: "message" },
   { href: "/tools/instagram-image-size", name: "Image size guide", summary: "Every Instagram size in pixels, plus a crop preview and exact-size JPG download.", category: "media", icon: "image" },
+  { href: "/tools/social-media-image-sizes", name: "Social media image sizes", summary: "Every 2026 image and video size for 9 platforms in one cheat sheet.", category: "media", icon: "image" },
   { href: "/tools/instagram-carousel-size-checker", name: "Carousel size checker", summary: "Check each slide's dimensions, ratio and file size before you schedule.", category: "media", icon: "square-stack" },
   { href: "/tools/instagram-carousel-splitter", name: "Carousel splitter", summary: "Split one wide image into equal carousel slides and download the PNGs.", category: "media", icon: "scissors" },
   { href: "/tools/instagram-carousel-maker", name: "Carousel maker", summary: "Design text-and-colour carousel slides and download 1080×1350 PNGs.", category: "media", icon: "gallery" },
@@ -57,6 +60,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/social-media-analytics-report", name: "Analytics report template", summary: "Compare two periods of reach, engagement and clicks and export a CSV.", category: "plan", icon: "chart" },
   { href: "/tools/instagram-scheduling-checklist", name: "Scheduling checklist", summary: "Tick off captions, media, time zone and account checks before you schedule.", category: "plan", icon: "check" },
   { href: "/tools/instagram-time-zone-converter", name: "Time zone converter", summary: "Convert a posting time between time zones with daylight saving handled.", category: "plan", icon: "globe" },
+  { href: "/tools/best-time-to-post-on-instagram", name: "Best time to post finder", summary: "Get three starting post times per day for your audience type and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/instagram-posting-frequency-calculator", name: "Posting frequency calculator", summary: "Turn your weekly time budget into a realistic posting range and plan.", category: "plan", icon: "gauge" },
   { href: "/tools/instagram-engagement-rate-calculator", name: "Engagement rate calculator", summary: "Engagement rate by followers or by reach from likes, comments, saves and shares.", category: "plan", icon: "percent" },
   // Comments & DMs
@@ -77,6 +81,7 @@ const SCHEDULE_TOOLS = new Set([
   "/tools/social-media-content-calendar",
   "/tools/instagram-scheduling-checklist",
   "/tools/instagram-time-zone-converter",
+  "/tools/best-time-to-post-on-instagram",
 ]);
 const ANALYTICS_TOOLS = new Set(["/tools/instagram-utm-builder", "/tools/instagram-comment-to-dm-calculator"]);
 

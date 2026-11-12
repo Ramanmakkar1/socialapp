@@ -17,7 +17,11 @@ import { AnimArt } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
-const canonical = new URL("/", BRAND.url).toString();
+// The trailing slash is load-bearing: new URL("/", base) normalises the root
+// path to the bare origin (https://poskoo.com), which Next then renders as the
+// canonical href. The audit compares the tag against the audited URL, so the
+// canonical must keep the "/" — write it explicitly instead of via URL.
+const canonical = `${BRAND.url}/`;
 export const metadata: Metadata = {
  title: { absolute: title }, description, alternates: { canonical },
  openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
