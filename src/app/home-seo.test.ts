@@ -30,6 +30,13 @@ test("home page canonical and description match the shared values", () => {
   assert.equal(PAGE_DESCRIPTIONS["/"].length > 0, true);
 });
 
+test("home page canonical is an absolute https URL on the final domain with no query string", () => {
+  const canonical = new URL("/", BRAND.url).toString();
+  assert.equal(canonical, `${BRAND.url}/`, "canonical must be the final domain root");
+  assert.ok(canonical.startsWith("https://"), "canonical must be https");
+  assert.ok(!canonical.includes("?"), "canonical must have no query string");
+});
+
 test("home page JSON-LD includes SoftwareApplication and FAQPage", () => {
   assert.ok(
     pageSource.includes('"@type": "SoftwareApplication"'),
