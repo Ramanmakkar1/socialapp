@@ -869,11 +869,34 @@
 .landing :global(.hero.heroCenter){
   display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding-block:3vh 12vh;max-width:860px;margin-inline:auto}
 .landing :global(.hero.heroCenter h1){
-  font-size:clamp(2.3rem, 4.4vw, 3.8rem);max-width:19ch}
+  font-size:clamp(2.2rem, 4.6vw, 4rem);max-width:none;line-height:1.02;letter-spacing:-.035em;margin-top:6px}
+.landing :global(.hero.heroCenter h1 .h1Line),.landing :global(.hero.heroCenter h1 em){
+  display:block;white-space:nowrap}
+.landing :global(.hero.heroCenter h1 em){
+  width:max-content;margin:.12em auto 0;padding:0 .18em}
+@media (max-width: 640px) {
+  /* "Auto-DM every comment." stays on one line: size the headline to the screen width. */
+  .landing :global(.hero.heroCenter h1){ font-size:min(2.2rem, 7.6vw); }
+  .landing :global(.hero.heroCenter){ max-width:100%; }
+  .landing :global(.hero.heroCenter .lede){ font-size:1rem; }
+  .landing :global(.heroPill){ max-width:100%; }
+}
+.landing :global(.heroPill b){
+  font-weight:600}
 .landing :global(.heroMeta){
   display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
 .landing :global(.hero.heroCenter .lede){
-  max-width:50ch;font-size:1.08rem}
+  max-width:44ch;font-size:1.1rem;line-height:1.55;margin-top:2px}
+.landing :global(.heroAlt){
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 16px;font-size:.88rem;color:var(--muted)}
+.landing :global(.googleChip){
+  display:inline-flex;align-items:center;gap:.5rem;min-height:38px;padding:0 .95rem;border-radius:var(--poskoo-radius-pill);border:1px solid color-mix(in srgb, var(--ink) 14%, transparent);background:rgba(255,255,255,.85);font:600 .88rem/1 var(--sans);color:var(--ink);text-decoration:none;transition:background .2s,border-color .2s}
+.landing :global(.googleChip:hover){
+  background:#fff;border-color:color-mix(in srgb, var(--ink) 28%, transparent)}
+.landing :global(.heroAlt .heroFine){
+  background:none;padding:0;-webkit-backdrop-filter:none;backdrop-filter:none;font-size:.88rem}
+.landing :global(.heroLogin a){
+  color:var(--ink);font-weight:700;text-decoration:underline;text-underline-offset:3px}
 
 /* Liquid glass, tuned for a light background. */
 .landing :global(.glass),.landing :global(.videoHero nav.top){
@@ -885,7 +908,7 @@
 .landing :global(.pill.glass){
   border:none}
 .landing :global(.heroSignup){
-  width:100%;max-width:540px;display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:4px}
+  width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:10px}
 .landing :global(.glassBar){
   width:100%;display:flex;align-items:center;gap:10px;border-radius:var(--poskoo-radius-pill);padding:6px 6px 6px 24px;background:rgba(255,255,255,.78)}
 .landing :global(.glassBar input){

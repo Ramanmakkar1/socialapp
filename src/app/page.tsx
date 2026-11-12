@@ -12,7 +12,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LandingDemo } from "./LandingDemo";
 import { HeroVideo } from "@/components/HeroVideo";
 import { GoogleButton } from "@/components/GoogleButton";
-import { HeroFloaters } from "@/components/HeroFloaters";
 import { AnimArt } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
@@ -68,28 +67,29 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 
 <div className="videoHero">
   <HeroVideo src="/landing/hero-loop.mp4?v=2" poster="/landing/hero-poster.webp?v=2" />
-  <HeroFloaters />
   <div className="wrap">
     <SiteHeader onHome />
     <header className="hero heroCenter" id="top">
-      <Link className="pill glass" href="#channels"><span>NEW</span><b className="pillLong">Schedule on Instagram, Facebook, Threads and YouTube, and auto-DM on Instagram</b><b className="pillShort">Now on Threads, YouTube &amp; more</b> <i aria-hidden="true">→</i></Link>
-      <h1>Schedule posts. Auto-DM every comment. <em className="s mark">Grow on Poskoo.</em></h1>
-      <p className="lede">Poskoo plans your posts on one calendar, then sends your link to everyone who comments, usually within a minute. One app, one plan, no copy-paste.</p>
+      <Link className="pill glass heroPill" href="#channels"><span>NEW</span><b>LinkedIn, Bluesky and Mastodon are here</b> <i aria-hidden="true">→</i></Link>
+      <h1><span className="h1Line">Schedule posts.</span> <span className="h1Line">Auto&#8209;DM every comment.</span> <em className="s mark">Grow on Poskoo.</em></h1>
+      <p className="lede">Plan every post on one calendar. Anyone who comments your keyword gets your link by DM, usually within a minute.</p>
       <div className="heroSignup">
         <form className="glassBar glass" action="/signup" method="get">
           <label className="sr-only" htmlFor="hero-email">Email</label>
-          <input id="hero-email" name="email" type="email" placeholder="Enter your email..." autoComplete="email" required />
-          <button type="submit">Get started free <ArrowRight size={18} aria-hidden="true" /></button>
+          <input id="hero-email" name="email" type="email" placeholder="Your email address" autoComplete="email" required />
+          <button type="submit">Start free <ArrowRight size={18} aria-hidden="true" /></button>
         </form>
-        <p className="heroOr"><span>or</span></p>
-        <GoogleButton className="googleBtn glass" />
-        <p className="heroFine"><svg width="16" height="16" aria-hidden="true"><use href="#ok" /></svg>No credit card required. <b>It&apos;s free!</b> <span className="sep" aria-hidden="true">·</span> Have an account? <Link href="/login">Log in</Link></p>
+        <div className="heroAlt">
+          <GoogleButton className="googleChip" label="Sign up with Google" />
+          <span className="heroFine"><svg width="15" height="15" aria-hidden="true"><use href="#ok" /></svg>Free plan, no card</span>
+          <span className="heroLogin">Have an account? <Link href="/login">Log in</Link></span>
+        </div>
       </div>
     </header>
   </div>
 </div>
 <div className="wrap">
-  <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><span>· Built on the official Meta API</span></div>
+  <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><b><i style={{"background": "#FF0033"}}></i>YouTube</b><b><i style={{"background": "#0A66C2"}}></i>LinkedIn</b><b><i style={{"background": "#1185FE"}}></i>Bluesky</b><b><i style={{"background": "#6364FF"}}></i>Mastodon</b><span>· Official APIs only</span></div>
 </div>
 
 <section className="howSection">
