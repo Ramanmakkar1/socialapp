@@ -169,8 +169,9 @@ export default function FacebookSchedulerPage() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            Also planning Instagram? See the{" "}
-            <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>
+            Also planning Instagram or Threads? See the{" "}
+            <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>, the{" "}
+            <Link className={s.vlink} href="/threads-scheduler">Threads scheduler</Link>
             {" "}or prepare your content with our{" "}
             <Link className={s.vlink} href="/tools">free Instagram tools</Link>.
           </p>
@@ -191,6 +192,10 @@ export default function FacebookSchedulerPage() {
                   </div>
                 ))}
               </div>
+              <p className="small" style={{ marginTop: 16 }}>
+                Want every detail? Read the step-by-step guide on{" "}
+                <Link className={s.vlink} href="/help/schedule-facebook-posts">how to schedule Facebook Page posts</Link>.
+              </p>
             </div>
             <div className="art">
               <Image
