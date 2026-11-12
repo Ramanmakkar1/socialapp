@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import robots from "./robots.ts";
@@ -116,6 +116,34 @@ test("toolMetadata sets the canonical, title, description and social card", () =
   assert.equal(meta.description, "D");
   assert.equal((meta.openGraph as { url?: string } | undefined)?.url, "/tools/x");
   assert.ok(meta.openGraph?.images, "tool pages carry an Open Graph image");
+});
+
+test("sitemap excludes every static route whose metadata is noindex", () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const urls = new Set(sitemap().map((entry) => entry.url));
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const full = join(dir, entry.name);
+        return entry.isDirectory() ? walk(full) : [full];
+      });
+    for (const file of walk("src/app")) {
+      if (!file.endsWith("page.tsx")) continue;
+      if (readFileSync(file, "utf8").includes("index: false") === false) continue;
+      const route = file
+        .slice("src/app".length)
+        .replace(/[\\/]page\.tsx$/, "")
+        .replace(/\\/g, "/");
+      if (route.includes("[") || route.split("/").some((part) => part.startsWith("("))) continue;
+      assert.ok(
+        !urls.has(`${BRAND.url}${route}`),
+        `${route} sets noindex but is listed in the sitemap`,
+      );
+    }
+  } finally {
+    BRAND.indexable = was;
+  }
 });
 
 test("no PUBLIC_PATHS entry is noindex", () => {
