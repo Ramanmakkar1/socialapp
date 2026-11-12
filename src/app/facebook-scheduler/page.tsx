@@ -175,7 +175,8 @@ export default function FacebookSchedulerPage() {
             <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>, the{" "}
             <Link className={s.vlink} href="/threads-scheduler">Threads scheduler</Link>
             {" "}or prepare your content with our{" "}
-            <Link className={s.vlink} href="/tools">free Instagram tools</Link>.
+            <Link className={s.vlink} href="/tools">free Instagram tools</Link>. Check your draft with our{" "}
+            <Link className={s.vlink} href="/tools/facebook-character-counter">Facebook character counter</Link> before scheduling.
           </p>
         </div>
       </section>
