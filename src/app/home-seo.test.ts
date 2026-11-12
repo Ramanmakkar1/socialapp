@@ -68,6 +68,21 @@ test("home page canonical is a self-reference on the final domain, not the stagi
   );
 });
 
+test("audited staging URL serves one clean canonical on the final domain", () => {
+  // The daily audit still probes https://socialapp.splitforms.com/, the old
+  // staging host. Its head must not leak that host: the home metadata always
+  // points at BRAND.url. Guard against a duplicated or missing trailing slash
+  // so the tag is exactly https://poskoo.com/.
+  const audited = "https://socialapp.splitforms.com/";
+  assert.equal(new URL(audited).hostname, "socialapp.splitforms.com");
+  assert.equal(BRAND.url.endsWith("/"), false, "BRAND.url must not carry a trailing slash");
+  const canonical = `${BRAND.url}/`;
+  assert.equal(canonical, `${BRAND.url}/`);
+  assert.equal(new URL(canonical).hostname, new URL(BRAND.url).hostname);
+  assert.notEqual(new URL(canonical).hostname, new URL(audited).hostname);
+  assert.ok(!canonical.includes("//", "https://".length), "canonical must have a single slash at the root");
+});
+
 test("home page JSON-LD includes SoftwareApplication and FAQPage", () => {
   assert.ok(
     pageSource.includes('"@type": "SoftwareApplication"'),
