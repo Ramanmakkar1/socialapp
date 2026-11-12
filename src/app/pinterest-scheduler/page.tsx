@@ -103,7 +103,7 @@ const appJsonLd = {
 
 export default function PinterestSchedulerPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Pinterest scheduler", path: PATH }]}>
+    <PublicShell className={s.sched} breadcrumbs={[{ name: "Pinterest scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
         <script
           key={data["@type"]}
@@ -113,6 +113,7 @@ export default function PinterestSchedulerPage() {
       ))}
 
       <header className="hero">
+        <div className={s.heroText}>
         <span className="pill">Official Pinterest API · No password needed</span>
         <p className="eyebrow">Pinterest scheduler</p>
         <h1>
@@ -128,6 +129,7 @@ export default function PinterestSchedulerPage() {
           <Link className="btn btn-line" href="/signup">Create your free account</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
+        </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends a scheduled Pin to a board alongside posts for other social channels" /></div>
       </header>
 
@@ -141,7 +143,7 @@ export default function PinterestSchedulerPage() {
             {features.map((feature) => (
               <article key={feature.title} className="pcard">
                 <span className="no">{feature.no}</span>
-                <h3>{feature.title}</h3>
+                <h3>{feature.title.replace(/-/g, "\u2011")}</h3>
                 <p>{feature.text}</p>
               </article>
             ))}
@@ -155,14 +157,17 @@ export default function PinterestSchedulerPage() {
             <div className="copy">
               <p className="eyebrow">How Pinterest scheduling works</p>
               <h2>Schedule your first <em className="s mark">Pinterest Pin.</em></h2>
-              <div className="pains">
+              <ol className={s.steps}>
                 {steps.map((step) => (
-                  <div key={step.n} className="pain">
-                    <b>{step.n}. {step.title}</b>
-                    <span>{step.text}</span>
-                  </div>
+                  <li key={step.n}>
+                    <span className={s.stepNo} aria-hidden="true">{step.n}</span>
+                    <div>
+                      <h3>{step.title}</h3>
+                      <p>{step.text}</p>
+                    </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
             </div>
             <div className="art">
               <Image

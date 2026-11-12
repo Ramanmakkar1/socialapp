@@ -124,7 +124,7 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function FacebookSchedulerPage() {
   return (
-    <PublicShell>
+    <PublicShell className={s.sched}>
       {[appJsonLd, breadcrumbJsonLd, faqJsonLd].map((data) => (
         <script
           key={data["@type"]}
@@ -137,6 +137,7 @@ export default function FacebookSchedulerPage() {
       </nav>
 
       <header className="hero">
+        <div className={s.heroText}>
         <span className="pill">Official Meta login · Facebook Pages</span>
         <h1>
           Facebook Page scheduler for <em className="s mark">consistent publishing</em>
@@ -150,6 +151,7 @@ export default function FacebookSchedulerPage() {
           <Link className="btn btn-line" href="/pricing">View pricing</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
+        </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
       </header>
 
@@ -163,7 +165,7 @@ export default function FacebookSchedulerPage() {
             {benefits.map((benefit) => (
               <article key={benefit.title} className="pcard">
                 <span className="no">{benefit.no}</span>
-                <h3>{benefit.title}</h3>
+                <h3>{benefit.title.replace(/-/g, "\u2011")}</h3>
                 <p>{benefit.text}</p>
               </article>
             ))}
@@ -184,14 +186,17 @@ export default function FacebookSchedulerPage() {
             <div className="copy">
               <p className="eyebrow">Setup in three steps</p>
               <h2>Schedule your first <em className="s mark">Facebook Page post</em></h2>
-              <div className="pains">
+              <ol className={s.steps}>
                 {steps.map((step) => (
-                  <div key={step.n} className="pain">
-                    <b>{step.n}. {step.title}</b>
-                    <span>{step.text}</span>
-                  </div>
+                  <li key={step.n}>
+                    <span className={s.stepNo} aria-hidden="true">{step.n}</span>
+                    <div>
+                      <h3>{step.title}</h3>
+                      <p>{step.text}</p>
+                    </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
               <p className="small" style={{ marginTop: 16 }}>
                 Want every detail? Read the step-by-step guide on{" "}
                 <Link className={s.vlink} href="/help/schedule-facebook-posts">how to schedule Facebook Page posts</Link>.

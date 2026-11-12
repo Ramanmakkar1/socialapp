@@ -412,3 +412,262 @@
     padding: 22px 20px;
   }
 }
+
+/* ------------------------------------------------------------------
+   Platform scheduler landing pages (/facebook-scheduler, /x-scheduler …).
+   PublicShell gets className={s.sched}; everything below is scoped to it so
+   other public pages keep the shared landing styles. Selectors start with
+   .shell.sched so they out-rank the .landing :global(...) rules.
+   ------------------------------------------------------------------ */
+
+/* One 1280px column for header, breadcrumbs, content and footer, so every
+   edge lines up with the logo on big screens instead of growing to 82%. */
+.shell.sched > :global(.wrap) {
+  max-width: 1280px;
+}
+/* Sections nest a second .wrap inside main; don't shrink it again. */
+.shell.sched :global(.wrap .wrap) {
+  max-width: none;
+}
+.shell.sched :global(section) {
+  padding-block: clamp(48px, 7vw, 88px);
+}
+
+/* Hero: copy | art, balanced two columns from 900px; stacked + centred below. */
+.shell.sched :global(.hero:not(.heroCenter)) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  align-items: center;
+  gap: 32px;
+  padding-block: 16px 24px;
+  text-align: center;
+}
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  max-width: 640px;
+}
+.shell.sched :global(.hero:not(.heroCenter) h1) {
+  font-size: clamp(2.2rem, 4.2vw, 3.9rem);
+  max-width: 16ch;
+}
+.shell.sched :global(.hero .lede) {
+  font-size: clamp(1.02rem, 1.2vw, 1.15rem);
+  max-width: 54ch;
+}
+.shell.sched :global(.hero .ctas) {
+  margin-top: 6px;
+}
+.shell.sched :global(.hero:not(.heroCenter) > .hero-art) {
+  grid-column: auto;
+  grid-row: auto;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  justify-self: center;
+  align-self: center;
+}
+@media (min-width: 900px) {
+  .shell.sched :global(.hero:not(.heroCenter)) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(40px, 5vw, 80px);
+    justify-items: stretch;
+    text-align: left;
+    padding-block: 24px 40px;
+  }
+  .shell.sched .heroText {
+    align-items: flex-start;
+    max-width: none;
+  }
+  .shell.sched :global(.hero .ctas) {
+    justify-content: flex-start;
+  }
+  .shell.sched :global(.hero:not(.heroCenter) > .hero-art) {
+    max-width: 580px;
+    margin: 0;
+    justify-self: end;
+  }
+}
+
+/* Feature cards: straight, equal height, one clean row. */
+.shell.sched :global(.wrap .cards) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
+  align-items: stretch;
+  max-width: none;
+}
+.shell.sched :global(.cards > .pcard:nth-child(n)) {
+  transform: none;
+  padding: clamp(22px, 2.2vw, 32px);
+  gap: 14px;
+  border: 1.5px solid rgba(30, 22, 49, 0.08);
+  box-shadow: 0 1px 0 rgba(30, 22, 49, 0.04), 0 14px 32px -20px rgba(30, 22, 49, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.shell.sched :global(.cards > .pcard:nth-child(3n + 1)) { background: var(--lilac); }
+.shell.sched :global(.cards > .pcard:nth-child(3n + 2)) { background: var(--peach); }
+.shell.sched :global(.cards > .pcard:nth-child(3n + 3)) { background: var(--pink); }
+.shell.sched :global(.cards > .pcard:hover) {
+  transform: translateY(-4px);
+  box-shadow: 0 1px 0 rgba(30, 22, 49, 0.04), 0 22px 40px -22px rgba(30, 22, 49, 0.45);
+}
+.shell.sched :global(.pcard .no) {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--poskoo-radius-pill);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+.shell.sched :global(.pcard h3) {
+  font-size: clamp(1.3rem, 1.7vw, 1.6rem);
+  line-height: 1.15;
+  hyphens: manual;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.shell.sched :global(.pcard p) {
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+@media (min-width: 641px) and (max-width: 960px) {
+  .shell.sched :global(.wrap .cards) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .shell.sched :global(.wrap .cards) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Bands (setup steps and the extra copy bands): copy | art, art centred. */
+.shell.sched :global(.band) {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(28px, 4vw, 64px);
+  padding: clamp(28px, 4.5vw, 64px);
+  align-items: center;
+}
+.shell.sched :global(.band .copy) {
+  gap: 18px;
+  min-width: 0;
+}
+.shell.sched :global(.band .copy > p:not(.eyebrow):not(.small)) {
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 60ch;
+}
+.shell.sched :global(.band .art) {
+  justify-self: center;
+  width: 100%;
+  max-width: 460px;
+}
+.shell.sched :global(.band .art img) {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+@media (max-width: 960px) {
+  .shell.sched :global(.band) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shell.sched :global(.band .art) {
+    max-width: 340px;
+  }
+}
+
+/* Numbered setup steps: badge | title over description, full width. */
+.steps {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  gap: 12px;
+  counter-reset: none;
+}
+.steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  background: var(--poskoo-card);
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-sm, 16px);
+  padding: 18px 20px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.steps li:hover {
+  border-color: var(--poskoo-ink);
+  transform: translateX(3px);
+}
+.stepNo {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--poskoo-lime);
+  color: var(--poskoo-ink);
+  border: 1.5px solid var(--poskoo-ink);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.shell.sched .steps h3 {
+  font-size: 1.08rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 6px 0 4px;
+}
+.shell.sched .steps p {
+  color: var(--poskoo-muted);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .steps li:hover { transform: none; }
+}
+
+/* Final CTA: copy | art, image kept proportional. */
+.shell.sched :global(.cta) {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(24px, 4vw, 56px);
+  padding: clamp(28px, 4.5vw, 64px);
+}
+.shell.sched :global(.cta > img) {
+  max-width: 420px;
+  justify-self: center;
+}
+.shell.sched :global(.cta .btn) {
+  margin-right: 8px;
+}
+@media (max-width: 960px) {
+  .shell.sched :global(.cta) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shell.sched :global(.cta > img) {
+    max-width: 300px;
+  }
+}
+@media (max-width: 560px) {
+  .shell.sched :global(.band),
+  .shell.sched :global(.cta) {
+    padding: 28px 18px;
+  }
+  .steps li {
+    gap: 12px;
+    padding: 16px 14px;
+  }
+}
+/* Four-card rows on these pages: no tilt either (the shared rule tilts the 4th). */
+.shell.sched :global(.wrap .cards:has(> .pcard:nth-child(4):last-child) > .pcard:nth-child(n)) {
+  transform: none;
+}
+.shell.sched :global(.wrap .cards:has(> .pcard:nth-child(4):last-child) > .pcard:hover) {
+  transform: translateY(-4px);
+}

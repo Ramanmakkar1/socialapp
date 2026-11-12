@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
+import s from "@/components/site.module.css";
 import { ArrowRight } from "lucide-react";
 import { AnimArt, type AnimName } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
@@ -93,12 +94,13 @@ const faqJsonLd = {
 
 export default function InstagramScheduler() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Instagram scheduler", path: "/instagram-scheduler" }]}>
+    <PublicShell className={s.sched} breadcrumbs={[{ name: "Instagram scheduler", path: "/instagram-scheduler" }]}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
+        <div className={s.heroText}>
         <span className="pill"><span>NEW</span>Schedule posts · auto-DM on publish</span>
         <p className="eyebrow">Instagram scheduler</p>
         <h1>
@@ -114,6 +116,7 @@ export default function InstagramScheduler() {
           <button type="submit">Get started free <ArrowRight size={18} aria-hidden="true" /></button>
         </form>
         <p className="heroFine schedFine"><svg width="16" height="16" aria-hidden="true"><use href="#sched-ok" /></svg>Free plan · 10 scheduled posts a month · no credit card</p>
+        </div>
         <div className="hero-art">
           <AnimArt name="demo-schedule" label="A creator relaxes in a beanbag with a coffee while a weekly calendar of posts publishes on its own" />
           <div className="demoChip chipA" aria-hidden="true"><span className="dot" style={{ background: "var(--violet)" }} />Scheduled · Thu 9:00 AM</div>

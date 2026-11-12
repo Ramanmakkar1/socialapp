@@ -103,7 +103,7 @@ const appJsonLd = {
 
 export default function XSchedulerPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "X scheduler", path: PATH }]}>
+    <PublicShell className={s.sched} breadcrumbs={[{ name: "X scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
         <script
           key={data["@type"]}
@@ -113,6 +113,7 @@ export default function XSchedulerPage() {
       ))}
 
       <header className="hero">
+        <div className={s.heroText}>
         <span className="pill">Official X API · No password needed</span>
         <p className="eyebrow">X scheduler</p>
         <h1>
@@ -127,6 +128,7 @@ export default function XSchedulerPage() {
           <Link className="btn btn-line" href="/signup">Create your free account</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
+        </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends a scheduled post to X alongside posts for other social channels" /></div>
       </header>
 
@@ -140,7 +142,7 @@ export default function XSchedulerPage() {
             {features.map((feature) => (
               <article key={feature.title} className="pcard">
                 <span className="no">{feature.no}</span>
-                <h3>{feature.title}</h3>
+                <h3>{feature.title.replace(/-/g, "\u2011")}</h3>
                 <p>{feature.text}</p>
               </article>
             ))}
@@ -154,14 +156,17 @@ export default function XSchedulerPage() {
             <div className="copy">
               <p className="eyebrow">How X scheduling works</p>
               <h2>Schedule your first <em className="s mark">post on X.</em></h2>
-              <div className="pains">
+              <ol className={s.steps}>
                 {steps.map((step) => (
-                  <div key={step.n} className="pain">
-                    <b>{step.n}. {step.title}</b>
-                    <span>{step.text}</span>
-                  </div>
+                  <li key={step.n}>
+                    <span className={s.stepNo} aria-hidden="true">{step.n}</span>
+                    <div>
+                      <h3>{step.title}</h3>
+                      <p>{step.text}</p>
+                    </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
             </div>
             <div className="art">
               <Image

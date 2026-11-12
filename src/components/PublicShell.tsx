@@ -31,8 +31,11 @@ const tokenBridge = {
 export default function PublicShell({
   children,
   breadcrumbs,
+  className,
 }: {
   children: ReactNode;
+  /** Extra class on the root, e.g. s.sched for the platform scheduler pages. */
+  className?: string;
   breadcrumbs?: { name: string; path: string }[];
 }) {
   // Home is always first; the prop never includes it.
@@ -40,7 +43,7 @@ export default function PublicShell({
     breadcrumbs && breadcrumbs.length > 0 ? [{ name: "Home", path: "/" }, ...breadcrumbs] : null;
   return (
     <div
-      className={`${landing.landing} ${s.shell} ${instrumentSans.variable} ${instrumentSerif.variable}`}
+      className={`${landing.landing} ${s.shell} ${instrumentSans.variable} ${instrumentSerif.variable}${className ? ` ${className}` : ""}`}
       style={tokenBridge}
     >
       <div className="wrap">
