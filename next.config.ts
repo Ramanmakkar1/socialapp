@@ -42,6 +42,15 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    return [
+      // Google crawled /Home and got a 404. Send every capitalisation of the
+      // old home path to the real home page with a permanent 301.
+      { source: "/Home", destination: "/", permanent: true },
+      { source: "/home", destination: "/", permanent: true },
+      { source: "/:path([Hh][Oo][Mm][Ee])", destination: "/", permanent: true },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
