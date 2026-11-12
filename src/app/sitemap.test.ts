@@ -12,6 +12,13 @@ test("sitemap stays empty while staging is noindex", () => {
   assert.deepEqual(sitemap(), []);
 });
 
+test("sitemap excludes both audited noindex home URLs", () => {
+  const urls = new Set(sitemap().map((entry) => entry.url));
+  for (const url of ["https://poskoo.com/", "https://socialapp.splitforms.com/"]) {
+    assert.equal(urls.has(url), false, `${url} must not be listed while it is noindex`);
+  }
+});
+
 test("robots omits the sitemap while staging is noindex", () => {
   assert.equal("sitemap" in robots(), false);
 });

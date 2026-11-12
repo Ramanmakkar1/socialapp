@@ -15,12 +15,11 @@ const isNoindex = (path: string) =>
   !BRAND.indexable || NOINDEX_PATHS.has(path) || path.startsWith("/app/");
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // While the site is noindex (staging), no page is indexable, so the sitemap
-  // must be empty. This includes "/" and every public path. After launch the
-  // isNoindex filter below drops only the always-noindex and /app/ pages.
-  if (!BRAND.indexable) return [];
+  // Only indexable paths can become sitemap candidates. While staging is
+  // noindex this is empty, including for the home page on every host alias.
+  const candidates = BRAND.indexable ? PUBLIC_PATHS : [];
   const lastModified = new Date();
-  return PUBLIC_PATHS
+  return candidates
     .filter((path) => !isNoindex(path))
     .map((path) => ({
       url: `${BRAND.url}${path}`,
