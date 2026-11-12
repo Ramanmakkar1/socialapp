@@ -237,7 +237,7 @@ export default function HighlightCoverMaker() {
                   <svg viewBox="0 0 24 24" className="h-5 w-5" fill={p.fg} aria-hidden="true">
                     <path d={icon.path} />
                   </svg>
-                  <span className="text-[10px] font-semibold" style={{ color: p.fg }}>
+                  <span className="text-[11px] font-semibold" style={{ color: p.fg }}>
                     {p.name}
                   </span>
                 </button>

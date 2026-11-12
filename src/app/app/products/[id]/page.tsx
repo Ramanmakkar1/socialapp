@@ -1,3 +1,4 @@
+import { Package } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CopyField from "@/components/commerce/CopyField";
@@ -30,7 +31,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
   const fee = platformFeeCents(product.price_cents);
   return (
     <>
-      <PageHero eyebrow="Product" title={product.title} lede={<Link href="/app/products" className={ui.link}>All products</Link>} art="/landing/card-dm.webp" />
+      <PageHero icon={<Package width={20} height={20} />} eyebrow="Product" title={product.title} lede={<Link href="/app/products" className={ui.link}>All products</Link>} />
       <PaymentsNotice configured={configured} account={account} />
       {saved ? <p role="status" className={`${ui.notice} mt-6`}>Saved.</p> : null}
       {error ? <p role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>Could not delete it. Please try again.</p> : null}

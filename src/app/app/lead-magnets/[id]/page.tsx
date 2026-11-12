@@ -1,3 +1,4 @@
+import { Magnet } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import LocalTime from "@/components/LocalTime";
@@ -23,7 +24,7 @@ export default async function LeadMagnetPage({ params, searchParams }: { params:
   const [rules, deliveries] = await Promise.all([listRuleOptions(user.id), recentDeliveries(user.id, magnet.id)]);
   return (
     <>
-      <PageHero eyebrow="Lead magnet" title={magnet.title} lede={<Link href="/app/lead-magnets" className={ui.link}>All lead magnets</Link>} art="/landing/card-leads.webp" />
+      <PageHero icon={<Magnet width={20} height={20} />} eyebrow="Lead magnet" title={magnet.title} lede={<Link href="/app/lead-magnets" className={ui.link}>All lead magnets</Link>} />
       {saved ? <p role="status" className={`${ui.notice} mt-6`}>Saved.</p> : null}
       {error ? <p role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>Could not delete it. Please try again.</p> : null}
       <div className={styles.stats}>

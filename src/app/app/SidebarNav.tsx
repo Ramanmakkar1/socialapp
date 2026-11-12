@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard } from "lucide-react";
 import styles from "./shell.module.css";
 
@@ -110,6 +111,19 @@ export default function SidebarNav({
 }) {
   const pathname = usePathname() ?? "";
   const footer = getFooter(showAdmin);
+  const navRef = useRef<HTMLElement>(null);
+
+  // Keep the active item visible inside the scrolling sidebar (only that container scrolls, never the page).
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>("[aria-current=page]");
+    const box = nav?.parentElement;
+    if (!active || !box || box.scrollHeight <= box.clientHeight) return;
+    const top = active.offsetTop - box.offsetTop;
+    if (top < box.scrollTop || top + active.offsetHeight > box.scrollTop + box.clientHeight) {
+      box.scrollTop = Math.max(0, top - box.clientHeight / 2);
+    }
+  }, [pathname]);
   if (variant === "footer") {
     return (
       <nav aria-label="Account" className={styles.footNav}>
@@ -120,7 +134,7 @@ export default function SidebarNav({
     );
   }
   return (
-    <nav aria-label="Dashboard" className={styles.nav}>
+    <nav ref={navRef} aria-label="Dashboard" className={styles.nav}>
       {groups.map((g) => (
         <div key={g.title ?? "top"} className={styles.navGroup}>
           {g.title && <p className={styles.navGroupTitle}>{g.title}</p>}

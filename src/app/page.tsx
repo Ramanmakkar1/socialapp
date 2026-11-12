@@ -11,6 +11,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LandingDemo } from "./LandingDemo";
 import { HeroVideo } from "@/components/HeroVideo";
+import { GoogleButton } from "@/components/GoogleButton";
 import { HeroFloaters } from "@/components/HeroFloaters";
 import { AnimArt } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
@@ -67,7 +68,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <div className="wrap">
     <SiteHeader onHome />
     <header className="hero heroCenter" id="top">
-      <Link className="pill glass" href="#channels"><span>NEW</span>Schedule on Instagram, Facebook, Threads and YouTube, and auto-DM on Instagram <span aria-hidden="true" style={{"background": "none", "color": "inherit", "padding": "0"}}>→</span></Link>
+      <Link className="pill glass" href="#channels"><span>NEW</span><b className="pillLong">Schedule on Instagram, Facebook, Threads and YouTube, and auto-DM on Instagram</b><b className="pillShort">Now on Threads, YouTube &amp; more</b> <i aria-hidden="true">→</i></Link>
       <h1>Schedule posts. Auto-DM every comment. <em className="s mark">Grow on Poskoo.</em></h1>
       <p className="lede">Poskoo plans your posts on one calendar, then sends your link to everyone who comments, usually within a minute. One app, one plan, no copy-paste.</p>
       <div className="heroSignup">
@@ -77,12 +78,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
           <button type="submit">Get started free <ArrowRight size={18} aria-hidden="true" /></button>
         </form>
         <p className="heroOr"><span>or</span></p>
-        {/* Plain <a>: the OAuth start is a route handler redirect, never prefetched. */}
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth redirect, must not be client-routed */}
-        <a className="googleBtn glass" href="/api/auth/google/start">
-          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
-          Continue with Google
-        </a>
+        <GoogleButton className="googleBtn glass" />
         <p className="heroFine"><svg width="16" height="16" aria-hidden="true"><use href="#ok" /></svg>No credit card required. <b>It&apos;s free!</b> <span className="sep" aria-hidden="true">·</span> Have an account? <Link href="/login">Log in</Link></p>
       </div>
     </header>
@@ -119,7 +115,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 </section>
 
 <section id="how"><div className="wrap">
-  <div className="head"><p className="eyebrow">Three jobs, one app</p><h2>Everything between <em className="s">posting</em> and <em className="s">getting paid.</em></h2></div>
+  <div className="head"><p className="eyebrow">Three jobs, one app</p><h2>Everything between <em className="s">posting</em> and <em className="s">getting paid</em></h2></div>
   <div className="cards">
     <article className="pcard"><AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" /><span className="no">01 / Schedule</span><h3>Plan a month in one sitting.</h3><p>Drag posts onto the calendar and they go live at the time you choose.</p><Link className="go" href="/instagram-scheduler">See the calendar <span aria-hidden="true">→</span></Link></article>
     <article className="pcard"><AnimArt name="card-dm" label="A relaxed creator on a beanbag while DMs fly out of his phone to followers" /><span className="no">02 / Auto-DM</span><h3>Every comment gets your link.</h3><p>Pick a word like LINK or PRICE. Anyone who comments it gets a DM, usually within a minute, day or night.</p><Link className="go" href="/instagram-auto-dm">Watch it work <span aria-hidden="true">→</span></Link></article>
@@ -132,7 +128,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <div className="art"><AnimArt name="problem" label="A tired creator at night buried under phones and chat-bubble notifications" /></div>
     <div className="copy">
       <p className="eyebrow">Sound familiar?</p>
-      <h2>Replying by hand doesn&apos;t scale.</h2>
+      <h2>Replying by hand doesn&apos;t scale</h2>
       <p>Every good post brings the same flood of &quot;where can I get this?&quot; messages. Answering them one by one eats your evenings and loses you sales.</p>
       <div className="pains">
         <div className="pain"><b>Same link, all day</b><span>You paste one link into DMs dozens of times.</span></div>
@@ -165,7 +161,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <div className="split rev">
     <div className="copy">
       <p className="eyebrow">Multi-channel scheduling</p>
-      <h2>Write once. <em className="s">Post everywhere.</em></h2>
+      <h2>Write once. <em className="s">Post everywhere</em></h2>
       <p>Schedule Instagram, Facebook Pages, Threads and YouTube posts from one calendar, each with its own caption.</p>
       <ul className="channels">
         <li><span className="chIcon" style={{ background: "#E1306C" }}><Instagram size={20} aria-hidden="true" /></span><span className="chText"><b>Instagram</b><span>Feed posts, carousels, Reels and Stories</span></span><span className="chLive">Live</span></li>
@@ -180,7 +176,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 </div></section>
 
 <section id="features" style={{"paddingTop": "20px"}}><div className="wrap">
-  <div className="head"><p className="eyebrow">What you get</p><h2>One app for the whole <em className="s">post-to-lead</em> loop.</h2></div>
+  <div className="head"><p className="eyebrow">What you get</p><h2>One app for the whole <em className="s">post-to-lead</em> loop</h2></div>
   <div className="bento">
     <article className="bentoCard">
       <div className="bentoArt"><AnimArt name="feat-calendar" /></div>
@@ -217,11 +213,11 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 </div></section>
 
 <section style={{"paddingTop": "20px"}}><div className="wrap">
-  <div className="split">
+  <div className="split subSplit">
     <div className="art"><Image sizes="(max-width: 960px) 100vw, (min-width: 1800px) 43vw, 570px" src="/landing/onesub.webp" width={1400} height={933} loading="lazy" decoding="async" alt="A happy creator in an armchair holds one membership card while app cards and bills fly away" /></div>
     <div className="copy">
       <p className="eyebrow">One subscription</p>
-      <h2>Stop paying <em className="s">here and there.</em></h2>
+      <h2>Stop paying <em className="s">here and there</em></h2>
       <p>Most creators pay for a stack of apps. Poskoo puts it all in one plan, with one login and one bill.</p>
       <div className="replace">
         <div className="old"><span>Content scheduler</span><span>Comment-to-DM tool</span><span>Link in bio app</span><span>AI caption writer</span><span>Analytics tool</span></div>
@@ -233,7 +229,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 </div></section>
 
 <section id="pricing"><div className="wrap">
-  <div className="head"><p className="eyebrow">Pricing</p><h2>Simple plans. <em className="s">Start free.</em></h2></div>
+  <div className="head"><p className="eyebrow">Pricing</p><h2>Simple plans. <em className="s">Start free</em></h2></div>
   <div className="plans">
     {PLANS.map((p) => (
       <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
@@ -270,7 +266,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <div className="cta">
     <div className="ctaCopy">
       <p className="ctaEyebrow">Ready when you are</p>
-      <h2>Your next post could fill your inbox <em className="s">with leads.</em></h2>
+      <h2>Your next post could fill your inbox <em className="s">with leads</em></h2>
       <p>Start free. Connect your social accounts in one tap, pick a keyword, and let Poskoo send the link while you get on with your day.</p>
       <form className="glassBar ctaBar" action="/signup" method="get">
         <label className="sr-only" htmlFor="cta-email">Email</label>

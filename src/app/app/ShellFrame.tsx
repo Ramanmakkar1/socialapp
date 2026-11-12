@@ -60,7 +60,8 @@ export default function ShellFrame({
     const aside = asideRef.current;
     const focusables = () =>
       aside ? [...aside.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), summary, input, select, textarea, [tabindex]:not([tabindex='-1'])")].filter((el) => el.offsetParent !== null) : [];
-    focusables()[0]?.focus();
+    // Focus the drawer itself (not the close button) so no focus ring flashes on open.
+    aside?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
       // A modal <dialog> opened from inside the drawer handles its own Escape.
       if (document.querySelector("dialog[open]")) return;
@@ -109,6 +110,7 @@ export default function ShellFrame({
         className={styles.sidebar}
         data-open={open ? "true" : undefined}
         aria-label="Main menu"
+        tabIndex={open ? -1 : undefined}
         onClick={onAsideClick}
       >
         <button type="button" className={styles.drawerClose} onClick={close} aria-label="Close menu">

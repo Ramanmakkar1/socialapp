@@ -10,7 +10,7 @@ export default function SiteError({ reset }: { error: Error & { digest?: string 
       <header className="hero" role="alert">
         <p className="eyebrow">A quick pause</p>
         <h1>
-          Something went wrong <em className="s">on this page.</em>
+          Something went wrong <em className="s">on this page</em>
         </h1>
         <p className="lede">This page hit a snag. Try again, or head back to the homepage.</p>
         <div className="ctas">

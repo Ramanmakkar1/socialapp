@@ -29,12 +29,11 @@ export default async function LeadMagnetsPage({ searchParams }: { searchParams: 
   const totals = magnets.reduce((t, m) => ({ deliveries: t.deliveries + m.deliveries, leads: t.leads + m.leads }), { deliveries: 0, leads: 0 });
   return (
     <>
-      <PageHero
+      <PageHero icon={<Magnet width={20} height={20} />}
         eyebrow="New · Grow your list"
         title="Lead"
         accent="magnets"
         lede="Give a free guide, checklist or template to everyone who comments your keyword. Poskoo asks for their email in the DM, sends the file and tags the lead."
-        art="/landing/card-leads.webp"
         action={magnets.length > 0 ? <BtnLink href="/app/lead-magnets/new"><Plus aria-hidden="true" size={18} /> Create lead magnet</BtnLink> : undefined}
       />
       {deleted ? <p role="status" className={`${ui.notice} mt-6`}>Lead magnet deleted.</p> : null}

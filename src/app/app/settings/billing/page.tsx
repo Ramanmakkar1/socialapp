@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, CreditCard } from "lucide-react";
 import { BtnLink, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
@@ -171,7 +171,7 @@ export default async function BillingPage({
 
   return (
     <div className={styles.page}>
-      <PageHero eyebrow="Settings" title="Plan &" accent="billing" lede="Your plan, what you have used this month, and your Stripe billing." art="/landing/card-schedule.webp" />
+      <PageHero title="Plan & billing" lede="Your plan, what you have used this month, and your Stripe billing." icon={<CreditCard width={20} height={20} />} action={<BtnLink href="/app/settings" variant="line" size="sm">Back to settings</BtnLink>} />
       {sp.upgraded === "1" && plan !== "Free" ? (
         <p role="status" className={ui.notice}>Welcome to {plan}! Your new limits are on. A receipt is on its way to {user.email}.</p>
       ) : null}

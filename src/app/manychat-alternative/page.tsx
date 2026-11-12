@@ -35,7 +35,7 @@ const compare: [string, string, string][] = [
   ["Facebook Messenger", "On the roadmap, no date", "Yes"],
   ["TikTok", "On the roadmap, no date", "Yes"],
   ["Official Meta API, no password", "Yes", "Yes"],
-  ["Price", PRICE_SUMMARY, "See their pricing"],
+  ["Price", PRICE_SUMMARY, "Check their site"],
 ];
 
 const faqs = [
@@ -84,6 +84,7 @@ export default function ManyChatAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people switch</h2>
           </div>
           <div className="cards">
@@ -106,7 +107,7 @@ export default function ManyChatAlternative() {
             <h2>{BRAND.name} vs ManyChat</h2>
             <p>ManyChat is a mature chat automation tool with more channels. {BRAND.name} focuses on Instagram comment-to-DM and adds post scheduling. Here is an honest side-by-side.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -136,6 +137,7 @@ export default function ManyChatAlternative() {
         <div className="wrap">
           <div className="split">
             <div className="copy">
+              <p className="eyebrow">How it works</p>
               <h2>Schedule the post, the <em className="s">DM rule</em> comes with it</h2>
               <p>
                 With ManyChat you set up the automation in one app and plan the post in another. In {BRAND.name} you write the post, pick the time and attach the keyword rule in one step.
@@ -155,6 +157,7 @@ export default function ManyChatAlternative() {
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>ManyChat alternative questions</h2>
           </div>
           <div className="faq">
@@ -173,7 +176,7 @@ export default function ManyChatAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Auto-DM your commenters and <em className="s">schedule your posts</em> in one place.</h2>
+              <h2>Auto-DM your commenters and <em className="s">schedule your posts</em> in one place</h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

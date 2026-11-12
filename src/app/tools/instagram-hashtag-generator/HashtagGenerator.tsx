@@ -212,7 +212,7 @@ export default function HashtagGenerator() {
                 </td>
                 <td className="py-2 pr-2 align-middle">
                   <span className="break-all font-medium text-[var(--poskoo-ink)]">#{r.tag}</span>
-                  <span className={`ml-1.5 inline-block rounded-full border px-1.5 py-px text-[10px] font-semibold sm:hidden ${TIER_STYLE[r.tier].chip}`}>{TIER_LABEL[r.tier]}</span>
+                  <span className={`ml-1.5 inline-block rounded-full border px-1.5 py-px text-[11px] font-semibold sm:hidden ${TIER_STYLE[r.tier].chip}`}>{TIER_LABEL[r.tier]}</span>
                 </td>
                 <td className="py-2 pr-2 align-middle">
                   <div className="flex items-center gap-2">

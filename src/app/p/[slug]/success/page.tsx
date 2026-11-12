@@ -7,6 +7,7 @@ import { recordSessionFromSuccessPage } from "@/lib/orders";
 import { getStripe, isStripeConfigured } from "@/lib/payments";
 import { getPublicProduct } from "@/lib/products";
 import styles from "../../product.module.css";
+import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 
 export const metadata: Metadata = { title: "Thank you", robots: { index: false, follow: false } };
 
@@ -37,7 +38,7 @@ export default async function ProductSuccessPage({ params, searchParams }: Props
     console.error("success page session lookup failed", err instanceof Error ? err.message : err);
   }
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
       <div className={styles.shell}>
         <article className={styles.card}>
           <div className={styles.body}>

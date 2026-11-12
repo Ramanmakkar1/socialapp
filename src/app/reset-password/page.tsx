@@ -32,7 +32,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
     const target = isDbConfigured() ? await peekToken(token, "reset").catch(() => null) : null;
     if (!target) {
       return (
-        <AuthFrame title={<>Link <em className="s">expired.</em></>} lede="This reset link has expired or was already used. Links work once, for 15 minutes." footer={footer}>
+        <AuthFrame title={<>Link <em className="s">expired</em></>} lede="This reset link has expired or was already used. Links work once, for 15 minutes." footer={footer}>
           <div className={a.stack}>
             <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>Request a new code and use the newest email.</p>
             <Link href="/forgot-password" className="btn btn-dark">Send a new code</Link>
@@ -41,14 +41,14 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
       );
     }
     return (
-      <AuthFrame title={<>Choose a new <em className="s">password.</em></>} lede="Pick something you don’t use anywhere else." footer={footer}>
+      <AuthFrame title={<>Choose a new <em className="s">password</em></>} lede="Pick something you don’t use anywhere else." footer={footer}>
         <ResetForm token={token} email={target.email} />
       </AuthFrame>
     );
   }
 
   return (
-    <AuthFrame title={<>Reset your <em className="s">password.</em></>} lede="Enter the 6-digit code we emailed you and choose a new password." footer={footer}>
+    <AuthFrame title={<>Reset your <em className="s">password</em></>} lede="Enter the 6-digit code we emailed you and choose a new password." footer={footer}>
       <ResetForm email={typeof email === "string" ? email.trim().slice(0, 254) : undefined} />
     </AuthFrame>
   );

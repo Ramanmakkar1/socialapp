@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { Fragment, useEffect, useId, useOptimistic, useRef, useState, useTransition, type ComponentType } from "react";
-import { Activity, LifeBuoy, MessageCircle, MessageCircleHeart, MoreHorizontal, Pause, Pencil, Play, Plus, Trash2, X } from "lucide-react";
+import { Activity, LifeBuoy, MessageCircle, MessageCircleHeart, MoreHorizontal, Pause, Pencil, Play, Trash2, X } from "lucide-react";
 import EmptyState from "../EmptyState";
+import NewAutomationDialog from "../NewAutomationDialog";
 import RuleBuilder, { AccountReadiness } from "./RuleBuilder";
 import TemplatePicker from "./TemplatePicker";
 import styles from "./auto-dm.module.css";
@@ -733,6 +734,16 @@ export function AutoDmView({
     }
   }
 
+  // Chooser dialog on this page: open the builder for the picked trigger in place.
+  const [picked, setPicked] = useState<{ trigger: RuleTrigger; n: number } | null>(null);
+  function startFromChooser(trigger: RuleTrigger) {
+    setPicked((p) => ({ trigger, n: (p?.n ?? 0) + 1 }));
+    setEditing(null);
+    setBlankDraft(false);
+    setFormOpen(true);
+  }
+  const activeTrigger = picked?.trigger ?? startTrigger;
+
   function openCreate(blank = false) {
     setEditing(null);
     setBlankDraft(blank);
@@ -780,7 +791,7 @@ export function AutoDmView({
     });
   }
 
-  const triggerDefaults: RuleFormDefaults | undefined = startTrigger ? { triggers: [startTrigger] } : undefined;
+  const triggerDefaults: RuleFormDefaults | undefined = activeTrigger ? { triggers: [activeTrigger] } : undefined;
   const formDefaults: RuleFormDefaults | undefined = editing
     ? {
         name: editing.name,
@@ -798,23 +809,24 @@ export function AutoDmView({
       }
     : blankDraft
       ? undefined
-      : templateDefaults ?? triggerDefaults;
+      : picked ? triggerDefaults : templateDefaults ?? triggerDefaults;
   const live = shownRules.filter((r) => r.status === "active").length;
 
   return (
     <>
       <header className={styles.pageHead}>
-        <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className={styles.pageIcon} aria-hidden="true"><MessageCircleHeart width={20} height={20} /></span>
+          <div className="min-w-0">
           <h1 className={styles.pageTitle}>Auto-DM</h1>
           <p className={styles.pageSub}>Comment to DM: send your link to everyone who comments a keyword. Story replies and DMs work too.</p>
+          </div>
         </div>
         <div className={styles.headActions}>
           <Link href="/app/auto-dm/activity" className={styles.headLink}><Activity width={16} height={16} aria-hidden="true" /> Activity</Link>
           <Link href="/help/instagram-auto-dm-not-working" className={styles.headLink}><LifeBuoy width={16} height={16} aria-hidden="true" /> DMs not sending?</Link>
           {!formOpen && (
-            <button type="button" className={styles.primaryBtn} onClick={() => openCreate(true)}>
-              <Plus width={16} height={16} aria-hidden="true" /> New Auto-DM
-            </button>
+            <NewAutomationDialog label="New Auto-DM" className={styles.primaryBtn} onStart={startFromChooser} />
           )}
         </div>
       </header>
@@ -827,7 +839,7 @@ export function AutoDmView({
       {formOpen && (
         <div className="mt-6">
           <RuleBuilder
-            key={editing ? `edit:${editing.id}` : blankDraft ? "create:blank" : `create:${templateKey || startTrigger || ""}`}
+            key={editing ? `edit:${editing.id}` : blankDraft ? "create:blank" : `create:${picked ? `${picked.trigger}-${picked.n}` : templateKey || startTrigger || ""}`}
             mode={editing ? "edit" : "create"}
             ruleId={editing?.id}
             initial={formDefaults}

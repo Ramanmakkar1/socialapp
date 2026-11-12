@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
+import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -82,6 +83,7 @@ export default function PlanolyAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people look for a Planoly alternative</h2>
           </div>
           <div className="cards">
@@ -104,7 +106,7 @@ export default function PlanolyAlternative() {
             <h2>{BRAND.name} vs Planoly</h2>
             <p>Planoly is a strong visual scheduler. {BRAND.name} keeps scheduling and adds comment-to-DM automation in one place. Here is an honest side-by-side.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -129,36 +131,17 @@ export default function PlanolyAlternative() {
         </div>
       </section>
 
-      {/* Who should stay on Planoly */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>Who should stay on Planoly</h2>
-            <p>
-              Stay on Planoly if Pinterest, TikTok or other networks they support are core to your workflow, you rely on their Link in Bio product end to end, or you only need scheduling with no comment-to-DM at all. Planoly is a mature planner; there is no reason to switch if automation is not on your roadmap.
-            </p>
-          </div>
-        </div>
-      </section>
+      <StaySection name="Planoly">
+        Stay on Planoly if Pinterest, TikTok or other networks they support are core to your workflow, you rely on their Link in Bio product end to end, or you only need scheduling with no comment-to-DM at all. Planoly is a mature planner; there is no reason to switch if automation is not on your roadmap.
+      </StaySection>
 
-      {/* How to switch in 10 minutes */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>How to switch in 10 minutes</h2>
-          </div>
-          <div className="pains" style={{ maxWidth: 760, marginInline: "auto" }}>
-            {switchSteps.map((step) => (
-              <div key={step.title} className="pain"><b>{step.title}</b><span>{step.text}</span></div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SwitchSteps steps={switchSteps} />
 
       {/* FAQ */}
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>Planoly alternative questions</h2>
           </div>
           <div className="faq">
@@ -177,7 +160,7 @@ export default function PlanolyAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule like Planoly. <em className="s">Auto-DM every commenter.</em></h2>
+              <h2>Schedule like Planoly. <em className="s">Auto-DM every commenter</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

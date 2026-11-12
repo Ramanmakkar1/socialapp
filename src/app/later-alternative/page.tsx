@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
+import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -26,9 +27,9 @@ const compare: [string, string, string][] = [
   ["Visual calendar", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
-  ["Link click tracking", "Yes", "See their site"],
+  ["Link click tracking", "Yes", "Check their site"],
   ["Lead CSV export", "Yes", "Check their site"],
-  ["AI caption ideas", "Yes", "See their site"],
+  ["AI caption ideas", "Yes", "Check their site"],
 ];
 
 const switchSteps = [
@@ -82,6 +83,7 @@ export default function LaterAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people look for a Later alternative</h2>
           </div>
           <div className="cards">
@@ -104,7 +106,7 @@ export default function LaterAlternative() {
             <h2>{BRAND.name} vs Later</h2>
             <p>Later is a strong visual scheduler. {BRAND.name} keeps scheduling and adds comment-to-DM automation in one place. Here is an honest side-by-side.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -129,36 +131,17 @@ export default function LaterAlternative() {
         </div>
       </section>
 
-      {/* Who should stay on Later */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>Who should stay on Later</h2>
-            <p>
-              Stay on Later if Pinterest, TikTok or other networks they support are core to your workflow, you rely on their Link in Bio product end to end, or you only need scheduling with no comment-to-DM at all. Later is a mature planner; there is no reason to switch if automation is not on your roadmap.
-            </p>
-          </div>
-        </div>
-      </section>
+      <StaySection name="Later">
+        Stay on Later if Pinterest, TikTok or other networks they support are core to your workflow, you rely on their Link in Bio product end to end, or you only need scheduling with no comment-to-DM at all. Later is a mature planner; there is no reason to switch if automation is not on your roadmap.
+      </StaySection>
 
-      {/* How to switch in 10 minutes */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>How to switch in 10 minutes</h2>
-          </div>
-          <div className="pains" style={{ maxWidth: 760, marginInline: "auto" }}>
-            {switchSteps.map((step) => (
-              <div key={step.title} className="pain"><b>{step.title}</b><span>{step.text}</span></div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SwitchSteps steps={switchSteps} />
 
       {/* FAQ */}
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>Later alternative questions</h2>
           </div>
           <div className="faq">
@@ -177,7 +160,7 @@ export default function LaterAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule like Later. <em className="s">Auto-DM every commenter.</em></h2>
+              <h2>Schedule like Later. <em className="s">Auto-DM every commenter</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

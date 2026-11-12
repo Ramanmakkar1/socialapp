@@ -1,3 +1,4 @@
+import { Package } from "lucide-react";
 import { PageHero } from "@/components/ui/kit";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
@@ -17,7 +18,7 @@ export default async function NewProductPage() {
   }
   return (
     <>
-      <PageHero eyebrow="Products" title="Create a" accent="product" lede="A digital product your followers can buy with a card. You get paid through Stripe." art="/landing/card-dm.webp" />
+      <PageHero icon={<Package width={20} height={20} />} eyebrow="Products" title="Create a" accent="product" lede="A digital product your followers can buy with a card. You get paid through Stripe." />
       <ProductForm
         id={null}
         defaults={{ title: "", description: "", cover_url: null, delivery_type: "file", delivery_url: "", price: "", currency: "usd", active: true }}

@@ -34,9 +34,12 @@ type Contact = {
 function Header({ action }: { action?: ReactNode }) {
   return (
     <header className={styles.head}>
-      <div>
-        <h1 className={styles.title}>Contacts</h1>
-        <p className={styles.sub}>Everyone your Auto-DMs talk to, with the emails and phone numbers they share.</p>
+      <div className={styles.headMain}>
+        <span className={styles.headIcon} aria-hidden="true"><Users width={20} height={20} /></span>
+        <div className="min-w-0">
+          <h1 className={styles.title}>Contacts</h1>
+          <p className={styles.sub}>Everyone your Auto-DMs talk to, with the emails and phone numbers they share.</p>
+        </div>
       </div>
       {action}
     </header>

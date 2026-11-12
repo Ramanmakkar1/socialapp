@@ -6,6 +6,7 @@ import { ArrowLeft, AtSign, Facebook, Instagram, Loader2, PartyPopper, Plus, Rot
 import { BlueskyIcon, GbpIcon, LinkedInIcon, MastodonIcon, PinterestIcon, TikTokIcon, XIcon } from "@/components/brandIcons";
 import { connectBlueskyAction, connectGbpLocationsAction, gbpPickListAction, type BlueskyConnectState, type GbpPickResult } from "./connectActions";
 import styles from "./shell.module.css";
+import cc from "./connectChannel.module.css";
 
 export type ConnectAvailability = {
   /** Instagram (and Facebook Pages through Meta login) need the Meta app keys. */
@@ -108,7 +109,32 @@ function retryHref(net: string): string | null {
   return `/api/${net}/connect`;
 }
 
-// "Connect a New Channel" window (Buffer-style). Every card is one click: straight to the network's
+const CORE: NetworkId[] = ["instagram", "facebook", "threads", "youtube", "tiktok"];
+function coreRank(id: NetworkId): number {
+  const i = CORE.indexOf(id);
+  return i === -1 ? CORE.length : i;
+}
+
+// Opens the modal and puts focus on its title (not the close button), so the first Tab reaches the cards.
+function showDialog(dialog: HTMLDialogElement | null, title: HTMLElement | null) {
+  if (!dialog) return;
+  if (!dialog.open) dialog.showModal();
+  title?.focus({ preventScroll: true });
+}
+
+function CardBody({ n }: { n: Network }) {
+  return (
+    <>
+      <span className={`${styles.connectIcon} ${styles[`netBg_${n.id}`] ?? ""}`}>{n.icon}</span>
+      <span className={styles.connectText}>
+        <b>{n.name}</b>
+        <span>{n.sub}</span>
+      </span>
+    </>
+  );
+}
+
+// "Connect a new channel" window (Buffer-style). Every card is one click: straight to the network's
 // own consent screen, or a one-step form inside the dialog (Instagram flow choice, Bluesky handle +
 // app password, Mastodon server). After the round trip the dialog reopens on success or on a
 // plain-words error with Retry.
@@ -125,7 +151,11 @@ export default function ConnectChannelDialog({
   slots?: { used: number; limit: number };
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const list = networks(availability);
+  // Core channels first (in colour); channels whose server keys are missing go in a separate muted group.
+  const ready = list.filter((n) => !n.off).sort((a, b) => coreRank(a.id) - coreRank(b.id));
+  const notReady = list.filter((n) => n.off);
   const [view, setView] = useState<View>({ kind: "grid" });
   const [igFlow, setIgFlow] = useState<"instagram" | "facebook">("instagram");
   const [bsState, bsAction, bsPending] = useActionState<BlueskyConnectState, FormData>(connectBlueskyAction, null);
@@ -150,7 +180,7 @@ export default function ConnectChannelDialog({
     }
     if (!next) return;
     setView(next);
-    ref.current?.showModal();
+    showDialog(ref.current, titleRef.current);
     for (const k of ["connected", "handle", "connect_error", "net", "connect", "connect_pick"]) p.delete(k);
     window.history.replaceState(null, "", `${url.pathname}${p.toString() ? `?${p.toString()}` : ""}${url.hash === "#connect" ? "" : url.hash}`);
   }, []);
@@ -160,7 +190,7 @@ export default function ConnectChannelDialog({
     const onHash = () => {
       if (window.location.hash !== "#connect") return;
       setView({ kind: "grid" });
-      if (!ref.current?.open) ref.current?.showModal();
+      if (!ref.current?.open) showDialog(ref.current, titleRef.current);
       window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
     };
     // Next.js <Link href="#connect"> changes the hash with pushState (no hashchange event): catch the click.
@@ -169,7 +199,7 @@ export default function ConnectChannelDialog({
       if (!a || !a.getAttribute("href")?.endsWith("#connect") || a.closest("dialog")) return;
       e.preventDefault();
       setView({ kind: "grid" });
-      if (!ref.current?.open) ref.current?.showModal();
+      if (!ref.current?.open) showDialog(ref.current, titleRef.current);
     };
     window.addEventListener("hashchange", onHash);
     document.addEventListener("click", onClick);
@@ -189,7 +219,7 @@ export default function ConnectChannelDialog({
 
   const open = () => {
     setView({ kind: "grid" });
-    ref.current?.showModal();
+    showDialog(ref.current, titleRef.current);
   };
 
   const full = slots ? slots.used >= slots.limit : false;
@@ -208,7 +238,7 @@ export default function ConnectChannelDialog({
       </button>
       <dialog
         ref={ref}
-        className={styles.connectDialog}
+        className={`${styles.connectDialog} ${cc.dialog}`}
         aria-labelledby="connect-title"
         onClick={(e) => {
           if (e.target === e.currentTarget) e.currentTarget.close();
@@ -216,10 +246,10 @@ export default function ConnectChannelDialog({
       >
         <div className={styles.connectInner}>
           <div className={styles.connectHead}>
-            <h2 id="connect-title" className={styles.connectTitle}>
-              {view.kind === "success" ? "Channel connected" : view.kind === "error" ? "Couldn't connect" : view.kind === "pick" ? "Select the locations to connect" : "Connect a New Channel"}
+            <h2 id="connect-title" ref={titleRef} tabIndex={-1} className={`${styles.connectTitle} ${cc.title}`}>
+              {view.kind === "success" ? "Channel connected" : view.kind === "error" ? "Couldn't connect" : view.kind === "pick" ? "Select the locations to connect" : "Connect a new channel"}
             </h2>
-            <button type="button" className={styles.connectClose} onClick={() => ref.current?.close()} aria-label="Close">
+            <button type="button" className={`${styles.connectClose} ${cc.close}`} onClick={() => ref.current?.close()} aria-label="Close">
               <X width={18} height={18} aria-hidden="true" />
             </button>
           </div>
@@ -233,31 +263,32 @@ export default function ConnectChannelDialog({
                   {full && slots.limit < 25 ? <> <Link href="/app/settings/billing" className="underline underline-offset-2">Upgrade for more channels</Link></> : null}
                 </p>
               )}
-              <ul className={styles.connectGrid}>
-                {list.map((n) => {
-                  const body = (
-                    <>
-                      <span className={`${styles.connectIcon} ${styles[`netBg_${n.id}`] ?? ""}`}>{n.icon}</span>
-                      <span className={styles.connectText}>
-                        <b>{n.name}</b>
-                        <span>{n.sub}</span>
-                        {n.off && <span className={styles.soonTag}>Not set up yet</span>}
-                      </span>
-                    </>
-                  );
-                  return (
-                    <li key={n.id}>
-                      {n.off ? (
-                        <span className={`${styles.connectCard} ${styles.connectCardOff}`} aria-disabled="true">{body}</span>
-                      ) : n.step ? (
-                        <button type="button" className={`${styles.connectCard} ${styles.connectCardBtn}`} onClick={() => setView({ kind: n.step! })}>{body}</button>
-                      ) : (
-                        <a href={n.href} className={styles.connectCard}>{body}</a>
-                      )}
-                    </li>
-                  );
-                })}
+              <ul className={`${styles.connectGrid} ${cc.grid}`}>
+                {ready.map((n) => (
+                  <li key={n.id}>
+                    {n.step ? (
+                      <button type="button" className={`${styles.connectCard} ${styles.connectCardBtn} ${cc.card}`} onClick={() => setView({ kind: n.step! })}><CardBody n={n} /></button>
+                    ) : (
+                      <a href={n.href} className={`${styles.connectCard} ${cc.card}`}><CardBody n={n} /></a>
+                    )}
+                  </li>
+                ))}
               </ul>
+              {notReady.length > 0 && (
+                <section className={cc.offGroup} aria-labelledby="connect-off-heading">
+                  <h3 id="connect-off-heading" className={cc.offTitle}>Not available yet</h3>
+                  <ul className={cc.offGrid}>
+                    {notReady.map((n) => (
+                      <li key={n.id}>
+                        <span className={cc.offCard} aria-disabled="true" title={`Connecting ${n.name} isn't switched on yet`}>
+                          <span className={cc.offIcon}>{n.icon}</span>
+                          <span className={cc.offName}>{n.name}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
               <p className={styles.connectFoot}>Instagram needs a professional (Business or Creator) account. <Link href="/help/getting-started">See the setup steps</Link></p>
               <details className={styles.connectMore}>
                 <summary>Facebook profile or Group?</summary>

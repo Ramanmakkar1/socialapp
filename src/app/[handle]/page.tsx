@@ -7,6 +7,7 @@ import { bioHandleFromParam } from "@/lib/bioPageShared";
 import { isDbConfigured } from "@/lib/db";
 import { BRAND } from "@/lib/brand";
 import styles from "./bio-public.module.css";
+import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -50,7 +51,7 @@ export default async function PublicBioPage({ params }: Props) {
 
   return (
     <main
-      className={styles.page}
+      className={`${styles.page} ${instrumentSans.variable} ${instrumentSerif.variable}`}
       style={{ background: theme.bg, color: theme.ink }}
     >
       <script

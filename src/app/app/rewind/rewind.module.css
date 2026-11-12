@@ -2,6 +2,7 @@
 .page { display: grid; gap: 18px; color: var(--poskoo-ink); font-family: var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; }
 .head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--poskoo-line); }
 .headIcon { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-tint, var(--poskoo-band)); color: var(--poskoo-violet); }
+.head > div { min-width: 0; }
 .h1 { margin: 0; font-size: 1.6rem; line-height: 1.1; letter-spacing: -.03em; }
 .sub { margin: 4px 0 0; color: var(--poskoo-muted); font-size: .92rem; }
 .card { border: 1px solid var(--poskoo-line); border-radius: 14px; background: var(--poskoo-card); padding: 18px; }
@@ -46,8 +47,14 @@
 .radio { flex: none; width: 18px; height: 18px; border: 1.5px solid var(--poskoo-pill-border); border-radius: 50%; }
 .ruleSelected .radio { border: 5px solid var(--poskoo-violet); }
 @media (max-width: 560px) {
-  .rule { flex-wrap: wrap; }
-  .offPill { margin-left: 48px; }
+  /* Icon + name on one row; the chip and helper text get the full width below. */
+  .rule { flex-wrap: wrap; align-items: flex-start; }
+  .ruleText { flex: 1 1 calc(100% - 52px); }
+  .ruleText > span { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+  .ruleText > .why { display: block; }
+  .offPill { margin-left: 48px; white-space: normal; }
+  .radio { position: absolute; top: 14px; right: 14px; }
+  .rule { position: relative; padding-right: 40px; }
 }
 
 .runRow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-top: 14px; }

@@ -20,7 +20,7 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
       >
         <div style={{ maxWidth: 480, textAlign: "center" }}>
           <h1 style={{ margin: "0 0 12px", fontSize: "1.9rem", fontWeight: 700, letterSpacing: "-0.035em", lineHeight: 1.1 }}>
-            Something went <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontStyle: "italic", fontWeight: 400 }}>wrong.</span>
+            Something went <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontStyle: "italic", fontWeight: 400 }}>wrong</span>
           </h1>
           <p style={{ margin: "0 0 24px", fontSize: "0.9375rem", lineHeight: 1.6, color: "#5f5873" }}>
             We hit an unexpected error. Try again, or return to the homepage.

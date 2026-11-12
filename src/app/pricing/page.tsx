@@ -139,7 +139,7 @@ export default function PricingPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Every plan</p>
-              <h2>What you get, <em className="s">whatever you pay.</em></h2>
+              <h2>What you get, <em className="s">whatever you pay</em></h2>
               <div className="pains">
                 {includes.map((t) => (
                   <div key={t} className="pain"><b>Included</b><span>{t}</span></div>

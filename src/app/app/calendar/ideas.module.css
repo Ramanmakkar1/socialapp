@@ -1,0 +1,56 @@
+/* Ideas board: four tinted columns, friendly empty states, "New idea" in every column. */
+.board { margin-top: 1rem; }
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.title { margin: 0; color: var(--poskoo-ink); font-size: 1.2rem; letter-spacing: -.02em; }
+.sub { margin: 4px 0 0; color: var(--poskoo-muted); font-size: .9rem; }
+.newBtn, .saveBtn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; border: 0; border-radius: 999px;
+  background: var(--fill-strong, var(--poskoo-violet)); padding: 0 1rem; color: #fff;
+  font: 600 .9rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; cursor: pointer;
+}
+.saveBtn { min-height: 34px; padding: 0 .9rem; font-size: .84rem; }
+.saveBtn:disabled { opacity: .55; cursor: default; }
+.failed { margin: 16px 0 0; border: 1px solid var(--poskoo-line); border-radius: 12px; background: var(--poskoo-card); padding: 14px; color: var(--poskoo-muted); font-size: .9rem; }
+
+.columns { display: grid; gap: 12px; margin-top: 16px; }
+@media (min-width: 700px) { .columns { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .columns { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.column {
+  --col: var(--poskoo-muted);
+  display: flex; flex-direction: column; min-width: 0; min-height: 220px;
+  border: 1px solid var(--poskoo-line); border-radius: 14px; background: var(--poskoo-card); padding: 12px;
+}
+.column[data-status="todo"] { --col: var(--poskoo-violet); }
+.column[data-status="in_progress"] { --col: #e08a00; }
+.column[data-status="done"] { --col: var(--poskoo-green); }
+.colHead { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--poskoo-ink); font-size: .9rem; font-weight: 700; }
+.dot { width: 8px; height: 8px; flex: none; border-radius: 999px; background: var(--col); }
+.count { margin-left: auto; border-radius: 999px; background: color-mix(in srgb, var(--col) 12%, var(--poskoo-card)); padding: 1px 8px; color: var(--poskoo-ink); font-size: .75rem; font-weight: 700; }
+.colBody { display: grid; flex: 1; align-content: start; gap: 10px; margin-top: 12px; }
+
+.empty {
+  display: grid; justify-items: center; gap: 6px; border-radius: 12px;
+  background: color-mix(in srgb, var(--col) 6%, var(--poskoo-card)); padding: 18px 12px; text-align: center;
+}
+.empty p { max-width: 22ch; margin: 0; color: var(--poskoo-muted); font-size: .84rem; }
+.emptyIcon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; background: var(--poskoo-card); color: var(--col); box-shadow: 0 1px 2px rgba(20, 18, 26, .08); }
+
+.addBtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; margin-top: 10px;
+  border: 1px dashed var(--poskoo-line); border-radius: 10px; background: transparent; color: var(--poskoo-muted);
+  font: 600 .84rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; cursor: pointer;
+}
+.addBtn:hover { border-color: var(--col); color: var(--poskoo-ink); }
+.addBtn:focus-visible, .newBtn:focus-visible, .saveBtn:focus-visible, .cancelBtn:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+
+.quick { display: grid; gap: 8px; border: 1px solid var(--poskoo-violet); border-radius: 12px; background: var(--poskoo-card); padding: 10px; }
+.input { width: 100%; border: 1px solid var(--poskoo-line); border-radius: 10px; background: var(--poskoo-card); padding: 8px 10px; color: var(--poskoo-ink); font: 400 .9rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; resize: vertical; }
+.input:focus { border-color: var(--poskoo-violet); outline: none; }
+.more summary { color: var(--poskoo-muted); font-size: .8rem; font-weight: 600; cursor: pointer; }
+.more[open] { display: grid; gap: 8px; }
+.label { display: grid; gap: 4px; color: var(--poskoo-muted); font-size: .78rem; font-weight: 600; }
+.error { margin: 0; color: var(--poskoo-red); font-size: .82rem; }
+.quickActions { display: flex; align-items: center; gap: 6px; }
+.cancelBtn { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 999px; background: transparent; color: var(--poskoo-muted); cursor: pointer; }
+.cancelBtn:hover { background: var(--poskoo-band); color: var(--poskoo-ink); }

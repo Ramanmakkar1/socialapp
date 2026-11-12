@@ -130,7 +130,7 @@ function StepCard({
           aria-label={valid ? `Step ${number} complete` : `Step ${number} incomplete`}
           className={`${styles.stepCheck} ${valid ? styles.stepDone : ""}`}
         >
-          <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
+          {valid ? <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" /> : <span className={styles.stepNum} aria-hidden="true">{number}</span>}
         </span>
         <h2 id={titleId} className={styles.stepTitle}>
           {title}
@@ -173,7 +173,11 @@ function PhonePreview({
       }),
     [dmText, trimmedLink, emailGate, followGate, gated],
   );
-  const body = !gated && trimmedLink ? rendered.split(trimmedLink).join("") : rendered;
+  // {{link}} renders as the link button chip: with a URL the URL is lifted out of the text,
+  // without one the raw token is hidden and a placeholder chip shows where the button goes.
+  const hasLinkToken = /\{\{\s*link\s*\}\}/i.test(dmText);
+  const showChip = !gated && (Boolean(trimmedLink) || hasLinkToken);
+  const body = (!gated && trimmedLink ? rendered.split(trimmedLink).join("") : rendered).replace(/\{\{\s*link\s*\}\}/gi, "");
   const firstPublicReply = publicReply.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
 
   return (
@@ -190,7 +194,7 @@ function PhonePreview({
           <div className={styles.thread}>
             <p className={styles.threadNote}>jane_doe commented “{comment}” on your post</p>
             {firstPublicReply && <p className={styles.replyNote}>Public reply: {firstPublicReply}</p>}
-            {trimmedLink && !gated ? (
+            {showChip ? (
               <div className={styles.outCard}>
                 <p aria-live="polite" aria-atomic="true">{body.trim() || "Your opening DM will appear here as you type."}</p>
                 <span className={styles.linkBtn}>
@@ -520,12 +524,12 @@ export default function RuleBuilder({
                               ) : (
                                 <span className="flex h-full items-center justify-center bg-[var(--poskoo-band)] p-3 text-xs text-[var(--poskoo-muted)]">{item.isReel ? "Reel" : "Instagram post"}</span>
                               )}
-                              <span className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/80 to-transparent px-2 pb-1.5 pt-6 text-[10px] font-semibold text-white">
+                              <span className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/80 to-transparent px-2 pb-1.5 pt-6 text-[11px] font-semibold text-white">
                                 <span className="inline-flex items-center gap-0.5"><Heart className="h-3 w-3" aria-hidden="true" />{item.likes ?? "–"}</span>
                                 <span className="inline-flex items-center gap-0.5"><MessageCircle className="h-3 w-3" aria-hidden="true" />{item.comments ?? "–"}</span>
                                 <span className="ml-auto">{item.isReel ? "Reel" : "Post"}</span>
                               </span>
-                              {selected && <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--poskoo-lime)] text-[var(--poskoo-ink)]"><Check className="h-4 w-4" strokeWidth={3} aria-hidden="true" /></span>}
+                              {selected && <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--fill-strong,var(--poskoo-violet))] text-white"><Check className="h-4 w-4" strokeWidth={3} aria-hidden="true" /></span>}
                             </button>
                           </li>
                         );

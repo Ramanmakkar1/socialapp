@@ -1,5 +1,10 @@
 // Shared definitions for public pages - used by sitemap and llms.txt to prevent drift.
 
+import { guideBySlug } from "@/content/guides/registry";
+
+/** Guide articles live in src/content/guides/registry.ts; their copy is read from there. */
+const guideDescription = (slug: string) => guideBySlug(slug)?.description ?? "";
+
 export const PUBLIC_PATHS = [
   "/",
   "/features",
@@ -55,6 +60,8 @@ export const PUBLIC_PATHS = [
   "/tools/threads-post-preview",
   "/tools",
   "/help",
+  "/guides",
+  "/guides/best-instagram-niches-2026",
   "/contact",
   "/help/getting-started",
   "/help/instagram-auto-dm-not-working",
@@ -130,6 +137,8 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
   "/tools/threads-post-preview": { priority: 0.7, changeFrequency: "weekly" },
   "/tools": { priority: 0.6, changeFrequency: "weekly" },
   "/help": { priority: 0.7, changeFrequency: "weekly" },
+  "/guides": { priority: 0.7, changeFrequency: "weekly" },
+  "/guides/best-instagram-niches-2026": { priority: 0.7, changeFrequency: "weekly" },
   "/contact": { priority: 0.4, changeFrequency: "yearly" },
   "/help/getting-started": { priority: 0.7, changeFrequency: "weekly" },
   "/help/instagram-auto-dm-not-working": { priority: 0.6, changeFrequency: "weekly" },
@@ -170,7 +179,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
   "/tools/instagram-carousel-maker": "Carousel Maker", "/tools/instagram-story-size-checker": "Story Size Checker",
   "/tools/instagram-hashtag-strategy": "Hashtag Strategy", "/tools/social-media-content-calendar": "Content Calendar",
   "/tools/social-media-analytics-report": "Analytics Report", "/tools/threads-post-preview": "Threads Post Preview",
-  "/help": "Help Center", "/contact": "Contact", "/help/getting-started": "Getting Started",
+  "/help": "Help Center", "/guides": "Guides", "/guides/best-instagram-niches-2026": "Best Instagram Niches to Start in 2026", "/contact": "Contact", "/help/getting-started": "Getting Started",
   "/help/instagram-auto-dm-not-working": "Auto-DM Troubleshooting", "/help/auto-dm-instagram-comments": "Auto-DM Setup Guide",
   "/help/schedule-instagram-stories": "Schedule Instagram Stories",
   "/help/schedule-instagram-reels": "Schedule Instagram Reels",
@@ -240,6 +249,8 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/social-media-analytics-report": "Build a social media analytics report for two periods: enter followers, reach, impressions, engagement, clicks and leads, then download a CSV.",
   "/tools/threads-post-preview": "Preview your Threads post in a mobile mockup, count characters against the 500-character limit, and copy or reset your text before you publish.",
   "/tools": "Free Instagram tools for captions, hashtags, bios, images and more, all in your browser and ready to use right away with your Poskoo account.",
+  "/guides": "Practical Instagram guides for beginners and small businesses: picking a niche, planning content, scheduling posts and turning comments into leads.",
+  "/guides/best-instagram-niches-2026": guideDescription("best-instagram-niches-2026"),
   "/help": "Help articles and FAQs for Poskoo, covering setup, Instagram connections, scheduling, auto-DMs, billing and common fixes for every feature in the app.",
   "/contact": "Contact Poskoo support or sales for help with your account, plans, billing and data requests, with a reply from our team as soon as we can help.",
   "/help/getting-started": "Start using Poskoo: connect Instagram, schedule your first posts, set up auto-DM rules and learn the main parts of the app with a step-by-step guide.",

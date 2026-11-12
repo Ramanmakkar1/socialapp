@@ -154,7 +154,7 @@ export default function InstagramDmAutomationPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">What it does</p>
-            <h2>What Instagram DM automation <em className="s">handles for you.</em></h2>
+            <h2>What Instagram DM automation <em className="s">handles for you</em></h2>
             <p>
               It does the repetitive replies: matching keywords, sending your link and asking for an
               email. You set the rules once and the DMs keep going
@@ -264,7 +264,7 @@ export default function InstagramDmAutomationPage() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Let your next post <em className="s">answer its own comments.</em></h2>
+              <h2>Let your next post <em className="s">answer its own comments</em></h2>
               <p>Start free, connect Instagram and turn on your first keyword in minutes.</p>
               <Link className="btn" href="/signup">
                 Start free <span aria-hidden="true">→</span>

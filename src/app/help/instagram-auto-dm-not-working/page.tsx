@@ -121,7 +121,7 @@ export default function InstagramAutoDmNotWorkingPage() {
           <div className="band">
             <div className="copy">
               <p className="eyebrow">The checklist</p>
-              <h2>Seven checks, in order.</h2>
+              <h2>Seven checks, in order</h2>
               <div className="pains">
                 {checks.map((c, i) => (
                   <div key={c} className="pain">

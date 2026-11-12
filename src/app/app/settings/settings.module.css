@@ -71,3 +71,188 @@
 @media (prefers-reduced-motion: reduce) {
   .previewBtn { transition: none; }
 }
+
+/* ---------- Section sub-nav (sticky tabs) ---------- */
+.subnav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: -8px 0 0;
+  border-bottom: 1px solid var(--poskoo-line);
+  background: var(--poskoo-paper);
+}
+.subnavList {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+.subnavList::-webkit-scrollbar { display: none; }
+.subnavLink {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  padding: 0 .75rem;
+  color: var(--poskoo-muted);
+  font-size: .88rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.subnavLink:hover { color: var(--poskoo-ink); }
+.subnavLink:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: -2px; border-radius: 6px; }
+.subnavActive { border-bottom-color: var(--poskoo-violet); color: var(--poskoo-ink); }
+/* Below 900px the shell's sticky top bar (about 57px) sits above the page. */
+@media (max-width: 899px) {
+  .subnav { top: 57px; }
+  .group { scroll-margin-top: 120px; }
+}
+@media (max-width: 640px) {
+  .subnav {
+    margin-right: -16px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+  .subnavList { padding-right: 28px; }
+}
+
+/* Each settings group sits below the sticky sub-nav when jumped to. */
+.group { display: flex; flex-direction: column; gap: 28px; scroll-margin-top: 64px; }
+.groupTitle {
+  margin: 0;
+  color: var(--poskoo-muted);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* ---------- Posting schedule: day chips + time chips ---------- */
+.schedList { display: grid; gap: 12px; }
+.schedCard {
+  border: 1px solid var(--poskoo-line);
+  border-radius: 14px;
+  background: var(--poskoo-card);
+  padding: 16px;
+}
+.schedHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.schedName { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; color: var(--poskoo-ink); font-weight: 700; }
+.schedDraft { color: var(--poskoo-muted); font-size: .78rem; font-weight: 500; }
+.schedTz { display: inline-flex; align-items: center; gap: 8px; color: var(--poskoo-muted); font-size: .82rem; font-weight: 600; }
+.select {
+  min-height: 36px;
+  max-width: 220px;
+  border: 1px solid var(--poskoo-line);
+  border-radius: 10px;
+  background: var(--poskoo-card);
+  padding: 0 .6rem;
+  color: var(--poskoo-ink);
+  font: 600 .85rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+}
+.select:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 1px; }
+.schedField { margin: 14px 0 0; border: 0; padding: 0; min-width: 0; }
+.schedLabel { display: block; margin-bottom: 8px; padding: 0; color: var(--poskoo-ink); font-size: .86rem; font-weight: 600; }
+.schedLabelSub { color: var(--poskoo-muted); font-weight: 500; }
+.schedHint { margin: 8px 0 0; color: var(--poskoo-muted); font-size: .8rem; }
+.schedFoot { margin-top: 16px; }
+.dayChips, .timeChips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dayChip { position: relative; cursor: pointer; }
+.dayChip input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
+.dayChip span {
+  display: inline-grid;
+  min-width: 48px;
+  min-height: 36px;
+  place-items: center;
+  border: 1px solid var(--poskoo-line);
+  border-radius: 999px;
+  background: var(--poskoo-card);
+  padding: 0 .8rem;
+  color: var(--poskoo-muted);
+  font-size: .84rem;
+  font-weight: 600;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.dayChip:hover span { border-color: var(--poskoo-violet); color: var(--poskoo-ink); }
+.dayChip input:checked + span { border-color: var(--poskoo-violet); background: var(--poskoo-violet); color: #fff; }
+.dayChip input:focus-visible + span { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+.timeChip {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  border: 1px solid var(--poskoo-pill-border);
+  border-radius: 10px;
+  background: var(--poskoo-band);
+  padding-left: 8px;
+}
+.timeChip:focus-within { border-color: var(--poskoo-violet); }
+.timeChip input {
+  border: 0;
+  background: transparent;
+  color: var(--poskoo-ink);
+  font: 600 .88rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  min-width: 8.2em;
+  padding: 0 2px;
+  outline: none;
+}
+.timeRemove {
+  display: grid;
+  width: 32px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 0 10px 10px 0;
+  background: none;
+  color: var(--poskoo-muted);
+  cursor: pointer;
+}
+.timeRemove:hover { color: var(--poskoo-ink); }
+.timeRemove:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: -2px; }
+.addTime {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 4px;
+  border: 1px dashed var(--poskoo-pill-border);
+  border-radius: 10px;
+  background: none;
+  padding: 0 .8rem;
+  color: var(--poskoo-violet);
+  font: 600 .84rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  cursor: pointer;
+}
+.addTime:hover { background: var(--poskoo-band); }
+.addTime:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+
+/* ---------- Compact connect row (YouTube etc.) ---------- */
+.connectIcon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--poskoo-band);
+  color: var(--poskoo-violet);
+}
+.disabledBtn {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  border: 1px solid var(--poskoo-line);
+  border-radius: 999px;
+  background: var(--poskoo-paper);
+  padding: 0 1rem;
+  color: var(--poskoo-muted);
+  font: 600 .86rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dayChip span { transition: none; }
+}

@@ -3,10 +3,9 @@ import { postThumbUrl } from "@/lib/mediaUpload";
 import { Suspense } from "react";
 import { BarChart3, Download, Info, Instagram, MessageCircle, TrendingUp, Trophy } from "lucide-react";
 import { requireUser } from "@/lib/auth";
-import { hourBars, topHours } from "@/lib/bestTime";
 import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parsePeriod, PERIOD_OPTIONS } from "@/lib/analytics";
 import { isDbConfigured, query } from "@/lib/db";
-import { getCommentActivity, getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
+import { getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
 import { filterComments, loadInbox } from "@/lib/inbox";
 import { DmActivity, DmAudience, DmPerformance } from "./DmAnalytics";
 import { BtnLink } from "@/components/ui/kit";
@@ -16,6 +15,8 @@ import EmptyState from "../EmptyState";
 import AccountInsightsPanel from "../AccountInsights";
 import PostPerformanceTable from "./PostPerformanceTable";
 import styles from "./analytics.module.css";
+import { CommentTimes, DailyBars, GrowthChart } from "./Charts";
+import { getCommentTimeCells } from "./commentTimes";
 
 export const metadata = { title: "Analytics" };
 
@@ -33,8 +34,6 @@ function formatInsightMetric(value: number | null | undefined): string {
 
 const INSIGHTS_SCOPE = "instagram_business_manage_insights";
 
-const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const BLOCK_LABELS = ["12a", "3a", "6a", "9a", "12p", "3p", "6p", "9p"];
 const TABS = [
   { id: "posts", label: "Posts" },
   { id: "dms", label: "DM performance" },
@@ -42,19 +41,11 @@ const TABS = [
   { id: "audience", label: "Audience" },
 ] as const;
 
-function blockRange(block: number): string {
-  return `${BLOCK_LABELS[block]}–${BLOCK_LABELS[(block + 1) % 8]}`;
-}
 
 function formatPlatforms(platforms: string[]): string {
   return platforms.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(", ");
 }
 
-function shortDayUtc(day: string): string {
-  const d = new Date(`${day}T12:00:00Z`);
-  if (Number.isNaN(d.getTime())) return day;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-}
 
 export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ range?: string; tab?: string; sort?: string; account?: string }> }) {
   const user = await requireUser();
@@ -83,11 +74,11 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     for (const [k, v] of Object.entries(merged)) if (v) q.set(k, v);
     return q.toString();
   };
-  const [stats, rules, recentPosts, activity, dailyActivity, postPerformance, growthSnapshots] = await Promise.all([
+  const [stats, rules, recentPosts, commentCells, dailyActivity, postPerformance, growthSnapshots] = await Promise.all([
     getDashboardStats(user.id),
     getRuleStats(user.id),
     getRecentPosts(user.id),
-    getCommentActivity(user.id),
+    getCommentTimeCells(user.id),
     getDailyActivity(user.id),
     getPostPerformance(user.id, period.range, accountId),
     getGrowthSnapshots(user.id, period.range, accountId),
@@ -133,44 +124,6 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const growthStart = growthSeries[0]?.followers ?? 0;
   const growthEnd = growthSeries[growthSeries.length - 1]?.followers ?? 0;
   const hasGrowth = growthMax > 0;
-
-  let commentHourRows: { hour: number; count: number }[] = [];
-  if (isDbConfigured()) {
-    try {
-      commentHourRows = await query<{ hour: number; count: number }>(
-        `select extract(hour from created_at at time zone 'UTC')::int as hour, count(*)::int as count from socialapp.dm_queue where user_id=$1 and created_at > now() - interval '30 days' group by 1`,
-        [user.id]
-      );
-    } catch {
-      commentHourRows = [];
-    }
-  }
-  const bestTimes = topHours(commentHourRows, 3);
-  const hourBarCounts = hourBars(commentHourRows);
-  const maxHourCount = Math.max(...hourBarCounts, 0);
-
-  // 7 rows (Mon..Sun) x 8 columns (3-hour UTC blocks).
-  const activityGrid: number[][] = DAY_LABELS.map(() => BLOCK_LABELS.map(() => 0));
-  for (const cell of activity) {
-    if (cell.dow >= 1 && cell.dow <= 7 && cell.block >= 0 && cell.block <= 7) {
-      activityGrid[cell.dow - 1][cell.block] += cell.count;
-    }
-  }
-  let activityTotal = 0;
-  let activityMax = 0;
-  let activityBest = { day: 0, block: 0 };
-  activityGrid.forEach((row, day) =>
-    row.forEach((count, block) => {
-      activityTotal += count;
-      if (count > activityMax) {
-        activityMax = count;
-        activityBest = { day, block };
-      }
-    })
-  );
-
-  const dailyMax = dailyActivity.reduce((max, row) => Math.max(max, row.dms, row.leads), 0);
-  const hasDailyActivity = dailyMax > 0;
 
   let missingInsightsScope = false;
   if (isDbConfigured()) {
@@ -359,31 +312,14 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             )}
           </section>
 
-      <div className={`${styles.panel} ${styles.mintPanel}`}>
+      <div className={styles.panel}>
         <h2>Account growth</h2>
         <p className={styles.subtle}>
-          Followers {channel ? `on @${channel.username ?? channel.platform}` : "across your connected accounts"}, {period.phrase} (UTC)
+          Followers {channel ? `on @${channel.username ?? channel.platform}` : "across your connected accounts"}, {period.phrase}
           {hasGrowth ? ` · ${growthEnd.toLocaleString("en-US")} now, ${growthEnd - growthStart >= 0 ? "+" : ""}${(growthEnd - growthStart).toLocaleString("en-US")} in period` : ""}
         </p>
         {hasGrowth ? (
-          <ul className={styles.dailyList}>
-            {growthSeries.map((row) => (
-              <li key={row.day} className="flex items-start gap-2 sm:gap-3">
-                <span className={styles.dayLabel}>{shortDayUtc(row.day)}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <div className={styles.track}>
-                      <div
-                        className={`${styles.fill} ${styles.violetFill}`}
-                        style={{ width: growthMax > 0 ? `${(row.followers / growthMax) * 100}%` : "0%" }}
-                      />
-                    </div>
-                    <span className={styles.chartValue}>{row.followers.toLocaleString("en-US")}</span>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <GrowthChart series={growthSeries} />
         ) : (
           <p className={styles.emptyCopy}>
             No follower data yet. Snapshots are recorded each day from your connected Instagram accounts.
@@ -393,145 +329,15 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       <Suspense fallback={<div role="status" className={styles.insightsLoading} aria-label="Loading Instagram insights" />}>
         <AccountInsightsPanel userId={user.id} />
       </Suspense>
-      <div className={`${styles.panel} ${styles.lilacPanel}`}>
+      <div className={styles.panel}>
         <h2>When your audience comments</h2>
-        <p className={styles.subtle}>Last 30 days, times in UTC</p>
-        {activityTotal > 0 ? (
-          <>
-            <div className={styles.heatmapWrap}>
-              <table className="border-separate border-spacing-1 text-xs">
-                <thead>
-                  <tr>
-                    <th scope="col" className="sr-only">
-                      Day
-                    </th>
-                    {BLOCK_LABELS.map((label) => (
-                        <th key={label} scope="col" className={styles.axisLabel}>
-                        {label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {activityGrid.map((row, day) => (
-                    <tr key={DAY_LABELS[day]}>
-                      <th scope="row" className={styles.axisLabel}>
-                        {DAY_LABELS[day]}
-                      </th>
-                      {row.map((count, block) => {
-                        const text = `${DAY_LABELS[day]} ${blockRange(block)}: ${count.toLocaleString("en-US")} comment${count === 1 ? "" : "s"}`;
-                        return (
-                          <td key={block} className="p-0">
-                            <div
-                              title={text}
-                              aria-label={text}
-                              role="img"
-                              className={styles.heatCell}
-                              style={{ opacity: count === 0 ? 0.06 : 0.1 + (0.9 * count) / activityMax }}
-                            />
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className={styles.note}>
-              <strong>Best time to post:</strong> {DAY_LABELS[activityBest.day]}{" "}
-              {blockRange(activityBest.block)} UTC
-            </p>
-          </>
-        ) : (
-          <p className={styles.emptyCopy}>
-            No comments yet. Once your auto-DM rules start getting comments, your best posting times show up here.
-          </p>
-        )}
+        <p className={styles.subtle}>Last 30 days, with the best times to post</p>
+        <CommentTimes cells={commentCells} />
       </div>
-      <div className={`${styles.panel} ${styles.peachPanel}`}>
+      <div className={styles.panel}>
         <h2>Last 14 days</h2>
-        <p className={styles.subtle}>DMs sent and leads captured per day (UTC)</p>
-        {hasDailyActivity ? (
-          <>
-            <div className={styles.legend}>
-              <span className="inline-flex items-center gap-1.5">
-                <span className={`${styles.legendSwatch} ${styles.violetSwatch}`} aria-hidden />
-                DMs sent
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className={`${styles.legendSwatch} ${styles.coralSwatch}`} aria-hidden />
-                Contacts
-              </span>
-            </div>
-            <ul className={styles.dailyList}>
-              {dailyActivity.map((row) => (
-                <li key={row.day} className="flex items-start gap-2 sm:gap-3">
-                  <span className={styles.dayLabel}>{shortDayUtc(row.day)}</span>
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <div className={styles.track}>
-                        <div
-                          className={`${styles.fill} ${styles.violetFill}`}
-                          style={{ width: dailyMax > 0 ? `${(row.dms / dailyMax) * 100}%` : "0%" }}
-                        />
-                      </div>
-                      <span className={styles.chartValue}>{row.dms.toLocaleString("en-US")}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={`${styles.track} ${styles.smallTrack}`}>
-                        <div
-                          className={`${styles.fill} ${styles.coralFill}`}
-                          style={{ width: dailyMax > 0 ? `${(row.leads / dailyMax) * 100}%` : "0%" }}
-                        />
-                      </div>
-                      <span className={styles.chartValue}>{row.leads.toLocaleString("en-US")}</span>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p className={styles.emptyCopy}>No activity in the last 14 days yet.</p>
-        )}
-      </div>
-      <div className={`${styles.panel} ${styles.mintPanel}`}>
-        <h2>Best time to post</h2>
-        <p className={styles.subtle}>
-          Hours (UTC) when people commented on your posts in the last 30 days.
-        </p>
-        {bestTimes.length > 0 ? (
-          <>
-            <div className={styles.pills}>
-              {bestTimes.map((slot) => (
-                <span
-                  key={slot.hour}
-                  className={styles.pill}
-                >
-                  {slot.label}
-                  <span>({slot.count.toLocaleString("en-US")})</span>
-                </span>
-              ))}
-            </div>
-            <div className={styles.hourChart} role="img" aria-label="Comment volume by hour UTC">
-              {hourBarCounts.map((count, hour) => {
-                const heightPct = maxHourCount > 0 ? (count / maxHourCount) * 100 : 0;
-                return (
-                  <div
-                    key={hour}
-                    title={`${String(hour).padStart(2, "0")}:00 – ${count.toLocaleString("en-US")} comment${count === 1 ? "" : "s"}`}
-                    className={styles.hourBar}
-                    style={{ height: `${heightPct}%` }}
-                  />
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <p className={styles.emptyCopy}>
-            Not enough comments yet. This fills in once your auto-DM rules start getting comments.
-          </p>
-        )}
+        <p className={styles.subtle}>DMs sent and new contacts per day</p>
+        <DailyBars rows={dailyActivity} emptyHref="/app/auto-dm" />
       </div>
       {recentPosts.length > 0 ? (
         <div className={styles.section}>

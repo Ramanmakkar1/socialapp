@@ -36,6 +36,9 @@
 .sub { margin: 4px 0 0; color: var(--poskoo-muted); font-size: .9rem; }
 .close { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; color: var(--poskoo-ink); cursor: pointer; }
 .close:hover { background: var(--poskoo-band); }
+.close:focus { outline: none; }
+.close:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+.title:focus { outline: none; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
 .card {
   display: flex;
@@ -60,7 +63,7 @@
 .lime { background: color-mix(in srgb, var(--poskoo-lime) 55%, white); }
 .blue { background: #dbeafe; }
 .pink { background: color-mix(in srgb, var(--poskoo-pink) 60%, white); }
-.label { padding: 0 4px; color: var(--poskoo-muted); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.label { padding: 0 4px; color: var(--poskoo-muted); font-size: .6875rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .cardTitle { padding: 0 4px; font-size: 1.02rem; font-weight: 700; }
 .cardText { padding: 0 4px; color: var(--poskoo-muted); font-size: .84rem; line-height: 1.4; }
 .start { display: inline-flex; align-items: center; gap: 5px; margin-top: auto; padding: 8px 4px 0; color: var(--poskoo-violet); font-size: .86rem; font-weight: 700; transition: gap .15s; }
@@ -70,7 +73,7 @@
 
 /* Mini UI mocks inside the illustration panels (always light: they sit on pastel panels). */
 .mock { display: grid; width: 150px; gap: 6px; }
-.mock > span { display: block; border-radius: 10px; background: #fff; padding: 5px 8px; color: #1e1631; font-size: 10px; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.mock > span { display: block; border-radius: 10px; background: #fff; padding: 5px 8px; color: #1e1631; font-size: 11px; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
 .mockPost { height: 34px; background: linear-gradient(135deg, #fbe7c6, #f6b6da) !important; }
 .mockStory { position: relative; height: 40px; background: linear-gradient(160deg, #9ec5ff, #6b4eff) !important; }
 .mockStory > span { position: absolute; top: 6px; left: 8px; right: 8px; height: 2px; border-radius: 2px; background: rgba(255, 255, 255, .8); }

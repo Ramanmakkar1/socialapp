@@ -238,7 +238,7 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
 export function ToolCta({ cta }: { cta?: ToolPageConfig["cta"] }) {
   const c = cta ?? {
     title: "Post it on time,",
-    mark: "then DM every commenter.",
+    mark: "then DM every commenter",
     text: `Schedule the post with ${BRAND.name}, and send your link to everyone who comments a keyword, on the official Meta API.`,
   };
   return (
@@ -247,7 +247,8 @@ export function ToolCta({ cta }: { cta?: ToolPageConfig["cta"] }) {
         <div className="ctaCopy">
           <p className="ctaEyebrow">Free plan · no credit card</p>
           <h2>
-            {c.title} <em className="s">{c.mark}</em>
+            {/* Site rule: no trailing period on H1/H2. */}
+            {c.title} <em className="s">{c.mark.replace(/\.$/, "")}</em>
           </h2>
           <p>{c.text}</p>
           <form className="glassBar ctaBar" action="/signup" method="get">

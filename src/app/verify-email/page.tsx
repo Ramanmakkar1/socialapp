@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 function Verified() {
   return (
-    <AuthFrame art="signup" title={<>Email <em className="s">verified.</em></>} lede="Thanks! Your email address is confirmed.">
+    <AuthFrame art="signup" title={<>Email <em className="s">verified</em></>} lede="Thanks! Your email address is confirmed.">
       <div className={a.stack}>
         <p role="status" className={ui.notice}>You’re all set. Password resets and alerts will reach you here.</p>
         <Link href="/app" className="btn btn-dark">Open your dashboard</Link>
@@ -34,7 +34,7 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
 
   if (!user) {
     return (
-      <AuthFrame art="signup" title={<>Log in to <em className="s">verify.</em></>} lede="For your safety, verification only works while you’re logged in to the account it was sent for.">
+      <AuthFrame art="signup" title={<>Log in to <em className="s">verify</em></>} lede="For your safety, verification only works while you’re logged in to the account it was sent for.">
         <div className={a.stack}>
           <p role="status" className={ui.notice}>Log in, then open the link in the email again (or type the 6-digit code from the banner in your dashboard).</p>
           <Link href="/login" className="btn btn-dark">Log in</Link>
@@ -66,7 +66,7 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
   return (
     <AuthFrame
       art="signup"
-      title={<>Verify your <em className="s">email.</em></>}
+      title={<>Verify your <em className="s">email</em></>}
       lede={<>Enter the 6-digit code we sent to <strong>{user.email}</strong>.</>}
     >
       <VerifyForm notice={notice} />

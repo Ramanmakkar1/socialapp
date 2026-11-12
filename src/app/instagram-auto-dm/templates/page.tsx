@@ -47,7 +47,7 @@ export default function DmTemplatesPage() {
         <span className="pill">Copy &amp; paste · {DM_TEMPLATES.length} templates</span>
         <p className="eyebrow">Auto-DM templates</p>
         <h1>
-          Instagram comment-to-DM <em className="s mark">templates.</em>
+          Instagram comment-to-DM <em className="s mark">templates</em>
         </h1>
         <p className="lede">
           {DM_TEMPLATES.length} ready-made auto DM messages for the keywords people actually comment. Copy one, add your link and turn it on in {BRAND.name}.
@@ -136,7 +136,7 @@ export default function DmTemplatesPage() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Put a template to work <em className="s">on your next post.</em></h2>
+              <h2>Put a template to work <em className="s">on your next post</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

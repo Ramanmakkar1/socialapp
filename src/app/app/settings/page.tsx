@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Settings } from "lucide-react";
+import { Mail, Plus, Settings, Youtube } from "lucide-react";
 import EmptyState from "../EmptyState";
 import { BtnA, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
@@ -28,6 +28,18 @@ import PaymentsSettings from "./PaymentsSettings";
 import ScheduleSeeder from "./ScheduleSeeder";
 import { SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import styles from "../app-page.module.css";
+import local from "./settings.module.css";
+import SettingsNav from "./SettingsNav";
+
+const SECTIONS = [
+  { id: "account", label: "Account" },
+  { id: "channels", label: "Channels" },
+  { id: "schedule", label: "Posting schedule" },
+  { id: "payments", label: "Payments" },
+  { id: "plan", label: "Plan & billing" },
+  { id: "api-keys", label: "API keys" },
+  { id: "danger", label: "Danger zone" },
+];
 
 export const metadata = { title: "Settings" };
 
@@ -199,20 +211,27 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       )[0] ?? null
     : null;
   const apiKeys = isDbConfigured() ? await listApiKeys(user.id) : [];
+  // Reconnect only works when the server has that network's keys; otherwise show one "not switched on" note instead.
+  const canConnect = (platform: string) =>
+    platform === "instagram" || platform === "facebook" ? connectReady : platform === "threads" ? isThreadsConfigured() : platform === "youtube" ? isYouTubeConfigured() : true;
+  const youtubeReady = isYouTubeConfigured();
+  const code = { fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" } as const;
   return (
     <div className={styles.page}>
       <PageHero
-        eyebrow="Your workspace"
         title="Settings"
-        lede="Manage your connected accounts and brand voice."
-        art="/landing/card-schedule.webp"
-        artAlt=""
+        lede="Your account, connected channels, posting schedule, payments and plan."
+        icon={<Settings width={20} height={20} />}
       />
+      <SettingsNav sections={SECTIONS} />
       {banner && (
         <p role="status" className={`${ui.notice} ${banner.tone === "warn" ? ui.noticeWarn : ""}`}>{banner.text}</p>
       )}
       {threadsBanner && (
         <p role="status" className={`${ui.notice} ${threadsBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{threadsBanner.text}</p>
+      )}
+      {youtubeBanner && (
+        <p role="status" className={`${ui.notice} ${youtubeBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{youtubeBanner.text}</p>
       )}
       {limitBanner && (
         <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>
@@ -220,64 +239,133 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           {plan !== "Agency" ? <>{" "}<Link href="/app/settings/billing" className={ui.link}>See plans</Link></> : null}
         </p>
       )}
-      <section className={styles.section} aria-labelledby="plan-heading">
-        <div className={styles.sectionHeader}>
-          <h2 id="plan-heading" className={styles.sectionTitle}>Plan &amp; billing</h2>
-          <BtnA href="/app/settings/billing" size="sm">{plan === "Free" ? "Upgrade" : "Manage plan"}</BtnA>
-        </div>
-        <p className={ui.hint}>You are on the {plan} plan.</p>
-      </section>
-      {youtubeBanner && (
-        <p role="status" className={`${ui.notice} ${youtubeBanner.tone === "warn" ? ui.noticeWarn : ""}`}>{youtubeBanner.text}</p>
-      )}
-      <section className={styles.section} aria-labelledby="accounts-heading">
-        <div className={styles.sectionHeader}>
-          <h2 id="accounts-heading" className={styles.sectionTitle}>Connected accounts</h2>
-          {accounts.length > 0 && connectReady ? <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA> : null}
-          <BtnA href="#connect" size="sm">Connect a channel</BtnA>
-          {isThreadsConfigured() ? <BtnA href="/api/threads/connect" size="sm">Connect Threads</BtnA> : null}
-          {isYouTubeConfigured() ? <BtnA href="/api/youtube/connect" size="sm">Connect YouTube</BtnA> : null}
-        </div>
-        <p className={ui.hint}>
-          Instagram professional account linked to a Facebook Page required.{" "}
-          <Link href="/help/getting-started" className={ui.link}>See the setup steps</Link>
-        </p>
-        {!connectReady && (
-          <p role="status" className={`${ui.notice} ${ui.noticeWarn}`}>
-            Connecting Instagram is not switched on yet. You can already write posts, save drafts and set up auto-DM rules; they start working once your account is connected.
-          </p>
-        )}
-        {accounts.length === 0 && !connectReady ? null : accounts.length === 0 ? (
-          <EmptyState
-            icon={Settings}
-            title="No connected accounts"
-            text="Connect your Instagram professional account to schedule posts and auto-DM commenters."
-            art="/illustrations/connect-account.webp"
-            artWidth={1536}
-            artHeight={1024}
-          >
-            <BtnA href="/api/instagram/connect">Connect Instagram</BtnA>
-          </EmptyState>
-        ) : (
+
+      <div id="account" className={local.group}>
+        <section className={styles.section} aria-labelledby="signin-heading">
+          <h2 id="signin-heading" className={styles.sectionTitle}>Account</h2>
           <ul className={styles.accountList}>
-            {accounts.map((a, i) => {
-              if (a.platform === "facebook") {
-                const fbOk = a.status !== "disconnected" && facebook.ready;
+            <li className={styles.accountCard}>
+              <div className={styles.accountIdentity}>
+                <span className={local.connectIcon} aria-hidden="true"><Mail width={18} height={18} /></span>
+                <span className={styles.username}>{user.email}</span>
+              </div>
+              <div className={styles.accountActions}>
+                <span className={user.emailVerified ? `${ui.pill} ${ui.pillMint}` : `${ui.pill} ${ui.pillPeach}`}>
+                  {user.emailVerified ? "Email verified" : "Email not verified"}
+                </span>
+              </div>
+              <p className={`${ui.hint} ${styles.accountNote}`}>
+                {user.emailVerified
+                  ? `Verified${emailVerifiedAt ? ` on ${new Date(emailVerifiedAt).toLocaleDateString()}` : ""}. Used for sign-in, password resets and alerts.`
+                  : <>We emailed you a 6-digit code. <Link href="/verify-email" className={ui.link}>Verify your email</Link> to get password resets and alerts.</>}
+              </p>
+            </li>
+          </ul>
+        </section>
+        <section className={styles.section} aria-labelledby="voice-heading">
+          <h2 id="voice-heading" className={styles.sectionTitle}>Brand voice</h2>
+          <p className={ui.hint}>
+            Tell the AI how your posts should sound, e.g. &apos;Friendly and short, a bit funny, no slang, we are a yoga studio in Toronto&apos;. Used by Write with AI.
+          </p>
+          {isDbConfigured() ? (
+            <form action={saveBrandVoice} className={styles.voiceForm}>
+              <label htmlFor="brand-voice" className={ui.label}>Your brand voice</label>
+              <textarea
+                id="brand-voice"
+                name="brand_voice"
+                maxLength={500}
+                rows={4}
+                defaultValue={voice ?? ""}
+                className={`${ui.input} ${styles.textarea}`}
+                placeholder="Friendly, short sentences, 1-2 emojis…"
+              />
+              <div>
+                <SubmitButton label="Save brand voice" size="sm" />
+              </div>
+            </form>
+          ) : (
+            <p className={ui.hint}>Brand voice can be saved once the database is set up on this server.</p>
+          )}
+          {voiceSaved && <p role="status" className={ui.notice}>Brand voice saved.</p>}
+          {voiceFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your brand voice. Please try again.</p>}
+        </section>
+      </div>
+
+      <div id="channels" className={local.group}>
+        <section className={styles.section} aria-labelledby="accounts-heading">
+          <div className={styles.sectionHeader}>
+            <h2 id="accounts-heading" className={styles.sectionTitle}>Channels</h2>
+            <BtnA href="#connect" size="sm"><Plus width={16} height={16} aria-hidden="true" /> Connect a channel</BtnA>
+          </div>
+          <p className={ui.hint}>
+            Instagram needs a professional account linked to a Facebook Page.{" "}
+            <Link href="/help/getting-started" className={ui.link}>See the setup steps</Link>
+          </p>
+          {!connectReady && (
+            <p role="status" className={`${ui.notice} ${ui.noticeWarn}`}>
+              Connecting Instagram and Facebook isn’t switched on for this server yet. You can already write posts, save drafts and set up auto-DM rules; they start working once an account is connected.
+            </p>
+          )}
+          {accounts.length === 0 && !connectReady ? null : accounts.length === 0 ? (
+            <EmptyState
+              icon={Settings}
+              title="No connected accounts"
+              text="Connect your Instagram professional account to schedule posts and auto-DM commenters."
+              art="/illustrations/connect-account.webp"
+              artWidth={1536}
+              artHeight={1024}
+            >
+              <BtnA href="/api/instagram/connect">Connect Instagram</BtnA>
+            </EmptyState>
+          ) : (
+            <ul className={styles.accountList}>
+              {accounts.map((a, i) => {
+                if (a.platform === "facebook") {
+                  const fbOk = a.status !== "disconnected" && facebook.ready;
+                  const fbCan = canConnect("facebook");
+                  return (
+                    <li key={`facebook-${a.id}`} className={styles.accountCard}>
+                      <div className={styles.accountIdentity}>
+                        <span className={styles.username}>{a.page_name ?? facebook.pageName ?? "Facebook Page"}</span>
+                        <span className={`${ui.pill} ${styles.platform}`}>Facebook</span>
+                      </div>
+                      <div className={styles.accountActions}>
+                        <span className={fbOk ? `${ui.pill} ${ui.pillMint}` : `${ui.pill} ${ui.pillPeach}`}>{fbOk ? "Connected" : fbCan ? "Reconnect needed" : "Not posting"}</span>
+                        {!fbOk && fbCan && <BtnA href="/api/instagram/connect" size="sm">Reconnect</BtnA>}
+                        {a.status !== "disconnected" && (
+                          <form action={disconnectAccountAction}>
+                            <input type="hidden" name="account_id" value={a.id} />
+                            <SubmitButton label="Disconnect" pendingLabel="Disconnecting…" variant="ghost" size="sm" />
+                          </form>
+                        )}
+                      </div>
+                      {!fbOk && (
+                        <p className={`${ui.hint} ${styles.accountNote}`}>
+                          Facebook posting uses your Instagram connection through Facebook.{fbCan ? " Reconnect Instagram and allow posting to your Page so Facebook posts publish." : ""}
+                        </p>
+                      )}
+                    </li>
+                  );
+                }
+                const state = tokenState(a);
+                const can = canConnect(a.platform);
+                const pill = state === "expired" && !can ? { label: "Expired", className: `${ui.pill} ${ui.pillPeach}` } : TOKEN_PILL[state];
                 return (
-                  <li key={`facebook-${a.id}`} className={styles.accountCard}>
+                  <li key={`${a.platform}-${a.username ?? i}`} className={styles.accountCard}>
                     <div className={styles.accountIdentity}>
-                      <span className={styles.username}>{a.page_name ?? facebook.pageName ?? "Facebook Page"}</span>
-                      <span className={`${ui.pill} ${styles.platform}`}>Facebook</span>
+                      {a.platform === "instagram" && a.status === "active" && a.access_token_enc ? (
+                        <Suspense fallback={<span className={styles.username}>@{a.username ?? "unknown"}</span>}>
+                          <AccountProfile account={a} fallbackUsername={a.username} />
+                        </Suspense>
+                      ) : (
+                        <span className={styles.username}>{a.username ? `@${a.username}` : (a.page_name ?? `${platformLabel(a.platform)} account`)}</span>
+                      )}
+                      <span className={`${ui.pill} ${styles.platform}`}>{platformLabel(a.platform)}</span>
                     </div>
                     <div className={styles.accountActions}>
-                      <span className={fbOk ? `${ui.pill} ${ui.pillMint}` : `${ui.pill} ${ui.pillPeach}`}>{fbOk ? "Connected" : "Reconnect needed"}</span>
-                      {!fbOk && (
-                        <>
-                          <p className={`${ui.hint} ${styles.accountNote}`}>
-                            Facebook posting uses your Instagram connection through Facebook. Reconnect Instagram and allow posting to your Page so Facebook posts publish.
-                          </p>
-                          <BtnA href="/api/instagram/connect" size="sm">Reconnect</BtnA>
-                        </>
+                      <span className={pill.className}>{pill.label}</span>
+                      {(state === "expiring" || state === "expired") && can && (
+                        <BtnA href={connectHref(a.platform)} size="sm">Reconnect</BtnA>
                       )}
                       {a.status !== "disconnected" && (
                         <form action={disconnectAccountAction}>
@@ -286,302 +374,270 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         </form>
                       )}
                     </div>
-                  </li>
-                );
-              }
-              const state = tokenState(a);
-              const pill = TOKEN_PILL[state];
-              return (
-                <li key={`${a.platform}-${a.username ?? i}`} className={styles.accountCard}>
-                  <div className={styles.accountIdentity}>
-                    {a.platform === "instagram" && a.status === "active" && a.access_token_enc ? (
-                      <Suspense fallback={<span className={styles.username}>@{a.username ?? "unknown"}</span>}>
-                        <AccountProfile account={a} fallbackUsername={a.username} />
-                      </Suspense>
-                    ) : (
-                      <span className={styles.username}>{a.username ? `@${a.username}` : (a.page_name ?? `${platformLabel(a.platform)} account`)}</span>
-                    )}
-                    <span className={`${ui.pill} ${styles.platform}`}>{platformLabel(a.platform)}</span>
-                  </div>
-                  <div className={styles.accountActions}>
-                    <span className={pill.className}>{pill.label}</span>
-                    {state === "ok" && a.page_name && <span className={ui.hint}>Via Facebook Page {a.page_name}</span>}
-                    {state === "ok" && a.token_expires_at && (
-                      <span className={ui.hint}>Token valid until {new Date(a.token_expires_at).toLocaleDateString()}</span>
-                    )}
+                    {state === "ok" && (a.page_name || a.token_expires_at) ? (
+                      <p className={`${ui.hint} ${styles.accountNote}`}>
+                        {[a.page_name ? `Via Facebook Page ${a.page_name}` : null, a.token_expires_at ? `Token valid until ${new Date(a.token_expires_at).toLocaleDateString()}` : null].filter(Boolean).join(" · ")}
+                      </p>
+                    ) : null}
                     {(state === "expiring" || state === "expired") && (
-                      <>
-                        <p className={`${ui.hint} ${styles.accountNote}`}>
-                          {a.status === "disconnected"
-                            ? "Disconnected. Connect again to schedule posts and send auto-DMs."
+                      <p className={`${ui.hint} ${styles.accountNote}`}>
+                        {a.status === "disconnected"
+                          ? "Disconnected. Connect again to schedule posts and send auto-DMs."
+                          : !can
+                            ? `${platformLabel(a.platform)} access expired. It can be reconnected once connecting is switched on.`
                             : a.platform !== "instagram"
                               ? `${platformLabel(a.platform)} access expired or was removed. Reconnect so scheduled posts keep publishing.`
                               : state === "expired"
                                 ? "Instagram access expired or was removed. Reconnect so posts publish and auto-DMs keep sending."
                                 : "Instagram needs you to reconnect so auto-DMs keep sending."}
-                        </p>
-                        <BtnA href={connectHref(a.platform)} size="sm">Reconnect</BtnA>
-                      </>
+                      </p>
                     )}
-                    {a.status !== "disconnected" && (
-                      <form action={disconnectAccountAction}>
-                        <input type="hidden" name="account_id" value={a.id} />
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+        <section className={styles.section} aria-labelledby="youtube-heading">
+          <h2 id="youtube-heading" className={styles.sectionTitle}>YouTube</h2>
+          <ul className={styles.accountList}>
+            {youtubeChannel ? (
+              <li className={styles.accountCard}>
+                <div className={styles.accountIdentity}>
+                  {youtubeChannel.avatar_url ? (
+                    // YouTube CDN URLs expire, so a plain <img> (no Next image cache) is used on purpose.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={youtubeChannel.avatar_url} alt="" width={36} height={36} className="h-9 w-9 shrink-0 rounded-full border border-[var(--poskoo-line)] object-cover" />
+                  ) : (
+                    <span className={local.connectIcon} aria-hidden="true"><Youtube width={18} height={18} /></span>
+                  )}
+                  <span className={styles.username}>{youtubeChannel.title || "YouTube channel"}</span>
+                  <span className={`${ui.pill} ${styles.platform}`}>YouTube</span>
+                </div>
+                <div className={styles.accountActions}>
+                  {youtubeChannel.status === "active" ? (
+                    <>
+                      <span className={`${ui.pill} ${ui.pillMint}`}>Connected</span>
+                      <form action={disconnectYouTubeAction}>
                         <SubmitButton label="Disconnect" pendingLabel="Disconnecting…" variant="ghost" size="sm" />
+                      </form>
+                    </>
+                  ) : youtubeReady ? (
+                    <>
+                      <span className={`${ui.pill} ${ui.pillPeach}`}>Reconnect needed</span>
+                      <BtnA href="/api/youtube/connect" size="sm">Reconnect</BtnA>
+                    </>
+                  ) : (
+                    <span className={`${ui.pill} ${ui.pillPeach}`}>Expired</span>
+                  )}
+                </div>
+                <p className={`${ui.hint} ${styles.accountNote}`}>
+                  {youtubeChannel.status === "active"
+                    ? "Videos you schedule upload to this channel at the set time."
+                    : youtubeReady
+                      ? "This channel stopped working. Connect again so scheduled videos keep uploading."
+                      : "This channel stopped working. It can be reconnected once YouTube connecting is switched on."}
+                </p>
+              </li>
+            ) : (
+              <li className={styles.accountCard}>
+                <div className={styles.accountIdentity}>
+                  <span className={local.connectIcon} aria-hidden="true"><Youtube width={18} height={18} /></span>
+                  <span className={styles.username}>No channel connected</span>
+                </div>
+                <div className={styles.accountActions}>
+                  {youtubeReady ? (
+                    <BtnA href="/api/youtube/connect" size="sm"><Youtube width={16} height={16} aria-hidden="true" /> Connect YouTube</BtnA>
+                  ) : (
+                    <span className={local.disabledBtn} aria-disabled="true">Connect YouTube</span>
+                  )}
+                </div>
+                <p className={`${ui.hint} ${styles.accountNote}`}>
+                  {youtubeReady
+                    ? "Schedule video uploads. Poskoo asks for permission to upload videos and read your channel details; you can revoke access any time in your Google account settings."
+                    : "YouTube connecting isn’t switched on for this server yet."}
+                </p>
+              </li>
+            )}
+          </ul>
+        </section>
+        <section className={styles.section} aria-labelledby="ai-reply-heading">
+          <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies</h2>
+          {aiAccounts.length === 0 ? (
+            <p className={ui.hint}>Connect an Instagram account first, then switch on AI replies.</p>
+          ) : (
+            <ul className={styles.accountList}>
+              {aiAccounts.map((a) => (
+                <li key={a.id} className={styles.accountCard}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%", minWidth: 0 }}>
+                    <span className={styles.username}>@{a.username ?? "unknown"}</span>
+                    <form action={saveAiReplySettings} className={styles.voiceForm}>
+                      <input type="hidden" name="account_id" value={a.id} />
+                      <label htmlFor={`ai-reply-${a.id}`} className={ui.checkRow}>
+                        <input
+                          id={`ai-reply-${a.id}`}
+                          type="checkbox"
+                          name="ai_reply_enabled"
+                          value="on"
+                          defaultChecked={a.ai_reply_enabled}
+                          disabled={!aiConfigured}
+                        />
+                        Reply to new DMs with AI
+                      </label>
+                      <label htmlFor={`ai-instructions-${a.id}`} className={ui.label}>What should the AI know? (services, hours, tone)</label>
+                      <textarea
+                        id={`ai-instructions-${a.id}`}
+                        name="ai_reply_instructions"
+                        maxLength={1500}
+                        rows={4}
+                        defaultValue={a.ai_reply_instructions ?? ""}
+                        className={`${ui.input} ${styles.textarea}`}
+                        placeholder="We are a yoga studio in Toronto, open 9-6, friendly and short…"
+                      />
+                      <label htmlFor={`ai-booking-${a.id}`} className={ui.label}>Booking link (optional)</label>
+                      <input
+                        id={`ai-booking-${a.id}`}
+                        name="ai_booking_link"
+                        type="url"
+                        defaultValue={a.ai_booking_link ?? ""}
+                        className={ui.input}
+                        placeholder="https://cal.com/you"
+                      />
+                      {!aiConfigured && <p className={ui.hint}>AI replies aren’t switched on for this server yet.</p>}
+                      <p className={ui.hint}>AI answers people who message you, asks for their name and email, and shares your booking link. It never replies more than 5 times a day to one person and only within Instagram&apos;s 24-hour window. If you reply to someone yourself from the Inbox, the AI stays quiet with that person for 12 hours.</p>
+                      <div>
+                        <SubmitButton label="Save AI reply settings" size="sm" />
+                      </div>
+                    </form>
+                    <AiReplyPreview instructions={a.ai_reply_instructions} bookingLink={a.ai_booking_link} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+          {aiReplySaved && <p role="status" className={ui.notice}>AI reply settings saved.</p>}
+          {aiReplyFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your AI reply settings. Please try again.</p>}
+        </section>
+      </div>
+
+      <div id="schedule" className={local.group}>
+        <section className={styles.section} aria-labelledby="channels-heading">
+          <h2 id="channels-heading" className={styles.sectionTitle}>Posting schedule</h2>
+          <p className={ui.hint}>
+            Pick the days and times each channel should publish. The composer&apos;s “Add to queue” and “Next available” use these slots.
+          </p>
+          {isDbConfigured() ? (
+            <>
+              <ScheduleSeeder needed={seedSchedule} />
+              <ChannelSchedules channels={channelSchedules} />
+            </>
+          ) : (
+            <p className={ui.hint}>Channel schedules can be saved once the database is set up on this server.</p>
+          )}
+          {scheduleSaved && <p role="status" className={ui.notice}>Posting schedule saved.</p>}
+          {scheduleFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your posting schedule. Please try again.</p>}
+        </section>
+      </div>
+
+      <div id="payments" className={local.group}>
+        <PaymentsSettings userId={user.id} status={typeof paymentsParam === "string" ? paymentsParam : undefined} />
+      </div>
+
+      <div id="plan" className={local.group}>
+        <section className={styles.section} aria-labelledby="plan-heading">
+          <div className={styles.sectionHeader}>
+            <h2 id="plan-heading" className={styles.sectionTitle}>Plan &amp; billing</h2>
+            <BtnA href="/app/settings/billing" size="sm">{plan === "Free" ? "Upgrade" : "Manage plan"}</BtnA>
+          </div>
+          <p className={ui.hint}>You are on the {plan} plan.</p>
+        </section>
+        <section className={styles.section} aria-labelledby="media-heading">
+          <h2 id="media-heading" className={styles.sectionTitle}>Media storage</h2>
+          <p className={ui.hint}>
+            {pendingStorageLabel(mediaPending, plan)} (only files waiting to be posted count).
+          </p>
+          <p className={ui.hint}>
+            Uploads are deleted as soon as every network has published the post; a small preview stays in your calendar.
+            Files not attached to a post are removed after 7 days. Per file: images up to {formatBytes(PLAN_MEDIA_LIMITS[plan].imageBytes)},
+            videos up to {formatBytes(PLAN_MEDIA_LIMITS[plan].videoBytes)} on the {plan} plan (each network may allow less).
+          </p>
+        </section>
+      </div>
+
+      <div id="api-keys" className={local.group}>
+        <section className={styles.section} aria-labelledby="api-keys-heading">
+          <div className={styles.sectionHeader}>
+            <h2 id="api-keys-heading" className={styles.sectionTitle}>API keys</h2>
+            <BtnA href="/developers" size="sm" variant="line">Developer guide</BtnA>
+          </div>
+          <p className={ui.hint}>
+            Connect Claude, ChatGPT or another AI assistant to Poskoo through the MCP server at{" "}
+            <code style={code}>{BRAND.url}/api/mcp</code>.
+            Create a key, copy it once, and share it with your assistant.
+          </p>
+          {apiKey === "created" && newKey && (
+            <p role="status" className={ui.notice}>
+              Your new API key — copy it now, it is shown only once:{" "}
+              <code style={{ ...code, background: "rgba(0,0,0,0.06)", borderRadius: 6, padding: "2px 6px", overflowWrap: "anywhere" }}>{newKey}</code>
+            </p>
+          )}
+          {apiKey === "revoked" && <p role="status" className={ui.notice}>API key revoked. It stops working right away.</p>}
+          {apiKey === "error" && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your API key. Please try again.</p>}
+          {isDbConfigured() ? (
+            <form action={createApiKeyAction} style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <input name="key_name" maxLength={60} defaultValue="" className={ui.input} placeholder="Name this key, e.g. Claude" aria-label="API key name" style={{ maxWidth: 280 }} />
+              <SubmitButton label="Create API key" pendingLabel="Creating…" size="sm" />
+            </form>
+          ) : (
+            <p className={ui.hint}>API keys are available once the database is set up on this server.</p>
+          )}
+          {apiKeys.length > 0 && (
+            <ul className={styles.accountList}>
+              {apiKeys.map((k) => (
+                <li key={k.id} className={styles.accountCard}>
+                  <div className={styles.accountIdentity}>
+                    <span className={styles.username}>{k.name}</span>
+                    <code style={code}>{k.key_prefix}…</code>
+                    <span className={k.revoked_at ? `${ui.pill} ${ui.pillPeach}` : `${ui.pill} ${ui.pillMint}`}>{k.revoked_at ? "Revoked" : "Active"}</span>
+                  </div>
+                  <div className={styles.accountActions}>
+                    <span className={ui.hint}>Created {new Date(k.created_at).toLocaleDateString()}</span>
+                    {k.last_used_at && <span className={ui.hint}>Last used {new Date(k.last_used_at).toLocaleDateString()}</span>}
+                    {!k.revoked_at && (
+                      <form action={revokeApiKeyAction}>
+                        <input type="hidden" name="key_id" value={k.id} />
+                        <SubmitButton label="Revoke" pendingLabel="Revoking…" variant="ghost" size="sm" />
                       </form>
                     )}
                   </div>
                 </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-      <section className={styles.section} aria-labelledby="youtube-heading">
-        <div className={styles.sectionHeader}>
-          <h2 id="youtube-heading" className={styles.sectionTitle}>YouTube</h2>
-          {isYouTubeConfigured() && !youtubeChannel ? <BtnA href="/api/youtube/connect" size="sm">Connect YouTube</BtnA> : null}
-        </div>
-        {youtubeChannel ? (
-          <ul className={styles.accountList}>
-            <li className={styles.accountCard}>
-              <div className={styles.accountIdentity}>
-                {youtubeChannel.avatar_url ? (
-                  // YouTube CDN URLs expire, so a plain <img> (no Next image cache) is used on purpose.
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={youtubeChannel.avatar_url} alt="" width={44} height={44} className="h-11 w-11 shrink-0 rounded-full border border-[var(--poskoo-line)] object-cover" />
-                ) : null}
-                <span className={styles.username}>{youtubeChannel.title || "YouTube channel"}</span>
-                <span className={`${ui.pill} ${styles.platform}`}>YouTube</span>
-              </div>
-              <div className={styles.accountActions}>
-                {youtubeChannel.status === "active" ? (
-                  <>
-                    <span className={`${ui.pill} ${ui.pillMint}`}>Connected</span>
-                    <p className={`${ui.hint} ${styles.accountNote}`}>Videos you schedule upload to this channel at the set time.</p>
-                    <form action={disconnectYouTubeAction}>
-                      <SubmitButton label="Disconnect" pendingLabel="Disconnecting…" variant="ghost" size="sm" />
-                    </form>
-                  </>
-                ) : (
-                  <>
-                    <span className={`${ui.pill} ${ui.pillPeach}`}>Reconnect needed</span>
-                    <p className={`${ui.hint} ${styles.accountNote}`}>This channel stopped working. Connect again so scheduled videos keep uploading.</p>
-                    <BtnA href="/api/youtube/connect" size="sm">Reconnect</BtnA>
-                  </>
-                )}
-              </div>
-            </li>
-          </ul>
-        ) : (
-          <p className={ui.hint}>
-            Connect a YouTube channel to schedule video uploads. Poskoo asks for permission to upload videos and read your channel details; you can revoke access any time in your Google account settings.
-          </p>
-        )}
-      </section>
-      <section className={`${styles.section} ${styles.voice}`} aria-labelledby="voice-heading">
-        <h2 id="voice-heading" className={styles.sectionTitle}>Brand voice</h2>
-        <p className={ui.hint}>
-          Tell the AI how your posts should sound, e.g. &apos;Friendly and short, a bit funny, no slang, we are a yoga studio in Toronto&apos;. Used by Write with AI.
-        </p>
-        {isDbConfigured() ? (
-          <form action={saveBrandVoice} className={styles.voiceForm}>
-            <label htmlFor="brand-voice" className={ui.label}>Your brand voice</label>
-            <textarea
-              id="brand-voice"
-              name="brand_voice"
-              maxLength={500}
-              rows={4}
-              defaultValue={voice ?? ""}
-              className={`${ui.input} ${styles.textarea}`}
-              placeholder="Friendly, short sentences, 1-2 emojis…"
-            />
-            <div>
-              <SubmitButton label="Save brand voice" />
-            </div>
-          </form>
-        ) : (
-          <p className={ui.hint}>Brand voice can be saved once the database is set up on this server.</p>
-        )}
-        {voiceSaved && <p role="status" className={ui.notice}>Brand voice saved.</p>}
-        {voiceFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your brand voice. Please try again.</p>}
-      </section>
-      <section className={styles.section} aria-labelledby="ai-reply-heading">
-        <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies</h2>
-        {aiAccounts.length === 0 ? (
-          <p className={ui.hint}>
-            Connect an Instagram account first, then switch on AI replies.{" "}
-            <BtnA href="/api/instagram/connect" size="sm">Connect Instagram</BtnA>
-          </p>
-        ) : (
-          <ul className={styles.accountList}>
-            {aiAccounts.map((a) => (
-              <li key={a.id} className={styles.accountCard}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%", minWidth: 0 }}>
-                  <span className={styles.username}>@{a.username ?? "unknown"}</span>
-                  <form action={saveAiReplySettings}>
-                    <input type="hidden" name="account_id" value={a.id} />
-                    <label htmlFor={`ai-reply-${a.id}`} className={ui.checkRow}>
-                      <input
-                        id={`ai-reply-${a.id}`}
-                        type="checkbox"
-                        name="ai_reply_enabled"
-                        value="on"
-                        defaultChecked={a.ai_reply_enabled}
-                        disabled={!aiConfigured}
-                      />
-                      Reply to new DMs with AI
-                    </label>
-                    <label htmlFor={`ai-instructions-${a.id}`} className={ui.label}>What should the AI know? (services, hours, tone)</label>
-                    <textarea
-                      id={`ai-instructions-${a.id}`}
-                      name="ai_reply_instructions"
-                      maxLength={1500}
-                      rows={4}
-                      defaultValue={a.ai_reply_instructions ?? ""}
-                      className={`${ui.input} ${styles.textarea}`}
-                      placeholder="We are a yoga studio in Toronto, open 9-6, friendly and short…"
-                    />
-                    <label htmlFor={`ai-booking-${a.id}`} className={ui.label}>Booking link (optional)</label>
-                    <input
-                      id={`ai-booking-${a.id}`}
-                      name="ai_booking_link"
-                      type="url"
-                      defaultValue={a.ai_booking_link ?? ""}
-                      className={ui.input}
-                      placeholder="https://cal.com/you"
-                    />
-                    {!aiConfigured && <p className={ui.hint}>AI is not set up on this server yet.</p>}
-                    <p className={ui.hint}>AI answers people who message you, asks for their name and email, and shares your booking link. It never replies more than 5 times a day to one person and only within Instagram&apos;s 24-hour window. If you reply to someone yourself from the Inbox, the AI stays quiet with that person for 12 hours.</p>
-                    <div>
-                      <SubmitButton label="Save AI reply settings" />
-                    </div>
-                  </form>
-                  <AiReplyPreview instructions={a.ai_reply_instructions} bookingLink={a.ai_booking_link} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-        {aiReplySaved && <p role="status" className={ui.notice}>AI reply settings saved.</p>}
-        {aiReplyFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your AI reply settings. Please try again.</p>}
-      </section>
-      <section className={styles.section} aria-labelledby="channels-heading">
-        <h2 id="channels-heading" className={styles.sectionTitle}>Channels</h2>
-        <p className={ui.hint}>
-          Pick the days and times each channel should publish. The composer&apos;s “Add to queue” and “Next available” use these slots.
-        </p>
-        {isDbConfigured() ? (
-          <>
-            <ScheduleSeeder needed={seedSchedule} />
-            <ChannelSchedules channels={channelSchedules} />
-          </>
-        ) : (
-          <p className={ui.hint}>Channel schedules can be saved once the database is set up on this server.</p>
-        )}
-        {scheduleSaved && <p role="status" className={ui.notice}>Posting schedule saved.</p>}
-        {scheduleFailed && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your posting schedule. Please try again.</p>}
-      </section>
-      <section className={styles.section} aria-labelledby="media-heading">
-        <h2 id="media-heading" className={styles.sectionTitle}>Media</h2>
-        <p className={ui.hint}>
-          {pendingStorageLabel(mediaPending, plan)} (only files waiting to be posted count).
-        </p>
-        <p className={ui.hint}>
-          Uploads are deleted as soon as every network has published the post; a small preview stays in your calendar.
-          Files not attached to a post are removed after 7 days. Per file: images up to {formatBytes(PLAN_MEDIA_LIMITS[plan].imageBytes)},
-          videos up to {formatBytes(PLAN_MEDIA_LIMITS[plan].videoBytes)} on the {plan} plan (each network may allow less).
-        </p>
-      </section>
-      <PaymentsSettings userId={user.id} status={typeof paymentsParam === "string" ? paymentsParam : undefined} />
-      <section className={styles.section} aria-labelledby="api-keys-heading">
-        <div className={styles.sectionHeader}>
-          <h2 id="api-keys-heading" className={styles.sectionTitle}>API keys</h2>
-          <BtnA href="/developers" size="sm">Developer guide</BtnA>
-        </div>
-        <p className={ui.hint}>
-          Connect Claude, ChatGPT or another AI assistant to Poskoo through the MCP server at{" "}
-          <code style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>{BRAND.url}/api/mcp</code>.
-          Create a key, copy it once, and share it with your assistant.
-        </p>
-        {apiKey === "created" && newKey && (
-          <p role="status" className={ui.notice}>
-            Your new API key — copy it now, it is shown only once:{" "}
-            <code style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", background: "rgba(0,0,0,0.06)", borderRadius: 6, padding: "2px 6px" }}>{newKey}</code>
-          </p>
-        )}
-        {apiKey === "revoked" && <p role="status" className={ui.notice}>API key revoked. It stops working right away.</p>}
-        {apiKey === "error" && <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t save your API key. Please try again.</p>}
-        {isDbConfigured() ? (
-          <form action={createApiKeyAction} style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", margin: "12px 0" }}>
-            <input name="key_name" maxLength={60} defaultValue="" className={ui.input} placeholder="Name this key, e.g. Claude" aria-label="API key name" style={{ maxWidth: 280 }} />
-            <SubmitButton label="Create API key" pendingLabel="Creating…" />
-          </form>
-        ) : (
-          <p className={ui.hint}>API keys are available once the database is set up on this server.</p>
-        )}
-        {apiKeys.length > 0 && (
-          <ul className={styles.accountList}>
-            {apiKeys.map((k) => (
-              <li key={k.id} className={styles.accountCard}>
-                <div className={styles.accountIdentity}>
-                  <span className={styles.username}>{k.name}</span>
-                  <code style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }}>{k.key_prefix}…</code>
-                  <span className={k.revoked_at ? `${ui.pill} ${ui.pillPeach}` : `${ui.pill} ${ui.pillMint}`}>{k.revoked_at ? "Revoked" : "Active"}</span>
-                </div>
-                <div className={styles.accountActions}>
-                  <span className={ui.hint}>Created {new Date(k.created_at).toLocaleDateString()}</span>
-                  {k.last_used_at && <span className={ui.hint}>Last used {new Date(k.last_used_at).toLocaleDateString()}</span>}
-                  {!k.revoked_at && (
-                    <form action={revokeApiKeyAction}>
-                      <input type="hidden" name="key_id" value={k.id} />
-                      <SubmitButton label="Revoke" pendingLabel="Revoking…" variant="ghost" size="sm" />
-                    </form>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-      <section className={styles.section} aria-labelledby="signin-heading">
-        <h2 id="signin-heading" className={styles.sectionTitle}>Sign-in and email</h2>
-        <ul className={styles.accountList}>
-          <li className={styles.accountCard}>
-            <div className={styles.accountIdentity}>
-              <span className={styles.username}>{user.email}</span>
-            </div>
-            <div className={styles.accountActions}>
-              <span className={user.emailVerified ? `${ui.pill} ${ui.pillMint}` : `${ui.pill} ${ui.pillPeach}`}>
-                {user.emailVerified ? "Email verified" : "Email not verified"}
-              </span>
-              <p className={`${ui.hint} ${styles.accountNote}`}>
-                {user.emailVerified
-                  ? `Verified${emailVerifiedAt ? ` on ${new Date(emailVerifiedAt).toLocaleDateString()}` : ""}.`
-                  : <>We emailed you a 6-digit code. <Link href="/verify-email" className="underline">Verify your email</Link> to get password resets and alerts.</>}
-              </p>
-            </div>
-          </li>
-        </ul>
-      </section>
-      <section className={styles.section} aria-labelledby="danger-heading">
-        <h2 id="danger-heading" className={styles.sectionTitle}>Delete account</h2>
-        {isDbConfigured() ? (
-          <DeleteAccountForm action={deleteMyAccountAction} />
-        ) : (
-          <p className={ui.hint}>
-            You can delete your account yourself once the database is set up on this server. Until then, email {BRAND.supportEmail} from your account email.
-          </p>
-        )}
-        {account === "confirm_needed" && (
-          <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>Type DELETE in capitals to confirm.</p>
-        )}
-        {account === "delete_error" && (
-          <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t delete your account. Please try again or email support.</p>
-        )}
-        {account === "reviewer_locked" && (
-          <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>The demo review account can&apos;t be deleted.</p>
-        )}
-      </section>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      <div id="danger" className={local.group}>
+        <section className={styles.section} aria-labelledby="danger-heading">
+          <h2 id="danger-heading" className={styles.sectionTitle}>Danger zone</h2>
+          {isDbConfigured() ? (
+            <DeleteAccountForm action={deleteMyAccountAction} />
+          ) : (
+            <p className={ui.hint}>
+              You can delete your account yourself once the database is set up on this server. Until then, email {BRAND.supportEmail} from your account email.
+            </p>
+          )}
+          {account === "confirm_needed" && (
+            <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>Type DELETE in capitals to confirm.</p>
+          )}
+          {account === "delete_error" && (
+            <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>We couldn&apos;t delete your account. Please try again or email support.</p>
+          )}
+          {account === "reviewer_locked" && (
+            <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>The demo review account can&apos;t be deleted.</p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

@@ -18,10 +18,10 @@ type Mark = boolean | string;
 
 // One card per Instagram format: shape preview + what Poskoo can do with it.
 const formats: { name: string; ratio: string; shape: [number, number]; media: string; rows: [string, Mark][]; guide?: string }[] = [
-  { name: "Feed post", ratio: "1:1 · 4:5 · 1.91:1", shape: [4, 5], media: "Image", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]] },
-  { name: "Reel", ratio: "9:16 · 1080×1920", shape: [9, 16], media: "Video (.mp4)", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-reels" },
-  { name: "Carousel", ratio: "Same ratio on all slides", shape: [1, 1], media: "2–10 images", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-carousel" },
-  { name: "Story", ratio: "9:16 · 1080×1920", shape: [9, 16], media: "Image or video", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", "Not on Stories (API limit)"], ["AI captions", "No captions on Stories (API limit)"], ["Comment-to-DM", "Via story replies"]], guide: "/help/schedule-instagram-stories" },
+  { name: "Feed post", ratio: "1:1, 4:5 or 1.91:1", shape: [4, 5], media: "Image", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-carousel" },
+  { name: "Reel", ratio: "9:16 (1080×1920)", shape: [9, 16], media: "Video (.mp4)", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-reels" },
+  { name: "Carousel", ratio: "same ratio on every slide", shape: [1, 1], media: "2–10 images", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-carousel" },
+  { name: "Story", ratio: "9:16 (1080×1920)", shape: [9, 16], media: "Image or video", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", "Not on Stories (API limit)"], ["AI captions", "No captions on Stories (API limit)"], ["Comment-to-DM", "Via story replies"]], guide: "/help/schedule-instagram-stories" },
 ];
 
 const benefits: { title: string; text: string; art: AnimName }[] = [
@@ -102,7 +102,7 @@ export default function InstagramScheduler() {
         <span className="pill"><span>NEW</span>Schedule posts · auto-DM on publish</span>
         <p className="eyebrow">Instagram scheduler</p>
         <h1>
-          Plan your posts. <em className="s mark">Auto‑DM every comment.</em>
+          Plan your posts. <em className="s mark">Auto‑DM every comment</em>
         </h1>
         <p className="lede">
           Plan and auto-publish posts, reels, carousels and stories, see suggested times from your own engagement history,
@@ -128,7 +128,7 @@ export default function InstagramScheduler() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Features</p>
-            <h2>Everything you need to <em className="s">schedule Instagram.</em></h2>
+            <h2>Everything you need to <em className="s">schedule Instagram</em></h2>
           </div>
           <div className="bento">
             {benefits.map((b) => (
@@ -144,7 +144,7 @@ export default function InstagramScheduler() {
 
       <section id="how" className="howSection">
         <div className="wrap">
-          <div className="head"><p className="eyebrow">How it works</p><h2>Three steps to your <em className="s mark">first scheduled post.</em></h2></div>
+          <div className="head"><p className="eyebrow">How it works</p><h2>Three steps to your <em className="s mark">first scheduled post</em></h2></div>
           <div className="howGrid">
             {steps.map((st) => (
               <article key={st.n} className="howStep">
@@ -162,14 +162,14 @@ export default function InstagramScheduler() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Every format</p>
-            <h2>What you can schedule for each <em className="s">Instagram format.</em></h2>
+            <h2>What you can schedule for each <em className="s">Instagram format</em></h2>
           </div>
           <div className="formatGrid">
             {formats.map((f) => (
               <article key={f.name} className="formatCard">
                 <div className="formatTop">
                   <span className="formatShape" style={{ aspectRatio: `${f.shape[0]} / ${f.shape[1]}` }} aria-hidden="true"><i /></span>
-                  <div><h3>{f.name}</h3><p>{f.ratio}</p><p>{f.media}</p></div>
+                  <div><h3>{f.name}</h3><p>{f.media} · {f.ratio}</p></div>
                 </div>
                 <ul>
                   {f.rows.map(([label, v]) => (
@@ -188,7 +188,7 @@ export default function InstagramScheduler() {
 
       <section id="demo">
         <div className="wrap">
-          <LandingDemo />
+          <LandingDemo hideLink="/instagram-scheduler" />
         </div>
       </section>
 
@@ -227,7 +227,7 @@ export default function InstagramScheduler() {
           <div className="cta">
             <div className="ctaCopy">
               <p className="ctaEyebrow">Ready when you are</p>
-              <h2>Schedule your next post <em className="s">in minutes.</em></h2>
+              <h2>Schedule your next post <em className="s">in minutes</em></h2>
               <p>Connect Instagram in one tap, drop your posts on the calendar and let Poskoo publish them, then DM everyone who comments.</p>
               <form className="glassBar ctaBar" action="/signup" method="get">
                 <label className="sr-only" htmlFor="sched-cta-email">Email</label>

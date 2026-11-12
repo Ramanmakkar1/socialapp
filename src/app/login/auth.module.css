@@ -14,8 +14,31 @@
   align-items: center;
   gap: 48px;
 }
+/* Desktop: one balanced split — form half and art half in a single frame,
+   same height, aligned top and bottom. */
 @media (min-width: 860px) {
-  .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .page .grid.grid {
+    margin-inline: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0;
+    max-width: 1040px;
+    border: 1.5px solid var(--poskoo-line);
+    border-radius: var(--poskoo-radius-band);
+    background: var(--poskoo-card);
+    box-shadow: var(--poskoo-shadow-card);
+    padding: 12px;
+  }
+  .grid > .card {
+    max-width: none;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
 
 /* Form card. */
@@ -70,21 +93,21 @@
 @media (min-width: 860px) {
   .side { display: block; }
 }
+.side > .panel { height: 100%; }
 .panel {
-  max-width: 480px;
-  margin-inline: auto;
-  border-radius: var(--poskoo-radius-band);
-  box-shadow: var(--poskoo-shadow-card);
-  padding: 28px 30px 30px;
-  transform: rotate(1.6deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: calc(var(--poskoo-radius-band) - 10px);
+  padding: 32px 36px;
 }
 .panelPeach { background: var(--poskoo-peach); }
-.panelLilac { background: var(--poskoo-lilac); transform: rotate(-1.6deg); }
+.panelLilac { background: var(--poskoo-lilac); }
 .art { display: flex; justify-content: center; }
 .art img {
   display: block;
   width: 100%;
-  max-width: 340px;
+  max-width: 300px;
   height: auto;
 }
 .panel h2.panelTitle {
@@ -121,9 +144,6 @@
   .page { align-items: flex-start; padding-block: 20px; }
   .card { padding: 24px 20px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .panel { transform: none; }
-}
 
 /* "or" divider + Continue with Google (landing line pill, full width like the form button). */
 .divider {
@@ -131,6 +151,7 @@
   align-items: center;
   gap: 12px;
   margin-top: 18px;
+  margin-bottom: -8px;
   color: var(--poskoo-muted);
   font-size: .9rem;
 }
@@ -147,7 +168,7 @@
   align-items: center;
   justify-content: center;
   min-height: 52px;
-  margin-top: 14px;
+  margin-top: 24px;
   color: var(--poskoo-ink);
 }
 .googleNotice { margin-top: 16px; }
@@ -185,3 +206,10 @@
 .linkButton:disabled { opacity: .6; cursor: default; }
 .stack { display: grid; gap: 16px; margin-top: 26px; }
 .stack :global(.btn) { width: 100%; justify-content: center; min-height: 52px; }
+
+/* Status notes in the auth card use the site's lilac band, not the app's mint. */
+.card [role="status"] {
+  background: var(--poskoo-band);
+  border-color: var(--poskoo-pill-border);
+  color: var(--poskoo-ink);
+}

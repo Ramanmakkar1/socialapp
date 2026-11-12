@@ -80,7 +80,7 @@ type Check = { key: string; label: string; hint: string; state: "done" | "todo" 
 function StatusIcon({ state }: { state: Check["state"] }) {
   if (state === "done") {
     return (
-      <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-[var(--poskoo-green)] text-[10px] font-bold text-white" aria-hidden>
+      <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-[var(--poskoo-green)] text-[11px] font-bold leading-none text-white" aria-hidden>
         ✓
       </span>
     );

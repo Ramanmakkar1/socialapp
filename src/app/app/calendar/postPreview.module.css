@@ -83,3 +83,13 @@
 .gbpDates { margin: 0 12px 6px; color: #5f6368; font-size: .8rem; }
 .gbpCoupon { margin: 0 12px 10px; border: 1px dashed #dadce0; border-radius: 8px; padding: 6px 10px; font-size: .85rem; }
 .gbpCta { display: inline-block; margin: 0 12px 12px; color: #1a73e8; font-size: .9rem; font-weight: 600; }
+
+/* Empty media: soft skeleton with a hint, in the network's media shape. */
+.mediaEmpty {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #f3f4f7, #eceef2);
+  color: #9aa0ab;
+}
+.mediaDark.mediaEmpty { background: linear-gradient(135deg, #26262c, #303037); color: #8b8b95; }
+.mediaEmptyInner { display: grid; justify-items: center; gap: 6px; font-size: .75rem; font-weight: 600; }

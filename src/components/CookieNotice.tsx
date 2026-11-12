@@ -1,21 +1,17 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { instrumentSans } from "@/lib/fonts";
+import c from "./cookieNotice.module.css";
 
 const STORAGE_KEY = "cookie-notice-ok";
 
-// Poskoo panel: white card on the poskoo tokens. Rendered at the body level
+// Slim one-line bar (max ~56px tall on phones). Rendered at the body level
 // (outside PublicShell), so the font variable class is applied here directly.
-const panelStyle: CSSProperties = {
-  background: "var(--poskoo-card)",
-  border: "1.5px solid var(--poskoo-line)",
-  borderRadius: "var(--poskoo-radius-card)",
-  boxShadow: "var(--poskoo-shadow-card)",
-  fontFamily: 'var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif',
-};
+// While it is visible the body gets bottom padding so it never sits on top of
+// the last CTA of a page.
+const BODY_PAD = "calc(72px + env(safe-area-inset-bottom, 0px))";
 
 export default function CookieNotice() {
   const [mounted, setMounted] = useState(false);
@@ -34,6 +30,16 @@ export default function CookieNotice() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!visible) return;
+    const body = document.body;
+    const prev = body.style.paddingBottom;
+    body.style.paddingBottom = BODY_PAD;
+    return () => {
+      body.style.paddingBottom = prev;
+    };
+  }, [visible]);
+
   function dismiss() {
     try {
       localStorage.setItem(STORAGE_KEY, "1");
@@ -48,40 +54,14 @@ export default function CookieNotice() {
   }
 
   return (
-    <div
-      role="dialog"
-      aria-label="Cookie notice"
-      className={`${instrumentSans.variable} fixed inset-x-4 bottom-4 z-50 mx-auto max-w-xl p-4 text-sm`}
-      style={panelStyle}
-    >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="min-w-0" style={{ color: "#3d3450" }}>
-          We only use essential cookies to keep you signed in.{" "}
-          <Link
-            href="/privacy#cookies"
-            className="font-medium underline underline-offset-2 hover:no-underline"
-            style={{ color: "var(--poskoo-ink)" }}
-          >
-            Learn more
-          </Link>
-        </p>
-        <button
-          type="button"
-          onClick={dismiss}
-          className="shrink-0"
-          style={{
-            background: "var(--poskoo-ink)",
-            color: "#fff",
-            border: "1.5px solid var(--poskoo-ink)",
-            borderRadius: "var(--poskoo-radius-pill)",
-            padding: "10px 22px",
-            minHeight: "44px",
-            font: '600 0.92rem/1 var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif',
-          }}
-        >
-          OK
-        </button>
-      </div>
+    <div role="region" aria-label="Cookie notice" className={`${instrumentSans.variable} ${c.bar}`}>
+      <p className={c.text}>Essential cookies only.</p>
+      <Link href="/privacy#cookies" className={c.more}>
+        Learn more
+      </Link>
+      <button type="button" onClick={dismiss} className={c.ok}>
+        OK
+      </button>
     </div>
   );
 }

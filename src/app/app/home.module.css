@@ -343,3 +343,21 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
   .fscArt { animation: none; }
 }
 .tableError { color: var(--poskoo-red); text-align: left; }
+
+/* Count badge next to a heading or button label (instead of "(3)"). */
+.countBadge {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--accent-tint, var(--poskoo-band));
+  padding: 0 6px;
+  color: var(--poskoo-violet);
+  font-size: .75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  vertical-align: middle;
+}

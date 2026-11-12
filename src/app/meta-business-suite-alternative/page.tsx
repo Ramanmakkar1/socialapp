@@ -5,6 +5,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
+import { StaySection } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -39,7 +40,7 @@ const compare: [string, string, string][] = [
   ["Comment→DM keyword automation with link delivery", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
   ["Lead / email list export (CSV)", "Yes", "Check their site"],
-  ["AI caption ideas", "Yes", "See their site"],
+  ["AI caption ideas", "Yes", "Check their site"],
   ["Free plan", "Yes", "Yes"],
   ["Made by Meta", "No", "Yes"],
 ];
@@ -89,6 +90,7 @@ export default function MetaBusinessSuiteAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people look for a Meta Business Suite alternative</h2>
           </div>
           <div className="cards">
@@ -118,7 +120,7 @@ export default function MetaBusinessSuiteAlternative() {
             <h2>{BRAND.name} vs Meta Business Suite</h2>
             <p>Meta Business Suite is Meta&apos;s free tool for scheduling Facebook and Instagram posts, with an inbox that has basic automated replies. {BRAND.name} keeps Instagram scheduling and adds keyword comment-to-DM automation and lead capture. Here is an honest side-by-side.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -143,22 +145,15 @@ export default function MetaBusinessSuiteAlternative() {
         </div>
       </section>
 
-      {/* When Meta Business Suite is enough */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>When Meta Business Suite is enough</h2>
-            <p>
-              Stay on Meta Business Suite if your posts publish without problems, you also run Meta ads from the same place, and you do not need comments turned into DMs with a link or an email list. It is free, made by Meta and covers basic Facebook and Instagram scheduling well. Switch when you want keyword comment-to-DM, lead capture and AI caption ideas in one tool.
-            </p>
-          </div>
-        </div>
-      </section>
+      <StaySection name="Meta Business Suite" title="When Meta Business Suite is enough">
+        Stay on Meta Business Suite if your posts publish without problems, you also run Meta ads from the same place, and you do not need comments turned into DMs with a link or an email list. It is free, made by Meta and covers basic Facebook and Instagram scheduling well. Switch when you want keyword comment-to-DM, lead capture and AI caption ideas in one tool.
+      </StaySection>
 
       {/* FAQ */}
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>Meta Business Suite alternative questions</h2>
           </div>
           <div className="faq">
@@ -177,7 +172,7 @@ export default function MetaBusinessSuiteAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule without the stuck posts. <em className="s">Auto-DM every commenter.</em></h2>
+              <h2>Schedule without the stuck posts. <em className="s">Auto-DM every commenter</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

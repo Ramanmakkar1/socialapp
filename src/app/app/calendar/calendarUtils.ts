@@ -60,6 +60,18 @@ export function formatTime(at: Date | string, tz: string): string {
   return new Date(at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: tz || "UTC" });
 }
 
+/** "Sun, Nov 8 · 7:00 PM" in the viewer's time zone. */
+export function formatDayTime(at: Date | string, tz: string): string {
+  const d = new Date(at);
+  const day = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: tz || "UTC" });
+  return `${day} · ${formatTime(d, tz)}`;
+}
+
+/** "Sun, Nov 8" for a "YYYY-MM-DD" day key. */
+export function dayKeyLabel(key: string): string {
+  return new Date(`${key}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+}
+
 export function formatDateTime(at: Date | string, tz: string): string {
   return new Date(at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: tz || "UTC" });
 }

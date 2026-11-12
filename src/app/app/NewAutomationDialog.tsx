@@ -51,18 +51,35 @@ function Mock({ kind }: { kind: Card["mock"] }) {
 }
 
 // "Start a new automation" chooser. Each card opens the builder at /app/auto-dm?trigger=<trigger>.
-export default function NewAutomationDialog({ label = "New Auto-DM", className }: { label?: string; className?: string }) {
+export default function NewAutomationDialog({
+  label = "New Auto-DM",
+  className,
+  onStart,
+}: {
+  label?: string;
+  className?: string;
+  /** Already on the Auto-DM page: open the builder in place instead of navigating. */
+  onStart?: (trigger: Card["trigger"]) => void;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const router = useRouter();
 
   function start(trigger: Card["trigger"]) {
     ref.current?.close();
-    router.push(`/app/auto-dm?trigger=${trigger}`);
+    if (onStart) onStart(trigger);
+    else router.push(`/app/auto-dm?trigger=${trigger}`);
+  }
+
+  function open() {
+    ref.current?.showModal();
+    // Focus the title, not the close button (no focus ring flashes on open).
+    titleRef.current?.focus();
   }
 
   return (
     <>
-      <button type="button" className={className ?? styles.trigger} aria-haspopup="dialog" onClick={() => ref.current?.showModal()}>
+      <button type="button" className={className ?? styles.trigger} aria-haspopup="dialog" onClick={open}>
         <Plus width={16} height={16} aria-hidden="true" /> {label}
       </button>
       <dialog
@@ -77,7 +94,7 @@ export default function NewAutomationDialog({ label = "New Auto-DM", className }
         <div className={styles.inner}>
           <div className={styles.head}>
             <div>
-              <h2 id="new-automation-title" className={styles.title}>Start a new Auto-DM</h2>
+              <h2 id="new-automation-title" ref={titleRef} tabIndex={-1} className={styles.title}>Start a new Auto-DM</h2>
               <p id="new-automation-sub" className={styles.sub}>Choose what triggers it, or pick a ready-made template</p>
             </div>
             <button type="button" className={styles.close} onClick={() => ref.current?.close()} aria-label="Close">

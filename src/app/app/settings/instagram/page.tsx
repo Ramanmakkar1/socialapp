@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Instagram } from "lucide-react";
 import { BtnLink, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
@@ -27,13 +28,9 @@ export default async function ChooseInstagramPage() {
   return (
     <div className={styles.page}>
       <PageHero
-        eyebrow="Connect Instagram"
-        title="Choose an"
-        accent="account"
+        title="Choose an Instagram account"
         lede="Your Facebook login gives access to more than one Instagram professional account. Pick the one Poskoo should post and auto-DM for. You can connect another one later."
-        art="/illustrations/connect-account.webp"
-        artWidth={1536}
-        artHeight={1024}
+        icon={<Instagram width={20} height={20} />}
       />
       <section className={styles.section} aria-labelledby="pick-heading">
         <h2 id="pick-heading" className={styles.sectionTitle}>Instagram accounts</h2>
@@ -49,7 +46,7 @@ export default async function ChooseInstagramPage() {
                   {p.igPicture ? (
                     // Instagram CDN URLs expire, so a plain <img> (no Next image cache) is used on purpose.
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.igPicture} alt="" width={44} height={44} className="h-11 w-11 shrink-0 rounded-full border border-[var(--poskoo-line)] object-cover" />
+                    <img src={p.igPicture} alt="" width={40} height={40} className="h-10 w-10 shrink-0 rounded-full border border-[var(--poskoo-line)] object-cover" />
                   ) : null}
                   <div>
                     <p className={styles.username}>@{p.igUsername || "unknown"}</p>

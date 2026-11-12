@@ -11,10 +11,11 @@ function formatBadge(igFormat: string | null, mediaCount: number): string {
   return "Feed";
 }
 
+// Flat rows inside the parent card: fixed time column, caption, badges (no nested grey boxes).
 const row =
-  "flex min-h-11 flex-col gap-2 rounded-[var(--poskoo-radius-md)] border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-3 transition hover:border-[var(--poskoo-violet)] max-[390px]:flex-col min-[391px]:flex-row min-[391px]:items-center min-[391px]:gap-3";
+  "grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-3 transition hover:bg-[var(--poskoo-paper)] sm:grid-cols-[11rem_minmax(0,1fr)_auto]";
 const timePill =
-  "inline-flex w-fit shrink-0 items-center rounded-[var(--poskoo-radius-pill)] border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-1 text-xs font-semibold tabular-nums text-[var(--poskoo-ink)]";
+  "col-span-2 text-xs font-semibold tabular-nums text-[var(--poskoo-muted)] sm:col-span-1 sm:text-sm sm:text-[var(--poskoo-ink)]";
 const badge =
   "rounded-[var(--poskoo-radius-pill)] border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-2.5 py-0.5 text-xs font-semibold text-[var(--poskoo-ink)]";
 
@@ -28,6 +29,7 @@ export default function UpcomingPosts({ posts }: { posts: UpcomingPost[] }) {
     setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
     const fmt = new Intl.DateTimeFormat(undefined, {
       weekday: "short",
+      month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
@@ -40,13 +42,13 @@ export default function UpcomingPosts({ posts }: { posts: UpcomingPost[] }) {
   }, [posts]);
 
   return (
-    <div className="mt-4">
-      <ul className="space-y-3">
+    <div>
+      <ul className="m-0 list-none divide-y divide-[var(--poskoo-line)] p-0">
         {posts.map((post) => (
           <li key={post.id}>
             <Link href="/app/calendar" className={row}>
               <span className={timePill}>{whenById[post.id] ?? "…"}</span>
-              <p className="min-w-0 flex-1 truncate text-sm text-[var(--poskoo-ink)]">
+              <p className="m-0 min-w-0 truncate text-sm text-[var(--poskoo-ink)]">
                 {post.caption.trim() || "Untitled post"}
               </p>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -65,7 +67,7 @@ export default function UpcomingPosts({ posts }: { posts: UpcomingPost[] }) {
         ))}
       </ul>
       {timeZone ? (
-        <p className="mt-3 text-xs text-[var(--poskoo-muted)]">Times shown in {timeZone}</p>
+        <p className="m-0 border-t border-[var(--poskoo-line)] px-4 py-2 text-xs text-[var(--poskoo-muted)]">Times shown in {timeZone}</p>
       ) : null}
     </div>
   );

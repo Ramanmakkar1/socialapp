@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Inbox } from "lucide-react";
+import { Activity, Inbox } from "lucide-react";
 import LocalTime from "@/components/LocalTime";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
@@ -83,14 +83,11 @@ export default async function AutoDmActivityPage({ searchParams }: { searchParam
       <p className="m-0 mb-4">
         <Link href="/app/auto-dm" className={ui.link}>← Back to Auto-DM</Link>
       </p>
-      <PageHero
+      <PageHero icon={<Activity width={20} height={20} />}
         eyebrow="Delivery log"
         title="Auto-DM"
         accent="activity"
-        accentAfter=""
         lede="The latest DMs your Auto-DMs tried to send. Pending messages wait while their Auto-DM is paused and send after you resume it."
-        art="/landing/card-dm.webp"
-        artAlt=""
       />
 
       {loadError ? (

@@ -95,7 +95,7 @@ export default function FlowDemo() {
         <div className="min-w-0">
           <p className="eyebrow">Try the flow builder</p>
           <h2 id={`${id}-title`} className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Build your first <span className={ui.accent}>comment-to-DM flow.</span>
+            Build your first <span className={ui.accent}>comment-to-DM flow</span>
           </h2>
         </div>
         <span className="rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-1 text-xs font-medium text-[#3d3450]">

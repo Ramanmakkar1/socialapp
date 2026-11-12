@@ -67,7 +67,7 @@ export default function FeaturesPage() {
         <span className="pill"><span>ALL-IN-ONE</span>Schedule · Auto-DM · AI captions · Free tools</span>
         <p className="eyebrow">Features</p>
         <h1>
-          Everything Poskoo does, <em className="s mark">in one place.</em>
+          Everything Poskoo does, <em className="s mark">in one place</em>
         </h1>
         <p className="lede">
           Poskoo is one app for planning posts, publishing on Instagram, Facebook, Threads and YouTube, and
@@ -86,7 +86,7 @@ export default function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Scheduler</p>
-              <h2>Plan once, <em className="s">publish everywhere.</em></h2>
+              <h2>Plan once, <em className="s">publish everywhere</em></h2>
               <p>
                 Build your week on a drag-and-drop calendar, then let Poskoo publish each post at the time you
                 choose.
@@ -116,7 +116,7 @@ export default function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Auto-DM</p>
-              <h2>Every comment can become <em className="s mark">a lead.</em></h2>
+              <h2>Every comment can become <em className="s mark">a lead</em></h2>
               <p>
                 Set a keyword such as GUIDE or LINK. When someone comments it, Poskoo sends them your message in
                 a DM, usually within a minute.
@@ -145,7 +145,7 @@ export default function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">AI captions</p>
-              <h2>Captions in <em className="s">your brand voice.</em></h2>
+              <h2>Captions in <em className="s">your brand voice</em></h2>
               <p>
                 Ask AI for caption ideas and DM message ideas that follow the brand voice you save. You review and
                 edit every idea before anything is scheduled or sent.
@@ -172,7 +172,7 @@ export default function FeaturesPage() {
           <div className="split rev">
             <div className="copy">
               <p className="eyebrow">Sell and grow</p>
-              <h2>Turn DMs into <em className="s mark">sales and sign-ups.</em></h2>
+              <h2>Turn DMs into <em className="s mark">sales and sign-ups</em></h2>
               <p>
                 Attach a lead magnet or a digital product to an auto-DM rule, and share your referral link to earn
                 more DMs. All three are in the app today.
@@ -198,7 +198,7 @@ export default function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Free tools</p>
-              <h2>Useful helpers, <em className="s mark">free forever.</em></h2>
+              <h2>Useful helpers, <em className="s mark">free forever</em></h2>
               <p>
                 Caption and hashtag helpers, a keyword tester and more. They run in your browser with no sign-up,
                 so you can check your post before you schedule it.
@@ -230,7 +230,7 @@ export default function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Compare</p>
-              <h2>One app instead of <em className="s">two or three.</em></h2>
+              <h2>One app instead of <em className="s">two or three</em></h2>
               <p>
                 Poskoo combines scheduling and comment-to-DM automation in one place. See how it compares with the
                 tools you may already know.

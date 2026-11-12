@@ -119,20 +119,20 @@ function ReelInterfaceOverlay() {
     <div className="pointer-events-none absolute inset-0 z-10 text-white" aria-hidden="true">
       <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
       <div className="absolute bottom-[3%] left-[4%] right-[19%] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
-        <div className="flex items-center gap-1.5 text-[10px] font-semibold">
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold">
           <span className="h-5 w-5 shrink-0 rounded-full border border-white/80 bg-[var(--poskoo-lilac)]" />
           <span>yourhandle</span>
-          <span className="rounded border border-white/80 px-1.5 py-0.5 text-[8px] leading-none">Follow</span>
+          <span className="rounded border border-white/80 px-1.5 py-0.5 text-[11px] leading-none">Follow</span>
         </div>
-        <p className="mt-2 text-[10px] leading-snug">Your caption appears here… <span className="text-white/75">more</span></p>
-        <div className="mt-2 flex items-center gap-1.5 text-[9px]">
+        <p className="mt-2 text-[11px] leading-snug">Your caption appears here… <span className="text-white/75">more</span></p>
+        <div className="mt-2 flex items-center gap-1.5 text-[11px]">
           <Music2 className="h-3 w-3 shrink-0" />
           <span className="truncate">Original audio · yourhandle</span>
         </div>
       </div>
       <div className="absolute bottom-[17%] right-[2%] flex w-10 flex-col items-center gap-2.5 [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
         {actions.map(({ label, Icon }) => (
-          <div key={label} className="flex flex-col items-center gap-0.5 text-[8px] font-medium">
+          <div key={label} className="flex flex-col items-center gap-0.5 text-[11px] font-medium">
             <Icon className="h-5 w-5 drop-shadow" strokeWidth={1.8} />
             <span>{label}</span>
           </div>
@@ -247,7 +247,7 @@ export default function SafeZoneChecker() {
                     }}
                   >
                     <span
-                      className="rounded-full bg-[#0d0d14]/80 px-2 py-0.5 text-center text-[10px] font-medium leading-tight text-white"
+                      className="rounded-full bg-[#0d0d14]/80 px-2 py-0.5 text-center text-[11px] font-medium leading-tight text-white"
                       style={vertical ? { writingMode: "vertical-rl" } : undefined}
                     >
                       {z.label}

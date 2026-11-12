@@ -67,7 +67,7 @@ export default function InstagramAutoDm() {
         <span className="pill">Official Meta API · no password needed</span>
         <p className="eyebrow">Instagram auto DM</p>
         <h1>
-          They comment. <em className="s mark">You get the lead.</em>
+          They comment. <em className="s mark">You get the lead</em>
         </h1>
         <p className="lede">
           Someone comments a keyword on your post or reel, and {BRAND.name} sends them your link in a DM, usually within a minute. Capture their email and track every lead.
@@ -94,7 +94,7 @@ export default function InstagramAutoDm() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">How it works</p>
-            <h2>How comment-to-DM <em className="s">works.</em></h2>
+            <h2>How comment-to-DM <em className="s">works</em></h2>
           </div>
           <div className="cards">
             {steps.map((st) => (
@@ -136,7 +136,7 @@ export default function InstagramAutoDm() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Automations</p>
-            <h2>What you can <em className="s mark">automate.</em></h2>
+            <h2>What you can <em className="s mark">automate</em></h2>
           </div>
           <div className="cards">
             {automations.slice(0, 3).map((a) => (
@@ -252,7 +252,7 @@ export default function InstagramAutoDm() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Turn your next comment section <em className="s">into leads.</em></h2>
+              <h2>Turn your next comment section <em className="s">into leads</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

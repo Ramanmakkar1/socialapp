@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { BRAND } from "@/lib/brand";
-import CookieNotice from "@/components/CookieNotice";
+import CookieNoticeGate from "@/components/CookieNoticeGate";
 import Analytics from "@/components/Analytics";
 import "./globals.css";
 
@@ -68,7 +68,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\u003c") }}
         />
         {children}
-        <CookieNotice />
+        <CookieNoticeGate />
         <Analytics />
       </body>
     </html>

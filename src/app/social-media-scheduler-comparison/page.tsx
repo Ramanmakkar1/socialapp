@@ -146,7 +146,7 @@ export default function SocialMediaSchedulerComparisonPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Platform support</p>
-            <h2>What Poskoo supports on <em className="s">each platform.</em></h2>
+            <h2>What Poskoo supports on <em className="s">each platform</em></h2>
           </div>
           <div className={s.tableWrap}>
             <table className={s.table}>
@@ -185,7 +185,7 @@ export default function SocialMediaSchedulerComparisonPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Scheduler comparison</p>
-            <h2>Poskoo vs other <em className="s">social media schedulers.</em></h2>
+            <h2>Poskoo vs other <em className="s">social media schedulers</em></h2>
             <p>
               We only list Poskoo features we can confirm. Where a competitor detail is unavailable or unverified, the
               table says “Check the provider” instead of guessing.
@@ -243,7 +243,7 @@ export default function SocialMediaSchedulerComparisonPage() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule Instagram, Facebook and Threads <em className="s">in one place.</em></h2>
+              <h2>Schedule Instagram, Facebook and Threads <em className="s">in one place</em></h2>
               <p>Start free. No credit card. Connect through Meta&apos;s official login.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { savePostingSchedule } from "./actions";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { ALL_DAYS, DAY_LABELS, DEFAULT_SCHEDULE_DAYS, DEFAULT_SCHEDULE_TIMES, TIMEZONES } from "@/lib/postingSchedule";
+import { Plus, X } from "lucide-react";
 import ui from "@/components/ui/ui.module.css";
+import styles from "./settings.module.css";
 
 export type ChannelScheduleInput = {
   platform: string;
@@ -64,21 +66,21 @@ function ChannelForm({ channel }: { channel: ChannelScheduleInput }) {
   const name = labelFor(channel.platform);
 
   return (
-    <form action={savePostingSchedule} className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
+    <form action={savePostingSchedule} className={styles.schedCard}>
       <input type="hidden" name="platform" value={channel.platform} />
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-[var(--poskoo-ink)]">
+      <div className={styles.schedHead}>
+        <span className={styles.schedName}>
           {name}
-          {unsaved && <span className="ml-2 text-xs font-normal text-[var(--poskoo-muted)]">Not saved yet: suggested times shown</span>}
+          {unsaved && <span className={styles.schedDraft}>Suggested times, not saved yet</span>}
         </span>
-        <label htmlFor={`tz-${channel.platform}`} className={ui.label}>
-          Timezone
+        <label htmlFor={`tz-${channel.platform}`} className={styles.schedTz}>
+          <span>Time zone</span>
           <select
             id={`tz-${channel.platform}`}
             name="timezone"
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            className={`${ui.input} mt-1`}
+            className={styles.select}
           >
             {zoneOptions.map((tz) => (
               <option key={tz} value={tz}>{tz}</option>
@@ -87,64 +89,59 @@ function ChannelForm({ channel }: { channel: ChannelScheduleInput }) {
         </label>
       </div>
 
-      <fieldset className="mt-4">
-        <legend className={ui.label}>Posting days</legend>
-        <div className="mt-2 flex flex-wrap gap-2">
+      <fieldset className={styles.schedField}>
+        <legend className={styles.schedLabel}>Posting days</legend>
+        <div className={styles.dayChips}>
           {ALL_DAYS.map((day) => (
-            <label key={day} className="flex cursor-pointer items-center gap-1.5 text-sm text-[var(--poskoo-ink)]">
+            <label key={day} className={styles.dayChip}>
               <input
                 type="checkbox"
                 name="days"
                 value={day}
                 checked={days.has(day)}
                 onChange={() => toggleDay(day)}
-                className="rounded border-[var(--poskoo-line)] text-[var(--poskoo-violet)] focus:ring-[var(--poskoo-violet)]"
               />
-              {DAY_LABELS[day]}
+              <span>{DAY_LABELS[day]}</span>
             </label>
           ))}
         </div>
       </fieldset>
 
-      <div className="mt-4">
-        <span className={ui.label}>Posting times (in {timezone})</span>
-        <div className="mt-2 flex flex-wrap gap-2">
+      <div className={styles.schedField}>
+        <span className={styles.schedLabel}>Posting times <span className={styles.schedLabelSub}>in {timezone}</span></span>
+        <div className={styles.timeChips}>
           {times.map((t, index) => (
-            <span key={index} className="inline-flex items-center gap-1">
+            <span key={index} className={styles.timeChip}>
               <input
                 type="time"
                 name="times"
                 value={t}
                 onChange={(e) => setTime(index, e.target.value)}
-                className={`${ui.input} w-auto`}
+                aria-label={`Posting time ${index + 1}`}
               />
               <button
                 type="button"
                 onClick={() => removeTime(index)}
                 aria-label={`Remove time ${t}`}
-                className="rounded-lg border border-[var(--poskoo-line)] px-2 py-1 text-xs text-[var(--poskoo-muted)] hover:bg-[var(--poskoo-band)]"
+                className={styles.timeRemove}
               >
-                Remove
+                <X width={14} height={14} aria-hidden="true" />
               </button>
             </span>
           ))}
           {times.length < 12 && (
-            <button
-              type="button"
-              onClick={addTime}
-              className="rounded-lg border border-dashed border-[var(--poskoo-line)] px-2 py-1 text-xs font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)]"
-            >
-              + Add time
+            <button type="button" onClick={addTime} className={styles.addTime}>
+              <Plus width={14} height={14} aria-hidden="true" /> Add time
             </button>
           )}
         </div>
-        {times.length === 0 && <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Add at least one time so “Add to queue” can pick a slot.</p>}
+        {times.length === 0 && <p className={styles.schedHint}>Add at least one time so “Add to queue” can pick a slot.</p>}
       </div>
 
-      {days.size === 0 && <p className="mt-2 text-xs text-[var(--poskoo-muted)]">Pick at least one day so “Add to queue” can pick a slot.</p>}
+      {days.size === 0 && <p className={styles.schedHint}>Pick at least one day so “Add to queue” can pick a slot.</p>}
 
-      <div className="mt-4">
-        <SubmitButton label={`Save ${name} schedule`} />
+      <div className={styles.schedFoot}>
+        <SubmitButton label={`Save ${name} schedule`} size="sm" />
       </div>
     </form>
   );
@@ -154,12 +151,12 @@ export default function ChannelSchedules({ channels }: { channels: ChannelSchedu
   if (channels.length === 0) {
     return (
       <p className={ui.hint}>
-        Connect a channel under “Connected accounts” above, then set its posting schedule here.
+        Connect a channel under “Channels” above, then set its posting schedule here.
       </p>
     );
   }
   return (
-    <div className="space-y-4">
+    <div className={styles.schedList}>
       {channels.map((channel) => (
         <ChannelForm key={`${channel.platform}-${channel.saved === false ? "new" : "saved"}`} channel={channel} />
       ))}

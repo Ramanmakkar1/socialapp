@@ -49,7 +49,7 @@ export default function HomeProductPreview() {
       <div role="tabpanel" id={`${id}-panel-0`} aria-labelledby={`${id}-tab-0`} hidden={active !== 0}
         tabIndex={0} className={`min-w-0 rounded-xl p-2 sm:p-5 ${focus}`}>
         <div className="mb-4 px-1">
-          <h2 className="font-semibold">Your week, ready to go.</h2>
+          <h2 className="font-semibold">Your week, ready to go</h2>
           <p className="mt-1 text-sm text-ink-2">Content calendar · <span className="md:hidden">Mon–Wed</span><span className="hidden md:inline">Mon–Sun</span></p>
         </div>
         <div className="grid min-w-0 grid-cols-3 gap-1.5 md:grid-cols-7 md:gap-2">
@@ -82,7 +82,7 @@ export default function HomeProductPreview() {
       </div>
       <div role="tabpanel" id={`${id}-panel-1`} aria-labelledby={`${id}-tab-1`} hidden={active !== 1}
         tabIndex={0} className={`min-w-0 rounded-xl p-3 sm:p-5 ${focus}`}>
-        <h2 className="font-semibold">A comment starts the conversation.</h2>
+        <h2 className="font-semibold">A comment starts the conversation</h2>
         <p className="mt-1 text-sm text-ink-2">Auto-DM · Reel “5 tips”</p>
         <ol className="mt-4 grid gap-4 text-sm md:grid-cols-3">
           <li className="min-w-0 rounded-xl border border-line p-3">

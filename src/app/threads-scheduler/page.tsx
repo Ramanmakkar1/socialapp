@@ -159,7 +159,7 @@ export default function ThreadsSchedulerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Threads scheduling features</p>
-            <h2>Everything you need to <em className="s">schedule Threads.</em></h2>
+            <h2>Everything you need to <em className="s">schedule Threads</em></h2>
           </div>
           <div className="cards">
             {features.map((feature) => (
@@ -183,7 +183,7 @@ export default function ThreadsSchedulerPage() {
           <div className="band">
             <div className="copy">
               <p className="eyebrow">How Threads scheduling works</p>
-              <h2>Schedule your first <em className="s mark">Threads post.</em></h2>
+              <h2>Schedule your first <em className="s mark">Threads post</em></h2>
               <div className="pains">
                 {steps.map((step) => (
                   <div key={step.n} className="pain">
@@ -257,7 +257,7 @@ export default function ThreadsSchedulerPage() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Put your next Threads post <em className="s">on the calendar.</em></h2>
+              <h2>Put your next Threads post <em className="s">on the calendar</em></h2>
               <p>Start free, connect through Meta, and manage Threads, Instagram and Facebook in one queue.</p>
               <Link className="btn" href="/signup">Start scheduling free <span aria-hidden="true">→</span></Link>
               {" "}

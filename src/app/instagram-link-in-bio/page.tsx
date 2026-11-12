@@ -172,7 +172,7 @@ export default function InstagramLinkInBioPage() {
         <span className="pill">Free plan · {freeLinks} links</span>
         <p className="eyebrow">Instagram link in bio</p>
         <h1>
-          One link in your bio. <em className="s mark">Every link you share.</em>
+          One link in your bio. <em className="s mark">Every link you share</em>
         </h1>
         <p className="lede">
           A link-in-bio page is one public page that holds all the links you want to share from your Instagram bio.
@@ -198,7 +198,7 @@ export default function InstagramLinkInBioPage() {
           <div className="head">
             <p className="eyebrow">How to add links</p>
             <h2>
-              Build your page in <em className="s">three steps.</em>
+              Build your page in <em className="s">three steps</em>
             </h2>
           </div>
           <div className="cards">
@@ -219,7 +219,7 @@ export default function InstagramLinkInBioPage() {
             <div className="copy">
               <p className="eyebrow">Who can view it</p>
               <h2>
-                Public when you publish. <em className="s">Hidden when you don&apos;t.</em>
+                Public when you publish. <em className="s">Hidden when you don&apos;t</em>
               </h2>
               <p>
                 Your page is public at poskoo.com/@yourname while Publish my page is ticked. Anyone with the link can
@@ -243,7 +243,7 @@ export default function InstagramLinkInBioPage() {
           <div className="head">
             <p className="eyebrow">Plan limits</p>
             <h2>
-              How many links <em className="s">you can add.</em>
+              How many links <em className="s">you can add</em>
             </h2>
             <p>
               The Free plan includes {freeLinks} links on your bio page. Pro and Agency include{" "}
@@ -304,7 +304,7 @@ export default function InstagramLinkInBioPage() {
           <div className="cta">
             <div>
               <h2>
-                Put every link <em className="s">in one place.</em>
+                Put every link <em className="s">in one place</em>
               </h2>
               <p>Start free, claim your handle and publish your page in a few minutes.</p>
               <Link className="btn" href="/signup">

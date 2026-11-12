@@ -85,8 +85,8 @@ export default function MonthView({ posts, monthStart, composeBase, accounts = {
             >
               <div className={styles.monthDayHead}>
                 <span className={styles.monthNum} aria-current={isToday ? "date" : undefined}>
-                  <span className={styles.phoneOnly}>{d.toLocaleDateString("en-US", { weekday: "short", month: "short", timeZone: "UTC" })} </span>
-                  {d.getUTCDate()}
+                  <span className={styles.phoneOnly}>{d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" })}</span>
+                  <span className={styles.wideOnly}>{d.getUTCDate()}</span>
                 </span>
                 {composeBase && key >= todayKey && (
                   <Link href={`${composeBase}&day=${key}`} scroll={false} className={styles.dayAdd} aria-label={`New post on ${long}`}>

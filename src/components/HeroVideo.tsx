@@ -43,18 +43,22 @@ export function HeroVideo({ src, poster }: { src: string; poster: string }) {
     };
   }, []);
 
+  // The frame crops the panorama: full-bleed behind the hero on desktop, a
+  // zoomed ~260px vignette (the creator on the phone) under the copy on phones.
   return (
-    <video
-      ref={videoRef}
-      className="heroVideo"
-      src={src}
-      poster={poster}
-      muted
-      loop
-      playsInline
-      preload="auto"
-      aria-hidden="true"
-      tabIndex={-1}
-    />
+    <div className="heroVideoFrame" aria-hidden="true">
+      <video
+        ref={videoRef}
+        className="heroVideo"
+        src={src}
+        poster={poster}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+    </div>
   );
 }

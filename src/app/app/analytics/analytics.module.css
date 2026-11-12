@@ -46,12 +46,12 @@
 .blockSub { color: var(--poskoo-muted); font-size: .8rem; font-weight: 500; letter-spacing: 0; }
 
 /* Weekly takeaways. */
-.takeaways { margin-top: 22px; border-radius: 16px; background: color-mix(in srgb, #3b82f6 8%, var(--poskoo-card)); padding: 18px; }
+.takeaways { margin-top: 22px; border-radius: 16px; background: var(--poskoo-band); padding: 18px; }
 .takeGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
-.takeCard { border: 1px solid color-mix(in srgb, #3b82f6 14%, var(--poskoo-line)); border-radius: 12px; background: var(--poskoo-card); padding: 14px 16px; }
+.takeCard { border: 1px solid var(--poskoo-pill-border); border-radius: 12px; background: var(--poskoo-card); padding: 14px 16px; }
 .takeCard h3 { margin: 8px 0 0; font-size: .95rem; }
 .takeCard p { margin: 4px 0 6px; color: var(--poskoo-muted); font-size: .86rem; line-height: 1.45; }
-.takeIcon { color: #2563eb; }
+.takeIcon { color: var(--poskoo-violet); }
 
 /* KPI tiles. */
 .summaryGrid, .kpiGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
@@ -202,6 +202,17 @@
 }
 @keyframes pulse { 50% { opacity: .55; } }
 
+@media (max-width: 640px) {
+  /* Tabs scroll sideways on phones; fade the right edge so the overflow is visible. */
+  .tabs {
+    margin-right: -16px;
+    padding-right: 28px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+  }
+  .rangePicker { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .rangeOption { flex: none; white-space: nowrap; }
+}
 @media (max-width: 560px) {
   .panel { padding: 16px; }
   .ruleNums { grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: 8px; }

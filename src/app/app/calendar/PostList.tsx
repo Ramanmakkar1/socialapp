@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { deletePost } from "./actions";
+import { useState } from "react";
 import LoadFailed, { type LoadError } from "./LoadFailed";
-import { duplicatePost } from "./duplicateActions";
-import { retryPost } from "./retryActions";
 import EmptyState from "../EmptyState";
-import { Btn, BtnA, BtnLink } from "@/components/ui/kit";
+import { Btn, BtnLink } from "@/components/ui/kit";
 import { allPostTags, postMatchesTag } from "@/lib/tagFilter";
+import PostCard from "./PostCard";
+import PostPopover from "./PostPopover";
+import QueueView from "./QueueView";
+import { dayKeyLabel, zonedParts, type AccountNames, type CalendarPost } from "./calendarUtils";
+import { useCalendar } from "./useCalendar";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
 
@@ -20,6 +22,8 @@ export type Post = {
   platforms: string[];
   tags?: string[];
   error?: string | null;
+  thumb?: string | null;
+  thumbIsVideo?: boolean;
 };
 
 export type PostFilter = "all" | "scheduled" | "draft" | "failed";
@@ -31,21 +35,62 @@ const filters: { value: PostFilter; label: string }[] = [
   { value: "failed", label: "Failed" },
 ];
 
-export default function PostList({ posts, loadError, initialFilter = "all", title = "Publishing queue" }: { posts: Post[]; loadError?: LoadError; initialFilter?: PostFilter; title?: string }) {
-  const [isPending, startTransition] = useTransition();
-  // Which row action is running, so that button says what is happening until the list updates.
-  const [busy, setBusy] = useState<{ id: string; kind: "delete" | "duplicate" | "retry" } | null>(null);
-  const isBusy = (id: string, kind: "delete" | "duplicate" | "retry") => isPending && busy?.id === id && busy.kind === kind;
-  const [error, setError] = useState<string | null>(null);
+type Group = { key: string; label: string; posts: Post[] };
+
+// Posts grouped by the viewer's local day ("Sun, Nov 8"), unscheduled drafts last.
+function groupPosts(posts: Post[], tz: string): Group[] {
+  const byDay = new Map<string, Post[]>();
+  const undated: Post[] = [];
+  const sorted = [...posts].sort((a, b) => (a.scheduled_at ? new Date(a.scheduled_at).getTime() : Infinity) - (b.scheduled_at ? new Date(b.scheduled_at).getTime() : Infinity));
+  for (const post of sorted) {
+    if (!post.scheduled_at) {
+      undated.push(post);
+      continue;
+    }
+    const key = zonedParts(post.scheduled_at, tz).key;
+    byDay.set(key, [...(byDay.get(key) ?? []), post]);
+  }
+  const groups: Group[] = [...byDay].map(([key, list]) => ({ key, label: dayKeyLabel(key), posts: list }));
+  if (undated.length) groups.push({ key: "undated", label: "No date set", posts: undated });
+  return groups;
+}
+
+// List view: the same post cards as the calendar, grouped by day. Open a card for edit / duplicate /
+// reschedule / retry / delete (the calendar popover). "Queue order" is a separate tab for drag-to-reorder.
+export default function PostList({
+  posts,
+  loadError,
+  initialFilter = "all",
+  title = "Posts",
+  published = [],
+  showQueueTab = false,
+  composeHref = "/app/calendar?view=list&compose=1",
+  accounts = {},
+  showStatusFilters = true,
+}: {
+  posts: Post[];
+  loadError?: LoadError;
+  initialFilter?: PostFilter;
+  title?: string;
+  /** Recently published posts, shown as their own group under the list. */
+  published?: CalendarPost[];
+  showQueueTab?: boolean;
+  composeHref?: string;
+  accounts?: AccountNames;
+  showStatusFilters?: boolean;
+}) {
+  const [tab, setTab] = useState<"posts" | "queue">("posts");
   const [filter, setFilter] = useState<PostFilter>(initialFilter);
   const [search, setSearch] = useState("");
   const [tag, setTag] = useState("");
+  const { tz, open, openPost, closePost } = useCalendar([...posts, ...published] as CalendarPost[]);
   const allTags = allPostTags(posts);
   const visiblePosts = posts.filter((post) =>
     (filter === "all" || post.status === filter) &&
     postMatchesTag(post, tag) &&
     post.caption.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
   );
+  const todayKey = tz ? zonedParts(new Date(), tz).key : "";
 
   function selectFilter(value: PostFilter) {
     setFilter(value);
@@ -61,101 +106,74 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
     setTag("");
   }
 
-  function handleDelete(id: string) {
-    if (!window.confirm("Delete this post?")) return;
-    setError(null);
-    setBusy({ id, kind: "delete" });
-    startTransition(async () => {
-      try {
-        const result = await deletePost(id);
-        if (!result.ok) setError(result.error ?? "Could not delete post.");
-      } catch {
-        setError("Could not delete post.");
-      }
-    });
-  }
-
-  function handleDuplicate(id: string) {
-    setError(null);
-    setBusy({ id, kind: "duplicate" });
-    startTransition(async () => {
-      try {
-        const result = await duplicatePost(id);
-        if (!result.ok) setError(result.error ?? "Could not duplicate post.");
-      } catch {
-        setError("Could not duplicate post.");
-      }
-    });
-  }
-
-  function handleRetry(id: string) {
-    setError(null);
-    setBusy({ id, kind: "retry" });
-    startTransition(async () => {
-      try {
-        const result = await retryPost(id);
-        if (!result.ok) setError(result.error ?? "Could not retry post.");
-      } catch {
-        setError("Could not retry post.");
-      }
-    });
-  }
+  const headingId = `${title.toLowerCase().replace(/\W+/g, "-")}-heading`;
 
   return (
-    <section className={styles.queue} aria-labelledby="upcoming-posts-heading">
-      <h2 id="upcoming-posts-heading" className={styles.sectionTitle}>{title}</h2>
-      {error && <p role="alert" className={`${styles.errorText} ${styles.mt}`}>{error}</p>}
-      {loadError ? (
+    <section className={styles.queue} aria-labelledby={headingId}>
+      <h2 id={headingId} className={styles.sectionTitle}>{title}</h2>
+      {showQueueTab && (
+        <div className={styles.listTabs} role="tablist" aria-label="List view">
+          <button type="button" role="tab" aria-selected={tab === "posts"} className={styles.listTab} onClick={() => setTab("posts")}>By day</button>
+          <button type="button" role="tab" aria-selected={tab === "queue"} className={styles.listTab} onClick={() => setTab("queue")}>Queue order</button>
+        </div>
+      )}
+      {tab === "queue" ? (
+        <QueueView posts={posts} tz={tz} composeHref={composeHref} onOpen={openPost} />
+      ) : loadError ? (
         <LoadFailed message={loadError.message} reloadHref={loadError.reloadHref} className={styles.mt} />
       ) : (
         <>
-          <p className={styles.queueHint}>Counts and search apply to the loaded posts (up to 50).</p>
-          <div className={styles.filters} role="group" aria-label="Filter queue by status">
-            {filters.map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                aria-pressed={filter === value}
-                onClick={() => selectFilter(value)}
-                className={`${styles.filterBtn} ${filter === value ? styles.filterBtnActive : ""}`}
-              >
-                {label} <span>{value === "all" ? posts.length : posts.filter((post) => post.status === value).length}</span>
-              </button>
-            ))}
-          </div>
-          <div className={`${ui.field} ${styles.search}`}>
-            <label htmlFor="queue-search" className={ui.label}>Search captions</label>
-            <input
-              id="queue-search"
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search loaded posts"
-              className={ui.input}
-            />
-          </div>
-          {allTags.length > 0 && (
+          <div className={styles.listControls}>
+            {showStatusFilters && <div className={styles.filters} role="group" aria-label="Filter posts by status">
+              {filters.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={filter === value}
+                  onClick={() => selectFilter(value)}
+                  className={`${styles.filterBtn} ${filter === value ? styles.filterBtnActive : ""}`}
+                >
+                  {label} <span>{value === "all" ? posts.length : posts.filter((post) => post.status === value).length}</span>
+                </button>
+              ))}
+            </div>}
             <div className={`${ui.field} ${styles.search}`}>
-              <label htmlFor="queue-tag-filter" className={ui.label}>Filter by tag</label>
-              <select id="queue-tag-filter" value={tag} onChange={(event) => setTag(event.target.value)} className={ui.input}>
-                <option value="">All tags</option>
-                {allTags.map((availableTag) => (
-                  <option key={availableTag} value={availableTag}>{availableTag}</option>
-                ))}
-              </select>
+              <label htmlFor={`${headingId}-search`} className="sr-only">Search captions</label>
+              <input
+                id={`${headingId}-search`}
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search captions"
+                className={ui.input}
+              />
             </div>
-          )}
-          <p className={styles.count} role="status">{visiblePosts.length} {visiblePosts.length === 1 ? "post" : "posts"} shown; scheduled times first, unscheduled posts last</p>
+            {allTags.length > 0 && (
+              <div className={`${ui.field} ${styles.search}`}>
+                <label htmlFor={`${headingId}-tag`} className="sr-only">Filter by tag</label>
+                <select id={`${headingId}-tag`} value={tag} onChange={(event) => setTag(event.target.value)} className={ui.input}>
+                  <option value="">All tags</option>
+                  {allTags.map((availableTag) => (
+                    <option key={availableTag} value={availableTag}>{availableTag}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+          <p className={styles.count} role="status">
+            {visiblePosts.length} {visiblePosts.length === 1 ? "post" : "posts"}
+            {tz ? ` · times in ${tz.replace(/_/g, " ")}` : ""}
+          </p>
           {visiblePosts.length === 0 ? (
             posts.length === 0 ? (
               <EmptyState
-                title="Your queue is empty"
-                text="Write your first post above to get started."
+                title="Nothing planned yet"
+                text="Write a post and it shows up here, grouped by day."
                 art="/illustrations/empty-calendar.webp"
                 artWidth={1536}
                 artHeight={1024}
               >
-                <BtnA href="#new" size="sm">Write a post</BtnA>
+                <BtnLink href={composeHref} scroll={false} size="sm">Write a post</BtnLink>
               </EmptyState>
             ) : (
               <EmptyState
@@ -168,59 +186,35 @@ export default function PostList({ posts, loadError, initialFilter = "all", titl
                 <Btn variant="line" size="sm" onClick={clearFilters}>Clear filters</Btn>
               </EmptyState>
             )
+          ) : !tz ? (
+            <p className={styles.count} role="status" aria-busy="true">Loading posts…</p>
           ) : (
-            <div className={styles.postList}>
-              {visiblePosts.map((post) => (
-                <article key={post.id} className={styles.postCard}>
-                  <div className={styles.postTop}>
-                    <span className={`${ui.pill} ${post.status === "failed" ? styles.statusFailed : ""}`}>
-                      {post.status.replace(/[_-]+/g, " ").replace(/^./, (letter) => letter.toUpperCase())}
-                    </span>
-                    <div className={styles.postActions}>
-                      {(post.status === "draft" || post.status === "scheduled") && (
-                        <BtnLink href={`/app/calendar?draft=${post.id}#new`} variant="ghost" size="sm">
-                          {post.status === "draft" ? "Edit draft" : "Edit"}
-                        </BtnLink>
-                      )}
-                      {post.status === "failed" && (
-                        <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleRetry(post.id)}>
-                          {isBusy(post.id, "retry") ? "Retrying…" : "Retry"}
-                        </Btn>
-                      )}
-                      <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleDuplicate(post.id)}>
-                        {isBusy(post.id, "duplicate") ? "Duplicating…" : "Duplicate"}
-                      </Btn>
-                      {["draft", "scheduled", "failed"].includes(post.status) && (
-                        <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleDelete(post.id)}>
-                          {isBusy(post.id, "delete") ? "Deleting…" : "Delete"}
-                        </Btn>
-                      )}
-                    </div>
+            <ol className={styles.dayGroups}>
+              {groupPosts(visiblePosts, tz).map((group) => (
+                <li key={group.key}>
+                  <h3 className={styles.dayGroupHead}>
+                    {group.label}
+                    {group.key === todayKey && <span className={styles.todayTag}>Today</span>}
+                    <span className={styles.dayGroupCount}>{group.posts.length} {group.posts.length === 1 ? "post" : "posts"}</span>
+                  </h3>
+                  <div className={styles.dayGroupList}>
+                    {group.posts.map((post) => <PostCard key={post.id} post={post} tz={tz} row onOpen={openPost} />)}
                   </div>
-                  <p className={styles.postMeta} suppressHydrationWarning>
-                    {post.scheduled_at ? new Date(post.scheduled_at).toLocaleString() : "No time set"}
-                  </p>
-                  <p className={styles.postPlatforms}>{post.platforms.join(", ")}</p>
-                  {(post.tags ?? []).length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Post tags">
-                      {post.tags?.map((postTag) => <span key={postTag} className={ui.pill}>{postTag}</span>)}
-                    </div>
-                  )}
-                  <p className={styles.postCaption}>{post.caption.slice(0, 140)}</p>
-                  {post.first_comment && (
-                    <span className={`${ui.pill} ${styles.mt}`}>First comment</span>
-                  )}
-                  {post.status === "failed" && (
-                    <p className={styles.postError} role="status">
-                      Couldn’t publish: {(post.error ?? "Unknown error").slice(0, 200)}
-                    </p>
-                  )}
-                </article>
+                </li>
               ))}
-            </div>
+            </ol>
+          )}
+          {published.length > 0 && tz && (
+            <section className={styles.published} aria-labelledby={`${headingId}-published`}>
+              <h3 id={`${headingId}-published`} className={styles.dayGroupHead}>Recently published</h3>
+              <div className={styles.dayGroupList}>
+                {published.map((post) => <PostCard key={post.id} post={post} tz={tz} row onOpen={openPost} />)}
+              </div>
+            </section>
           )}
         </>
       )}
+      {open && <PostPopover key={open.post.id} post={open.post} anchor={open.anchor} tz={tz} accounts={accounts} onClose={closePost} />}
     </section>
   );
 }

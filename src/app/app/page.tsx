@@ -61,6 +61,17 @@ async function unansweredComments(userId: string): Promise<number> {
   }
 }
 
+// Any connected channel on any network (expired ones still count as connected: they need a reconnect, not a connect).
+async function hasAnyChannel(userId: string): Promise<boolean> {
+  if (!isDbConfigured()) return false;
+  try {
+    const rows = await query<{ n: boolean }>("select exists(select 1 from socialapp.social_accounts where user_id=$1 and status <> 'disconnected') as n", [userId]);
+    return rows[0]?.n ?? false;
+  } catch {
+    return false;
+  }
+}
+
 // Any post row for this user (drafts included) — "created a post" signal.
 async function hasAnyPost(userId: string): Promise<boolean> {
   if (!isDbConfigured()) return false;
@@ -129,11 +140,16 @@ async function postThumbs(ids: string[]): Promise<Map<string, string>> {
 
 function Change({ cur, prev }: { cur: number; prev: number | null }) {
   if (prev === null) return null;
-  const p = pctChange(cur, prev);
-  if (p === null) return null;
+  // Tiny bases give absurd swings (+3200%): below 5 in the previous period, show "new" instead.
+  if (prev < 5 && cur > prev) {
+    return <span className={`${home.delta} ${home.deltaUp}`} title={`Up from ${prev}`}>↑ new</span>;
+  }
+  const raw = pctChange(cur, prev);
+  if (raw === null) return null;
+  const p = Math.max(-100, Math.min(999, raw));
   return (
     <span className={`${home.delta} ${p > 0 ? home.deltaUp : p < 0 ? home.deltaDown : ""}`}>
-      {p > 0 ? "+" : ""}{p}%
+      {p > 0 ? "+" : ""}{p}{raw > 999 ? "+" : ""}%
     </span>
   );
 }
@@ -154,7 +170,7 @@ export default async function AppHome() {
   await connection();
   const user = await getCurrentUser();
   // Database only: nothing here calls Instagram, so the page shell renders at once. Graph reads stream in below.
-  const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek] = user
+  const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek, anyChannel] = user
     ? await Promise.all([
         getDashboardStats(user.id),
         getUpcomingPosts(user.id),
@@ -168,8 +184,9 @@ export default async function AppHome() {
         commentRuleScopes(user.id),
         anyHandle(user.id),
         scheduledNextWeek(user.id),
+        hasAnyChannel(user.id),
       ])
-    : [EMPTY_STATS, [], EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null, 0];
+    : [EMPTY_STATS, [], EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null, 0, false];
   const handle = account?.username ?? dbHandle;
   const activeCount = automations.filter((a) => a.status === "active").length;
   const status = homeStatusParts({ scheduledThisWeek: nextWeek, liveAutomations: activeCount, commentsWaiting: unanswered });
@@ -187,7 +204,8 @@ export default async function AppHome() {
     .sort((a, b) => b.engagement - a.engagement)
     .slice(0, 5);
   const thumbs = await postThumbs(top.map((t) => t.post.id));
-  const checklistDone = stats.hasAccount && postCreated && stats.hasPost;
+  const channelConnected = stats.hasAccount || anyChannel;
+  const checklistDone = channelConnected && postCreated && stats.hasPost;
 
   return (
     <div className={`${instrumentSans.variable} ${home.page}`}>
@@ -212,7 +230,10 @@ export default async function AppHome() {
               <Plus width={16} height={16} aria-hidden="true" /> New Auto-DM
             </BtnLink>
             <BtnLink href="/app/inbox" variant="ghost" size="sm">
-              <Inbox width={16} height={16} aria-hidden="true" /> Open inbox{unanswered > 0 ? ` (${unanswered.toLocaleString("en-US")})` : ""}
+              <Inbox width={16} height={16} aria-hidden="true" /> Open inbox
+              {unanswered > 0 && (
+                <span className={home.countBadge} aria-label={`${unanswered} unanswered`}>{unanswered > 99 ? "99+" : unanswered}</span>
+              )}
             </BtnLink>
           </div>
         </div>
@@ -228,7 +249,7 @@ export default async function AppHome() {
       )}
 
       {!checklistDone && (
-        <FirstSessionChecklist connected={stats.hasAccount} postCreated={postCreated} postScheduled={stats.hasPost} />
+        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasPost} />
       )}
 
       <section className={home.section} aria-labelledby="todays-actions">
@@ -289,7 +310,7 @@ export default async function AppHome() {
         <section className={home.section} aria-labelledby="active-automations">
           <div className={home.sectionHead}>
             <div>
-              <h2 id="active-automations" className={home.sectionTitle}>Active Auto-DMs ({activeCount})</h2>
+              <h2 id="active-automations" className={home.sectionTitle}>Active Auto-DMs <span className={home.countBadge} aria-label={`${activeCount} active`}>{activeCount}</span></h2>
               <p className={home.sectionSub}>Running 24/7 to turn comments into DMs and contacts</p>
             </div>
             <Link href="/app/auto-dm" className={home.textLink}>View all <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
@@ -346,7 +367,7 @@ export default async function AppHome() {
           <h2 id="up-next" className={home.sectionTitle}>Up next</h2>
           <Link href="/app/calendar" className={home.textLink}>View calendar <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
         </div>
-        <div className={`${home.card} ${home.cardPad}`}>
+        <div className={upcoming.length === 0 ? undefined : home.card}>
           {upcoming.length === 0 ? (
             <EmptyState
               icon={Plus}

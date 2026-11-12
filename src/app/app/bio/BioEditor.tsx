@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { BIO_MAX_BIO, BIO_MAX_LABEL, BIO_MAX_LINKS, BIO_MAX_NAME, BIO_THEMES, type BioPage } from "@/lib/bioPageShared";
+import { BIO_MAX_BIO, BIO_MAX_LABEL, BIO_MAX_LINKS, BIO_MAX_NAME, BIO_THEMES, themeFor, type BioPage } from "@/lib/bioPageShared";
 import { Btn } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { saveBioPageAction } from "./actions";
@@ -16,6 +16,21 @@ export default function BioEditor({ page }: { page: BioPage | null }) {
       { id: "", label: "", url: "" },
     ],
   );
+
+  // Live preview state for the uncontrolled profile fields (read from the form on every change).
+  const [profile, setProfile] = useState({
+    handle: page?.handle ?? "",
+    name: page?.display_name ?? "",
+    bio: page?.bio ?? "",
+    avatar: page?.avatar_url ?? "",
+    theme: page?.theme ?? "sunrise",
+  });
+
+  function readForm(form: HTMLFormElement) {
+    const data = new FormData(form);
+    const get = (key: string) => String(data.get(key) ?? "");
+    setProfile({ handle: get("handle"), name: get("display_name"), bio: get("bio"), avatar: get("avatar_url"), theme: get("theme") || "sunrise" });
+  }
 
   function update(index: number, field: "label" | "url", value: string) {
     setLinks((prev) => prev.map((link, i) => (i === index ? { ...link, [field]: value } : link)));
@@ -31,7 +46,8 @@ export default function BioEditor({ page }: { page: BioPage | null }) {
   }
 
   return (
-    <form action={saveBioPageAction} className={styles.form}>
+    <div className={styles.editorLayout}>
+    <form action={saveBioPageAction} className={styles.form} onChange={(e) => readForm(e.currentTarget)}>
       <section className={styles.card}>
         <h2 className={styles.cardTitle}>Profile</h2>
         <div className={styles.grid2}>
@@ -118,5 +134,51 @@ export default function BioEditor({ page }: { page: BioPage | null }) {
         <SubmitButton label="Save page" pendingLabel="Saving…" />
       </div>
     </form>
+    <BioPreview profile={profile} links={links} />
+    </div>
+  );
+}
+
+function BioPreview({
+  profile,
+  links,
+}: {
+  profile: { handle: string; name: string; bio: string; avatar: string; theme: string };
+  links: DraftLink[];
+}) {
+  const theme = themeFor(profile.theme);
+  const shown = links.filter((l) => l.label.trim() || l.url.trim());
+  const name = profile.name.trim() || "Your name";
+  const safeAvatar = /^https:\/\//.test(profile.avatar.trim()) ? profile.avatar.trim() : "";
+  return (
+    <aside className={styles.previewCol} aria-label="Live preview of your link-in-bio page">
+      <p className={styles.previewLabel}>Live preview</p>
+      <div className={styles.previewPhone}>
+        <div className={styles.previewScreen} style={{ background: theme.bg, color: theme.ink }}>
+          <p className={styles.previewUrl}>poskoo.com/@{profile.handle.trim() || "yourname"}</p>
+          {safeAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element -- user-provided avatar URL from any host
+            <img src={safeAvatar} alt="" className={styles.previewAvatar} />
+          ) : (
+            <span className={styles.previewAvatar} style={{ background: theme.accent, color: theme.bg }} aria-hidden="true">
+              {name.slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          <p className={styles.previewName}>{name}</p>
+          {profile.bio.trim() ? <p className={styles.previewBio}>{profile.bio}</p> : null}
+          <div className={styles.previewLinks}>
+            {shown.length === 0 ? (
+              <span className={styles.previewLink} style={{ background: theme.card, color: theme.ink, opacity: 0.6 }}>Your first link</span>
+            ) : (
+              shown.map((l, i) => (
+                <span key={l.id || `p-${i}`} className={styles.previewLink} style={{ background: theme.card, color: theme.ink, borderColor: theme.accent }}>
+                  {l.label.trim() || l.url.trim()}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </aside>
   );
 }

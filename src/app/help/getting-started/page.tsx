@@ -68,7 +68,7 @@ export default function GettingStartedHelpPage() {
           <div className="band">
             <div className="copy">
               <p className="eyebrow">The three steps</p>
-              <h2>Connect, automate, schedule.</h2>
+              <h2>Connect, automate, schedule</h2>
               <div className="pains">
                 <div className="pain"><b>Step 1</b><span>Connect Instagram</span></div>
                 <div className="pain"><b>Step 2</b><span>Create your first auto-DM rule from a template</span></div>

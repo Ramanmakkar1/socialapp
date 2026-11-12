@@ -1,8 +1,7 @@
 import { requireUser } from "@/lib/auth";
-import { hourBars, topHours } from "@/lib/bestTime";
 import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parsePeriod, PERIOD_OPTIONS } from "@/lib/analytics";
-import { isDbConfigured, query } from "@/lib/db";
-import { getCommentActivity } from "@/lib/stats";
+import { CommentTimes, GrowthChart } from "../Charts";
+import { getCommentTimeCells } from "../commentTimes";
 import { BRAND } from "@/lib/brand";
 import LocalTime from "@/components/LocalTime";
 import PrintButton from "./PrintButton";
@@ -10,18 +9,8 @@ import styles from "./report.module.css";
 
 export const metadata = { title: "Analytics report" };
 
-const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const BLOCK_LABELS = ["12a", "3a", "6a", "9a", "12p", "3p", "6p", "9p"];
 
-function blockRange(block: number): string {
-  return `${BLOCK_LABELS[block]}–${BLOCK_LABELS[(block + 1) % 8]}`;
-}
 
-function shortDayUtc(day: string): string {
-  const d = new Date(`${day}T12:00:00Z`);
-  if (Number.isNaN(d.getTime())) return day;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-}
 
 function shortCaption(caption: string): string {
   const text = caption.trim();
@@ -42,50 +31,16 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
   const { range: rangeParam } = await searchParams;
   const period = parsePeriod(rangeParam);
 
-  const [postPerformance, growthSnapshots, activity] = await Promise.all([
+  const [postPerformance, growthSnapshots, commentCells] = await Promise.all([
     getPostPerformance(user.id, period.range),
     getGrowthSnapshots(user.id, period.range),
-    getCommentActivity(user.id),
+    getCommentTimeCells(user.id),
   ]);
 
   const growthSeries = buildGrowthSeries(period.lastDay, period.days, growthSnapshots);
   const growthMax = growthSeries.reduce((max, row) => Math.max(max, row.followers), 0);
   const growthStart = growthSeries[0]?.followers ?? 0;
   const growthEnd = growthSeries[growthSeries.length - 1]?.followers ?? 0;
-
-  let commentHourRows: { hour: number; count: number }[] = [];
-  if (isDbConfigured()) {
-    try {
-      commentHourRows = await query<{ hour: number; count: number }>(
-        `select extract(hour from created_at at time zone 'UTC')::int as hour, count(*)::int as count from socialapp.dm_queue where user_id=$1 and created_at > now() - interval '30 days' group by 1`,
-        [user.id]
-      );
-    } catch {
-      commentHourRows = [];
-    }
-  }
-  const bestTimes = topHours(commentHourRows, 3);
-  const hourBarCounts = hourBars(commentHourRows);
-  const maxHourCount = Math.max(...hourBarCounts, 0);
-
-  const activityGrid: number[][] = DAY_LABELS.map(() => BLOCK_LABELS.map(() => 0));
-  for (const cell of activity) {
-    if (cell.dow >= 1 && cell.dow <= 7 && cell.block >= 0 && cell.block <= 7) {
-      activityGrid[cell.dow - 1][cell.block] += cell.count;
-    }
-  }
-  let activityTotal = 0;
-  let activityMax = 0;
-  let activityBest = { day: 0, block: 0 };
-  activityGrid.forEach((row, day) =>
-    row.forEach((count, block) => {
-      activityTotal += count;
-      if (count > activityMax) {
-        activityMax = count;
-        activityBest = { day, block };
-      }
-    })
-  );
 
   const generatedAt = new Date();
 
@@ -109,22 +64,9 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
             <p className={styles.summary}>
               {growthEnd.toLocaleString("en-US")} followers now ·{" "}
               {growthEnd - growthStart >= 0 ? "+" : ""}
-              {(growthEnd - growthStart).toLocaleString("en-US")} over {period.phrase}.
+              {(growthEnd - growthStart).toLocaleString("en-US")} over {period.phrase}
             </p>
-            <ul className={styles.growthList}>
-              {growthSeries.map((row) => (
-                <li key={row.day} className={styles.growthRow}>
-                  <span className={styles.growthDay}>{shortDayUtc(row.day)}</span>
-                  <span className={styles.growthTrack}>
-                    <span
-                      className={styles.growthFill}
-                      style={{ width: growthMax > 0 ? `${(row.followers / growthMax) * 100}%` : "0%" }}
-                    />
-                  </span>
-                  <span className={styles.growthValue}>{row.followers.toLocaleString("en-US")}</span>
-                </li>
-              ))}
-            </ul>
+            <GrowthChart series={growthSeries} />
           </>
         ) : (
           <p className={styles.summary}>No follower snapshots in this period yet.</p>
@@ -175,73 +117,13 @@ export default async function AnalyticsReportPage({ searchParams }: { searchPara
 
       <section className={styles.section}>
         <h2 className={styles.h2}>Best time to post</h2>
-        {bestTimes.length > 0 ? (
-          <p className={styles.summary}>
-            Your audience commented most at:{" "}
-            {bestTimes.map((slot, i) => (
-              <span key={slot.hour}>
-                {i > 0 ? ", " : ""}
-                {slot.label} ({slot.count.toLocaleString("en-US")})
-              </span>
-            ))}
-            .
-          </p>
-        ) : (
-          <p className={styles.summary}>Not enough comments yet to suggest a best time.</p>
-        )}
-        {activityTotal > 0 ? (
-          <>
-            <div className={styles.heatmapWrap}>
-              <table className={styles.heatmap}>
-                <thead>
-                  <tr>
-                    <th scope="col" className={styles.axisLabel}>Day</th>
-                    {BLOCK_LABELS.map((label) => (
-                      <th key={label} scope="col" className={styles.axisLabel}>{label}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {activityGrid.map((row, day) => (
-                    <tr key={DAY_LABELS[day]}>
-                      <th scope="row" className={styles.axisLabel}>{DAY_LABELS[day]}</th>
-                      {row.map((count, block) => (
-                        <td key={block} className="p-0">
-                          <div
-                            role="img"
-                            aria-label={`${DAY_LABELS[day]} ${blockRange(block)}: ${count} comment${count === 1 ? "" : "s"}`}
-                            className={styles.heatCell}
-                            style={{ opacity: count === 0 ? 0.06 : 0.1 + (0.9 * count) / activityMax }}
-                          />
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className={styles.summary}>
-              <strong>Best time to post:</strong> {DAY_LABELS[activityBest.day]} {blockRange(activityBest.block)} UTC
-            </p>
-          </>
-        ) : null}
-        {maxHourCount > 0 ? (
-          <div className={styles.hourChart} role="img" aria-label="Comment volume by hour UTC">
-            {hourBarCounts.map((count, hour) => (
-              <div
-                key={hour}
-                title={`${String(hour).padStart(2, "0")}:00 – ${count} comment${count === 1 ? "" : "s"}`}
-                className={styles.hourBar}
-                style={{ height: `${maxHourCount > 0 ? (count / maxHourCount) * 100 : 0}%` }}
-              />
-            ))}
-          </div>
-        ) : null}
+        <p className={styles.summary}>When your audience commented over the last 30 days.</p>
+        <CommentTimes cells={commentCells} />
       </section>
 
       <footer className={styles.footer}>
         <p>
-          {BRAND.name} · {BRAND.url} · Times in UTC · Ranges: {PERIOD_OPTIONS.map((o) => o.label).join(" / ")}
+          {BRAND.name} · {BRAND.url} · Times in your browser time zone · Ranges: {PERIOD_OPTIONS.map((o) => o.label).join(" / ")}
         </p>
       </footer>
     </div>

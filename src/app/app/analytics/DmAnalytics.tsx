@@ -1,7 +1,9 @@
 // Server component: DM analytics tabs (Performance / Activity log / Audience), built only from
 // rows the app stores (dm_queue, short_links + link_clicks, contacts, comment webhook events).
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, RefreshCw } from "lucide-react";
+import { AlertTriangle, ArrowRight, RefreshCw, Users } from "lucide-react";
+import { BtnLink } from "@/components/ui/kit";
+import EmptyState from "../EmptyState";
 import LocalTime from "@/components/LocalTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { loadInbox } from "@/lib/inbox";
@@ -285,6 +287,21 @@ export async function DmAudience({ userId }: { userId: string }) {
   const total = inbox.comments.length;
   const unique = byUser.size;
   const top = [...byUser.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+  if (total === 0) {
+    return (
+      <EmptyState
+        icon={Users}
+        title="No audience data yet"
+        text="When people comment on your Instagram posts, your most active commenters and comment totals for the last 30 days show up here."
+        art="/illustrations/analytics.webp"
+        artWidth={1536}
+        artHeight={1024}
+      >
+        <BtnLink href="/app/auto-dm" size="sm">Set up an Auto-DM</BtnLink>
+        <BtnLink href="/app/calendar?compose=1" size="sm" variant="line">Schedule a post</BtnLink>
+      </EmptyState>
+    );
+  }
   return (
     <>
       <section aria-labelledby="aud-kpis" className={styles.block}>

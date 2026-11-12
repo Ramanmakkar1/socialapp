@@ -1,3 +1,4 @@
+import { MessageCircleHeart } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { BtnA, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
@@ -61,12 +62,10 @@ export default async function AutoDmPage({
   } catch {
     return (
       <>
-        <PageHero
+        <PageHero icon={<MessageCircleHeart width={20} height={20} />}
           eyebrow="Comment to DM"
           title="Auto-DM"
           lede="Send a DM to everyone who comments a keyword."
-          art="/landing/card-dm.webp"
-          artAlt=""
         />
         <div role="alert" className={`${ui.card} ${ui.peach} mt-6 p-6`}>
           <h2 className="m-0 text-lg font-semibold">We couldn&apos;t load your Auto-DMs</h2>

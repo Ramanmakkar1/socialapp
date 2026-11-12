@@ -27,6 +27,7 @@ export default function ComposerDialog({ title, children }: { title: string; chi
   // Below 1024px the preview is a sheet over the form, opened from the header "Preview" button.
   const [sheet, setSheet] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- open state follows the URL after navigation
@@ -58,7 +59,8 @@ export default function ComposerDialog({ title, children }: { title: string; chi
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    panelRef.current?.focus();
+    // Focus the window title (not the close button) so screen readers announce it and Tab starts in the form.
+    (titleRef.current ?? panelRef.current)?.focus({ preventScroll: true });
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
@@ -72,13 +74,13 @@ export default function ComposerDialog({ title, children }: { title: string; chi
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby="composer-dialog-title"
         className={`${styles.dialogPanel} ${wide ? styles.dialogPanelWide : ""}`}
         data-preview={preview ? "on" : "off"}
         data-sheet={sheet ? "open" : undefined}
       >
         <div className={styles.dialogHead}>
-          <h2 className={styles.dialogTitle}>{title}</h2>
+          <h2 id="composer-dialog-title" ref={titleRef} tabIndex={-1} className={styles.dialogTitle}>{title}</h2>
           <div className={styles.dialogTools}>
             <button type="button" onClick={() => setPreview((v) => !v)} className={`${styles.dialogTool} ${styles.desktopOnly}`} aria-pressed={preview}>
               {preview ? <EyeOff width={16} height={16} aria-hidden="true" /> : <Eye width={16} height={16} aria-hidden="true" />}

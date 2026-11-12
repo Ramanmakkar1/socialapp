@@ -1,10 +1,11 @@
 .report {
   color: var(--poskoo-ink);
-  max-width: 1080px;
+  max-width: 960px;
+  margin-inline: auto;
 }
 
 .eyebrow { margin: 0; font-size: .82rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--poskoo-violet); }
-.title { margin: 6px 0 0; font-size: 2rem; letter-spacing: var(--poskoo-type-heading-ls); }
+.title { margin: 6px 0 0; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: var(--poskoo-type-heading-ls); }
 .meta { margin: 6px 0 0; color: var(--poskoo-muted); font-size: .9rem; }
 
 .header {
@@ -13,7 +14,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 32px;
+  margin-top: 8px;
   padding-bottom: 20px;
   border-bottom: 1.5px solid var(--poskoo-line);
 }
@@ -37,12 +38,6 @@
 .h2 { margin: 0; font-size: 1.3rem; letter-spacing: var(--poskoo-type-heading-ls); }
 .summary { margin: 10px 0 0; color: var(--poskoo-muted); font-size: .94rem; }
 
-.growthList { display: grid; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
-.growthRow { display: flex; align-items: center; gap: 10px; }
-.growthDay { width: 52px; flex: 0 0 52px; color: var(--poskoo-muted); font-size: .8rem; }
-.growthTrack { display: flex; min-width: 0; height: 10px; flex: 1; overflow: hidden; border-radius: 999px; background: var(--poskoo-card); border: 1px solid var(--poskoo-line); }
-.growthFill { min-width: 0; height: 100%; border-radius: inherit; background: var(--poskoo-violet); }
-.growthValue { width: 64px; flex: 0 0 64px; text-align: right; font-size: .8rem; font-variant-numeric: tabular-nums; }
 
 .tableWrap { margin-top: 14px; overflow-x: auto; border: 1.5px solid var(--poskoo-line); border-radius: var(--poskoo-radius-panel); background: var(--poskoo-card); }
 .reportTable { border-collapse: collapse; width: 100%; min-width: 860px; text-align: left; font-size: .85rem; }
@@ -51,13 +46,7 @@
 .reportTable tr:last-child td { border-bottom: 0; }
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-.heatmapWrap { margin-top: 14px; overflow-x: auto; }
-.heatmap { border-collapse: separate; border-spacing: 3px; }
-.axisLabel { padding: 3px 5px; color: var(--poskoo-muted); font-size: .7rem; font-weight: 600; text-align: center; white-space: nowrap; }
-.heatCell { width: 30px; height: 24px; border-radius: 7px; background: var(--poskoo-violet); }
 
-.hourChart { display: flex; height: 84px; align-items: flex-end; gap: 3px; margin-top: 14px; padding: 10px; border-radius: var(--poskoo-radius-md); background: var(--poskoo-card); border: 1px solid var(--poskoo-line); }
-.hourBar { min-height: 0; flex: 1; border-radius: 6px 6px 3px 3px; background: var(--poskoo-coral); }
 
 .footer { margin-top: 36px; padding-top: 16px; border-top: 1.5px solid var(--poskoo-line); }
 .footer p { margin: 0; color: var(--poskoo-muted); font-size: .8rem; }

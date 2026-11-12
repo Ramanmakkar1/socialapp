@@ -19,9 +19,10 @@ import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { connectHref, networkAvailability } from "@/lib/networks/registry";
 import { logoutAction } from "../login/actions";
 import PoskooMark from "@/components/PoskooMark";
-import VerifyEmailBanner from "@/components/VerifyEmailBanner";
+import { VERIFY_DISMISS_COOKIE } from "@/lib/emailCodes";
+import AlertBar, { VerifyEmailActions, type ShellAlert } from "./AlertBar";
 import { BtnA } from "@/components/ui/kit";
-import { AtSign, Check, ChevronsUpDown, Facebook, Instagram, LogOut, Plus, Settings, Youtube } from "lucide-react";
+import { AtSign, Check, ChevronDown, ChevronsUpDown, Gauge, Facebook, Instagram, LogOut, Plus, Settings, Youtube } from "lucide-react";
 import { getSidebarChannels, type SidebarChannel } from "@/lib/sidebarChannels";
 import ConnectChannelDialog, { type ConnectAvailability } from "./ConnectChannelDialog";
 import SidebarNav from "./SidebarNav";
@@ -66,10 +67,10 @@ function AccountMenu({ name, email, plan }: { name: string; email: string; plan:
         <ChevronsUpDown width={16} height={16} aria-hidden="true" className={styles.acctChevron} />
       </summary>
       <div className={styles.acctPop}>
-        <p className={styles.acctLabel}>Workspaces</p>
+        <p className={styles.acctLabel}>Workspace</p>
         <p className={styles.acctWorkspace}>
           <span className={styles.acctAvatarSm} aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>
-          <span className={styles.acctWsName}>{name}’s workspace</span>
+          <span className={styles.acctWsName}>{name}</span>
           <Check width={16} height={16} aria-label="Current workspace" />
         </p>
         <p className={styles.acctEmail} title={email}>{email}</p>
@@ -234,6 +235,47 @@ async function AppShell({ children }: { children: ReactNode }) {
   const mediaPending = await mediaPendingPromise;
   // Same rule as the connect callbacks (planLimits.accountLimitError): anything not disconnected holds a slot.
   const connectedAccounts = channels.filter((c) => c.status !== "disconnected").length;
+  const showVerify = user.emailVerified !== true && (await cookies()).get(VERIFY_DISMISS_COOKIE)?.value !== "1";
+
+  // One compact alert bar, most important first (the rest sit behind "+N more").
+  const alerts: ShellAlert[] = [];
+  // Only offer Reconnect when Instagram connecting is switched on (otherwise Settings says it isn't).
+  if (needsReconnect && availability.instagram) {
+    alerts.push({
+      id: "reconnect",
+      tone: "danger",
+      text: "Instagram access expired. Posts and auto-DMs are paused until you reconnect.",
+      action: <BtnA href="/api/instagram/connect" size="sm">Reconnect Instagram</BtnA>,
+    });
+  }
+  if (paymentFailed) {
+    alerts.push({
+      id: "payment",
+      tone: "danger",
+      text: `Your last Poskoo payment failed. ${
+        graceEnd && plan !== "Free"
+          ? `Update your card by ${graceEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })} to keep your ${billing?.plan ?? "paid"} plan.`
+          : "Your account is on the Free plan until the payment goes through."
+      }`,
+      action: <BtnA href="/app/settings/billing" size="sm">Update payment</BtnA>,
+    });
+  }
+  if (upgradeIntent) {
+    alerts.push({
+      id: "upgrade",
+      tone: "info",
+      text: `You picked the ${upgradeIntent.plan} plan. Finish upgrading in one step.`,
+      action: <BtnA href={`/app/settings/billing?plan=${upgradeIntent.plan.toLowerCase()}&interval=${upgradeIntent.interval}#plans`} size="sm">Continue to checkout</BtnA>,
+    });
+  }
+  if (showVerify) {
+    alerts.push({
+      id: "verify",
+      tone: "info",
+      text: `Verify your email: we sent a 6-digit code to ${user.email}.`,
+      action: <VerifyEmailActions />,
+    });
+  }
 
   return (
     <div className={`app-theme ${instrumentSans.variable} ${styles.shell}`}>
@@ -255,48 +297,33 @@ async function AppShell({ children }: { children: ReactNode }) {
             <div className={styles.sideScroll}>
               <SidebarNav failedPosts={failedPosts} scheduledPosts={scheduledPosts} />
               <Channels channels={channels} availability={availability} slots={{ used: connectedAccounts, limit: limits.socialAccounts }} />
-            </div>
-            <div className={styles.usage} aria-label="Plan usage">
-              {limits.scheduledPostsPerMonth !== null && (
-                <Meter label="Scheduled this month" used={scheduledThisMonth} limit={limits.scheduledPostsPerMonth} />
-              )}
-              <Meter label="DMs sent this month" used={dmsThisMonth} limit={dmLimit} />
-              <Meter label="Connected accounts" used={connectedAccounts} limit={limits.socialAccounts} />
-              <MediaMeter used={mediaPending} plan={plan} />
-              {plan !== "Agency" && (
-                <Link href="/app/settings/billing" className={styles.meterUpgrade}>
-                  {plan === "Free" ? "Upgrade for more" : "Upgrade to Agency"}
-                </Link>
-              )}
+              <details className={styles.usage}>
+                <summary className={styles.usageSummary}>
+                  <Gauge width={16} height={16} aria-hidden="true" />
+                  <span>Usage</span>
+                  <span className={styles.usageHint}>{plan} plan</span>
+                  <ChevronDown width={14} height={14} aria-hidden="true" className={styles.usageChevron} />
+                </summary>
+                <div className={styles.usageBody} aria-label="Plan usage">
+                  {limits.scheduledPostsPerMonth !== null && (
+                    <Meter label="Scheduled this month" used={scheduledThisMonth} limit={limits.scheduledPostsPerMonth} />
+                  )}
+                  <Meter label="DMs sent this month" used={dmsThisMonth} limit={dmLimit} />
+                  <Meter label="Connected accounts" used={connectedAccounts} limit={limits.socialAccounts} />
+                  <MediaMeter used={mediaPending} plan={plan} />
+                  {plan !== "Agency" && (
+                    <Link href="/app/settings/billing" className={styles.meterUpgrade}>
+                      {plan === "Free" ? "Upgrade for more" : "Upgrade to Agency"}
+                    </Link>
+                  )}
+                </div>
+              </details>
             </div>
             <SidebarNav variant="footer" failedPosts={failedPosts} showAdmin={isAdmin(user)} />
           </>
         }
       >
-        {needsReconnect && (
-          <div role="alert" className={styles.banner}>
-            <span>Instagram access expired or was removed. Posts and auto-DMs are paused until you reconnect.</span>
-            <BtnA href="/api/instagram/connect" size="sm">Reconnect Instagram</BtnA>
-          </div>
-        )}
-        {paymentFailed && (
-          <div role="alert" className={styles.banner}>
-            <span>
-              Your last Poskoo payment failed.{" "}
-              {graceEnd && plan !== "Free"
-                ? `Update your card by ${graceEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })} to keep your ${billing?.plan ?? "paid"} plan.`
-                : "Your account is on the Free plan until the payment goes through."}
-            </span>
-            <BtnA href="/app/settings/billing" size="sm">Update payment</BtnA>
-          </div>
-        )}
-        {upgradeIntent && (
-          <div role="status" className={styles.banner}>
-            <span>You picked the {upgradeIntent.plan} plan. Finish upgrading in one step.</span>
-            <BtnA href={`/app/settings/billing?plan=${upgradeIntent.plan.toLowerCase()}&interval=${upgradeIntent.interval}#plans`} size="sm">Continue to checkout</BtnA>
-          </div>
-        )}
-        <VerifyEmailBanner email={user.email} verified={user.emailVerified === true} />
+        <AlertBar alerts={alerts} />
         <div className={styles.content}>{children}</div>
       </ShellFrame>
     </div>

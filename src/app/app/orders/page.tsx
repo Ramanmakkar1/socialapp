@@ -44,11 +44,10 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
   }
   return (
     <>
-      <PageHero
+      <PageHero icon={<Receipt width={20} height={20} />}
         eyebrow="Sales"
         title="Orders"
         lede="Every purchase of your products. Payouts go to your bank through Stripe."
-        art="/landing/card-leads.webp"
         action={total > 0 ? <ExportLeadsLink href="/app/orders/export">{total > 10_000 ? "Export latest 10,000" : "Export CSV"}</ExportLeadsLink> : undefined}
       />
       <PaymentsNotice configured={configured} account={account} />

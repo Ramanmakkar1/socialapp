@@ -27,9 +27,11 @@
 }
 
 /* Page layout (light dashboard cards; shell tokens only). */
-.head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 20px; }
-.title { margin: 0; color: var(--poskoo-ink); font-size: clamp(1.5rem, 3vw, 1.9rem); letter-spacing: -.03em; line-height: 1.1; }
-.sub { margin: 6px 0 0; color: var(--poskoo-muted); font-size: .95rem; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.headMain { display: flex; min-width: 0; flex: 1 1 260px; align-items: center; gap: 12px; }
+.headIcon { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-tint, var(--poskoo-band)); color: var(--poskoo-violet); }
+.title { margin: 0; color: var(--poskoo-ink); font-size: 1.6rem; letter-spacing: -.03em; line-height: 1.1; }
+.sub { margin: 3px 0 0; color: var(--poskoo-muted); font-size: .9rem; }
 .exportWrap { display: grid; justify-items: end; gap: 6px; }
 .exportWrap a { gap: 6px; }
 .hint { max-width: 20rem; margin: 0; color: var(--poskoo-muted); font-size: .8rem; text-align: right; }

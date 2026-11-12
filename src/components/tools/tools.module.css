@@ -116,6 +116,9 @@
 .prose h3 { font-size: 1.3rem; letter-spacing: -.01em; margin: 0 0 10px; scroll-margin-top: 20px; }
 .prose p { margin: 0 0 12px; color: #3d3450; line-height: 1.65; }
 .prose ul, .prose ol { margin: 0 0 12px; padding-left: 1.25rem; display: grid; gap: 6px; color: #3d3450; line-height: 1.6; }
+/* Tailwind preflight strips list markers; guide lists need them back. */
+.prose :where(ul) { list-style: disc outside; }
+.prose :where(ol) { list-style: decimal outside; }
 .prose li::marker { color: var(--violet); }
 .prose a { color: var(--violet); text-decoration: underline; text-underline-offset: 3px; }
 .prose b, .prose strong { color: var(--ink); }

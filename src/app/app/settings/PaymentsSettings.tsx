@@ -24,7 +24,7 @@ export default async function PaymentsSettings({ userId, status }: { userId: str
   return (
     <section className={styles.section} aria-labelledby="payments-heading">
       <div className={styles.sectionHeader}>
-        <h2 id="payments-heading" className={styles.sectionTitle}>Payments: connect Stripe</h2>
+        <h2 id="payments-heading" className={styles.sectionTitle}>Payments</h2>
       </div>
       <p className={ui.hint}>
         Sell digital products to your followers. Buyers pay by card through Stripe and the money goes to your own Stripe account; Poskoo keeps a {fee}% fee per sale (Stripe processing fees apply).

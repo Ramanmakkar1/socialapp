@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { LayoutGrid } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import ui from "./ui.module.css";
 
@@ -64,53 +64,48 @@ export function Card({
   );
 }
 
-/** Page hero for logged-in pages: eyebrow, big heading with an optional serif accent word, lede and art tile. */
+/**
+ * Compact page header for logged-in pages: icon tile + title + one-line subtitle + right-side actions
+ * (same shape as the Calendar and Auto-DM headers). The landing art now lives in empty states only;
+ * `art`/`eyebrow` are accepted for backwards compatibility but not rendered as a big hero.
+ */
 export function PageHero({
   eyebrow,
   title,
   accent,
-  accentAfter,
   lede,
-  art = "/landing/card-schedule.webp",
-  artAlt = "",
-  artWidth = 900,
-  artHeight = 900,
+  icon,
   action,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
-  /** Serif italic accent shown after the title, e.g. "creator." */
+  /** Extra title word(s), e.g. "billing" in "Plan & billing". */
   accent?: string;
-  /** Text shown after the serif accent (defaults to "."). */
+  /** Deprecated: kept for callers; headings no longer end with a period. */
   accentAfter?: string;
   lede?: ReactNode;
+  /** Icon shown in the tile; defaults to a generic page icon. */
+  icon?: ReactNode;
+  /** Deprecated: landing art moved to empty states. */
   art?: string;
   artAlt?: string;
-  /** Intrinsic size of the art file (square landing cards by default; the wide illustrations are 1536x1024). */
   artWidth?: number;
   artHeight?: number;
   action?: ReactNode;
 }) {
+  const text = accent ? `${title} ${accent}` : title;
   return (
     <header className={ui.hero}>
-      <div>
-        <p className={ui.eyebrow}>{eyebrow}</p>
-        <h1 className={ui.title}>
-          {title}
-          {accent ? (
-            <>
-              {" "}
-              <em>{accent}</em>
-              {accentAfter ?? "."}
-            </>
-          ) : null}
-        </h1>
-        {lede ? <p className={ui.lede}>{lede}</p> : null}
-        {action ? <div style={{ marginTop: 16 }}>{action}</div> : null}
+      <div className={ui.heroMain}>
+        <span className={ui.heroIcon} aria-hidden="true">
+          {icon ?? <LayoutGrid width={20} height={20} />}
+        </span>
+        <div className={ui.heroText}>
+          <h1 className={ui.title}>{text.replace(/\.$/, "")}</h1>
+          {lede ? <p className={ui.lede}>{lede}</p> : eyebrow ? <p className={ui.lede}>{eyebrow}</p> : null}
+        </div>
       </div>
-      <div className={ui.heroArt}>
-        <Image src={art} alt={artAlt} width={artWidth} height={artHeight} sizes="(max-width: 640px) 44vw, 200px" />
-      </div>
+      {action ? <div className={ui.heroActions}>{action}</div> : null}
     </header>
   );
 }

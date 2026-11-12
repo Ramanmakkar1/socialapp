@@ -31,12 +31,10 @@ export default async function ReferralsPage() {
   const bonus = REFERRAL_BONUS_DMS.toLocaleString("en-US");
   return (
     <>
-      <PageHero
+      <PageHero icon={<Gift width={20} height={20} />}
         eyebrow="Refer and earn"
-        title="Invite creators, get"
-        accent="more DMs"
+        title="Refer and earn"
         lede={`Every creator who joins with your link and connects an account adds ${bonus} automated DMs to your monthly limit, every month.`}
-        art="/landing/card-dm.webp"
       />
       {!stats ? (
         <p role="alert" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>Your referral link could not be loaded. Reload to try again.</p>

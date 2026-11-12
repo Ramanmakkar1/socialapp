@@ -155,7 +155,8 @@ function SnippetBlock({
         <p className="text-sm font-medium">{title}</p>
         <CopyChip text={text} label={copyLabel} />
       </div>
-      <p className={`mt-2 text-sm text-[#3d3450] ${mono ? "font-mono text-xs break-all" : ""}`}>
+      {/* Monospace only for the generated code itself, not for the hint. */}
+      <p className={`mt-2 text-sm text-[#3d3450] ${mono && text ? "font-mono text-xs break-all" : ""}`}>
         {text || "Enter a valid username above to generate this snippet."}
       </p>
     </div>

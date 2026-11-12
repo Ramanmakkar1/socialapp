@@ -31,7 +31,7 @@ const compare: [string, string, string, string][] = [
   ["Comment-to-DM automation", "Yes", "Check their site", "Yes"],
   ["Email capture in DMs", "Yes", "Check their site", "Yes"],
   ["AI DM message ideas", "Yes", "Check their site", "Yes"],
-  ["Price", PRICE_SUMMARY, "See their pricing", "See their pricing"],
+  ["Price", PRICE_SUMMARY, "Check their site", "Check their site"],
 ];
 
 const faqs = [
@@ -78,6 +78,7 @@ export default function BufferAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people switch</h2>
           </div>
           <div className="cards">
@@ -100,7 +101,7 @@ export default function BufferAlternative() {
             <h2>{BRAND.name} vs Buffer</h2>
             <p>Buffer schedules posts. To auto-DM commenters you would add a tool like ManyChat. {BRAND.name} does both.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -131,6 +132,7 @@ export default function BufferAlternative() {
         <div className="wrap">
           <div className="split">
             <div className="copy">
+              <p className="eyebrow">How it works</p>
               <h2>Plan a post, attach an <em className="s">auto-DM rule</em></h2>
               <p>
                 When you schedule a post in the {BRAND.name} calendar, you can attach a comment-to-DM rule to it. The rule stays off until the post goes live, then switches on by itself, so the first people who comment get your link straight away.
@@ -148,6 +150,7 @@ export default function BufferAlternative() {
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>Buffer alternative questions</h2>
           </div>
           <div className="faq">
@@ -166,7 +169,7 @@ export default function BufferAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule your posts and turn comments into <em className="s">leads.</em></h2>
+              <h2>Schedule your posts and turn comments into <em className="s">leads</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

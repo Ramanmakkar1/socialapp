@@ -1,3 +1,4 @@
+import { Magnet } from "lucide-react";
 import { PageHero } from "@/components/ui/kit";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
@@ -17,7 +18,7 @@ export default async function NewLeadMagnetPage() {
   }
   return (
     <>
-      <PageHero eyebrow="Lead magnets" title="Create a lead" accent="magnet" lede="A free resource your auto-DMs send once someone shares their email." art="/landing/card-leads.webp" />
+      <PageHero icon={<Magnet width={20} height={20} />} eyebrow="Lead magnets" title="Create a lead" accent="magnet" lede="A free resource your auto-DMs send once someone shares their email." />
       <LeadMagnetForm
         id={null}
         defaults={{ title: "", description: "", cover_url: null, delivery_type: "file", delivery_url: "" }}

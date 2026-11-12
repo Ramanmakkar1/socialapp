@@ -3,7 +3,7 @@ import { SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import ScheduleSeeder from "../settings/ScheduleSeeder";
 import { CalendarDays, Lightbulb, List, Plus } from "lucide-react";
 import CalendarToolbar from "./CalendarToolbar";
-import { weekMonthLabel, type AccountNames, type CalendarPost } from "./calendarUtils";
+import { PLATFORM_LABEL, weekMonthLabel, type AccountNames, type CalendarPost } from "./calendarUtils";
 import CalendarEmptyState from "./CalendarEmptyState";
 import Composer from "./Composer";
 import type { NetworkPanelData } from "./NetworkOptionsPanel";
@@ -16,7 +16,6 @@ import type { Idea } from "./IdeaCard";
 import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
-import QueueView from "./QueueView";
 import WeekView from "./WeekView";
 import { requireUser } from "@/lib/auth";
 import { planForUser, scheduledPostsUsage } from "@/lib/planLimits";
@@ -25,10 +24,9 @@ import { isDbConfigured, query } from "@/lib/db";
 import { facebookPageStatus, type FacebookSourceAccount } from "@/lib/facebookPublish";
 import { IDEA_BY_ID_SQL, IDEAS_LIST_SQL, ideaComposerPrefill, normalizeIdeaStatus, type IdeaRow } from "@/lib/ideas";
 import { allPostTags, hasColumn, postMatchesTag } from "@/lib/tagFilter";
-import ui from "@/components/ui/ui.module.css";
 import styles from "./calendar.module.css";
 
-export const metadata = { title: "Publish" };
+export const metadata = { title: "Calendar" };
 
 type WeekPost = {
   id: string;
@@ -43,23 +41,31 @@ type WeekPost = {
   error: string | null;
 };
 
+const CHANNEL_ORDER = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp"];
+
 const MONTH_FMT = { month: "long", year: "numeric", timeZone: "UTC" } as const;
 
-// Calendar card data: first media item as the thumbnail, a public link when one can be derived.
-function toCalendarPost(row: WeekPost): CalendarPost {
-  const first = Array.isArray(row.media) ? (row.media[0] as { url?: unknown; type?: unknown; thumb?: unknown } | undefined) : undefined;
+// First media item as the card thumbnail (videos use their poster when one was kept).
+function thumbOf(media: unknown): { thumb: string | null; thumbIsVideo: boolean } {
+  const first = Array.isArray(media) ? (media[0] as { url?: unknown; type?: unknown; thumb?: unknown } | undefined) : undefined;
   const url = typeof first?.url === "string" ? first.url : null;
   // After publish the upload is deleted and `thumb` (poster / placeholder) is kept instead.
   const poster = typeof first?.thumb === "string" ? first.thumb : null;
   const isVideo = first?.type === "video" || (url ? /\.(mp4|mov|webm)(\?|$)/i.test(url) : false);
+  return { thumb: poster ?? (url && !isVideo ? url : null), thumbIsVideo: isVideo };
+}
+
+// Calendar card data: first media item as the thumbnail, a public link when one can be derived.
+function toCalendarPost(row: WeekPost): CalendarPost {
+  const { thumb, thumbIsVideo } = thumbOf(row.media);
   return {
     id: row.id,
     caption: row.caption ?? "",
     scheduled_at: row.scheduled_at,
     status: row.status,
     platforms: row.platforms,
-    thumb: poster ?? (url && !isVideo ? url : null),
-    thumbIsVideo: isVideo,
+    thumb,
+    thumbIsVideo,
     insights: row.insights ?? null,
     permalink: row.fb_post_id && /^[0-9_]+$/.test(row.fb_post_id) ? `https://www.facebook.com/${row.fb_post_id}` : null,
     error: row.error,
@@ -71,6 +77,7 @@ type PublishedPost = {
   caption: string;
   published_at: Date | string | null;
   platforms: string[];
+  media?: unknown;
 };
 
 type RuleOption = { id: string; name: string; status: string };
@@ -154,7 +161,7 @@ export default async function CalendarPage({
   const rangeStart = new Date((view === "month" ? monthGridStart : weekStart).getTime() - 86_400_000);
   const rangeEnd = new Date((view === "month" ? monthRangeEnd : weekEndExclusive).getTime() + 86_400_000);
 
-  let rows: Post[] = [];
+  let rows: (Post & { media?: unknown })[] = [];
   let weekRows: WeekPost[] = [];
   let rules: RuleOption[] = [];
   let publishedRows: PublishedPost[] = [];
@@ -348,8 +355,8 @@ export default async function CalendarPage({
         "select id, name, status from socialapp.dm_rules where user_id = $1 order by created_at desc",
         [user.id],
       ),
-      query<Post>(
-        `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50`,
+      query<Post & { media?: unknown }>(
+        `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.media, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50`,
         [user.id],
       ),
       query<WeekPost>(
@@ -362,7 +369,7 @@ export default async function CalendarPage({
         [user.id, rangeStart, rangeEnd],
       ),
       query<PublishedPost>(
-        "select p.id, p.caption, max(t.published_at) as published_at, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status = 'published' group by p.id order by max(t.published_at) desc nulls last limit 10",
+        "select p.id, p.caption, p.media, max(t.published_at) as published_at, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status = 'published' group by p.id order by max(t.published_at) desc nulls last limit 10",
         [user.id],
       ),
     ]);
@@ -401,7 +408,24 @@ export default async function CalendarPage({
       (!statusFilter || post.status === statusFilter),
   );
   const calendarPosts = filteredWeekRows.map(toCalendarPost);
-  const channelOptions = [...new Set([...Object.keys(accountNames), ...weekRows.flatMap((p) => p.platforms)])].sort();
+  // Channels the user can filter by: every connected channel (YouTube lives in its own table) plus any on loaded posts.
+  const connectedChannels = [...new Set([...Object.keys(previewAccountNames), ...(youtubeReady ? ["youtube"] : [])])];
+  const channelOptions = [...new Set([...connectedChannels, ...weekRows.flatMap((p) => p.platforms)])].sort();
+  const channelNames = connectedChannels
+    .sort((a, b) => CHANNEL_ORDER.indexOf(a) - CHANNEL_ORDER.indexOf(b))
+    .map((c) => PLATFORM_LABEL[c] ?? c);
+  const pubSub = channelNames.length
+    ? `Plan, schedule and publish posts to ${channelNames.length > 1 ? `${channelNames.slice(0, -1).join(", ")} and ${channelNames.at(-1)}` : channelNames[0]}.`
+    : "Plan, schedule and publish posts to your social channels.";
+  const listPosts: Post[] = rows.map(({ media, ...row }) => ({ ...row, ...thumbOf(media) }));
+  const publishedPosts: CalendarPost[] = publishedRows.map((row) => ({
+    id: row.id,
+    caption: row.caption ?? "",
+    scheduled_at: row.published_at,
+    status: "published",
+    platforms: row.platforms,
+    ...thumbOf(row.media),
+  }));
   const filterQuery = [channel && `channel=${encodeURIComponent(channel)}`, statusFilter && `status=${statusFilter}`, tag && `tag=${encodeURIComponent(tag)}`].filter(Boolean).map((q) => `&${q}`).join("");
   const weekEndDay = new Date(weekStart.getTime() + 6 * 86_400_000);
   const shortDay = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -420,12 +444,12 @@ export default async function CalendarPage({
         <div className={styles.pubTitleWrap}>
           <span className={styles.pubIcon} aria-hidden="true"><CalendarDays width={20} height={20} /></span>
           <div>
-            <h1 className={styles.pubTitle}>Publish</h1>
-            <p className={styles.pubSub}>Plan, schedule and track posts for Instagram, Facebook, Threads and YouTube.</p>
+            <h1 className={styles.pubTitle}>Calendar</h1>
+            <p className={styles.pubSub}>{pubSub}</p>
           </div>
         </div>
         <div className={styles.pubActions}>
-          <nav className={styles.viewSwitch} aria-label="Publish view">
+          <nav className={styles.viewSwitch} aria-label="Calendar view">
             <Link href="/app/calendar?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
               <List width={16} height={16} aria-hidden="true" /> List
             </Link>
@@ -437,7 +461,7 @@ export default async function CalendarPage({
             </Link>
           </nav>
           <Link href={`${reloadHref}&compose=1`} scroll={false} className={styles.newPostBtn}>
-            <Plus width={18} height={18} aria-hidden="true" /> New post
+            <Plus width={18} height={18} aria-hidden="true" /> <span className={styles.newPostText}>New post</span>
           </Link>
         </div>
       </header>
@@ -520,9 +544,12 @@ export default async function CalendarPage({
         <>
           <IdeasBoard ideas={ideas} loadFailed={ideasFailed} />
           <PostList
-            posts={rows.filter((post) => post.status === "draft")}
+            posts={listPosts.filter((post) => post.status === "draft")}
             initialFilter="draft"
             title="Drafts"
+            showStatusFilters={false}
+            composeHref="/app/calendar?view=ideas&compose=1"
+            accounts={accountNames}
             loadError={
               rowsFailed
                 ? { message: "We couldn’t load your drafts. They may still exist.", reloadHref: queueReloadHref }
@@ -533,51 +560,29 @@ export default async function CalendarPage({
       )}
       {view === "list" && (
         <>
-      <PostList
-        posts={rows}
-        initialFilter={initialFilter}
-        loadError={
-          rowsFailed
-            ? { message: "We couldn’t load your scheduled posts and drafts. They may still exist.", reloadHref: queueReloadHref }
-            : undefined
-        }
-      />
-      <QueueView posts={rows} />
-      {publishedFailed && (
-        <section className={styles.published} aria-label="Recently published">
-          <h2 className={styles.sectionTitle}>Recently published</h2>
-          <LoadFailed
-            message="We couldn’t load your publishing history. Your published posts are still there."
-            reloadHref={reloadHref}
-            className={styles.mt}
+          <PostList
+            posts={listPosts}
+            initialFilter={initialFilter}
+            title="Upcoming and drafts"
+            showQueueTab
+            published={publishedPosts}
+            accounts={accountNames}
+            loadError={
+              rowsFailed
+                ? { message: "We couldn’t load your scheduled posts and drafts. They may still exist.", reloadHref: queueReloadHref }
+                : undefined
+            }
           />
-        </section>
-      )}
-      {publishedRows.length > 0 && (
-        <section className={styles.published} aria-labelledby="recently-published-heading">
-          <h2 id="recently-published-heading" className={styles.sectionTitle}>Recently published</h2>
-          <ul className={styles.publishedList}>
-            {publishedRows.map((post) => (
-              <li key={post.id} className={styles.publishedRow}>
-                <p className={styles.publishedCaption}>
-                  {post.caption.length > 80 ? `${post.caption.slice(0, 80)}…` : post.caption}
-                </p>
-                <div className={styles.publishedMeta}>
-                  <span className={`${ui.pill} ${styles.pillPublished}`}>Published</span>
-                  {post.platforms.map((platform) => (
-                    <span key={platform} className={`${ui.pill} ${styles.capitalize}`}>
-                      {platform}
-                    </span>
-                  ))}
-                  <span className={styles.publishedTime} suppressHydrationWarning>
-                    {post.published_at ? new Date(post.published_at).toLocaleString() : "Time unknown"}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          {publishedFailed && (
+            <section className={styles.published} aria-label="Recently published">
+              <h2 className={styles.sectionTitle}>Recently published</h2>
+              <LoadFailed
+                message="We couldn’t load your publishing history. Your published posts are still there."
+                reloadHref={reloadHref}
+                className={styles.mt}
+              />
+            </section>
+          )}
         </>
       )}
     </div>

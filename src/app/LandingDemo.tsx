@@ -44,7 +44,8 @@ function CommentPreview() {
   );
 }
 
-export function LandingDemo() {
+/** `hideLink`: leave out the feature link that points at the page the demo sits on. */
+export function LandingDemo({ hideLink }: { hideLink?: "/instagram-scheduler" | "/instagram-auto-dm" } = {}) {
   const [activeTab, setActiveTab] = useState<TabId>("schedule");
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
@@ -76,7 +77,7 @@ export function LandingDemo() {
     <div className="band landingDemo">
       <div className="copy">
         <p className="eyebrow">Two workflows, one app</p>
-        <h2>From scheduled post to <em className="s mark">new lead.</em></h2>
+        <h2>From scheduled post to <em className="s mark">new lead</em></h2>
         <p>Switch between two sample workflows: plan a post on your calendar, then turn a keyword comment into a DM conversation.</p>
         <div className="demoTabs" role="tablist" aria-label="Product demo">
           {tabs.map((tab, index) => (
@@ -101,8 +102,8 @@ export function LandingDemo() {
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
         </div>
         <div className="demoLinks">
-          <Link className="demoFeatureLink" href="/instagram-scheduler">Explore the Instagram scheduler <span aria-hidden="true">→</span></Link>
-          <Link className="demoFeatureLink" href="/instagram-auto-dm">See Instagram comment-to-DM automation <span aria-hidden="true">→</span></Link>
+          {hideLink !== "/instagram-scheduler" && <Link className="demoFeatureLink" href="/instagram-scheduler">Explore the Instagram scheduler <span aria-hidden="true">→</span></Link>}
+          {hideLink !== "/instagram-auto-dm" && <Link className="demoFeatureLink" href="/instagram-auto-dm">See Instagram comment-to-DM automation <span aria-hidden="true">→</span></Link>}
         </div>
       </div>
       <div className="demoStage">

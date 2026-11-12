@@ -1,0 +1,31 @@
+/* Connect-channel dialog refinements (layered on the shell's .connect* styles). */
+.dialog .title { outline: none; }
+.dialog .close:focus { outline: none; }
+.dialog .close:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; border-radius: 10px; }
+
+/* Equal-height cards in the ready grid. */
+.grid > li { display: flex; }
+.grid .card { width: 100%; min-height: 72px; box-sizing: border-box; }
+.dialog .card:focus { outline: none; }
+.dialog .card:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+
+/* Channels not switched on yet: one muted, compact row. */
+.offGroup { margin-top: 16px; border-top: 1px solid var(--poskoo-line); padding-top: 12px; }
+.offTitle { margin: 0 0 8px; color: var(--poskoo-muted); font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.offGrid { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.offCard {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px dashed var(--poskoo-line);
+  border-radius: 999px;
+  padding: 0 10px 0 6px;
+  color: var(--poskoo-muted);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: not-allowed;
+}
+.offIcon { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; background: var(--poskoo-band); color: var(--poskoo-muted); }
+.offIcon svg { width: 13px; height: 13px; }
+.offName { white-space: nowrap; }

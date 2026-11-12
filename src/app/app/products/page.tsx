@@ -42,11 +42,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const create = <BtnLink href="/app/products/new"><Plus aria-hidden="true" size={18} /> Create product</BtnLink>;
   return (
     <>
-      <PageHero
+      <PageHero icon={<Package width={20} height={20} />}
         eyebrow="Sell to your followers"
         title="Products"
         lede="Sell ebooks, presets, templates and courses. Share the buy link in your bio or let an auto-DM send it."
-        art="/landing/card-dm.webp"
         action={total > 0 ? create : undefined}
       />
       <PaymentsNotice configured={configured} account={account} />

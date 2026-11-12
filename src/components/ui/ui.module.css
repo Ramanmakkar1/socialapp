@@ -133,42 +133,41 @@ button.inkFill:disabled { transform: none; }
 }
 .checkRow input { width: 1.05rem; height: 1.05rem; accent-color: var(--poskoo-violet); }
 
-/* Page hero for logged-in pages (same shape as settings/review-guide). */
+/* Compact page header for logged-in pages: icon tile + title + subtitle, actions on the right. */
 .hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  padding-bottom: 18px;
+}
+.heroMain { display: flex; min-width: 0; flex: 1 1 260px; align-items: center; gap: 12px; }
+.heroIcon {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px;
-  align-items: end;
-  gap: 28px;
-  padding-bottom: 28px;
-  border-bottom: 1.5px solid var(--poskoo-line);
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-tint, var(--poskoo-band));
+  color: var(--poskoo-violet);
 }
-.heroArt {
-  width: 100%;
-  border-radius: var(--poskoo-radius-card);
-  background: var(--poskoo-peach);
-  box-shadow: var(--poskoo-shadow-card);
-  transform: rotate(3deg);
-  overflow: hidden;
-}
-.heroArt img { display: block; width: 100%; height: auto; }
+.heroText { min-width: 0; }
+.heroActions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .title {
-  max-width: 16ch;
-  margin: 8px 0 0;
+  margin: 0;
   color: var(--poskoo-ink);
-  font-size: clamp(2.35rem, 5vw, 4rem);
-  letter-spacing: var(--poskoo-type-heading-ls);
-  line-height: var(--poskoo-type-heading-lh);
-}
-.title em {
-  font-family: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  overflow-wrap: anywhere;
 }
 .lede {
-  max-width: 62ch;
-  margin-top: 12px;
+  max-width: 72ch;
+  margin: 3px 0 0;
   color: var(--poskoo-muted);
-  font-size: 1.02rem;
+  font-size: .9rem;
 }
 
 /* Tables. */
@@ -197,8 +196,7 @@ button.inkFill:disabled { transform: none; }
 .link:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
-  .hero { grid-template-columns: 1fr; gap: 18px; }
-  .heroArt { width: min(170px, 44vw); justify-self: end; }
+  .heroActions { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

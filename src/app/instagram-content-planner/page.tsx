@@ -93,7 +93,7 @@ export default function InstagramContentPlannerPage() {
         <span className="pill">Free planning toolkit</span>
         <p className="eyebrow">Instagram content planner</p>
         <h1>
-          From hook to scheduled post, <em className="s mark">in five steps.</em>
+          From hook to scheduled post, <em className="s mark">in five steps</em>
         </h1>
         <p className="lede">
           This free Instagram content planner walks you through one post in five steps — hook,
@@ -115,7 +115,7 @@ export default function InstagramContentPlannerPage() {
         <div className="head">
           <p className="eyebrow">The workflow</p>
           <h2>
-            Five steps from <em className="s">idea to scheduled post.</em>
+            Five steps from <em className="s">idea to scheduled post</em>
           </h2>
         </div>
         {groups.map((group, gi) => (
@@ -162,7 +162,7 @@ export default function InstagramContentPlannerPage() {
           <div className="cta">
             <div>
               <h2>
-                Ready when the post is. <em className="s">Schedule it.</em>
+                Ready when the post is. <em className="s">Schedule it</em>
               </h2>
               <p>Pick a time on the calendar and {BRAND.name} publishes it for you.</p>
               <Link className="btn" href="/instagram-scheduler">

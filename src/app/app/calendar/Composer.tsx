@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, AtSign, CalendarClock, ChevronDown, Facebook, Hash, Instagram, Link2, Loader2, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, CalendarClock, ChevronDown, Facebook, Hash, Info, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
 import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, nextAvailableSlots, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import PostPreview from "./PostPreview";
@@ -770,9 +770,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
               tabIndex={-1}
               className="mt-2 flex w-full min-w-0 max-w-full flex-wrap gap-2.5 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)] sm:gap-3"
             >
-              {PLATFORM_ORDER.map((platform) => {
+              {[...PLATFORM_ORDER.filter((p) => livePlatforms.includes(p)), ...PLATFORM_ORDER.filter((p) => !livePlatforms.includes(p))].map((platform, index, ordered) => {
                 const Icon = PLATFORM_ICON[platform];
                 const live = livePlatforms.includes(platform);
+                const firstOff = !live && (index === 0 || livePlatforms.includes(ordered[index - 1]));
                 const on = enabled[platform];
                 const disabledLabel = !live
                   ? platform === "facebook"
@@ -784,8 +785,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                         : `${PLATFORMS[platform].label}: connect it with “Connect a channel” to enable`
                   : undefined;
                 return (
+                  <span key={platform} className="contents">
+                  {firstOff && index > 0 && <span className="mx-0.5 h-8 w-px self-center bg-[var(--poskoo-line)]" aria-hidden />}
                   <button
-                    key={platform}
                     type="button"
                     disabled={!live}
                     aria-disabled={!live || undefined}
@@ -793,28 +795,37 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                     aria-label={live ? `${on ? "Remove" : "Add"} ${PLATFORMS[platform].label}` : disabledLabel}
                     title={disabledLabel}
                     onClick={() => togglePlatform(platform)}
-                    className={`group relative grid h-11 w-11 place-items-center rounded-full border-2 transition ${
+                    className={`group relative grid place-items-center rounded-full border-2 transition ${live ? "h-11 w-11" : "h-9 w-9 self-center"} ${
                       live
                         ? on
                           ? "border-[var(--poskoo-violet)] opacity-100"
                           : "border-transparent opacity-45 grayscale hover:opacity-80"
-                        : "cursor-not-allowed border-dashed border-[var(--poskoo-line)] opacity-40"
+                        : "cursor-not-allowed border-transparent opacity-35 grayscale"
                     }`}
                   >
-                    <span className="grid h-9 w-9 place-items-center rounded-full text-white" style={{ background: NET_COLOR[platform] }} aria-hidden>
-                      <Icon className="h-[18px] w-[18px]" />
+                    <span className={`grid place-items-center rounded-full text-white ${live ? "h-9 w-9" : "h-7 w-7"}`} style={{ background: NET_COLOR[platform] }} aria-hidden>
+                      <Icon className={live ? "h-[18px] w-[18px]" : "h-[14px] w-[14px]"} />
                     </span>
                     {on && live && (
-                      <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-[var(--poskoo-violet)] text-[9px] font-bold text-white" aria-hidden>✓</span>
+                      <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-[var(--poskoo-violet)] text-[11px] font-bold leading-none text-white" aria-hidden>✓</span>
                     )}
                   </button>
+                  </span>
                 );
               })}
+              {PLATFORM_ORDER.some((p) => !livePlatforms.includes(p)) && (
+                <a href="#connect" className="inline-flex items-center gap-1 self-center rounded-full px-2 py-1 text-xs font-medium text-[var(--poskoo-muted)] hover:bg-[var(--poskoo-band)] hover:text-[var(--poskoo-violet)]">
+                  <Plus className="h-3.5 w-3.5" aria-hidden /> Connect
+                </a>
+              )}
             </div>
           </div>
 
-          <details className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
-            <summary className="cursor-pointer text-sm font-medium text-[var(--poskoo-ink)]">Saved post templates</summary>
+          <details className="group rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-3">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 rounded-lg text-sm font-medium text-[var(--poskoo-ink)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)] [&::-webkit-details-marker]:hidden">
+              Saved post templates
+              <ChevronDown className="h-4 w-4 text-[var(--poskoo-muted)] transition-transform group-open:rotate-180" aria-hidden />
+            </summary>
             {templates.length > 0 && (
               <div className="mt-3 space-y-2">
                 {templates.map((template) => (
@@ -941,15 +952,21 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             </div>
           </div>
           <div>
-            <button
-              type="button"
-              disabled={aiOn === false}
-              onClick={() => setAiOpen((open) => !open)}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <Sparkles className="h-4 w-4" aria-hidden />
-              {aiOn === false ? "AI captions are not switched on" : "Write with AI"}
-            </button>
+            {aiOn === false ? (
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[var(--poskoo-band)] px-2.5 py-1.5 text-xs text-[var(--poskoo-muted)]">
+                <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                AI caption ideas aren&apos;t switched on for this workspace.
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setAiOpen((open) => !open)}
+                className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)]"
+              >
+                <Sparkles className="h-4 w-4" aria-hidden />
+                Write with AI
+              </button>
+            )}
             {aiOpen && aiOn && (
               <div className="mt-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row">
@@ -1035,8 +1052,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             <p id={`${postTagsId}-help`} className="mt-1 text-xs text-[var(--poskoo-muted)]">Separate up to 10 tags with commas. Use them to filter the queue and calendar.</p>
           </div>
 
-          <details className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
-            <summary className="cursor-pointer text-sm font-medium text-[var(--poskoo-ink)]">Saved hashtag groups</summary>
+          <details className="group rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-3">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 rounded-lg text-sm font-medium text-[var(--poskoo-ink)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)] [&::-webkit-details-marker]:hidden">
+              Saved hashtag groups
+              <ChevronDown className="h-4 w-4 text-[var(--poskoo-muted)] transition-transform group-open:rotate-180" aria-hidden />
+            </summary>
             {hashtagGroups.length > 0 && (
               <div className="mt-3 space-y-2">
                 {hashtagGroups.map((group) => (
@@ -1204,7 +1224,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                           className="h-28 w-full object-cover"
                         />
                       )}
-                      <span className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                      <span className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[11px] font-medium text-white">
                         {index + 1}
                       </span>
                       <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/55 p-1">
@@ -1716,7 +1736,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             onClick={() => handleSave("draft")}
             className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:bg-[var(--poskoo-band)] disabled:opacity-60 sm:px-4"
           >
-            {isPending ? "Saving…" : "Save Draft"}
+            {isPending ? "Saving…" : "Save draft"}
           </button>
           <button
             type="button"
@@ -1725,7 +1745,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             title={queueReady ? undefined : "Set a posting schedule in Settings → Channels first"}
             className="whitespace-nowrap rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)] disabled:opacity-60 sm:px-4"
           >
-            {isPending ? "Saving…" : "Add to Queue"}
+            {isPending ? "Saving…" : "Add to queue"}
           </button>
           <button
             type="button"
@@ -1733,7 +1753,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             onClick={() => handleSave("schedule")}
             className={`${ui.inkFill} whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold disabled:opacity-60 sm:px-5`}
           >
-            {isPending ? "Saving…" : "Schedule Post"}
+            {isPending ? "Saving…" : "Schedule post"}
           </button>
         </div>
         {feedback && (

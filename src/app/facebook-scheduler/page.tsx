@@ -157,7 +157,7 @@ export default function FacebookSchedulerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">A simpler Page workflow</p>
-            <h2>From draft to published, <em className="s">without the tab juggling.</em></h2>
+            <h2>From draft to published, <em className="s">without the tab juggling</em></h2>
           </div>
           <div className="cards">
             {benefits.map((benefit) => (
@@ -182,7 +182,7 @@ export default function FacebookSchedulerPage() {
           <div className="band">
             <div className="copy">
               <p className="eyebrow">Setup in three steps</p>
-              <h2>Schedule your first <em className="s mark">Facebook Page post.</em></h2>
+              <h2>Schedule your first <em className="s mark">Facebook Page post</em></h2>
               <div className="pains">
                 {steps.map((step) => (
                   <div key={step.n} className="pain">
@@ -227,7 +227,7 @@ export default function FacebookSchedulerPage() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Put your next Facebook Page post <em className="s">on the calendar.</em></h2>
+              <h2>Put your next Facebook Page post <em className="s">on the calendar</em></h2>
               <p>Start free, connect with Meta, and manage your Facebook, Instagram and Threads queue together.</p>
               <Link className="btn" href="/signup">Start scheduling free <span aria-hidden="true">→</span></Link>
               {" "}

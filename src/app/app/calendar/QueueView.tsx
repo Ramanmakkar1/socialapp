@@ -3,26 +3,33 @@
 import { useMemo, useState, useTransition } from "react";
 import { GripVertical } from "lucide-react";
 import { reorderQueue, shareNow } from "./actions";
-import { PLATFORMS, type PlatformId } from "@/lib/platforms";
 import { type Post } from "./PostList";
 import EmptyState from "../EmptyState";
-import { Btn, BtnA } from "@/components/ui/kit";
-import ui from "@/components/ui/ui.module.css";
+import { Btn, BtnLink } from "@/components/ui/kit";
+import PostCard from "./PostCard";
+import { PLATFORM_LABEL, type CalendarPost } from "./calendarUtils";
 import styles from "./calendar.module.css";
 
-const CHANNELS: PlatformId[] = ["instagram", "facebook", "threads"];
+type ChannelFilter = "all" | string;
 
-type ChannelFilter = "all" | PlatformId;
-
-// The publishing queue, viewable per channel: drag to reorder the publish order,
-// "Share now" publishes a post immediately.
-export default function QueueView({ posts }: { posts: Post[] }) {
+// The publishing queue in publish order, per channel: drag to reorder, "Share now" publishes at once.
+export default function QueueView({ posts, tz, composeHref, onOpen }: {
+  posts: Post[];
+  tz: string;
+  composeHref: string;
+  onOpen: (post: CalendarPost, el: HTMLElement) => void;
+}) {
   const [isPending, startTransition] = useTransition();
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [channel, setChannel] = useState<ChannelFilter>("all");
   const [dragId, setDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  // Only channels that actually have queued posts get a tab.
+  const channels = useMemo(
+    () => [...new Set(posts.filter((p) => p.status === "draft" || p.status === "scheduled").flatMap((p) => p.platforms))].sort(),
+    [posts],
+  );
 
   const queuePosts = useMemo(
     () =>
@@ -80,13 +87,12 @@ export default function QueueView({ posts }: { posts: Post[] }) {
 
   const channelTabs: { value: ChannelFilter; label: string }[] = [
     { value: "all", label: "All channels" },
-    ...CHANNELS.map((c) => ({ value: c as ChannelFilter, label: PLATFORMS[c].label })),
+    ...channels.map((c) => ({ value: c, label: PLATFORM_LABEL[c] ?? c })),
   ];
 
   return (
-    <section className={styles.queue} aria-labelledby="queue-view-heading">
-      <h2 id="queue-view-heading" className={styles.sectionTitle}>Queue</h2>
-      <p className={styles.queueHint}>
+    <div>
+      <p className={`${styles.queueHint} ${styles.mt}`}>
         Drag posts to change the publish order. “Share now” publishes a post immediately.
       </p>
       {error && (
@@ -94,19 +100,21 @@ export default function QueueView({ posts }: { posts: Post[] }) {
           {error}
         </p>
       )}
-      <div className={styles.filters} role="group" aria-label="Filter queue by channel">
-        {channelTabs.map(({ value, label }) => (
-          <button
-            key={value}
-            type="button"
-            aria-pressed={channel === value}
-            onClick={() => setChannel(value)}
-            className={`${styles.filterBtn} ${channel === value ? styles.filterBtnActive : ""}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {channels.length > 1 && (
+        <div className={styles.filters} role="group" aria-label="Filter queue by channel">
+          {channelTabs.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={channel === value}
+              onClick={() => setChannel(value)}
+              className={`${styles.filterBtn} ${channel === value ? styles.filterBtnActive : ""}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
       {queuePosts.length === 0 ? (
         <EmptyState
           title="Nothing in the queue yet"
@@ -115,16 +123,16 @@ export default function QueueView({ posts }: { posts: Post[] }) {
           artWidth={1536}
           artHeight={1024}
         >
-          <BtnA href="#new" size="sm">
+          <BtnLink href={composeHref} scroll={false} size="sm">
             Write a post
-          </BtnA>
+          </BtnLink>
         </EmptyState>
-      ) : (
-        <div className={styles.postList}>
+      ) : !tz ? null : (
+        <ol className={styles.queueList}>
           {queuePosts.map((post) => {
             const isOver = overId === post.id && dragId !== null && dragId !== post.id;
             return (
-              <article
+              <li
                 key={post.id}
                 draggable
                 onDragStart={() => setDragId(post.id)}
@@ -138,34 +146,22 @@ export default function QueueView({ posts }: { posts: Post[] }) {
                   setDragId(null);
                   setOverId(null);
                 }}
-                className={`${styles.postCard} ${isOver ? "ring-2 ring-[var(--poskoo-violet)]" : ""}`}
-                style={{ cursor: "grab" }}
+                className={`${styles.queueRow} ${isOver ? styles.queueRowOver : ""}`}
               >
-                <div className={styles.postTop}>
-                  <div className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-[var(--poskoo-muted)]" aria-hidden />
-                    <span className={`${ui.pill} ${post.status === "draft" ? styles.chipDraft : ""}`}>
-                      {post.status === "draft" ? "Draft" : "Scheduled"}
-                    </span>
-                  </div>
+                <GripVertical className={styles.queueGrip} width={16} height={16} aria-hidden />
+                <PostCard post={post} tz={tz} row onOpen={onOpen} />
+                <div className={styles.queueActions}>
                   {post.status === "scheduled" && (
-                    <div className={styles.postActions}>
-                      <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleShare(post.id)}>
-                        {isPending && sharingId === post.id ? "Sharing…" : "Share now"}
-                      </Btn>
-                    </div>
+                    <Btn variant="ghost" size="sm" disabled={isPending} onClick={() => handleShare(post.id)}>
+                      {isPending && sharingId === post.id ? "Sharing…" : "Share now"}
+                    </Btn>
                   )}
                 </div>
-                <p className={styles.postMeta} suppressHydrationWarning>
-                  {post.scheduled_at ? new Date(post.scheduled_at).toLocaleString() : "No time set"}
-                </p>
-                <p className={styles.postPlatforms}>{post.platforms.join(", ")}</p>
-                <p className={styles.postCaption}>{post.caption.slice(0, 140)}</p>
-              </article>
+              </li>
             );
           })}
-        </div>
+        </ol>
       )}
-    </section>
+    </div>
   );
 }

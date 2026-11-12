@@ -640,7 +640,7 @@
 .popError { margin: 8px 14px 0; border-radius: 10px; background: color-mix(in srgb, var(--poskoo-red) 10%, var(--poskoo-card)); padding: 8px 10px; color: var(--poskoo-ink); font-size: .8rem; overflow-wrap: anywhere; }
 .popMetrics { display: flex; align-items: center; gap: 8px; margin: 10px 14px 0; border: 1px solid var(--poskoo-line); border-radius: 12px; padding: 8px 6px 8px 12px; }
 .popMetrics dl { display: grid; flex: 1; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; }
-.popMetrics dt { color: var(--poskoo-muted); font-size: .68rem; font-weight: 600; }
+.popMetrics dt { color: var(--poskoo-muted); font-size: .7rem; font-weight: 600; }
 .popMetrics dd { margin: 1px 0 0; font-size: .92rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .popover .reschedule { margin: 4px 14px 0; }
 .popMsg { margin: 8px 14px 0; color: var(--poskoo-muted); font-size: .8rem; }
@@ -814,7 +814,7 @@
     box-shadow: 0 -18px 40px -18px rgba(20, 18, 26, .45);
   }
   .dialogPanel[data-sheet="open"] :global(.composerPreviewCard) { border: 0; padding: 0; }
-  .sheetScrim { position: fixed; z-index: 70; inset: 0; display: block; border: 0; background: rgba(20, 18, 26, .38); cursor: pointer; }
+  .sheetScrim { position: fixed; z-index: 70; inset: 0; display: block; border: 0; background: rgba(0, 0, 0, .4); cursor: pointer; }
 }
 @media (max-width: 639px) {
   .dialogPanel { max-height: none; height: 100dvh; }
@@ -828,4 +828,99 @@
 .ico_gbp { color: #4285f4; }
 @media (max-width: 1023px) {
   .dialogPanel[data-sheet="open"] :global(.composerPreviewCard) { max-width: 420px; margin-inline: auto; }
+}
+
+/* ---------- 2026-11 design audit: dialog chrome ---------- */
+.dialogBackdrop { background: rgba(0, 0, 0, .4); }
+.dialogTitle { outline: none; }
+.dialogClose:focus, .dialogTool:focus { outline: none; }
+.dialogClose:focus-visible, .dialogTool:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+.dialogPanel:focus, .dialogPanel:focus-visible { outline: none; }
+@media (max-width: 639px) {
+  /* Phones: a full-bleed sheet, no frame. */
+  .dialogPanel { border: 0; border-radius: 0; box-shadow: none; }
+  .dialogHead { border-radius: 0; }
+}
+
+/* ---------- 2026-11 design audit: post card (tile + meta row, full-width 2-line caption) ---------- */
+.card { flex-direction: column; gap: 4px; }
+.cardHead { display: flex; min-width: 0; align-items: center; gap: 7px; padding-right: 16px; }
+.cardTop { min-width: 0; padding-right: 0; }
+.cardCaption { margin: 0; color: color-mix(in srgb, var(--poskoo-ink) 72%, var(--poskoo-muted)); }
+.cardThumb { width: 30px; height: 30px; margin-top: 0; border-radius: 7px; }
+.cardTile { display: grid; place-items: center; color: #fff; }
+.tile_instagram { background: linear-gradient(135deg, #feda75, #d62976 50%, #4f5bd5); }
+.tile_facebook { background: #1877f2; }
+.tile_threads, .tile_tiktok, .tile_x { background: #111; }
+.tile_youtube { background: #ff0000; }
+.tile_linkedin { background: #0a66c2; }
+.tile_pinterest { background: #e60023; }
+.tile_bluesky { background: #1185fe; }
+.tile_mastodon { background: #6364ff; }
+.tile_gbp { background: #4285f4; }
+.cardCompact .cardCaption { margin-top: 0; }
+.agendaList .cardThumb { width: 36px; height: 36px; margin-top: 0; }
+.cardError { margin: 4px 0 0; border-radius: 8px; background: color-mix(in srgb, var(--poskoo-red) 10%, var(--poskoo-card)); padding: 6px 8px; color: var(--poskoo-ink); font-size: .8rem; overflow-wrap: anywhere; }
+
+/* List view row: tile on the left, meta + caption beside it. */
+.cardRow { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: 12px; row-gap: 4px; border-radius: 12px; padding: 12px 14px; }
+.cardRow .cardHead { display: contents; }
+.cardRow .cardThumb { display: grid; grid-row: span 3; width: 52px; height: 52px; border-radius: 10px; }
+.cardRow .cardTop, .cardRow .cardCaption, .cardRow .cardError { grid-column: 2; }
+.cardRow .cardTop { flex-wrap: wrap; gap: 6px 8px; }
+.cardRow .cardTime { font-size: .84rem; }
+.cardRow .cardCaption { font-size: .9rem; }
+
+/* Month grid on phones: "Mon, Nov 9" on one line. */
+.monthNum { white-space: nowrap; }
+@media (max-width: 639px) {
+  .monthNum { min-width: 0; padding: 0 8px; }
+}
+
+/* ---------- List view: grouped by day ---------- */
+.listTabs { display: inline-flex; gap: 2px; margin-top: 4px; border: 1px solid var(--poskoo-line); border-radius: 12px; background: var(--cal-col); padding: 3px; }
+.listTab { min-height: 34px; border: 0; border-radius: 9px; background: transparent; padding: 0 .9rem; color: var(--poskoo-muted); font: 600 .86rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif; cursor: pointer; }
+.listTab[aria-selected="true"] { background: var(--poskoo-card); color: var(--poskoo-ink); box-shadow: 0 1px 2px rgba(20, 18, 26, .06), 0 0 0 1px var(--poskoo-line); }
+.listTab:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
+.listControls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 14px; margin-top: 14px; }
+.listControls .filters, .listControls .search { margin-top: 0; }
+.dayGroups { display: grid; gap: 18px; margin: 14px 0 0; padding: 0; list-style: none; }
+.dayGroupHead { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: .95rem; letter-spacing: -.01em; }
+.dayGroupCount { color: var(--poskoo-muted); font-size: .8rem; font-weight: 600; }
+.dayGroups, .queueList, .published .dayGroupList { max-width: 880px; }
+.dayGroupList { display: grid; gap: 8px; }
+.queueRow { display: flex; align-items: center; gap: 10px; }
+.queueRow > :nth-child(2) { min-width: 0; flex: 1; }
+.queueGrip { flex: none; color: var(--poskoo-muted); cursor: grab; }
+.queueRowOver { border-radius: 12px; box-shadow: 0 0 0 2px var(--poskoo-violet); }
+.queueList { display: grid; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+@media (max-width: 639px) {
+  .listControls .search { width: 100%; margin-right: 0; }
+  .cardRow { padding: 10px 12px; column-gap: 10px; }
+  .cardRow .cardThumb { width: 44px; height: 44px; }
+}
+@media (max-width: 639px) {
+  /* Phones: view switch and an icon-only "New post" share one row. */
+  .pubActions { flex-wrap: nowrap; }
+  .newPostBtn { flex: none; width: 44px; padding: 0; }
+  .newPostText { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+/* Status icon sits in the head row (no overlap with the time). */
+.cardHead { padding-right: 0; }
+.cardHead .cardStatus { position: static; flex: none; margin-left: auto; }
+.cardTop { overflow: hidden; gap: 4px; }
+.cardIcons { flex: none; }
+.cardTime { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* Week / agenda cards: time on top, channel icons under it, beside the tile. */
+.card:not(.cardRow):not(.cardCompact) .cardTop { flex-direction: column-reverse; align-items: flex-start; gap: 2px; }
+.cardTime { max-width: 100%; }
+@media (min-width: 760px) and (max-width: 1100px) {
+  .weekTable .cardThumb { display: none; }
+}
+.queueRow { display: grid; grid-template-columns: auto minmax(0, 1fr) 7.5rem; }
+.queueActions { display: flex; justify-content: flex-end; }
+@media (max-width: 639px) {
+  .queueRow { grid-template-columns: auto minmax(0, 1fr); row-gap: 4px; }
+  .queueActions { grid-column: 2; justify-content: flex-start; }
+  .queueActions:empty { display: none; }
 }

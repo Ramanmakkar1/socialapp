@@ -1,3 +1,4 @@
+import { BookOpenCheck } from "lucide-react";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
@@ -72,19 +73,16 @@ export default async function ReviewGuidePage() {
   await requireUser();
   return (
     <div className={styles.page}>
-      <PageHero
+      <PageHero icon={<BookOpenCheck width={20} height={20} />}
         eyebrow="A clear path through the product"
         title="App review"
         accent="guide"
-        accentAfter="."
         lede={
           <>
             A 5-minute walkthrough of every Instagram permission {BRAND.name} uses. See the{" "}
             <Link href="/privacy#instagram" className={ui.link}>privacy policy</Link> for how this data is stored.
           </>
         }
-        art="/landing/card-dm.webp"
-        artAlt=""
       />
       <ol className={styles.steps}>
         {STEPS.map((s) => (

@@ -10,6 +10,8 @@ import { ruleMatchesMedia } from "@/lib/ruleMedia";
 import TodaysActions from "../TodaysActions";
 import RefreshInstagramButton from "../RefreshInstagramButton";
 import { CardRowSkeleton, TableSkeleton } from "../Skeleton";
+import EmptyState from "../EmptyState";
+import { BtnLink } from "@/components/ui/kit";
 import styles from "./content.module.css";
 
 export const metadata = { title: "Posts & Reels" };
@@ -84,15 +86,28 @@ async function ContentFeed({ account, scopes }: { account: Account | null; scope
     <>
 
       {!account ? (
-        <div className={styles.empty}>
-          <p><b>Connect Instagram to see your posts</b></p>
-          <p>Once a professional Instagram account is connected, its latest posts and reels show up here.</p>
-          <Link href="/app/settings#accounts-heading" className={styles.primary}>Connect Instagram</Link>
-        </div>
+        <EmptyState
+          icon={Film}
+          title="Connect Instagram to see your posts"
+          text="Once a professional Instagram account is connected, its latest posts and reels show up here."
+          art="/illustrations/connect-account.webp"
+          artWidth={1536}
+          artHeight={1024}
+        >
+          <BtnLink href="/app/settings#accounts-heading" size="sm">Connect Instagram</BtnLink>
+        </EmptyState>
       ) : failed ? (
-        <div className={styles.empty} role="alert">
-          <p><b>We couldn’t load your posts from Instagram</b></p>
-          <p>Instagram didn’t answer or the connection needs to be renewed. Try Refresh, or reconnect the account in Settings.</p>
+        <div role="alert">
+          <EmptyState
+            icon={Film}
+            title="We couldn’t load your posts from Instagram"
+            text="Instagram didn’t answer or the connection needs to be renewed. Try Refresh, or reconnect the account in Settings."
+            art="/illustrations/connect-account.webp"
+            artWidth={1536}
+            artHeight={1024}
+          >
+            <BtnLink href="/app/content" variant="line" size="sm">Try again</BtnLink>
+          </EmptyState>
         </div>
       ) : (
         <>
@@ -101,7 +116,16 @@ async function ContentFeed({ account, scopes }: { account: Account | null; scope
             {items.length ? (
               <TodaysActions items={items.slice(0, 8)} username={username} avatarUrl={profile?.profilePictureUrl ?? null} />
             ) : (
-              <p className={styles.muted}>No posts or reels on this account yet.</p>
+              <EmptyState
+                icon={Film}
+                title="No posts or reels yet"
+                text="Publish your first post or reel and it shows up here, with whether an Auto-DM answers its comments."
+                art="/illustrations/empty-calendar.webp"
+                artWidth={1536}
+                artHeight={1024}
+              >
+                <BtnLink href="/app/calendar?compose=1" size="sm">Create a post</BtnLink>
+              </EmptyState>
             )}
           </section>
 

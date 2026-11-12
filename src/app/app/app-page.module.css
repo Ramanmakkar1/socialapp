@@ -23,34 +23,38 @@
   letter-spacing: -.025em;
 }
 
-.accountList { display: grid; gap: 14px; }
-
-.accountCard {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  min-width: 0;
-  border: 1.5px solid var(--poskoo-line);
-  border-radius: var(--poskoo-radius-card);
-  padding: 20px 22px;
+.accountList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--poskoo-line);
+  border-radius: 14px;
   background: var(--poskoo-card);
-  box-shadow: var(--poskoo-shadow-card);
-  transition: transform .2s, box-shadow .2s;
+  overflow: hidden;
 }
 
-.accountCard:hover, .step:hover { transform: translateY(-2px); box-shadow: var(--poskoo-shadow-float); }
+/* Compact account row: identity on the left, status + actions on the right, note below. */
+.accountCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  min-width: 0;
+  padding: 12px 16px;
+  background: var(--poskoo-card);
+}
+.accountCard + .accountCard { border-top: 1px solid var(--poskoo-line); }
 
-.accountCard:nth-child(3n + 1) { background: var(--poskoo-lilac); }
-.accountCard:nth-child(3n + 2) { background: var(--poskoo-peach); }
-.accountCard:nth-child(3n) { background: var(--poskoo-mint); }
+.step:hover { transform: translateY(-2px); box-shadow: var(--poskoo-shadow-float); }
 
-.accountIdentity { display: flex; min-width: 0; align-items: center; gap: 12px; }
+.accountIdentity { display: flex; min-width: 0; flex: 1 1 220px; align-items: center; gap: 10px; }
 .accountIdentity > div { min-width: 0; }
-.accountActions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
+.accountActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
 .username { color: var(--poskoo-ink); font-weight: 600; overflow-wrap: anywhere; }
 .platform { text-transform: capitalize; }
-.accountNote { max-width: 32ch; margin: 0; }
+.accountNote { flex: 1 0 100%; max-width: none; margin: 0; }
 
 .voice {
   border-top: 1px solid var(--poskoo-line);
@@ -84,8 +88,8 @@
 .stepAction { margin: 18px 0 0 45px; }
 
 @media (max-width: 640px) {
-  .accountCard, .sectionHeader { align-items: flex-start; flex-direction: column; }
-  .accountActions { width: 100%; align-items: flex-start; text-align: left; }
+  .sectionHeader { align-items: flex-start; flex-direction: column; }
+  .accountActions { width: 100%; justify-content: flex-start; }
   .stepTop { flex-direction: column; }
   .permission { max-width: 100%; text-align: left; }
   .step { padding: 20px; }
@@ -93,5 +97,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .accountCard, .step { transition: none; }
+  .step { transition: none; }
 }

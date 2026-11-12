@@ -241,3 +241,20 @@
     justify-self: end;
   }
 }
+
+/* Editor + live phone preview: side by side on desktop, preview below the form on mobile. */
+.editorLayout { display: grid; gap: 20px; align-items: start; }
+@media (min-width: 1200px) {
+  .editorLayout { grid-template-columns: minmax(0, 1fr) 300px; }
+  .previewCol { position: sticky; top: 20px; }
+}
+.previewCol { min-width: 0; }
+.previewLabel { margin: 0 0 8px; color: var(--poskoo-muted); font-size: .8rem; font-weight: 700; text-align: center; }
+.previewPhone { max-width: 280px; margin: 0 auto; border-radius: 40px; background: #1c1c1f; padding: 8px; box-shadow: 0 24px 50px -24px rgba(0, 0, 0, .45); }
+.previewScreen { display: flex; min-height: 500px; flex-direction: column; align-items: center; gap: 8px; overflow: hidden; border-radius: 32px; padding: 22px 16px; text-align: center; }
+.previewUrl { margin: 0 0 8px; opacity: .6; font-size: .72rem; }
+.previewAvatar { display: grid; width: 72px; height: 72px; place-items: center; border-radius: 50%; object-fit: cover; font-size: 1.6rem; font-weight: 700; }
+.previewName { margin: 4px 0 0; font-size: 1.05rem; font-weight: 700; overflow-wrap: anywhere; }
+.previewBio { margin: 0; opacity: .8; font-size: .82rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.previewLinks { display: grid; width: 100%; gap: 8px; margin-top: 10px; }
+.previewLink { display: block; overflow: hidden; border: 1.5px solid transparent; border-radius: 14px; padding: 11px 12px; font-size: .86rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; box-shadow: 0 1px 2px rgba(0, 0, 0, .06); }

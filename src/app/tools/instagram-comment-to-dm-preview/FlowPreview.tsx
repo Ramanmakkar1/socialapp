@@ -109,7 +109,7 @@ export default function FlowPreview() {
         <div className="min-w-0">
           <p className="eyebrow">Interactive local preview</p>
           <h2 id={`${id}-title`} className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-            See a comment become a DM.
+            See a comment become a DM
           </h2>
         </div>
         <span className="rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] px-3 py-1 text-xs font-medium text-[#3d3450]">

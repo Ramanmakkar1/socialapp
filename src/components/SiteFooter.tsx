@@ -90,6 +90,7 @@ export function SiteFooter() {
           { href: "/pricing", label: "Pricing" },
         ]}
         extra={{ title: "Company", links: [
+            { href: "/guides", label: "Guides" },
             { href: "/help", label: "Help center" },
             { href: "/contact", label: "Contact" },
             { href: "/privacy", label: "Privacy" },

@@ -22,10 +22,9 @@ export default async function BioPage({
 
   return (
     <div className={styles.page}>
-      <PageHero
+      <PageHero icon={<Link2 width={20} height={20} />}
         eyebrow="Link in bio"
-        title="One page for"
-        accent="every link"
+        title="Link in bio"
         lede="Build a mobile-first page at poskoo.com/@yourname. Add your links, pick a colour theme and see which links people click."
         action={
           publicUrl ? (

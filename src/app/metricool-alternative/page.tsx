@@ -6,6 +6,7 @@ import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
+import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -40,7 +41,7 @@ const compare: [string, string, string][] = [
   ["Facebook & Threads publishing", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
-  ["AI DM message ideas", "Yes", "See their site"],
+  ["AI DM message ideas", "Yes", "Check their site"],
   ["Lead CSV export", "Yes", "Check their site"],
   ["Price", PRICE_SUMMARY, "See Metricool's site for current plans"],
 ];
@@ -97,6 +98,7 @@ export default function MetricoolAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people look for a Metricool alternative</h2>
           </div>
           <div className="cards">
@@ -119,7 +121,7 @@ export default function MetricoolAlternative() {
             <h2>{BRAND.name} vs Metricool</h2>
             <p>Metricool is a social media management tool for scheduling and analytics across many networks. {BRAND.name} keeps Instagram scheduling and adds comment-to-DM automation in one place. Here is an honest side-by-side.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -144,36 +146,17 @@ export default function MetricoolAlternative() {
         </div>
       </section>
 
-      {/* Who should stay on Metricool */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>Who should stay on Metricool</h2>
-            <p>
-              Stay on Metricool if you need its scheduling and reporting end to end — multi-network publishing, analytics across many networks and workflows — and you do not need comment-to-DM automation. Metricool is a mature platform; there is no reason to switch if you do not need Instagram comment-to-DM.
-            </p>
-          </div>
-        </div>
-      </section>
+      <StaySection name="Metricool">
+        Stay on Metricool if you need its scheduling and reporting end to end — multi-network publishing, analytics across many networks and workflows — and you do not need comment-to-DM automation. Metricool is a mature platform; there is no reason to switch if you do not need Instagram comment-to-DM.
+      </StaySection>
 
-      {/* How to switch in 10 minutes */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>How to switch in 10 minutes</h2>
-          </div>
-          <div className="pains" style={{ maxWidth: 760, marginInline: "auto" }}>
-            {switchSteps.map((step) => (
-              <div key={step.title} className="pain"><b>{step.title}</b><span>{step.text}</span></div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SwitchSteps steps={switchSteps} />
 
       {/* FAQ */}
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>Metricool alternative questions</h2>
           </div>
           <div className="faq">
@@ -192,7 +175,7 @@ export default function MetricoolAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule like Metricool. <em className="s">Auto-DM every commenter.</em></h2>
+              <h2>Schedule like Metricool. <em className="s">Auto-DM every commenter</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

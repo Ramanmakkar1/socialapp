@@ -179,7 +179,7 @@ export default function AutomationMessagePreview({
           >
             <div className="rounded-[1.35rem] bg-[var(--poskoo-card)] px-3 pb-4 pt-8">
               <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-[var(--poskoo-line)]" aria-hidden="true" />
-              <p className="text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
+              <p className="text-center text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]">
                 Messages
               </p>
               <div
@@ -191,7 +191,7 @@ export default function AutomationMessagePreview({
               >
                 {messageBody}
               </div>
-              <p className="mt-2 text-center text-[10px] text-[var(--poskoo-muted)]">Initial automated DM only</p>
+              <p className="mt-2 text-center text-[11px] text-[var(--poskoo-muted)]">Initial automated DM only</p>
             </div>
           </div>
         </div>

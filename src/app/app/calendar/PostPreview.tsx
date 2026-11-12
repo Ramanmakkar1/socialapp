@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AtSign, Bookmark, Facebook, Globe2, Heart, Instagram, MessageCircle, MoreHorizontal, Music2, Play, Repeat2, Send, Share2, ThumbsUp, Youtube } from "lucide-react";
+import { AtSign, Bookmark, Facebook, Globe2, Heart, Image as ImageIcon, Instagram, MessageCircle, MoreHorizontal, Music2, Play, Repeat2, Send, Share2, ThumbsUp, Youtube } from "lucide-react";
 import { captionTokens, truncateCaption } from "@/lib/captionTokens";
 import { mediaKindFromUrl } from "@/lib/mediaUpload";
 import { PLATFORMS, type PlatformId } from "@/lib/platforms";
@@ -47,7 +47,17 @@ function Bars({ lines = 3 }: { lines?: number }) {
 
 function Media({ urls, shape, dark = false }: { urls: string[]; shape: "square" | "wide" | "tall" | "auto"; dark?: boolean }) {
   const cls = `${styles.media} ${styles[`media_${shape}`]} ${dark ? styles.mediaDark : ""}`;
-  if (urls.length === 0) return <div className={cls} aria-hidden="true" />;
+  if (urls.length === 0) {
+    // Network-shaped skeleton until media is added (not a flat grey box).
+    return (
+      <div className={`${cls} ${styles.mediaEmpty}`} aria-hidden="true">
+        <span className={styles.mediaEmptyInner}>
+          <ImageIcon width={22} height={22} />
+          <span>Add a photo or video</span>
+        </span>
+      </div>
+    );
+  }
   const one = (url: string, key?: number) =>
     mediaKindFromUrl(url) === "video" ? (
       <span key={key} className={styles.videoWrap}>

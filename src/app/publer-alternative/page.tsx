@@ -24,13 +24,13 @@ const whySwitch = [
 
 const compare: [string, string, string, string][] = [
   ["Social media scheduling", "Yes", "Yes", "Yes"],
-  ["Instagram, Facebook Page and Threads publishing", "Yes", "See their site", "Depends on the tools"],
-  ["Instagram comment-to-DM automation", "Yes", "See their site", "Depends on the DM tool"],
-  ["Email capture in the DM", "Yes", "See their site", "Depends on the DM tool"],
-  ["AI caption ideas", "Yes", "See their site", "See their site"],
-  ["AI DM message ideas", "Yes", "See their site", "Depends on the DM tool"],
-  ["Lead tracking from comment to DM", "Yes", "See their site", "Depends on the DM tool"],
-  ["Price", PRICE_SUMMARY, "See their pricing", "Two subscriptions"],
+  ["Instagram, Facebook Page and Threads publishing", "Yes", "Check their site", "Depends on the tools"],
+  ["Instagram comment-to-DM automation", "Yes", "Check their site", "Depends on the DM tool"],
+  ["Email capture in the DM", "Yes", "Check their site", "Depends on the DM tool"],
+  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
+  ["AI DM message ideas", "Yes", "Check their site", "Depends on the DM tool"],
+  ["Lead tracking from comment to DM", "Yes", "Check their site", "Depends on the DM tool"],
+  ["Price", PRICE_SUMMARY, "Check their site", "Two subscriptions"],
 ];
 
 const faqs = [
@@ -78,6 +78,7 @@ export default function PublerAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people switch</h2>
           </div>
           <div className="cards">
@@ -100,7 +101,7 @@ export default function PublerAlternative() {
             <h2>{BRAND.name} vs Publer</h2>
             <p>Publer is a social media scheduler for many networks. To auto-DM commenters you would add a separate chatbot tool. {BRAND.name} does both in one plan. See the Publer site for its exact features and plans.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -131,6 +132,7 @@ export default function PublerAlternative() {
         <div className="wrap">
           <div className="split">
             <div className="copy">
+              <p className="eyebrow">How it works</p>
               <h2>Plan a post, attach an <em className="s">auto-DM rule</em></h2>
               <p>
                 When you schedule a post in the {BRAND.name} calendar, you can attach a comment-to-DM rule to it. The rule stays off until the post goes live, then switches on by itself, so the first people who comment get your link straight away.
@@ -148,6 +150,7 @@ export default function PublerAlternative() {
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>Publer alternative questions</h2>
           </div>
           <div className="faq">
@@ -166,7 +169,7 @@ export default function PublerAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule your posts and turn comments into <em className="s">leads.</em></h2>
+              <h2>Schedule your posts and turn comments into <em className="s">leads</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>

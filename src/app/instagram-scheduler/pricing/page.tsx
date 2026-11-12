@@ -140,7 +140,7 @@ export default function InstagramSchedulerPricingPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Plan comparison</p>
-            <h2>Compare Poskoo Instagram scheduler <em className="s">plan limits.</em></h2>
+            <h2>Compare Poskoo Instagram scheduler <em className="s">plan limits</em></h2>
             <p>A dash means that feature is not listed in the current plan details for that plan.</p>
           </div>
           <div className={s.tableWrap} style={{ maxWidth: 980, marginInline: "auto" }}>
@@ -203,7 +203,7 @@ export default function InstagramSchedulerPricingPage() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Start free and see your <em className="s">plan limits.</em></h2>
+              <h2>Start free and see your <em className="s">plan limits</em></h2>
               <p>No credit card needed. Schedule your first Instagram post and auto-DM today.</p>
               <Link className="btn" href="/signup">
                 Start free <span aria-hidden="true">→</span>

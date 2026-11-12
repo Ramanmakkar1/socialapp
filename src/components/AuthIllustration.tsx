@@ -19,9 +19,9 @@ export default function AuthIllustration({ mode }: { mode: "login" | "signup" })
       </div>
       <h2 className={a.panelTitle}>
         {signup ? (
-          <>Start posting and replying <em className="s">on autopilot.</em></>
+          <>Start posting and replying <em className="s">on autopilot</em></>
         ) : (
-          <>Welcome back to your <em className="s">calendar and inbox.</em></>
+          <>Welcome back to your <em className="s">calendar and inbox</em></>
         )}
       </h2>
       <ul className={a.points}>

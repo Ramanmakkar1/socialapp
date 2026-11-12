@@ -6,6 +6,7 @@ import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
+import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -28,7 +29,7 @@ const compare: [string, string, string][] = [
   ["Facebook & Threads publishing", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
-  ["AI DM message ideas", "Yes", "See their site"],
+  ["AI DM message ideas", "Yes", "Check their site"],
   ["Lead CSV export", "Yes", "Check their site"],
   ["Price", PRICE_SUMMARY, "Per-seat pricing"],
 ];
@@ -85,6 +86,7 @@ export default function SproutSocialAlternative() {
       <section>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Why switch</p>
             <h2>Why people look for a Sprout Social alternative</h2>
           </div>
           <div className="cards">
@@ -107,7 +109,7 @@ export default function SproutSocialAlternative() {
             <h2>{BRAND.name} vs Sprout Social</h2>
             <p>Sprout Social is a full enterprise social media management suite priced per seat. {BRAND.name} keeps Instagram scheduling and adds comment-to-DM automation in one place. Here is an honest side-by-side.</p>
           </div>
-          <div className={s.tableWrap} style={{ maxWidth: 920, marginInline: "auto" }}>
+          <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
                 <tr className={s.tr}>
@@ -132,36 +134,17 @@ export default function SproutSocialAlternative() {
         </div>
       </section>
 
-      {/* Who should stay on Sprout Social */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>Who should stay on Sprout Social</h2>
-            <p>
-              Stay on Sprout Social if you need its enterprise suite end to end — multi-network publishing, social listening, reporting for large teams and workflows — and per-seat pricing works for your team size. Sprout Social is a mature platform; there is no reason to switch if you do not need comment-to-DM automation.
-            </p>
-          </div>
-        </div>
-      </section>
+      <StaySection name="Sprout Social">
+        Stay on Sprout Social if you need its enterprise suite end to end — multi-network publishing, social listening, reporting for large teams and workflows — and per-seat pricing works for your team size. Sprout Social is a mature platform; there is no reason to switch if you do not need comment-to-DM automation.
+      </StaySection>
 
-      {/* How to switch in 10 minutes */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>How to switch in 10 minutes</h2>
-          </div>
-          <div className="pains" style={{ maxWidth: 760, marginInline: "auto" }}>
-            {switchSteps.map((step) => (
-              <div key={step.title} className="pain"><b>{step.title}</b><span>{step.text}</span></div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SwitchSteps steps={switchSteps} />
 
       {/* FAQ */}
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Questions</p>
             <h2>Sprout Social alternative questions</h2>
           </div>
           <div className="faq">
@@ -180,7 +163,7 @@ export default function SproutSocialAlternative() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule like Sprout Social. <em className="s">Auto-DM every commenter.</em></h2>
+              <h2>Schedule like Sprout Social. <em className="s">Auto-DM every commenter</em></h2>
               <p>Start free. No credit card. Connect Instagram in one tap.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
