@@ -970,7 +970,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             {aiOn === false ? (
               <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[var(--poskoo-band)] px-2.5 py-1.5 text-xs text-[var(--poskoo-muted)]">
                 <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                AI caption ideas aren&apos;t switched on for this workspace.
+                AI caption ideas are coming soon.
               </p>
             ) : (
               <button

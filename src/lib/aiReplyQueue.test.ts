@@ -44,6 +44,8 @@ async function run(opts: { enabled: boolean; repliesToday: number }) {
     });
   }) as typeof fetch;
   process.env.ANTHROPIC_API_KEY = "test-key";
+  const prevSwitch = process.env.AI_REPLIES_ENABLED;
+  process.env.AI_REPLIES_ENABLED = "1";
   try {
     const { maybeQueueAiReply } = await import("./aiReplyQueue.ts");
     const result = await maybeQueueAiReply(params);
@@ -52,9 +54,30 @@ async function run(opts: { enabled: boolean; repliesToday: number }) {
     globalThis.fetch = prevFetch;
     if (prevKey === undefined) delete process.env.ANTHROPIC_API_KEY;
     else process.env.ANTHROPIC_API_KEY = prevKey;
+    if (prevSwitch === undefined) delete process.env.AI_REPLIES_ENABLED;
+    else process.env.AI_REPLIES_ENABLED = prevSwitch;
     restore();
   }
 }
+
+test("maybeQueueAiReply: AI replies on hold (no AI_REPLIES_ENABLED) touch nothing", async () => {
+  const { pool, calls } = createFakePool(handlers({ enabled: true, repliesToday: 0 }));
+  const restore = installFakePool(pool);
+  const prevSwitch = process.env.AI_REPLIES_ENABLED;
+  const prevKey = process.env.ANTHROPIC_API_KEY;
+  delete process.env.AI_REPLIES_ENABLED;
+  process.env.ANTHROPIC_API_KEY = "test-key";
+  try {
+    const { maybeQueueAiReply } = await import("./aiReplyQueue.ts");
+    assert.equal(await maybeQueueAiReply(params), false);
+    assert.equal(calls.length, 0);
+  } finally {
+    if (prevSwitch !== undefined) process.env.AI_REPLIES_ENABLED = prevSwitch;
+    if (prevKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = prevKey;
+    restore();
+  }
+});
 
 test("maybeQueueAiReply: AI off returns false and makes no fetch", async () => {
   const { result, calls, fetches } = await run({ enabled: false, repliesToday: 0 });
@@ -121,6 +144,8 @@ async function runWithInbound(
     });
   }) as typeof fetch;
   process.env.ANTHROPIC_API_KEY = "test-key";
+  const prevSwitch = process.env.AI_REPLIES_ENABLED;
+  process.env.AI_REPLIES_ENABLED = "1";
   try {
     const { maybeQueueAiReply } = await import("./aiReplyQueue.ts");
     const result = await maybeQueueAiReply(params);
@@ -130,6 +155,8 @@ async function runWithInbound(
     globalThis.fetch = prevFetch;
     if (prevKey === undefined) delete process.env.ANTHROPIC_API_KEY;
     else process.env.ANTHROPIC_API_KEY = prevKey;
+    if (prevSwitch === undefined) delete process.env.AI_REPLIES_ENABLED;
+    else process.env.AI_REPLIES_ENABLED = prevSwitch;
     restore();
   }
 }

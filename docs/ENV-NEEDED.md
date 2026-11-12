@@ -1,5 +1,21 @@
 # Environment variables
 
+New on 2026-11-12 (feature readiness, `src/lib/featureReadiness.ts`): features that would break or run in
+Stripe test mode show "Coming soon" until their env is production-ready. Rules (decided at runtime):
+
+| Feature | Ready when | Coming-soon state |
+|---|---|---|
+| Paid plans (Pro / Agency) | `STRIPE_SECRET_KEY` is live (`sk_live_` / `rk_live_`) + `STRIPE_BILLING_WEBHOOK_SECRET` + `STRIPE_BILLING_LIVE_PRICES=1` (set after `scripts/stripe-setup-billing.mjs` ran on the live account) + `DATABASE_URL` | pricing cards "Coming soon" / "Start free now", no checkout, /upgrade sends to sign-up |
+| Card payments (Stripe Connect products) | live `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` + `DATABASE_URL` | "Card payments are coming soon", buy pages "Checkout coming soon"; UPI unaffected |
+| E-mail | `SMTP_HOST` (+ `SMTP_*`) | forgot/reset password and verify-email say codes are coming soon (Google sign-in), reminder channels "Coming soon", UPI order page "save this link" |
+| AI ideas (captions / DM messages) | `ANTHROPIC_API_KEY` | "AI ideas are coming soon" |
+| AI DM replies | `ANTHROPIC_API_KEY` + `AI_REPLIES_ENABLED=1` (owner hold) | Settings section "Coming soon", nothing queued |
+
+Testing overrides: `FEATURE_FORCE_READY=billing,card_payments,email,ai,ai_replies` (or `all`) skips the launch
+requirements (e.g. a Stripe test-mode checkout locally) but never the hard ones (a key must exist);
+`FEATURE_FORCE_SOON=...` turns features off and wins. Public pricing pages regenerate every 10 minutes
+(`revalidate = 600`), so a flip shows there within 10 minutes of the env change.
+
 New on 2026-11-11 (subscriptions): `STRIPE_BILLING_WEBHOOK_SECRET`, `STRIPE_TAX_ENABLED`, `STRIPE_PORTAL_CONFIGURATION_ID` (Poskoo Pro / Agency billing; migration 043). See "Subscription billing" below.
 
 New on 2026-11-11 (later): TikTok, LinkedIn, Pinterest and X keys (`TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`,

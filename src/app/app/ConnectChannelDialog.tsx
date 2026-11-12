@@ -44,6 +44,8 @@ export type ConnectAvailability = {
   mastodon?: boolean;
   /** Pills + explanations for channels that are built but not switched on (src/lib/channelStatus.ts). */
   statuses?: Partial<Record<ComingChannel, ChannelStatus>>;
+  /** Reminder channels work by e-mail: "Coming soon" while no mailer is set up (src/lib/featureReadiness.ts). */
+  reminderStatuses?: Partial<Record<ReminderNetworkId, ChannelStatus>>;
 };
 
 type NetworkId = "instagram" | "facebook" | "threads" | "youtube" | "tiktok" | "linkedin" | "pinterest" | "x" | "bluesky" | "mastodon" | "gbp";
@@ -199,7 +201,12 @@ export default function ConnectChannelDialog({
     else if (p.get("connect_pick") === "linkedin") next = { kind: "pickLinkedin" };
     else if (p.get("connect_error")) next = { kind: "error", net: p.get("net") ?? "", code: p.get("connect_error") ?? "" };
     else if (c === "bluesky" || c === "mastodon" || c === "instagram" || c === "facebook" || c === "linkedin") next = { kind: c };
-    else if (c === "ig_personal" || c === "fb_group") next = { kind: "reminder", platform: c };
+    else if (c === "ig_personal" || c === "fb_group") {
+      const soon = availability.reminderStatuses?.[c];
+      next = soon && soon.state !== "ready"
+        ? { kind: "status", id: c, name: LABEL[c], icon: icon(c === "ig_personal" ? Instagram : Facebook), bg: styles[`netBg_${c === "ig_personal" ? "instagram" : "facebook"}`] ?? "", status: soon }
+        : { kind: "reminder", platform: c };
+    }
     else if (url.hash === "#connect" || c === "1") next = { kind: "grid" };
     try {
       const saved = window.localStorage.getItem(IG_FLOW_KEY);
@@ -213,7 +220,7 @@ export default function ConnectChannelDialog({
     showDialog(ref.current, titleRef.current);
     for (const k of ["connected", "handle", "connect_error", "net", "connect", "connect_pick"]) p.delete(k);
     window.history.replaceState(null, "", `${url.pathname}${p.toString() ? `?${p.toString()}` : ""}${url.hash === "#connect" ? "" : url.hash}`);
-  }, []);
+  }, [availability.reminderStatuses]);
 
   useEffect(() => {
     // In-page links to #connect (Settings, onboarding checklist) open the grid without a reload.
@@ -271,6 +278,12 @@ export default function ConnectChannelDialog({
   const bothIg = a.facebook && a.instagramLogin;
   const igAuto = a.instagram;
   const pagesStatus = coming(a, "linkedin_pages", "LinkedIn Pages");
+  const reminderSoon = (p: ReminderNetworkId) => {
+    const s = a.reminderStatuses?.[p];
+    return s && s.state !== "ready" ? s : undefined;
+  };
+  const igRemind = reminderSoon("ig_personal");
+  const groupRemind = reminderSoon("fb_group");
 
   const title =
     view.kind === "success" ? "Channel connected"
@@ -388,11 +401,17 @@ export default function ConnectChannelDialog({
                   )}
                 </div>
                 <div className={cc.option}>
-                  <p className={cc.optionTitle}>Personal account <span className={`${cc.tag} ${cc.tagRemind}`}><Bell width={11} height={11} aria-hidden="true" /> Reminders</span></p>
+                  <p className={cc.optionTitle}>Personal account <span className={`${cc.tag} ${cc.tagRemind}`}><Bell width={11} height={11} aria-hidden="true" /> Reminders</span>{igRemind ? <span className={cc.pill}>{igRemind.pill}</span> : null}</p>
                   <p className={cc.optionText}>Instagram has no posting API for personal accounts. Poskoo e-mails you the caption and files at the scheduled time; you post it in the app.</p>
-                  <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "ig_personal" })}>
-                    <Bell width={16} height={16} aria-hidden="true" /> Get reminders for a personal account
-                  </button>
+                  {igRemind ? (
+                    <button type="button" className={styles.connectSecondary} onClick={() => openStatus(net("instagram"), igRemind, "ig_personal")}>
+                      Coming soon. Learn more
+                    </button>
+                  ) : (
+                    <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "ig_personal" })}>
+                      <Bell width={16} height={16} aria-hidden="true" /> Get reminders for a personal account
+                    </button>
+                  )}
                 </div>
               </div>
               <p className={styles.connectFoot}>
@@ -418,11 +437,17 @@ export default function ConnectChannelDialog({
                   )}
                 </div>
                 <div className={cc.option}>
-                  <p className={cc.optionTitle}>Facebook Group <span className={`${cc.tag} ${cc.tagRemind}`}><Bell width={11} height={11} aria-hidden="true" /> Reminders</span></p>
+                  <p className={cc.optionTitle}>Facebook Group <span className={`${cc.tag} ${cc.tagRemind}`}><Bell width={11} height={11} aria-hidden="true" /> Reminders</span>{groupRemind ? <span className={cc.pill}>{groupRemind.pill}</span> : null}</p>
                   <p className={cc.optionText}>Meta removed posting to Groups from its API in April 2024, so no app can publish there. Poskoo e-mails you the post at the scheduled time, ready to paste.</p>
-                  <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "fb_group" })}>
-                    <Bell width={16} height={16} aria-hidden="true" /> Get reminders for a Group
-                  </button>
+                  {groupRemind ? (
+                    <button type="button" className={styles.connectSecondary} onClick={() => openStatus(net("facebook"), groupRemind, "fb_group")}>
+                      Coming soon. Learn more
+                    </button>
+                  ) : (
+                    <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "fb_group" })}>
+                      <Bell width={16} height={16} aria-hidden="true" /> Get reminders for a Group
+                    </button>
+                  )}
                 </div>
               </div>
               <p className={styles.connectFoot}>Personal profiles can&apos;t be connected: Meta doesn&apos;t let apps post to them.</p>

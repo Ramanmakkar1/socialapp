@@ -3,14 +3,15 @@
 import { NextResponse } from "next/server";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured } from "@/lib/db";
-import { isStripeConfigured } from "@/lib/payments";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { checkoutMethod, createCheckoutUrl, getPublicProduct } from "@/lib/products";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request, ctx: { params: Promise<{ slug: string }> }) {
   const { slug } = await ctx.params;
   const back = (q = "") => NextResponse.redirect(new URL(`/p/${encodeURIComponent(slug)}${q}`, BRAND.url), 303);
-  if (!isStripeConfigured() || !isDbConfigured()) return back();
+  // Card checkout only with live Stripe (src/lib/featureReadiness.ts): the page shows "Checkout coming soon".
+  if (!isFeatureReady("card_payments") || !isDbConfigured()) return back();
   const limited = rateLimit(`checkout:${clientIp(request.headers)}`, 20, 10 * 60 * 1000);
   if (!limited.ok) return back("?error=busy");
   try {

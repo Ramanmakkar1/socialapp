@@ -4,7 +4,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
-import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
+import { PlanCta, PlanTag } from "@/components/PlanCta";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -27,8 +29,11 @@ export const metadata: Metadata = {
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
 export const dynamic = "force-static";
+// Pricing cards follow the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
+// regenerate in the background at most every 10 minutes.
+export const revalidate = 600;
 const faqs = [{"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": "Instagram, Facebook Pages, Threads, YouTube, Bluesky and Mastodon scheduling work today, plus Instagram auto-DMs. TikTok, LinkedIn, Pinterest and X are coming soon."}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
-const jsonLd = {
+const pageJsonLd = (faqs: { q: string; a: string }[], r: PlanReadiness) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
@@ -41,7 +46,7 @@ const jsonLd = {
       image: BRAND.url + "/landing/hero.webp",
       description: BRAND.description,
       publisher: { "@id": BRAND.url + "#org" },
-      offers: SOFTWARE_APPLICATION_OFFERS,
+      offers: softwareOffers(r),
     },
     {
       "@type": "FAQPage",
@@ -52,9 +57,14 @@ const jsonLd = {
       })),
     },
   ],
-};
+});
 
 export default function Home() {
+// Paid plans / AI items: "Coming soon" until featureReadiness says they're switched on.
+const r = planReadiness();
+const plans = plansFor(r);
+const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
+const jsonLd = pageJsonLd(faqList, r);
 // The hero poster is the first thing painted above the fold (the video fades in over it):
 // fetch it early and at high priority so it, not the lazy art below, is the LCP candidate.
 preload("/landing/hero-poster.webp?v=2", { as: "image", fetchPriority: "high" });
@@ -235,9 +245,9 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 <section id="pricing"><div className="wrap">
   <div className="head"><p className="eyebrow">Pricing</p><h2>Simple plans. <em className="s">Start free</em></h2></div>
   <div className="plans">
-    {PLANS.map((p) => (
+    {plans.map((p) => (
       <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
-        {p.popular ? <span className="tag">Most popular</span> : null}
+        <PlanTag plan={p} />
         <h3>{p.name}</h3>
         <div className="price">{p.price} <small>{p.per}</small></div>
         {p.yearly && <p className="priceYearly">or {p.yearlyHref ? <a href={p.yearlyHref}>{p.yearly}</a> : p.yearly}</p>}
@@ -245,22 +255,21 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
           {p.items.map((item) => (
             <li key={item.text}>
               <svg width="16" height="16"><use href="#ok"/></svg>
-              {item.text}
-              {item.soon ? <small className="soon"> · coming soon</small> : null}
+              <span>{item.text}{item.soon ? <small className="soon"> · coming soon</small> : null}</span>
             </li>
           ))}
         </ul>
-        {p.ctaHref.startsWith("/upgrade") ? <a className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</a> : <Link className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</Link>}
+        <PlanCta plan={p} />
       </div>
     ))}
   </div>
-  <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{PLANS_NOTE}</p>
+  <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{plansNote(r)}</p>
 </div></section>
 
 <section id="faq" style={{"paddingTop": "20px"}}><div className="wrap">
   <div className="head"><p className="eyebrow">Questions</p><h2>Good to know</h2></div>
   <div className="faq">
-    {faqs.map((f, i) => (
+    {faqList.map((f, i) => (
       <details key={f.q} open={i === 0}><summary>{f.q}</summary><p>{f.a}</p></details>
     ))}
   </div>

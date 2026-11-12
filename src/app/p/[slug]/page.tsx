@@ -6,8 +6,8 @@ import ui from "@/components/ui/ui.module.css";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
-import { isStripeConfigured } from "@/lib/payments";
-import { checkoutMethod, getPublicProduct } from "@/lib/products";
+import { isFeatureReady } from "@/lib/featureReadiness";
+import { cardCheckoutSoon, checkoutMethod, getPublicProduct } from "@/lib/products";
 import { newOrderRef, upiAmount, upiDeepLink, upiNote } from "@/lib/upi";
 import { randomBytes } from "node:crypto";
 import UpiCheckout from "./UpiCheckout";
@@ -37,7 +37,12 @@ export default async function ProductBuyPage({ params, searchParams }: Props) {
   const product = await getPublicProduct(slug);
   if (!product || !product.active) notFound();
   // Seller's country routes the checkout: India -> Direct UPI, Stripe countries -> Stripe.
-  const method = checkoutMethod(product, isStripeConfigured());
+  // Card checkout only once card payments are live (src/lib/featureReadiness.ts); UPI always works.
+  const cardReady = isFeatureReady("card_payments");
+  const method = checkoutMethod(product, cardReady);
+  // A card-routed product (not India / not INR) whose checkout isn't switched on yet.
+  const cardSoon = !method && cardCheckoutSoon(product, cardReady);
+  const emailReady = isFeatureReady("email");
   const orderRef = newOrderRef(randomBytes(8));
   const upi =
     method === "upi" && product.upi_vpa && product.upi_payee_name
@@ -84,18 +89,23 @@ export default async function ProductBuyPage({ params, searchParams }: Props) {
               orderRef={orderRef}
               deepLink={upiDeepLink({ vpa: upi.vpa, payeeName: upi.payeeName, amountPaise: product.price_cents, note: upi.note })}
               supportContact={product.upi_support_contact}
+              emailReady={emailReady}
             />
           ) : method === "stripe" ? (
             <form action={`/p/${product.slug}/checkout`} method="post">
               <Btn type="submit" className={`w-full ${styles.buy}`}>Buy now · {formatMoney(product.price_cents, product.currency)}</Btn>
             </form>
+          ) : cardSoon ? (
+            <div role="status" className={styles.unavailable}>
+              <strong>Checkout coming soon.</strong> Card payments for this product are launching soon. Check back shortly.
+            </div>
           ) : (
             <p role="status" className={styles.unavailable}>This product is not available for purchase right now.</p>
           )}
-          {upi ? (
+          {!upi && !method ? null : upi ? (
             <ul className={styles.trust}>
               <li>Pay with any UPI app: GPay, PhonePe, Paytm, BHIM</li>
-              <li>Your {delivery} is e-mailed once the seller confirms your payment</li>
+              <li>{emailReady ? `Your ${delivery} is e-mailed once the seller confirms your payment` : `Your ${delivery} appears on your order page once the seller confirms your payment`}</li>
             </ul>
           ) : (
             <ul className={styles.trust}>

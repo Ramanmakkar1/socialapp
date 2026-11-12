@@ -2,12 +2,17 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS } from "@/lib/plans";
+import { PLANS, cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
+import { PlanCta, PlanTag } from "@/components/PlanCta";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
 
 const PATH = "/pricing";
+// Plan buttons follow the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
+// the page stays static and regenerates in the background at most every 10 minutes.
+export const revalidate = 600;
 const title = `${BRAND.name} Pricing: Free Instagram Scheduler & Auto-DM Plans`;
 const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, then upgrade to Pro or Agency when you need more. No credit card needed to start.`;
 
@@ -22,7 +27,7 @@ export const metadata: Metadata = {
 const free = PLANS[0];
 const freeLimits = free.items.filter((i) => !i.soon).map((i) => i.text).join(", ");
 
-const faqs = [
+const pricingFaqs = (r: PlanReadiness) => [
   {
     q: "Is there a free plan?",
     a: `Yes. The ${free.name} plan is ${free.price} ${free.per} and includes ${freeLimits}. Every account starts on it.`,
@@ -33,7 +38,7 @@ const faqs = [
   },
   {
     q: "Can I cancel any time?",
-    a: "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for.",
+    a: cancelAnswer(r),
   },
   {
     q: "Which platforms are included?",
@@ -49,21 +54,21 @@ const includes = [
   "Facebook Pages, Threads and YouTube scheduling",
 ];
 
-const faqJsonLd = {
+const faqJsonLd = (faqs: { q: string; a: string }[]) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
-const appJsonLd = {
+});
+const appJsonLd = (r: PlanReadiness) => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: BRAND.name,
   url: `${BRAND.url}${PATH}`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  offers: softwareOffers(r),
   publisher: { "@type": "Organization", name: BRAND.company },
-};
+});
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -85,9 +90,12 @@ function Check() {
 }
 
 export default function PricingPage() {
+  const r = planReadiness();
+  const plans = plansFor(r);
+  const faqs = pricingFaqs(r);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`}>
-      {[faqJsonLd, appJsonLd, breadcrumbJsonLd].map((data) => <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />)}
+      {[faqJsonLd(faqs), appJsonLd(r), breadcrumbJsonLd].map((data) => <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />)}
       <nav aria-label="Breadcrumb" className={s.crumbs}>
         <Link href="/">Home</Link> / Pricing
       </nav>
@@ -97,7 +105,7 @@ export default function PricingPage() {
           <h1>
                 Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
               </h1>
-          <p className="lede">Start free today. Upgrade to Pro or Agency for more accounts, posts and DMs whenever you are ready.</p>
+          <p className="lede">{r.paidPlans ? "Start free today. Upgrade to Pro or Agency for more accounts, posts and DMs whenever you are ready." : "Start free today. Pro and Agency, with more accounts, posts and DMs, are launching soon."}</p>
           <div className="ctas">
                 <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
                 <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
@@ -109,9 +117,9 @@ export default function PricingPage() {
       <section style={{ paddingTop: 40 }}>
         <div className="wrap">
           <div className="plans">
-            {PLANS.map((p) => (
+            {plans.map((p) => (
               <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
-                {p.popular ? <span className="tag">Most popular</span> : null}
+                <PlanTag plan={p} />
                 <h3>{p.name}</h3>
                 <div className="price">{p.price} <small>{p.per}</small></div>
         {p.yearly && <p className="priceYearly">or {p.yearlyHref ? <a href={p.yearlyHref}>{p.yearly}</a> : p.yearly}</p>}
@@ -119,16 +127,15 @@ export default function PricingPage() {
                   {p.items.map((item) => (
                     <li key={item.text}>
                       <Check />
-                      {item.text}
-                      {item.soon ? <small className="soon"> · coming soon</small> : null}
+                      <span>{item.text}{item.soon ? <small className="soon"> · coming soon</small> : null}</span>
                     </li>
                   ))}
                 </ul>
-                {p.ctaHref.startsWith("/upgrade") ? <a className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</a> : <Link className={p.popular ? "btn btn-dark" : "btn btn-line"} href={p.ctaHref}>{p.cta}</Link>}
+                <PlanCta plan={p} />
               </div>
             ))}
           </div>
-          <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{PLANS_NOTE}</p>
+          <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{plansNote(r)}</p>
           <p className="small" style={{ textAlign: "center", marginTop: "10px" }}>
             Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}
             by accounts, scheduled posts and auto-DMs.

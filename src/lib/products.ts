@@ -8,6 +8,7 @@ import type { DeliveryFields } from "@/lib/digitalDelivery";
 import { isUuid } from "@/lib/leadMagnets";
 import { platformFeeBps, platformFeeCents, type ProductCurrency } from "@/lib/money";
 import { getStripe } from "@/lib/payments";
+import { payoutRoute } from "@/lib/upi";
 
 export type Product = {
   id: string;
@@ -115,6 +116,19 @@ export function checkoutMethod(
   if (p.payout_country === "IN") return p.upi_vpa && p.upi_payee_name && p.currency === "inr" ? "upi" : null;
   if (p.currency === "inr") return null;
   return stripeConfigured && p.charges_enabled && p.stripe_account_id ? "stripe" : null;
+}
+
+/**
+ * True when this product would sell by card but card payments aren't live yet
+ * (featureReadiness "card_payments"): the buy page says "Checkout coming soon" instead of
+ * "not available". Never for India sellers or INR prices (those are UPI).
+ */
+export function cardCheckoutSoon(
+  p: Pick<Product, "active" | "currency"> & PublicPayout & { stripe_account_id: string | null },
+  cardPaymentsReady: boolean,
+): boolean {
+  if (cardPaymentsReady || !p.active || p.currency === "inr" || p.payout_country === "IN") return false;
+  return Boolean(p.stripe_account_id) || payoutRoute(p.payout_country) === "stripe";
 }
 
 /** Create or update; points exactly `ruleIds` at the product's buy link. Null when not this user's product. */

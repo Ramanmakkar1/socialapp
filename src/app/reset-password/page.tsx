@@ -6,6 +6,9 @@ import AuthFrame from "../login/AuthFrame";
 import { ResetForm } from "../login/EmailAuthForms";
 import ui from "@/components/ui/ui.module.css";
 import a from "../login/auth.module.css";
+import EmailSoon from "../login/EmailSoon";
+import { isFeatureReady } from "@/lib/featureReadiness";
+import { isGoogleConfigured } from "@/lib/googleAuth";
 
 // Per request: a magic-link token is checked against the DB.
 export const dynamic = "force-dynamic";
@@ -47,6 +50,14 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
     );
   }
 
+  // No mailer: no code was ever e-mailed, so don't ask for one (src/lib/featureReadiness.ts).
+  if (!isFeatureReady("email")) {
+    return (
+      <AuthFrame title={<>Reset your <em className="s">password</em></>} lede="Password reset codes are sent by e-mail, which isn’t switched on yet." footer={<Link href="/login" className={a.textLink}>Log in</Link>}>
+        <EmailSoon googleEnabled={isGoogleConfigured()} what="a reset code" />
+      </AuthFrame>
+    );
+  }
   return (
     <AuthFrame title={<>Reset your <em className="s">password</em></>} lede="Enter the 6-digit code we emailed you and choose a new password." footer={footer}>
       <ResetForm email={typeof email === "string" ? email.trim().slice(0, 254) : undefined} />

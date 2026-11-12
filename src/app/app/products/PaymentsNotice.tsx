@@ -25,10 +25,20 @@ export default function PaymentsNotice({ configured, account, payout = null }: {
       </p>
     );
   }
+  // Card payments (Stripe Connect) not live yet (src/lib/featureReadiness.ts "card_payments").
   if (!configured) {
     return (
-      <p role="status" className={`${ui.notice} ${ui.noticeWarn} mt-6`}>
-        Payments are not switched on yet. You can already create products; buy links start taking payments once payments are switched on and you connect Stripe in Settings.
+      <p role="status" className={`${ui.notice} ${ui.noticeSoon} mt-6`}>
+        <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span>{" "}
+        {route === "stripe" ? (
+          <>
+            <strong>Card payments are coming soon.</strong> You can already create products; your buy links show &ldquo;Checkout coming soon&rdquo; until card payments are switched on.
+          </>
+        ) : (
+          <>
+            <strong>Card payments are coming soon.</strong> In India you can sell with Direct UPI today. <Link href="/app/settings#payments-heading" className={ui.link}>Choose your country in Settings, Payments</Link>
+          </>
+        )}
       </p>
     );
   }

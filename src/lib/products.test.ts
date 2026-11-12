@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { checkoutMethod, checkoutSessionParams, newSlug, slugBase } from "./products.ts";
+import { cardCheckoutSoon, checkoutMethod, checkoutSessionParams, newSlug, slugBase } from "./products.ts";
 
 const product = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -58,4 +58,16 @@ test("checkout routing: India sellers -> UPI (INR only), others -> Stripe when e
   assert.equal(checkoutMethod({ ...stripe, payout_country: null }, true), "stripe");
   assert.equal(checkoutMethod({ ...stripe, currency: "inr" }, true), null);
   assert.equal(checkoutMethod({ ...stripe, charges_enabled: false }, true), null);
+});
+
+test("cardCheckoutSoon: card-routed products say 'coming soon' only while card payments aren't live", () => {
+  const card = { active: true, currency: "cad" as const, payout_country: "CA", upi_vpa: null, upi_payee_name: null, upi_support_contact: null, stripe_account_id: null };
+  assert.equal(cardCheckoutSoon(card, false), true);
+  assert.equal(cardCheckoutSoon(card, true), false);
+  assert.equal(cardCheckoutSoon({ ...card, active: false }, false), false);
+  assert.equal(cardCheckoutSoon({ ...card, payout_country: "IN" }, false), false);
+  assert.equal(cardCheckoutSoon({ ...card, currency: "inr" as const }, false), false);
+  assert.equal(cardCheckoutSoon({ ...card, payout_country: null }, false), false);
+  assert.equal(cardCheckoutSoon({ ...card, payout_country: null, stripe_account_id: "acct_1" }, false), true);
+  assert.equal(cardCheckoutSoon({ ...card, payout_country: "BR" }, false), false);
 });

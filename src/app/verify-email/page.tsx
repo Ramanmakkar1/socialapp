@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { consumeToken, markEmailVerified } from "@/lib/authEmail";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { isDbConfigured } from "@/lib/db";
 import AuthFrame from "../login/AuthFrame";
 import { VerifyForm } from "../login/EmailAuthForms";
@@ -63,6 +64,19 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
         ? { error: "We couldn’t send a new code right now. Please wait a few minutes and try again." }
         : undefined;
 
+  // No mailer: no code was sent. Verification never blocks the app, so just say so honestly.
+  if (!isFeatureReady("email")) {
+    return (
+      <AuthFrame art="signup" title={<>Verify your <em className="s">email</em></>} lede="Email verification codes are coming soon.">
+        <div className={a.stack}>
+          <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}>
+            <strong>Coming soon.</strong> We can&apos;t e-mail codes yet, so there&apos;s nothing to type here. Your account works fully meanwhile; signing in with Google verifies your address automatically.
+          </p>
+          <Link href="/app" className="btn btn-dark">Open your dashboard</Link>
+        </div>
+      </AuthFrame>
+    );
+  }
   return (
     <AuthFrame
       art="signup"

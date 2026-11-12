@@ -3,7 +3,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
-import { BILLING_PATH, isBillingConfigured, startCheckout } from "@/lib/billing";
+import { BILLING_PATH, startCheckout } from "@/lib/billing";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { parsePlanChoice } from "@/lib/billingState";
 import { UPGRADE_INTENT_COOKIE } from "@/lib/upgradeIntent";
 
@@ -12,7 +13,8 @@ const back = (status: string) => NextResponse.redirect(new URL(`${BILLING_PATH}?
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.redirect(new URL("/login", BRAND.url), 303);
-  if (!isBillingConfigured()) return back("not_configured");
+  // Paid plans launch only with live Stripe keys etc. (src/lib/featureReadiness.ts): never a test checkout.
+  if (!isFeatureReady("billing")) return back("not_configured");
   const form = await request.formData().catch(() => null);
   const choice = parsePlanChoice(form?.get("plan"), form?.get("interval"));
   if (!choice) return back("error");

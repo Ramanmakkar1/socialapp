@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { consumeToken, findUserByEmail, issueCode, markEmailVerified, setPasswordAndRevoke, redeemCode } from "@/lib/authEmail";
 import { isDbConfigured } from "@/lib/db";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { sendEmail } from "@/lib/email";
 import { CODE_MESSAGES, VERIFY_DISMISS_COOKIE, normalizeCodeInput } from "@/lib/emailCodes";
 import { inBackground, sendPasswordChanged, sendVerification } from "@/lib/emailNotify";
@@ -15,6 +16,7 @@ import { clientIp, rateLimit, tooManyMessage } from "@/lib/rateLimit";
 export type EmailFormState = { error?: string; sent?: boolean; email?: string; message?: string } | undefined;
 
 const UNAVAILABLE = "This is not available right now. Please try again in a minute.";
+const EMAIL_SOON = "Email sign-in codes are coming soon. Continue with Google to sign in.";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -27,6 +29,8 @@ function field(formData: FormData, key: string): string {
  */
 export async function forgotPasswordAction(_prev: EmailFormState, formData: FormData): Promise<EmailFormState> {
   if (!isDbConfigured()) return { error: UNAVAILABLE };
+  // Never pretend a code was sent when no mailer is configured (src/lib/featureReadiness.ts).
+  if (!isFeatureReady("email")) return { error: EMAIL_SOON };
   return requestPasswordReset(field(formData, "email"), clientIp(await headers()), {
     findUser: findUserByEmail,
     issueCode: (userId) => issueCode(userId, "reset"),
@@ -98,6 +102,7 @@ export async function resendVerificationAction(): Promise<EmailFormState> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (user.emailVerified) return { message: "Your email is already verified." };
+  if (!isFeatureReady("email")) return { error: "Email verification codes are coming soon. Nothing is blocked meanwhile." };
   const limited = rateLimit(`verify-send:${user.id}`, 3, 15 * 60 * 1000);
   if (!limited.ok) return { error: tooManyMessage(limited.retryAfterMs) };
   try {

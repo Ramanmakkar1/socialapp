@@ -4,7 +4,7 @@ import SubmitButton from "@/components/ui/SubmitButton";
 import { BtnA, BtnLink } from "@/components/ui/kit";
 import { isDbConfigured } from "@/lib/db";
 import { platformFeeBps } from "@/lib/money";
-import { isStripeConfigured } from "@/lib/payments";
+import { FEATURE_COPY, isFeatureReady } from "@/lib/featureReadiness";
 import { CONNECT_COUNTRIES, connectedAccountForPage, type ConnectedAccount } from "@/lib/stripeConnect";
 import { payoutRoute } from "@/lib/upi";
 import { getSellerPayout, upiReady, type SellerPayout } from "@/lib/upiOrders";
@@ -14,7 +14,7 @@ const MESSAGES: Record<string, { warn: boolean; text: string }> = {
   connected: { warn: false, text: "Stripe is connected. You can take payments." },
   pending: { warn: true, text: "Stripe still needs a few details before you can take payments. Continue setup when you're ready." },
   error: { warn: true, text: "We couldn't reach Stripe. Please try again." },
-  not_configured: { warn: true, text: "Payments are not switched on yet." },
+  not_configured: { warn: false, text: "Card payments are coming soon. Direct UPI (India) works today." },
   country: { warn: false, text: "Country saved." },
   country_error: { warn: true, text: "Pick a country from the list." },
   upi_saved: { warn: false, text: "UPI details saved. Your INR products can now be bought by UPI." },
@@ -118,7 +118,8 @@ function StripeSection({ account, country }: { account: ConnectedAccount | null;
  */
 export default async function PaymentsSettings({ userId, status }: { userId: string; status?: string }) {
   const db = isDbConfigured();
-  const stripeOn = isStripeConfigured() && db;
+  // Card payments (Stripe Connect) need live Stripe keys (src/lib/featureReadiness.ts); UPI never does.
+  const stripeOn = isFeatureReady("card_payments") && db;
   const [payout, account] = await Promise.all([
     db ? getSellerPayout(userId).catch(() => null) : Promise.resolve(null),
     stripeOn ? connectedAccountForPage(userId) : Promise.resolve(null),
@@ -150,8 +151,8 @@ export default async function PaymentsSettings({ userId, status }: { userId: str
             stripeOn ? (
               <StripeSection account={account} country={country} />
             ) : (
-              <p role="status" className={`${ui.notice} ${ui.noticeWarn}`}>
-                Card payments are not switched on yet. You can already create products; they start selling once payments are switched on.
+              <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}>
+                <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span> <strong>{FEATURE_COPY.card_payments.title}.</strong> You can already create products; buy links start taking card payments once card payments are switched on.
               </p>
             )
           ) : (

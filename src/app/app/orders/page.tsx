@@ -11,7 +11,7 @@ import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { ORDER_STATUS_LABEL, countOrders, listOrders, type OrderRow } from "@/lib/orders";
-import { isStripeConfigured } from "@/lib/payments";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { connectedAccountForPage, type ConnectedAccount } from "@/lib/stripeConnect";
 import PaymentsNotice from "../products/PaymentsNotice";
 import { getSellerPayout, listAwaitingUpi, type AwaitingUpiOrder, type SellerPayout } from "@/lib/upiOrders";
@@ -35,7 +35,8 @@ const GOOD = new Set(["paid"]);
 export default async function OrdersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await requireUser();
   const params = await searchParams;
-  const configured = isStripeConfigured();
+  // Card checkout needs live Stripe (src/lib/featureReadiness.ts); UPI never does.
+  const configured = isFeatureReady("card_payments");
   let total = 0;
   let orders: OrderRow[] = [];
   let account: ConnectedAccount | null = null;

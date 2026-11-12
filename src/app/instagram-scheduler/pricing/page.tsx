@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLANS, PLANS_NOTE, SOFTWARE_APPLICATION_OFFERS, type Plan } from "@/lib/plans";
+import { PLANS, plansNote, softwareOffers, type Plan, type PlanReadiness } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-scheduler/pricing";
+// The upgrade FAQ follows the RUNTIME env (src/lib/featureReadiness.ts); regenerate every 10 minutes.
+export const revalidate = 600;
 const title = "Instagram Scheduler Pricing: Plans & Limits | Poskoo";
 const description =
-  "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free, upgrade to Pro or Agency any time.";
+  "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free; Pro and Agency add more accounts, posts and DMs.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -57,7 +60,7 @@ const proDms = limitFor(pro, ["auto-DMs"]);
 const agencyAccounts = limitFor(agency, ["social accounts"]);
 const agencyDms = limitFor(agency, ["auto-DMs"]);
 
-const faqs = [
+const pageFaqs = (r: PlanReadiness) => [
   {
     q: "How much does the Poskoo Instagram scheduler cost?",
     a: `The Free plan is ${free.price} ${free.per} and includes ${freeAccounts}, ${freePosts} and ${freeDms}. Pro is ${proPrice} (or ${pro.yearly}) with ${proAccounts}, unlimited scheduling and ${proDms}, and Agency is ${agency.price} ${agency.per} (or ${agency.yearly}) with ${agencyAccounts} and ${agencyDms}.`,
@@ -72,7 +75,9 @@ const faqs = [
   },
   {
     q: "Can I upgrade to Pro or Agency today?",
-    a: `Yes. Press "Choose Pro" or "Choose Agency" on the pricing page, or open Settings > Plan & billing after you log in. You pay by card through Stripe. ${PLANS_NOTE}`,
+    a: r.paidPlans
+      ? `Yes. Press "Choose Pro" or "Choose Agency" on the pricing page, or open Settings > Plan & billing after you log in. You pay by card through Stripe. ${plansNote(r)}`
+      : `Not yet. ${plansNote(r)}`,
   },
   {
     q: "Does the pricing table include competitor plan limits?",
@@ -80,7 +85,7 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
+const faqJsonLd = (faqs: { q: string; a: string }[]) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: faqs.map((faq) => ({
@@ -88,22 +93,24 @@ const faqJsonLd = {
     name: faq.q,
     acceptedAnswer: { "@type": "Answer", text: faq.a },
   })),
-};
+});
 
-const appJsonLd = {
+const appJsonLd = (r: PlanReadiness) => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: BRAND.name,
   url: `${BRAND.url}${PATH}`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  offers: SOFTWARE_APPLICATION_OFFERS,
+  offers: softwareOffers(r),
   publisher: { "@type": "Organization", name: BRAND.company },
-};
+});
 
 const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function InstagramSchedulerPricingPage() {
+  const r = planReadiness();
+  const faqs = pageFaqs(r);
   return (
     <PublicShell
       breadcrumbs={[
@@ -111,7 +118,7 @@ export default function InstagramSchedulerPricingPage() {
         { name: "Pricing and plan limits", path: PATH },
       ]}
     >
-      {[faqJsonLd, appJsonLd].map((data) => (
+      {[faqJsonLd(faqs), appJsonLd(r)].map((data) => (
         <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />
       ))}
 
@@ -178,7 +185,7 @@ export default function InstagramSchedulerPricingPage() {
             competitor plan limits here because competitor prices and limits change, and we only publish comparison
             facts we can verify. Check each competitor&apos;s own pricing page for their current limits.
           </p>
-          <p className="small" style={{ textAlign: "center", marginTop: 8 }}>{PLANS_NOTE}</p>
+          <p className="small" style={{ textAlign: "center", marginTop: 8 }}>{plansNote(r)}</p>
         </div>
       </section>
 

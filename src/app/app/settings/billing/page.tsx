@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Check, CreditCard } from "lucide-react";
-import { BtnLink, PageHero } from "@/components/ui/kit";
+import { Btn, BtnLink, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
 import { requireUser } from "@/lib/auth";
@@ -18,6 +18,7 @@ import {
   type PaidPlan,
 } from "@/lib/billingState";
 import { isDbConfigured, query } from "@/lib/db";
+import { FEATURE_COPY, isFeatureReady } from "@/lib/featureReadiness";
 import { pendingMediaUsage } from "@/lib/mediaLifecycle";
 import { PLAN_MEDIA_LIMITS, pendingStorageLabel } from "@/lib/mediaLimits";
 import { PLAN_LIMITS, monthlyAutoDmLimit, scheduledPostsUsage, type PlanName } from "@/lib/planLimits";
@@ -29,7 +30,7 @@ export const metadata = { title: "Plan & billing" };
 
 const MESSAGES: Record<string, { warn: boolean; text: string }> = {
   error: { warn: true, text: "We couldn't reach Stripe. Nothing was charged. Please try again." },
-  not_configured: { warn: true, text: "Paid plans are not switched on on this server yet." },
+  not_configured: { warn: false, text: "Paid plans are launching soon. Nothing was charged." },
   no_customer: { warn: true, text: "There is no billing account yet. Pick a plan below to start one." },
 };
 
@@ -102,6 +103,7 @@ function UpgradeCard({ plan, interval, current, picked, enabled }: { plan: PaidP
       <p className={billing.planName}>
         {plan}
         {isCurrent ? <span className={`${ui.pill} ${ui.pillMint}`}>Your plan</span> : null}
+        {!enabled && !isCurrent ? <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span> : null}
         {picked && !isCurrent ? <span className={`${ui.pill} ${ui.pillPeach}`}>You picked this</span> : null}
       </p>
       <p className={billing.price}>
@@ -125,7 +127,12 @@ function UpgradeCard({ plan, interval, current, picked, enabled }: { plan: PaidP
           <SubmitButton label={picked ? "Continue to checkout" : `Upgrade to ${plan}`} pendingLabel="Opening checkout…" variant={plan === "Pro" ? "dark" : "line"} />
         </form>
       ) : (
-        <p className={ui.hint}>Paid plans are not switched on on this server yet.</p>
+        <div>
+          <Btn variant="line" disabled aria-describedby={`soon-${plan}`} className="w-full cursor-not-allowed opacity-60">
+            Coming soon
+          </Btn>
+          <p id={`soon-${plan}`} className={ui.hint} style={{ marginTop: 8 }}>Paid plans are launching soon.</p>
+        </div>
       )}
     </div>
   );
@@ -139,6 +146,9 @@ export default async function BillingPage({
   const user = await requireUser();
   const sp = await searchParams;
   const configured = isBillingConfigured();
+  // Selling Pro / Agency needs live Stripe (src/lib/featureReadiness.ts). Until then the cards show
+  // "Coming soon" and no checkout starts; syncing an existing subscription still works.
+  const paidReady = isFeatureReady("billing");
   let syncNote: { warn: boolean; text: string } | null = null;
 
   // Success page sync: record the subscription now, so a slow or missing webhook never leaves a paying user on Free.
@@ -195,7 +205,7 @@ export default async function BillingPage({
               <span className={`${ui.pill} ${row.status === "active" || row.status === "trialing" ? ui.pillMint : ui.pillPeach}`}>{STATUS_LABEL[row.status] ?? row.status}</span>
             ) : null}
           </p>
-          {plan === "Free" && !hasSubscription ? <p className={ui.hint}>Free forever. Upgrade any time; cancel any time.</p> : null}
+          {plan === "Free" && !hasSubscription ? <p className={ui.hint}>{paidReady ? "Free forever. Upgrade any time; cancel any time." : "Free forever. Pro and Agency are launching soon."}</p> : null}
           {hasSubscription && row ? (
             <p className={ui.hint}>
               {row.plan} · {row.billing_interval === "year" ? "billed yearly" : "billed monthly"}
@@ -247,16 +257,19 @@ export default async function BillingPage({
               ))}
             </div>
           </div>
-          {hasSubscription ? (
+          {!paidReady ? (
+            <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}><strong>{FEATURE_COPY.billing.title}.</strong> {FEATURE_COPY.billing.body}</p>
+          ) : null}
+          {hasSubscription && paidReady ? (
             <p className={ui.hint}>You already have a subscription: switching plans or billing period happens in Manage billing (Stripe charges or credits the difference).</p>
           ) : null}
           <div className={billing.plans}>
             {upgradeTargets.map((p) => (
-              <UpgradeCard key={p} plan={p} interval={interval} current={plan} picked={picked?.plan === p} enabled={configured} />
+              <UpgradeCard key={p} plan={p} interval={interval} current={plan} picked={picked?.plan === p && paidReady} enabled={paidReady} />
             ))}
           </div>
           <p className={ui.hint}>
-            Prices in USD. Taxes may apply at checkout. Cancel any time from Manage billing: you keep your plan until the end of the period you paid for.{" "}
+            {paidReady ? "Prices in USD. Taxes may apply at checkout. Cancel any time from Manage billing: you keep your plan until the end of the period you paid for." : "Prices in USD, shown so you can plan ahead. Nothing can be charged until paid plans launch."}{" "}
             <Link href="/pricing" className={ui.link}>Compare all plans</Link>
           </p>
         </section>

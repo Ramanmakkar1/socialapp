@@ -45,6 +45,8 @@ export default function UpiCheckout(props: {
   orderRef: string;
   deepLink: string;
   supportContact: string | null;
+  /** E-mail switched on (src/lib/featureReadiness.ts)? If not, the order page link is how the buyer gets the product. */
+  emailReady?: boolean;
 }) {
   const [state, action] = useActionState(submitUpiOrderAction, undefined);
   const err = (f: "email" | "name" | "utr") => (state?.field === f ? true : undefined);
@@ -88,7 +90,9 @@ export default function UpiCheckout(props: {
       </ol>
       <p className={styles.upiDirect}>
         Your payment goes directly to {props.payeeName} by UPI. Poskoo doesn&apos;t hold or process this money, so refunds and payment questions go to the seller{props.supportContact ? <> ({props.supportContact})</> : null}.
-        The seller confirms your payment, usually within a few hours, and you&apos;ll get an e-mail with your product.
+        {props.emailReady === false
+          ? "The seller confirms your payment, usually within a few hours. The next page is your order page: save its link, because that's where your product appears."
+          : "The seller confirms your payment, usually within a few hours, and you'll get an e-mail with your product."}
       </p>
     </div>
   );

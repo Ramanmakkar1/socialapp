@@ -19,6 +19,7 @@ import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { connectHref, networkAvailability } from "@/lib/networks/registry";
 import { linkedinConfig } from "@/lib/networks/linkedin";
 import { channelStatuses } from "@/lib/channelStatus";
+import { isFeatureReady, reminderChannelStatus } from "@/lib/featureReadiness";
 import { logoutAction } from "../login/actions";
 import PoskooMark from "@/components/PoskooMark";
 import { VERIFY_DISMISS_COOKIE } from "@/lib/emailCodes";
@@ -222,7 +223,8 @@ async function AppShell({ children }: { children: ReactNode }) {
   // Admins get Agency limits (same rule as planLimits.planForUser).
   const plan: PlanName = isAdmin(user) ? "Agency" : planFromBilling(billing);
   const limits = PLAN_LIMITS[plan];
-  const upgradeIntent = plan === "Free" ? parseUpgradeIntent((await cookies()).get(UPGRADE_INTENT_COOKIE)?.value) : null;
+  // No "Continue to checkout" banner while paid plans aren't on sale (src/lib/featureReadiness.ts).
+  const upgradeIntent = plan === "Free" && isFeatureReady("billing") ? parseUpgradeIntent((await cookies()).get(UPGRADE_INTENT_COOKIE)?.value) : null;
   const paymentFailed = billing?.status === "past_due" || billing?.status === "unpaid";
   const graceEnd = billing?.status === "past_due" ? graceEndsAt(billing.past_due_since) : null;
   // Same number the send worker enforces (plan + Refer-and-earn bonus).
@@ -242,11 +244,16 @@ async function AppShell({ children }: { children: ReactNode }) {
     { tiktok: Boolean(availability.tiktok), pinterest: Boolean(availability.pinterest), x: Boolean(availability.x), gbp: Boolean(availability.gbp), linkedin_pages: availability.linkedinPages },
     process.env,
   );
+  availability.reminderStatuses = {
+    ig_personal: reminderChannelStatus("Instagram (personal)", process.env),
+    fb_group: reminderChannelStatus("Facebook Group", process.env),
+  };
   const displayName = user.name?.trim() || user.email.split("@")[0];
   const mediaPending = await mediaPendingPromise;
   // Same rule as the connect callbacks (planLimits.accountLimitError): anything not disconnected holds a slot.
   const connectedAccounts = channels.filter((c) => c.status !== "disconnected").length;
-  const showVerify = user.emailVerified !== true && (await cookies()).get(VERIFY_DISMISS_COOKIE)?.value !== "1";
+  // "We sent you a code" is only true when e-mail is switched on; verification never blocks the app.
+  const showVerify = user.emailVerified !== true && isFeatureReady("email") && (await cookies()).get(VERIFY_DISMISS_COOKIE)?.value !== "1";
 
   // One compact alert bar, most important first (the rest sit behind "+N more").
   const alerts: ShellAlert[] = [];

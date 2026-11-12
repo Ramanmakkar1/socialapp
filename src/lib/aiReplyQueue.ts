@@ -2,6 +2,7 @@
 // AI replies switched on. Never throws, so a failed AI reply can't make the webhook fail.
 import { generateAiDmReply, shouldAiReply, type AiReplySettings, type ChatTurn } from "@/lib/aiReply";
 import { getPool, query } from "@/lib/db";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { recentInboundMessages } from "@/lib/inbox";
 
 export async function maybeQueueAiReply(params: {
@@ -15,6 +16,8 @@ export async function maybeQueueAiReply(params: {
 }): Promise<boolean> {
   // Empty text or an echo of our own outgoing message: never answer.
   if (!params.text?.trim() || params.senderId === params.accountExternalId) return false;
+  // AI replies are on hold until switched on (src/lib/featureReadiness.ts "ai_replies").
+  if (!isFeatureReady("ai_replies")) return false;
   try {
     const rows = await query<{
       ai_reply_enabled: boolean;

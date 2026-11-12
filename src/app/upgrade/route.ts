@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { parsePlanChoice } from "@/lib/billingState";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { UPGRADE_INTENT_COOKIE, UPGRADE_INTENT_MAX_AGE, billingChoiceHref, serializeUpgradeIntent } from "@/lib/upgradeIntent";
 
 export async function GET(request: Request) {
@@ -13,9 +14,13 @@ export async function GET(request: Request) {
   const choice = parsePlanChoice(url.searchParams.get("plan"), url.searchParams.get("interval") ?? "month");
   if (!choice) return NextResponse.redirect(new URL("/pricing", BRAND.url), 303);
   const user = await getCurrentUser().catch(() => null);
-  if (user) return NextResponse.redirect(new URL(billingChoiceHref(choice), BRAND.url), 303);
+  // Paid plans not on sale yet (featureReadiness "billing"): the billing page explains, and a
+  // visitor just signs up for Free (no plan remembered, so no "Continue to checkout" banner).
+  const paidReady = isFeatureReady("billing");
+  if (user) return NextResponse.redirect(new URL(paidReady ? billingChoiceHref(choice) : "/app/settings/billing#plans", BRAND.url), 303);
   const res = NextResponse.redirect(new URL(url.searchParams.get("login") === "1" ? "/login" : "/signup", BRAND.url), 303);
   // Only a real click remembers the choice (never a router/browser prefetch).
+  if (!paidReady) return res;
   const h = request.headers;
   if (h.get("next-router-prefetch") || h.get("rsc") || h.get("purpose") === "prefetch" || h.get("sec-purpose")?.includes("prefetch")) return res;
   res.cookies.set(UPGRADE_INTENT_COOKIE, serializeUpgradeIntent(choice), {

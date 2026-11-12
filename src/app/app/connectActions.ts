@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { cleanChannelRequest } from "@/lib/channelStatus";
 import { isReminderNetwork, parseReminderChannel } from "@/lib/networks/reminder";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { updateAccountMeta } from "@/lib/networks/store";
 import { NetworkAuthError } from "@/lib/networks/common";
 import { createBlueskySession, jwtExpiresIn, normalizeHandle, normalizeService } from "@/lib/networks/bluesky";
@@ -93,6 +94,8 @@ export type ReminderConnectState = { error: string } | null;
 export async function connectReminderAction(_prev: ReminderConnectState, formData: FormData): Promise<ReminderConnectState> {
   const user = await requireUser();
   if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
+  // Reminders are e-mails: without a mailer they would never arrive (src/lib/featureReadiness.ts).
+  if (!isFeatureReady("email")) return { error: "Reminder channels are coming soon: e-mail sending isn't switched on yet." };
   const platform = String(formData.get("platform") ?? "");
   if (!isReminderNetwork(platform)) return { error: "Choose Instagram or a Facebook group." };
   const parsed = parseReminderChannel(platform, String(formData.get("target") ?? "").slice(0, 300), String(formData.get("name") ?? ""));

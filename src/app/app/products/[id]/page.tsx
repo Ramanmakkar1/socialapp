@@ -9,7 +9,7 @@ import ui from "@/components/ui/ui.module.css";
 import { requireUser } from "@/lib/auth";
 import { listRuleOptions } from "@/lib/leadMagnets";
 import { centsToInput, formatMoney, platformFeeCents } from "@/lib/money";
-import { isStripeConfigured } from "@/lib/payments";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { buyLink, getProduct } from "@/lib/products";
 import { connectedAccountForPage } from "@/lib/stripeConnect";
 import { payoutRoute } from "@/lib/upi";
@@ -27,7 +27,8 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
   const { saved, error } = await searchParams;
   const product = await getProduct(user.id, id);
   if (!product) notFound();
-  const configured = isStripeConfigured();
+  // Card checkout needs live Stripe (src/lib/featureReadiness.ts); UPI never does.
+  const configured = isFeatureReady("card_payments");
   const [rules, account, payout] = await Promise.all([
     listRuleOptions(user.id),
     configured ? connectedAccountForPage(user.id) : Promise.resolve(null),

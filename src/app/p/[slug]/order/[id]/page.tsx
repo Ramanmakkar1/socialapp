@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { BtnA } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import { isDbConfigured } from "@/lib/db";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import { formatMoney } from "@/lib/money";
 import { getUpiOrderForBuyer } from "@/lib/upiOrders";
@@ -23,6 +24,8 @@ export default async function UpiOrderPage({ params, searchParams }: Props) {
   const order = await getUpiOrderForBuyer(id, t);
   if (!order || (order.slug && order.slug !== slug)) notFound();
   const seller = order.seller_name ?? "The seller";
+  // Without a mailer no order e-mail arrives: this page's link is the buyer's only way back.
+  const emailReady = isFeatureReady("email");
   const rows: [string, string][] = [
     ["Product", order.product_title],
     ["Amount", formatMoney(order.amount_cents, order.currency)],
@@ -60,8 +63,15 @@ export default async function UpiOrderPage({ params, searchParams }: Props) {
               <>
                 <h1 className={styles.title}>Thanks! Payment sent for confirmation</h1>
                 <p role="status" className={ui.notice}>
-                  {seller} will confirm your payment, usually within a few hours; you&apos;ll get an e-mail with your product. You can also come back to this page.
+                  {emailReady
+                    ? <>{seller} will confirm your payment, usually within a few hours; you&apos;ll get an e-mail with your product. You can also come back to this page.</>
+                    : <>{seller} will confirm your payment, usually within a few hours. Your product appears right here once they do.</>}
                 </p>
+                {!emailReady ? (
+                  <p role="status" className={`${ui.notice} ${ui.noticeWarn}`}>
+                    <strong>Save this link</strong> (bookmark this page or copy its address). Order e-mails are coming soon, so this page is how you get back to your product.
+                  </p>
+                ) : null}
               </>
             )}
             <dl className={styles.statusRows}>

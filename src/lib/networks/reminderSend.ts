@@ -4,6 +4,7 @@
 // the owner marks it as posted or REMINDER_MEDIA_HOLD_DAYS pass.
 import { query } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { absoluteUrl, reminderEmail } from "@/lib/emailTemplates";
 import { NETWORK_LABEL, type PublishInput, type PublishOutcome } from "@/lib/networks/common";
 import {
@@ -29,6 +30,8 @@ export function reminderDoneUrl(targetId: string, nowMs = Date.now()): string | 
 export async function publishReminder(input: PublishInput): Promise<PublishOutcome> {
   const platform = input.account.platform;
   if (!isReminderNetwork(platform)) return { ok: false, error: "Not a reminder channel." };
+  // Without a mailer the reminder would be "sent" to a log only: fail honestly instead.
+  if (!isFeatureReady("email")) return { ok: false, error: "Reminder e-mails are coming soon: e-mail sending isn't switched on yet. Post this one yourself, or press Retry once it is." };
   const targetId = input.idempotencyKey ?? "";
   const rows = await query<{ email: string; name: string | null; scheduled_at: Date | null }>(
     `select u.email, u.name, p.scheduled_at from socialapp.post_targets t

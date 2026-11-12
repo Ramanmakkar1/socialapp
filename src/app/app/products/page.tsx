@@ -9,7 +9,7 @@ import ui from "@/components/ui/ui.module.css";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
-import { isStripeConfigured } from "@/lib/payments";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { countProducts, listProducts, type ProductRow } from "@/lib/products";
 import { connectedAccountForPage, type ConnectedAccount } from "@/lib/stripeConnect";
 import { getSellerPayout, type SellerPayout } from "@/lib/upiOrders";
@@ -23,7 +23,8 @@ export const metadata = {
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await requireUser();
   const params = await searchParams;
-  const configured = isStripeConfigured();
+  // Card checkout needs live Stripe (src/lib/featureReadiness.ts); UPI never does.
+  const configured = isFeatureReady("card_payments");
   let total = 0;
   let products: ProductRow[] = [];
   let account: ConnectedAccount | null = null;

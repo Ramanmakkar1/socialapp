@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured } from "@/lib/db";
-import { isStripeConfigured } from "@/lib/payments";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { CONNECT_COUNTRIES, ensureConnectedAccount, getConnectedAccount, onboardingLink } from "@/lib/stripeConnect";
 
 const back = (status: string) => NextResponse.redirect(new URL(`/app/settings?payments=${status}#payments-heading`, BRAND.url), 303);
@@ -12,7 +12,8 @@ const back = (status: string) => NextResponse.redirect(new URL(`/app/settings?pa
 async function start(country: string | null) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.redirect(new URL("/login", BRAND.url), 303);
-  if (!isStripeConfigured() || !isDbConfigured()) return back("not_configured");
+  // Stripe onboarding only once card payments are live (src/lib/featureReadiness.ts).
+  if (!isFeatureReady("card_payments") || !isDbConfigured()) return back("not_configured");
   try {
     let accountId = (await getConnectedAccount(user.id))?.stripe_account_id ?? null;
     if (!accountId) {

@@ -1,7 +1,8 @@
 "use server";
 
 import { requireUser } from "@/lib/auth";
-import { generateCaptionIdeas, isAiConfigured, type CaptionIdeasResult } from "@/lib/ai";
+import { isFeatureReady } from "@/lib/featureReadiness";
+import { generateCaptionIdeas, type CaptionIdeasResult } from "@/lib/ai";
 import { consumeAiRequest } from "@/lib/aiQuota";
 import { isDbConfigured, query } from "@/lib/db";
 
@@ -30,8 +31,8 @@ export async function suggestCaptions(input: {
       /* column may not exist yet; ignore */
     }
   }
-  if (!isAiConfigured()) {
-    return { ok: false, error: "AI is not set up on this server yet." };
+  if (!isFeatureReady("ai")) {
+    return { ok: false, error: "AI ideas are coming soon." };
   }
   // Per-user limits: a short burst limit and a monthly quota (src/lib/aiQuota.ts).
   if (isDbConfigured()) {
@@ -48,5 +49,5 @@ export async function suggestCaptions(input: {
 
 export async function aiAvailable(): Promise<boolean> {
   await requireUser();
-  return isAiConfigured();
+  return isFeatureReady("ai");
 }

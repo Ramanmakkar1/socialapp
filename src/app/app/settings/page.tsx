@@ -5,11 +5,11 @@ import EmptyState from "../EmptyState";
 import { BtnA, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
-import { isAiConfigured } from "@/lib/ai";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { listApiKeys } from "@/lib/apiKeys";
 import { isDbConfigured, query } from "@/lib/db";
+import { FEATURE_COPY, isFeatureReady } from "@/lib/featureReadiness";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
@@ -169,7 +169,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         [user.id]
       )
     : [];
-  const aiConfigured = isAiConfigured();
+  // AI DM replies are on hold until the owner switches them on (src/lib/featureReadiness.ts "ai_replies").
+  const aiConfigured = isFeatureReady("ai_replies");
+  const emailReady = isFeatureReady("email");
   // Instagram login needs the Meta app keys on the server; until then show a clear "not yet" state.
   const connectReady = isMetaLoginConfigured() || isIgConfigured();
   // Per-channel posting schedules, only for channels the user has connected.
@@ -250,14 +252,16 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 <span className={styles.username}>{user.email}</span>
               </div>
               <div className={styles.accountActions}>
-                <span className={user.emailVerified ? `${ui.pill} ${ui.pillMint}` : `${ui.pill} ${ui.pillPeach}`}>
-                  {user.emailVerified ? "Email verified" : "Email not verified"}
+                <span className={user.emailVerified ? `${ui.pill} ${ui.pillMint}` : emailReady ? `${ui.pill} ${ui.pillPeach}` : `${ui.pill} ${ui.pillSoon}`}>
+                  {user.emailVerified ? "Email verified" : emailReady ? "Email not verified" : "Verification coming soon"}
                 </span>
               </div>
               <p className={`${ui.hint} ${styles.accountNote}`}>
                 {user.emailVerified
                   ? `Verified${emailVerifiedAt ? ` on ${new Date(emailVerifiedAt).toLocaleDateString()}` : ""}. Used for sign-in, password resets and alerts.`
-                  : <>We emailed you a 6-digit code. <Link href="/verify-email" className={ui.link}>Verify your email</Link> to get password resets and alerts.</>}
+                  : emailReady
+                    ? <>We emailed you a 6-digit code. <Link href="/verify-email" className={ui.link}>Verify your email</Link> to get password resets and alerts.</>
+                    : "Email verification codes are coming soon. Nothing is blocked meanwhile; sign in with Google to use an address Google has already verified."}
               </p>
             </li>
           </ul>
@@ -462,7 +466,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </ul>
         </section>
         <section className={styles.section} aria-labelledby="ai-reply-heading">
-          <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies</h2>
+          <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies{!aiConfigured ? <> <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span></> : null}</h2>
+          {!aiConfigured ? <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}><strong>{FEATURE_COPY.ai_replies.title}.</strong> {FEATURE_COPY.ai_replies.body}</p> : null}
           {aiAccounts.length === 0 ? (
             <p className={ui.hint}>Connect an Instagram account first, then switch on AI replies.</p>
           ) : (
@@ -503,7 +508,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         className={ui.input}
                         placeholder="https://cal.com/you"
                       />
-                      {!aiConfigured && <p className={ui.hint}>AI replies aren’t switched on for this server yet.</p>}
                       <p className={ui.hint}>AI answers people who message you, asks for their name and email, and shares your booking link. It never replies more than 5 times a day to one person and only within Instagram&apos;s 24-hour window. If you reply to someone yourself from the Inbox, the AI stays quiet with that person for 12 hours.</p>
                       <div>
                         <SubmitButton label="Save AI reply settings" size="sm" />
