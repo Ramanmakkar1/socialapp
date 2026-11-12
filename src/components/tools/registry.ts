@@ -57,6 +57,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/social-media-analytics-report", name: "Analytics report template", summary: "Compare two periods of reach, engagement and clicks and export a CSV.", category: "plan", icon: "chart" },
   { href: "/tools/instagram-scheduling-checklist", name: "Scheduling checklist", summary: "Tick off captions, media, time zone and account checks before you schedule.", category: "plan", icon: "check" },
   { href: "/tools/instagram-time-zone-converter", name: "Time zone converter", summary: "Convert a posting time between time zones with daylight saving handled.", category: "plan", icon: "globe" },
+  { href: "/tools/best-time-to-post-on-instagram", name: "Best time to post finder", summary: "Get three starting post times per day for your audience type and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/instagram-posting-frequency-calculator", name: "Posting frequency calculator", summary: "Turn your weekly time budget into a realistic posting range and plan.", category: "plan", icon: "gauge" },
   { href: "/tools/instagram-engagement-rate-calculator", name: "Engagement rate calculator", summary: "Engagement rate by followers or by reach from likes, comments, saves and shares.", category: "plan", icon: "percent" },
   // Comments & DMs
@@ -77,6 +78,7 @@ const SCHEDULE_TOOLS = new Set([
   "/tools/social-media-content-calendar",
   "/tools/instagram-scheduling-checklist",
   "/tools/instagram-time-zone-converter",
+  "/tools/best-time-to-post-on-instagram",
 ]);
 const ANALYTICS_TOOLS = new Set(["/tools/instagram-utm-builder", "/tools/instagram-comment-to-dm-calculator"]);
 
