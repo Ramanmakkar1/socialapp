@@ -185,6 +185,11 @@ export default function LinkedInSchedulerPage() {
                   </div>
                 ))}
               </div>
+              <p className="small" style={{ marginTop: 16 }}>
+                Need emphasis or bullets? Try our{" "}
+                <Link className={s.vlink} href="/tools/linkedin-text-formatter">free LinkedIn text formatter</Link>{" "}
+                before adding the post to your calendar.
+              </p>
             </div>
             <div className="art">
               <Image
