@@ -3,13 +3,14 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import { BRAND } from "@/lib/brand";
+import { PINTEREST_LIMITS } from "@/lib/pinterestCharCount";
 import PinterestCharCounter from "./PinterestCharCounter";
 
 const limitRows: [string, string][] = [
-  ["Pin title", "100 characters"],
-  ["Pin description", "500 characters"],
-  ["Image alt text", "500 characters"],
-  ["Board name", "50 characters"],
+  ["Pin title", `${PINTEREST_LIMITS.title.max} characters`],
+  ["Pin description", `${PINTEREST_LIMITS.description.max} characters`],
+  ["Image alt text", `${PINTEREST_LIMITS.altText.max} characters`],
+  ["Board name", `${PINTEREST_LIMITS.boardName.max} characters`],
   ["Board description", "500 characters"],
   ["Profile About", "500 characters"],
 ];
@@ -21,7 +22,7 @@ const config: ToolPageConfig = {
   title: "Pinterest Character Counter: Pin Title & Description",
   description: "Free Pinterest character counter for Pin titles (100), descriptions (500) and alt text (500). See characters left and your feed preview. No signup needed.",
   pill: "Free · runs in your browser · nothing is uploaded",
-  h1: { mark: "Pinterest character counter" },
+  h1: { mark: "Pinterest Pin title and description counter" },
   lede: "A Pinterest Pin title can be up to 100 characters and a Pin description up to 500 characters; this counter checks both as you type.",
   art: "writing",
   artLabel: "A creator writes a Pinterest Pin beside a character counter and feed preview",

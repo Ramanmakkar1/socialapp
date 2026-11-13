@@ -265,7 +265,7 @@ export default function PinterestSchedulerPage() {
             New to it? Read{" "}
             <Link className={s.vlink} href="/help/schedule-pinterest-posts">how to schedule Pinterest Pins</Link>, find the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-pinterest">best time to post on Pinterest</Link>, or check your{" "}
-            <Link className={s.vlink} href="/tools/pinterest-character-counter">Pinterest character counter</Link> limits before you publish.
+            <Link className={s.vlink} href="/tools/pinterest-character-counter">free Pinterest character counter</Link> limits before you publish.
           </p>
         </div>
       </section>
