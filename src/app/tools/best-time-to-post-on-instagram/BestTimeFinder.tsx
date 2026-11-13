@@ -128,7 +128,7 @@ function zoneLabel(zone: string): string {
   return zone.replace(/_/g, " ");
 }
 
-export default function BestTimeFinder() {
+export default function BestTimeFinder({ platform = "Instagram", insightsName = "Insights" }: { platform?: string; insightsName?: string } = {}) {
   const id = useId();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const zones = useSyncExternalStore(subscribeToNothing, getTimeZones, () => FALLBACK_ZONES);
@@ -158,11 +158,11 @@ export default function BestTimeFinder() {
   }
 
   function planText(): string {
-    const lines = [`Best time to post on Instagram - starting slots (${zoneLabel(zone)})`];
+    const lines = [`Best time to post on ${platform} - starting slots (${zoneLabel(zone)})`];
     for (const day of selectedDays) {
       lines.push(`${day.label}: ${slotsFor(day).map(formatTime).join(", ")}`);
     }
-    lines.push("Starting points to test. Your own Insights beat any general rule.");
+    lines.push(`Starting points to test. Your own ${insightsName} beat any general rule.`);
     return lines.join("\n");
   }
 
@@ -412,7 +412,7 @@ export default function BestTimeFinder() {
           </p>
           <p className="flex items-start gap-1.5 text-xs text-[var(--poskoo-muted)]">
             <Info className="mt-px h-3.5 w-3.5 flex-none" aria-hidden="true" />
-            Starting points to test. Your own Insights beat any general rule.
+            Starting points to test. Your own {insightsName} beat any general rule.
           </p>
         </aside>
       </div>
