@@ -70,6 +70,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/best-time-to-post-on-social-media", name: "Best time to post (all platforms)", summary: "Best posting windows for Instagram, TikTok, LinkedIn, Facebook, X, Pinterest, Threads and YouTube in one table.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-instagram", name: "Best time to post finder", summary: "Get three starting post times per day for your audience type and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-tiktok", name: "Best time to post on TikTok", summary: "Three starting TikTok post times per day for your audience and time zone.", category: "plan", icon: "calendar" },
+  { href: "/tools/best-time-to-post-on-facebook", name: "Best time to post on Facebook", summary: "Three starting Facebook Page post times per day for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/instagram-posting-frequency-calculator", name: "Posting frequency calculator", summary: "Turn your weekly time budget into a realistic posting range and plan.", category: "plan", icon: "gauge" },
   { href: "/tools/instagram-engagement-rate-calculator", name: "Engagement rate calculator", summary: "Engagement rate by followers or by reach from likes, comments, saves and shares.", category: "plan", icon: "percent" },
   // Comments & DMs
@@ -92,6 +93,7 @@ const SCHEDULE_TOOLS = new Set([
   "/tools/instagram-time-zone-converter",
   "/tools/best-time-to-post-on-instagram",
   "/tools/best-time-to-post-on-tiktok",
+  "/tools/best-time-to-post-on-facebook",
 ]);
 const ANALYTICS_TOOLS = new Set(["/tools/instagram-utm-builder", "/tools/instagram-comment-to-dm-calculator"]);
 
