@@ -124,6 +124,7 @@ const howToJsonLd = {
 
 const related = [
   { href: "/linkedin-scheduler", label: "LinkedIn post scheduler" },
+  { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
   { href: "/help/schedule-facebook-posts", label: "Schedule Facebook Page posts" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];

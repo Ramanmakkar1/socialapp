@@ -126,6 +126,7 @@ const howToJsonLd = {
 
 const related = [
   { href: "/tiktok-scheduler", label: "TikTok scheduler" },
+  { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
   { href: "/tools/instagram-safe-zone-checker", label: "9:16 safe zone checker" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];

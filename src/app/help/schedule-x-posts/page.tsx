@@ -146,6 +146,7 @@ const howToJsonLd = {
 
 const related = [
   { href: "/x-scheduler", label: "X scheduler features and media limits" },
+  { href: "/tools/x-character-counter", label: "X character counter (280-character check)" },
   { href: "/help/getting-started", label: "Getting started with Poskoo" },
   { href: "/pricing", label: "Poskoo pricing and free plan" },
 ];
