@@ -59,10 +59,16 @@ function Segments({ level, max, color, label }: { level: number; max: number; co
   );
 }
 
-export default function HashtagGenerator() {
+const PLATFORM = {
+  instagram: { min: 5, max: 30, start: 15, note: "Instagram allows up to 30 per post." },
+  tiktok: { min: 3, max: 15, start: 5, note: "TikTok has no fixed hashtag cap; captions allow 4,000 characters. 3 to 5 relevant tags is a good start." },
+} as const;
+
+export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" }) {
   const id = useId();
+  const cfg = PLATFORM[platform];
   const [niche, setNiche] = useState("fitness");
-  const [count, setCount] = useState(15);
+  const [count, setCount] = useState(cfg.start);
   const [mix, setMix] = useState<HashtagMix>("balanced");
   const [extra, setExtra] = useState("");
   const [sort, setSort] = useState<Sort>("order");
@@ -147,8 +153,8 @@ export default function HashtagGenerator() {
         </div>
         <div className="min-w-0">
           <label htmlFor={`${id}-count`} className="flex justify-between text-sm font-semibold">Hashtag count <span className="rounded-md bg-[var(--poskoo-band)] px-1.5 text-[var(--poskoo-violet)] tabular-nums">{count}</span></label>
-          <input id={`${id}-count`} type="range" min={5} max={30} value={count} onChange={(e) => setCount(Number(e.target.value))} className="mt-2 min-h-11 w-full accent-[var(--poskoo-violet)]" />
-          <div className="flex justify-between text-xs text-[#3d3450]"><span>5</span><span>30</span></div>
+          <input id={`${id}-count`} type="range" min={cfg.min} max={cfg.max} value={count} onChange={(e) => setCount(Number(e.target.value))} className="mt-2 min-h-11 w-full accent-[var(--poskoo-violet)]" />
+          <div className="flex justify-between text-xs text-[#3d3450]"><span>{cfg.min}</span><span>{cfg.max}</span></div>
         </div>
         <fieldset className="min-w-0">
           <legend className="text-sm font-semibold">Mix</legend>
@@ -174,7 +180,7 @@ export default function HashtagGenerator() {
           <div className={kpi}>
             <p className={kpiLabel}>Selected</p>
             <p aria-live="polite" className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{selectedTags.length}<span className="text-base font-medium text-[#5f5873]"> / {rows.length}</span></p>
-            <p className="mt-1 text-xs text-[#3d3450]">Instagram allows up to 30 per post.</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{cfg.note}</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel} title={POPULARITY_NOTE}>Combined tag size<Info className="h-3 w-3" aria-hidden="true" /><span className="sr-only"> (estimate)</span></p>
@@ -342,7 +348,7 @@ export default function HashtagGenerator() {
           <div>
             <h4 id={`${id}-prev`} className="flex items-center justify-between text-sm font-semibold">
               Caption preview
-              <span className={`text-xs font-medium tabular-nums ${selectedTags.length > 30 ? "text-[var(--poskoo-red)]" : "text-[#5f5873]"}`}>{selectedTags.length}/30 tags · {line.length} chars</span>
+              <span className={`text-xs font-medium tabular-nums ${selectedTags.length > cfg.max ? "text-[var(--poskoo-red)]" : "text-[#5f5873]"}`}>{selectedTags.length}/{cfg.max} tags · {line.length} chars</span>
             </h4>
             <div className="mt-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 text-sm">
               <div className="flex items-center gap-2 border-b border-[var(--poskoo-line)] pb-2">

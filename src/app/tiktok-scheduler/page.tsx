@@ -256,6 +256,10 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-caption-counter">TikTok caption character counter</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
+            Need hashtags? Build a small set of 3 to 15 niche tags with our{" "}
+            <Link className={s.vlink} href="/tools/tiktok-hashtag-generator">free TikTok hashtag generator</Link>.
+          </p>
+          <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Not sure when to post? Get three starting times for your audience with the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link>{" "}
             finder.
