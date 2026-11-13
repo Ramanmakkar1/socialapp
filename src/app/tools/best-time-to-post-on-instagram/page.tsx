@@ -133,7 +133,8 @@ const config: ToolPageConfig = {
             Once a slot works, <Link href="/instagram-scheduler">schedule Instagram posts</Link> in Poskoo so they publish
             at that time without you opening the app. You can plan a week in the calendar, then let Poskoo publish and
             auto-DM everyone who comments your keyword. New here?{" "}
-            <Link href="/signup">Create a free account</Link> and start with one post.
+            <Link href="/signup">Create a free account</Link> and start with one post. Posting on more than Instagram?{" "}
+            <Link href="/tools/best-time-to-post-on-social-media">See the best time to post on every platform</Link>.
           </p>
         ),
       },
