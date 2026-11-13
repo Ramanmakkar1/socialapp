@@ -141,7 +141,7 @@ const config: ToolPageConfig = {
       a: "A Facebook Page bio can contain up to 255 characters. Select Page bio in the counter to see exactly how many characters remain before you paste it into your Page.",
     },
   ],
-  related: ["/tools/linkedin-character-counter", "/tools/threads-character-counter", "/tools/youtube-title-counter"],
+  related: ["/tools/facebook-post-preview", "/tools/linkedin-character-counter", "/tools/threads-character-counter", "/tools/youtube-title-counter"],
   schema: {
     features: [
       "Facebook post, comment, ad headline and Page bio character limits",

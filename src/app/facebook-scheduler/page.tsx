@@ -179,7 +179,8 @@ export default function FacebookSchedulerPage() {
             <Link className={s.vlink} href="/threads-scheduler">Threads scheduler</Link>
             {" "}or prepare your content with our{" "}
             <Link className={s.vlink} href="/tools">free Instagram tools</Link>. Check your draft with our{" "}
-            <Link className={s.vlink} href="/tools/facebook-character-counter">Facebook character counter</Link> before scheduling. Not sure when to post? Find the{" "}
+            <Link className={s.vlink} href="/tools/facebook-character-counter">Facebook character counter</Link> before scheduling. See how your draft will look in the feed with our{" "}
+            <Link className={s.vlink} href="/tools/facebook-post-preview">Facebook post preview</Link>. Not sure when to post? Find the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-facebook">best time to post on Facebook</Link>.
           </p>
         </div>

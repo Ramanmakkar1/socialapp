@@ -57,6 +57,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/threads-post-preview", name: "Threads post preview", summary: "Write a Threads post, count against 500 characters and preview it on mobile.", category: "media", icon: "message" },
   { href: "/tools/linkedin-post-preview", name: "LinkedIn post preview", summary: "Preview a LinkedIn post on desktop and mobile, with the see more cut-off and 3,000-character count.", category: "media", icon: "message" },
   { href: "/tools/x-post-preview", name: "X post preview", summary: "Preview an X post on desktop and mobile, with X-accurate counting: links as 23 against the 280 limit.", category: "media", icon: "message" },
+  { href: "/tools/facebook-post-preview", name: "Facebook post preview", summary: "Preview a Facebook post on desktop and mobile, with the See more cut-off and 63,206-character count.", category: "media", icon: "message" },
   { href: "/tools/instagram-image-size", name: "Image size guide", summary: "Every Instagram size in pixels, plus a crop preview and exact-size JPG download.", category: "media", icon: "image" },
   { href: "/tools/social-media-image-sizes", name: "Social media image sizes", summary: "Every 2026 image and video size for 9 platforms in one cheat sheet.", category: "media", icon: "image" },
   { href: "/tools/instagram-carousel-size-checker", name: "Carousel size checker", summary: "Check each slide's dimensions, ratio and file size before you schedule.", category: "media", icon: "square-stack" },
