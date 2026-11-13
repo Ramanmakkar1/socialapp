@@ -3,6 +3,21 @@
 
 export type ToolCategory = "create" | "media" | "plan" | "dm";
 
+export type ToolPlatform =
+  | "instagram" | "tiktok" | "x" | "youtube" | "linkedin" | "facebook" | "threads" | "pinterest" | "other";
+
+export const TOOL_PLATFORMS: { id: ToolPlatform; label: string }[] = [
+  { id: "instagram", label: "Instagram" },
+  { id: "tiktok", label: "TikTok" },
+  { id: "x", label: "X (Twitter)" },
+  { id: "youtube", label: "YouTube" },
+  { id: "linkedin", label: "LinkedIn" },
+  { id: "facebook", label: "Facebook" },
+  { id: "threads", label: "Threads" },
+  { id: "pinterest", label: "Pinterest" },
+  { id: "other", label: "Other & multi-platform" },
+];
+
 /** Lucide icon names used by the hub cards (mapped to components in ToolIcon.tsx). */
 export type ToolIconName =
   | "sparkles" | "hash" | "type" | "pilcrow" | "align" | "layers" | "lightbulb" | "megaphone" | "user" | "at"
@@ -141,3 +156,15 @@ export function toolArt(tool: ToolEntry): ToolArt {
 }
 
 export const categoryLabel = (c: ToolCategory) => TOOL_CATEGORIES.find((x) => x.id === c)?.label ?? c;
+
+const PLATFORM_IDS: ToolPlatform[] = TOOL_PLATFORMS.map((p) => p.id).filter((id): id is Exclude<ToolPlatform, "other"> => id !== "other");
+
+/** The platform a tool targets, read from its slug segments (e.g. "x-bio-generator", "best-time-to-post-on-x"). */
+export function toolPlatform(tool: ToolEntry): ToolPlatform {
+  const slug = tool.href.replace(/^.*\/tools\//, "");
+  for (const segment of slug.split("-")) {
+    const match = PLATFORM_IDS.find((id) => id === segment);
+    if (match) return match;
+  }
+  return "other";
+}

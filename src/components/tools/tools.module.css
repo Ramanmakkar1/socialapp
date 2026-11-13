@@ -387,3 +387,11 @@
 .filter { display: inline-flex; align-items: center; gap: .35rem; }
 .filter:hover:not([aria-pressed="true"]) { border-color: var(--ink); }
 .filter:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+
+/* Second hub row: lighter platform chips, one swipeable line on phones. */
+.platformFilters { flex: 1 1 100%; gap: 5px; }
+.platformFilters .filter { min-height: 40px; padding: 0 .8rem; font-size: .84rem; }
+@media (max-width: 640px) {
+  .platformFilters { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .platformFilters::-webkit-scrollbar { display: none; }
+}
