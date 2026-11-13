@@ -89,7 +89,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/best-time-to-post-on-social-media", name: "Best time to post (all platforms)", summary: "Best posting windows for Instagram, TikTok, LinkedIn, Facebook, X, Pinterest, Threads and YouTube in one table.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-instagram", name: "Best time to post finder", summary: "Get three starting post times per day for your audience type and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-facebook", name: "Best time to post on Facebook", summary: "Three starting Facebook Page post times per day for your audience and time zone.", category: "plan", icon: "calendar" },
-  { href: "/tools/best-time-to-post-on-x", name: "Best time to post on X", summary: "Three starting X (Twitter) post times per day for your audience and time zone.", category: "plan", icon: "calendar" },
+  { href: "/tools/best-time-to-post-on-x", name: "Best time to post on X", summary: "Get starting X (Twitter) posting windows for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-linkedin", name: "Best time to post on LinkedIn", summary: "Three starting LinkedIn post times per day for your B2B audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-tiktok", name: "Best time to post on TikTok", summary: "Get starting TikTok posting windows for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-threads", name: "Best time to post on Threads", summary: "Three starting Threads post times per day for your audience and time zone.", category: "plan", icon: "calendar" },

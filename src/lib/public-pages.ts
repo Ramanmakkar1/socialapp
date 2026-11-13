@@ -408,7 +408,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/best-time-to-post-on-instagram": "Find the best time to post on Instagram with a free finder. Pick your audience time zone and posting days to get three starting slots to test for 2 weeks.",
   "/tools/best-time-to-post-on-tiktok": "Find the best time to post on TikTok with a free finder. Pick your audience time zone and days to get starting slots to test for two weeks, no signup.",
   "/tools/best-time-to-post-on-facebook": "Find the best time to post on Facebook with a free finder. Choose your audience time zone and posting days to get three slots to test for two weeks.",
-  "/tools/best-time-to-post-on-x": "Find the best time to post on X (Twitter) with a free finder. Pick your audience time zone and posting days to get three slots to test for two weeks.",
+  "/tools/best-time-to-post-on-x": "Find the best time to post on X (Twitter) with a free finder. Pick your audience and time zone to get weekday and weekend slots to test. No signup.",
   "/tools/best-time-to-post-on-linkedin": "Find the best time to post on LinkedIn with a free finder. Pick your audience time zone and workdays to get three starting slots to test for two weeks.",
   "/tools/best-time-to-post-on-threads": "Find the best time to post on Threads with a free finder. Pick your audience time zone and posting days to get three starting slots to test for two weeks.",
   "/tools/best-time-to-post-on-youtube": "Find the best time to post on YouTube with a free finder. Pick your audience time zone and upload days to get three starting slots to test for two weeks.",

@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
-import BestTimeFinder from "../best-time-to-post-on-instagram/BestTimeFinder";
+import BestTimeFinder from "./BestTimeFinder";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-x",
   name: "Best time to post on X finder",
   crumb: "Best time to post on X",
-  title: "Best Time to Post on X (Twitter): Free Finder 2026",
+  title: "Best Time to Post on X (Twitter): Free Finder | Poskoo",
   description:
-    "Find the best time to post on X (Twitter) with a free finder. Pick your audience time zone and posting days to get three slots to test for two weeks.",
+    "Find the best time to post on X (Twitter) with a free finder. Pick your audience and time zone to get weekday and weekend slots to test. No signup.",
   pill: "Free · runs in your browser · nothing is saved",
   h1: { before: "Best time to post on", mark: "X (Twitter)" },
-  lede: "There is no single best time to post on X. The best time is when your own followers are online, so test two or three slots for two weeks and keep the ones that get the most impressions and replies.",
+  lede: "A good starting point for X (Twitter) is weekdays around 8–10 am and 12 pm in your audience's local time, with an early-evening test. Try these slots for two weeks and keep the ones your X analytics show working.",
   art: "card-schedule",
   artLabel: "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
   heroPoints: ["Your audience's time zone", "3 slots per day", "No signup"],
@@ -143,27 +143,28 @@ const config: ToolPageConfig = {
   faqTitle: "Best time to post on X questions",
   faqs: [
     {
-      q: "What is the best time to post on X?",
-      a: "There is no single best time for every account. The best time is when your own followers are most active. Compare impressions and engagement rate per time slot in the Analytics view on x.com, test two or three slots for two weeks, and keep the ones that get the most impressions and replies.",
+      q: "What is the best time to post on X (Twitter)?",
+      a: "A good starting point is weekdays around 8–10 am and 12 pm in your audience's local time, with an early-evening test. There is no single best time for every account, though: compare impressions and engagement rate per slot in your X analytics, test two or three for two weeks, and keep the ones that work for you.",
     },
     {
-      q: "How do I see when my followers are most active on X?",
-      a: "X does not show a when-your-followers-are-online chart. Instead, use the Analytics view on x.com to compare impressions and engagement rate for posts at different times. The slots with the best numbers are when your audience is most active.",
+      q: "Is it better to post on X in the morning?",
+      a: "Mornings often work for news and B2B audiences because people check X before work and at the start of the day. Treat it as a starting point to test, not a rule. Compare impressions and engagement for your morning posts with other slots in your X analytics before you commit.",
     },
     {
-      q: "How long should I test posting times before changing them?",
-      a: "Give each slot about two weeks. That is long enough to see a pattern without waiting a month. Change one thing at a time, then compare impressions and engagement rate for each slot in your X analytics before you keep or drop it.",
+      q: "Should you post on X on weekends?",
+      a: "Weekends can be quieter on X, but they still work for some accounts, especially creators and news. Try a later weekend slot such as 10 am and compare it with your weekday results. Post on the days you can sustain, and let your X analytics decide.",
     },
     {
-      q: "Does the best time to post change by content type on X?",
-      a: "It can. Text posts can keep getting replies for hours, threads may suit longer reading sessions, and posts with images or video can keep collecting views for days. Treat the content-type suggestions as starting points to test, not fixed rules, and check your own X post analytics.",
+      q: "How often should you post on X?",
+      a: "A few times a day is common on X, but start with what you can sustain and test it. Pick two or three slots from the finder, keep the quality high, and check your X analytics after two weeks before adding more.",
     },
   ],
   related: [
-    "/tools/best-time-to-post-on-social-media",
     "/tools/x-character-counter",
-    "/tools/instagram-time-zone-converter",
     "/tools/social-media-content-calendar",
+    "/tools/best-time-to-post-on-linkedin",
+    "/tools/best-time-to-post-on-facebook",
+    "/tools/best-time-to-post-on-instagram",
   ],
   schema: {
     features: [
