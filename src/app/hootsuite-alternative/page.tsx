@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -38,7 +39,7 @@ const compare: [string, string, string, string][] = [
 const faqs = [
   { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram, Facebook Pages and Threads. ${BRAND.name} schedules and publishes your Instagram, Facebook Page and Threads posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in. Hootsuite covers more networks and team features today.` },
   { q: "Can I import my Hootsuite schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your schedule there.` },
-  { q: "Which platforms are supported?", a: "Instagram, Facebook Pages, Threads and YouTube (videos and Shorts) scheduling work today, plus Instagram auto-DMs. LinkedIn, Pinterest, TikTok and WhatsApp are on the roadmap, with no date yet." },
+  { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
   { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
