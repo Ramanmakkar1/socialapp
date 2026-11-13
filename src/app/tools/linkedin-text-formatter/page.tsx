@@ -92,7 +92,9 @@ const config: ToolPageConfig = {
               &ldquo;• &rdquo; to each non-empty line, making a sequence of ideas easier to scan without changing blank lines.
             </p>
             <p>
-              Keep search terms and calls to action in plain text where possible. Once your post is ready, you can{" "}
+              Keep search terms and calls to action in plain text where possible. To write the profile line your post
+              points back to, use the <Link href="/tools/linkedin-headline-generator">free LinkedIn headline generator</Link>.
+              Once your post is ready, you can{" "}
               <Link href="/linkedin-scheduler">schedule LinkedIn posts with Poskoo</Link> instead of publishing by hand.
             </p>
           </>

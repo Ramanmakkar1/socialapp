@@ -46,6 +46,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/youtube-handle-generator", name: "YouTube handle generator", summary: "@handle and channel name ideas that fit YouTube's 3-30 character rule.", category: "create", icon: "at" },
   { href: "/tools/linkedin-text-formatter", name: "LinkedIn Text Formatter", summary: "Copy bold, italic and bulleted Unicode text for LinkedIn posts and profiles.", category: "create", icon: "type" },
   { href: "/tools/linkedin-character-counter", name: "LinkedIn character counter", summary: "Check LinkedIn post, comment, headline and About limits, with a live See more preview.", category: "create", icon: "type" },
+  { href: "/tools/linkedin-headline-generator", name: "LinkedIn headline generator", summary: "Build profile headlines from your role, audience, result and skills, checked against the 220-character limit.", category: "create", icon: "type" },
   { href: "/tools/threads-character-counter", name: "Threads character counter", summary: "Check the 500-character post and 150-character bio limits, with hashtag and 5-link checks.", category: "create", icon: "type" },
   { href: "/tools/tiktok-caption-counter", name: "TikTok caption counter", summary: "Check the 4,000-character caption limit, unique hashtags and mentions, and the preview before more.", category: "create", icon: "type" },
   { href: "/tools/tiktok-hashtag-generator", name: "TikTok hashtag generator", summary: "Niche hashtag sets for TikTok videos: mix broad and specific tags, add a keyword, copy 3 to 15 at once.", category: "create", icon: "hash" },
