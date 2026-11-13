@@ -41,6 +41,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-post-ideas-generator", name: "Post ideas generator", summary: "Six post ideas for your niche: Reels, carousels and Stories with caption starters.", category: "create", icon: "lightbulb" },
   { href: "/tools/instagram-bio-generator", name: "Bio generator", summary: "Instagram bio ideas for your niche with emojis, line breaks and a call to action.", category: "create", icon: "user" },
   { href: "/tools/tiktok-bio-generator", name: "TikTok bio generator", summary: "Short TikTok bio ideas for your niche that fit the 80-character limit.", category: "create", icon: "user" },
+  { href: "/tools/x-bio-generator", name: "X (Twitter) bio generator", summary: "X bio ideas for your niche that fit the 160-character limit.", category: "create", icon: "user" },
   { href: "/tools/instagram-username-generator", name: "Username generator", summary: "Up to 30 username ideas from your name and niche that follow Instagram's rules.", category: "create", icon: "at" },
   { href: "/tools/tiktok-username-generator", name: "TikTok username generator", summary: "Handle ideas from your name and niche that fit TikTok's 24-character rule.", category: "create", icon: "at" },
   { href: "/tools/youtube-handle-generator", name: "YouTube handle generator", summary: "@handle and channel name ideas that fit YouTube's 3-30 character rule.", category: "create", icon: "at" },

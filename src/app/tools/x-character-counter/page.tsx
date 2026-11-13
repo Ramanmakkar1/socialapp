@@ -154,7 +154,7 @@ const config: ToolPageConfig = {
       a: "No. All counting happens in your browser. Your post is not uploaded or saved, and you do not need to sign in to use the counter.",
     },
   ],
-  related: ["/tools/x-post-preview", "/tools/threads-post-preview", "/tools/instagram-caption-counter"],
+  related: ["/tools/x-post-preview", "/tools/threads-post-preview", "/tools/instagram-caption-counter", "/tools/x-bio-generator"],
   schema: {
     features: [
       "X weighted character counting against 280 and 25,000 limits",

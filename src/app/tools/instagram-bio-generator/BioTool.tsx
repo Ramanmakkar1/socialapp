@@ -15,6 +15,18 @@ import { FONT_STYLES, convert } from "@/lib/igFonts";
 
 const DEFAULT_CTA = 'DM "START" for my free guide';
 
+const PLATFORM_LABEL: Record<BioPlatform, string> = {
+  instagram: "Instagram",
+  tiktok: "TikTok",
+  x: "X",
+};
+
+const PLATFORM_CTA: Record<BioPlatform, string> = {
+  instagram: DEFAULT_CTA,
+  tiktok: 'DM "START" 👇',
+  x: "Follow for daily tips 👇",
+};
+
 const field =
   "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base outline-none focus:border-[var(--poskoo-violet)] focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]/30";
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
@@ -23,10 +35,10 @@ const icon = "pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1
 
 export default function BioTool({ platform = "instagram" }: { platform?: BioPlatform }) {
   const limit = PLATFORM_BIO_LIMIT[platform];
-  const platformLabel = platform === "tiktok" ? "TikTok" : "Instagram";
+  const platformLabel = PLATFORM_LABEL[platform];
   const [name, setName] = useState("");
   const [what, setWhat] = useState("");
-  const [cta, setCta] = useState(platform === "tiktok" ? 'DM "START" 👇' : DEFAULT_CTA);
+  const [cta, setCta] = useState(PLATFORM_CTA[platform]);
   const [nicheId, setNicheId] = useState<NicheId>("creator");
   const [nameStyle, setNameStyle] = useState("");
   const [copied, setCopied] = useState<string | null>(null);

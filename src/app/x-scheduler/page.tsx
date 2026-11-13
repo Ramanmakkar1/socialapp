@@ -264,6 +264,7 @@ export default function XSchedulerPage() {
             New to it? Read the{" "}
             <Link className={s.vlink} href="/help/schedule-x-posts">step-by-step guide to scheduling X posts</Link>, or
             check your post with the <Link className={s.vlink} href="/tools/x-character-counter">X character counter</Link>, and preview it with the <Link className={s.vlink} href="/tools/x-post-preview">X post preview</Link>.
+            Need a profile refresh? Try the <Link className={s.vlink} href="/tools/x-bio-generator">free X bio generator</Link>.
             Not sure when to post? Find the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-x">best time to post on X</Link>.
           </p>
