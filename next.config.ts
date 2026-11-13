@@ -51,6 +51,13 @@ const nextConfig: NextConfig = {
       { source: "/sitemap.xml", has: OLD_HOST, destination: "https://poskoo.com/sitemap.xml", permanent: true },
       { source: "/robots.txt", has: OLD_HOST, destination: "https://poskoo.com/robots.txt", permanent: true },
       {
+        // Old staging host: make its home page 301 to poskoo.com, because the catch-all regex below may not match the empty root path.
+        source: "/",
+        has: [{ type: "host", value: "socialapp.splitforms.com" }],
+        destination: "https://poskoo.com/",
+        permanent: true,
+      },
+      {
         // Old staging host: send every page to the same path on poskoo.com.
         // /api/* is excluded so webhooks or OAuth callbacks still registered on the old host keep working.
         source: "/:path((?!api/).*)",
