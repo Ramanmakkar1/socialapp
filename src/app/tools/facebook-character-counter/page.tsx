@@ -116,7 +116,8 @@ const config: ToolPageConfig = {
           <p>
             Use the counter to finish your draft, then open the <Link href="/facebook-scheduler">Facebook scheduler</Link> to connect
             through Meta&apos;s official login and choose a publishing time. If you are setting up your first scheduled
-            post, follow the <Link href="/help/schedule-facebook-posts">step-by-step Facebook scheduling guide</Link>.
+            post, follow the <Link href="/help/schedule-facebook-posts">step-by-step Facebook scheduling guide</Link>. To add a
+            few relevant tags to the draft, use the <Link href="/tools/facebook-hashtag-generator">Facebook hashtag generator</Link>.
           </p>
         ),
       },
