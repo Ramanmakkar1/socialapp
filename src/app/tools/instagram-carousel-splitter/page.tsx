@@ -175,6 +175,7 @@ const config: ToolPageConfig = {
               Forgetting the caption. A short line telling people to swipe helps; write it with the{" "}
               <Link href="/tools/instagram-caption-generator">caption generator</Link>.
             </li>
+            <li>Wanting one picture across your profile instead of a swipe? Use the <Link href="/tools/instagram-grid-maker">Instagram grid maker</Link>.</li>
           </ul>
         ),
       },
@@ -204,6 +205,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/instagram-grid-maker",
     "/tools/instagram-carousel-size-checker",
     "/tools/instagram-carousel-maker",
     "/tools/instagram-image-size",

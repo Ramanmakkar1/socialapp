@@ -72,6 +72,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/social-media-image-sizes", name: "Social media image sizes", summary: "Every 2026 image and video size for 9 platforms in one cheat sheet.", category: "media", icon: "image" },
   { href: "/tools/instagram-carousel-size-checker", name: "Carousel size checker", summary: "Check each slide's dimensions, ratio and file size before you schedule.", category: "media", icon: "square-stack" },
   { href: "/tools/instagram-carousel-splitter", name: "Carousel splitter", summary: "Split one wide image into equal carousel slides and download the PNGs.", category: "media", icon: "scissors" },
+  { href: "/tools/instagram-grid-maker", name: "Grid maker", summary: "Split one photo into 3, 6, 9 or 12 profile-grid tiles, numbered in posting order.", category: "media", icon: "scissors" },
   { href: "/tools/instagram-carousel-maker", name: "Carousel maker", summary: "Design text-and-colour carousel slides and download 1080×1350 PNGs.", category: "media", icon: "gallery" },
   { href: "/tools/instagram-safe-zone-checker", name: "Safe zone checker", summary: "See what Reels and Story buttons and captions cover on your 9:16 frame.", category: "media", icon: "frame" },
   { href: "/tools/instagram-story-size-checker", name: "Story size checker", summary: "Check a Story image's size and ratio in a 9:16 frame against 1080×1920.", category: "media", icon: "smartphone" },
