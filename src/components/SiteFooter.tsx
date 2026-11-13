@@ -141,6 +141,7 @@ export function SiteFooter() {
           { href: "/buffer-alternative", label: "Buffer alternative" },
           { href: "/publer-alternative", label: "Publer alternative" },
           { href: "/agorapulse-alternative", label: "Agorapulse alternative" },
+          { href: "/loomly-alternative", label: "Loomly alternative" },
           { href: "/later-alternative", label: "Later alternative" },
           { href: "/planoly-alternative", label: "Planoly alternative" },
           { href: "/sprout-social-alternative", label: "Sprout Social alternative" },
