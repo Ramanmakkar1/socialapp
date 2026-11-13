@@ -260,6 +260,7 @@ export default function LinkedInSchedulerPage() {
             New to it? Follow our step-by-step guide:{" "}
             <Link className={s.vlink} href="/help/schedule-linkedin-posts">how to schedule LinkedIn posts</Link>.
             Check your draft with the <Link className={s.vlink} href="/tools/linkedin-character-counter">LinkedIn character counter</Link>.
+            Not sure when to post? Use the <Link className={s.vlink} href="/tools/best-time-to-post-on-linkedin">best time to post on LinkedIn finder</Link> for starting slots to test.
           </p>
         </div>
       </section>
