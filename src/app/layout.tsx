@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: `${BRAND.name} — Social media scheduler + Instagram auto-DM`,
     description: BRAND.description,
   },
-  // Staging only until launch: the same isPathIndexable helper gates the sitemap.
+  // Indexing is controlled by BRAND.indexable (src/lib/brand.ts); the same isPathIndexable helper gates the sitemap.
   robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },
 };
 

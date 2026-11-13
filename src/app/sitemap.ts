@@ -5,7 +5,7 @@ import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
 
 // Only indexable paths can become sitemap candidates. This uses the same
 // isPathIndexable helper as the root layout robots meta, so a noindex page can
-// never leak into the sitemap. While staging is noindex this is empty,
+// never leak into the sitemap. If BRAND.indexable is set to false this is empty,
 // including for the home page on every host alias.
 function getSitemapPaths(): PublicPath[] {
   return PUBLIC_PATHS.filter((path) => isPathIndexable(path));

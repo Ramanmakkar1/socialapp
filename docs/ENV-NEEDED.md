@@ -40,7 +40,6 @@ New on 2026-11-06: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (Sign in with Goog
 | `REVIEWER_EMAIL`, `REVIEWER_PASSWORD` | optional Meta App Review demo login | |
 | `ANTHROPIC_API_KEY`, `AI_MODEL` | optional AI caption helper | |
 | `NEXT_PUBLIC_ANALYTICS_DOMAIN`, `NEXT_PUBLIC_ANALYTICS_SRC` | optional analytics | |
-| `SITE_INDEXABLE` | keep unset (noindex until launch) | |
 | `STRIPE_SECRET_KEY` | Products / Orders / Stripe Connect onboarding / checkout | platform key (restricted `rk_` key recommended; needs v2 Accounts write (`v2_account_storer_write`), Account Links + login links write, Checkout Sessions write on connected accounts). Without it Products, Orders and Settings show "Payments are not switched on yet" |
 | `STRIPE_WEBHOOK_SECRET` | `/api/stripe/webhook` | `whsec_...` of that endpoint (a **Connected accounts** endpoint, see below); without it the webhook answers 503 |
 | `STRIPE_CONNECT_PREVIEW_API_VERSION` | optional | API version sent only on connected-account creation (Express Dashboard + Managed Risk is a Stripe public preview). Default `2026-10-28.preview`; set it when Stripe publishes a newer preview string |
