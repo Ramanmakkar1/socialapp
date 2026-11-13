@@ -26,6 +26,13 @@ const PARTS: { key: Exclude<keyof Fields, "base">; label: string; color: string 
 ];
 const ICONS = { likes: Heart, comments: MessageCircle, saves: Bookmark, shares: Send };
 
+export type EngagementCalculatorProps = {
+  labels?: Partial<Record<"likes" | "comments" | "saves" | "shares", string>>;
+  followersLabel?: string;
+  reachLabel?: string;
+  hideSaves?: boolean;
+};
+
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn = "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
@@ -68,13 +75,18 @@ function Field({
   );
 }
 
-export default function EngagementCalculator() {
+export default function EngagementCalculator({
+  labels,
+  followersLabel = "Followers",
+  reachLabel = "Reach",
+  hideSaves = false,
+}: EngagementCalculatorProps = {}) {
   const [mode, setMode] = useState<Mode>("followers");
   const [values, setValues] = useState<Fields>(empty);
   const [copied, setCopied] = useState(false);
   const uid = useId();
 
-  const baseLabel = mode === "followers" ? "Followers" : "Reach";
+  const baseLabel = mode === "followers" ? followersLabel : reachLabel;
 
   const filled =
     values.likes.trim() !== "" && values.comments.trim() !== "" && values.base.trim() !== "";
@@ -84,21 +96,23 @@ export default function EngagementCalculator() {
     return engagementRate({
       likes: Number(values.likes),
       comments: Number(values.comments),
-      saves: values.saves === "" ? undefined : Number(values.saves),
+      saves: hideSaves || values.saves === "" ? undefined : Number(values.saves),
       shares: values.shares === "" ? undefined : Number(values.shares),
       base: Number(values.base),
     });
-  }, [filled, values]);
+  }, [filled, values, hideSaves]);
 
-  const baseWord = mode === "followers" ? "followers" : "reach";
-  const formula = `(likes + comments + saves + shares) ÷ ${baseWord} × 100`;
+  const baseWord = mode === "followers" ? followersLabel.toLowerCase() : reachLabel.toLowerCase();
 
   function set(field: keyof Fields, v: string) {
     setValues((prev) => ({ ...prev, [field]: v }));
   }
 
   // Breakdown uses the same numbers the rate was calculated from; only shown once the rate is valid.
-  const parts = PARTS.map((p) => ({ ...p, n: rate === null ? 0 : Number(values[p.key] || 0) }));
+  const parts = PARTS.filter((p) => !(hideSaves && p.key === "saves"))
+    .map((p) => ({ ...p, label: labels?.[p.key] ?? p.label }))
+    .map((p) => ({ ...p, n: rate === null ? 0 : Number(values[p.key] || 0) }));
+  const formula = `(${parts.map((p) => p.label.toLowerCase()).join(" + ")}) ÷ ${baseWord} × 100`;
   const total = parts.reduce((s, p) => s + p.n, 0);
   const top = total > 0 ? parts.reduce((a, b) => (b.n > a.n ? b : a)) : null;
   const meter = rate === null ? 0 : Math.min(100, rate * 10); // 0–10% scale, capped
@@ -126,18 +140,28 @@ export default function EngagementCalculator() {
         <div className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
           <div role="tablist" aria-label="Engagement rate basis" className="flex gap-1 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1">
             <button type="button" role="tab" aria-selected={mode === "followers"} onClick={() => setMode("followers")} className={tabClass(mode === "followers")}>
-              By followers
+              By {followersLabel.toLowerCase()}
             </button>
             <button type="button" role="tab" aria-selected={mode === "reach"} onClick={() => setMode("reach")} className={tabClass(mode === "reach")}>
-              By reach
+              By {reachLabel.toLowerCase()}
             </button>
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
-            <Field id={`${uid}-likes`} label="Likes" icon={Heart} value={values.likes} onChange={(v) => set("likes", v)} />
-            <Field id={`${uid}-comments`} label="Comments" icon={MessageCircle} value={values.comments} onChange={(v) => set("comments", v)} />
-            <Field id={`${uid}-saves`} label="Saves" optional icon={Bookmark} value={values.saves} onChange={(v) => set("saves", v)} />
-            <Field id={`${uid}-shares`} label="Shares" optional icon={Send} value={values.shares} onChange={(v) => set("shares", v)} />
+            {parts.map((p) => {
+              const Icon = ICONS[p.key];
+              return (
+                <Field
+                  key={p.key}
+                  id={`${uid}-${p.key}`}
+                  label={p.label}
+                  optional={p.key === "saves" || p.key === "shares"}
+                  icon={Icon}
+                  value={values[p.key]}
+                  onChange={(v) => set(p.key, v)}
+                />
+              );
+            })}
           </div>
           <div className="mt-4 border-t border-dashed border-[var(--poskoo-line)] pt-4">
             <Field id={`${uid}-base`} label={baseLabel} icon={Users} value={values.base} onChange={(v) => set("base", v)} />
@@ -190,7 +214,7 @@ export default function EngagementCalculator() {
           <div className={kpi}>
             <p className={kpiLabel}>Total interactions</p>
             <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{number.format(total)}</p>
-            <p className="mt-1 text-xs text-[#3d3450]">Likes + comments + saves + shares.</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{parts.map((p) => p.label.toLowerCase()).join(" + ")}.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>{baseLabel}</p>
