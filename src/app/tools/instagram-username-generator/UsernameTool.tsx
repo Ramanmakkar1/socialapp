@@ -17,8 +17,10 @@ const kpiLabel = "text-[11px] font-semibold uppercase tracking-wide text-[#5f587
 
 export default function UsernameTool({ platform = "instagram" }: { platform?: UsernamePlatform }) {
   const max = PLATFORM_USERNAME_MAX[platform];
-  const platformLabel = platform === "tiktok" ? "TikTok" : "Instagram";
-  const availabilityNote = platform === "tiktok"
+  const platformLabel = platform === "youtube" ? "YouTube" : platform === "tiktok" ? "TikTok" : "Instagram";
+  const availabilityNote = platform === "youtube"
+    ? `We do not check YouTube. Before you settle on a handle, go to YouTube Studio > Customization > Basic info > Handle to see if it is free.`
+    : platform === "tiktok"
     ? `We do not check ${platformLabel}. Before you settle on a name, open Profile > Edit profile > Username in the ${platformLabel} app to see if it is free.`
     : `We do not check ${platformLabel}. Before you settle on a name, type it into Edit profile > Username in the ${platformLabel} app to see if it is free.`;
   const [name, setName] = useState("");

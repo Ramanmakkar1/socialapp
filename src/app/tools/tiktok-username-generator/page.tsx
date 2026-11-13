@@ -136,6 +136,7 @@ const config: ToolPageConfig = {
     "/tools/tiktok-hashtag-generator",
     "/tools/instagram-username-generator",
     "/tools/best-time-to-post-on-tiktok",
+    "/tools/youtube-handle-generator",
   ],
   schema: {
     features: [

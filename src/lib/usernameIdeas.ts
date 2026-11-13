@@ -1,10 +1,10 @@
 /**
- * Template-based Instagram and TikTok username ideas. No AI, no network, no randomness:
+ * Template-based Instagram, TikTok and YouTube username ideas. No AI, no network, no randomness:
  * the same input always gives the same list in the same order.
  */
 
 export type UsernameStyle = "clean" | "creative" | "business";
-export type UsernamePlatform = "instagram" | "tiktok";
+export type UsernamePlatform = "instagram" | "tiktok" | "youtube";
 
 export type UsernameInput = {
   name: string;
@@ -14,7 +14,7 @@ export type UsernameInput = {
 };
 
 export const USERNAME_MAX = 30;
-export const PLATFORM_USERNAME_MAX: Record<UsernamePlatform, number> = { instagram: 30, tiktok: 24 };
+export const PLATFORM_USERNAME_MAX: Record<UsernamePlatform, number> = { instagram: 30, tiktok: 24, youtube: 30 };
 export const MAX_RESULTS = 30;
 
 export const USERNAME_STYLES: { id: UsernameStyle; label: string }[] = [
@@ -23,7 +23,7 @@ export const USERNAME_STYLES: { id: UsernameStyle; label: string }[] = [
   { id: "business", label: "Business / brand" },
 ];
 
-/** Instagram and TikTok usernames: letters, numbers, periods and underscores, within the platform limit. */
+/** Instagram, TikTok and YouTube usernames: letters, numbers, periods and underscores, within the platform limit. */
 export function isValidInstagramUsername(u: string, max = USERNAME_MAX, minLength = 1): boolean {
   if (u.length < minLength || u.length > max) return false;
   if (!/^[a-z0-9._]+$/.test(u)) return false;
@@ -115,7 +115,7 @@ function build(parts: Parts): string {
 export function generateUsernames(input: UsernameInput): string[] {
   const platform = input.platform ?? "instagram";
   const max = PLATFORM_USERNAME_MAX[platform];
-  const minLength = platform === "tiktok" ? 2 : 1;
+  const minLength = platform === "youtube" ? 3 : platform === "tiktok" ? 2 : 1;
   const nameWords = words(input.name);
   const nicheWords = words(input.niche);
   // Keep base parts short so combined ideas still fit the platform limit.

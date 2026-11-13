@@ -43,6 +43,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/tiktok-bio-generator", name: "TikTok bio generator", summary: "Short TikTok bio ideas for your niche that fit the 80-character limit.", category: "create", icon: "user" },
   { href: "/tools/instagram-username-generator", name: "Username generator", summary: "Up to 30 username ideas from your name and niche that follow Instagram's rules.", category: "create", icon: "at" },
   { href: "/tools/tiktok-username-generator", name: "TikTok username generator", summary: "Handle ideas from your name and niche that fit TikTok's 24-character rule.", category: "create", icon: "at" },
+  { href: "/tools/youtube-handle-generator", name: "YouTube handle generator", summary: "@handle and channel name ideas that fit YouTube's 3-30 character rule.", category: "create", icon: "at" },
   { href: "/tools/linkedin-text-formatter", name: "LinkedIn Text Formatter", summary: "Copy bold, italic and bulleted Unicode text for LinkedIn posts and profiles.", category: "create", icon: "type" },
   { href: "/tools/linkedin-character-counter", name: "LinkedIn character counter", summary: "Check LinkedIn post, comment, headline and About limits, with a live See more preview.", category: "create", icon: "type" },
   { href: "/tools/threads-character-counter", name: "Threads character counter", summary: "Check the 500-character post and 150-character bio limits, with hashtag and 5-link checks.", category: "create", icon: "type" },
