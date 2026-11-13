@@ -95,12 +95,15 @@ const config: ToolPageConfig = {
       {
         title: "How does YouTube count tags and invalid title characters?",
         body: (
-          <ul>
-            <li><b>Tags are comma-separated.</b> Empty items are ignored, and each comma between tags counts as one character.</li>
-            <li><b>Multi-word tags count quotes.</b> Add two characters for tags containing whitespace, such as &quot;video marketing&quot;.</li>
-            <li><b>Titles cannot contain angle brackets.</b> YouTube rejects titles containing &lt; or &gt;, so the tool warns you immediately.</li>
-            <li><b>Characters count by code point.</b> A standalone emoji such as 😀 counts as one character in this tool.</li>
-          </ul>
+          <>
+            <ul>
+              <li><b>Tags are comma-separated.</b> Empty items are ignored, and each comma between tags counts as one character.</li>
+              <li><b>Multi-word tags count quotes.</b> Add two characters for tags containing whitespace, such as &quot;video marketing&quot;.</li>
+              <li><b>Titles cannot contain angle brackets.</b> YouTube rejects titles containing &lt; or &gt;, so the tool warns you immediately.</li>
+              <li><b>Characters count by code point.</b> A standalone emoji such as 😀 counts as one character in this tool.</li>
+            </ul>
+            <p>Need a starting list? Build one with the <Link href="/tools/youtube-tag-generator">free YouTube tag generator</Link>, then check or trim it here.</p>
+          </>
         ),
       },
       {
@@ -134,7 +137,7 @@ const config: ToolPageConfig = {
       a: "Search usually shows about 70 title characters. On the watch page, about 157 description characters appear above Show more. Exact display lengths vary by device and layout.",
     },
   ],
-  related: ["/tools/tiktok-caption-counter", "/tools/linkedin-character-counter", "/tools/threads-character-counter"],
+  related: ["/tools/youtube-tag-generator", "/tools/tiktok-caption-counter", "/tools/linkedin-character-counter", "/tools/threads-character-counter"],
   schema: {
     features: [
       "YouTube title counting against the 100-character limit",
