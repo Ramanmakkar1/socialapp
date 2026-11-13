@@ -65,12 +65,13 @@ const PLATFORM = {
   linkedin: { min: 1, max: 5, start: 3, note: "LinkedIn has no hard cap, but 3 to 5 relevant hashtags per post works best; more can look spammy." },
   youtube: { min: 1, max: 15, start: 3, note: "YouTube shows the first 3 hashtags from your description above or below the title. Use 3 to 5 that fit the video. A video with more than 60 hashtags has all its hashtags ignored." },
   facebook: { min: 1, max: 5, start: 3, note: "Facebook has no hashtag cap, but 1 to 3 relevant hashtags per post works best. Long hashtag blocks can look spammy." },
+  x: { min: 1, max: 3, start: 2, note: "X counts every hashtag toward the 280-character limit. 1 to 2 relevant hashtags per post works best; more can look spammy." },
 } as const;
 
-export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" | "youtube" | "facebook" }) {
+export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" | "youtube" | "facebook" | "x" }) {
   const id = useId();
   const cfg = PLATFORM[platform];
-  const [niche, setNiche] = useState(platform === "linkedin" || platform === "facebook" ? "small-business" : "fitness");
+  const [niche, setNiche] = useState(platform === "linkedin" || platform === "facebook" || platform === "x" ? "small-business" : "fitness");
   const [count, setCount] = useState<number>(cfg.start);
   const [mix, setMix] = useState<HashtagMix>("balanced");
   const [extra, setExtra] = useState("");
