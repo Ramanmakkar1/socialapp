@@ -3,6 +3,11 @@ import { BRAND } from "./brand";
 export type ToolFaq = { q: string; a: string };
 export type Crumb = { name: string; url: string };
 
+/** Reference to the site-wide Organization node declared in src/app/layout.tsx. */
+export function publisherRef() {
+  return { "@id": BRAND.url + "#org" };
+}
+
 /**
  * SoftwareApplication JSON-LD for a free tool page.
  * Free (price 0 USD), web-based, no aggregateRating or review fields.

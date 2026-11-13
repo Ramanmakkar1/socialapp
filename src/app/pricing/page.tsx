@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { publisherRef } from "@/lib/tool-schema";
 import { PLANS, cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { PlanCta, PlanTag } from "@/components/PlanCta";
@@ -68,7 +69,7 @@ const appJsonLd = (r: PlanReadiness) => ({
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   offers: softwareOffers(r),
-  publisher: { "@type": "Organization", name: BRAND.company },
+  publisher: publisherRef(),
 });
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",

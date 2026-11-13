@@ -7,7 +7,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
-import { faqJsonLd, ldJson } from "@/lib/tool-schema";
+import { faqJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 import { CompareNote } from "@/components/CompareNote";
 
@@ -103,7 +103,7 @@ const appJsonLd = {
   ],
   // Paid offers only once Pro/Agency checkout is live, matching /pricing.
   offers: softwareOffers(planReadiness()),
-  publisher: { "@type": "Organization", name: BRAND.company },
+  publisher: publisherRef(),
 };
 
 function Cell({ value }: { value: string }) {

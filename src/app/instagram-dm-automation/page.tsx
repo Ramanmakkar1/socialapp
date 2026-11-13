@@ -5,6 +5,7 @@ import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
+import { publisherRef } from "@/lib/tool-schema";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { AnimArt } from "@/components/AnimArt";
@@ -95,7 +96,7 @@ const appJsonLd = {
   ],
   // Paid offers only once Pro/Agency checkout is live, matching /pricing.
   offers: softwareOffers(planReadiness()),
-  publisher: { "@type": "Organization", name: BRAND.company },
+  publisher: publisherRef(),
 };
 
 const faqJsonLd = {

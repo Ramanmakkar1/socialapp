@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { publisherRef } from "@/lib/tool-schema";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
@@ -113,7 +114,7 @@ const appJsonLd = {
     "Comment-to-DM automation on publish",
   ],
   offers: softwareOffers(planReadiness()),
-  publisher: { "@type": "Organization", name: BRAND.company },
+  publisher: publisherRef(),
 };
 
 export default function InstagramScheduler() {

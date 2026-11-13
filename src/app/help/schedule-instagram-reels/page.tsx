@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
+import { breadcrumbJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -21,7 +21,7 @@ const articleJsonLd = {
   description: metadata.description,
   dateModified: "2026-11-07",
   author: { "@type": "Organization", name: BRAND.company },
-  publisher: { "@type": "Organization", name: BRAND.company, url: BRAND.url },
+  publisher: publisherRef(),
   mainEntityOfPage: `${BRAND.url}/help/schedule-instagram-reels`,
 };
 
