@@ -14,7 +14,7 @@ const PATH = "/instagram-scheduler/pricing";
 export const revalidate = 600;
 const title = "Instagram Scheduler Pricing: Plans & Limits | Poskoo";
 const description =
-  "What each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free; Pro and Agency add more.";
+  "See what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free, upgrade any time.";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },

@@ -15,7 +15,7 @@ const PATH = "/pricing";
 // the page stays static and regenerates in the background at most every 10 minutes.
 export const revalidate = 600;
 const title = `${BRAND.name} Pricing: Free Instagram Scheduler & Auto-DM Plans`;
-const description = `Compare ${BRAND.name} plans: start free with Instagram scheduling and 500 auto-DMs a month, then upgrade to Pro or Agency when you need more. No card needed to start.`;
+const description = `Compare ${BRAND.name} Free, Pro and Agency plans. Start free with Instagram scheduling and 500 auto-DMs a month, then upgrade any time. No credit card needed.`;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },

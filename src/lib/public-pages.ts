@@ -377,7 +377,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/help/schedule-bluesky-posts": "Schedule Bluesky posts with an app password: connect your handle, write up to 300 characters, add up to 4 images or a link, pick a time and fix errors.",
   "/help/schedule-mastodon-posts": "Schedule Mastodon posts on any server: connect with OAuth, write to your server's limit, add images or video, pick a time and track the publishing status.",
   "/instagram-scheduler": "Schedule Instagram posts with a drag-and-drop calendar, feed, Reels and carousel support, all from one Poskoo workspace for your Instagram content.",
-  "/instagram-scheduler/pricing": "See exactly what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free, upgrade to Pro or Agency any time.",
+  "/instagram-scheduler/pricing": "See what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free, upgrade any time.",
   "/threads-scheduler": "Schedule Threads posts on one calendar and publish them automatically through Meta's official API. Plan text, image or video posts and track results.",
   "/pinterest-scheduler": "Schedule Pinterest Pins to any board with the official API. Add a title and destination link, upload a JPG or PNG image, and choose the publishing time.",
   "/x-scheduler": "Schedule posts to X (Twitter) through X's official API: write the text, add up to 4 images or one video, and pick a publishing time in Poskoo.",
@@ -389,6 +389,6 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/social-media-scheduler-comparison": "Compare Poskoo's Instagram, Facebook Pages and Threads scheduling: calendar, media, auto-publishing and Instagram comment-to-DM, plus a free plan.",
   "/facebook-scheduler": "Schedule Facebook Page posts with text, photos or video through Meta's official login, and plan Instagram and Threads content in Poskoo too.",
   "/instagram-content-planner": "Plan an Instagram post step by step with free tools: draft a hook, write a caption, check image dimensions, preview and schedule it in Poskoo.",
-  "/pricing": "Compare Poskoo Free, Pro and Agency plans and see what each includes. Every account starts on Free; upgrade any time.",
+  "/pricing": "Compare Poskoo Free, Pro and Agency plans. Start free with Instagram scheduling and 500 auto-DMs a month, then upgrade any time. No credit card needed.",
   "/developers": "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp, then schedule posts and read analytics from your assistant.",
 };
