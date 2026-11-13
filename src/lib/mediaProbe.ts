@@ -36,7 +36,7 @@ async function findBox(fh: FileHandle, start: number, end: number, type: string)
 export async function probeVideoDurationSec(filePath: string): Promise<number | null> {
   let fh: FileHandle | null = null;
   try {
-    fh = await open(filePath, "r");
+    fh = await open(/*turbopackIgnore: true*/ filePath, "r");
     const { size } = await fh.stat();
     const moov = await findBox(fh, 0, size, "moov");
     if (!moov) return null;

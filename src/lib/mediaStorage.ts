@@ -50,7 +50,7 @@ export function mediaStorageDir(): string {
   if (process.env.MEDIA_STORAGE_DIR) return process.env.MEDIA_STORAGE_DIR;
   // The production home server mounts /data; local Windows runs use the repo's data folder.
   return process.platform === "win32"
-    ? path.join(process.cwd(), "data", "media")
+    ? path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "media")
     : "/data/poskoo-media";
 }
 
@@ -70,8 +70,8 @@ export function mediaKeyFor(userId: string, ext: string): string {
 /** Resolves a storage key to a file path, refusing anything outside the media directory. */
 export function mediaFilePath(key: string): string | null {
   if (!KEY_RE.test(key)) return null;
-  const base = path.resolve(mediaStorageDir());
-  const full = path.resolve(base, key);
+  const base = path.resolve(/*turbopackIgnore: true*/ mediaStorageDir());
+  const full = path.resolve(/*turbopackIgnore: true*/ base, key);
   if (!full.startsWith(base + path.sep)) return null;
   return full;
 }
@@ -79,17 +79,17 @@ export function mediaFilePath(key: string): string | null {
 /** Bytes used by one user's uploads (0 when they have none). */
 export async function userMediaUsage(userId: string): Promise<number> {
   if (!/^[0-9a-f-]{36}$/i.test(userId)) return 0;
-  const dir = path.join(path.resolve(mediaStorageDir()), userId);
+  const dir = path.join(/*turbopackIgnore: true*/ path.resolve(/*turbopackIgnore: true*/ mediaStorageDir()), userId);
   let names: string[];
   try {
-    names = await readdir(dir);
+    names = await readdir(/*turbopackIgnore: true*/ dir);
   } catch {
     return 0;
   }
   let total = 0;
   for (const name of names) {
     try {
-      const info = await stat(path.join(dir, name));
+      const info = await stat(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ dir, name));
       if (info.isFile()) total += info.size;
     } catch {
       // removed meanwhile
@@ -118,7 +118,7 @@ export async function saveMediaStream(
   const key = fixedKey ?? mediaKeyFor(userId, ext);
   const file = mediaFilePath(key);
   if (!file) throw new Error("Invalid media key");
-  await mkdir(path.dirname(file), { recursive: true });
+  await mkdir(/*turbopackIgnore: true*/ path.dirname(file), { recursive: true });
   const tmp = `${file}.part`;
   let size = 0;
   const counter = new Transform({
@@ -129,11 +129,11 @@ export async function saveMediaStream(
     },
   });
   try {
-    await pipeline(Readable.fromWeb(body as WebReadableStream<Uint8Array>), counter, createWriteStream(tmp));
+    await pipeline(Readable.fromWeb(body as WebReadableStream<Uint8Array>), counter, createWriteStream(/*turbopackIgnore: true*/ tmp));
     if (size === 0) throw new Error("Empty upload");
-    await rename(tmp, file);
+    await rename(/*turbopackIgnore: true*/ tmp, file);
   } catch (err) {
-    await unlink(tmp).catch(() => undefined);
+    await unlink(/*turbopackIgnore: true*/ tmp).catch(() => undefined);
     throw err;
   }
   return { key, size };
@@ -172,7 +172,7 @@ export async function statMediaUpload(key: string): Promise<{ size: number; cont
   const file = mediaFilePath(key);
   if (!file) return null;
   try {
-    const info = await stat(file);
+    const info = await stat(/*turbopackIgnore: true*/ file);
     if (!info.isFile()) return null;
     const ext = key.split(".").pop()?.toLowerCase() ?? "";
     return { size: info.size, contentType: CONTENT_TYPES[ext] ?? "application/octet-stream" };
@@ -185,7 +185,7 @@ export async function statMediaUpload(key: string): Promise<{ size: number; cont
 export function openMediaStream(key: string, range?: ByteRange | null): ReadStream | null {
   const file = mediaFilePath(key);
   if (!file) return null;
-  return range ? createReadStream(file, { start: range.start, end: range.end }) : createReadStream(file);
+  return range ? createReadStream(/*turbopackIgnore: true*/ file, { start: range.start, end: range.end }) : createReadStream(/*turbopackIgnore: true*/ file);
 }
 
 /** Storage keys mentioned in a text (post media JSON, rule rows, ...). */
@@ -206,10 +206,10 @@ export async function cleanupUnusedMedia(
   olderThanDays = 7,
   nowMs = Date.now(),
 ): Promise<{ deleted: number; freedBytes: number }> {
-  const base = path.resolve(mediaStorageDir());
+  const base = path.resolve(/*turbopackIgnore: true*/ mediaStorageDir());
   let users: string[];
   try {
-    users = await readdir(base);
+    users = await readdir(/*turbopackIgnore: true*/ base);
   } catch {
     return { deleted: 0, freedBytes: 0 };
   }
@@ -218,10 +218,10 @@ export async function cleanupUnusedMedia(
   let freedBytes = 0;
   for (const userId of users) {
     if (!/^[0-9a-f-]{36}$/i.test(userId)) continue;
-    const dir = path.join(base, userId);
+    const dir = path.join(/*turbopackIgnore: true*/ base, userId);
     let names: string[];
     try {
-      names = await readdir(dir);
+      names = await readdir(/*turbopackIgnore: true*/ dir);
     } catch {
       continue;
     }
@@ -231,7 +231,7 @@ export async function cleanupUnusedMedia(
       const file = mediaFilePath(key);
       if (!file && !name.endsWith(".part")) continue;
       try {
-        const info = await stat(path.join(dir, name));
+        const info = await stat(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ dir, name));
         if (info.isFile() && info.mtimeMs < cutoff) old.push({ key, size: info.size });
       } catch {
         // gone
@@ -253,7 +253,7 @@ export async function cleanupUnusedMedia(
         if (["jpg", "jpeg", "png", "mp4", "mov"].some((e) => present.has(`${stem}.${e}`))) continue;
       }
       try {
-        await unlink(path.join(base, item.key));
+        await unlink(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ base, item.key));
         deleted++;
         freedBytes += item.size;
       } catch {
@@ -303,10 +303,10 @@ export function signedMediaUrl(
 /** Files in one user's folder (finished uploads and posters; temp .part files are skipped). */
 export async function listUserMedia(userId: string): Promise<{ key: string; size: number; mtimeMs: number }[]> {
   if (!/^[0-9a-f-]{36}$/i.test(userId)) return [];
-  const dir = path.join(path.resolve(mediaStorageDir()), userId);
+  const dir = path.join(/*turbopackIgnore: true*/ path.resolve(/*turbopackIgnore: true*/ mediaStorageDir()), userId);
   let names: string[];
   try {
-    names = await readdir(dir);
+    names = await readdir(/*turbopackIgnore: true*/ dir);
   } catch {
     return [];
   }
@@ -315,7 +315,7 @@ export async function listUserMedia(userId: string): Promise<{ key: string; size
     const key = `${userId}/${name}`;
     if (!mediaFilePath(key)) continue;
     try {
-      const info = await stat(path.join(dir, name));
+      const info = await stat(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ dir, name));
       if (info.isFile()) out.push({ key, size: info.size, mtimeMs: info.mtimeMs });
     } catch {
       // removed meanwhile
@@ -332,8 +332,8 @@ export async function deleteMediaKeys(keys: Iterable<string>): Promise<{ deleted
     const file = mediaFilePath(key);
     if (!file) continue;
     try {
-      const info = await stat(file);
-      await unlink(file);
+      const info = await stat(/*turbopackIgnore: true*/ file);
+      await unlink(/*turbopackIgnore: true*/ file);
       deleted += 1;
       freedBytes += info.size;
     } catch {
@@ -353,10 +353,10 @@ export function minFreeBytes(): number {
 
 /** Free / total bytes on the disk that holds the media folder (null when it cannot be read). */
 export async function mediaDiskSpace(): Promise<{ freeBytes: number; totalBytes: number } | null> {
-  const base = path.resolve(mediaStorageDir());
+  const base = path.resolve(/*turbopackIgnore: true*/ mediaStorageDir());
   try {
-    await mkdir(base, { recursive: true });
-    const info = await statfs(base);
+    await mkdir(/*turbopackIgnore: true*/ base, { recursive: true });
+    const info = await statfs(/*turbopackIgnore: true*/ base);
     return { freeBytes: info.bavail * info.bsize, totalBytes: info.blocks * info.bsize };
   } catch {
     return null;
@@ -380,26 +380,26 @@ export function diskDecision(freeBytes: number, incomingBytes: number, minFree: 
 
 /** Total bytes in the media folder (admin health line). Walks one level of user folders. */
 export async function mediaDirSize(): Promise<{ bytes: number; files: number }> {
-  const base = path.resolve(mediaStorageDir());
+  const base = path.resolve(/*turbopackIgnore: true*/ mediaStorageDir());
   let users: string[];
   try {
-    users = await readdir(base);
+    users = await readdir(/*turbopackIgnore: true*/ base);
   } catch {
     return { bytes: 0, files: 0 };
   }
   let bytes = 0;
   let files = 0;
   for (const userId of users) {
-    const dir = path.join(base, userId);
+    const dir = path.join(/*turbopackIgnore: true*/ base, userId);
     let names: string[];
     try {
-      names = await readdir(dir);
+      names = await readdir(/*turbopackIgnore: true*/ dir);
     } catch {
       continue;
     }
     for (const name of names) {
       try {
-        const info = await stat(path.join(dir, name));
+        const info = await stat(/*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ dir, name));
         if (info.isFile()) {
           bytes += info.size;
           files += 1;
