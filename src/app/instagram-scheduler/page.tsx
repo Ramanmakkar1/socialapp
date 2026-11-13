@@ -3,16 +3,19 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { ArrowRight } from "lucide-react";
 import { AnimArt, type AnimName } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
 
+const description = "Schedule Instagram posts, reels, carousels and stories, see suggested posting times, and auto-DM everyone who comments. Free plan, no credit card.";
+
 export const metadata: Metadata = withSocial({
   title: { absolute: "Instagram Scheduler: Plan & Auto-Publish Posts and Reels" },
-  description:
-    "Schedule Instagram posts, reels, carousels and stories, see suggested posting times, and auto-DM everyone who comments. Free plan, no credit card.",
+  description,
   alternates: { canonical: "/instagram-scheduler" },
 });
 
@@ -93,12 +96,36 @@ const faqJsonLd = {
   })),
 };
 
+const appJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: BRAND.name,
+  url: `${BRAND.url}/instagram-scheduler`,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description,
+  featureList: [
+    "Instagram post, reel, carousel and story scheduling",
+    "Week and month calendar",
+    "Suggested posting times",
+    "First comment with hashtags",
+    "AI caption writing",
+    "Comment-to-DM automation on publish",
+  ],
+  offers: softwareOffers(planReadiness()),
+  publisher: { "@type": "Organization", name: BRAND.company },
+};
+
 export default function InstagramScheduler() {
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Instagram scheduler", path: "/instagram-scheduler" }]}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
         <div className={s.heroText}>
