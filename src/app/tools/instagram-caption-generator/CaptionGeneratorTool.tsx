@@ -1705,9 +1705,11 @@ function Switch({ on }: { on: boolean }) {
   );
 }
 
-export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" }) {
+export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "facebook" }) {
   const isTikTok = platform === "tiktok";
-  const captionLimit = isTikTok ? 4000 : INSTAGRAM_CAPTION_LIMIT;
+  const isFacebook = platform === "facebook";
+  const captionLimit = isTikTok ? 4000 : isFacebook ? 63206 : INSTAGRAM_CAPTION_LIMIT;
+  const foldAt = isFacebook ? 480 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1716,7 +1718,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
   const [shuffleKey, setShuffleKey] = useState(0);
   const [selected, setSelected] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const useCommentCta = addCommentCta && !isTikTok;
+  const useCommentCta = addCommentCta && platform === "instagram";
 
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1764,9 +1766,11 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
 
       // Joined with real line breaks
       const fullText = [hookPart, ...bodyLines, ctaPart].join("\n\n");
-      return isTikTok ? fullText.replace(/Instagram/g, "TikTok") : fullText;
+      if (isTikTok) return fullText.replace(/Instagram/g, "TikTok");
+      if (isFacebook) return fullText.replace(/Instagram/g, "Facebook");
+      return fullText;
     });
-  }, [goal, tone, topic, addEmojis, useCommentCta, isTikTok, shuffleKey]);
+  }, [goal, tone, topic, addEmojis, useCommentCta, isTikTok, isFacebook, shuffleKey]);
 
   async function handleCopy(index: number, text: string) {
     try {
@@ -1793,8 +1797,8 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
   const avgLength = lengths.length ? Math.round(lengths.reduce((s, n) => s + n, 0) / lengths.length) : 0;
   const shortest = lengths.length ? Math.min(...lengths) : 0;
   const longest = lengths.length ? Math.max(...lengths) : 0;
-  const hookFits = captions.filter((c) => c.split("\n\n")[0].length <= FOLD_AT).length;
-  const fold = foldCaption(selectedText, FOLD_AT);
+  const hookFits = captions.filter((c) => c.split("\n\n")[0].length <= foldAt).length;
+  const fold = foldCaption(selectedText, foldAt);
   const selectedWords = selectedText.split(/\s+/).filter(Boolean).length;
   const usingDefaultTopic = !topic.trim();
 
@@ -1877,7 +1881,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
             <Switch on={addEmojis} />
           </label>
 
-          {!isTikTok && (
+          {platform === "instagram" && (
             <label htmlFor={commentCtaId} className={toggle}>
               <span className="inline-flex min-w-0 items-center gap-2">
                 <MessageCircle className="h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
@@ -2052,7 +2056,9 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
             <p className="mt-2 text-xs text-[#5f5873]">
               {isTikTok
                 ? "Only the first line or so shows over the video before “more”. Keep the hook short."
-                : `About the first ${FOLD_AT} characters show before “… more” in the feed. That cut-off varies by device.`}
+                : isFacebook
+                  ? `About the first ${foldAt} characters show before “See more” on desktop. That cut-off varies by device.`
+                  : `About the first ${foldAt} characters show before “… more” in the feed. That cut-off varies by device.`}
             </p>
           </div>
         </aside>

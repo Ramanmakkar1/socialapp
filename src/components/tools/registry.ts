@@ -76,6 +76,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/youtube-description-generator", name: "YouTube description generator", summary: "Hook, summary, chapters, links and hashtags in one description under 5,000 characters.", category: "create", icon: "type" },
   { href: "/tools/facebook-character-counter", name: "Facebook character counter", summary: "Check Facebook post, comment, ad and Page bio limits, with a live See more preview.", category: "create", icon: "type" },
   { href: "/tools/facebook-hashtag-generator", name: "Facebook hashtag generator", summary: "1 to 5 relevant hashtags for Facebook posts and Reels, copied in one click.", category: "create", icon: "hash" },
+  { href: "/tools/facebook-caption-generator", name: "Facebook caption generator", summary: "Six Facebook post caption drafts with a hook and call to action for any topic.", category: "create", icon: "sparkles" },
   { href: "/tools/x-hashtag-generator", name: "X hashtag generator", summary: "1 to 3 relevant hashtags for X posts that fit the 280-character limit, copied in one click.", category: "create", icon: "hash" },
   { href: "/tools/pinterest-hashtag-generator", name: "Pinterest hashtag generator", summary: "2 to 5 relevant hashtags for Pin descriptions, mixed broad to specific, copied in one click.", category: "create", icon: "hash" },
   { href: "/tools/bluesky-character-counter", name: "Bluesky character counter", summary: "Check the 300-grapheme post limit, with live remaining counts and emoji-aware totals.", category: "create", icon: "type" },
