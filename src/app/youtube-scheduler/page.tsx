@@ -160,7 +160,7 @@ export default function YouTubeSchedulerPage() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            Check the title, description and combined tag limits with the <Link className={s.vlink} href="/tools/youtube-title-counter">free YouTube title and description counter</Link>, then build tags with the <Link className={s.vlink} href="/tools/youtube-tag-generator">free YouTube tag generator</Link>. Not sure when to publish? Find the{" "}
+            Check the title, description and combined tag limits with the <Link className={s.vlink} href="/tools/youtube-title-counter">free YouTube title and description counter</Link>, then build tags with the <Link className={s.vlink} href="/tools/youtube-tag-generator">free YouTube tag generator</Link>, then write the description with the <Link className={s.vlink} href="/tools/youtube-description-generator">free YouTube description generator</Link>. Not sure when to publish? Find the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-youtube">best time to post on YouTube</Link>.
           </p>
         </div>

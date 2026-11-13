@@ -50,6 +50,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/tiktok-caption-generator", name: "TikTok caption generator", summary: "Six TikTok caption drafts with a short hook and call to action for any topic.", category: "create", icon: "sparkles" },
   { href: "/tools/youtube-title-counter", name: "YouTube title counter", summary: "Check YouTube titles, descriptions and tags, with search previews and invalid-character warnings.", category: "create", icon: "type" },
   { href: "/tools/youtube-tag-generator", name: "YouTube tag generator", summary: "Tags from your topic, counted against the 500-character limit, ready to copy.", category: "create", icon: "hash" },
+  { href: "/tools/youtube-description-generator", name: "YouTube description generator", summary: "Hook, summary, chapters, links and hashtags in one description under 5,000 characters.", category: "create", icon: "type" },
   { href: "/tools/facebook-character-counter", name: "Facebook character counter", summary: "Check Facebook post, comment, ad and Page bio limits, with a live See more preview.", category: "create", icon: "type" },
   { href: "/tools/bluesky-character-counter", name: "Bluesky character counter", summary: "Check the 300-grapheme post limit, with live remaining counts and emoji-aware totals.", category: "create", icon: "type" },
   { href: "/tools/mastodon-character-counter", name: "Mastodon character counter", summary: "Check the 500-character default or your server's limit, with links counted as 23 and mentions by username.", category: "create", icon: "type" },

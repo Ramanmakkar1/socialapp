@@ -118,6 +118,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/youtube-description-generator",
     "/tools/youtube-title-counter",
     "/tools/best-time-to-post-on-youtube",
     "/tools/social-media-image-sizes",
