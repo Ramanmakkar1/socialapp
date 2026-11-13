@@ -36,7 +36,7 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-function readImage(file: File): Promise<Omit<Loaded, "url" | "typeOk">> {
+function readImage(file: File): Promise<Omit<Loaded, "url">> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
