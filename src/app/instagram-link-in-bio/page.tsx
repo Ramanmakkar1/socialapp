@@ -324,6 +324,11 @@ export default function InstagramLinkInBioPage() {
               <Link className="btn" href="/signup">
                 Create your free page <span aria-hidden="true">→</span>
               </Link>
+              <p className="small" style={{ marginTop: 16 }}>
+                <Link className={s.vlink} href="/linktree-alternative">
+                  Compare Poskoo with Linktree
+                </Link>
+              </p>
             </div>
             <BioPreview />
           </div>

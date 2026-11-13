@@ -1,7 +1,7 @@
 import Link from "next/link";
 import s from "./site.module.css";
 
-type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer";
+type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "linktree";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
@@ -13,6 +13,7 @@ const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/metricool-alternative", label: "Metricool alternative", key: "metricool" },
   { href: "/hootsuite-alternative", label: "Hootsuite alternative", key: "hootsuite" },
   { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative", key: "meta" },
+  { href: "/linktree-alternative", label: "Linktree alternative", key: "linktree" },
 ];
 
 export function CompareAlternativesNav({ current }: { current?: ComparePage }) {
