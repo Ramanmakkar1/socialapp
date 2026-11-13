@@ -263,9 +263,10 @@ export default function PinterestSchedulerPage() {
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             New to it? Read{" "}
-            <Link className={s.vlink} href="/help/schedule-pinterest-posts">how to schedule Pinterest Pins</Link>, find the{" "}
-            <Link className={s.vlink} href="/tools/best-time-to-post-on-pinterest">best time to post on Pinterest</Link>, or check your{" "}
+            <Link className={s.vlink} href="/help/schedule-pinterest-posts">how to schedule Pinterest Pins</Link> or check your{" "}
             <Link className={s.vlink} href="/tools/pinterest-character-counter">free Pinterest character counter</Link> limits before you publish.
+            Not sure when to pin? Try the free{" "}
+            <Link className={s.vlink} href="/tools/best-time-to-post-on-pinterest">best time to post on Pinterest</Link> finder.
           </p>
         </div>
       </section>

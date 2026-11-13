@@ -134,6 +134,7 @@ const howToJsonLd = {
 const related = [
   { href: "/pinterest-scheduler", label: "Pinterest scheduler" },
   { href: "/tools/pinterest-character-counter", label: "Pinterest title and description counter" },
+  { href: "/tools/best-time-to-post-on-pinterest", label: "Best time to post on Pinterest" },
   { href: "/instagram-scheduler", label: "Instagram scheduler" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];

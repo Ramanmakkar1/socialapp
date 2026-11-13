@@ -1,20 +1,20 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
-import BestTimeFinder from "../best-time-to-post-on-instagram/BestTimeFinder";
+import BestTimeFinder from "./BestTimeFinder";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-pinterest",
   name: "Best time to post on Pinterest finder",
   crumb: "Best time to post on Pinterest",
-  title: "Best Time to Post on Pinterest: Free Finder Tool 2026",
+  title: "Best Time to Post on Pinterest: Free Finder | Poskoo",
   description:
-    "Find the best time to post on Pinterest with a free finder. Pick your audience time zone and posting days to get three Pin slots to test for two weeks.",
+    "Find the best time to post on Pinterest with a free finder. Pick your niche and time zone to get evening and weekend Pin slots to test. No signup needed.",
   pill: "Free · runs in your browser · nothing is saved",
   h1: { before: "Best time to post on", mark: "Pinterest" },
-  lede: "There is no single best time to post on Pinterest. Pins keep getting found in search for months, so posting regularly matters more than the exact hour. Still, test two or three slots for two weeks and keep the ones that get the most impressions and saves.",
+  lede: "A good starting point for Pinterest is evenings, around 8–11 pm on weekdays, plus Saturday mornings in your audience's local time. Pins have a long life, so steady weekly pinning matters more than the exact minute.",
   art: "card-schedule",
   artLabel: "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
-  heroPoints: ["Your audience's time zone", "3 slots per day", "No signup"],
+  heroPoints: ["Your audience's time zone", "Evening and weekend slots", "No signup"],
   toolTitle: "Find your starting Pin times",
   toolNote: "Free · nothing is uploaded or saved",
   stepsTitle: "How to use the best time finder",
@@ -25,13 +25,13 @@ const config: ToolPageConfig = {
       art: "card-schedule",
     },
     {
-      title: "Choose your audience and posting days",
-      text: "Your audience type sets three starting slots per day. Tick the days you can actually post, and the grid updates straight away.",
+      title: "Choose your niche and posting days",
+      text: "Your niche sets the starting slots for each day. Tick the days you can actually pin, and the grid updates straight away.",
       art: "feat-calendar",
     },
     {
       title: "Test the slots for two weeks",
-      text: "Press Copy plan, post at those times, then check Pinterest Analytics > Overview. Keep the slots that get more impressions and saves, and drop the rest.",
+      text: "Press Copy plan, pin at those times, then check Pinterest Analytics for impressions and saves per Pin. Keep the slots that perform best and drop the rest.",
       art: "analytics",
     },
   ],
@@ -39,12 +39,12 @@ const config: ToolPageConfig = {
   features: [
     {
       title: "Built around your audience",
-      text: "Slots are shown in your audience's time zone, with your own local time underneath, so you never post at the wrong hour by accident.",
+      text: "Slots are shown in your audience's time zone, with your own local time underneath, so you never pin at the wrong hour by accident.",
       art: "feat-calendar",
     },
     {
-      title: "Three slots, not one magic hour",
-      text: "You get a morning, midday and evening option for each day, so you can test a small set instead of guessing a single perfect minute.",
+      title: "Evenings and weekends first",
+      text: "Pinterest browsing peaks after work and on Saturday mornings, so the finder starts there and adds a niche-specific test slot.",
       art: "card-schedule",
     },
     {
@@ -63,12 +63,12 @@ const config: ToolPageConfig = {
         body: (
           <>
             <p>
-              Pinterest shows your audience&apos;s activity in <b>Pinterest Analytics</b>. Open your business account, go
-              to <b>Analytics</b>, then <b>Overview</b>. It shows impressions, saves and outbound clicks per Pin, so you
-              can see which days and hours your Pins actually get found.
+              Pinterest shows how your Pins perform in <b>Pinterest Analytics</b>. Open your business account, go to{" "}
+              <b>Analytics</b>, then <b>Overview</b>. It shows impressions, saves and outbound clicks per Pin, so you can
+              see which days and hours your Pins actually get found.
             </p>
             <p>
-              Read the numbers for the days you can post. If one window stands out, pick two or three times inside it and
+              Read the numbers for the days you can pin. If one window stands out, pick two or three times inside it and
               test them. If your account is new and the data is thin, start with the finder above and gather your own
               data as you post.
             </p>
@@ -80,12 +80,12 @@ const config: ToolPageConfig = {
         body: (
           <>
             <p>
-              Pick two or three slots from the finder and keep everything else about your posting the same for two weeks.
+              Pick two or three slots from the finder and keep everything else about your pinning the same for two weeks.
               That way the time is the only thing that changes.
             </p>
             <ol>
-              <li>Choose the days you can post and copy the plan.</li>
-              <li>Post at the same slots for 14 days, without changing your content style.</li>
+              <li>Choose the days you can pin and copy the plan.</li>
+              <li>Pin at the same slots for 14 days, without changing your content style.</li>
               <li>After two weeks, compare impressions and saves for each slot in Pinterest Analytics.</li>
               <li>Keep the best slot, drop the weakest, and test one new time next.</li>
             </ol>
@@ -97,7 +97,7 @@ const config: ToolPageConfig = {
         ),
       },
       {
-        title: "Best time by content type",
+        title: "Best time by Pin and board type",
         body: (
           <>
             <p>
@@ -106,24 +106,23 @@ const config: ToolPageConfig = {
             </p>
             <ul>
               <li>
-                <b>Standard image Pins:</b> try a morning slot and an evening slot, because image Pins keep getting found
-                in search for months after posting. Test both and compare impressions after a week.
+                <b>Standard image Pins:</b> try an evening slot and a weekend morning, because image Pins keep getting
+                found in search for months after posting. Test both and compare impressions after a week.
               </li>
               <li>
-                <b>Video Pins:</b> try midday and early evening, when people tend to browse for longer. Check impressions
-                and saves, not just outbound clicks.
+                <b>Video Pins:</b> try early evening, when people tend to browse for longer. Check impressions and saves,
+                not just outbound clicks.
               </li>
               <li>
-                <b>Idea-style multi-image Pins:</b> try a morning and an evening Pin, since they save well when people are
-                planning. Posting twice gives audiences in different time zones a chance to see one.
+                <b>Seasonal Pins:</b> publish 30–45 days before the event, because people search Pinterest ahead of
+                holidays and seasons. Save the Pin to the most relevant board so it keeps surfacing.
               </li>
             </ul>
             <p>
-              Publish seasonal Pins weeks before the event, because people search Pinterest ahead of holidays and
-              seasons. Use the <Link href="/tools/instagram-time-zone-converter">time zone converter</Link> when your
-              audience is spread across countries, and the{" "}
-              <Link href="/tools/social-media-image-sizes">social media image sizes guide</Link> to keep your Pins at the
-              right dimensions.
+              Use the <Link href="/tools/instagram-time-zone-converter">time zone converter</Link> when your audience is
+              spread across countries, and the{" "}
+              <Link href="/tools/pinterest-character-counter">Pinterest character counter</Link> to keep Pin titles and
+              descriptions within the platform limits.
             </p>
           </>
         ),
@@ -145,30 +144,30 @@ const config: ToolPageConfig = {
   faqs: [
     {
       q: "What is the best time to post on Pinterest?",
-      a: "There is no single best time for every account. Pins keep getting found in search for months, so posting regularly matters more than the exact hour. Test two or three slots for two weeks and keep the ones that get the most impressions and saves in Pinterest Analytics.",
+      a: "A good starting point is evenings, around 8–11 pm on weekdays, plus Saturday mornings in your audience's local time. There is no single best time for every account, though: Pins keep getting found in search for months, so steady weekly pinning matters more than the exact minute. Test two or three slots for two weeks and keep the ones that get the most impressions and saves in Pinterest Analytics.",
     },
     {
-      q: "How do I see when my audience is most active on Pinterest?",
-      a: "Open your business account, go to Analytics, then Overview. It shows impressions, saves and outbound clicks per Pin, so you can pick posting slots that match when your Pins get found.",
+      q: "What is the best day to post on Pinterest?",
+      a: "Saturday and Sunday often work well because people browse and plan at the weekend, and weekday evenings are a strong starting point too. Treat the day as something to test: compare impressions and saves for each day in Pinterest Analytics before you commit to a fixed weekly plan.",
     },
     {
-      q: "How long should I test posting times before changing them?",
-      a: "Give each slot about two weeks. That is long enough to see a pattern without waiting a month. Change one thing at a time, then compare impressions and saves for each slot in Pinterest Analytics before you keep or drop it.",
+      q: "How often should I pin?",
+      a: "Aim for a steady number of fresh Pins each week rather than a burst followed by silence. Start with one or two Pins a day on the days you can sustain, spread across your most relevant boards, then add more once your analytics show what is working.",
     },
     {
-      q: "Does the best time to post change by content type on Pinterest?",
-      a: "It can. Standard image Pins keep getting found in search for months, video Pins may suit longer browsing sessions, and idea-style multi-image Pins save well when people are planning. Seasonal Pins should go out weeks before the event. Treat the content-type suggestions as starting points to test, not fixed rules, and check your own Pinterest Analytics.",
+      q: "Does posting time matter on Pinterest?",
+      a: "It matters less than on fast-moving feeds because Pins keep getting found in search for months. Posting at a time when your audience is browsing can help early impressions and saves, but consistent weekly pinning and strong Pin titles and descriptions usually matter more than the exact minute.",
     },
   ],
   related: [
+    "/tools/pinterest-character-counter",
     "/tools/best-time-to-post-on-social-media",
-    "/tools/social-media-image-sizes",
-    "/tools/instagram-time-zone-converter",
     "/tools/social-media-content-calendar",
+    "/tools/instagram-time-zone-converter",
   ],
   schema: {
     features: [
-      "Three starting Pin times per day for your audience type",
+      "Starting Pin times per day for your niche",
       "Slots shown in your audience's time zone",
       "Your own local time shown under each slot",
       "Choose the days you can post",
