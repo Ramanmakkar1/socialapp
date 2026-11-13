@@ -78,6 +78,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-carousel-maker", name: "Carousel maker", summary: "Design text-and-colour carousel slides and download 1080×1350 PNGs.", category: "media", icon: "gallery" },
   { href: "/tools/instagram-safe-zone-checker", name: "Safe zone checker", summary: "See what Reels and Story buttons and captions cover on your 9:16 frame.", category: "media", icon: "frame" },
   { href: "/tools/instagram-story-size-checker", name: "Story size checker", summary: "Check a Story image's size and ratio in a 9:16 frame against 1080×1920.", category: "media", icon: "smartphone" },
+  { href: "/tools/tiktok-video-size-checker", name: "TikTok video size checker", summary: "Check a TikTok video's pixels, 9:16 ratio and length against 1080×1920.", category: "media", icon: "smartphone" },
   { href: "/tools/youtube-thumbnail-size-checker", name: "YouTube thumbnail size checker", summary: "Test a thumbnail against YouTube's 1280×720, 16:9 and 2 MB rules in your browser.", category: "media", icon: "smartphone" },
   { href: "/tools/youtube-banner-size-checker", name: "YouTube banner size checker", summary: "Test channel art against YouTube's 2560×1440, 6 MB and safe-area rules.", category: "media", icon: "smartphone" },
   { href: "/tools/linkedin-banner-size-checker", name: "LinkedIn banner size checker", summary: "Test a profile banner against LinkedIn's 1584×396, 4:1 and 8 MB rules.", category: "media", icon: "smartphone" },

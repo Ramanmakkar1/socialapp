@@ -256,6 +256,10 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-caption-counter">TikTok caption character counter</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
+            Check the file first with our free{" "}
+            <Link className={s.vlink} href="/tools/tiktok-video-size-checker">TikTok video size checker</Link> so it fills the 9:16 screen.
+          </p>
+          <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Need words for your video? Draft six hooks and captions with our{" "}
             <Link className={s.vlink} href="/tools/tiktok-caption-generator">free TikTok caption generator</Link>.
           </p>
