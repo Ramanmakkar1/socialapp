@@ -61,7 +61,10 @@ export function AnimArt({ name, label, className }: { name: AnimName; label?: st
     return () => observer.disconnect();
   }, [base]);
 
+  // The video itself stays out of the accessibility tree (role="img" is not valid on <video>);
+  // the description is read from a visually hidden span next to it.
   return (
+    <>
     <video
       ref={ref}
       className={className ? `animArt ${className}` : "animArt"}
@@ -73,7 +76,9 @@ export function AnimArt({ name, label, className }: { name: AnimName; label?: st
       playsInline
       preload="none"
       tabIndex={-1}
-      {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
+      aria-hidden="true"
     />
+    {label ? <span className="sr-only">{label}</span> : null}
+    </>
   );
 }

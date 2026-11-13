@@ -1139,9 +1139,9 @@
 .landing :global(.chText span){
   color:var(--muted);font-size:.92rem}
 .landing :global(.chLive){
-  flex:none;display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .65rem;border-radius:var(--poskoo-radius-pill);background:color-mix(in srgb, var(--green) 14%, var(--card));color:var(--green);font-size:.78rem;font-weight:700}
+  flex:none;display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .65rem;border-radius:var(--poskoo-radius-pill);background:color-mix(in srgb, var(--green) 14%, var(--card));color:#146b43;font-size:.78rem;font-weight:700}
 .landing :global(.chLive)::before{
-  content:"";width:7px;height:7px;border-radius:50%;background:currentColor;animation:livePulse 1.8s ease-in-out infinite}
+  content:"";width:7px;height:7px;border-radius:50%;background:var(--green);animation:livePulse 1.8s ease-in-out infinite}
 @keyframes livePulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
 @media (prefers-reduced-motion: reduce) { .landing :global(.chLive)::before { animation:none; } }
 .landing :global(.chLinks){
