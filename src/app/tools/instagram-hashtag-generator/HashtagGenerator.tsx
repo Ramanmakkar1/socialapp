@@ -62,12 +62,13 @@ function Segments({ level, max, color, label }: { level: number; max: number; co
 const PLATFORM = {
   instagram: { min: 5, max: 30, start: 15, note: "Instagram allows up to 30 per post." },
   tiktok: { min: 3, max: 15, start: 5, note: "TikTok has no fixed hashtag cap; captions allow 4,000 characters. 3 to 5 relevant tags is a good start." },
+  linkedin: { min: 1, max: 5, start: 3, note: "LinkedIn has no hard cap, but 3 to 5 relevant hashtags per post works best; more can look spammy." },
 } as const;
 
-export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" }) {
+export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" }) {
   const id = useId();
   const cfg = PLATFORM[platform];
-  const [niche, setNiche] = useState("fitness");
+  const [niche, setNiche] = useState(platform === "linkedin" ? "small-business" : "fitness");
   const [count, setCount] = useState<number>(cfg.start);
   const [mix, setMix] = useState<HashtagMix>("balanced");
   const [extra, setExtra] = useState("");
