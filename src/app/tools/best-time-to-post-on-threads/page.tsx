@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
-import BestTimeFinder from "../best-time-to-post-on-instagram/BestTimeFinder";
+import BestTimeFinder from "./BestTimeFinder";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-threads",
   name: "Best time to post on Threads finder",
   crumb: "Best time to post on Threads",
-  title: "Best Time to Post on Threads: Free Finder Tool 2026",
+  title: "Best Time to Post on Threads: Free Finder | Poskoo",
   description:
-    "Find the best time to post on Threads with a free finder. Pick your audience time zone and posting days to get three starting slots to test for two weeks.",
+    "Find the best time to post on Threads with a free finder. Choose your audience and time zone to get morning, lunch and evening slots to test. No signup.",
   pill: "Free · runs in your browser · nothing is saved",
   h1: { before: "Best time to post on", mark: "Threads" },
-  lede: "There is no single best time to post on Threads. The best time is when your own followers are online, so test two or three slots for two weeks and keep the ones that get the most views and replies.",
+  lede: "A good starting point for Threads is weekdays around 7–9 am, at lunch and 6–8 pm in your audience's local time, because many people check Threads alongside Instagram. Test these slots for two weeks and keep what your Threads insights show working.",
   art: "card-schedule",
   artLabel: "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
   heroPoints: ["Your audience's time zone", "3 slots per day", "No signup"],
@@ -56,7 +56,7 @@ const config: ToolPageConfig = {
   guide: {
     title: "How to find the best time to post on Threads",
     intro:
-      "The best time to post on Threads is when your own followers are most likely to see and reply to your posts, not a fixed hour that works for every account. Use the finder above for starting points, then let your Threads Insights decide which slots to keep.",
+      "The best time to post on Threads is when your own followers are most likely to see and reply to your posts, not a fixed hour that works for every account. Use the finder above for starting points, then let your Threads Insights decide which slots to keep. Because many people check Threads alongside Instagram, content you cross-post from Instagram can ride the same morning, lunch and evening habits.",
     sections: [
       {
         title: "How to find your own best time",
@@ -143,19 +143,19 @@ const config: ToolPageConfig = {
   faqs: [
     {
       q: "What is the best time to post on Threads?",
-      a: "There is no single best time for every Threads account. The best time is when your own followers are online. Test two or three slots for two weeks and keep the ones that get the most views and replies.",
+      a: "A good starting point is weekdays around 7–9 am, at lunch and 6–8 pm in your audience's local time, because many people check Threads alongside Instagram. There is no single best time for every account, so test these slots for two weeks and keep the ones your Threads insights show working.",
     },
     {
-      q: "Where can I see how my Threads posts perform?",
-      a: "Open the Threads app and go to your profile, then Insights. You can see views and interactions there, but not an active hours chart. Compare views and replies for the posts in each slot to find your strongest times.",
+      q: "What is the best day to post on Threads?",
+      a: "Weekdays are a safe starting point because people check Threads during commutes, lunch breaks and the evening. Tuesday to Thursday often suit B2B and SaaS accounts, while creators and local businesses can test a weekend late-morning slot. Compare views and replies per day in Threads insights before you commit.",
     },
     {
-      q: "How long should I test posting times before changing them?",
-      a: "Give each slot about two weeks. That is long enough to see a pattern without waiting a month. Change one thing at a time, then compare views and replies for each slot in Threads Insights before you keep or drop it.",
+      q: "How often should I post on Threads?",
+      a: "Start with one or two posts a day on the days you can sustain, then check your Threads insights after two weeks. Replies drive reach on Threads, so a smaller number of posts that start conversations usually beats posting many times with no follow-up.",
     },
     {
-      q: "Does the best time to post change by content type on Threads?",
-      a: "It can. Text posts, posts with photos or video, and replies or conversation starters can earn different responses at different times. Treat the content-type suggestions as starting points to test, not fixed rules, and compare views and replies per slot in Threads Insights.",
+      q: "Can I schedule Threads posts?",
+      a: "Yes. Poskoo schedules Threads posts through Meta's official API, so you can plan a week in the calendar and let it publish at the time you pick. Read how to schedule Threads posts in the help guide, or open the Threads scheduler to start.",
     },
   ],
   related: [

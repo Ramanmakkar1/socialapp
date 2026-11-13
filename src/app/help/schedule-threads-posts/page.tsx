@@ -121,6 +121,7 @@ const faqJsonLd = {
 const related = [
   { href: "/threads-scheduler", label: "Threads scheduler" },
   { href: "/tools/threads-character-counter", label: "Threads character counter" },
+  { href: "/tools/best-time-to-post-on-threads", label: "Best time to post on Threads" },
   { href: "/tools/threads-post-preview", label: "Threads post preview tool" },
   { href: "/help", label: "All help guides" },
 ];

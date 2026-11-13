@@ -177,7 +177,7 @@ export default function ThreadsSchedulerPage() {
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             Check your caption against the 500-character and 5-link limits with the <Link className={s.vlink} href="/tools/threads-character-counter">Threads character counter</Link>.
-            {" "}Not sure when to post? Find the{" "}<Link className={s.vlink} href="/tools/best-time-to-post-on-threads">best time to post on Threads</Link>.
+            {" "}Not sure when to post? Try the free <Link className={s.vlink} href="/tools/best-time-to-post-on-threads">best time to post on Threads</Link> finder.
           </p>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             Also planning Instagram or Facebook? See the{" "}
