@@ -161,7 +161,7 @@ export default function YouTubeSchedulerPage() {
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             Get title ideas with the <Link className={s.vlink} href="/tools/youtube-title-generator">free YouTube title generator</Link>, check the title, description and combined tag limits with the <Link className={s.vlink} href="/tools/youtube-title-counter">free YouTube title and description counter</Link>, then build tags with the <Link className={s.vlink} href="/tools/youtube-tag-generator">free YouTube tag generator</Link>, add hashtags with the <Link className={s.vlink} href="/tools/youtube-hashtag-generator">YouTube hashtag generator</Link>, then write the description with the <Link className={s.vlink} href="/tools/youtube-description-generator">free YouTube description generator</Link>. Not sure when to publish? Find the{" "}
-            <Link className={s.vlink} href="/tools/best-time-to-post-on-youtube">best time to post on YouTube</Link>. Starting a channel? Get @handle ideas with our{" "}<Link className={s.vlink} href="/tools/youtube-handle-generator">free YouTube handle generator</Link>.
+            <Link className={s.vlink} href="/tools/best-time-to-post-on-youtube">best time to post on YouTube</Link>. Starting a channel? Get @handle ideas with our{" "}<Link className={s.vlink} href="/tools/youtube-handle-generator">free YouTube handle generator</Link>. Check your cover image with the <Link className={s.vlink} href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link>.
           </p>
         </div>
       </section>

@@ -75,6 +75,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-carousel-maker", name: "Carousel maker", summary: "Design text-and-colour carousel slides and download 1080×1350 PNGs.", category: "media", icon: "gallery" },
   { href: "/tools/instagram-safe-zone-checker", name: "Safe zone checker", summary: "See what Reels and Story buttons and captions cover on your 9:16 frame.", category: "media", icon: "frame" },
   { href: "/tools/instagram-story-size-checker", name: "Story size checker", summary: "Check a Story image's size and ratio in a 9:16 frame against 1080×1920.", category: "media", icon: "smartphone" },
+  { href: "/tools/youtube-thumbnail-size-checker", name: "YouTube thumbnail size checker", summary: "Test a thumbnail against YouTube's 1280×720, 16:9 and 2 MB rules in your browser.", category: "media", icon: "smartphone" },
   { href: "/tools/instagram-highlight-cover-maker", name: "Highlight cover maker", summary: "Matching highlight covers with icons and brand colours, downloaded as PNGs.", category: "media", icon: "circle" },
   { href: "/tools/instagram-reel-cover-maker", name: "Reel cover maker", summary: "1080×1920 Reel covers with a title that stays inside the grid crop.", category: "media", icon: "clapperboard" },
   { href: "/tools/instagram-story-maker", name: "Story maker", summary: "Design a 1080×1920 Story with a photo, text and gradient, then download it.", category: "media", icon: "palette" },

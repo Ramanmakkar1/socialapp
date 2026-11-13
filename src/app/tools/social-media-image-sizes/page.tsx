@@ -105,7 +105,7 @@ const config: ToolPageConfig = {
       },
       {
         title: "Keep important details away from the edges",
-        body: <p>Profile pictures are usually shown as circles, vertical videos have interface elements over the top and bottom, and channel banners appear at different widths across devices. Centre faces and logos, keep text inside the visible area and check YouTube channel art against its 1546×423 safe area.</p>,
+        body: <p>Profile pictures are usually shown as circles, vertical videos have interface elements over the top and bottom, and channel banners appear at different widths across devices. Centre faces and logos, keep text inside the visible area and check YouTube channel art against its 1546×423 safe area. Test a finished 1280×720 cover with the <Link href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link>.</p>,
       },
       {
         title: "Link previews are not all identical",
