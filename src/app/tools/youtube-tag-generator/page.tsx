@@ -74,7 +74,9 @@ const config: ToolPageConfig = {
             There is no ideal number to reach and no reason to fill all 500 characters. Start with the exact topic, then
             add only close variations, common misspellings and specific terms the video genuinely covers. This generator
             gives you a starting list, not a requirement to use every suggestion. Remove irrelevant chips before copying.
-            When the details are ready, use the <Link href="/youtube-scheduler">YouTube scheduler</Link> to choose an upload time.
+            For the visible <code>#hashtags</code> that go in your description, use the{" "}
+            <Link href="/tools/youtube-hashtag-generator">YouTube hashtag generator</Link>. When the details are ready,
+            use the <Link href="/youtube-scheduler">YouTube scheduler</Link> to choose an upload time.
           </p>
         ),
       },

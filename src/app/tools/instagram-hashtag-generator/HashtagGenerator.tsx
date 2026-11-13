@@ -63,9 +63,10 @@ const PLATFORM = {
   instagram: { min: 5, max: 30, start: 15, note: "Instagram allows up to 30 per post." },
   tiktok: { min: 3, max: 15, start: 5, note: "TikTok has no fixed hashtag cap; captions allow 4,000 characters. 3 to 5 relevant tags is a good start." },
   linkedin: { min: 1, max: 5, start: 3, note: "LinkedIn has no hard cap, but 3 to 5 relevant hashtags per post works best; more can look spammy." },
+  youtube: { min: 1, max: 15, start: 3, note: "YouTube shows the first 3 hashtags from your description above or below the title. Use 3 to 5 that fit the video. A video with more than 60 hashtags has all its hashtags ignored." },
 } as const;
 
-export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" }) {
+export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" | "youtube" }) {
   const id = useId();
   const cfg = PLATFORM[platform];
   const [niche, setNiche] = useState(platform === "linkedin" ? "small-business" : "fitness");
