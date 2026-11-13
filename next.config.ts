@@ -19,6 +19,8 @@ const noFrameHeaders = [
   { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
 ];
 
+const OLD_HOST = [{ type: "host" as const, value: "socialapp.splitforms.com" }];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   // Render metadata in <head> for every user agent, so crawlers and audits always see title/description/canonical.
@@ -44,11 +46,15 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Old staging host: redirect the bare root, sitemap and robots explicitly. The catch-all below needs :path to match an empty string for "/", and the cached home page must never be served on the old host.
+      { source: "/", has: OLD_HOST, destination: "https://poskoo.com/", permanent: true },
+      { source: "/sitemap.xml", has: OLD_HOST, destination: "https://poskoo.com/sitemap.xml", permanent: true },
+      { source: "/robots.txt", has: OLD_HOST, destination: "https://poskoo.com/robots.txt", permanent: true },
       {
         // Old staging host: send every page to the same path on poskoo.com.
         // /api/* is excluded so webhooks or OAuth callbacks still registered on the old host keep working.
         source: "/:path((?!api/).*)",
-        has: [{ type: "host", value: "socialapp.splitforms.com" }],
+        has: OLD_HOST,
         destination: "https://poskoo.com/:path",
         permanent: true,
       },
