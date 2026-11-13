@@ -41,6 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# local build logs
+build-check.log
+
 # worker junk
 graphify-out/
 PROJECT-MEMORY.md
