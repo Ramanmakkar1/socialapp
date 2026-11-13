@@ -134,7 +134,7 @@ const config: ToolPageConfig = {
       a: "No. All counting and previewing happens in your browser. Your caption is not uploaded or saved, and you do not need to sign in.",
     },
   ],
-  related: ["/tools/tiktok-hashtag-generator", "/tools/x-character-counter", "/tools/linkedin-character-counter", "/tools/instagram-caption-counter"],
+  related: ["/tools/tiktok-caption-generator", "/tools/tiktok-hashtag-generator", "/tools/x-character-counter", "/tools/linkedin-character-counter", "/tools/instagram-caption-counter"],
   schema: {
     features: [
       "TikTok caption counting against the 4,000-character limit",

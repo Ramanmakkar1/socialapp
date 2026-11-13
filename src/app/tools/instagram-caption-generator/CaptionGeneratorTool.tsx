@@ -1705,7 +1705,9 @@ function Switch({ on }: { on: boolean }) {
   );
 }
 
-export default function CaptionGeneratorTool() {
+export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" }) {
+  const isTikTok = platform === "tiktok";
+  const captionLimit = isTikTok ? 4000 : INSTAGRAM_CAPTION_LIMIT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1714,6 +1716,7 @@ export default function CaptionGeneratorTool() {
   const [shuffleKey, setShuffleKey] = useState(0);
   const [selected, setSelected] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const useCommentCta = addCommentCta && !isTikTok;
 
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1749,7 +1752,7 @@ export default function CaptionGeneratorTool() {
       const bodyLines = tmpl.body(cleanedTopic);
 
       let ctaPart = "";
-      if (addCommentCta) {
+      if (useCommentCta) {
         ctaPart = addEmojis
           ? `${tmpl.ctaEmoji ? tmpl.ctaEmoji.trim() + " " : ""}${tmpl.keywordCta}`
           : tmpl.keywordCta;
@@ -1761,9 +1764,9 @@ export default function CaptionGeneratorTool() {
 
       // Joined with real line breaks
       const fullText = [hookPart, ...bodyLines, ctaPart].join("\n\n");
-      return fullText;
+      return isTikTok ? fullText.replace(/Instagram/g, "TikTok") : fullText;
     });
-  }, [goal, tone, topic, addEmojis, addCommentCta, shuffleKey]);
+  }, [goal, tone, topic, addEmojis, useCommentCta, isTikTok, shuffleKey]);
 
   async function handleCopy(index: number, text: string) {
     try {
@@ -1874,20 +1877,22 @@ export default function CaptionGeneratorTool() {
             <Switch on={addEmojis} />
           </label>
 
-          <label htmlFor={commentCtaId} className={toggle}>
-            <span className="inline-flex min-w-0 items-center gap-2">
-              <MessageCircle className="h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
-              Add a comment-keyword CTA (Auto-DM style)
-            </span>
-            <input
-              id={commentCtaId}
-              type="checkbox"
-              checked={addCommentCta}
-              onChange={(e) => setAddCommentCta(e.target.checked)}
-              className="sr-only"
-            />
-            <Switch on={addCommentCta} />
-          </label>
+          {!isTikTok && (
+            <label htmlFor={commentCtaId} className={toggle}>
+              <span className="inline-flex min-w-0 items-center gap-2">
+                <MessageCircle className="h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
+                Add a comment-keyword CTA (Auto-DM style)
+              </span>
+              <input
+                id={commentCtaId}
+                type="checkbox"
+                checked={addCommentCta}
+                onChange={(e) => setAddCommentCta(e.target.checked)}
+                className="sr-only"
+              />
+              <Switch on={addCommentCta} />
+            </label>
+          )}
         </div>
       </div>
 
@@ -1907,7 +1912,7 @@ export default function CaptionGeneratorTool() {
           <div className={kpi}>
             <p className={kpiLabel}>Avg. length</p>
             <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{avgLength}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
-            <p className="mt-1 text-xs tabular-nums text-[#3d3450]">Range {shortest}–{longest} of {INSTAGRAM_CAPTION_LIMIT.toLocaleString("en-US")}.</p>
+            <p className="mt-1 text-xs tabular-nums text-[#3d3450]">Range {shortest}–{longest} of {captionLimit.toLocaleString("en-US")}.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Hook before “more”</p>
@@ -1920,8 +1925,8 @@ export default function CaptionGeneratorTool() {
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Call to action</p>
-            <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{addCommentCta ? "Keyword" : "Standard"}</p>
-            <p className="mt-1 text-xs text-[#3d3450]">{addCommentCta ? "Comment a word, get a DM." : "Comment, tag or link in bio."}</p>
+            <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{useCommentCta ? "Keyword" : "Standard"}</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : "Comment, tag or link in bio."}</p>
           </div>
         </div>
         {usingDefaultTopic && (
@@ -1939,7 +1944,7 @@ export default function CaptionGeneratorTool() {
           <ul className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3" aria-label="Generated captions">
             {captions.map((captionText, index) => {
               const charCount = captionText.length;
-              const isOver = charCount > INSTAGRAM_CAPTION_LIMIT;
+              const isOver = charCount > captionLimit;
               const isCopied = copiedId === index;
               const isSelected = current === index;
               const [hook, ...rest] = captionText.split("\n\n");
@@ -1973,10 +1978,10 @@ export default function CaptionGeneratorTool() {
                           isOver ? "text-[var(--poskoo-coral)]" : "text-[#3d3450]"
                         }`}
                       >
-                        {charCount}/{INSTAGRAM_CAPTION_LIMIT} chars
+                        {charCount}/{captionLimit} chars
                       </span>
                       <span className="mt-1 block h-1 max-w-[9rem] overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
-                        <i className="block h-full rounded-full bg-[var(--poskoo-green)]" style={{ width: `${Math.min(100, (charCount / INSTAGRAM_CAPTION_LIMIT) * 100)}%` }} />
+                        <i className="block h-full rounded-full bg-[var(--poskoo-green)]" style={{ width: `${Math.min(100, (charCount / captionLimit) * 100)}%` }} />
                       </span>
                     </span>
 
@@ -2045,7 +2050,9 @@ export default function CaptionGeneratorTool() {
               </p>
             </div>
             <p className="mt-2 text-xs text-[#5f5873]">
-              About the first {FOLD_AT} characters show before “… more” in the feed. That cut-off varies by device.
+              {isTikTok
+                ? "Only the first line or so shows over the video before “more”. Keep the hook short."
+                : `About the first ${FOLD_AT} characters show before “… more” in the feed. That cut-off varies by device.`}
             </p>
           </div>
         </aside>
