@@ -94,17 +94,19 @@ export function SiteFooter() {
       <FooterColumn
         title="Product"
         links={[
-          { href: "/features", label: "Features" },
-          { href: "/instagram-scheduler", label: "Instagram scheduler" },
+          { href: "/features", label: "All features" },
           { href: "/instagram-auto-dm", label: "Instagram auto DM" },
+          { href: "/instagram-dm-automation", label: "Instagram DM automation" },
           { href: "/instagram-auto-dm/templates", label: "Auto-DM templates" },
-          { href: "/instagram-link-in-bio", label: "Link in bio" },
+          { href: "/instagram-link-in-bio", label: "Instagram link in bio" },
+          { href: "/instagram-content-planner", label: "Instagram content planner" },
+          { href: "/tools", label: "Free social media tools" },
           { href: "/pricing", label: "Pricing" },
-          { href: "/developers", label: "API and MCP" },
         ]}
         extra={{ title: "Company", links: [
             { href: "/guides", label: "Guides" },
             { href: "/help", label: "Help center" },
+            { href: "/developers", label: "Developers (MCP)" },
             { href: "/contact", label: "Contact" },
             { href: "/privacy", label: "Privacy" },
             { href: "/terms", label: "Terms" },
