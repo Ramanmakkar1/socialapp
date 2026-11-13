@@ -93,7 +93,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/best-time-to-post-on-linkedin", name: "Best time to post on LinkedIn", summary: "Three starting LinkedIn post times per day for your B2B audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-tiktok", name: "Best time to post on TikTok", summary: "Get starting TikTok posting windows for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-threads", name: "Best time to post on Threads", summary: "Three starting Threads post times per day for your audience and time zone.", category: "plan", icon: "calendar" },
-  { href: "/tools/best-time-to-post-on-youtube", name: "Best time to post on YouTube", summary: "Three starting YouTube upload times per day for your audience and time zone.", category: "plan", icon: "calendar" },
+  { href: "/tools/best-time-to-post-on-youtube", name: "Best time to post on YouTube", summary: "Get starting YouTube upload windows for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-pinterest", name: "Best Time to Post on Pinterest", summary: "Three starting Pinterest Pin times per day for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/instagram-posting-frequency-calculator", name: "Posting frequency calculator", summary: "Turn your weekly time budget into a realistic posting range and plan.", category: "plan", icon: "gauge" },
   { href: "/tools/instagram-engagement-rate-calculator", name: "Engagement rate calculator", summary: "Engagement rate by followers or by reach from likes, comments, saves and shares.", category: "plan", icon: "percent" },

@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
-import BestTimeFinder from "../best-time-to-post-on-instagram/BestTimeFinder";
+import BestTimeFinder from "./BestTimeFinder";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-youtube",
   name: "Best time to post on YouTube finder",
   crumb: "Best time to post on YouTube",
-  title: "Best Time to Post on YouTube: Free Finder Tool 2026",
+  title: "Best Time to Post on YouTube: Free Time Finder | Poskoo",
   description:
-    "Find the best time to post on YouTube with a free finder. Pick your audience time zone and upload days to get three starting slots to test for two weeks.",
+    "Find the best time to post on YouTube with a free finder. Pick your audience and time zone to get weekday and weekend upload slots to test. No signup.",
   pill: "Free · runs in your browser · nothing is saved",
   h1: { before: "Best time to post on", mark: "YouTube" },
-  lede: "There is no single best time to post on YouTube. The best time is a little before your own viewers are most active, so test two or three upload slots for two weeks and keep the ones that get the most views in the first 24 hours.",
+  lede: "A good starting point for YouTube is to publish on weekdays around 2–4 pm in your audience's local time, a few hours before evening viewing, with weekend slots in the morning. Test them for a few weeks and keep the ones YouTube Studio analytics show working.",
   art: "card-schedule",
   artLabel: "A creator pins video cards onto a weekly calendar next to a smiling alarm clock",
   heroPoints: ["Your audience's time zone", "3 slots per day", "No signup"],
@@ -26,12 +26,12 @@ const config: ToolPageConfig = {
     },
     {
       title: "Choose your audience and upload days",
-      text: "Your audience type sets three starting slots per day. Tick the days you can actually upload, and the grid updates straight away.",
+      text: "Your audience type sets weekday and weekend starting slots. Tick the days you can actually upload, and the grid updates straight away.",
       art: "feat-calendar",
     },
     {
-      title: "Test the slots for two weeks",
-      text: "Press Copy plan, upload at those times, then check YouTube Studio > Analytics. Keep the slots that get more views in the first 24 hours and drop the rest.",
+      title: "Test the slots for a few weeks",
+      text: "Press Copy plan, publish at those times, then check YouTube Studio analytics. Keep the slots that get more views and drop the rest.",
       art: "analytics",
     },
   ],
@@ -43,8 +43,8 @@ const config: ToolPageConfig = {
       art: "feat-calendar",
     },
     {
-      title: "Three slots, not one magic hour",
-      text: "You get a morning, midday and evening option for each day, so you can test a small set instead of guessing a single perfect minute.",
+      title: "Publish before the peak",
+      text: "Times are publish times, a couple of hours before evening viewing, so the video is processed and indexed by the time your viewers arrive.",
       art: "card-schedule",
     },
     {
@@ -56,76 +56,54 @@ const config: ToolPageConfig = {
   guide: {
     title: "How to find the best time to post on YouTube",
     intro:
-      "The best time to post on YouTube is a little before your own viewers are most active, not a fixed hour that works for every channel. Use the finder above for starting points, then let your YouTube Studio Analytics decide which upload slots to keep.",
+      "A good starting point for YouTube is to publish on weekdays around 2–4 pm in your audience's local time, a few hours before evening viewing. Use the finder above for starting points, then let YouTube Studio analytics decide which upload slots to keep.",
     sections: [
       {
-        title: "How to find your own best time",
+        title: "What is the best time to post on YouTube?",
         body: (
           <>
             <p>
-              Open <b>YouTube Studio &gt; Analytics &gt; Audience tab</b> and find the{" "}
-              <b>When your viewers are on YouTube</b> chart. It shows the days and hours when your viewers are on
-              YouTube in your local time. Aim to upload a little before a busy window so your video is ready as viewers
-              arrive.
+              There is no single best time for every channel. The best time is a little before your own viewers are most
+              active, which you can see in <b>YouTube Studio analytics</b> &gt; <b>Audience</b> &gt; the{" "}
+              <b>When your viewers are on YouTube</b> report. It shows the days and hours when your viewers are on
+              YouTube.
             </p>
             <p>
-              Read the chart for the days you can upload. If the busiest window is a range, pick two or three times just
-              before it and test them. If your channel is new and the chart is thin, start with the finder above and
+              Read the report for the days you can upload. If the busiest window is a range, pick two or three times just
+              before it and test them. If your channel is new and the report is thin, start with the finder above and
               gather your own data as you publish.
             </p>
           </>
         ),
       },
       {
-        title: "A simple 2-week upload test",
+        title: "Should you publish before your audience is online?",
         body: (
-          <>
-            <p>
-              Pick two or three slots from the finder and keep everything else about your uploads the same for two weeks.
-              That way the time is the only thing that changes.
-            </p>
-            <ol>
-              <li>Choose the days you can upload and copy the plan.</li>
-              <li>Publish at the same slots for 14 days, without changing your content style.</li>
-              <li>After two weeks, compare views in the first 24 hours for each slot in YouTube Studio Analytics.</li>
-              <li>Keep the best slot, drop the weakest, and test one new time next.</li>
-            </ol>
-            <p>
-              Two weeks is long enough to see a pattern without waiting a whole month. Change one thing at a time so you
-              know what made the difference.
-            </p>
-          </>
+          <p>
+            Yes. Publish about 1–3 hours before your peak so the video is processed and indexed by the time viewers
+            arrive. If you upload at the exact peak, the first people to check your channel may find the video is not
+            ready yet. Use the When your viewers are on YouTube report to find that peak, then work backwards.
+          </p>
         ),
       },
       {
-        title: "Best time by content type",
+        title: "Should you post YouTube videos on weekends?",
         body: (
-          <>
-            <p>
-              These are general starting points to test, not measured data. Your own YouTube Studio Analytics always
-              beat a general rule.
-            </p>
-            <ul>
-              <li>
-                <b>Long videos:</b> try uploading an hour or two before a busy window, then compare views in the first
-                24 hours for each slot.
-              </li>
-              <li>
-                <b>Shorts:</b> try a midday slot and an evening slot, then compare views in the first 24 hours to see
-                which time reaches more viewers.
-              </li>
-              <li>
-                <b>Live streams:</b> schedule a premiere or a stream ahead so viewers can see when it starts. Pick a time
-                just before your audience is most active and be ready to join the live chat.
-              </li>
-            </ul>
-            <p>
-              Use the <Link href="/tools/instagram-time-zone-converter">time zone converter</Link> when your audience is
-              spread across countries, and the{" "}
-              <Link href="/tools/youtube-title-counter">YouTube title and description counter</Link> to check your video
-              details before you upload.
-            </p>
-          </>
+          <p>
+            It is worth testing. Weekend viewing often starts later and lasts longer, so morning and early afternoon
+            slots can work well. The finder gives you weekend slots to try, but compare them with your weekday results
+            in YouTube Studio analytics before you change your whole schedule.
+          </p>
+        ),
+      },
+      {
+        title: "Does the best time differ for YouTube Shorts?",
+        body: (
+          <p>
+            Shorts are discovered over a longer window, so consistency matters more than the exact hour. Test the same
+            slots you use for long videos, then check whether Shorts views build in the first hours or over several
+            days. Keep the slots that suit your workflow and your audience.
+          </p>
         ),
       },
       {
@@ -134,8 +112,7 @@ const config: ToolPageConfig = {
           <p>
             Once a slot works, <Link href="/youtube-scheduler">schedule YouTube videos</Link> in Poskoo so they publish
             at that time without you opening the app. You can plan a week in the calendar, then let Poskoo publish at the
-            right time. New here? <Link href="/signup">Create a free account</Link> and start with one video. Need help
-            getting started? Read <Link href="/help/schedule-youtube-videos">how to schedule YouTube videos</Link>.
+            right time. New here? <Link href="/signup">Create a free account</Link> and start with one video.
           </p>
         ),
       },
@@ -145,30 +122,31 @@ const config: ToolPageConfig = {
   faqs: [
     {
       q: "What is the best time to post on YouTube?",
-      a: "There is no single best time for every channel. The best time is a little before your own viewers are most active, which you can see in YouTube Studio under Analytics, Audience, and the When your viewers are on YouTube chart. Test two or three upload slots for two weeks and keep the ones that get the most views in the first 24 hours.",
+      a: "A good starting point is to publish on weekdays around 2–4 pm in your audience's local time, a few hours before evening viewing, with weekend slots in the morning. The real best time is before your own viewers are most active, which you can see in YouTube Studio analytics and the When your viewers are on YouTube report. Test a few slots for a few weeks and keep the ones that work.",
     },
     {
-      q: "How do I see when my viewers are most active on YouTube?",
-      a: "Open YouTube Studio, go to Analytics, then the Audience tab, and look at the When your viewers are on YouTube chart. It shows the days and hours in your local time, so you can pick upload slots just before your viewers are most active.",
+      q: "Should you publish before your audience is online?",
+      a: "Yes. Publish about 1–3 hours before your peak so the video is processed and indexed by the time viewers arrive. Uploading at the exact peak can mean the first people to check your channel find the video is not ready yet.",
     },
     {
-      q: "How long should I test upload times before changing them?",
-      a: "Give each slot about two weeks. That is long enough to see a pattern without waiting a month. Change one thing at a time, then compare views in the first 24 hours for each slot in YouTube Studio Analytics before you keep or drop it.",
+      q: "Should you post YouTube videos on weekends?",
+      a: "It is worth testing. Weekend viewing often starts later and lasts longer, so morning and early afternoon slots can work well. Compare weekend and weekday results in YouTube Studio analytics before you change your whole schedule.",
     },
     {
-      q: "Does the best time to post change by content type on YouTube?",
-      a: "It can. Long videos, Shorts, and live streams can earn different responses at different times. Schedule a premiere or a stream ahead, treat the content-type suggestions as starting points to test, not fixed rules, and check your own YouTube Studio Analytics.",
+      q: "Does the best time differ for YouTube Shorts?",
+      a: "Shorts are discovered over a longer window, so consistency matters more than the exact hour. Test the same slots you use for long videos and keep the ones that suit your workflow and your audience.",
     },
   ],
   related: [
-    "/tools/best-time-to-post-on-social-media",
     "/tools/youtube-title-counter",
-    "/tools/instagram-time-zone-converter",
     "/tools/social-media-content-calendar",
+    "/tools/best-time-to-post-on-tiktok",
+    "/tools/best-time-to-post-on-instagram",
+    "/tools/best-time-to-post-on-facebook",
   ],
   schema: {
     features: [
-      "Three starting upload times per day for your audience type",
+      "Weekday and weekend starting upload times for your audience type",
       "Slots shown in your audience's time zone",
       "Your own local time shown under each slot",
       "Choose the days you can upload",
@@ -187,7 +165,7 @@ export const metadata = toolMetadata(config);
 export default function BestTimeToPostOnYouTubePage() {
   return (
     <ToolPageTemplate config={config}>
-      <BestTimeFinder platform="YouTube" insightsName="YouTube Studio Analytics" />
+      <BestTimeFinder platform="YouTube" insightsName="YouTube Studio analytics" />
     </ToolPageTemplate>
   );
 }

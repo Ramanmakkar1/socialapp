@@ -411,7 +411,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/best-time-to-post-on-x": "Find the best time to post on X (Twitter) with a free finder. Pick your audience and time zone to get weekday and weekend slots to test. No signup.",
   "/tools/best-time-to-post-on-linkedin": "Find the best time to post on LinkedIn with a free finder. Pick your audience time zone and workdays to get three starting slots to test for two weeks.",
   "/tools/best-time-to-post-on-threads": "Find the best time to post on Threads with a free finder. Pick your audience time zone and posting days to get three starting slots to test for two weeks.",
-  "/tools/best-time-to-post-on-youtube": "Find the best time to post on YouTube with a free finder. Pick your audience time zone and upload days to get three starting slots to test for two weeks.",
+  "/tools/best-time-to-post-on-youtube": "Find the best time to post on YouTube with a free finder. Pick your audience and time zone to get weekday and weekend upload slots to test. No signup.",
   "/tools/best-time-to-post-on-pinterest": "Find the best time to post on Pinterest with a free finder. Pick your audience time zone and posting days to get three Pin slots to test for two weeks.",
   "/tools/instagram-comment-to-dm-calculator": "Estimate Instagram comment-to-DM campaign results from views, comment rate, DM delivery and link clicks. Free, browser-based and no signup needed.",
   "/tools/instagram-comment-to-dm-preview": "Preview an Instagram comment-to-DM flow with your keyword, comments and DM text. Compare contains and exact matching locally with no Meta connection.",

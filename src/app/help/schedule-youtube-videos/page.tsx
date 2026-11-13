@@ -154,6 +154,7 @@ const howToJsonLd = {
 const related = [
   { href: "/youtube-scheduler", label: "YouTube scheduler" },
   { href: "/tools/youtube-title-counter", label: "YouTube title and description counter" },
+  { href: "/tools/best-time-to-post-on-youtube", label: "Best time to post on YouTube" },
   { href: "/help/schedule-tiktok-posts", label: "Schedule TikTok videos" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];
