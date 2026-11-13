@@ -1,17 +1,20 @@
 /**
- * Template-based Instagram username ideas. No AI, no network, no randomness:
+ * Template-based Instagram and TikTok username ideas. No AI, no network, no randomness:
  * the same input always gives the same list in the same order.
  */
 
 export type UsernameStyle = "clean" | "creative" | "business";
+export type UsernamePlatform = "instagram" | "tiktok";
 
 export type UsernameInput = {
   name: string;
   niche: string;
   style: UsernameStyle;
+  platform?: UsernamePlatform;
 };
 
 export const USERNAME_MAX = 30;
+export const PLATFORM_USERNAME_MAX: Record<UsernamePlatform, number> = { instagram: 30, tiktok: 24 };
 export const MAX_RESULTS = 30;
 
 export const USERNAME_STYLES: { id: UsernameStyle; label: string }[] = [
@@ -20,9 +23,9 @@ export const USERNAME_STYLES: { id: UsernameStyle; label: string }[] = [
   { id: "business", label: "Business / brand" },
 ];
 
-/** Instagram usernames: letters, numbers, periods and underscores, up to 30 characters. */
-export function isValidInstagramUsername(u: string): boolean {
-  if (u.length < 1 || u.length > USERNAME_MAX) return false;
+/** Instagram and TikTok usernames: letters, numbers, periods and underscores, within the platform limit. */
+export function isValidInstagramUsername(u: string, max = USERNAME_MAX, minLength = 1): boolean {
+  if (u.length < minLength || u.length > max) return false;
   if (!/^[a-z0-9._]+$/.test(u)) return false;
   if (u.startsWith(".") || u.endsWith(".")) return false;
   if (u.includes("..")) return false;
@@ -110,11 +113,14 @@ function build(parts: Parts): string {
 }
 
 export function generateUsernames(input: UsernameInput): string[] {
+  const platform = input.platform ?? "instagram";
+  const max = PLATFORM_USERNAME_MAX[platform];
+  const minLength = platform === "tiktok" ? 2 : 1;
   const nameWords = words(input.name);
   const nicheWords = words(input.niche);
-  // Keep base parts short so combined ideas still fit in 30 characters.
-  const nameJoined = nameWords.join("").slice(0, 18);
-  const nicheJoined = nicheWords.join("").slice(0, 14);
+  // Keep base parts short so combined ideas still fit the platform limit.
+  const nameJoined = nameWords.join("").slice(0, Math.min(18, max - 6));
+  const nicheJoined = nicheWords.join("").slice(0, Math.min(14, max - 10));
   if (!nameJoined && !nicheJoined) return [];
 
   const n = nameJoined || nicheJoined;
@@ -149,7 +155,7 @@ export function generateUsernames(input: UsernameInput): string[] {
     // Skip patterns that need a part we don't have (e.g. a niche combo with no niche).
     if (parts.some((p) => p === "")) continue;
     const u = sanitizeUsername(build(parts));
-    if (!isValidInstagramUsername(u) || seen.has(u)) continue;
+    if (!isValidInstagramUsername(u, max, minLength) || seen.has(u)) continue;
     seen.add(u);
     results.push(u);
     if (results.length >= MAX_RESULTS) break;

@@ -3,9 +3,10 @@
 import { useId, useMemo, useRef, useState } from "react";
 import { AtSign, Check, Copy, Info, Sparkles } from "lucide-react";
 import {
-  USERNAME_MAX,
+  PLATFORM_USERNAME_MAX,
   USERNAME_STYLES,
   generateUsernames,
+  type UsernamePlatform,
   type UsernameStyle,
 } from "@/lib/usernameIdeas";
 
@@ -14,7 +15,12 @@ const fieldClass =
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
 const kpiLabel = "text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
-export default function UsernameTool() {
+export default function UsernameTool({ platform = "instagram" }: { platform?: UsernamePlatform }) {
+  const max = PLATFORM_USERNAME_MAX[platform];
+  const platformLabel = platform === "tiktok" ? "TikTok" : "Instagram";
+  const availabilityNote = platform === "tiktok"
+    ? `We do not check ${platformLabel}. Before you settle on a name, open Profile > Edit profile > Username in the ${platformLabel} app to see if it is free.`
+    : `We do not check ${platformLabel}. Before you settle on a name, type it into Edit profile > Username in the ${platformLabel} app to see if it is free.`;
   const [name, setName] = useState("");
   const [niche, setNiche] = useState("");
   const [style, setStyle] = useState<UsernameStyle>("clean");
@@ -25,7 +31,7 @@ export default function UsernameTool() {
   const nicheId = useId();
   const styleId = useId();
 
-  const results = useMemo(() => generateUsernames({ name, niche, style }), [name, niche, style]);
+  const results = useMemo(() => generateUsernames({ name, niche, style, platform }), [name, niche, style, platform]);
   const current = picked && results.includes(picked) ? picked : results[0] ?? null;
   const lengths = results.map((u) => u.length);
   const shortest = lengths.length ? Math.min(...lengths) : 0;
@@ -65,7 +71,7 @@ export default function UsernameTool() {
         </div>
         <p className="flex items-start gap-1.5 text-sm text-[#3d3450] sm:col-span-3">
           <Info className="mt-0.5 h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
-          <span>We do not check Instagram. Before you settle on a name, type it into Edit profile &gt; Username in the Instagram app to see if it is free.</span>
+          <span>{availabilityNote}</span>
         </p>
       </div>
 
@@ -79,7 +85,7 @@ export default function UsernameTool() {
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <div className={kpi}><p className={kpiLabel}>Ideas</p><p className="mt-1 text-2xl font-bold tabular-nums">{results.length}</p></div>
             <div className={kpi}><p className={kpiLabel}>Shortest</p><p className="mt-1 text-2xl font-bold tabular-nums">{shortest}<span className="text-sm font-medium text-[#5f5873]"> chars</span></p></div>
-            <div className={kpi}><p className={kpiLabel}>Average length</p><p className="mt-1 text-2xl font-bold tabular-nums">{average}<span className="text-sm font-medium text-[#5f5873]"> / {USERNAME_MAX}</span></p></div>
+            <div className={kpi}><p className={kpiLabel}>Average length</p><p className="mt-1 text-2xl font-bold tabular-nums">{average}<span className="text-sm font-medium text-[#5f5873]"> / {max}</span></p></div>
             <div className={kpi}><p className={kpiLabel}>No dots or underscores</p><p className="mt-1 text-2xl font-bold tabular-nums">{plain}</p></div>
           </div>
 
@@ -113,7 +119,7 @@ export default function UsernameTool() {
                 </span>
                 <p className="mt-2 break-all text-lg font-bold">{current}</p>
                 <p className="text-xs text-[#5f5873]">{name.trim() || "Your name"}{niche.trim() ? ` · ${niche.trim()}` : ""}</p>
-                <p className="mt-2 text-xs tabular-nums text-[#3d3450]">{current?.length ?? 0} of {USERNAME_MAX} characters</p>
+                <p className="mt-2 text-xs tabular-nums text-[#3d3450]">{current?.length ?? 0} of {max} characters</p>
               </div>
               <button type="button" onClick={() => current && copy(current, "picked")}
                 className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px">
