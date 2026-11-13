@@ -130,13 +130,11 @@ export default function InstagramScheduler() {
       <header className="hero">
         <div className={s.heroText}>
         <span className="pill"><span>NEW</span>Schedule posts · auto-DM on publish</span>
-        <p className="eyebrow">Instagram scheduler</p>
         <h1>
-          Plan your posts. <em className="s mark">Auto‑DM every comment</em>
+          Instagram scheduler that <em className="s mark">auto‑DMs every comment</em>
         </h1>
         <p className="lede">
-          Plan and auto-publish posts, reels, carousels and stories, see suggested times from your own engagement history,
-          and attach comment-to-DM automation when each post goes live.
+          {BRAND.name} is an Instagram scheduler that auto-publishes your posts, reels, carousels and stories at the time you pick. Plan on a week or month calendar, see suggested times from your own engagement, and send a DM to everyone who comments when each post goes live.
         </p>
         <form className="glassBar glass schedBar" action="/signup" method="get">
           <label className="sr-only" htmlFor="sched-email">Email</label>
