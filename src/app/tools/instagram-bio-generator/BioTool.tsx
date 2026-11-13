@@ -3,11 +3,12 @@
 import { useId, useMemo, useRef, useState } from "react";
 import { AtSign, Briefcase, Check, Copy, Megaphone, PenLine, Sparkles, Tag, Type, UserRound } from "lucide-react";
 import {
-  BIO_LIMIT,
   BIO_TEMPLATES,
   NICHES,
+  PLATFORM_BIO_LIMIT,
   bioLength,
   fillBio,
+  type BioPlatform,
   type NicheId,
 } from "@/lib/bioTemplates";
 import { FONT_STYLES, convert } from "@/lib/igFonts";
@@ -20,10 +21,12 @@ const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--po
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const icon = "pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--poskoo-violet)]";
 
-export default function BioTool() {
+export default function BioTool({ platform = "instagram" }: { platform?: BioPlatform }) {
+  const limit = PLATFORM_BIO_LIMIT[platform];
+  const platformLabel = platform === "tiktok" ? "TikTok" : "Instagram";
   const [name, setName] = useState("");
   const [what, setWhat] = useState("");
-  const [cta, setCta] = useState(DEFAULT_CTA);
+  const [cta, setCta] = useState(platform === "tiktok" ? 'DM "START" 👇' : DEFAULT_CTA);
   const [nicheId, setNicheId] = useState<NicheId>("creator");
   const [nameStyle, setNameStyle] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
@@ -64,7 +67,7 @@ export default function BioTool() {
   const current = Math.min(selected, bios.length - 1);
   const currentBio = bios[current];
   const currentId = `${nicheId}-${current}`;
-  const fitCount = bios.filter((b) => b.filled && b.len <= BIO_LIMIT).length;
+  const fitCount = bios.filter((b) => b.filled && b.len <= limit).length;
   const shortest = bios.length ? Math.min(...bios.map((b) => b.len)) : 0;
   const nicheLabel = NICHES.find((n) => n.id === nicheId)?.label ?? "";
   const styleLabel = FONT_STYLES.find((s) => s.id === nameStyle)?.label ?? "Plain text";
@@ -179,18 +182,18 @@ export default function BioTool() {
             <p className="mt-1 text-xs text-[#3d3450]">Templates for this niche.</p>
           </div>
           <div className={kpi}>
-            <p className={kpiLabel}>Fit in {BIO_LIMIT}</p>
+            <p className={kpiLabel}>Fit in {limit}</p>
             <p aria-live="polite" className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{fitCount}<span className="text-base font-medium text-[#5f5873]"> / {bios.length}</span></p>
             <div className="mt-2 flex gap-0.5" aria-hidden="true">
               {bios.map((b, i) => (
-                <i key={i} className="h-1.5 flex-1 rounded-full" style={{ background: !b.filled ? "var(--poskoo-line)" : b.len > BIO_LIMIT ? "var(--poskoo-coral)" : "var(--poskoo-green)" }} />
+                <i key={i} className="h-1.5 flex-1 rounded-full" style={{ background: !b.filled ? "var(--poskoo-line)" : b.len > limit ? "var(--poskoo-coral)" : "var(--poskoo-green)" }} />
               ))}
             </div>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Shortest</p>
             <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{shortest}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
-            <p className="mt-1 text-xs tabular-nums text-[#3d3450]">{Math.max(0, BIO_LIMIT - shortest)} left of {BIO_LIMIT}.</p>
+            <p className="mt-1 text-xs tabular-nums text-[#3d3450]">{Math.max(0, limit - shortest)} left of {limit}.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Name style</p>
@@ -212,7 +215,7 @@ export default function BioTool() {
           <ul className="grid gap-3 sm:grid-cols-2" aria-label="Generated bios">
             {bios.map(({ filled, len }, index) => {
               const cardId = `${nicheId}-${index}`;
-              const over = len > BIO_LIMIT;
+              const over = len > limit;
               const isSelected = current === index;
               return (
                 <li
@@ -241,10 +244,10 @@ export default function BioTool() {
                       <span
                         className={`text-xs font-medium tabular-nums ${over ? "text-[var(--poskoo-coral)]" : "text-[#3d3450]"}`}
                       >
-                        {len}/{BIO_LIMIT}
+                        {len}/{limit}
                       </span>
                       <span className="mt-1 block h-1 max-w-[9rem] overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
-                        <i className="block h-full rounded-full" style={{ width: `${Math.min(100, (len / BIO_LIMIT) * 100)}%`, background: over ? "var(--poskoo-coral)" : "var(--poskoo-green)" }} />
+                        <i className="block h-full rounded-full" style={{ width: `${Math.min(100, (len / limit) * 100)}%`, background: over ? "var(--poskoo-coral)" : "var(--poskoo-green)" }} />
                       </span>
                     </span>
                     <button
@@ -284,7 +287,7 @@ export default function BioTool() {
           <div>
             <h4 id={`${baseId}-prev`} className="flex items-center justify-between gap-2 text-sm font-semibold">
               Profile preview
-              <span className={`text-xs font-medium tabular-nums ${currentBio && currentBio.len > BIO_LIMIT ? "text-[var(--poskoo-coral)]" : "text-[#5f5873]"}`}>{currentBio?.len ?? 0}/{BIO_LIMIT}</span>
+              <span className={`text-xs font-medium tabular-nums ${currentBio && currentBio.len > limit ? "text-[var(--poskoo-coral)]" : "text-[#5f5873]"}`}>{currentBio?.len ?? 0}/{limit}</span>
             </h4>
             <div className="mt-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 text-sm">
               <div className="flex items-center gap-3">
@@ -308,7 +311,7 @@ export default function BioTool() {
                 <span className="rounded-lg bg-[var(--poskoo-band)] py-1.5 text-center text-xs font-semibold">Message</span>
               </div>
             </div>
-            <p className="mt-2 text-xs text-[#5f5873]">Instagram bios allow up to {BIO_LIMIT} characters. Pick an option to preview it here.</p>
+            <p className="mt-2 text-xs text-[#5f5873]">{platformLabel} bios allow up to {limit} characters. Pick an option to preview it here.</p>
           </div>
         </aside>
       </div>

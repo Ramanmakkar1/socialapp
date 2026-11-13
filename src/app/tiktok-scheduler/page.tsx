@@ -264,6 +264,8 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-hashtag-generator">free TikTok hashtag generator</Link>.
             Need a new handle? Try our{" "}
             <Link className={s.vlink} href="/tools/tiktok-username-generator">free TikTok username generator</Link>.
+            Writing your profile? Use our{" "}
+            <Link className={s.vlink} href="/tools/tiktok-bio-generator">free TikTok bio generator</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Not sure when to post? Get three starting times for your audience with the{" "}
