@@ -140,6 +140,7 @@ export function SiteFooter() {
         links={[
           { href: "/buffer-alternative", label: "Buffer alternative" },
           { href: "/publer-alternative", label: "Publer alternative" },
+          { href: "/agorapulse-alternative", label: "Agorapulse alternative" },
           { href: "/later-alternative", label: "Later alternative" },
           { href: "/planoly-alternative", label: "Planoly alternative" },
           { href: "/sprout-social-alternative", label: "Sprout Social alternative" },
