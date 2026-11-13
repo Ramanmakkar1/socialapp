@@ -1,18 +1,17 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
-import BestTimeFinder from "../best-time-to-post-on-instagram/BestTimeFinder";
+import BestTimeFinder from "./BestTimeFinder";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-tiktok",
   name: "Best time to post on TikTok finder",
   crumb: "Best time to post on TikTok",
-  title: "Best Time to Post on TikTok: Free Finder Tool 2026",
+  title: "Best Time to Post on TikTok: Free Time Finder | Poskoo",
   description:
-    "Find the best time to post on TikTok with a free finder. Pick your audience time zone and days to get three starting slots, then test them for 2 weeks.",
+    "Find the best time to post on TikTok with a free finder. Pick your audience time zone and days to get starting slots to test for two weeks, no signup.",
   pill: "Free · runs in your browser · nothing is saved",
   h1: { before: "Best time to post on", mark: "TikTok" },
-  lede:
-    "There is no single best time to post on TikTok. The best time is when your own followers are active, which TikTok shows in Analytics under Followers, so test two or three slots for two weeks and keep the winners.",
+  lede: "A good starting point for TikTok is weekday evenings around 7–10 pm, plus 6–9 am and lunchtime, in your audience's local time. Test these slots for two weeks and keep the ones your TikTok analytics show working.",
   art: "card-schedule",
   artLabel: "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
   heroPoints: ["Your audience's time zone", "3 slots per day", "No signup"],
@@ -22,17 +21,17 @@ const config: ToolPageConfig = {
   steps: [
     {
       title: "Pick your audience time zone",
-      text: "The zone starts on your browser's setting. Change it to where most of your followers live, so the slots are shown on their clock.",
+      text: "The zone starts on your browser's setting. Change it to where most of your TikTok audience lives, so the slots are shown on their clock.",
       art: "card-schedule",
     },
     {
       title: "Choose your audience and posting days",
-      text: "Your audience type sets three starting slots per day. Tick the days you can actually post, and the grid updates straight away.",
+      text: "Your audience type sets three starting slots per day. All seven days are selected by default, so tick off any day you cannot post and the grid updates straight away.",
       art: "feat-calendar",
     },
     {
       title: "Test the slots for two weeks",
-      text: "Press Copy plan, post at those times, then check TikTok Analytics. Keep the slots that reach more of your followers and drop the rest.",
+      text: "Press Copy plan, post at those times, then check TikTok analytics. Keep the slots that reach more of your audience and drop the rest.",
       art: "analytics",
     },
   ],
@@ -45,7 +44,7 @@ const config: ToolPageConfig = {
     },
     {
       title: "Three slots, not one magic hour",
-      text: "You get a morning, midday and evening option for each day, so you can test a small set instead of guessing a single perfect minute.",
+      text: "You get an evening, morning and lunchtime option for each weekday, plus weekend windows, so you can test a small set instead of guessing a single perfect minute.",
       art: "card-schedule",
     },
     {
@@ -57,83 +56,75 @@ const config: ToolPageConfig = {
   guide: {
     title: "How to find the best time to post on TikTok",
     intro:
-      "The best time to post on TikTok is when your own followers are active, not a fixed hour that works for every account. Use the finder above for starting points, then let your TikTok Analytics decide which slots to keep.",
+      "The best time to post on TikTok is when your own audience is active, not a fixed hour that works for every account. Use the finder above for starting points, then let your TikTok analytics decide which slots to keep.",
     sections: [
       {
-        title: "How to find your own best time",
+        title: "Is it better to post on TikTok in the morning or evening?",
         body: (
           <>
             <p>
-              TikTok shows your audience&apos;s activity in <b>Analytics</b>, which you get with a Business or Creator
-              account. Open Analytics, go to the <b>Followers</b> tab and look at <b>Follower activity</b>. It shows the
-              hours and days when your followers are on TikTok.
+              For most accounts, evening is the safer starting point: test a slot between 7 and 10 pm in your audience&apos;s
+              local time. Morning and lunchtime can work just as well for some audiences, so test a 6–9 am and a 12–2 pm
+              slot alongside the evening one.
             </p>
             <p>
-              Read that chart for the days you can post. If the busiest window is a range, pick two or three times
-              inside it and test them. If your account is new and the chart is thin, start with the finder above and
-              gather your own data as you post.
+              TikTok analytics shows when your viewers are active. Open <b>Analytics</b> in the TikTok app or on the web,
+              then look at follower activity and the performance of your recent posts by time of day. If the busiest
+              window is a range, pick two or three times inside it and test them.
             </p>
           </>
         ),
       },
       {
-        title: "A simple 2-week posting test",
+        title: "Which days should you test first?",
         body: (
           <>
             <p>
-              Pick two or three slots from the finder and keep everything else about your posting the same for two
-              weeks. That way the time is the only thing that changes.
+              Start with the days you can actually post consistently. All seven days are selected in the finder by
+              default, because TikTok audiences use the app throughout the week, but a steady weekday schedule beats an
+              irregular one.
             </p>
             <ol>
               <li>Choose the days you can post and copy the plan.</li>
               <li>Post at the same slots for 14 days, without changing your content style.</li>
-              <li>After two weeks, compare views, likes and profile visits for each slot in TikTok Analytics.</li>
+              <li>After two weeks, compare views, watch time and engagement for each slot in TikTok analytics.</li>
               <li>Keep the best slot, drop the weakest, and test one new time next.</li>
             </ol>
             <p>
-              Two weeks is long enough to see a pattern without waiting a month. Change one thing at a time so you
-              know what made the difference.
+              Two weeks is long enough to see a pattern without waiting a month. Change one thing at a time so you know
+              what made the difference.
             </p>
           </>
         ),
       },
       {
-        title: "Best time by content type",
+        title: "Should you post on TikTok on weekends?",
         body: (
           <>
             <p>
-              These are general starting points to test, not measured data. Your own Analytics always beat a general
-              rule.
+              Yes, weekends are worth testing on TikTok. Many viewers have more free time on Saturday and Sunday, so the
+              finder offers weekend windows such as 9–11 am and 7–9 pm in your audience&apos;s local time.
             </p>
-            <ul>
-              <li>
-                <b>Videos:</b> try a morning slot and an evening slot, because videos can keep getting For You views
-                for days after posting. Test both and compare views after a week.
-              </li>
-              <li>
-                <b>LIVE:</b> pick a slot when your Follower activity chart is highest, and post consistently at that
-                time so followers learn when to expect you.
-              </li>
-              <li>
-                <b>Stories:</b> try a morning and an evening Story, since Stories disappear after 24 hours. Posting
-                twice gives followers in different time zones a chance to see one.
-              </li>
-            </ul>
             <p>
-              Use the <Link href="/tools/instagram-time-zone-converter">time zone converter</Link> when your audience
-              is spread across countries.
+              These are general starting points to test, not measured data. Your own TikTok analytics always beat a
+              general rule. If weekend posts underperform for two weeks, drop them and put the effort into your weekday
+              slots.
+            </p>
+            <p>
+              Use the <Link href="/tools/tiktok-caption-counter">TikTok caption character counter</Link> to keep your
+              captions within the platform limit before you schedule.
             </p>
           </>
         ),
       },
       {
-        title: "Turn your best time into a schedule",
+        title: "How do you turn a test slot into a schedule?",
         body: (
           <p>
-            Once a slot works, <Link href="/tiktok-scheduler">schedule TikTok posts</Link> in Poskoo so they publish
-            at that time without you opening the app. You can plan a week in the calendar, then let Poskoo publish at
-            the scheduled time. New here? <Link href="/signup">Create a free account</Link> and start with one post.
-            Posting on more than TikTok?{" "}
+            Once a slot works, <Link href="/tiktok-scheduler">schedule TikTok posts</Link> in Poskoo so they publish at
+            that time without you opening the app. You can plan a week in the calendar, then let Poskoo publish at the
+            scheduled time. New here? <Link href="/signup">Create a free account</Link> and start with one post. Posting
+            on more than TikTok?{" "}
             <Link href="/tools/best-time-to-post-on-social-media">See the best time to post on every platform</Link>.
           </p>
         ),
@@ -144,40 +135,41 @@ const config: ToolPageConfig = {
   faqs: [
     {
       q: "What is the best time to post on TikTok?",
-      a: "There is no single best time for every account. The best time is when your own followers are active, which TikTok shows in Analytics under the Followers tab and Follower activity. Test two or three slots for two weeks and keep the ones that perform best.",
+      a: "There is no single best time for every account. A good starting point is weekday evenings around 7–10 pm, plus 6–9 am and lunchtime, in your audience's local time. Test those slots for two weeks and keep the ones your TikTok analytics show working.",
     },
     {
-      q: "How do I see when my followers are most active on TikTok?",
-      a: "You need a Business or Creator account. Open TikTok Analytics, go to the Followers tab and look at Follower activity. It shows the hours and days when your followers are on TikTok, so you can pick slots that match.",
+      q: "Is it better to post on TikTok in the morning or evening?",
+      a: "Evening is a safer starting point for most accounts, so test a slot between 7 and 10 pm first. Morning and lunchtime can work for some audiences, so test a 6–9 am and a 12–2 pm slot alongside it and compare views, watch time and engagement in TikTok analytics.",
     },
     {
-      q: "How long should I test posting times before changing them?",
-      a: "Give each slot about two weeks. That is long enough to see a pattern without waiting a month. Change one thing at a time, then compare views, likes and profile visits for each slot before you keep or drop it.",
+      q: "Should I post on TikTok on weekends?",
+      a: "Yes, weekends are worth testing. Many viewers have more free time on Saturday and Sunday, so try a 9–11 am and a 7–9 pm window in your audience's local time. If weekend posts underperform for two weeks, drop them and focus on your weekday slots.",
     },
     {
-      q: "Does the best time to post change by content type on TikTok?",
-      a: "It can. Videos can keep getting For You views for days after posting, LIVE works best when your follower activity is highest, and Stories only last 24 hours. Treat the content-type suggestions as starting points to test, not fixed rules, and check your own Analytics.",
+      q: "Does the best time to post on TikTok depend on my time zone?",
+      a: "Yes. TikTok shows your post to viewers on their own clock, so the best time depends on where your audience lives. Set the finder to your audience's time zone, not your own, and it shows each slot in their local time with your time underneath.",
     },
   ],
   related: [
-    "/tools/best-time-to-post-on-instagram",
     "/tools/tiktok-caption-counter",
-    "/tools/instagram-time-zone-converter",
+    "/tools/instagram-safe-zone-checker",
     "/tools/social-media-content-calendar",
+    "/tools/best-time-to-post-on-instagram",
+    "/tools/best-time-to-post-on-linkedin",
   ],
   schema: {
     features: [
       "Three starting post times per day for your audience type",
       "Slots shown in your audience's time zone",
       "Your own local time shown under each slot",
-      "Choose the days you can post",
+      "All seven days selected by default, with weekend windows",
       "Copy the whole plan as text",
     ],
   },
   cta: {
     title: "Found a slot to test?",
-    mark: "Plan the post.",
-    text: "Pick the time in your audience's zone and plan your TikTok posts in Poskoo so they publish at that time without you opening the app.",
+    mark: "Schedule the post.",
+    text: "Pick the time in your audience's zone and Poskoo publishes your TikTok post at that time.",
   },
 };
 
@@ -186,7 +178,7 @@ export const metadata = toolMetadata(config);
 export default function BestTimeToPostOnTikTokPage() {
   return (
     <ToolPageTemplate config={config}>
-      <BestTimeFinder platform="TikTok" insightsName="TikTok Analytics" />
+      <BestTimeFinder platform="TikTok" insightsName="TikTok analytics" />
     </ToolPageTemplate>
   );
 }

@@ -406,7 +406,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/instagram-time-zone-converter": "Convert an Instagram posting time between any two time zones, with daylight saving handled. See the exact local date and time before you schedule a post.",
   "/tools/best-time-to-post-on-social-media": "Use weekday late mornings and early evenings on Instagram, TikTok, LinkedIn, Facebook, X, Pinterest, Threads and YouTube, with a free finder for each.",
   "/tools/best-time-to-post-on-instagram": "Find the best time to post on Instagram with a free finder. Pick your audience time zone and posting days to get three starting slots to test for 2 weeks.",
-  "/tools/best-time-to-post-on-tiktok": "Find the best time to post on TikTok with a free finder. Pick your audience time zone and days to get three starting slots, then test them for 2 weeks.",
+  "/tools/best-time-to-post-on-tiktok": "Find the best time to post on TikTok with a free finder. Pick your audience time zone and days to get starting slots to test for two weeks, no signup.",
   "/tools/best-time-to-post-on-facebook": "Find the best time to post on Facebook with a free finder. Choose your audience time zone and posting days to get three slots to test for two weeks.",
   "/tools/best-time-to-post-on-x": "Find the best time to post on X (Twitter) with a free finder. Pick your audience time zone and posting days to get three slots to test for two weeks.",
   "/tools/best-time-to-post-on-linkedin": "Find the best time to post on LinkedIn with a free finder. Pick your audience time zone and workdays to get three starting slots to test for two weeks.",

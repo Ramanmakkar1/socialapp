@@ -128,6 +128,7 @@ const related = [
   { href: "/tiktok-scheduler", label: "TikTok scheduler" },
   { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
   { href: "/tools/instagram-safe-zone-checker", label: "9:16 safe zone checker" },
+  { href: "/tools/best-time-to-post-on-tiktok", label: "Best time to post on TikTok" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];
 
