@@ -40,6 +40,7 @@ const jsonLd = {
       legalName: BRAND.company,
       url: BRAND.url,
       email: BRAND.supportEmail,
+      sameAs: BRAND.social,
       logo: {
         "@type": "ImageObject",
         url: BRAND.url + "/brand/poskoo-icon-1024.png",

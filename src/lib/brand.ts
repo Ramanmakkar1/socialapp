@@ -11,5 +11,10 @@ export const BRAND = {
   // Set back to false only to take the whole site out of search (noindex everywhere, empty sitemap).
   indexable: true,
   supportEmail: "hello@poskoo.com",
+  // Official Poskoo profiles (Organization sameAs). Add each new one here.
+  social: [
+    "https://www.facebook.com/profile.php?id=61596482132387",
+    "https://www.youtube.com/@poskooapp",
+  ],
   company: "Town Media Labs",
 };
