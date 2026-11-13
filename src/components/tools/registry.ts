@@ -77,6 +77,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-story-size-checker", name: "Story size checker", summary: "Check a Story image's size and ratio in a 9:16 frame against 1080×1920.", category: "media", icon: "smartphone" },
   { href: "/tools/youtube-thumbnail-size-checker", name: "YouTube thumbnail size checker", summary: "Test a thumbnail against YouTube's 1280×720, 16:9 and 2 MB rules in your browser.", category: "media", icon: "smartphone" },
   { href: "/tools/youtube-banner-size-checker", name: "YouTube banner size checker", summary: "Test channel art against YouTube's 2560×1440, 6 MB and safe-area rules.", category: "media", icon: "smartphone" },
+  { href: "/tools/linkedin-banner-size-checker", name: "LinkedIn banner size checker", summary: "Test a profile banner against LinkedIn's 1584×396, 4:1 and 8 MB rules.", category: "media", icon: "smartphone" },
   { href: "/tools/instagram-highlight-cover-maker", name: "Highlight cover maker", summary: "Matching highlight covers with icons and brand colours, downloaded as PNGs.", category: "media", icon: "circle" },
   { href: "/tools/instagram-reel-cover-maker", name: "Reel cover maker", summary: "1080×1920 Reel covers with a title that stays inside the grid crop.", category: "media", icon: "clapperboard" },
   { href: "/tools/instagram-story-maker", name: "Story maker", summary: "Design a 1080×1920 Story with a photo, text and gradient, then download it.", category: "media", icon: "palette" },
