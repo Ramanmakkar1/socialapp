@@ -144,7 +144,7 @@ const config: ToolPageConfig = {
       a: "No. All counting and previewing happens in your browser. Your draft is not uploaded or saved, and you do not need to sign in.",
     },
   ],
-  related: ["/tools/linkedin-text-formatter", "/tools/threads-post-preview", "/tools/instagram-caption-counter"],
+  related: ["/tools/linkedin-post-preview", "/tools/linkedin-text-formatter", "/tools/threads-post-preview", "/tools/instagram-caption-counter"],
   schema: {
     features: [
       "LinkedIn post, comment, headline and About character limits",
