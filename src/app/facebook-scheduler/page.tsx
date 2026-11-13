@@ -181,7 +181,8 @@ export default function FacebookSchedulerPage() {
             <Link className={s.vlink} href="/tools">free Instagram tools</Link>. Check your draft with our{" "}
             <Link className={s.vlink} href="/tools/facebook-character-counter">Facebook character counter</Link> before scheduling. See how your draft will look in the feed with our{" "}
             <Link className={s.vlink} href="/tools/facebook-post-preview">Facebook post preview</Link>. Add a few relevant tags with our{" "}
-            <Link className={s.vlink} href="/tools/facebook-hashtag-generator">Facebook hashtag generator</Link>. Not sure when to post? Find the{" "}
+            <Link className={s.vlink} href="/tools/facebook-hashtag-generator">Facebook hashtag generator</Link>. Check your header image with our{" "}
+            <Link className={s.vlink} href="/tools/facebook-cover-photo-size-checker">Facebook cover photo size checker</Link>. Not sure when to post? Find the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-facebook">best time to post on Facebook</Link>.
           </p>
         </div>
