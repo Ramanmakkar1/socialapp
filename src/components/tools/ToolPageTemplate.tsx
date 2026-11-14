@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, BookOpen } from "lucide-react";
 import PublicShell from "@/components/PublicShell";
-import { AnimArt, type AnimName } from "@/components/AnimArt";
+import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { BRAND } from "@/lib/brand";
 import { TOOLS, toolByHref, type ToolIconName } from "./registry";
 import { ToolIcon } from "./ToolIcon";
@@ -41,11 +41,11 @@ export type ToolPageConfig = {
   toolTitle: string;
   toolNote?: string;
   /** Exactly three "How to use" steps, each with optional art. Also feeds HowTo JSON-LD. */
-  steps: { title: string; text: string; art?: AnimName }[];
+  steps: { title: string; text: string; art?: AnimName; artLabel?: string }[];
   /** Section heading for the steps, e.g. "How to generate Instagram hashtags". */
   stepsTitle: string;
   /** Three (or six) benefit cards with art. */
-  features: { title: string; text: string; art: AnimName }[];
+  features: { title: string; text: string; art: AnimName; artLabel?: string }[];
   featuresTitle: string;
   /** SEO guide: one H2 and H3 sections. Bodies may contain links, lists and tables. */
   guide: { title: string; intro?: ReactNode; sections: { title: string; body: ReactNode }[] };
@@ -57,7 +57,7 @@ export type ToolPageConfig = {
   /** Schema options. */
   schema?: { category?: AppCategory; features?: string[]; howTo?: boolean };
   /** Dark CTA band copy. */
-  cta?: { title: string; mark: string; text: string; art?: AnimName };
+  cta?: { title: string; mark: string; text: string; art?: AnimName; artLabel?: string };
 };
 
 const DEFAULT_STEP_ART: AnimName[] = ["writing", "visual", "card-schedule"];
@@ -152,7 +152,7 @@ export function HowItWorks({ title, steps }: { title: string; steps: ToolPageCon
         {steps.map((st, i) => (
           <li key={st.title} className="howStep">
             <div className={`howArt ${t.howArt}`}>
-              <AnimArt name={st.art ?? DEFAULT_STEP_ART[i % DEFAULT_STEP_ART.length]} />
+              <AnimArt name={st.art ?? DEFAULT_STEP_ART[i % DEFAULT_STEP_ART.length]} label={st.artLabel ?? ANIM_LABELS[st.art ?? DEFAULT_STEP_ART[i % DEFAULT_STEP_ART.length]]} />
             </div>
             <span className="howNo">Step {i + 1}</span>
             <h3>{st.title}</h3>
@@ -174,7 +174,7 @@ export function ToolFeatures({ title, features }: { title: string; features: Too
       <div className="bento">
         {features.map((f) => (
           <article key={f.title} className="bentoCard">
-            <div className="bentoArt"><AnimArt name={f.art} /></div>
+            <div className="bentoArt"><AnimArt name={f.art} label={f.artLabel ?? ANIM_LABELS[f.art]} /></div>
             <h3>{f.title}</h3>
             <p>{f.text}</p>
           </article>
@@ -291,7 +291,7 @@ export function ToolCta({ cta }: { cta?: ToolPageConfig["cta"] }) {
           </ul>
         </div>
         {c.art ? (
-          <AnimArt name={c.art} />
+          <AnimArt name={c.art} label={c.artLabel ?? ANIM_LABELS[c.art]} />
         ) : (
           <AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" />
         )}

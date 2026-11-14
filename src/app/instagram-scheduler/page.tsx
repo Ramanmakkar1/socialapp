@@ -9,7 +9,7 @@ import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { ArrowRight } from "lucide-react";
-import { AnimArt, type AnimName } from "@/components/AnimArt";
+import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
 
 const description = "Schedule Instagram posts, reels, carousels and stories, see suggested posting times, and auto-DM everyone who comments. Free plan, no credit card.";
@@ -175,7 +175,7 @@ export default function InstagramScheduler() {
           <div className="bento">
             {benefits.map((b) => (
               <article key={b.title} className="bentoCard">
-                <div className="bentoArt"><AnimArt name={b.art} /></div>
+                <div className="bentoArt"><AnimArt name={b.art} label={ANIM_LABELS[b.art]} /></div>
                 <h3>{b.title}</h3>
                 <p>{b.text}</p>
               </article>

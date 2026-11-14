@@ -15,7 +15,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { LandingDemo } from "./LandingDemo";
 import { HeroVideo } from "@/components/HeroVideo";
 import { GoogleButton } from "@/components/GoogleButton";
-import { AnimArt } from "@/components/AnimArt";
+import { AnimArt, ANIM_LABELS } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
@@ -194,33 +194,33 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <div className="head"><p className="eyebrow">What you get</p><h2>One app for the whole <em className="s">post-to-lead</em> loop</h2></div>
   <div className="bento">
     <article className="bentoCard">
-      <div className="bentoArt"><AnimArt name="feat-calendar" /></div>
+      <div className="bentoArt"><AnimArt name="feat-calendar" label={ANIM_LABELS["feat-calendar"]} /></div>
       <h3>Calendar</h3>
       <p>Plan a week of Instagram, Facebook and Threads posts on one calendar.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt"><AnimArt name="feat-dm" /></div>
+      <div className="bentoArt"><AnimArt name="feat-dm" label={ANIM_LABELS["feat-dm"]} /></div>
       <h3>Comment to DM</h3>
       <p>When someone comments your keyword, Poskoo sends them your link by Instagram DM.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt"><AnimArt name="feat-ai" /></div>
+      <div className="bentoArt"><AnimArt name="feat-ai" label={ANIM_LABELS["feat-ai"]} /></div>
       <h3>AI captions</h3>
       <p>Draft captions in your brand voice with AI, then edit and schedule.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt"><AnimArt name="feat-leads" /></div>
+      <div className="bentoArt"><AnimArt name="feat-leads" label={ANIM_LABELS["feat-leads"]} /></div>
       <h3>Lead capture</h3>
       <p>Ask for an email in the DM and save every new lead in one place.</p>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt"><AnimArt name="feat-linkbio" /></div>
+      <div className="bentoArt"><AnimArt name="feat-linkbio" label={ANIM_LABELS["feat-linkbio"]} /></div>
       <h3>Link in bio</h3>
       <p>One page for every link in your Instagram bio, with click tracking and four themes.</p>
       <Link className="bentoLink" href="/instagram-link-in-bio">Build your Instagram link-in-bio page <span aria-hidden="true">→</span></Link>
     </article>
     <article className="bentoCard">
-      <div className="bentoArt"><AnimArt name="analytics" /></div>
+      <div className="bentoArt"><AnimArt name="analytics" label={ANIM_LABELS["analytics"]} /></div>
       <h3>Analytics</h3>
       <p>See reach, comments, DMs, link clicks and leads for every post, so you know what works.</p>
     </article>

@@ -33,6 +33,32 @@ const ANIM_SIZES = {
 
 export type AnimName = keyof typeof ANIM_SIZES;
 
+/** Default descriptions for each illustration, used when a call site has no specific label. */
+export const ANIM_LABELS: Record<AnimName, string> = {
+  "analytics": "A creator waters a growing bar chart while hearts float up",
+  "card-dm": "A relaxed creator on a beanbag while DMs fly out of his phone to followers",
+  "card-leads": "Two friends high-five next to a board of contacts with check marks and a rising chart",
+  "card-schedule": "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
+  "demo-dm": "A comment sends a paper-plane DM with a link to a happy follower, who is saved as a new lead",
+  "demo-schedule": "A creator relaxes in a beanbag with a coffee while a weekly calendar of posts publishes on its own",
+  "feat-ai": "An AI helper drafts a caption idea beside a phone",
+  "feat-calendar": "A creator plans posts on a weekly calendar",
+  "feat-dm": "A creator's phone sends an automatic DM to a follower who commented",
+  "feat-leads": "A creator collects new leads in a contact list",
+  "feat-linkbio": "A creator's link-in-bio page with click tracking",
+  "multichannel": "A creator at a laptop sends one post that splits to several phones and screens",
+  "problem": "A tired creator at night buried under phones and chat-bubble notifications",
+  "compare": "Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all",
+  "help": "A creator reads on a giant open book under a lightbulb and a signpost",
+  "features": "A creator points at an open toolbox of calendar, chat, mail, chart and link tools",
+  "legal": "A calm creator holds a shield with a check mark next to a padlock, a key and a neat document",
+  "developers": "A developer types code on a laptop while a plug connects to a socket and gears turn",
+  "writing": "A creator writes on a giant phone screen with a big pencil while a puppy watches",
+  "visual": "A creator arranges photos and video frames on a phone screen",
+  "hashtag": "A creator juggles colourful hashtag balloons above a phone",
+  "pricing": "A happy creator in an armchair holds one membership card while app cards and bills fly away",
+};
+
 function isSafari() {
   const ua = navigator.userAgent;
   return /safari/i.test(ua) && !/chrome|chromium|crios|fxios|edg|android/i.test(ua);
