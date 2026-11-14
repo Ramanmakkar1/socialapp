@@ -50,6 +50,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-caption-formatter", name: "Caption formatter", summary: "Keep blank lines and spacing in a caption, with live counts and copy.", category: "create", icon: "align" },
   { href: "/tools/instagram-line-break-generator", name: "Line break generator", summary: "Stop paragraphs collapsing into one block of text in your captions.", category: "create", icon: "pilcrow" },
   { href: "/tools/instagram-font-generator", name: "Font generator", summary: "Copy Unicode font styles for your Instagram bio and captions.", category: "create", icon: "type" },
+  { href: "/tools/tiktok-font-generator", name: "TikTok font generator", summary: "Copy-and-paste Unicode fonts for your TikTok bio, name and captions, checked against the 80-character bio limit.", category: "create", icon: "type" },
   { href: "/tools/instagram-hashtag-generator", name: "Hashtag generator", summary: "Hand-curated hashtag sets for 15 niches, mixed broad to specific, up to 30 tags.", category: "create", icon: "hash" },
   { href: "/tools/instagram-hashtag-strategy", name: "Hashtag strategy worksheet", summary: "Group tags into broad, niche and branded sets and save them in your browser.", category: "create", icon: "layers" },
   { href: "/tools/instagram-hook-generator", name: "Hook generator", summary: "Ready-to-copy Reel hooks for any topic across eight hook styles.", category: "create", icon: "megaphone" },

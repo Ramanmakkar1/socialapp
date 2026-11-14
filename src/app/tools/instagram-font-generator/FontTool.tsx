@@ -4,11 +4,14 @@ import { useId, useRef, useState } from "react";
 import { Check, Copy, Eye, Type, X } from "lucide-react";
 import { FONT_STYLES } from "@/lib/igFonts";
 
-const BIO_LIMIT = 150;
+const DEFAULT_BIO_LIMIT = 150;
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
-export default function FontTool() {
+export default function FontTool({
+  platform = "Instagram",
+  bioLimit = DEFAULT_BIO_LIMIT,
+}: { platform?: string; bioLimit?: number } = {}) {
   const [text, setText] = useState("Your bio here");
   const [copied, setCopied] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState(FONT_STYLES[0].id);
@@ -31,7 +34,7 @@ export default function FontTool() {
   const chars = Array.from(text).length;
   const lines = text ? text.split("\n").length : 0;
   const styledLen = styled.length; // UTF-16 length, which is what most counters (and the bio box) measure
-  const over = styledLen > BIO_LIMIT;
+  const over = styledLen > bioLimit;
 
   return (
     <div className="min-w-0 space-y-5 text-left">
@@ -72,10 +75,10 @@ export default function FontTool() {
           <p className={kpiLabel}>{preview.label} length</p>
           <p className={`mt-1 text-2xl font-bold tabular-nums ${over ? "text-[var(--poskoo-red)]" : "text-[var(--poskoo-ink)]"}`}>
             {styledLen}
-            <span className="text-base font-medium text-[#5f5873]"> / {BIO_LIMIT}</span>
+            <span className="text-base font-medium text-[#5f5873]"> / {bioLimit}</span>
           </p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
-            <i className="block h-full rounded-full" style={{ width: `${Math.min(100, (styledLen / BIO_LIMIT) * 100)}%`, background: over ? "var(--poskoo-red)" : "var(--poskoo-violet)" }} />
+            <i className="block h-full rounded-full" style={{ width: `${Math.min(100, (styledLen / bioLimit) * 100)}%`, background: over ? "var(--poskoo-red)" : "var(--poskoo-violet)" }} />
           </div>
         </div>
         <div className={kpi}>
@@ -101,7 +104,7 @@ export default function FontTool() {
                   className={`flex min-w-0 flex-col gap-3 rounded-2xl border p-3.5 transition-colors ${on ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-band)]/60" : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)]"}`}>
                   <div className="flex items-center justify-between gap-2">
                     <h2 className="text-xs font-semibold uppercase tracking-wide text-[#5f5873]">{style.label}</h2>
-                    <button type="button" onClick={() => setPreviewId(style.id)} aria-pressed={on} aria-label={`Preview ${style.label} in bio`}
+                    <button type="button" onClick={() => setPreviewId(style.id)} aria-pressed={on} aria-label={`Preview ${style.label} in ${platform} bio`}
                       className={`inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-xs font-medium ${on ? "text-[var(--poskoo-violet)]" : "text-[#5f5873] hover:bg-[var(--poskoo-band)]"}`}>
                       <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                       {on ? "Previewing" : "Preview"}

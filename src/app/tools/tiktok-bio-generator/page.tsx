@@ -167,6 +167,7 @@ const config: ToolPageConfig = {
     "/tools/instagram-bio-generator",
     "/tools/tiktok-username-generator",
     "/tools/tiktok-caption-generator",
+    "/tools/tiktok-font-generator",
     "/tools/tiktok-hashtag-generator",
   ],
   schema: {
