@@ -105,15 +105,6 @@ const appJsonLd = {
   publisher: publisherRef(),
 };
 
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${BRAND.url}/` },
-    { "@type": "ListItem", position: 2, name: "Facebook Page scheduler", item: `${BRAND.url}${PATH}` },
-  ],
-};
-
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -128,17 +119,14 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 export default function FacebookSchedulerPage() {
   return (
-    <PublicShell className={s.sched}>
-      {[appJsonLd, breadcrumbJsonLd, faqJsonLd].map((data) => (
+    <PublicShell className={s.sched} breadcrumbs={[{ name: "Facebook Page scheduler", path: PATH }]}>
+      {[appJsonLd, faqJsonLd].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: ld(data) }}
         />
       ))}
-      <nav aria-label="Breadcrumb" className={s.crumbs}>
-        <Link href="/">Home</Link> / <span aria-current="page">Facebook Page scheduler</span>
-      </nav>
 
       <header className="hero">
         <div className={s.heroText}>

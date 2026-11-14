@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
+import { ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
@@ -182,21 +182,12 @@ const collectionJsonLd = {
   },
 };
 
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: BRAND.url },
-  { name: "Help", url: `${BRAND.url}/help` },
-]);
-
 export default function HelpHubPage() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Help", path: "/help" }]}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <header className="hero">
         <div className={s.heroText}>

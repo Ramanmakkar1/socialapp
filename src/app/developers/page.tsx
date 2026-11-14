@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
+import { ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
@@ -59,16 +59,10 @@ const collectionJsonLd = {
   description,
 };
 
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: BRAND.url },
-  { name: "Developers", url: `${BRAND.url}/developers` },
-]);
-
 export default function DevelopersPage() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Developers", path: "/developers" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }} />
       <header className="hero">
         <div className={s.heroText}>
           <span className="pill">MCP server · API keys · for builders</span>

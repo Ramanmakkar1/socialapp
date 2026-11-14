@@ -4,7 +4,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
+import { publisherRef } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -64,12 +64,6 @@ const articleJsonLd = {
   mainEntityOfPage: `${BRAND.url}/help/instagram-auto-dm-not-working`,
 };
 
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: `${BRAND.url}/` },
-  { name: "Help", url: `${BRAND.url}/help` },
-  { name: "Instagram auto DM not working", url: `${BRAND.url}/help/instagram-auto-dm-not-working` },
-]);
-
 const checks = [
   "Instagram Business or Creator, connected in Settings",
   "Allow access to messages in Instagram",
@@ -89,7 +83,13 @@ const codeStyle: CSSProperties = {
 
 export default function InstagramAutoDmNotWorkingPage() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`}>
+    <PublicShell
+      className={`${s.sched} ${s.pub}`}
+      breadcrumbs={[
+        { name: "Help center", path: "/help" },
+        { name: "Instagram auto DM not working", path: "/help/instagram-auto-dm-not-working" },
+      ]}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
@@ -98,13 +98,6 @@ export default function InstagramAutoDmNotWorkingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
-      />
-      <nav aria-label="Breadcrumb" className={s.crumbs}>
-        <Link href="/help">Help center</Link> / Instagram auto DM not working
-      </nav>
       <header className="hero">
         <div className={s.heroText}>
           <p className="eyebrow">Troubleshooting guide</p>

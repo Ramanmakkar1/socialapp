@@ -71,14 +71,6 @@ const appJsonLd = (r: PlanReadiness) => ({
   offers: softwareOffers(r),
   publisher: publisherRef(),
 });
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${BRAND.url}/` },
-    { "@type": "ListItem", position: 2, name: "Pricing", item: `${BRAND.url}${PATH}` },
-  ],
-};
 const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 // The landing's green check (its #ok symbol only exists on the home page, so inline it here).
@@ -96,11 +88,8 @@ export default function PricingPage() {
   const plans = plansFor(r);
   const faqs = pricingFaqs(r);
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`}>
-      {[faqJsonLd(faqs), appJsonLd(r), breadcrumbJsonLd].map((data) => <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />)}
-      <nav aria-label="Breadcrumb" className={s.crumbs}>
-        <Link href="/">Home</Link> / Pricing
-      </nav>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Pricing", path: PATH }]}>
+      {[faqJsonLd(faqs), appJsonLd(r)].map((data) => <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />)}
       <header className="hero">
         <div className={s.heroText}>
           <span className="pill">Free plan · no credit card · official Meta API</span>

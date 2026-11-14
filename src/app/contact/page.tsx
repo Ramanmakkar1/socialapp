@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
+import { ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
@@ -27,21 +27,12 @@ const contactJsonLd = {
   },
 };
 
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: BRAND.url },
-  { name: "Contact", url: `${BRAND.url}/contact` },
-]);
-
 export default function ContactPage() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`}>
+    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Contact", path: "/contact" }]}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(contactJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <header className="hero">
         <div className={s.heroText}>
