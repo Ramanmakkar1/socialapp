@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
 import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -76,7 +76,7 @@ export default function SproutSocialAlternative() {
             Sprout Social alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            Sprout Social is an enterprise suite priced per seat. {BRAND.name} schedules your Instagram, Facebook Page, Threads and YouTube posts and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
+            Sprout Social is an enterprise suite priced per seat. {BRAND.name} schedules your {LIVE_PLATFORMS_TEXT} posts and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>

@@ -142,8 +142,8 @@ const config: ToolPageConfig = {
           <p>
             A plan only helps if the posts go out. Once the week is set, add each post to Poskoo with its date, time and
             media: the <Link href="/instagram-scheduler">Instagram scheduler</Link> handles feed posts, Reels, carousels and
-            Stories, and Poskoo also schedules Facebook Page, Threads and YouTube posts. TikTok, LinkedIn, Pinterest and X
-            rows in the template are for planning only.
+            Stories, and Poskoo also schedules Facebook Page, Threads, YouTube, LinkedIn, Bluesky and Mastodon posts.
+            TikTok, Pinterest and X rows in the template are for planning only for now.
           </p>
         ),
       },

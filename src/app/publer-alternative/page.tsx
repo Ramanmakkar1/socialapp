@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
 import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -14,19 +14,19 @@ import { AnimArt } from "@/components/AnimArt";
 export const metadata: Metadata = withSocial({
   title: { absolute: `Publer Alternative with Instagram Auto-DM | ${BRAND.name}` },
   description:
-    "Poskoo is a Publer alternative that schedules Instagram, Facebook and Threads posts and auto-DMs every keyword commenter to capture leads. Free plan.",
+    "Poskoo is a Publer alternative that schedules Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon posts and auto-DMs keyword commenters.",
   alternates: { canonical: `${BRAND.url}/publer-alternative` },
 });
 
 const whySwitch = [
-  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page, Threads and YouTube posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },
+  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: `Plan and publish ${LIVE_PLATFORMS_TEXT} posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool.` },
   { no: "02 / Free to start", title: "Start on the Free plan", text: `${BRAND.name} Free includes 2 social accounts, 10 scheduled posts / month and 500 auto-DMs / month.` },
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
 const compare: [string, string, string, string][] = [
   ["Social media scheduling", "Yes", "Yes", "Yes"],
-  ["Instagram, Facebook Page and Threads publishing", "Yes", "Check their site", "Depends on the tools"],
+  ["Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon publishing", "Yes", "Check their site", "Depends on the tools"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Depends on the DM tool"],
   ["Email capture in the DM", "Yes", "Check their site", "Depends on the DM tool"],
   ["AI caption ideas", "Yes", "Check their site", "Check their site"],
