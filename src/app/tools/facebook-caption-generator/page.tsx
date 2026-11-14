@@ -7,9 +7,9 @@ const config: ToolPageConfig = {
   path: "/tools/facebook-caption-generator",
   name: "Facebook caption generator",
   crumb: "Facebook caption generator",
-  title: "Facebook Caption Generator: Free Post Captions in 1 Click",
+  title: "Facebook Caption Generator: Free Captions for Posts",
   description:
-    "Free Facebook caption generator: enter your topic, pick a goal and tone, and copy six post captions with a hook and call to action. No signup or AI.",
+    "Free Facebook caption generator: enter a topic, pick a goal and tone, and copy six post captions with a hook and call to action. No signup, no AI.",
   pill: "Free · no signup · no AI or scraping",
   h1: { before: "Facebook caption generator:", mark: "free captions", after: "with hooks" },
   lede: "Generate six Facebook caption drafts from your topic, goal and tone. Each one has a short hook and a call to action, runs in your browser and is ready to copy.",
@@ -85,8 +85,8 @@ const config: ToolPageConfig = {
               breaks. That is a maximum, not a target: use enough words to explain the post and give readers a next step.
             </p>
             <p>
-              On desktop, only about the first <b>480 characters</b> show before <b>See more</b>. Put the topic or hook
-              first and keep it short. The preview uses an approximate fold to help you check the opening; the exact
+              On mobile, only about the first <b>125 characters</b> show before <b>See more</b>. Put the topic or hook
+              first and keep it short. The preview uses a 125-character fold to help you check the opening; the exact
               cutoff varies by device and layout.
             </p>
           </>
@@ -135,8 +135,9 @@ const config: ToolPageConfig = {
             <li>Adding popular tags that have nothing to do with the post.</li>
             <li>Publishing without checking the total length or how the opening looks in the feed.</li>
             <li>
-              Forgetting the next step. Use the <Link href="/tools/facebook-post-preview">Facebook post preview</Link>{" "}
-              to see the See more cut-off before you publish.
+              Publishing without checking the total length. Use the <Link href="/tools/facebook-character-counter">Facebook
+              character counter</Link> to check the 63,206-character limit, and build a relevant tag set with the{" "}
+              <Link href="/tools/facebook-hashtag-generator">Facebook hashtag generator</Link>.
             </li>
           </ul>
         ),
@@ -161,6 +162,10 @@ const config: ToolPageConfig = {
       q: "Can I use Instagram captions on Facebook?",
       a: "You can reuse the idea, but adapt the hook and call to action to the Facebook post. Facebook allows 63,206 characters, and this version omits Instagram's comment-keyword auto-DM option.",
     },
+    {
+      q: "When is the best time to post on Facebook?",
+      a: "Post when your audience is most active, then test a few slots and keep what works. Use the best time to post on Facebook finder for three starting slots for your time zone.",
+    },
   ],
   related: [
     "/tools/facebook-character-counter",
@@ -182,7 +187,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your captions are ready.",
     mark: "Schedule the post.",
-    text: "Connect your Facebook Page with its official login, plan your posts on one calendar and publish them automatically with Poskoo's <Link href=\"/facebook-scheduler\">Facebook scheduler</Link>.",
+    text: "Connect your Facebook Page with its official login, plan your posts on one calendar and publish them automatically with Poskoo's Facebook scheduler.",
   },
 };
 

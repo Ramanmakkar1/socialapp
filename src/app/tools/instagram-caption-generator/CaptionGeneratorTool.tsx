@@ -1711,7 +1711,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
   const isLinkedIn = platform === "linkedin";
   const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : "Instagram";
   const captionLimit = isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
-  const foldAt = isFacebook ? 480 : isLinkedIn ? 210 : FOLD_AT;
+  const foldAt = isFacebook ? 125 : isLinkedIn ? 210 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1769,10 +1769,11 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
       // Joined with real line breaks
       const fullText = [hookPart, ...bodyLines, ctaPart].join("\n\n");
       let text = fullText.replace(/Instagram/g, platformName);
+      if (isFacebook) text = text.replace(/link in (my |the )?bio/gi, "link below");
       if (isLinkedIn) text = text.replace(/link in bio/gi, "link in the comments");
       return text;
     });
-  }, [goal, tone, topic, addEmojis, useCommentCta, isLinkedIn, platformName, shuffleKey]);
+  }, [goal, tone, topic, addEmojis, useCommentCta, isFacebook, isLinkedIn, platformName, shuffleKey]);
 
   async function handleCopy(index: number, text: string) {
     try {
@@ -2059,7 +2060,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
               {isTikTok
                 ? "Only the first line or so shows over the video before “more”. Keep the hook short."
                 : isFacebook
-                  ? `About the first ${foldAt} characters show before “See more” on desktop. That cut-off varies by device.`
+                  ? "About the first 125 characters show before “See more” on mobile. Put the point first."
                   : isLinkedIn
                     ? `About the first ${foldAt} characters show before “…see more” on LinkedIn. That cut-off varies by device.`
                     : `About the first ${foldAt} characters show before “… more” in the feed. That cut-off varies by device.`}
