@@ -137,7 +137,7 @@ const config: ToolPageConfig = {
       a: "No. A Threads post must be 500 characters or fewer. Shorten your draft until the remaining count reaches zero or above and the progress bar is no longer red.",
     },
   ],
-  related: ["/tools/threads-post-preview", "/tools/linkedin-character-counter", "/tools/instagram-caption-counter"],
+  related: ["/tools/threads-post-preview", "/tools/linkedin-character-counter", "/tools/instagram-caption-counter", "/tools/threads-thread-maker"],
   schema: {
     features: [
       "Threads 500-character post and 150-character bio limits",

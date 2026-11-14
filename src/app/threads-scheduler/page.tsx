@@ -179,6 +179,7 @@ export default function ThreadsSchedulerPage() {
             Check your caption against the 500-character and 5-link limits with the <Link className={s.vlink} href="/tools/threads-character-counter">Threads character counter</Link>.
             {" "}Not sure when to post? Try the free <Link className={s.vlink} href="/tools/best-time-to-post-on-threads">best time to post on Threads</Link> finder.
             {" "}Want a better profile? Use the free <Link className={s.vlink} href="/tools/threads-bio-generator">Threads bio generator</Link>.
+            {" "}Have a long draft? Split it into numbered posts with the <Link className={s.vlink} href="/tools/threads-thread-maker">Threads thread maker</Link>.
           </p>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             Also planning Instagram or Facebook? See the{" "}

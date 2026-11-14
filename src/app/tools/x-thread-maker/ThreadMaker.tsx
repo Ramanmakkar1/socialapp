@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { Check, Copy, Eraser, ListOrdered, Type } from "lucide-react";
 import { countX, X_LIMIT } from "@/lib/xCharCount";
+import { countThreads, THREADS_LIMITS } from "@/lib/threadsCharCount";
 
 const SAMPLE =
   "Posting at the right time is easier when you plan ahead. A content calendar turns a pile of ideas into a steady schedule you can actually keep up with.\n\nStart by choosing the days and times your audience is most active. Then write each post in advance, add the image or link, and let the queue publish it for you.\n\nScheduling also gives you room to review your wording before it goes live. You can check the character count, fix a typo, and make sure every link works.\n\nKeep a few slots open for timely posts. When news breaks or a conversation takes off, you can still join in without breaking your routine.\n\nReview your results each week. Keep the formats that get replies and saves, and drop the ones that do not. Small adjustments add up over time.";
@@ -13,10 +14,10 @@ const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tr
 
 type Style = "end" | "start";
 
-function pack(paragraphs: string[], suffixLength: number): string[] {
+function pack(paragraphs: string[], suffixLength: number, limit: number, count: (value: string) => number): string[] {
   const posts: string[] = [];
   let current = "";
-  const fits = (value: string) => countX(value + " ".repeat(suffixLength)).weighted <= X_LIMIT;
+  const fits = (value: string) => count(value + " ".repeat(suffixLength)) <= limit;
 
   function pushCurrent() {
     if (current.trim()) posts.push(current.trim());
@@ -81,7 +82,7 @@ function pack(paragraphs: string[], suffixLength: number): string[] {
   return posts;
 }
 
-function splitThread(text: string, numbering: boolean, style: Style): string[] {
+function splitThread(text: string, numbering: boolean, style: Style, limit: number, count: (value: string) => number): string[] {
   const paragraphs = text
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.trim())
@@ -92,7 +93,7 @@ function splitThread(text: string, numbering: boolean, style: Style): string[] {
   let posts: string[] = [];
   for (let attempt = 0; attempt < 6; attempt += 1) {
     const suffixLength = numbering ? ` ${total}/${total}`.length : 0;
-    posts = pack(paragraphs, suffixLength);
+    posts = pack(paragraphs, suffixLength, limit, count);
     if (posts.length === total) break;
     total = posts.length;
   }
@@ -113,15 +114,19 @@ function CountCard({ label, value, icon: Icon }: { label: string; value: number;
   );
 }
 
-export default function ThreadMaker() {
+export default function ThreadMaker({ platform = "x" }: { platform?: "x" | "threads" }) {
   const [text, setText] = useState(SAMPLE);
   const [numbering, setNumbering] = useState(true);
   const [style, setStyle] = useState<Style>("end");
   const [copied, setCopied] = useState<number | "all" | null>(null);
   const id = useId();
 
-  const posts = splitThread(text, numbering, style);
-  const totalCharacters = posts.reduce((sum, post) => sum + countX(post).weighted, 0);
+  const isThreads = platform === "threads";
+  const limit = isThreads ? THREADS_LIMITS.post : X_LIMIT;
+  const count = (value: string) => (isThreads ? countThreads(value).chars : countX(value).weighted);
+
+  const posts = splitThread(text, numbering, style, limit, count);
+  const totalCharacters = posts.reduce((sum, post) => sum + count(post), 0);
 
   async function copy(value: string, key: number | "all") {
     try {
@@ -178,7 +183,9 @@ export default function ThreadMaker() {
             </label>
           </div>
           <p className="mt-2 text-xs text-[#5f5873]">
-            Posts are split at sentence breaks and kept under 280 weighted characters, with links counted as 23 and emoji as 2.
+            {isThreads
+              ? "Posts are split at sentence breaks and kept under 500 characters, counted by code point."
+              : "Posts are split at sentence breaks and kept under 280 weighted characters, with links counted as 23 and emoji as 2."}
           </p>
         </div>
 
@@ -206,15 +213,15 @@ export default function ThreadMaker() {
       <div className="space-y-3">
         {posts.length ? (
           posts.map((post, index) => {
-            const count = countX(post).weighted;
-            const over = count > X_LIMIT;
+            const postCount = count(post);
+            const over = postCount > limit;
             return (
               <article key={index} className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-semibold uppercase tracking-wide text-[#5f5873]">Post {index + 1}</span>
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-semibold tabular-nums ${over ? "text-[var(--poskoo-red)]" : "text-[#5f5873]"}`}>
-                      {count}/{X_LIMIT}
+                      {postCount}/{limit}
                     </span>
                     <button type="button" className={ghostBtn} onClick={() => copy(post, index)}>
                       {copied === index ? <Check className="h-4 w-4 text-[var(--poskoo-green)]" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
