@@ -7,9 +7,9 @@ const config: ToolPageConfig = {
   path: "/tools/x-hashtag-generator",
   name: "X (Twitter) hashtag generator",
   crumb: "X (Twitter) hashtag generator",
-  title: "Free X (Twitter) Hashtag Generator: Copy 1-3 Tags",
+  title: "X Hashtag Generator: Free Twitter Hashtags for Posts",
   description:
-    "Free X (Twitter) hashtag generator: pick your niche, mix broad and specific tags and copy 1 to 3 hashtags that fit the 280-character limit.",
+    "Free X (Twitter) hashtag generator: pick your niche, add your keyword and copy 1 to 3 relevant hashtags that fit the 280-character limit. No signup.",
   pill: "Free · no signup · no AI or scraping",
   h1: { before: "X (Twitter) hashtag generator:", mark: "copy 1 to 3 tags", after: "that fit 280 characters" },
   lede: "Use 1 to 2 relevant hashtags per X post; each one counts toward the 280-character limit. Pick your niche, choose how broad or specific the mix should be, and copy a clean set of 1 to 3 hashtags for your X posts. Hand-curated tags, generated in your browser.",
@@ -146,6 +146,20 @@ const config: ToolPageConfig = {
         ),
       },
       {
+        title: "Check the post before you schedule it",
+        body: (
+          <>
+            <p>
+              Hashtags are only one part of an X post. Before you publish, check the whole post with the{" "}
+              <Link href="/tools/x-character-counter">X character counter</Link> and see how it looks in the feed with the{" "}
+              <Link href="/tools/x-post-preview">X post preview</Link>. If you are planning ahead, the{" "}
+              <Link href="/tools/best-time-to-post-on-x">best time to post on X</Link> finder gives you three starting
+              slots, and the <Link href="/x-scheduler">X scheduler</Link> publishes the post for you at the time you pick.
+            </p>
+          </>
+        ),
+      },
+      {
         title: "Example: a small set for a small-business post",
         body: (
           <>
@@ -189,8 +203,12 @@ const config: ToolPageConfig = {
       a: "Yes. The generator builds your set and copies it in your browser without uploading your keyword, using AI or scraping X. Choose Copy selected to copy the set, or select the plain text if clipboard access is unavailable.",
     },
     {
+      q: "Do hashtags count toward the 280-character limit?",
+      a: "Yes. Every hashtag, including the # symbol, counts toward the 280-character limit on a free X account. A short tag such as #smallbusiness uses 14 characters, so 1 to 2 tags leave most of the post for your message. Check the total with the X character counter before you post.",
+    },
+    {
       q: "How do I find the best time to post on X?",
-      a: "Use the <Link href=\"/tools/best-time-to-post-on-x\">best time to post on X</Link> finder to get three starting slots for your audience and time zone, then test them for two weeks and keep what works.",
+      a: "Use the best time to post on X finder to get three starting slots for your audience and time zone, then test them for two weeks and keep what works.",
     },
   ],
   related: [
@@ -212,7 +230,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your hashtags are ready.",
     mark: "Schedule the post.",
-    text: "Connect X with its official login, plan your posts on one calendar and publish them automatically with Poskoo's <Link href=\"/x-scheduler\">X scheduler</Link>.",
+    text: "Connect X with its official login, plan your posts on one calendar and publish them automatically with Poskoo's X scheduler.",
   },
 };
 

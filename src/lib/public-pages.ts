@@ -547,7 +547,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/youtube-hashtag-generator": "Free YouTube hashtag generator: pick your niche, mix broad and specific tags and copy 3 to 15 hashtags for your video description and Shorts in one click.",
   "/tools/facebook-hashtag-generator": "Free Facebook hashtag generator: pick your niche, mix broad and specific tags and copy 1 to 5 hashtags for your Facebook posts, Reels and Page updates.",
   "/tools/facebook-caption-generator": "Free Facebook caption generator: enter a topic, pick a goal and tone, and copy six post captions with a hook and call to action. No signup, no AI.",
-  "/tools/x-hashtag-generator": "Free X (Twitter) hashtag generator: pick your niche, mix broad and specific tags and copy 1 to 3 hashtags that fit the 280-character limit.",
+  "/tools/x-hashtag-generator": "Free X (Twitter) hashtag generator: pick your niche, add your keyword and copy 1 to 3 relevant hashtags that fit the 280-character limit. No signup.",
   "/tools/x-thread-maker": "Paste long text and this free Twitter thread maker splits it into numbered X posts of up to 280 characters at sentence breaks. Copy each post. No signup.",
   "/tools/threads-thread-maker": "Paste long text and this free Threads thread maker splits it into numbered posts of up to 500 characters at sentence breaks. Copy each post. No signup.",
   "/tools/pinterest-hashtag-generator": "Free Pinterest hashtag generator: pick your niche, mix broad and specific tags and copy 2 to 5 relevant hashtags for your Pin descriptions in one click.",
