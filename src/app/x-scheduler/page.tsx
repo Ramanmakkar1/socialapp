@@ -266,6 +266,7 @@ export default function XSchedulerPage() {
             check your post with the <Link className={s.vlink} href="/tools/x-character-counter">X character counter</Link>, preview it with the <Link className={s.vlink} href="/tools/x-post-preview">X post preview</Link> and pick tags with the <Link className={s.vlink} href="/tools/x-hashtag-generator">X hashtag generator</Link>.
             Check your profile header with the <Link className={s.vlink} href="/tools/x-header-size-checker">X header size checker</Link>.
             Style a post or bio with the <Link className={s.vlink} href="/tools/x-font-generator">X font generator</Link>.
+            Start from a draft with the <Link className={s.vlink} href="/tools/x-post-generator">free X post generator</Link>.
             Split long posts with the <Link className={s.vlink} href="/tools/x-thread-maker">Twitter thread maker</Link>.
             Measure results with the <Link className={s.vlink} href="/tools/x-engagement-rate-calculator">X engagement rate calculator</Link>.
             Need a profile refresh? Try the <Link className={s.vlink} href="/tools/x-bio-generator">free X bio generator</Link>.
