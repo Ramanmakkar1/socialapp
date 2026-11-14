@@ -8,6 +8,7 @@ import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import ToolsHeroIllustration from "@/components/ToolsHeroIllustration";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
+import { publisherRef } from "@/lib/tool-schema";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: "Poskoo Features: Scheduling, Auto-DM & AI Captions" },
@@ -56,6 +57,27 @@ const jsonLd = {
       name: "Everything Poskoo does, in one place.",
       inLanguage: "en",
       isPartOf: { "@id": BRAND.url + "#website" },
+      mainEntity: { "@id": BRAND.url + "#app" },
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": BRAND.url + "#app",
+      name: BRAND.name,
+      description: BRAND.description,
+      url: BRAND.url + "/features",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      isAccessibleForFree: true,
+      featureList: [
+        "Schedule and auto-publish to Instagram, Facebook Pages, Threads and YouTube",
+        "Week and month content calendar",
+        "Instagram comment-to-DM automation",
+        "AI captions and DM message ideas",
+        "Lead capture from DMs",
+        "Free Instagram tools",
+      ],
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      publisher: publisherRef(),
     },
   ],
 };
