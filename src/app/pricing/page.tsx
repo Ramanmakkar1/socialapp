@@ -122,7 +122,7 @@ export default function PricingPage() {
                   {p.items.map((item) => (
                     <li key={item.text}>
                       <Check />
-                      <span>{item.text}{item.soon ? <small className="soon"> · coming soon</small> : null}</span>
+                      <span>{item.text}{item.soon ? <small className="soon"> · launching soon</small> : null}</span>
                     </li>
                   ))}
                 </ul>

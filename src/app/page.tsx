@@ -61,7 +61,7 @@ const pageJsonLd = (faqs: { q: string; a: string }[], r: PlanReadiness) => ({
 });
 
 export default function Home() {
-// Paid plans / AI items: "Coming soon" until featureReadiness says they're switched on.
+// Paid plans / AI items: "Launching soon" until featureReadiness says they're switched on.
 const r = planReadiness();
 const plans = plansFor(r);
 const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
@@ -256,7 +256,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
           {p.items.map((item) => (
             <li key={item.text}>
               <svg width="16" height="16"><use href="#ok"/></svg>
-              <span>{item.text}{item.soon ? <small className="soon"> · coming soon</small> : null}</span>
+              <span>{item.text}{item.soon ? <small className="soon"> · launching soon</small> : null}</span>
             </li>
           ))}
         </ul>

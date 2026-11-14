@@ -32,7 +32,7 @@ function itemFor(plan: Plan, matches: string[]) {
 function limitFor(plan: Plan, matches: string[]) {
   const item = itemFor(plan, matches);
   if (!item) return "—";
-  return item.soon ? `${item.text} (coming soon)` : item.text;
+  return item.soon ? `${item.text} (launching soon)` : item.text;
 }
 
 const allRows: { label: string; value: (plan: Plan) => string }[] = [
