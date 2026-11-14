@@ -492,6 +492,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/youtube-thumbnail-size-checker": "Free YouTube thumbnail size checker: upload an image to test the 1280x720 size, 16:9 ratio, 640 px minimum width and 2 MB limit before you upload.",
   "/tools/youtube-banner-size-checker": "Free YouTube banner size checker: test channel art against 2560x1440, the 2048x1152 minimum, 6 MB limit and 1546x423 safe area right in your browser.",
   "/tools/linkedin-banner-size-checker": "Free LinkedIn banner size checker: test your profile banner against 1584x396 (4:1) and the 8 MB limit, with a preview of the profile photo overlap.",
+  "/tools/linkedin-post-image-size-checker": "Check a LinkedIn post image in seconds: see its exact pixels and ratio, preview it in a 1.91:1 feed frame and find out if it matches 1200 x 627. Free.",
   "/tools/linkedin-profile-picture-size-checker": "Free LinkedIn profile picture size checker: check a photo is square, at least 400x400 px, under 8 MB and safe inside the circle crop before you upload it.",
   "/tools/youtube-profile-picture-size-checker": "Free YouTube profile picture size checker: check a channel photo is square, at least 800x800 px, under 4 MB and safe inside the 98x98 circle crop.",
   "/tools/tiktok-profile-picture-size-checker": "Free TikTok profile picture size checker: check a photo is square, at least 200x200 px and safe inside the circle crop TikTok shows on your profile and comments.",
