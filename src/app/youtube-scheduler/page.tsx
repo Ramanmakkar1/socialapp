@@ -248,7 +248,7 @@ export default function YouTubeSchedulerPage() {
             <article className="pcard">
               <span className="no">01 / Shorts</span>
               <h3>Schedule videos and Shorts together</h3>
-              <p>Plan standard YouTube uploads and Shorts on the same calendar. Turn on the Short option for each Short you want to publish.</p>
+              <p>Plan standard YouTube uploads and Shorts on the same calendar. Turn on the Short option for each Short you want to publish. Before you upload, check the file with the <Link className={s.vlink} href="/tools/youtube-shorts-size-checker">YouTube Shorts size checker</Link>.</p>
             </article>
             <article className="pcard">
               <span className="no">02 / Privacy</span>

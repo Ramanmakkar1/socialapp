@@ -7,12 +7,12 @@ const config: ToolPageConfig = {
   path: "/tools/youtube-shorts-size-checker",
   name: "YouTube Shorts size checker",
   crumb: "YouTube Shorts size checker",
-  title: "YouTube Shorts Size Checker: 1080 × 1920 and 9:16 Ratio",
+  title: "YouTube Shorts Size Checker: 1080 × 1920, 9:16 (Free)",
   description:
-    "The best YouTube Shorts size is 1080 × 1920 pixels in a 9:16 frame. Load a clip to check its exact pixels, aspect ratio and length before you post. Free.",
+    "YouTube Shorts should be 1080 × 1920 pixels (9:16 vertical) and up to 3 minutes long. Load a clip to check its exact pixels, ratio and length. Free.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "YouTube Shorts size checker", after: "(1080 × 1920)" },
-  lede: "The best YouTube Shorts size is 1080 × 1920 pixels in a 9:16 vertical frame.",
+  lede: "YouTube Shorts should be 1080 × 1920 pixels (9:16 vertical) and up to 3 minutes long.",
   art: "visual",
   artLabel: "A creator measures a vertical video frame next to a phone showing a 9:16 Short",
   heroPoints: ["Exact pixels and ratio", "9:16 frame preview", "Nothing is uploaded"],
@@ -22,7 +22,7 @@ const config: ToolPageConfig = {
   steps: [
     {
       title: "Load a Shorts video",
-      text: "Choose an MP4, MOV or WebM file with the Load a Shorts video button. It is read locally in your browser and never uploaded.",
+      text: "Choose an MP4, MOV or WebM file with the Load a YouTube Short button. It is read locally in your browser and never uploaded.",
       art: "visual",
     },
     {
@@ -82,7 +82,9 @@ const config: ToolPageConfig = {
             </ul>
             <p>
               Load your clip above to see its real pixels and ratio. If it is not 9:16, re-export or crop it to
-              1080 × 1920 before you upload.
+              1080 × 1920 before you upload. Once it checks out, schedule it with the{" "}
+              <Link href="/youtube-scheduler">YouTube scheduler</Link> and prepare a cover with the{" "}
+              <Link href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link>.
             </p>
           </>
         ),
@@ -93,7 +95,8 @@ const config: ToolPageConfig = {
           <>
             <p>
               YouTube only treats a video as a Short when it is square or vertical. A horizontal (16:9) video is not
-              treated as a Short, so it is published as a regular video instead of appearing in the Shorts feed.
+              treated as a Short, so it is published as a regular video instead of appearing in the Shorts feed. In
+              other words, a 1:1 square or any taller shape (such as 9:16) counts as a Short.
             </p>
             <p>
               If you want a horizontal clip in Shorts, place it on a 1080 × 1920 vertical background and keep the
@@ -114,8 +117,10 @@ const config: ToolPageConfig = {
         body: (
           <>
             <p>
-              A YouTube Short can be up to <b>3 minutes</b> long. Square or vertical videos up to 3 minutes count as
-              Shorts, so a clip that runs longer is published as a regular video.
+              A YouTube Short can be up to <b>3 minutes</b> long. YouTube raised the limit from 60 seconds to 3 minutes
+              in October 2024. Any square or vertical video up to 3 minutes counts as a Short, and clips longer than
+              60 seconds must be square or vertical to qualify. A clip that runs longer, or a horizontal clip, is
+              published as a regular video.
             </p>
             <p>
               This checker compares your clip with a <b>3-minute</b> limit. If the Length result is over 3 minutes,
@@ -136,7 +141,7 @@ const config: ToolPageConfig = {
               Keep faces, text and products away from those edges and toward the middle of the 9:16 frame. The preview
               above fits your whole clip into the phone shape so you can see the space the interface will use. For a
               dedicated overlay view, try the{" "}
-              <Link href="/tools/instagram-safe-zone-checker">safe zone checker</Link>.
+              <Link href="/tools/youtube-shorts-safe-zone-checker">YouTube Shorts safe zone checker</Link>.
             </p>
           </>
         ),
@@ -146,20 +151,20 @@ const config: ToolPageConfig = {
   faqTitle: "YouTube Shorts size questions",
   faqs: [
     {
-      q: "What is the best YouTube Shorts size?",
+      q: "What size is a YouTube Short?",
       a: "1080 × 1920 pixels in a 9:16 vertical frame. That fills a phone screen without cropping or bars. Any 9:16 video fills the frame, but 1080 × 1920 is the sharpest common export.",
     },
     {
-      q: "Does my YouTube Short have to be exactly 1080 × 1920?",
-      a: "No, but it is the safest choice. Any 9:16 video fills the frame. Videos smaller than 1080 × 1920 can look soft, and videos with a different shape get cropped or padded with bars.",
+      q: "How long can a Short be?",
+      a: "Up to 3 minutes. YouTube raised the limit from 60 seconds to 3 minutes in October 2024. Clips longer than 60 seconds must be square or vertical to count as a Short.",
     },
     {
-      q: "What happens if I upload a horizontal video to YouTube Shorts?",
-      a: "YouTube does not treat horizontal videos as Shorts, so it publishes as a regular video instead of appearing in the Shorts feed. Crop or re-export the clip at 1080 × 1920 to make it a Short.",
+      q: "Can a Short be horizontal?",
+      a: "No. YouTube only counts square (1:1) or taller videos as Shorts. A horizontal 16:9 video is published as a regular video, so crop it to 9:16 or place it on a vertical background first.",
     },
     {
-      q: "How long can a YouTube Short be?",
-      a: "Up to 3 minutes. Square or vertical videos up to 3 minutes count as Shorts, and anything longer is published as a regular video. Trim the clip or upload it as a regular video.",
+      q: "Does Poskoo schedule Shorts?",
+      a: "Yes. Poskoo schedules YouTube Shorts through the official YouTube Data API. Connect your channel, add your video details, mark it as a Short and Poskoo uploads it at your chosen time.",
     },
   ],
   related: [
@@ -196,8 +201,8 @@ export default function YouTubeShortsSizeCheckerPage() {
         ratioW={9}
         ratioH={16}
         maxSeconds={180}
-        durationNote="YouTube Shorts can be up to 3 minutes long; square or vertical videos up to 3 minutes count as Shorts."
-        inputLabel="Load a Shorts video"
+        durationNote="YouTube Shorts can be up to 3 minutes long. Clips over 60 seconds must be square or vertical to count as a Short."
+        inputLabel="Load a YouTube Short"
       />
     </ToolPageTemplate>
   );
