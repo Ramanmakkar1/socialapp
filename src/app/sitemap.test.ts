@@ -93,6 +93,19 @@ test("every sitemap URL is indexable", () => {
   }
 });
 
+test("admin descendants inherit noindex and stay out of the production sitemap", () => {
+  const adminLayoutSource = readFileSync("src/app/admin/layout.tsx", "utf8");
+  assert.ok(adminLayoutSource.includes("export const metadata: Metadata = { robots: { index: false, follow: false } };"), "admin layout must pass noindex and nofollow to its descendants");
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const paths = sitemap().map((entry) => entry.url.slice(BRAND.url.length));
+    assert.ok(!paths.some((path) => path === "/admin" || path.startsWith("/admin/")), "no /admin URL may be in the sitemap");
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
 test("sitemap and layout share the same indexability helper", () => {
   const sitemapSource = readFileSync("src/app/sitemap.ts", "utf8");
   const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
