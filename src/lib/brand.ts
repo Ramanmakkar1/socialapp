@@ -7,9 +7,9 @@ export const BRAND = {
   description:
     "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
-  // Search launch authorized by Raman on 2026-11-12: pages are indexable and the sitemap is live.
-  // Set back to false only to take the whole site out of search (noindex everywhere, empty sitemap).
-  indexable: true,
+  // Socialapp remains staging/noindex until Raman moves it to the new domain.
+  // Keep this false site-wide: noindex everywhere and an empty sitemap.
+  indexable: false,
   supportEmail: "hello@poskoo.com",
   // Official Poskoo profiles (Organization sameAs). Add each new one here.
   social: [

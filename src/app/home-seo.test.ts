@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import sitemap from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
+import { isPathIndexable } from "@/lib/indexability";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 
 // page.tsx imports next/font and a CSS module, so it cannot be imported in a
@@ -10,10 +11,15 @@ import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 const pageSource = readFileSync("src/app/page.tsx", "utf8");
 const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
 
-test("site is launched: indexable, sitemap lists the home page", () => {
-  assert.equal(BRAND.indexable, true);
+test("staging homepage is noindex and excluded from the sitemap", () => {
+  assert.equal(BRAND.indexable, false);
+  assert.equal(isPathIndexable("/"), false, "home page must be noindex while staging");
+  assert.ok(
+    layoutSource.includes('robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false }'),
+    "root layout must emit noindex from the shared indexability helper",
+  );
   const urls = sitemap().map((e) => e.url);
-  assert.ok(urls.includes(`${BRAND.url}/`), "sitemap must include the home page");
+  assert.equal(urls.includes(`${BRAND.url}/`), false, "sitemap must exclude the home page");
   assert.ok(!urls.some((u) => u.includes("/app/") || u.endsWith("/login") || u.endsWith("/signup")), "private pages must stay out");
 });
 

@@ -68,10 +68,10 @@ test("sitemap is empty for both audited host aliases while staging is noindex", 
   }
 });
 
-test("launched: sitemap lists the home page and robots points to the sitemap", () => {
-  assert.equal(BRAND.indexable, true);
-  assert.ok(sitemap().some((e) => e.url === `${BRAND.url}/`));
-  assert.equal(robots().sitemap, `${BRAND.url}/sitemap.xml`);
+test("staging: sitemap omits the home page and robots omits the sitemap", () => {
+  assert.equal(BRAND.indexable, false);
+  assert.equal(sitemap().some((e) => e.url === `${BRAND.url}/`), false);
+  assert.equal("sitemap" in robots(), false);
 });
 
 test("llms.txt uses the same isPathIndexable helper as the sitemap", () => {
