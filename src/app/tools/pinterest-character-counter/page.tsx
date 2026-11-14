@@ -142,7 +142,7 @@ const config: ToolPageConfig = {
       a: "Descriptions over 500 characters are truncated. In feeds, Pinterest often shows only the opening line, so put your best words in the first sentence.",
     },
   ],
-  related: ["/tools/best-time-to-post-on-pinterest", "/tools/social-media-image-sizes", "/tools/social-media-content-calendar"],
+  related: ["/tools/pinterest-hashtag-generator", "/tools/best-time-to-post-on-pinterest", "/tools/social-media-image-sizes", "/tools/social-media-content-calendar"],
   schema: {
     features: [
       "Pin title 100-character limit",

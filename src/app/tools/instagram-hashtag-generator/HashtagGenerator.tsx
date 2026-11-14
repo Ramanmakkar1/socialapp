@@ -66,9 +66,10 @@ const PLATFORM = {
   youtube: { min: 1, max: 15, start: 3, note: "YouTube shows the first 3 hashtags from your description above or below the title. Use 3 to 5 that fit the video. A video with more than 60 hashtags has all its hashtags ignored." },
   facebook: { min: 1, max: 5, start: 3, note: "Facebook has no hashtag cap, but 1 to 3 relevant hashtags per post works best. Long hashtag blocks can look spammy." },
   x: { min: 1, max: 3, start: 2, note: "X counts every hashtag toward the 280-character limit. 1 to 2 relevant hashtags per post works best; more can look spammy." },
+  pinterest: { min: 2, max: 20, start: 5, note: "Pinterest allows up to 20 hashtags in a Pin description, but search mostly uses your title and description keywords. 2 to 5 relevant hashtags is plenty." },
 } as const;
 
-export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" | "youtube" | "facebook" | "x" }) {
+export default function HashtagGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" | "youtube" | "facebook" | "x" | "pinterest" }) {
   const id = useId();
   const cfg = PLATFORM[platform];
   const [niche, setNiche] = useState(platform === "linkedin" || platform === "facebook" || platform === "x" ? "small-business" : "fitness");
