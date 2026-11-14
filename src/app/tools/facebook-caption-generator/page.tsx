@@ -7,11 +7,11 @@ const config: ToolPageConfig = {
   path: "/tools/facebook-caption-generator",
   name: "Facebook caption generator",
   crumb: "Facebook caption generator",
-  title: "Facebook Caption Generator: Free Captions for Posts",
+  title: "Facebook Caption Generator: Free Post Captions Online",
   description:
-    "Free Facebook caption generator: enter a topic, pick a goal and tone, and copy six post captions with a hook and call to action. No signup, no AI.",
+    "Free Facebook caption generator: enter your topic, pick a goal and tone and copy six post captions with a hook and call to action. No signup or login.",
   pill: "Free · no signup · no AI or scraping",
-  h1: { before: "Facebook caption generator:", mark: "free captions", after: "with hooks" },
+  h1: { before: "Facebook caption generator:", mark: "free post captions", after: "in seconds" },
   lede: "Generate six Facebook caption drafts from your topic, goal and tone. Each one has a short hook and a call to action, runs in your browser and is ready to copy.",
   art: "writing",
   artLabel: "A Page owner writes Facebook captions with a hook, call to action and feed preview",
@@ -82,7 +82,8 @@ const config: ToolPageConfig = {
           <>
             <p>
               A Facebook post can be up to <b>63,206 characters</b>, including spaces, hashtags, mentions and line
-              breaks. That is a maximum, not a target: use enough words to explain the post and give readers a next step.
+              breaks. That is a maximum, not a target: short posts with a question are easier to read and reply to, so
+              use enough words to explain the post and give readers a next step.
             </p>
             <p>
               On mobile, only about the first <b>125 characters</b> show before <b>See more</b>. Put the topic or hook
@@ -102,9 +103,10 @@ const config: ToolPageConfig = {
               caption text gives Facebook and readers useful context about the subject.
             </p>
             <p>
-              Hashtags can add more context, but they do not replace a descriptive sentence. Build a small, relevant set
-              with the <Link href="/tools/facebook-hashtag-generator">Facebook hashtag generator</Link>, and remove
-              anything that does not describe the post.
+              Hashtags can add more context, but they do not replace a descriptive sentence. Use <b>1-3 hashtags</b> that
+              fit the post. Build a small, relevant set with the{" "}
+              <Link href="/tools/facebook-hashtag-generator">Facebook hashtag generator</Link>, and remove anything that
+              does not describe the post.
             </p>
           </>
         ),
@@ -159,8 +161,8 @@ const config: ToolPageConfig = {
       a: "No. It combines fixed caption templates in your browser using your topic, goal, tone and emoji choice. It does not upload your text, call an AI service or scrape Facebook.",
     },
     {
-      q: "Can I use Instagram captions on Facebook?",
-      a: "You can reuse the idea, but adapt the hook and call to action to the Facebook post. Facebook allows 63,206 characters, and this version omits Instagram's comment-keyword auto-DM option.",
+      q: "Is there a Facebook post generator too?",
+      a: "Yes. This tool writes full Facebook post captions: give it a topic, goal and tone and it creates six drafts with a hook, body and call to action, ready to copy or edit before you publish.",
     },
     {
       q: "When is the best time to post on Facebook?",
@@ -169,9 +171,10 @@ const config: ToolPageConfig = {
   ],
   related: [
     "/tools/facebook-character-counter",
-    "/tools/facebook-hashtag-generator",
     "/tools/facebook-post-preview",
+    "/tools/facebook-hashtag-generator",
     "/tools/best-time-to-post-on-facebook",
+    "/tools/facebook-cover-photo-size-checker",
   ],
   schema: {
     features: [
