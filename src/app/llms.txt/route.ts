@@ -45,7 +45,7 @@ export async function GET() {
   });
 
   // Only channels that can actually be connected on this server are listed as working; the rest
-  // carry the same "awaiting approval" / "coming soon" wording the Connect dialog shows.
+  // carry the same "awaiting approval" / "not available yet" wording the Connect dialog shows.
   const nets = networkAvailability();
   const statuses = channelStatuses(
     { tiktok: nets.tiktok, pinterest: nets.pinterest, x: nets.x, gbp: nets.gbp, linkedin_pages: false },
@@ -104,7 +104,7 @@ export async function GET() {
     "- Link-in-bio page with your links.",
     cardPayments
       ? "- Sell digital products with Stripe card checkout, or direct UPI payments to the seller for sellers in India."
-      : "- Sell digital products: direct UPI payments to the seller work today for sellers in India; card checkout for sellers is coming soon.",
+      : "- Sell digital products: direct UPI payments to the seller work today for sellers in India; card checkout for sellers is not available yet.",
     "- Refer and earn: +500 bonus auto-DMs a month for each referred user who connects an account.",
     "- Free browser tools (caption counters, hashtag and bio generators, image size guides) with no sign-up.",
     "",
@@ -115,8 +115,8 @@ export async function GET() {
     "",
     "## Not available yet",
     "",
-    ...(aiReplies ? [] : ["- AI replies to DMs: coming soon."]),
-    `- ${list(soon)}: coming soon.`,
+    ...(aiReplies ? [] : ["- AI replies to DMs: not available yet."]),
+    `- ${list(soon)}: not available yet.`,
     "",
     ...pageSections,
   ].join("\n");
