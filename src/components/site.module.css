@@ -160,6 +160,58 @@
   min-width: 0;
 }
 
+/* 404 "Popular pages" grid: one column on phones, two on sm, three on lg. */
+.nfGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 640px) {
+  .nfGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .nfGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.nfCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  padding: 22px 24px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-card);
+  background: var(--poskoo-card);
+  box-shadow: var(--poskoo-shadow-card);
+  color: var(--poskoo-ink);
+  text-decoration: none;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.nfCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--poskoo-violet);
+  box-shadow: var(--poskoo-shadow-float);
+}
+.nfCard:focus-visible {
+  outline: 3px solid var(--poskoo-violet);
+  outline-offset: 2px;
+}
+.nfCard b {
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+.nfCard span {
+  color: var(--poskoo-muted);
+  font-size: .92rem;
+  line-height: 1.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nfCard { transition: none; }
+  .nfCard:hover { transform: none; }
+}
+
 /* Comparison tables (alternative pages). */
 .tableWrap {
   border: 1.5px solid var(--poskoo-line);
