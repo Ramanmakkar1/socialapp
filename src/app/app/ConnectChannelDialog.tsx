@@ -405,7 +405,7 @@ export default function ConnectChannelDialog({
                   <p className={cc.optionText}>Instagram has no posting API for personal accounts. Poskoo e-mails you the caption and files at the scheduled time; you post it in the app.</p>
                   {igRemind ? (
                     <button type="button" className={styles.connectSecondary} onClick={() => openStatus(net("instagram"), igRemind, "ig_personal")}>
-                      Coming soon. Learn more
+                      Needs e-mail reminders switched on. Learn more
                     </button>
                   ) : (
                     <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "ig_personal" })}>
@@ -441,7 +441,7 @@ export default function ConnectChannelDialog({
                   <p className={cc.optionText}>Meta removed posting to Groups from its API in April 2024, so no app can publish there. Poskoo e-mails you the post at the scheduled time, ready to paste.</p>
                   {groupRemind ? (
                     <button type="button" className={styles.connectSecondary} onClick={() => openStatus(net("facebook"), groupRemind, "fb_group")}>
-                      Coming soon. Learn more
+                      Needs e-mail reminders switched on. Learn more
                     </button>
                   ) : (
                     <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "reminder", platform: "fb_group" })}>

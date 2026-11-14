@@ -95,7 +95,7 @@ export async function connectReminderAction(_prev: ReminderConnectState, formDat
   const user = await requireUser();
   if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
   // Reminders are e-mails: without a mailer they would never arrive (src/lib/featureReadiness.ts).
-  if (!isFeatureReady("email")) return { error: "Reminder channels are coming soon: e-mail sending isn't switched on yet." };
+  if (!isFeatureReady("email")) return { error: "Reminder channels need e-mail sending, which isn't switched on on this server yet. Your other channels work as normal." };
   const platform = String(formData.get("platform") ?? "");
   if (!isReminderNetwork(platform)) return { error: "Choose Instagram or a Facebook group." };
   const parsed = parseReminderChannel(platform, String(formData.get("target") ?? "").slice(0, 300), String(formData.get("name") ?? ""));
