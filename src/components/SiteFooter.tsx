@@ -131,6 +131,7 @@ export function SiteFooter() {
           { href: "/x-scheduler", label: "X (Twitter) scheduler" },
           { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
           { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
+          { href: "/google-business-profile-scheduler", label: "Google Business Profile scheduler" },
           { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
         ]}
       />
