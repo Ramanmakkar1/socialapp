@@ -8,6 +8,7 @@ import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
+import { LandingDemo } from "@/app/LandingDemo";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 const PATH = "/social-media-scheduler";
@@ -128,6 +129,7 @@ const appJsonLd = {
     description,
     url: `${BRAND.url}${PATH}`,
   }),
+  "@id": `${BRAND.url}${PATH}#software`,
   featureList: [
     "Schedule posts to 10 social platforms from one calendar",
     "Official platform APIs and OAuth login",
@@ -139,10 +141,21 @@ const appJsonLd = {
   offers: softwareOffers(planReadiness()),
 };
 
+const webPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${BRAND.url}${PATH}#webpage`,
+  url: `${BRAND.url}${PATH}`,
+  name: title,
+  description,
+  isPartOf: { "@id": `${BRAND.url}#website` },
+  about: { "@id": `${BRAND.url}${PATH}#software` },
+};
+
 export default function SocialMediaSchedulerPage() {
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Social media scheduler", path: PATH }]}>
-      {[appJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd, webPageJsonLd, faqJsonLd(faqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -233,6 +246,12 @@ export default function SocialMediaSchedulerPage() {
               <Link key={tool.href} href={tool.href}>{tool.label}</Link>
             ))}
           </nav>
+        </div>
+      </section>
+
+      <section id="demo" style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <LandingDemo hideLink={PATH} />
         </div>
       </section>
 

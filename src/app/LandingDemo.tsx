@@ -45,7 +45,7 @@ function CommentPreview() {
 }
 
 /** `hideLink`: leave out the feature link that points at the page the demo sits on. */
-export function LandingDemo({ hideLink }: { hideLink?: "/instagram-scheduler" | "/instagram-auto-dm" } = {}) {
+export function LandingDemo({ hideLink }: { hideLink?: "/instagram-scheduler" | "/instagram-auto-dm" | "/social-media-scheduler" } = {}) {
   const [activeTab, setActiveTab] = useState<TabId>("schedule");
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
