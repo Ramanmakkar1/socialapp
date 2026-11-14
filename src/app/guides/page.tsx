@@ -56,8 +56,9 @@ export default function GuidesPage() {
             Grow on social media with <em className="s mark">practical guides</em>
           </h1>
           <p className="lede">
-            Plain-English guides on picking a niche, planning content, scheduling posts and turning comments into
-            leads. Sourced, honest and written for beginners and small businesses.
+            Instagram guides are step-by-step help for growth, scheduling and comment-to-lead automation. Plain-English
+            walkthroughs on picking a niche, planning content, scheduling posts and turning comments into leads,
+            sourced, honest and written for beginners and small businesses.
           </p>
           <div className="hero-art">
             <AnimArt name="writing" label="A creator writes on a giant phone screen with a big pencil while a puppy watches" />
