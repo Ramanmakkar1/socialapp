@@ -56,7 +56,7 @@ const config: ToolPageConfig = {
   guide: {
     title: "A practical guide to writing LinkedIn posts",
     intro:
-      "A strong LinkedIn post names the idea in the first line, gives readers a clear reason to keep reading and ends with a relevant next step. Use these drafts as a starting point, then add the details only you can supply.",
+      "A strong LinkedIn post names the idea in the first line, gives readers a clear reason to keep reading and ends with a relevant next step. Keep paragraphs short, add 3–5 relevant hashtags and finish with a question that invites replies. Use these drafts as a starting point, then add the details only you can supply. What will you write about first?",
     sections: [
       {
         title: "What this LinkedIn post generator does",
@@ -148,8 +148,8 @@ const config: ToolPageConfig = {
       a: "A LinkedIn post can be up to 3,000 characters. Spaces, punctuation, line breaks, hashtags and mentions all count. This generator shows each draft's character count against that limit.",
     },
     {
-      q: "Should LinkedIn posts include hashtags?",
-      a: "They can, but hashtags are optional. Start with a post that names the idea in plain words, then add a small set of relevant hashtags. Avoid tags that do not describe the post.",
+      q: "How many hashtags should I use on LinkedIn?",
+      a: "Use 3–5 relevant hashtags per post. Start with a post that names the idea in plain words, then add a small set of tags that describe the topic. Avoid tags that do not describe the post.",
     },
     {
       q: "Does this LinkedIn post generator use AI?",
