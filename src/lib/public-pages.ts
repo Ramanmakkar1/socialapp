@@ -591,7 +591,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/pinterest-hashtag-generator": "Free Pinterest hashtag generator: pick your niche and get 2-5 relevant hashtags for Pin descriptions, with a 500-character limit note. No signup needed.",
   "/tools/tiktok-caption-generator": "Free TikTok caption generator: enter your topic, pick a goal and tone, copy six captions with a short hook and call to action. Under TikTok's 4,000 limit.",
   "/tools/linkedin-post-generator": "Free LinkedIn post generator: enter a topic, pick a goal and tone, and copy six post drafts with a hook and call to action. Fits LinkedIn's 3,000 limit.",
-  "/tools/social-media-post-generator": "Free social media post generator: pick Instagram, TikTok, Facebook, LinkedIn, X or Pinterest, add your topic and get six drafts sized to each limit.",
+  "/tools/social-media-post-generator": "Free social media post generator for Instagram, TikTok, Facebook, LinkedIn, X, Threads and Pinterest: add a topic and copy six drafts sized to each limit.",
   "/tools/x-post-generator": "Free X post generator: enter a topic, choose a goal and tone, and copy six post drafts trimmed to X's 280-character limit, all in your browser.",
   "/tools/linkedin-hook-generator": "A LinkedIn hook is the first line people see before '...see more'. Type your topic and copy first lines in eight styles, sized for the first 210 characters.",
   "/tools/youtube-title-counter": "Free YouTube title and description counter with real limits, search previews, tag totals and warnings. Check your video details before you publish.",

@@ -8,7 +8,7 @@ const config: ToolPageConfig = {
   crumb: "Social media post generator",
   title: "Free Social Media Post Generator for Every Platform",
   description:
-    "Free social media post generator: pick Instagram, TikTok, Facebook, LinkedIn, X or Pinterest, add your topic and get six drafts sized to each limit.",
+    "Free social media post generator for Instagram, TikTok, Facebook, LinkedIn, X, Threads and Pinterest: add a topic and copy six drafts sized to each limit.",
   pill: "Free · no signup · no AI or scraping",
   h1: { before: "Social media", mark: "post generator" },
   lede: "The free social media post generator writes six ready-to-copy post drafts for Instagram, TikTok, Facebook, LinkedIn, X (Twitter) and Pinterest from one topic, each sized to that platform's character limit.",
@@ -180,10 +180,11 @@ const config: ToolPageConfig = {
   related: [
     "/tools/instagram-caption-generator",
     "/tools/tiktok-caption-generator",
-    "/tools/facebook-caption-generator",
     "/tools/linkedin-post-generator",
-    "/tools/pinterest-description-generator",
+    "/tools/facebook-caption-generator",
     "/tools/x-post-generator",
+    "/tools/threads-post-generator",
+    "/tools/pinterest-description-generator",
   ],
   schema: {
     features: [
