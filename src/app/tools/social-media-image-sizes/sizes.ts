@@ -5,6 +5,7 @@ export type Platform = {
   scheduler: string;
   note: string;
   rows: SizeRow[];
+  checkers?: { href: string; label: string }[];
 };
 
 export const platforms: Platform[] = [
@@ -19,6 +20,13 @@ export const platforms: Platform[] = [
       { format: "Story / Reel", size: "1080×1920", ratio: "9:16" },
       { format: "Profile photo", size: "320×320", ratio: "1:1" },
     ],
+    checkers: [
+      { href: "/tools/instagram-image-size", label: "Instagram image size guide" },
+      { href: "/tools/instagram-carousel-size-checker", label: "Instagram carousel size checker" },
+      { href: "/tools/instagram-story-size-checker", label: "Instagram Story size checker" },
+      { href: "/tools/instagram-profile-picture-size-checker", label: "Instagram profile picture size checker" },
+      { href: "/tools/instagram-safe-zone-checker", label: "Instagram safe zone checker" },
+    ],
   },
   {
     name: "Facebook",
@@ -31,6 +39,9 @@ export const platforms: Platform[] = [
       { format: "Story", size: "1080×1920", ratio: "9:16" },
       { format: "Page cover", size: "851×315", ratio: "2.7:1" },
       { format: "Profile photo", size: "176×176 minimum", ratio: "1:1" },
+    ],
+    checkers: [
+      { href: "/tools/facebook-cover-photo-size-checker", label: "Facebook cover photo size checker" },
     ],
   },
   {
@@ -53,6 +64,11 @@ export const platforms: Platform[] = [
       { format: "Company cover", size: "1128×191", ratio: "5.91:1" },
       { format: "Personal banner", size: "1584×396", ratio: "4:1" },
     ],
+    checkers: [
+      { href: "/tools/linkedin-post-image-size-checker", label: "LinkedIn post image size checker" },
+      { href: "/tools/linkedin-banner-size-checker", label: "LinkedIn banner size checker" },
+      { href: "/tools/linkedin-profile-picture-size-checker", label: "LinkedIn profile picture size checker" },
+    ],
   },
   {
     name: "X",
@@ -64,6 +80,9 @@ export const platforms: Platform[] = [
       { format: "Header", size: "1500×500", ratio: "3:1" },
       { format: "Profile photo", size: "400×400", ratio: "1:1" },
     ],
+    checkers: [
+      { href: "/tools/x-header-size-checker", label: "X header size checker" },
+    ],
   },
   {
     name: "TikTok",
@@ -73,12 +92,21 @@ export const platforms: Platform[] = [
       { format: "Video", size: "1080×1920", ratio: "9:16" },
       { format: "Profile photo", size: "200×200", ratio: "1:1" },
     ],
+    checkers: [
+      { href: "/tools/tiktok-video-size-checker", label: "TikTok video size checker" },
+      { href: "/tools/tiktok-photo-size-checker", label: "TikTok photo size checker" },
+      { href: "/tools/tiktok-profile-picture-size-checker", label: "TikTok profile picture size checker" },
+      { href: "/tools/tiktok-safe-zone-checker", label: "TikTok safe zone checker" },
+    ],
   },
   {
     name: "Pinterest",
     scheduler: "/pinterest-scheduler",
     note: "A vertical 2:3 Pin is the standard format and leaves enough room for a clear title or product image.",
     rows: [{ format: "Standard Pin", size: "1000×1500", ratio: "2:3" }],
+    checkers: [
+      { href: "/tools/pinterest-pin-size-checker", label: "Pinterest Pin size checker" },
+    ],
   },
   {
     name: "YouTube",
@@ -88,6 +116,12 @@ export const platforms: Platform[] = [
       { format: "Video thumbnail", size: "1280×720", ratio: "16:9" },
       { format: "Short", size: "1080×1920", ratio: "9:16" },
       { format: "Channel banner", size: "2560×1440 (safe area 1546×423)", ratio: "16:9" },
+    ],
+    checkers: [
+      { href: "/tools/youtube-thumbnail-size-checker", label: "YouTube thumbnail size checker" },
+      { href: "/tools/youtube-banner-size-checker", label: "YouTube banner size checker" },
+      { href: "/tools/youtube-shorts-size-checker", label: "YouTube Shorts size checker" },
+      { href: "/tools/youtube-profile-picture-size-checker", label: "YouTube profile picture size checker" },
     ],
   },
   {

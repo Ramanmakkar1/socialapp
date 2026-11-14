@@ -54,6 +54,7 @@ const TOOLS: FooterLink[] = [
   { href: "/tools/instagram-username-generator", label: "Instagram username generator" },
   { href: "/tools/instagram-caption-generator", label: "Instagram caption generator" },
   { href: "/tools/instagram-image-size", label: "Instagram image sizes" },
+  { href: "/tools/social-media-image-sizes", label: "Social media image sizes" },
   { href: "/tools/instagram-engagement-rate-calculator", label: "Instagram engagement calculator" },
   { href: "/tools/best-time-to-post-on-social-media", label: "Best time to post" },
   { href: "/tools/instagram-line-break-generator", label: "Instagram line breaks" },

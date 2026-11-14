@@ -63,6 +63,17 @@ const platformTables = platforms.map((platform) => (
       <h2 id={`${platform.name.toLowerCase()}-sizes`}>{platform.name} image sizes</h2>
       <p>{platform.note}</p>
       <p><Link href={platform.scheduler}>Schedule {platform.name} posts</Link></p>
+      {platform.checkers && platform.checkers.length > 0 && (
+        <p>
+          Check your image:{" "}
+          {platform.checkers.map((checker, index) => (
+            <span key={checker.href}>
+              {index > 0 && " · "}
+              <Link href={checker.href}>{checker.label}</Link>
+            </span>
+          ))}
+        </p>
+      )}
     </div>
     <SizeTable rows={platform.rows} label={`${platform.name} image sizes in pixels and aspect ratios`} />
   </section>
@@ -136,6 +147,7 @@ const config: ToolPageConfig = {
     "/tools/instagram-image-size",
     "/tools/instagram-carousel-size-checker",
     "/tools/instagram-safe-zone-checker",
+    "/tools/pinterest-pin-size-checker",
   ],
   schema: {
     category: "MultimediaApplication",
