@@ -29,14 +29,14 @@ export default function PaymentsNotice({ configured, account, payout = null }: {
   if (!configured) {
     return (
       <p role="status" className={`${ui.notice} ${ui.noticeSoon} mt-6`}>
-        <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span>{" "}
+        <span className={`${ui.pill} ${ui.pillSoon}`}>Not switched on yet</span>{" "}
         {route === "stripe" ? (
           <>
-            <strong>Card payments are coming soon.</strong> You can already create products; your buy links show &ldquo;Checkout coming soon&rdquo; until card payments are switched on.
+            <strong>Card payments aren&apos;t switched on yet.</strong> You can already create products; your buy links say card checkout isn&apos;t available yet until card payments are switched on.
           </>
         ) : (
           <>
-            <strong>Card payments are coming soon.</strong> In India you can sell with Direct UPI today. <Link href="/app/settings#payments-heading" className={ui.link}>Choose your country in Settings, Payments</Link>
+            <strong>Card payments aren&apos;t switched on yet.</strong> In India you can sell with Direct UPI today. <Link href="/app/settings#payments-heading" className={ui.link}>Choose your country in Settings, Payments</Link>
           </>
         )}
       </p>
