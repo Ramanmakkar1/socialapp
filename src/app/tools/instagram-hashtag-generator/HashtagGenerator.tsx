@@ -126,7 +126,7 @@ export default function HashtagGenerator({ platform = "instagram" }: { platform?
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `instagram-hashtags-${niche}.csv`;
+    a.download = `${platform}-hashtags-${niche}.csv`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }

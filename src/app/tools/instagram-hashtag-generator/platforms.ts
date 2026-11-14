@@ -8,6 +8,7 @@ export const PLATFORM = {
   facebook: { min: 1, max: 5, start: 3, note: "Facebook has no hashtag cap, but 1 to 3 relevant hashtags per post works best. Long hashtag blocks can look spammy." },
   x: { min: 1, max: 3, start: 2, note: "X counts every hashtag toward the 280-character limit. 1 to 2 relevant hashtags per post works best; more can look spammy." },
   pinterest: { min: 1, max: 10, start: 5, note: "Pinterest descriptions allow 500 characters. Hashtags are optional on Pinterest; 2 to 5 specific tags at the end of the description help people find your Pin through search, and keywords in the title and description matter more." },
+  threads: { min: 1, max: 1, start: 1, note: "Threads uses one topic tag per post. Pick the single tag that best describes the conversation; extra hashtags are not clickable topic tags." },
 } as const;
 
 export type HashtagPlatform = keyof typeof PLATFORM;

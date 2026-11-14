@@ -13,6 +13,7 @@ const ALL_ROWS: Row[] = [
   { key: "youtube", label: "YouTube", href: "/tools/youtube-hashtag-generator", recommended: "3–5 (first 3 shown)" },
   { key: "facebook", label: "Facebook", href: "/tools/facebook-hashtag-generator", recommended: "1–3" },
   { key: "x", label: "X (Twitter)", href: "/tools/x-hashtag-generator", recommended: "1–2" },
+  { key: "threads", label: "Threads", href: "/tools/threads-hashtag-generator", recommended: "1 topic tag" },
   { key: "pinterest", label: "Pinterest", href: "/tools/pinterest-hashtag-generator", recommended: "2–5" },
 ];
 
