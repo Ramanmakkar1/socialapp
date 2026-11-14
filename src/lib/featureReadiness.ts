@@ -1,5 +1,5 @@
 // Feature readiness: ONE place that decides, from environment configuration at RUNTIME, which
-// features are switched on for real users and which show an honest "Coming soon" state instead
+// features are switched on for real users and which show an honest "Not switched on yet" state instead
 // of a flow that would break (or quietly run in Stripe test mode, or "send" an e-mail nobody gets).
 //
 // Pure helpers (pass an env object; tests use plain objects). Server code calls them with
@@ -13,7 +13,7 @@
 // Rules:
 //   - `hard` requirements: without them the feature cannot work at all (never ready, even forced).
 //   - `launch` requirements: what production needs before real users get it (live Stripe keys,
-//     webhook secrets, the owner's go-ahead). Missing = "Coming soon" (the safe default).
+//     webhook secrets, the owner's go-ahead). Missing = "Not switched on yet" (the safe default).
 //   - FEATURE_FORCE_READY=billing,email (or "all") skips the launch requirements, for testing
 //     (e.g. a Stripe test-mode checkout locally). FEATURE_FORCE_SOON=... (or "all") turns features
 //     off whatever is configured; it wins over FORCE_READY.
@@ -109,19 +109,19 @@ export const FEATURE_COPY: Record<FeatureId, { title: string; body: string }> = 
     body: "Pro and Agency aren't on sale yet. Everything on the Free plan works today, and you'll never be charged without choosing a plan first.",
   },
   card_payments: {
-    title: "Card payments are coming soon",
+    title: "Card payments aren't switched on yet",
     body: "Selling by card through Stripe isn't switched on yet. You can already create products; buy links start taking card payments once it is. In India, Direct UPI works today.",
   },
   email: {
-    title: "Email is coming soon",
+    title: "E-mail sending isn't switched on yet",
     body: "Poskoo can't send e-mails yet (sign-in codes, reminders, receipts). Everything else keeps working.",
   },
   ai: {
-    title: "AI ideas are coming soon",
+    title: "AI ideas aren't switched on yet",
     body: "AI caption and DM message ideas aren't switched on yet. You can still write and schedule everything yourself.",
   },
   ai_replies: {
-    title: "AI DM replies are coming soon",
+    title: "AI DM replies aren't switched on yet",
     body: "Automatic AI replies to your DMs are on hold while we finish them. Your saved instructions stay, and nothing is sent by AI until this is switched on.",
   },
 };
@@ -129,7 +129,7 @@ export const FEATURE_COPY: Record<FeatureId, { title: string; body: string }> = 
 /** The ChannelStatus-shaped pill / title / body for a feature ("ready" has empty texts). */
 export function featureStatus(id: FeatureId, env: Env): ChannelStatus {
   if (featureReadiness(id, env).ready) return { state: "ready", pill: "", title: "", body: "" };
-  return { state: "soon", pill: "Coming soon", ...FEATURE_COPY[id] };
+  return { state: "soon", pill: "Not switched on yet", ...FEATURE_COPY[id] };
 }
 
 /** Reminder channels (Instagram personal, Facebook Group) work by e-mail: "soon" without a mailer. */
@@ -137,8 +137,8 @@ export function reminderChannelStatus(name: string, env: Env): ChannelStatus {
   if (featureReadiness("email", env).ready) return { state: "ready", pill: "", title: name, body: "" };
   return {
     state: "soon",
-    pill: "Coming soon",
-    title: `${name} reminders are coming soon`,
+    pill: "Not switched on yet",
+    title: `${name} reminders need e-mail sending switched on`,
     body: "Reminder channels e-mail you the caption and files at the scheduled time so you can post them yourself. Poskoo's e-mail sending isn't switched on yet, so you can't add these channels for now. Tap “Notify me” and we'll tell you when it is.",
   };
 }

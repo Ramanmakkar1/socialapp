@@ -24,7 +24,7 @@ test("stripeMode reads the key prefix only", () => {
   assert.equal(stripeMode("pk_live_123"), "none");
 });
 
-test("empty env: everything is coming soon (safe default)", () => {
+test("empty env: everything is not switched on (safe default)", () => {
   const all = allFeatureReadiness({});
   for (const r of Object.values(all)) {
     assert.equal(r.ready, false, r.id);
@@ -93,16 +93,16 @@ test("missing never contains secret values", () => {
 test("statuses use the ChannelStatus shape", () => {
   const soon = featureStatus("billing", {});
   assert.equal(soon.state, "soon");
-  assert.equal(soon.pill, "Coming soon");
+  assert.equal(soon.pill, "Not switched on yet");
   assert.match(soon.title, /launching soon/);
   assert.equal(featureStatus("email", LIVE).state, "ready");
   const remind = reminderChannelStatus("Facebook Group", {});
   assert.equal(remind.state, "soon");
-  assert.match(remind.title, /Facebook Group reminders are coming soon/);
+  assert.match(remind.title, /Facebook Group reminders need e-mail sending/);
   assert.equal(reminderChannelStatus("Facebook Group", { SMTP_HOST: "smtp.x" }).state, "ready");
 });
 
-test("pricing cards: paid plans say coming soon and point to the Free sign-up", () => {
+test("pricing cards: paid plans say not switched on and point to the Free sign-up", () => {
   const r = planReadiness({});
   assert.deepEqual(r, { paidPlans: false, ai: false });
   const plans = plansFor(r);

@@ -72,7 +72,7 @@ export function channelStatus(id: ComingChannel, configured: boolean, override?:
   if (state === "awaiting") {
     return { state, pill: `Awaiting ${c.reviewer} approval`, title: `${c.name} is waiting for ${c.reviewer}'s approval`, body: c.why };
   }
-  return { state, pill: "Coming soon", title: `${c.name} is coming soon`, body: c.why };
+  return { state, pill: "Not available yet", title: `${c.name} isn't available yet`, body: c.why };
 }
 
 /** Every coming channel's status (server side: pass process.env and which keys are configured). */
@@ -86,7 +86,7 @@ export function channelStatuses(configured: Record<ComingChannel, boolean>, env:
 export function unavailableStatus(name: string): ChannelStatus {
   return {
     state: "soon",
-    pill: "Coming soon",
+    pill: "Not switched on yet",
     title: `${name} isn't switched on yet`,
     body: `Connecting ${name} isn't switched on on this server yet. Tap “Notify me” and we'll let you know when it is.`,
   };
