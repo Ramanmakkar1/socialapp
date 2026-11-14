@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
-import EngagementCalculator from "../instagram-engagement-rate-calculator/EngagementCalculator";
+import EngagementCalculator from "../facebook-engagement-rate-calculator/EngagementCalculator";
 
 const config: ToolPageConfig = {
   path: "/tools/tiktok-engagement-rate-calculator",
