@@ -396,7 +396,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
   "/tools/threads-thread-maker": "Threads Thread Maker",
   "/tools/pinterest-hashtag-generator": "Pinterest Hashtag Generator",
   "/tools/tiktok-caption-generator": "TikTok Caption Generator",
-  "/tools/linkedin-post-generator": "LinkedIn Post Generator: Free Post Drafts with Hooks",
+  "/tools/linkedin-post-generator": "LinkedIn Post Generator",
   "/tools/youtube-title-counter": "YouTube Title Counter",
   "/tools/youtube-title-generator": "YouTube Title Generator",
   "/tools/facebook-character-counter": "Facebook Character Counter",

@@ -70,7 +70,8 @@ const config: ToolPageConfig = {
             <p>
               The posts come from fixed writing templates in your browser. The tool does <b>not use AI</b>, upload your
               text or scrape LinkedIn. It also does not check live trends, so review every draft against what actually
-              happened in your work.
+              happened in your work. When a draft is ready, plan it on the calendar with the{" "}
+              <Link href="/linkedin-scheduler">LinkedIn scheduler</Link>.
             </p>
           </>
         ),
@@ -184,7 +185,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your posts are ready.",
     mark: "Schedule them.",
-    text: "Connect LinkedIn with its official login, plan your posts on one calendar and publish them automatically with Poskoo's <Link href=\"/linkedin-scheduler\">LinkedIn scheduler</Link>.",
+    text: "Connect LinkedIn with its official login, plan your posts on one calendar and publish them automatically with Poskoo's LinkedIn scheduler.",
   },
 };
 
