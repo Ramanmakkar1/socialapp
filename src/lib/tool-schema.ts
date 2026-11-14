@@ -3,9 +3,9 @@ import { BRAND } from "./brand";
 export type ToolFaq = { q: string; a: string };
 export type Crumb = { name: string; url: string };
 
-/** Reference to the site-wide Organization node declared in src/app/layout.tsx. */
+/** Reference to the site Organization defined in src/app/layout.tsx (same @id), so every page points at one entity. */
 export function publisherRef() {
-  return { "@id": BRAND.url + "#org" };
+  return { "@type": "Organization", "@id": `${BRAND.url}#org`, name: BRAND.name, legalName: BRAND.company, url: BRAND.url };
 }
 
 /**
@@ -34,7 +34,7 @@ export function toolSoftwareJsonLd({
     operatingSystem: "Web",
     isAccessibleForFree: true,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    publisher: { "@type": "Organization", name: BRAND.company },
+    publisher: publisherRef(),
   };
 }
 

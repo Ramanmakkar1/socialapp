@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
+import { publisherRef } from "@/lib/tool-schema";
 import type { ToolFaq } from "@/lib/tool-schema";
 
 /** Site-wide 1200×630 social card (src/app/opengraph-image.tsx). */
@@ -38,7 +39,7 @@ export function webAppJsonLd({ name, description, path, category = "BusinessAppl
     isAccessibleForFree: true,
     ...(features?.length ? { featureList: features } : {}),
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    publisher: { "@type": "Organization", name: BRAND.company, url: BRAND.url },
+    publisher: publisherRef(),
   };
 }
 
