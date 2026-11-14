@@ -125,7 +125,8 @@ export default function FeaturesPage() {
                 Explore the Instagram scheduler <span aria-hidden="true">→</span>
               </Link>
               <p className="small">
-                Also see the <Link className={s.vlink} href="/facebook-scheduler">Facebook Page scheduler</Link>{" "}
+                Also see the <Link className={s.vlink} href="/facebook-scheduler">Facebook Page scheduler</Link>,{" "}
+                the <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>{" "}
                 and the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>.
                 Running a small business? See the{" "}
                 <Link className={s.vlink} href="/social-media-scheduler-for-small-business">
