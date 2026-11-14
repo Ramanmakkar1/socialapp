@@ -18,13 +18,10 @@ export default function SiteError({ reset }: { error: Error & { digest?: string 
             Try again
           </button>
           <Link className="btn btn-line" href="/">Back to homepage</Link>
+          <Link className="btn btn-line" href="/pricing">See pricing</Link>
+          <Link className="btn btn-line" href="/help">Visit help</Link>
+          <Link className="btn btn-line" href="/contact">Contact us</Link>
         </div>
-        <p className="small">
-          Need a hand?{" "}
-          <Link href="/help" style={{ color: "var(--violet)", textDecoration: "underline", textUnderlineOffset: 3 }}>
-            Visit help
-          </Link>
-        </p>
         <PageArt />
       </header>
     </PublicShell>

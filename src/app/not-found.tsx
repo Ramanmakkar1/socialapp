@@ -17,6 +17,8 @@ export default function NotFound() {
           <div className="ctas">
             <Link className="btn btn-dark" href="/">Back to home</Link>
             <Link className="btn btn-line" href="/pricing">See pricing</Link>
+            <Link className="btn btn-line" href="/help">Visit help</Link>
+            <Link className="btn btn-line" href="/contact">Contact us</Link>
           </div>
         </div>
         <div className="hero-art"><PageArt /></div>
