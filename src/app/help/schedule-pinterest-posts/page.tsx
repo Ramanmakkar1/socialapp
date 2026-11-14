@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -13,12 +12,6 @@ export const metadata: Metadata = withSocial({
     "Schedule Pinterest Pins: connect with Pinterest's official login, pick a board, add a JPG or PNG image, title and link, choose a time and it pins.",
   alternates: { canonical: new URL("/help/schedule-pinterest-posts", BRAND.url).toString() },
 });
-
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: `${BRAND.url}/` },
-  { name: "Help", url: `${BRAND.url}/help` },
-  { name: "Schedule Pinterest Pins", url: `${BRAND.url}/help/schedule-pinterest-posts` },
-]);
 
 const steps = [
   {
@@ -147,10 +140,6 @@ export default function SchedulePinterestPostsHelpPage() {
         { name: "Schedule Pinterest Pins", path: "/help/schedule-pinterest-posts" },
       ]}
     >
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd).replace(/</g, "\\u003c") }}

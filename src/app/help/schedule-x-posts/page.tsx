@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -18,12 +17,6 @@ export const metadata: Metadata = withSocial({
   alternates: { canonical: new URL(PATH, BRAND.url).toString() },
   openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
 });
-
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: `${BRAND.url}/` },
-  { name: "Help", url: `${BRAND.url}/help` },
-  { name: "Schedule X Posts", url: `${BRAND.url}${PATH}` },
-]);
 
 const steps = [
   {
@@ -160,10 +153,6 @@ export default function ScheduleXPostsHelpPage() {
         { name: "Schedule X Posts", path: PATH },
       ]}
     >
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd).replace(/</g, "\\u003c") }}

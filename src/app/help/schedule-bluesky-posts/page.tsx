@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -13,12 +12,6 @@ export const metadata: Metadata = withSocial({
     "Schedule Bluesky posts with an app password: connect your handle, write up to 300 characters, add up to 4 images or a link, pick a time and fix errors.",
   alternates: { canonical: new URL("/help/schedule-bluesky-posts", BRAND.url).toString() },
 });
-
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: `${BRAND.url}/` },
-  { name: "Help", url: `${BRAND.url}/help` },
-  { name: "Schedule Bluesky Posts", url: `${BRAND.url}/help/schedule-bluesky-posts` },
-]);
 
 const steps = [
   {
@@ -157,10 +150,6 @@ export default function ScheduleBlueskyPostsHelpPage() {
         { name: "Schedule Bluesky Posts", path: "/help/schedule-bluesky-posts" },
       ]}
     >
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd).replace(/</g, "\\u003c") }}
