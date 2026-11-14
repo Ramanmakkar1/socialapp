@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
 import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -19,14 +19,14 @@ export const metadata: Metadata = withSocial({
 });
 
 const whySwitch = [
-  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page, Threads and YouTube posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },
+  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: `Plan and publish ${LIVE_PLATFORMS_TEXT} posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool.` },
   { no: "02 / Free to start", title: "Start on the Free plan", text: `${BRAND.name} Free includes 2 social accounts, 10 scheduled posts / month and 500 auto-DMs / month.` },
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
 const compare: [string, string, string, string][] = [
   ["Social media scheduling", "Yes", "Yes", "Yes"],
-  ["Instagram, Facebook Page and Threads publishing", "Yes", "Check their site", "Check their site"],
+  [`${LIVE_PLATFORMS_TEXT} publishing`, "Yes", "Check their site", "Check their site"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
   ["AI caption ideas", "Yes", "Check their site", "Check their site"],
@@ -37,8 +37,8 @@ const compare: [string, string, string, string][] = [
 
 const faqs = [
   { q: `Is ${BRAND.name} a SocialBee alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
-  { q: "What is SocialBee?", a: "SocialBee is a social media scheduler built around content categories and evergreen posting. For its exact features and plans, see their site." },
-  { q: "Can I import my existing SocialBee schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
+  { q: "What is SocialBee?", a: "SocialBee is a social media scheduler built around content categories. For its exact features and plans, see their site — this page focuses on what Poskoo does." },
+  { q: "Can I import my SocialBee categories?", a: `Not yet. Recreate your posts in the ${BRAND.name} calendar and rebuild your categories there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
   { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
@@ -68,7 +68,7 @@ export default function SocialBeeAlternative() {
             A SocialBee alternative that also <em className="s">auto-DMs every comment</em>
           </h1>
           <p className="lede">
-            Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, write captions with AI and track every lead.
+            {BRAND.name} is a good SocialBee alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. Capture their email, write captions with AI and track every lead.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -103,7 +103,7 @@ export default function SocialBeeAlternative() {
           <div className="head">
             <p className="eyebrow">Comparison</p>
             <h2>{BRAND.name} vs SocialBee</h2>
-            <p>SocialBee is a social media scheduler built around content categories and evergreen posting. For its exact features and plans, see their site. {BRAND.name} adds comment-to-DM automation and email capture in the same plan.</p>
+            <p>SocialBee is a social media scheduler built around content categories. For its exact features and plans, see their site. {BRAND.name} adds comment-to-DM automation and email capture in the same plan.</p>
           </div>
           <div className={s.tableWrap}>
             <table className={s.table}>
