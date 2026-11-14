@@ -16,7 +16,7 @@ import { clientIp, rateLimit, tooManyMessage } from "@/lib/rateLimit";
 export type EmailFormState = { error?: string; sent?: boolean; email?: string; message?: string } | undefined;
 
 const UNAVAILABLE = "This is not available right now. Please try again in a minute.";
-const EMAIL_SOON = "Email sign-in codes are coming soon. Continue with Google to sign in.";
+const EMAIL_SOON = "Email sign-in codes aren't switched on yet. Continue with Google to sign in.";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -102,7 +102,7 @@ export async function resendVerificationAction(): Promise<EmailFormState> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (user.emailVerified) return { message: "Your email is already verified." };
-  if (!isFeatureReady("email")) return { error: "Email verification codes are coming soon. Nothing is blocked meanwhile." };
+  if (!isFeatureReady("email")) return { error: "Email verification codes aren't switched on yet. Nothing is blocked meanwhile." };
   const limited = rateLimit(`verify-send:${user.id}`, 3, 15 * 60 * 1000);
   if (!limited.ok) return { error: tooManyMessage(limited.retryAfterMs) };
   try {

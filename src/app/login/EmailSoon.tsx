@@ -9,7 +9,7 @@ export default function EmailSoon({ googleEnabled, what }: { googleEnabled: bool
   return (
     <div className={a.stack}>
       <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}>
-        <strong>Email codes aren&apos;t switched on yet.</strong> We can&apos;t e-mail {what} yet, so nothing would arrive.{" "}
+        <strong>Email sign-in codes aren&apos;t switched on yet.</strong> We can&apos;t e-mail {what} yet, so nothing would arrive.{" "}
         {googleEnabled ? "Continue with Google to sign in with the same address." : <>Write to <a href="mailto:hello@poskoo.com" className={ui.link}>hello@poskoo.com</a> and we&apos;ll help you get back in.</>}
         {" "}You can also <Link href="/contact" className={ui.link}>contact support</Link>.
       </p>

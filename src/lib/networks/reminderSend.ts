@@ -31,7 +31,7 @@ export async function publishReminder(input: PublishInput): Promise<PublishOutco
   const platform = input.account.platform;
   if (!isReminderNetwork(platform)) return { ok: false, error: "Not a reminder channel." };
   // Without a mailer the reminder would be "sent" to a log only: fail honestly instead.
-  if (!isFeatureReady("email")) return { ok: false, error: "Reminder e-mails are coming soon: e-mail sending isn't switched on yet. Post this one yourself, or press Retry once it is." };
+  if (!isFeatureReady("email")) return { ok: false, error: "Reminder e-mails aren't switched on yet, so this post wasn't sent. Post this one yourself, or press Retry once e-mail sending is on." };
   const targetId = input.idempotencyKey ?? "";
   const rows = await query<{ email: string; name: string | null; scheduled_at: Date | null }>(
     `select u.email, u.name, p.scheduled_at from socialapp.post_targets t
