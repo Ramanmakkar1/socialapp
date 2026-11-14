@@ -17,6 +17,16 @@ const FORMAT_LABELS: Record<string, string> = {
   story: "Story",
   post: "Post",
 };
+const TIKTOK_FORMAT_LABELS: Record<string, string> = {
+  reel: "Video",
+  carousel: "Photo carousel",
+  story: "Story",
+  post: "Photo post",
+};
+const forPlatform = (text: string, platform: "instagram" | "tiktok") =>
+  platform === "tiktok"
+    ? text.replace(/\bReels\b/g, "TikTok videos").replace(/\bReel\b/g, "TikTok video")
+    : text;
 const FORMAT_ICON: Record<string, LucideIcon> = { reel: Video, carousel: Images, story: MessageSquareQuote, post: Square };
 const FORMAT_HEX: Record<string, string> = { reel: "#6b4eff", carousel: "#ff8a5b", story: "#1fa971", post: "#c6a700" };
 
@@ -25,7 +35,7 @@ const ghostBtn = "inline-flex min-h-10 items-center justify-center gap-1.5 round
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
-export default function PostIdeasGenerator() {
+export default function PostIdeasGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" }) {
   const [nicheId, setNicheId] = useState<string>("creator");
   const [format, setFormat] = useState<string>("all");
   const [seed, setSeed] = useState(1);
@@ -33,15 +43,22 @@ export default function PostIdeasGenerator() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nicheSelectId = useId();
 
-  const ideas = useMemo<Idea[]>(
-    () =>
-      pickIdeas(nicheId, {
-        format: format === "all" ? undefined : format,
-        count: 6,
-        seed,
-      }),
-    [nicheId, format, seed],
-  );
+  const formatLabels = platform === "tiktok" ? TIKTOK_FORMAT_LABELS : FORMAT_LABELS;
+
+  const ideas = useMemo<Idea[]>(() => {
+    const picked = pickIdeas(nicheId, {
+      format: format === "all" ? undefined : format,
+      count: 6,
+      seed,
+    });
+    if (platform !== "tiktok") return picked;
+    return picked.map((idea) => ({
+      ...idea,
+      title: forPlatform(idea.title, platform),
+      hook: forPlatform(idea.hook, platform),
+      captionStarter: forPlatform(idea.captionStarter, platform),
+    }));
+  }, [nicheId, format, seed, platform]);
 
   const mix = FORMATS.map((f) => ({ f, n: ideas.filter((i) => i.format === f).length }));
   const nicheLabel = NICHES.find((n) => n.id === nicheId)?.label ?? "Creator";
@@ -63,7 +80,7 @@ export default function PostIdeasGenerator() {
   }
 
   function ideaText(idea: Idea) {
-    return `${idea.title}\nFormat: ${FORMAT_LABELS[idea.format] ?? idea.format}\nHook: ${idea.hook}\nCaption starter: ${idea.captionStarter}`;
+    return `${idea.title}\nFormat: ${formatLabels[idea.format] ?? idea.format}\nHook: ${idea.hook}\nCaption starter: ${idea.captionStarter}`;
   }
 
   return (
@@ -98,7 +115,7 @@ export default function PostIdeasGenerator() {
                 aria-pressed={format === f}
                 className={`flex min-h-10 min-w-0 items-center justify-center rounded-lg px-1 text-center text-[13px] font-medium leading-tight ${format === f ? "bg-[var(--poskoo-ink)] text-white" : "text-[#3d3450] hover:bg-[var(--poskoo-band)]"}`}
               >
-                {f === "all" ? "All" : FORMAT_LABELS[f]}
+                {f === "all" ? "All" : formatLabels[f]}
               </button>
             ))}
           </div>
@@ -115,7 +132,7 @@ export default function PostIdeasGenerator() {
         <div className={kpi}>
           <p className={kpiLabel}>Niche</p>
           <p className="mt-1 truncate text-2xl font-bold text-[var(--poskoo-ink)]">{nicheLabel}</p>
-          <p className="mt-1 text-xs text-[#3d3450]">{format === "all" ? "All formats" : `${FORMAT_LABELS[format]}s only`}</p>
+          <p className="mt-1 text-xs text-[#3d3450]">{format === "all" ? "All formats" : `${formatLabels[format]}s only`}</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Batch</p>
@@ -130,7 +147,7 @@ export default function PostIdeasGenerator() {
             <p className={kpiLabel}>Format mix</p>
             <ul className="mt-1 space-y-0.5 text-xs text-[#3d3450]">
               {mix.filter((m) => m.n > 0).map((m) => (
-                <li key={m.f} className="flex items-center gap-1.5"><i className="h-2 w-2 flex-none rounded-full" style={{ background: FORMAT_HEX[m.f] }} /><b className="tabular-nums text-[var(--poskoo-ink)]">{m.n}</b> {FORMAT_LABELS[m.f].toLowerCase()}</li>
+                <li key={m.f} className="flex items-center gap-1.5"><i className="h-2 w-2 flex-none rounded-full" style={{ background: FORMAT_HEX[m.f] }} /><b className="tabular-nums text-[var(--poskoo-ink)]">{m.n}</b> {formatLabels[m.f].toLowerCase()}</li>
               ))}
               {ideas.length === 0 && <li>—</li>}
             </ul>
@@ -161,7 +178,7 @@ export default function PostIdeasGenerator() {
                     <span className="text-xs font-semibold tabular-nums text-[#5f5873]">{String(index + 1).padStart(2, "0")}</span>
                     <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[var(--poskoo-band)] px-2 py-0.5 text-xs font-semibold text-[#3d3450]">
                       <Icon className="h-3.5 w-3.5" style={{ color: FORMAT_HEX[idea.format] }} aria-hidden="true" />
-                      {FORMAT_LABELS[idea.format] ?? idea.format}
+                      {formatLabels[idea.format] ?? idea.format}
                     </span>
                   </div>
                   <h3 className="mt-1.5 text-base font-semibold leading-snug tracking-normal text-[var(--poskoo-ink)]">

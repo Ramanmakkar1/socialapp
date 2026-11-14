@@ -272,6 +272,8 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-hook-generator">free TikTok hook generator</Link>{" "}
             or draft six hooks and captions with our{" "}
             <Link className={s.vlink} href="/tools/tiktok-caption-generator">free TikTok caption generator</Link>.
+            Need a topic? Get six ideas with our{" "}
+            <Link className={s.vlink} href="/tools/tiktok-video-ideas-generator">TikTok video ideas generator</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Need hashtags? Build a small set of 3 to 15 niche tags with our{" "}
