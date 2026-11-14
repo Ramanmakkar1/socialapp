@@ -118,6 +118,10 @@ export default function ToolsPage() {
             <Link href="/instagram-dm-automation">Instagram DM automation</Link>
             <Link href="/instagram-link-in-bio">Link in bio page</Link>
             <Link href="/facebook-scheduler">Facebook scheduler</Link>
+            <Link href="/threads-scheduler">Threads scheduler</Link>
+            <Link href="/youtube-scheduler">YouTube scheduler</Link>
+            <Link href="/linkedin-scheduler">LinkedIn scheduler</Link>
+            <Link href="/tiktok-scheduler">TikTok scheduler</Link>
             <Link href="/tools/threads-tools">Threads tools</Link>
             <Link href="/social-media-scheduler-for-small-business">Social media scheduler for small business</Link>
           </nav>
