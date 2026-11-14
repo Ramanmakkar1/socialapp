@@ -340,6 +340,12 @@
 }
 
 /* ---------- /tools hub: "Start here" picks ---------- */
+/* The cookie notice is a fixed bar. On the hub it would sit over the first
+   "Start here" cards on first paint, so dock it to the top and reserve its
+   height instead of letting it cover the cards. Scoped to the hub only. */
+.hubPage { min-width: 0; }
+:global(body):has(.hubPage):has([aria-label="Cookie notice"]) { padding-top: 64px; }
+:global(body):has(.hubPage) [aria-label="Cookie notice"] { top: 8px; bottom: auto; }
 .picks { padding-top: 30px; }
 .pickGrid {
   list-style: none; margin: 0; padding: 0;

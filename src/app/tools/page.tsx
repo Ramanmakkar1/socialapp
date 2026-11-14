@@ -65,7 +65,7 @@ export default function ToolsPage() {
           </symbol>
         </defs>
       </svg>
-      <div className={t.page}>
+      <div className={`${t.page} ${t.hubPage}`}>
         <header className={`hero ${t.hero} ${t.hubHero}`}>
           <span className="pill">Free · no signup · runs in your browser</span>
           <h1>
