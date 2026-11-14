@@ -14,23 +14,23 @@ const PATH = "/tools";
 
 export const metadata = toolMetadata({
   path: "/tools",
-  title: "Free Instagram Tools: Captions, Hashtags, Sizes & DMs",
+  title: "Free Social Media Tools: Captions, Hashtags & Sizes",
   description:
-    `${TOOLS.length} free Instagram tools: caption and hashtag generators, image size and carousel tools, planning templates and comment-to-DM helpers. No signup needed.`,
+    `${TOOLS.length} free social media tools for Instagram, TikTok, X, YouTube, LinkedIn, Facebook, Threads and Pinterest: captions, hashtags, sizes. No signup.`,
 });
 
 const faqs = [
   {
-    q: "Are these Instagram tools really free?",
-    a: `Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by ${BRAND.name}, a scheduler with Instagram auto-DM, which has its own free plan if you want to schedule what you create.`,
+    q: "Are these social media tools really free?",
+    a: `Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by ${BRAND.name}, a social media scheduler with Instagram auto-DM, which has its own free plan if you want to schedule what you create.`,
   },
   {
     q: "Do the tools upload my photos or text?",
     a: "No. The tools run in your browser. Images you load into the size checkers, carousel tools and cover makers are processed on your device and downloads are generated locally.",
   },
   {
-    q: "Do I need to connect my Instagram account?",
-    a: "No. None of the free tools ask for an Instagram login. You only connect Instagram, through Meta's official login, if you sign up to schedule posts or run auto-DMs.",
+    q: "Do I need to connect my social accounts?",
+    a: "No. None of the free tools ask you to log in to Instagram, TikTok or any other network. You only connect an account, through that platform's official login, if you sign up to schedule posts or run auto-DMs.",
   },
   {
     q: "Which tool should I start with?",
@@ -41,7 +41,7 @@ const faqs = [
 const itemListJsonLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Free Instagram tools",
+  name: "Free social media tools",
   numberOfItems: TOOLS.length,
   itemListElement: TOOLS.map((tool, i) => ({
     "@type": "ListItem",
@@ -53,7 +53,7 @@ const itemListJsonLd = {
 
 export default function ToolsPage() {
   return (
-    <PublicShell breadcrumbs={[{ name: "Free Instagram tools", path: PATH }]}>
+    <PublicShell breadcrumbs={[{ name: "Free social media tools", path: PATH }]}>
       {[itemListJsonLd, faqJsonLd(faqs)].map((data, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(data) }} />
       ))}
@@ -69,11 +69,12 @@ export default function ToolsPage() {
         <header className={`hero ${t.hero} ${t.hubHero}`}>
           <span className="pill">Free · no signup · runs in your browser</span>
           <h1>
-            {TOOLS.length} free <em className="s mark">Instagram tools</em> for every post
+            {TOOLS.length} free <em className="s mark">social media tools</em> for every post
           </h1>
           <p className="lede">
-            Write captions and hashtags, size your photos and carousels, plan your week and test comment-to-DM
-            keywords. Use them before you post, or schedule the result with {BRAND.name}.
+            Write captions and hashtags for Instagram, TikTok, X, LinkedIn and more, size your photos and videos,
+            plan your week and test comment-to-DM keywords. Use them before you post, or schedule the result with{" "}
+            {BRAND.name}.
           </p>
           <ul className={t.catTiles} aria-label="Tool categories">
             {TOOL_CATEGORIES.map((c) => (
@@ -107,7 +108,7 @@ export default function ToolsPage() {
           <ToolsDirectory />
         </section>
 
-        <ToolFaqSection title="Free Instagram tools questions" faqs={faqs} />
+        <ToolFaqSection title="Free social media tools questions" faqs={faqs} />
 
         <section className={`${t.section} ${t.related}`}>
           <nav className="relChips" aria-label="Keep exploring">
@@ -117,6 +118,7 @@ export default function ToolsPage() {
             <Link href="/instagram-dm-automation">Instagram DM automation</Link>
             <Link href="/instagram-link-in-bio">Link in bio page</Link>
             <Link href="/facebook-scheduler">Facebook scheduler</Link>
+            <Link href="/social-media-scheduler-for-small-business">Social media scheduler for small business</Link>
           </nav>
         </section>
 
