@@ -211,6 +211,9 @@ export default function InstagramScheduler() {
               </article>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Check your files before you schedule: the free <Link className={s.vlink} href="/tools/instagram-reels-size-checker">Instagram Reels size checker</Link>, <Link className={s.vlink} href="/tools/instagram-story-size-checker">Instagram Story size checker</Link> and <Link className={s.vlink} href="/tools/instagram-image-size">Instagram image size guide</Link>. Write the post with the <Link className={s.vlink} href="/tools/instagram-caption-generator">free Instagram caption generator</Link> and <Link className={s.vlink} href="/tools/instagram-hashtag-generator">Instagram hashtag generator</Link>, split a wide image with the <Link className={s.vlink} href="/tools/instagram-carousel-splitter">carousel splitter</Link>, and pick a slot with the <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">best time to post on Instagram</Link> finder.
+          </p>
         </div>
       </section>
 
