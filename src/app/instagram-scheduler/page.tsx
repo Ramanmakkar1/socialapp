@@ -97,6 +97,16 @@ const faqJsonLd = {
   })),
 };
 
+const webPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${BRAND.url}/instagram-scheduler#webpage`,
+  url: `${BRAND.url}/instagram-scheduler`,
+  name: "Instagram scheduler that auto-DMs every comment",
+  description,
+  isPartOf: { "@id": `${BRAND.url}#website` },
+};
+
 const appJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -127,6 +137,10 @@ export default function InstagramScheduler() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd).replace(/</g, "\\u003c") }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
         <div className={s.heroText}>

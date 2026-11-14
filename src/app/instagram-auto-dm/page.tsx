@@ -54,6 +54,17 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const webPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${BRAND.url}/instagram-auto-dm#webpage`,
+  url: `${BRAND.url}/instagram-auto-dm`,
+  name: "They comment. You get the lead",
+  description:
+    "Auto-DM everyone who comments a keyword on your Instagram posts and reels. Official Meta API, email capture, follow gate and a simpler ManyChat alternative.",
+  isPartOf: { "@id": `${BRAND.url}#website` },
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -64,6 +75,7 @@ export default function InstagramAutoDm() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Instagram auto-DM", path: "/instagram-auto-dm" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd).replace(/</g, "\\u003c") }} />
       <header className="hero">
         <div className={s.heroText}>
           <span className="pill">Official Meta API · no password needed</span>
