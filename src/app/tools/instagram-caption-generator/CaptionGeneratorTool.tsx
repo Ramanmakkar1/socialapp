@@ -1705,11 +1705,13 @@ function Switch({ on }: { on: boolean }) {
   );
 }
 
-export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "facebook" }) {
+export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "facebook" | "linkedin" }) {
   const isTikTok = platform === "tiktok";
   const isFacebook = platform === "facebook";
-  const captionLimit = isTikTok ? 4000 : isFacebook ? 63206 : INSTAGRAM_CAPTION_LIMIT;
-  const foldAt = isFacebook ? 480 : FOLD_AT;
+  const isLinkedIn = platform === "linkedin";
+  const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : "Instagram";
+  const captionLimit = isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
+  const foldAt = isFacebook ? 480 : isLinkedIn ? 210 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1766,11 +1768,11 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
 
       // Joined with real line breaks
       const fullText = [hookPart, ...bodyLines, ctaPart].join("\n\n");
-      if (isTikTok) return fullText.replace(/Instagram/g, "TikTok");
-      if (isFacebook) return fullText.replace(/Instagram/g, "Facebook");
-      return fullText;
+      let text = fullText.replace(/Instagram/g, platformName);
+      if (isLinkedIn) text = text.replace(/link in bio/gi, "link in the comments");
+      return text;
     });
-  }, [goal, tone, topic, addEmojis, useCommentCta, isTikTok, isFacebook, shuffleKey]);
+  }, [goal, tone, topic, addEmojis, useCommentCta, isLinkedIn, platformName, shuffleKey]);
 
   async function handleCopy(index: number, text: string) {
     try {
@@ -1930,7 +1932,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
           <div className={kpi}>
             <p className={kpiLabel}>Call to action</p>
             <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{useCommentCta ? "Keyword" : "Standard"}</p>
-            <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : "Comment, tag or link in bio."}</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : isLinkedIn ? "Comment, tag or link in the comments." : "Comment, tag or link in bio."}</p>
           </div>
         </div>
         {usingDefaultTopic && (
@@ -2058,7 +2060,9 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
                 ? "Only the first line or so shows over the video before “more”. Keep the hook short."
                 : isFacebook
                   ? `About the first ${foldAt} characters show before “See more” on desktop. That cut-off varies by device.`
-                  : `About the first ${foldAt} characters show before “… more” in the feed. That cut-off varies by device.`}
+                  : isLinkedIn
+                    ? `About the first ${foldAt} characters show before “…see more” on LinkedIn. That cut-off varies by device.`
+                    : `About the first ${foldAt} characters show before “… more” in the feed. That cut-off varies by device.`}
             </p>
           </div>
         </aside>

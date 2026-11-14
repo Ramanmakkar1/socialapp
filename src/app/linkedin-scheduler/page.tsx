@@ -259,7 +259,7 @@ export default function LinkedInSchedulerPage() {
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             New to it? Follow our step-by-step guide:{" "}
             <Link className={s.vlink} href="/help/schedule-linkedin-posts">how to schedule LinkedIn posts</Link>.
-            Check your draft with the <Link className={s.vlink} href="/tools/linkedin-character-counter">LinkedIn character counter</Link>, then see how it looks with the <Link className={s.vlink} href="/tools/linkedin-post-preview">LinkedIn post preview</Link>.
+            Draft it with the <Link className={s.vlink} href="/tools/linkedin-post-generator">free LinkedIn post generator</Link>, check it with the <Link className={s.vlink} href="/tools/linkedin-character-counter">LinkedIn character counter</Link>, then see how it looks with the <Link className={s.vlink} href="/tools/linkedin-post-preview">LinkedIn post preview</Link>.
             Pick a starting slot with our <Link className={s.vlink} href="/tools/best-time-to-post-on-linkedin">best time to post on LinkedIn</Link> finder.
             Build a short, relevant tag set with the <Link className={s.vlink} href="/tools/linkedin-hashtag-generator">LinkedIn hashtag generator</Link>.
             Write a profile line with the <Link className={s.vlink} href="/tools/linkedin-headline-generator">LinkedIn headline generator</Link>.
