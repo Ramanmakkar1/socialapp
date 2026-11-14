@@ -630,6 +630,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/instagram-scheduler/pricing": "See what each Poskoo Instagram scheduler plan includes: social accounts, monthly posts, auto-DM limits and email capture. Start free, upgrade any time.",
   "/threads-scheduler": "Schedule Threads posts on one calendar and publish them automatically through Meta's official API. Plan text, image or video posts and track results.",
   "/pinterest-scheduler": "Schedule Pinterest Pins to any board with the official API. Add a title and destination link, upload a JPG or PNG image, and choose the publishing time.",
+  "/google-business-profile-scheduler": "Schedule Google Business Profile posts with the official API: write the text, add an image, and pick a publishing time. Currently waiting for Google's approval.",
   "/x-scheduler": "Schedule posts to X (Twitter) through X's official API: write the text, add up to 4 images or one video, and pick a publishing time in Poskoo.",
   "/bluesky-scheduler": "Schedule Bluesky posts with your handle and an app password. Add text and up to 4 images, pick a time, and Poskoo publishes with a clear status.",
   "/mastodon-scheduler": "Schedule Mastodon posts on any server with OAuth, up to 500 characters or your server's limit, images or video, and automatic publishing by Poskoo.",
