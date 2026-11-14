@@ -105,6 +105,11 @@ export default function FeaturesPage() {
               <p className="small">
                 Also see the <Link className={s.vlink} href="/facebook-scheduler">Facebook Page scheduler</Link>{" "}
                 and the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>.
+                Running a small business? See the{" "}
+                <Link className={s.vlink} href="/social-media-scheduler-for-small-business">
+                  social media scheduler for small business
+                </Link>
+                .
               </p>
             </div>
             <div className="art">

@@ -15,7 +15,7 @@ const isNoindex = (path: string) => !isPathIndexable(path);
 
 /** Page groups, matched in order. New pages (help, tools, guides) fall into a group by their path. */
 const GROUPS: { heading: string; match: (path: string) => boolean }[] = [
-  { heading: "Product", match: (p) => ["/", "/features", "/pricing", "/developers", "/contact"].includes(p) || p.startsWith("/instagram-auto-dm") || ["/instagram-dm-automation", "/instagram-link-in-bio", "/instagram-content-planner"].includes(p) },
+  { heading: "Product", match: (p) => ["/", "/features", "/pricing", "/developers", "/contact", "/social-media-scheduler-for-small-business"].includes(p) || p.startsWith("/instagram-auto-dm") || ["/instagram-dm-automation", "/instagram-link-in-bio", "/instagram-content-planner"].includes(p) },
   { heading: "Schedulers", match: (p) => /-scheduler(\/|$)/.test(p) || p === "/social-media-scheduler-comparison" },
   { heading: "Free tools", match: (p) => p === "/tools" || p.startsWith("/tools/") },
   { heading: "Guides", match: (p) => p === "/guides" || p.startsWith("/guides/") },
