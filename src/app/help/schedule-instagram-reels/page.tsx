@@ -128,6 +128,7 @@ const faqJsonLd = {
 };
 
 const related = [
+  { href: "/help/schedule-instagram-posts", label: "Schedule Instagram posts" },
   { href: "/help/schedule-instagram-stories", label: "Schedule Instagram Stories" },
   { href: "/instagram-scheduler", label: "Instagram scheduler" },
   { href: "/instagram-auto-dm", label: "Instagram auto DM" },

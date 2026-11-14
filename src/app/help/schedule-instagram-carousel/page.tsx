@@ -125,6 +125,7 @@ const faqJsonLd = {
 };
 
 const related = [
+  { href: "/help/schedule-instagram-posts", label: "Schedule Instagram posts" },
   { href: "/help/schedule-instagram-reels", label: "Schedule Instagram Reels" },
   { href: "/help/schedule-instagram-stories", label: "Schedule Instagram Stories" },
   { href: "/instagram-scheduler", label: "Instagram scheduler" },

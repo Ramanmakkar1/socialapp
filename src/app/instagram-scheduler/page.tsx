@@ -24,7 +24,7 @@ type Mark = boolean | string;
 
 // One card per Instagram format: shape preview + what Poskoo can do with it.
 const formats: { name: string; ratio: string; shape: [number, number]; media: string; rows: [string, Mark][]; guide?: string }[] = [
-  { name: "Feed post", ratio: "1:1, 4:5 or 1.91:1", shape: [4, 5], media: "Image", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-carousel" },
+  { name: "Feed post", ratio: "1:1, 4:5 or 1.91:1", shape: [4, 5], media: "Image", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-posts" },
   { name: "Reel", ratio: "9:16 (1080×1920)", shape: [9, 16], media: "Video (.mp4)", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-reels" },
   { name: "Carousel", ratio: "same ratio on every slide", shape: [1, 1], media: "2–10 images", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", true], ["AI captions", true], ["Comment-to-DM", true]], guide: "/help/schedule-instagram-carousel" },
   { name: "Story", ratio: "9:16 (1080×1920)", shape: [9, 16], media: "Image or video", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", "Not on Stories (API limit)"], ["AI captions", "No captions on Stories (API limit)"], ["Comment-to-DM", "Via story replies"]], guide: "/help/schedule-instagram-stories" },
