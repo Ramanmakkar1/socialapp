@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "An X (Twitter) bio can be up to 160 characters. Add your name, what you do and a call to action, pick a niche and copy a bio that fits the limit.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "X (Twitter) bio generator:", mark: "bio ideas", after: "under 160 characters" },
-  lede: "An X (Twitter) bio can be up to 160 characters, so it has room for who you are, what you post about and one clear next step. Fill in your details and copy a bio that fits.",
+  lede: "An X (Twitter) bio can be up to 160 characters. This free generator writes bio ideas from your name, what you do and a call to action, with a live 160-character counter.",
   art: "writing",
   artLabel: "A creator writes with a giant pencil on a phone-shaped card full of lines and emoji",
   heroPoints: ["160-char counter", "8 niches", "No signup"],
@@ -147,8 +147,16 @@ const config: ToolPageConfig = {
   faqTitle: "X (Twitter) bio questions",
   faqs: [
     {
-      q: "How long can a Twitter/X bio be?",
-      a: "An X (Twitter) bio can be up to 160 characters. Emojis, spaces and line breaks all count toward that limit, and some combined emojis can count as more than one character.",
+      q: "How long can an X bio be?",
+      a: "An X (Twitter) bio can be up to 160 characters. Emojis, spaces and line breaks all count toward that limit, and some combined emojis can count as more than one character. The 160-character limit covers only the bio text: your location and website are separate profile fields and do not count.",
+    },
+    {
+      q: "What should I put in my X bio?",
+      a: "Say who you are and what you post about in plain words, then add one clear call to action such as follow, tap the link or reply with a keyword. A simple formula is your name or brand, what you do and the next step.",
+    },
+    {
+      q: "Can I use hashtags or @mentions in my X bio?",
+      a: "Yes. Hashtags and @mentions are allowed in an X bio, and they become clickable links. They still count toward the 160-character limit, so use one or two relevant ones rather than a long list.",
     },
     {
       q: "Can I add a link to my X bio?",
