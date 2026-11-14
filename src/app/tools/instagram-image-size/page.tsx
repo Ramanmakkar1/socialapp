@@ -215,6 +215,9 @@ const config: ToolPageConfig = {
             <p>
               Posting to other networks too? See the <Link href="/tools/social-media-image-sizes">image sizes for every social platform</Link>.
             </p>
+            <p>
+              Before you upload, test the photo with the <Link href="/tools/instagram-profile-picture-size-checker">Instagram profile picture size checker</Link> to see the square frame and circle crop.
+            </p>
           </>
         ),
       },
