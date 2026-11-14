@@ -13,6 +13,8 @@ export type FirstSessionChecklistProps = {
   postScheduled: boolean;
   /** At least one Auto-DM rule exists for this user. */
   ruleCreated: boolean;
+  /** At least one of those Auto-DM rules is active (not paused). */
+  ruleActive?: boolean;
 };
 
 type Step = { label: string; detail: string; href: string; done: boolean };
@@ -20,12 +22,20 @@ type Step = { label: string; detail: string; href: string; done: boolean };
 // First-session checklist for the dashboard. Completed steps are derived on the
 // server from existing account and post data; the whole card hides once every
 // step is done.
-export default function FirstSessionChecklist({ connected, postCreated, postScheduled, ruleCreated }: FirstSessionChecklistProps) {
+export default function FirstSessionChecklist({ connected, postCreated, postScheduled, ruleCreated, ruleActive = false }: FirstSessionChecklistProps) {
   const steps: Step[] = [
     { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", href: "/app/settings#channels", done: connected },
     { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar?compose=1", done: postCreated },
     { label: "Schedule it", detail: "Pick a date and time on the calendar.", href: "/app/calendar", done: postScheduled },
-    { label: "Create an Auto-DM rule", detail: "Reply automatically when someone comments on your post.", href: "/app/auto-dm", done: ruleCreated },
+    {
+      label: "Create an Auto-DM rule",
+      detail:
+        ruleCreated && !ruleActive
+          ? "Your rule is paused — turn it on to reply automatically when someone comments."
+          : "Reply automatically when someone comments on your post.",
+      href: "/app/auto-dm",
+      done: ruleCreated,
+    },
   ];
   const doneCount = steps.filter((s) => s.done).length;
   if (doneCount === steps.length) return null;

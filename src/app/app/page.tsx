@@ -205,7 +205,9 @@ export default async function AppHome() {
     .slice(0, 5);
   const thumbs = await postThumbs(top.map((t) => t.post.id));
   const channelConnected = stats.hasAccount || anyChannel;
-  const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && stats.hasRule;
+  const ruleCreated = automations.length > 0 || stats.hasRule;
+  const ruleActive = automations.some((a) => a.status === "active");
+  const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && ruleCreated;
 
   return (
     <div className={`${instrumentSans.variable} ${home.page}`}>
@@ -249,7 +251,7 @@ export default async function AppHome() {
       )}
 
       {!checklistDone && (
-        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasScheduledPost} ruleCreated={stats.hasRule} />
+        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasScheduledPost} ruleCreated={ruleCreated} ruleActive={ruleActive} />
       )}
 
       <section className={home.section} aria-labelledby="todays-actions">
