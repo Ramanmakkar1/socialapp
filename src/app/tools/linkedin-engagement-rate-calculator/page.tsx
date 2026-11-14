@@ -9,9 +9,9 @@ const config: ToolPageConfig = {
   crumb: "LinkedIn engagement rate calculator",
   title: "LinkedIn Engagement Rate Calculator: Free, by Impressions",
   description:
-    "Free LinkedIn engagement rate calculator: add reactions, comments, reposts and impressions or followers to get the engagement rate for any post in seconds.",
+    "LinkedIn engagement rate = (reactions + comments + reposts) / impressions x 100. Enter one post's numbers to get the rate by impressions or followers.",
   pill: "Free · runs in your browser · nothing is uploaded",
-  h1: { before: "LinkedIn engagement rate calculator:", mark: "free", after: "by impressions" },
+  h1: { before: "LinkedIn engagement rate", mark: "calculator" },
   lede: "LinkedIn engagement rate = (reactions + comments + reposts) / impressions x 100. Enter the numbers from one post, choose impressions or followers as the base, and get the rate as a percentage.",
   art: "analytics",
   artLabel: "A marketer reads a rising engagement chart next to a LinkedIn-style post card",
@@ -75,6 +75,10 @@ const config: ToolPageConfig = {
               Reactions, comments and the base are required, and the base must be above zero. Reposts are optional and
               count as zero when left blank. The result is rounded to two decimals.
             </p>
+            <p>
+              LinkedIn&apos;s own engagement rate column also counts clicks and follows, so its figure can differ from
+              this reactions, comments and reposts calculation.
+            </p>
           </>
         ),
       },
@@ -97,19 +101,20 @@ const config: ToolPageConfig = {
         ),
       },
       {
-        title: "Personal profiles vs company pages",
+        title: "Personal profile vs Company Page posts",
         body: (
           <ul>
             <li>
-              <b>Personal profiles</b> usually reach a mix of connections and second-degree viewers, so impressions can
-              be much larger than the follower count. A follower-based rate can look low even when a post travelled far.
+              For a <b>personal profile</b> post, open the post and select <b>View analytics</b> to find its
+              impressions, reactions, comments and reposts.
             </li>
             <li>
-              <b>Company pages</b> tend to have a smaller organic reach per follower, so impressions are often the fairer
-              base when you judge a page post.
+              For a <b>Company Page</b> post, open <b>Page &gt; Analytics &gt; Content</b> to find the post and its
+              numbers. You need access to the Page&apos;s analytics.
             </li>
             <li>
-              Whichever you run, keep the same base for every post in a comparison so the trend is real.
+              Use the same base for every personal-profile or Company Page post in a comparison so the trend is
+              meaningful.
             </li>
           </ul>
         ),
@@ -148,8 +153,8 @@ const config: ToolPageConfig = {
               average over a month.
             </li>
             <li>
-              <b>Give people a reason to comment.</b> A clear question or a comment keyword that sends a resource by DM
-              turns passive viewers into conversations.
+              <b>Give people a reason to comment.</b> Ask a clear question or invite readers to share their experience
+              to turn passive viewers into conversations.
             </li>
             <li>
               <b>Read the parts.</b> A post with many comments but few reactions is still doing a job; the total rate
@@ -184,10 +189,10 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
-    "/tools/linkedin-hashtag-generator",
+    "/tools/best-time-to-post-on-linkedin",
     "/tools/linkedin-character-counter",
     "/tools/linkedin-post-preview",
-    "/tools/best-time-to-post-on-linkedin",
+    "/tools/linkedin-hashtag-generator",
     "/tools/social-media-analytics-report",
   ],
   schema: {

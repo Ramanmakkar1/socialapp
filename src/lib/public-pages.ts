@@ -517,7 +517,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/youtube-shorts-size-checker": "Free YouTube Shorts size checker: load a clip to see its exact pixels, 9:16 ratio and length against 1080 × 1920 and the 3-minute limit. No upload.",
   "/tools/tiktok-hashtag-generator": "Free TikTok hashtag generator: pick one of 15 niches, mix broad and specific tags, add your own keyword and copy 3 to 15 hashtags for your next video.",
   "/tools/linkedin-hashtag-generator": "Free LinkedIn hashtag generator: pick your industry, mix broad and specific tags, add your own keyword and copy 1 to 5 hashtags for your next post.",
-  "/tools/linkedin-engagement-rate-calculator": "Free LinkedIn engagement rate calculator: add reactions, comments, reposts and impressions or followers to get the engagement rate for any post in seconds.",
+  "/tools/linkedin-engagement-rate-calculator": "LinkedIn engagement rate = (reactions + comments + reposts) / impressions x 100. Enter one post's numbers to get the rate by impressions or followers.",
   "/tools/youtube-engagement-rate-calculator": "Free YouTube engagement rate calculator: add likes, comments and shares, divide by views or subscribers and get one video's engagement rate in seconds.",
   "/tools/x-engagement-rate-calculator": "Free X engagement rate calculator: add likes, replies, reposts, bookmarks and impressions or followers to get a post's engagement rate in seconds.",
   "/tools/youtube-hashtag-generator": "Free YouTube hashtag generator: pick your niche, mix broad and specific tags and copy 3 to 15 hashtags for your video description and Shorts in one click.",
