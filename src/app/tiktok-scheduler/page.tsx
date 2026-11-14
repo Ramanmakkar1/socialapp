@@ -277,6 +277,7 @@ export default function TikTokSchedulerPage() {
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Measure results with the <Link className={s.vlink} href="/tools/tiktok-engagement-rate-calculator">free TikTok engagement rate calculator</Link>.
+            Keep text clear of the interface with the <Link className={s.vlink} href="/tools/tiktok-safe-zone-checker">TikTok safe zone checker</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Not sure when to post? Get three starting times for your audience with the{" "}

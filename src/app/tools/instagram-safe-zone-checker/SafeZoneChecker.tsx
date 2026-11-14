@@ -5,6 +5,7 @@ import { Bookmark, Check, Download, Frame, Heart, Layers, MessageCircle, Music2,
 import {
   FRAME_H,
   FRAME_W,
+  MODE_META,
   SAFE_ZONES,
   SAFE_ZONE_MODES,
   toPixels,
@@ -87,9 +88,9 @@ function drawTemplate(mode: SafeZoneMode, showGrid: boolean): HTMLCanvasElement 
   ctx.font = "600 48px system-ui, -apple-system, Segoe UI, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const label = mode === "reels" ? "Reels safe zone" : "Story safe zone";
-  const midY = mode === "reels" ? FRAME_H * 0.4 : FRAME_H * 0.5;
-  const midX = mode === "reels" ? FRAME_W * 0.42 : FRAME_W * 0.5;
+  const label = MODE_META[mode].label;
+  const midY = mode === "story" ? FRAME_H * 0.5 : FRAME_H * 0.4;
+  const midX = mode === "story" ? FRAME_W * 0.5 : FRAME_W * 0.42;
   ctx.fillText(label, midX, midY);
   ctx.font = "400 32px system-ui, -apple-system, Segoe UI, sans-serif";
   ctx.fillText("1080 × 1920 · approximate guide", midX, midY + 60);
@@ -159,8 +160,8 @@ function ReelInterfaceOverlay() {
   );
 }
 
-export default function SafeZoneChecker() {
-  const [mode, setMode] = useState<SafeZoneMode>("reels");
+export default function SafeZoneChecker({ modes = SAFE_ZONE_MODES }: { modes?: { id: SafeZoneMode; label: string }[] } = {}) {
+  const [mode, setMode] = useState<SafeZoneMode>(modes[0].id);
   const [media, setMedia] = useState<Media | null>(null);
   const [opacity, setOpacity] = useState(45);
   const [showGrid, setShowGrid] = useState(false);
@@ -199,7 +200,7 @@ export default function SafeZoneChecker() {
       const a = document.createElement("a");
       const url = URL.createObjectURL(blob);
       a.href = url;
-      a.download = `instagram-${mode}-safe-zone-template-1080x1920.png`;
+      a.download = `${mode}-safe-zone-1080x1920.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -226,7 +227,7 @@ export default function SafeZoneChecker() {
           <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
             {FRAME_W}×{FRAME_H}
           </p>
-          <p className="mt-1 text-xs text-[#3d3450]">9:16 {mode === "reels" ? "Reel" : "Story"}, in px.</p>
+          <p className="mt-1 text-xs text-[#3d3450]">9:16 {MODE_META[mode].noun}, in px.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>
@@ -277,31 +278,33 @@ export default function SafeZoneChecker() {
           </div>
 
           <div className="grid gap-4 border-t border-[var(--poskoo-line)] pt-4 sm:grid-cols-2">
-            <fieldset className="min-w-0 border-0 p-0">
-              <legend id={modeLegendId} className="text-sm font-semibold">
-                Format
-              </legend>
-              <div className="mt-2 grid grid-cols-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1" role="radiogroup" aria-labelledby={modeLegendId}>
-                {SAFE_ZONE_MODES.map((m) => (
-                  <label
-                    key={m.id}
-                    className={`flex min-h-10 cursor-pointer items-center justify-center rounded-lg px-2 text-sm font-medium transition has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-[var(--poskoo-violet)] ${
-                      mode === m.id ? "bg-[var(--poskoo-ink)] text-white" : "text-[#3d3450] hover:bg-[var(--poskoo-band)]"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="safeZoneMode"
-                      value={m.id}
-                      checked={mode === m.id}
-                      onChange={() => setMode(m.id)}
-                      className="sr-only"
-                    />
-                    {m.label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+            {modes.length > 1 ? (
+              <fieldset className="min-w-0 border-0 p-0">
+                <legend id={modeLegendId} className="text-sm font-semibold">
+                  Format
+                </legend>
+                <div className="mt-2 grid grid-cols-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1" role="radiogroup" aria-labelledby={modeLegendId}>
+                  {modes.map((m) => (
+                    <label
+                      key={m.id}
+                      className={`flex min-h-10 cursor-pointer items-center justify-center rounded-lg px-2 text-sm font-medium transition has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-[var(--poskoo-violet)] ${
+                        mode === m.id ? "bg-[var(--poskoo-ink)] text-white" : "text-[#3d3450] hover:bg-[var(--poskoo-band)]"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="safeZoneMode"
+                        value={m.id}
+                        checked={mode === m.id}
+                        onChange={() => setMode(m.id)}
+                        className="sr-only"
+                      />
+                      {m.label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : null}
 
             <label className="block min-w-0 text-sm font-semibold">
               <span className="flex justify-between gap-2">
@@ -370,7 +373,7 @@ export default function SafeZoneChecker() {
             <div className="w-full max-w-[17rem] rounded-[2.25rem] border border-[var(--poskoo-line)] bg-[#0d0d14] p-2.5 shadow-xl">
               <div
                 className="relative aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] bg-[var(--poskoo-paper)]"
-                aria-label={`${mode === "reels" ? "Reels" : "Story"} safe zone preview`}
+                aria-label={`${MODE_META[mode].label} preview`}
                 role="img"
               >
                 {media ? (
@@ -443,8 +446,8 @@ export default function SafeZoneChecker() {
           </button>
           <span className="sr-only" aria-live="polite">{downloaded ? "Template downloaded" : ""}</span>
           <p className="text-xs text-[var(--poskoo-muted)]">
-            A 1080×1920 PNG of the {mode === "reels" ? "Reels" : "Story"} guides to use as a layer in Canva, Figma or
-            CapCut. Zones are approximate; Instagram&apos;s layout varies by device.
+            A 1080×1920 PNG of the {MODE_META[mode].noun} guides to use as a layer in Canva, Figma or
+            CapCut. Zones are approximate; the layout varies by device.
           </p>
         </aside>
       </div>
