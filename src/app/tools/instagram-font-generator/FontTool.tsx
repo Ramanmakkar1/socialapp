@@ -7,6 +7,7 @@ import { FONT_STYLES } from "@/lib/igFonts";
 const PLATFORM_LIMITS = {
   instagram: { limit: 150, label: "Instagram bio" },
   x: { limit: 160, label: "X bio" },
+  facebook: { limit: 101, label: "Facebook intro" },
 } as const;
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";

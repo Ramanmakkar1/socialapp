@@ -52,6 +52,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-font-generator", name: "Font generator", summary: "Copy Unicode font styles for your Instagram bio and captions.", category: "create", icon: "type" },
   { href: "/tools/tiktok-font-generator", name: "TikTok font generator", summary: "Copy-and-paste Unicode fonts for your TikTok bio, name and captions, checked against the 80-character bio limit.", category: "create", icon: "type" },
   { href: "/tools/x-font-generator", name: "X font generator", summary: "Copy bold, italic and fancy Unicode text for X posts and your bio.", category: "create", icon: "type" },
+  { href: "/tools/facebook-font-generator", name: "Facebook font generator", summary: "Copy bold, italic and fancy Unicode text for Facebook posts and your intro.", category: "create", icon: "type" },
   { href: "/tools/hashtag-generator", name: "Hashtag generator", summary: "Hashtags for Instagram, TikTok, LinkedIn, YouTube, Facebook and X, with the right count per platform.", category: "create", icon: "hash" },
   { href: "/tools/instagram-hashtag-generator", name: "Hashtag generator", summary: "Hand-curated hashtag sets for 15 niches, mixed broad to specific, up to 30 tags.", category: "create", icon: "hash" },
   { href: "/tools/instagram-hashtag-strategy", name: "Hashtag strategy worksheet", summary: "Group tags into broad, niche and branded sets and save them in your browser.", category: "create", icon: "layers" },
