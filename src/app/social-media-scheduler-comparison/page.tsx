@@ -10,6 +10,7 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 import { CompareNote } from "@/components/CompareNote";
+import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 const PATH = "/social-media-scheduler-comparison";
@@ -291,6 +292,20 @@ export default function SocialMediaSchedulerComparisonPage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="alternatives" style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Switching tools?</p>
+            <h2>Compare Poskoo with <em className="s">each alternative</em></h2>
+            <p>
+              Side-by-side pages for the schedulers and DM tools people most often switch from, with what Poskoo really
+              supports today.
+            </p>
+          </div>
+          <CompareAlternativesNav />
         </div>
       </section>
 
