@@ -120,6 +120,7 @@ export function SiteFooter() {
       <FooterColumn
         title="Schedulers"
         links={[
+          { href: "/social-media-scheduler", label: "Social media scheduler" },
           { href: "/instagram-scheduler", label: "Instagram scheduler" },
           { href: "/facebook-scheduler", label: "Facebook scheduler" },
           { href: "/threads-scheduler", label: "Threads scheduler" },
