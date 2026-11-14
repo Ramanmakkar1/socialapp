@@ -19,12 +19,14 @@ const PLATFORM_LABEL: Record<BioPlatform, string> = {
   instagram: "Instagram",
   tiktok: "TikTok",
   x: "X",
+  threads: "Threads",
 };
 
 const PLATFORM_CTA: Record<BioPlatform, string> = {
   instagram: DEFAULT_CTA,
   tiktok: 'DM "START" 👇',
   x: "Follow for daily tips 👇",
+  threads: 'Reply "START" for the guide 👇',
 };
 
 const field =
