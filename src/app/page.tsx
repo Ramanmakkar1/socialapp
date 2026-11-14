@@ -17,7 +17,7 @@ import { HeroVideo } from "@/components/HeroVideo";
 import { GoogleButton } from "@/components/GoogleButton";
 import { AnimArt } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
-const title = `Instagram Post Scheduler & Auto-DM Automation | ${BRAND.name}`;
+const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 // The trailing slash is load-bearing: new URL("/", base) normalises the root
 // path to the bare origin (https://poskoo.com), which Next then renders as the

@@ -23,6 +23,15 @@ test("staging homepage is noindex and excluded from the sitemap", () => {
   assert.ok(!urls.some((u) => u.includes("/app/") || u.endsWith("/login") || u.endsWith("/signup")), "private pages must stay out");
 });
 
+test("homepage title matches the keyword-first template and is 50–60 characters", () => {
+  const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
+  assert.ok(
+    pageSource.includes("const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;"),
+    "homepage title must use the Instagram scheduler keyword-first, brand-last template",
+  );
+  assert.ok(title.length >= 50 && title.length <= 60, `homepage title is ${title.length} characters: ${title}`);
+});
+
 test("home page canonical and description match the shared values", () => {
   assert.ok(
     pageSource.includes("const canonical = `${BRAND.url}/`;"),
