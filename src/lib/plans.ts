@@ -55,6 +55,29 @@ export const PLANS: Plan[] = [
 ];
 export const PLANS_NOTE = "Every account starts on the Free plan. Upgrade to Pro or Agency any time and cancel any time from Settings. You will never be charged without choosing a plan first.";
 
+/**
+ * Numeric plan limits for the plan-fit calculator, read from the plan item text (the public copy
+ * is the single source of truth). `null` means unlimited: "Unlimited scheduling" must not turn into
+ * a limit of 0, or the calculator would say Pro/Agency allow no posts at all.
+ */
+export type PlanFitLimit = { name: string; accounts: number; postsPerMonth: number | null; dmsPerMonth: number | null };
+
+function limitFromText(text: string | undefined): number | null {
+  if (!text) return 0;
+  if (/unlimited/i.test(text)) return null;
+  const match = text.match(/[\d,]+/);
+  return match ? Number(match[0].replace(/,/g, "")) : 0;
+}
+
+const planItem = (plan: Plan, pattern: RegExp) => plan.items.find((i) => pattern.test(i.text))?.text;
+
+export const PLAN_FIT_LIMITS: PlanFitLimit[] = PLANS.map((p) => ({
+  name: p.name,
+  accounts: limitFromText(planItem(p, /social accounts?/i)) ?? 0,
+  postsPerMonth: limitFromText(planItem(p, /schedul|scheduled posts?/i)),
+  dmsPerMonth: limitFromText(planItem(p, /auto-dms?/i)),
+}));
+
 /** Which plan features are switched on (from src/lib/featureReadiness.ts, decided at runtime). */
 export type PlanReadiness = { paidPlans: boolean; ai: boolean };
 

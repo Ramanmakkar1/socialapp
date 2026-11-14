@@ -141,7 +141,9 @@ export default function PricingPage() {
           <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{plansNote(r)}</p>
           <p className="small" style={{ textAlign: "center", marginTop: "10px" }}>
             Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}
-            by accounts, scheduled posts and auto-DMs.
+            by accounts, scheduled posts and auto-DMs, or use the free{" "}
+            <Link className={s.vlink} href="/tools/social-media-scheduler-plan-calculator">plan-fit calculator</Link>{" "}
+            to find the smallest plan for your numbers.
           </p>
         </div>
       </section>
