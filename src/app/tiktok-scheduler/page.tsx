@@ -272,6 +272,9 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-bio-generator">free TikTok bio generator</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
+            Measure results with the <Link className={s.vlink} href="/tools/tiktok-engagement-rate-calculator">free TikTok engagement rate calculator</Link>.
+          </p>
+          <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Not sure when to post? Get three starting times for your audience with the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link>{" "}
             finder.

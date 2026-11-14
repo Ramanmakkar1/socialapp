@@ -123,6 +123,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/best-time-to-post-on-pinterest", name: "Best time to post on Pinterest", summary: "Get starting Pinterest posting windows for your niche and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/instagram-posting-frequency-calculator", name: "Posting frequency calculator", summary: "Turn your weekly time budget into a realistic posting range and plan.", category: "plan", icon: "gauge" },
   { href: "/tools/instagram-engagement-rate-calculator", name: "Engagement rate calculator", summary: "Engagement rate by followers or by reach from likes, comments, saves and shares.", category: "plan", icon: "percent" },
+  { href: "/tools/tiktok-engagement-rate-calculator", name: "TikTok engagement rate calculator", summary: "Engagement rate by views or followers from likes, comments, shares and favorites.", category: "plan", icon: "percent" },
   // Comments & DMs
   { href: "/tools/instagram-comment-keyword-tester", name: "Comment keyword tester", summary: "Test which comments trigger a keyword with contains or exact matching.", category: "dm", icon: "key" },
   { href: "/tools/instagram-comment-to-dm-preview", name: "Comment-to-DM preview", summary: "Preview a keyword, sample comment and DM reply as a full flow.", category: "dm", icon: "workflow" },
