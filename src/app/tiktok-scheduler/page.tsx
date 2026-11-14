@@ -268,7 +268,9 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-profile-picture-size-checker">TikTok profile picture size checker</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
-            Need words for your video? Draft six hooks and captions with our{" "}
+            Need words for your video? Get opening lines with our{" "}
+            <Link className={s.vlink} href="/tools/tiktok-hook-generator">free TikTok hook generator</Link>{" "}
+            or draft six hooks and captions with our{" "}
             <Link className={s.vlink} href="/tools/tiktok-caption-generator">free TikTok caption generator</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>

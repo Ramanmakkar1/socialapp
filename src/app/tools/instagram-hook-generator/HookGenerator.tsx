@@ -18,7 +18,8 @@ const ghostBtn = "inline-flex min-h-11 w-full items-center justify-center gap-1.
 const CHIP_CLASS =
   "inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 text-sm font-medium text-[#3d3450] transition-colors hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)]";
 
-export default function HookGenerator() {
+export default function HookGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" }) {
+  const isTikTok = platform === "tiktok";
   const [topic, setTopic] = useState("");
   const [style, setStyle] = useState<HookStyleFilter>("all");
   const [copied, setCopied] = useState<string | null>(null);
@@ -60,7 +61,7 @@ export default function HookGenerator() {
       <div className="grid gap-4 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
         <div className="min-w-0">
           <label htmlFor={topicId} className="text-sm font-semibold">
-            What is your Reel about?
+            {isTikTok ? "What is your video about?" : "What is your Reel about?"}
           </label>
           <input
             id={topicId}
@@ -156,7 +157,7 @@ export default function HookGenerator() {
                           type="button"
                           onClick={() => setPicked(hook)}
                           aria-pressed={on}
-                          aria-label={`Preview hook on a Reel: ${hook}`}
+                          aria-label={`Preview hook on a ${isTikTok ? "video" : "Reel"}: ${hook}`}
                           className={`hidden min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-medium lg:inline-flex ${on ? "text-[var(--poskoo-violet)]" : "text-[#5f5873] hover:bg-[var(--poskoo-band)]"}`}
                         >
                           <Clapperboard className="h-4 w-4" aria-hidden="true" />
@@ -184,7 +185,7 @@ export default function HookGenerator() {
           ))}
         </div>
 
-        {/* Actions + Reel preview */}
+        {/* Actions + video preview */}
         <aside className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 max-lg:order-first lg:sticky lg:top-24">
           <button
             type="button"
@@ -203,7 +204,7 @@ export default function HookGenerator() {
           <span className="sr-only" aria-live="polite">{copied ? "Copied to clipboard" : ""}</span>
 
           <div className="hidden lg:block">
-            <p className="mb-2 text-sm font-semibold">Reel preview</p>
+            <p className="mb-2 text-sm font-semibold">{isTikTok ? "Video preview" : "Reel preview"}</p>
             <div className="relative mx-auto aspect-[9/16] w-full max-w-[190px] overflow-hidden rounded-2xl bg-[linear-gradient(160deg,#2a1f4a,#6b4eff_55%,#ff8a5b)] p-4" aria-hidden="true">
               <Sparkles className="absolute right-3 top-3 h-4 w-4 text-white/70" />
               <p className="absolute inset-x-3 top-[22%] rounded-lg bg-white px-2.5 py-2 text-center text-[13px] font-bold leading-snug text-[var(--poskoo-ink)] shadow">
@@ -215,12 +216,12 @@ export default function HookGenerator() {
           </div>
 
           <Link
-            href="/signup"
+            href={isTikTok ? "/tiktok-scheduler" : "/signup"}
             className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[var(--poskoo-violet)] px-4 text-sm font-semibold !text-white transition-transform hover:-translate-y-0.5"
           >
-            Schedule your Reel with Poskoo <span aria-hidden="true">&nbsp;→</span>
+            {isTikTok ? "Schedule your video with Poskoo" : "Schedule your Reel with Poskoo"} <span aria-hidden="true">&nbsp;→</span>
           </Link>
-          <Link href="/tools/instagram-caption-generator" className={ghostBtn}>
+          <Link href={isTikTok ? "/tools/tiktok-caption-generator" : "/tools/instagram-caption-generator"} className={ghostBtn}>
             Turn a hook into a caption
           </Link>
         </aside>
