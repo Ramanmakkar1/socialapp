@@ -14,6 +14,8 @@ export function HeroVideo({ src, poster }: { src: string; poster: string }) {
     const video = videoRef.current;
     if (!video) return;
     let frame: number | null = null;
+    let idleHandle: number | null = null;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       video.pause();
@@ -32,16 +34,32 @@ export function HeroVideo({ src, poster }: { src: string; poster: string }) {
     };
 
     video.addEventListener("playing", fadeIn, { once: true });
-    video.play().catch(() => {
-      // Autoplay blocked (e.g. low-power mode): show the poster frame instead.
-      video.style.opacity = "1";
-    });
+
+    // Defer the download until the poster has painted and the browser is idle,
+    // so the video never competes with the LCP image on first load.
+    const load = () => {
+      idleHandle = null;
+      timeoutHandle = null;
+      if (!video.getAttribute("src")) video.src = src;
+      video.play().catch(() => {
+        // Autoplay blocked (e.g. low-power mode): show the poster frame instead.
+        video.style.opacity = "1";
+      });
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleHandle = window.requestIdleCallback(load, { timeout: 2000 });
+    } else {
+      timeoutHandle = setTimeout(load, 200);
+    }
 
     return () => {
       video.removeEventListener("playing", fadeIn);
       if (frame !== null) cancelAnimationFrame(frame);
+      if (idleHandle !== null) window.cancelIdleCallback(idleHandle);
+      if (timeoutHandle !== null) clearTimeout(timeoutHandle);
     };
-  }, []);
+  }, [src]);
 
   // The frame crops the panorama: full-bleed behind the hero on desktop, a
   // full-width bottom strip (the whole comment-to-DM story) under the copy on phones.
@@ -51,12 +69,11 @@ export function HeroVideo({ src, poster }: { src: string; poster: string }) {
       <video
         ref={videoRef}
         className="heroVideo"
-        src={src}
         poster={poster}
         muted
         loop
         playsInline
-        preload="auto"
+        preload="none"
         aria-hidden="true"
         tabIndex={-1}
       />
