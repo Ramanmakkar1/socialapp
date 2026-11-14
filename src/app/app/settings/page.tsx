@@ -253,7 +253,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </div>
               <div className={styles.accountActions}>
                 <span className={user.emailVerified ? `${ui.pill} ${ui.pillMint}` : emailReady ? `${ui.pill} ${ui.pillPeach}` : `${ui.pill} ${ui.pillSoon}`}>
-                  {user.emailVerified ? "Email verified" : emailReady ? "Email not verified" : "Verification coming soon"}
+                  {user.emailVerified ? "Email verified" : emailReady ? "Email not verified" : "Verification not available yet"}
                 </span>
               </div>
               <p className={`${ui.hint} ${styles.accountNote}`}>
@@ -261,7 +261,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   ? `Verified${emailVerifiedAt ? ` on ${new Date(emailVerifiedAt).toLocaleDateString()}` : ""}. Used for sign-in, password resets and alerts.`
                   : emailReady
                     ? <>We emailed you a 6-digit code. <Link href="/verify-email" className={ui.link}>Verify your email</Link> to get password resets and alerts.</>
-                    : "Email verification codes are coming soon. Nothing is blocked meanwhile; sign in with Google to use an address Google has already verified."}
+                    : "We can't send verification emails yet. Nothing is blocked: you can use every feature now. Sign in with Google if you want an address Google has already verified."}
               </p>
             </li>
           </ul>
@@ -466,7 +466,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </ul>
         </section>
         <section className={styles.section} aria-labelledby="ai-reply-heading">
-          <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies{!aiConfigured ? <> <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span></> : null}</h2>
+          <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies{!aiConfigured ? <> <span className={`${ui.pill} ${ui.pillSoon}`}>Not switched on</span></> : null}</h2>
           {!aiConfigured ? <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}><strong>{FEATURE_COPY.ai_replies.title}.</strong> {FEATURE_COPY.ai_replies.body}</p> : null}
           {aiAccounts.length === 0 ? (
             <p className={ui.hint}>Connect an Instagram account first, then switch on AI replies.</p>
