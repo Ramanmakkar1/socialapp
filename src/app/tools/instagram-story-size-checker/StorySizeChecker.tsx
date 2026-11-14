@@ -3,10 +3,20 @@
 import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
 import { CheckCircle2, ImageUp, Trash2, XCircle } from "lucide-react";
 
-const TARGET_W = 1080;
-const TARGET_H = 1920;
-const TARGET_RATIO = TARGET_W / TARGET_H;
 const MAX_BYTES = 20 * 1024 * 1024;
+
+type Props = {
+  /** Platform name used in the copy and verdicts, e.g. "Pinterest". */
+  platform?: string;
+  /** Format name used in the copy, e.g. "Pin". */
+  formatName?: string;
+  targetWidth?: number;
+  targetHeight?: number;
+  ratioW?: number;
+  ratioH?: number;
+  /** Label of the file picker. */
+  inputLabel?: string;
+};
 
 type Loaded = {
   name: string;
@@ -62,13 +72,23 @@ function readImage(file: File): Promise<Omit<Loaded, "url">> {
   });
 }
 
-export default function StorySizeChecker() {
+export default function StorySizeChecker({
+  platform = "Instagram",
+  formatName = "Story",
+  targetWidth = 1080,
+  targetHeight = 1920,
+  ratioW = 9,
+  ratioH = 16,
+  inputLabel = "Load a Story image",
+}: Props) {
   const [image, setImage] = useState<Loaded | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const urlRef = useRef<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileId = useId();
+
+  const targetRatio = targetWidth / targetHeight;
 
   useEffect(() => {
     return () => {
@@ -114,32 +134,32 @@ export default function StorySizeChecker() {
     }
   }
 
-  const ratioDiff = image ? Math.abs(image.ratio - TARGET_RATIO) : 0;
-  const exact = image ? image.width === TARGET_W && image.height === TARGET_H : false;
+  const ratioDiff = image ? Math.abs(image.ratio - targetRatio) : 0;
+  const exact = image ? image.width === targetWidth && image.height === targetHeight : false;
   const correctShape = image ? ratioDiff < 0.005 : false;
-  const tooSmall = image ? image.width < TARGET_W || image.height < TARGET_H : false;
+  const tooSmall = image ? image.width < targetWidth || image.height < targetHeight : false;
 
   let verdict = "";
   let detail = "";
   if (image) {
     if (exact) {
-      verdict = "Perfect match: 1080 × 1920";
-      detail = "This image is exactly the recommended Instagram Story size and 9:16 shape. It will fill the screen without cropping or padding.";
+      verdict = `Perfect match: ${targetWidth} × ${targetHeight}`;
+      detail = `This image is exactly the recommended ${platform} ${formatName} size and ${ratioW}:${ratioH} shape. It will fill the screen without cropping or padding.`;
     } else if (correctShape) {
-      verdict = "Correct 9:16 shape, different resolution";
+      verdict = `Correct ${ratioW}:${ratioH} shape, different resolution`;
       detail = tooSmall
-        ? `This image is ${image.width} × ${image.height} px. The shape is right, but it is smaller than 1080 × 1920, so Instagram may upscale it and it can look soft. Re-export at 1080 × 1920 for the sharpest Story.`
-        : `This image is ${image.width} × ${image.height} px. The 9:16 shape is right, so it will fill the Story frame. Instagram scales it to 1080 × 1920, which is fine as long as the image is sharp.`;
+        ? `This image is ${image.width} × ${image.height} px. The shape is right, but it is smaller than ${targetWidth} × ${targetHeight}, so ${platform} may upscale it and it can look soft. Re-export at ${targetWidth} × ${targetHeight} for the sharpest ${formatName}.`
+        : `This image is ${image.width} × ${image.height} px. The ${ratioW}:${ratioH} shape is right, so it will fill the ${formatName} frame. ${platform} scales it to ${targetWidth} × ${targetHeight}, which is fine as long as the image is sharp.`;
     } else {
-      verdict = "Not a 9:16 Story shape";
-      detail = `This image is ${image.width} × ${image.height} px (${image.ratioLabel}). Instagram Stories use a 9:16 frame, so this image will be cropped or padded with bars. Re-export or crop it to 1080 × 1920 before you post.`;
+      verdict = `Not a ${ratioW}:${ratioH} ${formatName} shape`;
+      detail = `This image is ${image.width} × ${image.height} px (${image.ratioLabel}). ${platform} ${formatName}s use a ${ratioW}:${ratioH} frame, so this image will be cropped or padded with bars. Re-export or crop it to ${targetWidth} × ${targetHeight} before you post.`;
     }
   }
 
   const checks = image
     ? [
-        { label: "9:16 Story shape", ok: correctShape },
-        { label: "At least 1080 × 1920 px", ok: !tooSmall },
+        { label: `${ratioW}:${ratioH} ${formatName} shape`, ok: correctShape },
+        { label: `At least ${targetWidth} × ${targetHeight} px`, ok: !tooSmall },
         { label: "Under 20 MB", ok: image.bytes <= MAX_BYTES },
       ]
     : [];
@@ -159,7 +179,7 @@ export default function StorySizeChecker() {
         <div className="min-w-0 space-y-4">
           <div className="rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
             <label htmlFor={fileId} className="text-sm font-semibold">
-              Load a Story image
+              {inputLabel}
             </label>
             <div className="relative mt-2 grid min-h-32 place-items-center rounded-xl border-2 border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-4 text-center transition hover:border-[var(--poskoo-violet)] has-[:focus-visible]:border-[var(--poskoo-violet)] has-[:focus-visible]:shadow-[0_0_0_3px_var(--poskoo-band)]">
               <div className="pointer-events-none" aria-hidden="true">
@@ -224,7 +244,7 @@ export default function StorySizeChecker() {
               </ul>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="min-w-0 break-all text-xs text-[#5f5873]">
-                  {image.name} · {formatBytes(image.bytes)} · recommended {TARGET_W} × {TARGET_H} px (9:16)
+                  {image.name} · {formatBytes(image.bytes)} · recommended {targetWidth} × {targetHeight} px ({ratioW}:{ratioH})
                 </p>
                 <button
                   type="button"
@@ -240,7 +260,7 @@ export default function StorySizeChecker() {
 
           {!image && !loading && !error ? (
             <p className="rounded-xl border border-dashed border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] px-4 py-5 text-center text-sm text-[#5f5873]">
-              Choose an image to see its exact dimensions, aspect ratio and whether it fits the 1080 × 1920 Story frame.
+              Choose an image to see its exact dimensions, aspect ratio and whether it fits the {targetWidth} × {targetHeight} {formatName} frame.
             </p>
           ) : null}
         </div>
@@ -248,9 +268,10 @@ export default function StorySizeChecker() {
         <div className="flex min-w-0 justify-center md:sticky md:top-24">
           <div className="w-full max-w-[17rem] rounded-[2.25rem] border border-[var(--poskoo-line)] bg-[#0d0d14] p-2.5 shadow-[var(--poskoo-shadow-float)]">
             <div
-              className="relative aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] bg-[repeating-conic-gradient(#f3eeff_0%_25%,#fffcf6_0%_50%)] bg-[length:20px_20px]"
+              className="relative w-full overflow-hidden rounded-[1.75rem] bg-[repeating-conic-gradient(#f3eeff_0%_25%,#fffcf6_0%_50%)] bg-[length:20px_20px]"
+              style={{ aspectRatio: `${ratioW} / ${ratioH}` }}
               role="img"
-              aria-label={image ? `9:16 Story preview of ${image.name}` : "Empty 9:16 Instagram Story frame"}
+              aria-label={image ? `${ratioW}:${ratioH} ${formatName} preview of ${image.name}` : `Empty ${ratioW}:${ratioH} ${platform} ${formatName} frame`}
             >
               {image ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -258,8 +279,8 @@ export default function StorySizeChecker() {
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center text-[#5f5873]">
                   <ImageUp className="h-8 w-8" aria-hidden="true" />
-                  <p className="text-xs font-medium">Your Story preview appears here</p>
-                  <p className="text-[11px]">9:16 · 1080 × 1920 recommended</p>
+                  <p className="text-xs font-medium">Your {formatName} preview appears here</p>
+                  <p className="text-[11px]">{ratioW}:{ratioH} · {targetWidth} × {targetHeight} recommended</p>
                 </div>
               )}
               <div className="pointer-events-none absolute inset-x-3 top-2.5 flex gap-1" aria-hidden="true">
@@ -267,7 +288,7 @@ export default function StorySizeChecker() {
               </div>
               {image && (
                 <span className={`pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 max-w-[90%] truncate whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-bold shadow ${exact ? "bg-[var(--poskoo-green)] text-white" : correctShape ? "bg-[var(--poskoo-lime)] text-[var(--poskoo-ink)]" : "bg-[var(--poskoo-coral)] text-white"}`} aria-hidden="true">
-                  {exact ? "Perfect fit" : correctShape ? "9:16 shape" : `${image.ratioLabel} — not 9:16`}
+                  {exact ? "Perfect fit" : correctShape ? `${ratioW}:${ratioH} shape` : `${image.ratioLabel} — not ${ratioW}:${ratioH}`}
                 </span>
               )}
               <div className="pointer-events-none absolute inset-0 rounded-[1.75rem] ring-1 ring-inset ring-white/15" aria-hidden="true" />
