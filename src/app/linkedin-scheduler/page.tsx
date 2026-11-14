@@ -263,7 +263,7 @@ export default function LinkedInSchedulerPage() {
             Pick a starting slot with our <Link className={s.vlink} href="/tools/best-time-to-post-on-linkedin">best time to post on LinkedIn</Link> finder.
             Build a short, relevant tag set with the <Link className={s.vlink} href="/tools/linkedin-hashtag-generator">LinkedIn hashtag generator</Link>.
             Write a profile line with the <Link className={s.vlink} href="/tools/linkedin-headline-generator">LinkedIn headline generator</Link>.
-            Check your banner with the <Link className={s.vlink} href="/tools/linkedin-banner-size-checker">LinkedIn banner size checker</Link>.
+            Check your banner with the <Link className={s.vlink} href="/tools/linkedin-banner-size-checker">LinkedIn banner size checker</Link> and the <Link className={s.vlink} href="/tools/linkedin-profile-picture-size-checker">LinkedIn profile picture size checker</Link>.
             Measure a post with the <Link className={s.vlink} href="/tools/linkedin-engagement-rate-calculator">free LinkedIn engagement rate calculator</Link>.
           </p>
         </div>
