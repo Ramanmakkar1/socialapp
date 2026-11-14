@@ -3,6 +3,7 @@ import { preload } from "react-dom";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
+import { canonicalUrl } from "@/lib/canonical";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
@@ -21,9 +22,9 @@ const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 // The trailing slash is load-bearing: new URL("/", base) normalises the root
 // path to the bare origin (https://poskoo.com), which Next then renders as the
-// canonical href. The audit compares the tag against the audited URL, so the
-// canonical must keep the "/" — write it explicitly instead of via URL.
-const canonical = `${BRAND.url}/`;
+// canonical href. canonicalUrl() keeps that "/" explicitly and always builds
+// from BRAND.url, dropping any query string or fragment.
+const canonical = canonicalUrl("/");
 export const metadata: Metadata = {
  title: { absolute: title }, description, alternates: { canonical },
  openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
