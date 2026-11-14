@@ -9,11 +9,13 @@ import { faqJsonLd, ldJson } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-content-planner";
+const PAGE_TITLE = "Instagram Content Planner: Hook to Scheduled Post";
+const PAGE_DESCRIPTION =
+  "Plan one Instagram post in five steps: draft a hook, write the caption, check image dimensions, preview the post, then schedule it with Poskoo.";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Instagram Content Planner: Hook to Scheduled Post" },
-  description:
-    "Plan one Instagram post in five steps: draft a hook, write the caption, check image dimensions, preview the post, then schedule it with Poskoo.",
+  title: { absolute: PAGE_TITLE },
+  description: PAGE_DESCRIPTION,
   alternates: { canonical: PATH },
 });
 
@@ -74,6 +76,39 @@ const faqs = [
   },
 ];
 
+const faq = faqJsonLd(faqs);
+
+// WebPage + HowTo built from the same title, description and five steps the page renders.
+const pageJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": `${BRAND.url}${PATH}#webpage`,
+      url: `${BRAND.url}${PATH}`,
+      name: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      inLanguage: "en",
+      isPartOf: { "@type": "WebSite", "@id": `${BRAND.url}#website`, name: BRAND.name, url: BRAND.url },
+    },
+    {
+      "@type": "HowTo",
+      "@id": `${BRAND.url}${PATH}#howto`,
+      name: "How to plan an Instagram post in five steps",
+      description: PAGE_DESCRIPTION,
+      url: `${BRAND.url}${PATH}`,
+      step: steps.map((st, i) => ({
+        "@type": "HowToStep",
+        position: i + 1,
+        name: st.title,
+        text: st.text,
+        url: `${BRAND.url}${st.href}`,
+      })),
+    },
+    { "@type": faq["@type"], mainEntity: faq.mainEntity },
+  ],
+};
+
 // One .cards grid per 3 steps so the pcard tilt/colors (nth-child 1-3) work.
 const groups: (typeof steps)[] = [];
 for (let i = 0; i < steps.length; i += 3) groups.push(steps.slice(i, i + 3));
@@ -88,7 +123,7 @@ export default function InstagramContentPlannerPage() {
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }}
+        dangerouslySetInnerHTML={{ __html: ldJson(pageJsonLd) }}
       />
       <header className="hero">
         <div className={s.heroText}>
