@@ -205,7 +205,7 @@ export default async function AppHome() {
     .slice(0, 5);
   const thumbs = await postThumbs(top.map((t) => t.post.id));
   const channelConnected = stats.hasAccount || anyChannel;
-  const checklistDone = channelConnected && postCreated && stats.hasPost && stats.hasRule;
+  const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && stats.hasRule;
 
   return (
     <div className={`${instrumentSans.variable} ${home.page}`}>
@@ -249,7 +249,7 @@ export default async function AppHome() {
       )}
 
       {!checklistDone && (
-        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasPost} ruleCreated={stats.hasRule} />
+        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasScheduledPost} ruleCreated={stats.hasRule} />
       )}
 
       <section className={home.section} aria-labelledby="todays-actions">
