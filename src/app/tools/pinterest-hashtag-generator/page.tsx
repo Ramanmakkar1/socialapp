@@ -7,15 +7,15 @@ const config: ToolPageConfig = {
   path: "/tools/pinterest-hashtag-generator",
   name: "Pinterest hashtag generator",
   crumb: "Pinterest hashtag generator",
-  title: "Free Pinterest Hashtag Generator: Tags for Your Pins",
+  title: "Pinterest Hashtag Generator: Free Tags for Pins (2026)",
   description:
-    "Free Pinterest hashtag generator: pick your niche, mix broad and specific tags and copy 2 to 5 relevant hashtags for your Pin descriptions in one click.",
+    "Free Pinterest hashtag generator: pick your niche and get 2-5 relevant hashtags for Pin descriptions, with a 500-character limit note. No signup needed.",
   pill: "Free · no signup · no AI or scraping",
   h1: { before: "Pinterest hashtag generator:", mark: "free hashtags", after: "for your Pins" },
-  lede: "Pins can carry hashtags in the description, but Pinterest search mostly uses your title and description keywords, so 2 to 5 relevant hashtags is plenty. Pick your niche, choose how broad or specific the mix should be, and copy a clean set of 2 to 20 hashtags for your Pin descriptions. Hand-curated tags, generated in your browser.",
+  lede: "Pinterest hashtags still work, but they are optional: keywords in your Pin title and description matter most, and 2 to 5 specific tags at the end of the description are plenty. Pick your niche, choose how broad or specific the mix should be, and copy a clean set of 1 to 10 hashtags for your Pin descriptions. Hand-curated tags, generated in your browser.",
   art: "hashtag",
   artLabel: "A creator pins colourful hashtag cards to a board above a laptop showing a Pinterest Pin",
-  heroPoints: ["15 niches", "2–20 tags", "Copy, caption block or CSV"],
+  heroPoints: ["15 niches", "1–10 tags", "Copy, caption block or CSV"],
   toolTitle: "Generate your Pinterest hashtag set",
   toolNote: "Free · nothing leaves your browser",
   stepsTitle: "How to generate Pinterest hashtags",
@@ -27,7 +27,7 @@ const config: ToolPageConfig = {
     },
     {
       title: "Set the count and mix",
-      text: "Slide between 2 and 20 tags, then choose Balanced, More broad or More specific. Add an optional keyword such as your brand or city.",
+      text: "Slide between 1 and 10 tags, then choose Balanced, More broad or More specific. Add an optional keyword such as your brand or city.",
       art: "writing",
     },
     {
@@ -88,8 +88,9 @@ const config: ToolPageConfig = {
         body: (
           <>
             <p>
-              Pinterest allows up to 20 hashtags in a Pin description, but 2 to 5 relevant hashtags is plenty. Pinterest
-              search mostly uses your title and description keywords, so the words in your Pin do more work than the tags.
+              Pinterest descriptions allow 500 characters, and hashtags are optional. Use 2 to 5 specific tags at the end
+              of the description; Pinterest search mostly uses your title and description keywords, so the words in your
+              Pin do more work than the tags. This generator lets you copy between 1 and 10 tags at once.
             </p>
             <ul>
               <li>Start with 2 to 5 tags that describe the Pin exactly.</li>
@@ -146,6 +147,22 @@ const config: ToolPageConfig = {
         ),
       },
       {
+        title: "Check the Pin before you schedule it",
+        body: (
+          <>
+            <p>
+              Hashtags are only one part of a Pin. Write the description with the{" "}
+              <Link href="/tools/pinterest-description-generator">Pinterest description generator</Link>, check the
+              title, description and alt text limits with the{" "}
+              <Link href="/tools/pinterest-character-counter">Pinterest character counter</Link>, and make sure the
+              image fits the feed with the{" "}
+              <Link href="/tools/pinterest-pin-size-checker">Pinterest pin size checker</Link>. When the Pin is ready,
+              the <Link href="/pinterest-scheduler">Pinterest scheduler</Link> publishes it at the time you pick.
+            </p>
+          </>
+        ),
+      },
+      {
         title: "Example: a small set for a recipe Pin",
         body: (
           <>
@@ -169,7 +186,7 @@ const config: ToolPageConfig = {
   faqs: [
     {
       q: "How many hashtags should I use on Pinterest?",
-      a: "Pinterest allows up to 20 hashtags in a Pin description, but 2 to 5 relevant hashtags is plenty. Pinterest search mostly uses your title and description keywords, so start with tags that describe the Pin exactly and add more only when each one is still relevant. This generator lets you copy between 2 and 20 hashtags at once.",
+      a: "Pinterest descriptions allow 500 characters, and hashtags are optional. Use 2 to 5 specific tags at the end of the description; Pinterest search mostly uses your title and description keywords, so start with tags that describe the Pin exactly and add more only when each one is still relevant. This generator lets you copy between 1 and 10 hashtags at once.",
     },
     {
       q: "Where do hashtags go in a Pin description?",
@@ -193,15 +210,16 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/pinterest-description-generator",
     "/tools/pinterest-character-counter",
-    "/tools/best-time-to-post-on-pinterest",
-    "/tools/instagram-hashtag-generator",
+    "/tools/pinterest-pin-size-checker",
+    "/pinterest-scheduler",
   ],
   schema: {
     features: [
       "Hand-curated hashtag sets for 15 niches",
       "Broad, mid-level and specific tag tiers",
-      "Choose 2 to 20 hashtags",
+      "Choose 1 to 10 hashtags",
       "Optional custom keyword tag",
       "Estimated popularity range, tier and competition per tag",
       "Copy selected tags, copy as a caption block or download CSV",
@@ -211,7 +229,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your hashtags are ready.",
     mark: "Schedule the Pin.",
-    text: "Connect Pinterest with its official login, plan your Pins on one calendar and publish them automatically with Poskoo's <Link href=\"/pinterest-scheduler\">Pinterest scheduler</Link>.",
+    text: "Connect Pinterest with its official login, plan your Pins on one calendar and publish them automatically with Poskoo's Pinterest scheduler.",
   },
 };
 

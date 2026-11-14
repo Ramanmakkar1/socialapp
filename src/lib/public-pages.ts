@@ -556,7 +556,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/x-hashtag-generator": "Free X (Twitter) hashtag generator: pick your niche, add your keyword and copy 1 to 3 relevant hashtags that fit the 280-character limit. No signup.",
   "/tools/x-thread-maker": "Paste long text and this free Twitter thread maker splits it into numbered X posts of up to 280 characters at sentence breaks. Copy each post. No signup.",
   "/tools/threads-thread-maker": "Paste long text and this free Threads thread maker splits it into numbered posts of up to 500 characters at sentence breaks. Copy each post. No signup.",
-  "/tools/pinterest-hashtag-generator": "Free Pinterest hashtag generator: pick your niche, mix broad and specific tags and copy 2 to 5 relevant hashtags for your Pin descriptions in one click.",
+  "/tools/pinterest-hashtag-generator": "Free Pinterest hashtag generator: pick your niche and get 2-5 relevant hashtags for Pin descriptions, with a 500-character limit note. No signup needed.",
   "/tools/tiktok-caption-generator": "Free TikTok caption generator: enter your topic, pick a goal and tone, copy six captions with a short hook and call to action. Under TikTok's 4,000 limit.",
   "/tools/linkedin-post-generator": "Free LinkedIn post generator: enter a topic, pick a goal and tone, and copy six post drafts with a hook and call to action. Fits LinkedIn's 3,000 limit.",
   "/tools/youtube-title-counter": "Free YouTube title and description counter with real limits, search previews, tag totals and warnings. Check your video details before you publish.",
