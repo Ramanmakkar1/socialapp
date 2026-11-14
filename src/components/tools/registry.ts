@@ -64,7 +64,6 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/tiktok-bio-generator", name: "TikTok bio generator", summary: "Short TikTok bio ideas for your niche that fit the 80-character limit.", category: "create", icon: "user" },
   { href: "/tools/x-bio-generator", name: "X (Twitter) bio generator", summary: "X bio ideas for your niche that fit the 160-character limit.", category: "create", icon: "user" },
   { href: "/tools/threads-bio-generator", name: "Threads bio generator", summary: "Threads bio ideas for your niche that fit the 150-character limit.", category: "create", icon: "user" },
-  { href: "/tools/threads-post-generator", name: "Threads post generator", summary: "Six Threads post drafts with a hook and a question, each under 500 characters.", category: "create", icon: "sparkles" },
   { href: "/tools/threads-hashtag-generator", name: "Threads hashtag generator", summary: "Pick a niche and copy one relevant topic tag for your Threads post.", category: "create", icon: "hash" },
   { href: "/tools/facebook-bio-generator", name: "Facebook bio generator", summary: "Short Facebook bio ideas that fit the 101-character Intro limit.", category: "create", icon: "user" },
   { href: "/tools/instagram-username-generator", name: "Username generator", summary: "Up to 30 username ideas from your name and niche that follow Instagram's rules.", category: "create", icon: "at" },
@@ -100,6 +99,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/mastodon-character-counter", name: "Mastodon character counter", summary: "Check the 500-character default or your server's limit, with links counted as 23 and mentions by username.", category: "create", icon: "type" },
   { href: "/tools/pinterest-character-counter", name: "Pinterest character counter", summary: "Check Pin title (100), description (500) and alt text limits, with a feed preview.", category: "create", icon: "type" },
   { href: "/tools/pinterest-description-generator", name: "Pinterest description generator", summary: "Six Pin description drafts under 500 characters with your keyword early and a call to action.", category: "create", icon: "sparkles" },
+  { href: "/tools/threads-post-generator", name: "Threads post generator", summary: "Six ready-to-post Threads captions for any topic, kept under the 500-character limit.", category: "create", icon: "sparkles" },
   { href: "/tools/tweet-generator", name: "Tweet generator", summary: "Six ready-to-post tweets for any topic, trimmed to X's 280-character limit.", category: "create", icon: "sparkles" },
   { href: "/tools/threads-caption-generator", name: "Threads caption generator", summary: "Six Threads post drafts with a hook and call to action that fit the 500-character limit.", category: "create", icon: "sparkles" },
   // Images & video

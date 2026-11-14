@@ -660,7 +660,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/youtube-shorts-safe-zone-checker": "Free YouTube Shorts safe zone checker: load a frame to see what the title, channel name and buttons cover, then download a 1080×1920 template.",
   "/tools/x-bio-generator": "Free X (Twitter) bio generator: add your name, what you do and a call to action, pick a niche and copy a bio with a live 160-character counter.",
   "/tools/threads-bio-generator": "Free Threads bio generator: add your name, what you do and a call to action, pick a niche and copy a ready-to-paste bio with a live 150-character counter.",
-  "/tools/threads-post-generator": "Free Threads post generator: enter your topic, pick a goal and tone, and copy six drafts with a hook and a question, each under the 500-character limit.",
+  "/tools/threads-post-generator": "Free Threads post generator: enter a topic to get six ready-to-post Threads captions checked against the 500-character limit, all in your browser.",
   "/tools/threads-hashtag-generator": "Free Threads hashtag generator: pick a niche and copy one relevant topic tag for your post, chosen from hand-curated lists in your browser, no signup.",
   "/tools/threads-tools": "Seven free Threads tools from Poskoo: write posts and threads, build a bio, try bold fonts, count characters, preview posts and find the best time to post.",
   "/tools/facebook-bio-generator": "Free Facebook bio generator: add your name, what you do and a call to action, pick a niche and copy a short bio with a live 101-character counter.",

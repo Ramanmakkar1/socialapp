@@ -1715,7 +1715,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
   const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : isPinterest ? "Pinterest" : isX ? "X" : isThreads ? "Threads" : "Instagram";
   const captionLimit = isPinterest ? 500 : isX ? 280 : isThreads ? 500 : isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
   const noun = isLinkedIn || isX || isThreads ? "post" : isPinterest ? "description" : "caption";
-  const foldAt = isFacebook ? 125 : isLinkedIn ? 210 : isThreads ? 500 : isPinterest ? 50 : FOLD_AT;
+  const foldAt = isFacebook ? 125 : isLinkedIn ? 210 : isPinterest ? 50 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1803,11 +1803,14 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
         return textX;
       }
       if (isThreads) {
-        const short =
-          fullText.length > 500
-            ? [hookPart, bodyLines[0], ctaPart].filter(Boolean).join("\n\n")
-            : fullText;
-        return short.replace(/Instagram/g, "Threads");
+        const toThreads = (v: string) => v.replace(/Instagram/g, "Threads").replace(/link in (my |the )?bio/gi, "link in my profile");
+        let n = bodyLines.length;
+        text = toThreads(fullText);
+        while (text.length > 500 && n > 1) {
+          n -= 1;
+          text = toThreads([hookPart, ...bodyLines.slice(0, n), ctaPart].join("\n\n"));
+        }
+        return text.slice(0, 500);
       }
       return text;
     });
