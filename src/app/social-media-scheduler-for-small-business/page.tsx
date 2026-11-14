@@ -331,6 +331,10 @@ export default function SocialMediaSchedulerForSmallBusinessPage() {
             Need a hand? Browse the{" "}
             <Link className={s.vlink} href="/tools">
               free social media tools
+            </Link>
+            , see the{" "}
+            <Link className={s.vlink} href="/free-social-media-scheduler">
+              free social media scheduler
             </Link>{" "}
             or read the{" "}
             <Link className={s.vlink} href="/social-media-scheduler-comparison">
