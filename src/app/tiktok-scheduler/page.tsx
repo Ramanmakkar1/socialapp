@@ -284,7 +284,7 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-bio-generator">free TikTok bio generator</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
-            Measure results with the <Link className={s.vlink} href="/tools/tiktok-engagement-rate-calculator">free TikTok engagement rate calculator</Link>.
+            Measure how each video did with the <Link className={s.vlink} href="/tools/tiktok-engagement-rate-calculator">free TikTok engagement rate calculator</Link>.
             Keep text clear of the interface with the <Link className={s.vlink} href="/tools/tiktok-safe-zone-checker">TikTok safe zone checker</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
