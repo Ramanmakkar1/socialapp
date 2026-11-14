@@ -7,8 +7,8 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: `Privacy Policy: How ${BRAND.name} Handles Your Instagram Data` },
-  description: "Read how Poskoo stores your Instagram, Facebook, Threads and YouTube data, which cookies we use, and how to export or delete your account at any time.",
+  title: { absolute: `Privacy Policy: How ${BRAND.name} Protects Your Data` },
+  description: "Read how Poskoo uses and protects your Google, YouTube, Instagram, Facebook and Threads data, including encryption, access controls and deletion options.",
   alternates: { canonical: "/privacy" },
 });
 
@@ -50,10 +50,23 @@ export default function Page() {
       <section style={{ paddingTop: 20 }}>
         <div className={s.prose}>
           <p>{BRAND.name} ({BRAND.company}) helps you schedule social posts and automatically reply to comments and messages on accounts you connect.</p>
+          <p>Last updated: November 14, 2026.</p>
           <h2>What we collect</h2>
           <p>Your account email; the social accounts you connect (through each platform&apos;s official login); the posts, comments and messages needed to run the features you turn on; and the contacts (name, email, phone) your followers choose to share.</p>
           <h2>How we use it</h2>
           <p>Only to provide the service: publishing your posts, sending the replies you set up, and showing you analytics. We never sell your data.</p>
+          <h2 id="google-sign-in">Sign in with Google</h2>
+          <p>If you choose Sign in with Google, we receive your Google account identifier, email address, email verification status and name. We use this information to create or identify your {BRAND.name} account and sign you in. Google sign-in does not by itself grant access to your YouTube channel. We never receive or store your Google password.</p>
+          <h2 id="data-protection">How we protect Google user data and other sensitive information</h2>
+          <p>We use technical safeguards to protect the confidentiality and integrity of Google user data and other sensitive information against unauthorized access, disclosure, alteration and loss. These safeguards apply to Google sign-in information, YouTube channel information, OAuth credentials and the content you provide for publishing:</p>
+          <ul>
+            <li><strong>Encryption in transit.</strong> Our website uses HTTPS (TLS) to protect data sent between your browser and {BRAND.name}. Requests to Google&apos;s sign-in, token and YouTube API endpoints also use HTTPS.</li>
+            <li><strong>Encryption of stored credentials.</strong> We encrypt YouTube OAuth refresh tokens with AES-256-GCM before storing them in our database. The encryption key and OAuth client secrets are held in server environment configuration, separately from the encrypted database records. Tokens are decrypted on the server only when needed to perform the features you authorize and are not displayed in the interface.</li>
+            <li><strong>Account access controls.</strong> Protected account pages and actions require an authenticated session, and connected YouTube channel records are accessed using the signed-in user&apos;s account identifier. Session credentials use Secure, HttpOnly and SameSite cookies in production, with only a hash of the session token stored in the database. If you create a password for {BRAND.name}, it is stored as a salted scrypt hash.</li>
+            <li><strong>OAuth safeguards.</strong> Google sign-in and YouTube connection use OAuth authorization codes, PKCE and a state parameter to protect the connection process. Temporary OAuth flow cookies are encrypted and expire after about 10 minutes. Google sign-in also validates the returned identity token and nonce.</li>
+            <li><strong>Control over access.</strong> We request permissions for the features described in this policy. You can disconnect YouTube in Settings → Connected accounts, which clears the stored refresh token, or revoke our access in your Google account. You can also request deletion using our <Link href="/data-deletion">data deletion page</Link>.</li>
+          </ul>
+          <p>No method of transmission or storage can guarantee absolute security. For a privacy or data security concern, contact <a href={`mailto:${BRAND.supportEmail}`}>{BRAND.supportEmail}</a>.</p>
           <h2 id="instagram">Instagram and Meta data</h2>
           <p>When you connect an Instagram professional account through Instagram&apos;s official login, you choose to give {BRAND.name} these permissions. We only use them for the features you turn on:</p>
           <ul>
@@ -77,7 +90,7 @@ export default function Page() {
           <p><strong>Sharing and retention of Google data.</strong> We do not sell, rent or share Google user data (your channel name, avatar and access token) with anyone, and we never use it for advertising or to train AI or machine-learning models. We keep it only while your YouTube channel is connected; when you disconnect or delete your account it is deleted straight away (backups roll off within 30 days). Video files you upload for a scheduled post are deleted from our server as soon as YouTube has published them.</p>
           <p><strong>Limited Use.</strong> {BRAND.name}&apos;s use and transfer of information received from Google APIs to any other app will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener noreferrer" target="_blank">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
           <p><strong>Revoking access.</strong> Disconnect any time in Settings → Connected accounts. You can also revoke {BRAND.name} from Google directly: go to <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer" target="_blank">myaccount.google.com/permissions</a>, find our app under &ldquo;Third-party apps &amp; add-ons&rdquo; and remove it. When you disconnect, we delete your token straight away.</p>
-          <p><strong>Google&apos;s policies.</strong> When you sign in, Google&apos;s <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Privacy Policy</a> and <a href="https://www.youtube.com/intl/en_US/Terms" rel="noopener noreferrer" target="_blank">YouTube Terms of Service</a> apply to how Google and YouTube handle your data. Google does not share your personal data with us except your channel name and avatar and the access you grant above.</p>
+          <p><strong>Google&apos;s policies.</strong> Google&apos;s <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Privacy Policy</a> and, when you connect YouTube, the <a href="https://www.youtube.com/intl/en_US/Terms" rel="noopener noreferrer" target="_blank">YouTube Terms of Service</a> apply to how Google and YouTube handle your data. We access the Google sign-in and YouTube information described above only when you authorize the corresponding feature.</p>
           <h2>Deleting your data</h2>
           <p>You can disconnect an account or delete everything at any time — see our <Link href="/data-deletion">data deletion page</Link>.</p>
           <h2 id="cookies">Cookies</h2>
