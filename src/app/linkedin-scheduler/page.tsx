@@ -264,6 +264,7 @@ export default function LinkedInSchedulerPage() {
             Build a short, relevant tag set with the <Link className={s.vlink} href="/tools/linkedin-hashtag-generator">LinkedIn hashtag generator</Link>.
             Write a profile line with the <Link className={s.vlink} href="/tools/linkedin-headline-generator">LinkedIn headline generator</Link>.
             Check your banner with the <Link className={s.vlink} href="/tools/linkedin-banner-size-checker">LinkedIn banner size checker</Link>.
+            Measure a post with the <Link className={s.vlink} href="/tools/linkedin-engagement-rate-calculator">free LinkedIn engagement rate calculator</Link>.
           </p>
         </div>
       </section>
