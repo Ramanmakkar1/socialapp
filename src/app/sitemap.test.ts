@@ -5,6 +5,7 @@ import { test } from "node:test";
 import robots from "./robots.ts";
 import { GET as llmsTxt } from "./llms.txt/route.ts";
 import sitemap from "./sitemap.ts";
+import nextConfig from "../../next.config.ts";
 import { BRAND } from "@/lib/brand";
 import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS } from "@/lib/public-pages";
@@ -119,6 +120,22 @@ test("noindex mode returns an empty sitemap and omits the sitemap directive", ()
 
 test("robots omits the sitemap while staging is noindex", () => {
   whileNoindex(() => assert.equal("sitemap" in robots(), false));
+});
+
+test("sitemap.xml and robots.txt are configured never to be cached", async () => {
+  const rules = (await nextConfig.headers?.()) ?? [];
+  for (const source of ["/sitemap.xml", "/robots.txt"]) {
+    const rule = rules.find((entry) => entry.source === source);
+    assert.ok(rule, `${source} needs an explicit cache header rule`);
+    const headers = new Map(rule.headers.map((header) => [header.key, header.value]));
+    for (const key of ["Cache-Control", "CDN-Cache-Control", "Cloudflare-CDN-Cache-Control"]) {
+      const value = headers.get(key);
+      assert.ok(value, `${source} must set ${key}`);
+      assert.match(value, /no-store/, `${source} ${key} must fail closed with no-store`);
+    }
+    assert.match(headers.get("Cache-Control") ?? "", /no-cache/, `${source} Cache-Control must include no-cache`);
+    assert.doesNotMatch(headers.get("Cache-Control") ?? "", /public|s-maxage|max-age=[1-9]/, `${source} must not allow a cached copy`);
+  }
 });
 
 test("robots disallows app pages for every crawler group", () => {

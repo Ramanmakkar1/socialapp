@@ -73,6 +73,17 @@ const nextConfig: NextConfig = {
         source,
         headers: noFrameHeaders,
       })),
+      // Staging indexability can flip between deploys. A sitemap or robots
+      // response cached from an earlier indexable state must never outlive the
+      // change, so fail closed at the browser, origin and CDN layers.
+      ...["/sitemap.xml", "/robots.txt"].map((source) => ({
+        source,
+        headers: [
+          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, max-age=0" },
+          { key: "CDN-Cache-Control", value: "no-store" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "no-store" },
+        ],
+      })),
       {
         source: "/",
         headers: [
