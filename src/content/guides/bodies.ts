@@ -4,6 +4,7 @@ import { body as howToMakeMoneyOnSocialMedia2026 } from "./how-to-make-money-on-
 import { body as socialMediaSeo2026 } from "./social-media-seo-2026";
 import { body as bestInstagramAutoDmTools2026 } from "./best-instagram-auto-dm-tools-2026";
 import { body as cheapestSocialMediaSchedulingTools2026 } from "./cheapest-social-media-scheduling-tools-2026";
+import { body as howToScheduleInstagramPosts } from "./how-to-schedule-instagram-posts";
 
 /** Article body per registry slug. Every GUIDES entry must have one (checked by the article page). */
 export const GUIDE_BODIES: Record<string, GuideBody> = {
@@ -12,4 +13,5 @@ export const GUIDE_BODIES: Record<string, GuideBody> = {
   "social-media-seo-2026": socialMediaSeo2026,
   "best-instagram-auto-dm-tools-2026": bestInstagramAutoDmTools2026,
   "cheapest-social-media-scheduling-tools-2026": cheapestSocialMediaSchedulingTools2026,
+  "how-to-schedule-instagram-posts": howToScheduleInstagramPosts,
 };

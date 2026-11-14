@@ -359,6 +359,68 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["best-instagram-auto-dm-tools-2026", "best-instagram-niches-2026"],
   },
+  {
+    slug: "how-to-schedule-instagram-posts",
+    title: "How to Schedule Instagram Posts in 2026 (3 Free Ways)",
+    description:
+      "Learn how to schedule Instagram posts free in the app, Meta Business Suite or Poskoo, with steps, timing tips and mistakes to avoid in 2026.",
+    h1: "How to schedule Instagram posts in 2026",
+    subtitle:
+      "Three free ways to schedule Instagram posts, the steps for each, and how to pick the one that fits how you post.",
+    crumb: "Schedule Instagram posts",
+    excerpt: "3 free ways to schedule Instagram posts, with steps and timing tips.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-13",
+    updated: "2026-11-13",
+    wordCount: 1540,
+    cover: {
+      src: "/guides/cheapest-social-media-scheduling-tools-2026.webp",
+      width: 1280,
+      height: 720,
+      alt: "A creator holding a phone drops a gold coin into a pink piggy bank next to a spiral calendar filled with scheduled post cards",
+    },
+    takeaways: [
+      "You can schedule Instagram posts free in the Instagram app on a Professional account, in Meta Business Suite, or with a scheduler like Poskoo.",
+      "The in-app option is quickest for one post on your phone; Meta Business Suite is better for planning on a desktop.",
+      "A scheduler adds a queue, a calendar and comment-to-DM automation, which helps once you post several times a week.",
+      "Check the time zone and aspect ratio before you save, or a post can publish at the wrong time or get cropped.",
+      "Scheduling does not replace checking the queue: confirm every slot before a busy week or launch.",
+    ],
+    faqs: [
+      {
+        q: "Can you schedule Instagram Stories?",
+        a: "Scheduling support for Stories varies by tool. The Instagram app is mainly built for scheduling feed posts, Reels and carousels, while some third-party schedulers, including Poskoo, can publish Stories. Check the current format list in the tool you use before you plan a Story-only campaign.",
+      },
+      {
+        q: "Is scheduling Instagram posts free?",
+        a: "Yes. Scheduling in the Instagram app is free on Business and Creator accounts, and Meta Business Suite is free for Facebook and Instagram. Third-party schedulers usually have a free plan with limits on accounts or posts, then a paid plan.",
+      },
+      {
+        q: "Does scheduling a post affect its reach?",
+        a: "There is no clear evidence that scheduling a post by itself lowers reach. What matters more is the content, how early people engage and whether the post suits the format. Publishing through an official API tool is different from using a bot that posts for you.",
+      },
+      {
+        q: "Can you schedule Instagram posts from a computer?",
+        a: "Yes, through Meta Business Suite or a third-party scheduler. The Instagram app itself is designed for posting from a phone, so a desktop tool is easier when your media and captions already live on your computer.",
+      },
+      {
+        q: "Can you edit a scheduled Instagram post?",
+        a: "Usually yes, as long as it has not published yet. You can open the scheduled post in the app, Business Suite or your scheduler and change the caption, media or time. Exact options depend on the tool and the post format.",
+      },
+      {
+        q: "How far ahead can you schedule Instagram posts?",
+        a: "Each tool sets its own limit, and the limit can change. Some planners allow weeks or months ahead, while others cap the queue. Check the current limit in your tool before you plan a long campaign.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-scheduling-checklist",
+      "/tools/best-time-to-post-on-instagram",
+      "/tools/instagram-caption-generator",
+      "/tools/instagram-image-size",
+    ],
+    related: ["cheapest-social-media-scheduling-tools-2026", "best-instagram-auto-dm-tools-2026"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
