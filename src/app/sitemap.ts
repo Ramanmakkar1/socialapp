@@ -4,6 +4,9 @@ import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
 import { GUIDES, guidePath } from "@/content/guides/registry";
 
+// Evaluate indexability per request so a build never freezes the staging noindex.
+export const dynamic = "force-dynamic";
+
 // Only indexable paths can become sitemap candidates. This uses the same
 // isPathIndexable helper as the root layout robots meta, so a noindex page can
 // never leak into the sitemap. If BRAND.indexable is set to false this is empty,

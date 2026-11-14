@@ -99,6 +99,24 @@ test("sitemap and layout share the same indexability helper", () => {
   assert.ok(layoutSource.includes("isPathIndexable"), "layout robots meta must use isPathIndexable");
 });
 
+test("metadata routes evaluate indexability at request time, not build time", () => {
+  for (const file of ["src/app/robots.ts", "src/app/sitemap.ts"]) {
+    const source = readFileSync(file, "utf8");
+    assert.match(
+      source,
+      /export const dynamic = "force-dynamic"/,
+      `${file} must set force-dynamic so environment-controlled indexability is read per request`,
+    );
+  }
+});
+
+test("noindex mode returns an empty sitemap and omits the sitemap directive", () => {
+  whileNoindex(() => {
+    assert.deepEqual(sitemap(), [], "noindex staging must serve an empty sitemap");
+    assert.equal("sitemap" in robots(), false, "noindex staging must omit the sitemap directive");
+  });
+});
+
 test("robots omits the sitemap while staging is noindex", () => {
   whileNoindex(() => assert.equal("sitemap" in robots(), false));
 });

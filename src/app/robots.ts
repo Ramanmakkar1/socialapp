@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { BRAND } from "@/lib/brand";
 
+// Evaluate indexability per request so a build never freezes the staging noindex.
+export const dynamic = "force-dynamic";
+
 /** Private areas: the signed-in app, the API and short-link redirects. */
 const ROBOTS_DISALLOW = ["/app", "/app/", "/api/", "/l/"];
 
