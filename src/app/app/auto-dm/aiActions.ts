@@ -37,7 +37,11 @@ export async function suggestDmMessages(input: {
     }
   }
   if (!isFeatureReady("ai")) {
-    return { ok: false, error: "AI ideas are coming soon." };
+    return {
+      ok: false,
+      error:
+        "AI ideas aren't switched on on this server yet. You can still write and schedule everything yourself.",
+    };
   }
   // Per-user limits: a short burst limit and a monthly quota (src/lib/aiQuota.ts).
   if (isDbConfigured()) {
