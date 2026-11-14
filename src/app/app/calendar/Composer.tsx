@@ -970,7 +970,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             {aiOn === false ? (
               <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[var(--poskoo-band)] px-2.5 py-1.5 text-xs text-[var(--poskoo-muted)]">
                 <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                AI caption ideas are coming soon.
+                AI caption ideas aren&apos;t switched on in this workspace yet. Write your caption here, or get ideas from our free{" "}
+                <Link href="/tools/instagram-caption-generator" target="_blank" rel="noopener" className="underline font-medium text-[var(--poskoo-violet)]">caption generator</Link>.
               </p>
             ) : (
               <button

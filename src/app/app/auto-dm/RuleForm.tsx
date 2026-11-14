@@ -447,7 +447,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
           </div>
           {aiOn === false && (
             <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[var(--poskoo-band)] px-2.5 py-1.5 text-xs text-[var(--poskoo-muted)]">
-              ✨ AI message ideas are coming soon.
+              ✨ AI message ideas aren&apos;t switched on in this workspace yet. Type your DM above; {"{{link}}"} adds your link automatically.
             </p>
           )}
           {aiOn && (
