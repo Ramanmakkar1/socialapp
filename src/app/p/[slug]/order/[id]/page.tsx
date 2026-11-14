@@ -69,7 +69,7 @@ export default async function UpiOrderPage({ params, searchParams }: Props) {
                 </p>
                 {!emailReady ? (
                   <p role="status" className={`${ui.notice} ${ui.noticeWarn}`}>
-                    <strong>Save this link</strong> (bookmark this page or copy its address). Order e-mails are coming soon, so this page is how you get back to your product.
+                    <strong>Save this link</strong> (bookmark this page or copy its address). We don&apos;t send order e-mails yet, so this page is how you get back to your product.
                   </p>
                 ) : null}
               </>

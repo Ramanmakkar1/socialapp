@@ -97,7 +97,7 @@ export default async function ProductBuyPage({ params, searchParams }: Props) {
             </form>
           ) : cardSoon ? (
             <div role="status" className={styles.unavailable}>
-              <strong>Checkout coming soon.</strong> Card payments for this product are launching soon. Check back shortly.
+              <strong>Card checkout isn&apos;t open for this product yet.</strong> The seller hasn&apos;t switched on card payments. Please check back later or contact the seller.
             </div>
           ) : (
             <p role="status" className={styles.unavailable}>This product is not available for purchase right now.</p>
