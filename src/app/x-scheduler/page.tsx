@@ -265,6 +265,7 @@ export default function XSchedulerPage() {
             <Link className={s.vlink} href="/help/schedule-x-posts">step-by-step guide to scheduling X posts</Link>, or
             check your post with the <Link className={s.vlink} href="/tools/x-character-counter">X character counter</Link>, preview it with the <Link className={s.vlink} href="/tools/x-post-preview">X post preview</Link> and pick tags with the <Link className={s.vlink} href="/tools/x-hashtag-generator">X hashtag generator</Link>.
             Split long posts with the <Link className={s.vlink} href="/tools/x-thread-maker">Twitter thread maker</Link>.
+            Measure results with the <Link className={s.vlink} href="/tools/x-engagement-rate-calculator">X engagement rate calculator</Link>.
             Need a profile refresh? Try the <Link className={s.vlink} href="/tools/x-bio-generator">free X bio generator</Link>.
             Not sure when to post? Find the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-x">best time to post on X</Link>.
