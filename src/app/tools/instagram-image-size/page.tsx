@@ -51,6 +51,9 @@ const sizesTable = (
         </tbody>
       </table>
     </div>
+    <p className="mt-3 text-sm text-[#3d3450]">
+      Need to fix a photo? Use the free <Link href="/tools/instagram-image-resizer" className="font-medium text-[var(--poskoo-violet)] underline underline-offset-2">Instagram image resizer</Link>.
+    </p>
   </section>
 );
 
