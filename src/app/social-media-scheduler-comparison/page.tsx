@@ -62,6 +62,53 @@ const competitorRows = [
   { feature: "Free plan", poskoo: "Yes — 2 accounts, 10 posts / month", buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
 ];
 
+const workflows = [
+  {
+    title: "Instagram comment-to-DM",
+    text: "You get comments on posts and want an automatic reply in the DMs. Poskoo turns a keyword comment into a DM through the official Instagram API.",
+    links: [
+      { label: "Instagram auto-DM", href: "/instagram-auto-dm" },
+      { label: "ManyChat alternative", href: "/manychat-alternative" },
+    ],
+  },
+  {
+    title: "Meta-only scheduling",
+    text: "You only run Instagram, Facebook Pages and Threads and do not need a separate inbox, ads or analytics tool. Poskoo covers those three from one calendar.",
+    links: [
+      { label: "Meta Business Suite alternative", href: "/meta-business-suite-alternative" },
+      { label: "Instagram scheduler", href: "/instagram-scheduler" },
+    ],
+  },
+  {
+    title: "Multi-platform publishing",
+    text: "You post to several networks and want one queue instead of switching apps. Compare Poskoo with general schedulers before you move.",
+    links: [
+      { label: "Buffer alternative", href: "/buffer-alternative" },
+      { label: "Metricool alternative", href: "/metricool-alternative" },
+    ],
+  },
+  {
+    title: "Link-in-bio",
+    text: "You need one link your audience can tap to reach every destination. Poskoo includes an Instagram link-in-bio page next to the scheduler.",
+    links: [
+      { label: "Instagram link-in-bio", href: "/instagram-link-in-bio" },
+      { label: "Linktree alternative", href: "/linktree-alternative" },
+    ],
+  },
+  {
+    title: "Analytics",
+    text: "You want to see how scheduled posts perform, not just that they published. Compare Poskoo's reporting with an analytics-first scheduler.",
+    links: [
+      { label: "Metricool alternative", href: "/metricool-alternative" },
+      { label: "Poskoo pricing", href: "/pricing" },
+    ],
+  },
+];
+
+const comparisonLinks = workflows
+  .flatMap((workflow) => workflow.links)
+  .filter((link, i, all) => all.findIndex((item) => item.href === link.href) === i);
+
 const faqs = [
   {
     q: "What does this social media scheduler comparison cover?",
@@ -82,6 +129,18 @@ const faqs = [
   {
     q: "Is there a free plan?",
     a: "Yes. Every account starts on the $0 Free plan with 2 social accounts and 10 scheduled posts per month. No credit card is needed to sign up.",
+  },
+  {
+    q: "How do I choose a social media scheduler?",
+    a: "Start with the platforms you actually post to, then check the workflow you need most: comment-to-DM, a shared calendar, link-in-bio or analytics. Pick the tool that covers that workflow without forcing you to pay for channels you do not use.",
+  },
+  {
+    q: "Does Poskoo support multiple platforms?",
+    a: "Yes. Poskoo schedules Instagram, Facebook Pages and Threads from one calendar and one publishing queue, all connected through Meta's official login.",
+  },
+  {
+    q: "Which scheduler is best for Instagram comment-to-DM?",
+    a: "Choose a scheduler that runs comment-to-DM on the official Instagram API and lets you pause rules. Poskoo includes keyword comment triggers and DM automation alongside scheduling, so you do not need a second tool.",
   },
 ];
 
@@ -106,6 +165,18 @@ const appJsonLd = {
   publisher: publisherRef(),
 };
 
+const itemListJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Choose a social media scheduler by workflow",
+  itemListElement: comparisonLinks.map((link, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: link.label,
+    url: `${BRAND.url}${link.href}`,
+  })),
+};
+
 function Cell({ value }: { value: string }) {
   if (value === "Yes") {
     return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
@@ -119,7 +190,7 @@ function Cell({ value }: { value: string }) {
 export default function SocialMediaSchedulerComparisonPage() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Social media scheduler comparison", path: PATH }]}>
-      {[appJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd, faqJsonLd(faqs), itemListJsonLd].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -185,6 +256,34 @@ export default function SocialMediaSchedulerComparisonPage() {
             {" · "}
             <Link className={s.vlink} href="/threads-scheduler">Threads scheduler</Link>
           </p>
+        </div>
+      </section>
+
+      <section id="workflows" style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Choose by workflow</p>
+            <h2>Pick the scheduler that fits <em className="s">how you work</em></h2>
+            <p>
+              Start from the job you need done, then open the page that compares Poskoo with the tool built for it.
+            </p>
+          </div>
+          <div className="cards">
+            {workflows.map((workflow) => (
+              <article key={workflow.title} className="pcard">
+                <h3>{workflow.title}</h3>
+                <p>{workflow.text}</p>
+                <p>
+                  {workflow.links.map((link, i) => (
+                    <span key={link.href}>
+                      {i > 0 ? " · " : null}
+                      <Link className={s.vlink} href={link.href}>{link.label}</Link>
+                    </span>
+                  ))}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
