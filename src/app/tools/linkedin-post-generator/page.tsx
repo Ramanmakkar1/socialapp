@@ -165,6 +165,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/social-media-post-generator",
     "/tools/linkedin-character-counter",
     "/tools/linkedin-text-formatter",
     "/tools/linkedin-hashtag-generator",

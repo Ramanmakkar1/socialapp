@@ -170,6 +170,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/social-media-post-generator",
     "/tools/facebook-character-counter",
     "/tools/facebook-post-preview",
     "/tools/facebook-hashtag-generator",

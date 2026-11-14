@@ -164,6 +164,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/social-media-post-generator",
     "/tools/pinterest-character-counter",
     "/tools/pinterest-hashtag-generator",
     "/tools/best-time-to-post-on-pinterest",

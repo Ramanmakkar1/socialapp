@@ -167,6 +167,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/social-media-post-generator",
     "/tools/tiktok-caption-counter",
     "/tools/tiktok-hashtag-generator",
     "/tools/best-time-to-post-on-tiktok",
