@@ -260,6 +260,10 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-video-size-checker">TikTok video size checker</Link> so it fills the 9:16 screen.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
+            Posting photos or a slideshow? Check each image with the{" "}
+            <Link className={s.vlink} href="/tools/tiktok-photo-size-checker">TikTok photo size checker</Link> first.
+          </p>
+          <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Freshen up your avatar with the{" "}
             <Link className={s.vlink} href="/tools/tiktok-profile-picture-size-checker">TikTok profile picture size checker</Link>.
           </p>
