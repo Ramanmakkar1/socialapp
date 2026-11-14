@@ -189,7 +189,7 @@ export default function FeaturesPage() {
               <Link className="btn btn-line" href="/signup">
                 Try AI captions free <span aria-hidden="true">→</span>
               </Link>
-              <p className="small">Coming soon: AI replies that answer incoming DMs for you. They are not part of Poskoo yet.</p>
+              <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p>
             </div>
             <div className="art">
               <AnimArt name="feat-ai" label="An AI helper drafts a caption idea" />
