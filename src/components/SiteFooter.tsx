@@ -145,6 +145,7 @@ export function SiteFooter() {
           { href: "/agorapulse-alternative", label: "Agorapulse alternative" },
           { href: "/loomly-alternative", label: "Loomly alternative" },
           { href: "/socialbee-alternative", label: "SocialBee alternative" },
+          { href: "/sendible-alternative", label: "Sendible alternative" },
           { href: "/later-alternative", label: "Later alternative" },
           { href: "/planoly-alternative", label: "Planoly alternative" },
           { href: "/sprout-social-alternative", label: "Sprout Social alternative" },

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import s from "./site.module.css";
 
-type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "loomly" | "socialbee" | "linktree";
+type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "loomly" | "socialbee" | "sendible" | "linktree";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
@@ -9,6 +9,7 @@ const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/agorapulse-alternative", label: "Agorapulse alternative", key: "agorapulse" },
   { href: "/loomly-alternative", label: "Loomly alternative", key: "loomly" },
   { href: "/socialbee-alternative", label: "SocialBee alternative", key: "socialbee" },
+  { href: "/sendible-alternative", label: "Sendible alternative", key: "sendible" },
   { href: "/manychat-alternative", label: "ManyChat alternative", key: "manychat" },
   { href: "/later-alternative", label: "Later alternative", key: "later" },
   { href: "/planoly-alternative", label: "Planoly alternative", key: "planoly" },
