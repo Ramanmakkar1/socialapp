@@ -131,6 +131,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-engagement-rate-calculator", name: "Engagement rate calculator", summary: "Engagement rate by followers or by reach from likes, comments, saves and shares.", category: "plan", icon: "percent" },
   { href: "/tools/tiktok-engagement-rate-calculator", name: "TikTok engagement rate calculator", summary: "Engagement rate by views or followers from likes, comments, shares and favorites.", category: "plan", icon: "percent" },
   { href: "/tools/linkedin-engagement-rate-calculator", name: "LinkedIn engagement rate calculator", summary: "Engagement rate by impressions or followers from reactions, comments and reposts.", category: "plan", icon: "percent" },
+  { href: "/tools/youtube-engagement-rate-calculator", name: "YouTube engagement rate calculator", summary: "Engagement rate by views or subscribers from likes, comments and shares.", category: "plan", icon: "percent" },
   // Comments & DMs
   { href: "/tools/instagram-comment-keyword-tester", name: "Comment keyword tester", summary: "Test which comments trigger a keyword with contains or exact matching.", category: "dm", icon: "key" },
   { href: "/tools/instagram-comment-to-dm-preview", name: "Comment-to-DM preview", summary: "Preview a keyword, sample comment and DM reply as a full flow.", category: "dm", icon: "workflow" },
