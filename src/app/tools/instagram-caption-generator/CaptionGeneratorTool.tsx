@@ -1715,7 +1715,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
   const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : isPinterest ? "Pinterest" : isX ? "X" : isThreads ? "Threads" : "Instagram";
   const captionLimit = isPinterest ? 500 : isX ? 280 : isThreads ? 500 : isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
   const noun = isLinkedIn || isX || isThreads ? "post" : isPinterest ? "description" : "caption";
-  const foldAt = isX ? 280 : isFacebook ? 125 : isLinkedIn ? 210 : isThreads ? 500 : isPinterest ? 50 : FOLD_AT;
+  const foldAt = isFacebook ? 125 : isLinkedIn ? 210 : isThreads ? 500 : isPinterest ? 50 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1785,12 +1785,22 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
           .replace(/link in (my |the )?bio/gi, "tap the Pin for the link");
       }
       if (isX) {
-        text = text.replace(/link in bio/gi, "link below");
-        if (text.length > 280) {
-          const cut = text.slice(0, 279);
-          const lastSpace = cut.lastIndexOf(" ");
-          text = `${(lastSpace > 180 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+        const toX = (v: string) => v.replace(/Instagram/g, "X").replace(/link in (my |the )?bio/gi, "link below");
+        const hookX = toX(hookPart);
+        const ctaX = toX(ctaPart);
+        let bodyX = bodyLines.map(toX);
+        let textX = [hookX, ...bodyX, ctaX].join("\n\n");
+        while (textX.length > 280 && bodyX.length > 0) {
+          bodyX = bodyX.slice(0, -1);
+          textX = [hookX, ...bodyX, ctaX].join("\n\n");
         }
+        if (textX.length > 280) {
+          textX = [hookX, ctaX].join("\n\n");
+        }
+        if (textX.length > 280) {
+          textX = `${textX.slice(0, 277)}...`;
+        }
+        return textX;
       }
       if (isThreads) {
         const short =
