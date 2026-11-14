@@ -9,6 +9,11 @@ import ToolsHeroIllustration from "@/components/ToolsHeroIllustration";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
+import { featureReadiness } from "@/lib/featureReadiness";
+
+// Payment copy follows the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
+// the page stays static and regenerates in the background at most every 10 minutes.
+export const revalidate = 600;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: "Poskoo Features: Scheduling, Auto-DM & AI Captions" },
@@ -35,9 +40,11 @@ const aiBullets = [
   "Save your brand voice once in settings and every idea follows it.",
 ];
 
-const growBullets = [
+const growBullets = (cardPaymentsReady: boolean) => [
   "Lead magnets: hand out a free file or link once someone gives their email in the DM.",
-  "Digital products: sell downloads from your own product page. Stripe card checkout is available when configured, and UPI is available for eligible sellers in India.",
+  cardPaymentsReady
+    ? "Digital products: sell downloads from your own product page with Stripe card checkout, or take Direct UPI payments if you're in India."
+    : "Digital products: sell downloads from your own product page. Direct UPI works today for eligible sellers in India; Stripe card checkout opens once card payments are switched on.",
   "Refer and earn: get 500 bonus auto-DMs a month for each friend who signs up and connects an account.",
 ];
 
@@ -83,6 +90,7 @@ const jsonLd = {
 };
 
 export default function FeaturesPage() {
+  const cardPaymentsReady = featureReadiness("card_payments", process.env).ready;
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Features", path: "/features" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
@@ -209,7 +217,7 @@ export default function FeaturesPage() {
                 more DMs. All three are in the app today.
               </p>
               <ul>
-                {growBullets.map((item) => (
+                {growBullets(cardPaymentsReady).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
