@@ -1715,7 +1715,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
   const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : isPinterest ? "Pinterest" : isX ? "X" : isThreads ? "Threads" : "Instagram";
   const captionLimit = isPinterest ? 500 : isX ? 280 : isThreads ? 500 : isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
   const noun = isLinkedIn || isX || isThreads ? "post" : isPinterest ? "description" : "caption";
-  const foldAt = isX ? 280 : isFacebook ? 125 : isLinkedIn ? 210 : isThreads ? 280 : FOLD_AT;
+  const foldAt = isX ? 280 : isFacebook ? 125 : isLinkedIn ? 210 : isThreads ? 280 : isPinterest ? 50 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1776,15 +1776,13 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
       if (isFacebook) text = text.replace(/link in (my |the )?bio/gi, "link below");
       if (isLinkedIn) text = text.replace(/link in bio/gi, "link in the comments");
       if (isPinterest) {
-        const toPinterest = (value: string) =>
-          value.replace(/Instagram/g, "Pinterest").replace(/link in (my |the )?bio/gi, "tap the Pin for the link");
-        text = toPinterest(fullText);
-        let n = bodyLines.length;
-        while (text.length > 500 && n > 1) {
-          n -= 1;
-          text = toPinterest([hookPart, ...bodyLines.slice(0, n), ctaPart].join("\n\n"));
-        }
-        if (text.length > 500) text = text.slice(0, 500);
+        const short =
+          fullText.length > 500
+            ? [hookPart, bodyLines[0], ctaPart].filter(Boolean).join("\n\n")
+            : fullText;
+        return short
+          .replace(/Instagram/g, "Pinterest")
+          .replace(/link in (my |the )?bio/gi, "tap the Pin for the link");
       }
       if (isX) {
         text = text.replace(/link in bio/gi, "link below");

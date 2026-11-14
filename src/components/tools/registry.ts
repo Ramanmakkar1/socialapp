@@ -96,7 +96,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/bluesky-character-counter", name: "Bluesky character counter", summary: "Check the 300-grapheme post limit, with live remaining counts and emoji-aware totals.", category: "create", icon: "type" },
   { href: "/tools/mastodon-character-counter", name: "Mastodon character counter", summary: "Check the 500-character default or your server's limit, with links counted as 23 and mentions by username.", category: "create", icon: "type" },
   { href: "/tools/pinterest-character-counter", name: "Pinterest character counter", summary: "Check Pin title (100), description (500) and alt text limits, with a feed preview.", category: "create", icon: "type" },
-  { href: "/tools/pinterest-description-generator", name: "Pinterest description generator", summary: "Six keyword-rich Pin descriptions for any topic, kept under Pinterest's 500-character limit.", category: "create", icon: "sparkles" },
+  { href: "/tools/pinterest-description-generator", name: "Pinterest description generator", summary: "Six Pin description drafts under 500 characters with your keyword early and a call to action.", category: "create", icon: "sparkles" },
   // Images & video
   { href: "/tools/instagram-post-preview", name: "Post preview", summary: "Preview a photo and caption in a feed mockup with square and portrait crops.", category: "media", icon: "eye" },
   { href: "/tools/threads-post-preview", name: "Threads post preview", summary: "Write a Threads post, count against 500 characters and preview it on mobile.", category: "media", icon: "message" },

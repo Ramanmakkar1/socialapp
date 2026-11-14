@@ -614,7 +614,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/bluesky-character-counter": "Free Bluesky character counter for the 300-character post limit. Count emoji as graphemes, see characters left, and copy your text. No signup needed.",
   "/tools/mastodon-character-counter": "Free Mastodon character counter for the default 500-character limit. Links count as 23, mentions count only the username, and set your server's limit.",
   "/tools/pinterest-character-counter": "Free Pinterest character counter for Pin titles (100), descriptions (500) and alt text (500). See characters left and your feed preview. No signup needed.",
-  "/tools/pinterest-description-generator": "Free Pinterest description generator: enter a topic to get six keyword-rich Pin descriptions checked against the 500-character limit, all in your browser.",
+  "/tools/pinterest-description-generator": "Free Pinterest description generator: enter your topic, pick a goal and tone, and copy six Pin descriptions under 500 characters. No signup or AI.",
   "/tools/tiktok-username-generator": "Free TikTok username generator: turn your name and niche into clean, creative or brand handle ideas of 24 characters or fewer that follow TikTok rules.",
   "/tools/youtube-handle-generator": "Free YouTube handle generator: turn your name and niche into @handle and channel name ideas of 3 to 30 characters that follow YouTube's handle rules.",
   "/tools/tiktok-bio-generator": "Free TikTok bio generator: add your name, what you do and a call to action, pick a niche and copy a short bio with a live 80-character counter.",

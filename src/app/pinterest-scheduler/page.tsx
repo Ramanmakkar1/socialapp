@@ -266,8 +266,8 @@ export default function PinterestSchedulerPage() {
             <Link className={s.vlink} href="/help/schedule-pinterest-posts">how to schedule Pinterest Pins</Link> or check your{" "}
             <Link className={s.vlink} href="/tools/pinterest-character-counter">free Pinterest character counter</Link> limits before you publish.
             Check the image with the free <Link className={s.vlink} href="/tools/pinterest-pin-size-checker">Pinterest pin size checker</Link>.
-            Need a description? Write one with the{" "}
-            <Link className={s.vlink} href="/tools/pinterest-description-generator">free Pinterest description generator</Link>.
+            Write the text with the free{" "}
+            <Link className={s.vlink} href="/tools/pinterest-description-generator">Pinterest description generator</Link>.
             Add a few tags with the{" "}
             <Link className={s.vlink} href="/tools/pinterest-hashtag-generator">free Pinterest hashtag generator</Link>.
             Not sure when to pin? Try the free{" "}

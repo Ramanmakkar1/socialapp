@@ -8,13 +8,13 @@ const config: ToolPageConfig = {
   crumb: "Pinterest description generator",
   title: "Pinterest Description Generator: Free Pin Descriptions",
   description:
-    "Free Pinterest description generator: enter a topic to get six keyword-rich Pin descriptions checked against the 500-character limit, all in your browser.",
+    "Free Pinterest description generator: enter your topic, pick a goal and tone, and copy six Pin descriptions under 500 characters. No signup or AI.",
   pill: "Free · no signup · no AI or scraping",
   h1: { before: "Pinterest description generator:", mark: "Pin descriptions", after: "that get saved" },
-  lede: "A Pinterest description is the text under your Pin title, up to 500 characters. Type your topic to get six ready-to-copy Pin descriptions with a clear call to action.",
+  lede: "A Pinterest description is the up-to-500-character text under a Pin that helps Pinterest search understand it. This free tool writes six drafts from your topic.",
   art: "writing",
   artLabel: "A creator writes Pinterest Pin descriptions with keywords, a call to action and a feed preview",
-  heroPoints: ["Six Pin descriptions", "500-character limit", "Keyword-ready with a call to action"],
+  heroPoints: ["Six Pin descriptions", "500-character limit", "Keyword in first 50 characters"],
   toolTitle: "Generate your Pinterest descriptions",
   toolNote: "Free · nothing leaves your browser",
   stepsTitle: "How to generate Pinterest descriptions",
@@ -148,7 +148,11 @@ const config: ToolPageConfig = {
     },
     {
       q: "Do hashtags matter on Pinterest?",
-      a: "They can help, but they are optional. Write a clear description first and add a small set of relevant hashtags only if they fit naturally. Unrelated tags do not make a Pin more useful.",
+      a: "They can help, but they are optional. Write a clear description first and add a few relevant hashtags only if they fit naturally; the Pinterest hashtag generator can build a small set for your niche. Unrelated tags do not make a Pin more useful.",
+    },
+    {
+      q: "Do Pinterest descriptions help SEO?",
+      a: "Yes. Pinterest search reads the Pin title and description to understand the topic, so describing the Pin in plain words with your main keyword early gives it a better chance of appearing in relevant searches. The description also helps people decide to save or click.",
     },
     {
       q: "What is the difference between a Pin title and a description?",
@@ -166,6 +170,7 @@ const config: ToolPageConfig = {
   related: [
     "/tools/social-media-post-generator",
     "/tools/pinterest-character-counter",
+    "/tools/pinterest-pin-size-checker",
     "/tools/pinterest-hashtag-generator",
     "/tools/best-time-to-post-on-pinterest",
     "/pinterest-scheduler",
