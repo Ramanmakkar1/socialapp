@@ -96,7 +96,7 @@ export default function PricingPage() {
           <h1>
                 Simple pricing for <em className="s mark">Instagram scheduling</em> and auto-DMs
               </h1>
-          <p className="lede">{r.paidPlans ? "Start free today. Upgrade to Pro or Agency for more accounts, posts and DMs whenever you are ready." : "Start free today. Pro and Agency, with more accounts, posts and DMs, are launching soon."}</p>
+          <p className="lede">The Free plan is $0 forever and includes 2 social accounts, 10 scheduled posts a month, 500 auto-DMs a month and a 5-link bio page. Schedule to Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon, with no credit card required. {r.paidPlans ? "Upgrade to Pro or Agency for more accounts, posts and DMs whenever you are ready." : "Pro and Agency, with more accounts, posts and DMs, are launching soon."}</p>
           <div className="ctas">
                 <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
                 <Link className="btn btn-line" href="/instagram-scheduler">See the scheduler</Link>
@@ -108,6 +108,9 @@ export default function PricingPage() {
       <section style={{ paddingTop: 40 }}>
         <div className="wrap">
           <h2 className="sr-only">{BRAND.name} plans and prices</h2>
+          <p className="lede" style={{ textAlign: "center", maxWidth: "760px", margin: "0 auto 28px" }}>
+            The Free plan costs $0 forever and includes 2 social accounts, 10 scheduled posts a month, 500 auto-DMs a month and a 5-link bio page. You can schedule to Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon, and no credit card is required.
+          </p>
           <div className="plans">
             {plans.map((p) => (
               <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
