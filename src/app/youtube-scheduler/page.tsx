@@ -186,6 +186,10 @@ export default function YouTubeSchedulerPage() {
                   </li>
                 ))}
               </ol>
+              <p className="small" style={{ marginTop: 8 }}>
+                Want the full walkthrough? Read{" "}
+                <Link className={s.vlink} href="/guides/how-to-schedule-youtube-videos">how to schedule YouTube videos and Shorts</Link>.
+              </p>
             </div>
             <div className="art">
               <Image
