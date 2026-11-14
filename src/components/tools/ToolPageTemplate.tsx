@@ -228,7 +228,7 @@ export function ToolFaqSection({ title, faqs }: { title: string; faqs: ToolFaq[]
           {faqs.map((f) => (
             <details key={f.q}>
               <summary>{f.q}</summary>
-              <p>{f.a}</p>
+              <p>{f.aNode ?? f.a}</p>
             </details>
           ))}
         </div>

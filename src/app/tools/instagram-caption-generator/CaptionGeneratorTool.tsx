@@ -1705,16 +1705,17 @@ function Switch({ on }: { on: boolean }) {
   );
 }
 
-export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "facebook" | "linkedin" | "pinterest" | "x" }) {
+export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "facebook" | "linkedin" | "pinterest" | "x" | "threads" }) {
   const isTikTok = platform === "tiktok";
   const isFacebook = platform === "facebook";
   const isLinkedIn = platform === "linkedin";
   const isPinterest = platform === "pinterest";
   const isX = platform === "x";
-  const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : isPinterest ? "Pinterest" : isX ? "X" : "Instagram";
-  const captionLimit = isPinterest ? 500 : isX ? 280 : isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
-  const noun = isLinkedIn || isX ? "post" : isPinterest ? "description" : "caption";
-  const foldAt = isX ? 280 : isFacebook ? 125 : isLinkedIn ? 210 : FOLD_AT;
+  const isThreads = platform === "threads";
+  const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : isPinterest ? "Pinterest" : isX ? "X" : isThreads ? "Threads" : "Instagram";
+  const captionLimit = isPinterest ? 500 : isX ? 280 : isThreads ? 500 : isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
+  const noun = isLinkedIn || isX || isThreads ? "post" : isPinterest ? "description" : "caption";
+  const foldAt = isX ? 280 : isFacebook ? 125 : isLinkedIn ? 210 : isThreads ? 280 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
   const [tone, setTone] = useState<Tone>("Friendly");
@@ -1793,9 +1794,17 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
           text = `${(lastSpace > 180 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
         }
       }
+      if (isThreads) {
+        text = text.replace(/link in bio/gi, "link below");
+        if (text.length > 500) {
+          const cut = text.slice(0, 499);
+          const lastSpace = cut.lastIndexOf(" ");
+          text = `${(lastSpace > 300 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+        }
+      }
       return text;
     });
-  }, [goal, tone, topic, addEmojis, useCommentCta, isFacebook, isLinkedIn, isPinterest, isX, platformName, shuffleKey]);
+  }, [goal, tone, topic, addEmojis, useCommentCta, isFacebook, isLinkedIn, isPinterest, isX, isThreads, platformName, shuffleKey]);
 
   async function handleCopy(index: number, text: string) {
     try {
@@ -1955,7 +1964,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
           <div className={kpi}>
             <p className={kpiLabel}>Call to action</p>
             <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{useCommentCta ? "Keyword" : "Standard"}</p>
-            <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : isPinterest ? "Save, click or visit the link." : isLinkedIn ? "Comment, tag or link in the comments." : isX ? "Reply, repost or follow the link." : "Comment, tag or link in bio."}</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : isPinterest ? "Save, click or visit the link." : isLinkedIn ? "Comment, tag or link in the comments." : isX ? "Reply, repost or follow the link." : isThreads ? "Reply, repost or follow the link." : "Comment, tag or link in bio."}</p>
           </div>
         </div>
         {usingDefaultTopic && (
@@ -2087,6 +2096,8 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
                     ? `About the first ${foldAt} characters show before “… more” on Pinterest. That cut-off varies by device.`
                     : isX
                     ? "A post is capped at 280 characters on X, so long drafts are trimmed. Keep the point first."
+                    : isThreads
+                    ? "A Threads post is capped at 500 characters, so long drafts are trimmed. Keep the point first."
                     : isLinkedIn
                     ? `About the first ${foldAt} characters show before “…see more” on LinkedIn. That cut-off varies by device.`
                     : `About the first ${foldAt} characters show before “… more” in the feed. That cut-off varies by device.`}

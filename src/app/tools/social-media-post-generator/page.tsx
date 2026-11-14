@@ -99,7 +99,7 @@ const config: ToolPageConfig = {
                   <td>280 characters</td>
                 </tr>
                 <tr>
-                  <td>Threads</td>
+                  <td><Link href="/tools/threads-post-generator">Threads</Link></td>
                   <td>500 characters</td>
                 </tr>
               </tbody>

@@ -1,6 +1,8 @@
 import { BRAND } from "./brand";
 
-export type ToolFaq = { q: string; a: string };
+import type { ReactNode } from "react";
+
+export type ToolFaq = { q: string; a: string; aNode?: ReactNode };
 export type Crumb = { name: string; url: string };
 
 /** Reference to the site Organization defined in src/app/layout.tsx (same @id), so every page points at one entity. */
