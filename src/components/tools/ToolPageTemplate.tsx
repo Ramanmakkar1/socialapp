@@ -248,7 +248,7 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
       <div className={t.relHead}>
         <div>
           <p className="eyebrow">Keep going</p>
-          <h2 id="related-title">More free Instagram tools</h2>
+          <h2 id="related-title">More free social media tools</h2>
         </div>
         <Link href="/tools" className={t.textLink}>See all tools <span aria-hidden="true">→</span></Link>
       </div>
@@ -257,7 +257,7 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
         <span>Ready to post?</span>
         <Link href="/instagram-scheduler">Instagram scheduler</Link>
         <Link href="/instagram-auto-dm">Instagram auto DM</Link>
-        <Link href="/tools">All free Instagram tools</Link>
+        <Link href="/tools">All free social media tools</Link>
       </nav>
     </section>
   );
