@@ -67,10 +67,10 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
   // No mailer: no code was sent. Verification never blocks the app, so just say so honestly.
   if (!isFeatureReady("email")) {
     return (
-      <AuthFrame art="signup" title={<>Verify your <em className="s">email</em></>} lede="Email verification codes are coming soon.">
+      <AuthFrame art="signup" title={<>Verify your <em className="s">email</em></>} lede="Your account is ready. No code is needed right now.">
         <div className={a.stack}>
           <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}>
-            <strong>Coming soon.</strong> We can&apos;t e-mail codes yet, so there&apos;s nothing to type here. Your account works fully meanwhile; signing in with Google verifies your address automatically.
+            <strong>No code needed.</strong> Email verification codes aren&apos;t switched on yet, so there&apos;s nothing to type here. Your account works fully, and signing in with Google verifies your address automatically.
           </p>
           <Link href="/app" className="btn btn-dark">Open your dashboard</Link>
         </div>
