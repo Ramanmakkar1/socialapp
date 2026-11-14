@@ -8,6 +8,11 @@ import ui from "@/components/ui/ui.module.css";
 
 type Mode = "followers" | "reach";
 
+const COPY = {
+  instagram: { reachTab: "By reach", reachLabel: "Reach", reachWord: "reach", saves: "Saves", savesWord: "saves" },
+  tiktok: { reachTab: "By views", reachLabel: "Views", reachWord: "views", saves: "Favorites", savesWord: "favorites" },
+};
+
 type Fields = {
   likes: string;
   comments: string;
@@ -31,6 +36,7 @@ export type EngagementCalculatorProps = {
   followersLabel?: string;
   reachLabel?: string;
   hideSaves?: boolean;
+  platform?: "instagram" | "tiktok";
 };
 
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
@@ -78,15 +84,18 @@ function Field({
 export default function EngagementCalculator({
   labels,
   followersLabel = "Followers",
-  reachLabel = "Reach",
+  reachLabel,
   hideSaves = false,
+  platform = "instagram",
 }: EngagementCalculatorProps = {}) {
+  const c = COPY[platform];
+  const resolvedReachLabel = reachLabel ?? c.reachLabel;
   const [mode, setMode] = useState<Mode>("followers");
   const [values, setValues] = useState<Fields>(empty);
   const [copied, setCopied] = useState(false);
   const uid = useId();
 
-  const baseLabel = mode === "followers" ? followersLabel : reachLabel;
+  const baseLabel = mode === "followers" ? followersLabel : resolvedReachLabel;
 
   const filled =
     values.likes.trim() !== "" && values.comments.trim() !== "" && values.base.trim() !== "";
@@ -102,7 +111,7 @@ export default function EngagementCalculator({
     });
   }, [filled, values, hideSaves]);
 
-  const baseWord = mode === "followers" ? followersLabel.toLowerCase() : reachLabel.toLowerCase();
+  const baseWord = mode === "followers" ? followersLabel.toLowerCase() : reachLabel?.toLowerCase() ?? c.reachWord;
 
   function set(field: keyof Fields, v: string) {
     setValues((prev) => ({ ...prev, [field]: v }));
@@ -110,9 +119,13 @@ export default function EngagementCalculator({
 
   // Breakdown uses the same numbers the rate was calculated from; only shown once the rate is valid.
   const parts = PARTS.filter((p) => !(hideSaves && p.key === "saves"))
-    .map((p) => ({ ...p, label: labels?.[p.key] ?? p.label }))
+    .map((p) => ({
+      ...p,
+      label: labels?.[p.key] ?? (p.key === "saves" ? c.saves : p.label),
+      word: labels?.[p.key]?.toLowerCase() ?? (p.key === "saves" ? c.savesWord : p.label.toLowerCase()),
+    }))
     .map((p) => ({ ...p, n: rate === null ? 0 : Number(values[p.key] || 0) }));
-  const formula = `(${parts.map((p) => p.label.toLowerCase()).join(" + ")}) ÷ ${baseWord} × 100`;
+  const formula = `(${parts.map((p) => p.word).join(" + ")}) ÷ ${baseWord} × 100`;
   const total = parts.reduce((s, p) => s + p.n, 0);
   const top = total > 0 ? parts.reduce((a, b) => (b.n > a.n ? b : a)) : null;
   const meter = rate === null ? 0 : Math.min(100, rate * 10); // 0–10% scale, capped
@@ -143,7 +156,7 @@ export default function EngagementCalculator({
               By {followersLabel.toLowerCase()}
             </button>
             <button type="button" role="tab" aria-selected={mode === "reach"} onClick={() => setMode("reach")} className={tabClass(mode === "reach")}>
-              By {reachLabel.toLowerCase()}
+              {reachLabel ? `By ${reachLabel.toLowerCase()}` : c.reachTab}
             </button>
           </div>
 
@@ -214,7 +227,7 @@ export default function EngagementCalculator({
           <div className={kpi}>
             <p className={kpiLabel}>Total interactions</p>
             <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{number.format(total)}</p>
-            <p className="mt-1 text-xs text-[#3d3450]">{parts.map((p) => p.label.toLowerCase()).join(" + ")}.</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{parts.map((p) => p.word).join(" + ")}.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>{baseLabel}</p>
