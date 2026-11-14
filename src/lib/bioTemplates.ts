@@ -1,12 +1,13 @@
 export const BIO_LIMIT = 150;
 
-export type BioPlatform = "instagram" | "tiktok" | "x" | "threads";
+export type BioPlatform = "instagram" | "tiktok" | "x" | "threads" | "facebook";
 
 export const PLATFORM_BIO_LIMIT: Record<BioPlatform, number> = {
   instagram: 150,
   tiktok: 80,
   x: 160,
   threads: 150,
+  facebook: 101,
 };
 
 export const NICHES = [
