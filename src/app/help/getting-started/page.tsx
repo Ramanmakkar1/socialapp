@@ -53,7 +53,8 @@ export default function GettingStartedHelpPage() {
               Getting started in <em className="s">3 minutes</em>
             </h1>
           <p className="lede">
-            These three steps match the checklist on your {BRAND.name} dashboard after you sign in.
+            Getting started takes about three minutes: connect Instagram, create an auto-DM rule from a template, and
+            schedule your first post. Sign in, then follow the three steps below in order.
           </p>
         </div>
         <HelpGuideIllustration variant="start" className="hero-art" />

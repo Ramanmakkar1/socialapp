@@ -175,8 +175,8 @@ export default function InstagramStoryReplyAutoDmHelpPage() {
               Auto-DM people who reply to your Instagram <em className="s">Story</em>
             </h1>
           <p className="lede">
-            Ask viewers to reply with a keyword like FREE, and {BRAND.name} sends each of them a DM with your link. Here is
-            how to set it up, step by step.
+            Yes — {BRAND.name} can automatically DM people who reply to your Instagram Story with a keyword like FREE.
+            Connect your account, create a rule set to Story replies, then put the keyword in your Story.
           </p>
         </div>
         <HelpGuideIllustration variant="story" className="hero-art" />

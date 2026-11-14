@@ -186,8 +186,8 @@ export default function InstagramLinkInBioSetupHelpPage() {
               How to set up your Instagram <em className="s">link-in-bio page</em>
             </h1>
           <p className="lede">
-            A link-in-bio page is one page at poskoo.com/@yourname that holds all your links. You create it in{" "}
-            {BRAND.name}, add your links, pick a theme and paste its URL into your Instagram bio.
+            Your Instagram link-in-bio page is one {BRAND.name} page that holds all your links, ready to paste into your
+            bio. Create it free in the app, add your links, then copy the page URL into your Instagram profile.
           </p>
         </div>
         <HelpGuideIllustration variant="start" className="hero-art" />

@@ -160,8 +160,8 @@ export default function ScheduleInstagramCarouselHelpPage() {
               How to schedule an Instagram <em className="s">carousel post</em>
             </h1>
           <p className="lede">
-            Paste 2 to 10 public image links, write one caption, choose a time and {BRAND.name} publishes your carousel
-            for you. Here is exactly what a scheduled carousel needs, step by step.
+            Yes — you can schedule an Instagram carousel by pasting 2 to 10 public image links, writing one caption, and
+            picking a time. Connect your Instagram account, then open the Calendar to paste the links and schedule it.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />

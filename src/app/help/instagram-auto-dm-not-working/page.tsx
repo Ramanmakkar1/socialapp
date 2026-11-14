@@ -105,8 +105,9 @@ export default function InstagramAutoDmNotWorkingPage() {
               Instagram auto DM <em className="s">not working?</em>
             </h1>
           <p className="lede">
-            Walk through this checklist in order. Each step reflects how {BRAND.name} actually processes comments, gates,
-            and the send queue.
+            If your Instagram auto DM is not working, check that your professional account is connected, access to
+            messages is on, and the rule is Active with matching keywords. Start with the seven checks below in order,
+            then retry with a test comment.
           </p>
         </div>
         <HelpGuideIllustration variant="troubleshoot" className="hero-art" />
