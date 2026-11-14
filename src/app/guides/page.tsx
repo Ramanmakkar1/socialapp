@@ -12,7 +12,7 @@ import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { GUIDES_BY_DATE, guidePath } from "@/content/guides/registry";
 
 const PATH = "/guides";
-const TITLE = "Instagram Guides: Growth, Scheduling & Auto-DM Tips";
+const TITLE = "Social Media Guides: Growth, Scheduling & Auto-DM Tips";
 const description = PAGE_DESCRIPTIONS[PATH];
 const OG_IMAGE = { url: "/opengraph-image", width: 1200, height: 630, alt: `${BRAND.name} guides` };
 
@@ -53,7 +53,7 @@ export default function GuidesPage() {
         <header className={`hero ${g.hubHero}`}>
           <span className="pill">Guides &amp; articles</span>
           <h1>
-            Grow on Instagram with <em className="s mark">practical guides</em>
+            Grow on social media with <em className="s mark">practical guides</em>
           </h1>
           <p className="lede">
             Plain-English guides on picking a niche, planning content, scheduling posts and turning comments into

@@ -626,7 +626,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/tools/threads-post-generator": "Free Threads post generator: enter your topic, pick a goal and tone, and copy six drafts with a hook and a question, each under the 500-character limit.",
   "/tools/facebook-bio-generator": "Free Facebook bio generator: add your name, what you do and a call to action, pick a niche and copy a short bio with a live 101-character counter.",
   "/tools": "Free social media tools for Instagram, TikTok, X, YouTube, LinkedIn and more: captions, hashtags, bios, image and video sizes, all in your browser.",
-  "/guides": "Practical Instagram guides for beginners and small businesses: picking a niche, planning content, scheduling posts and turning comments into leads.",
+  "/guides": "Practical social media guides for creators and small businesses: picking a niche, social media SEO, scheduling tools and turning comments into leads.",
   "/guides/best-instagram-niches-2026": guideDescription("best-instagram-niches-2026"),
   "/guides/how-to-make-money-on-social-media-2026": guideDescription("how-to-make-money-on-social-media-2026"),
   "/guides/social-media-seo-2026": guideDescription("social-media-seo-2026"),
