@@ -1705,12 +1705,14 @@ function Switch({ on }: { on: boolean }) {
   );
 }
 
-export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "facebook" | "linkedin" }) {
+export default function CaptionGeneratorTool({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "facebook" | "linkedin" | "pinterest" }) {
   const isTikTok = platform === "tiktok";
   const isFacebook = platform === "facebook";
   const isLinkedIn = platform === "linkedin";
-  const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : "Instagram";
-  const captionLimit = isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
+  const isPinterest = platform === "pinterest";
+  const platformName = isTikTok ? "TikTok" : isFacebook ? "Facebook" : isLinkedIn ? "LinkedIn" : isPinterest ? "Pinterest" : "Instagram";
+  const captionLimit = isPinterest ? 500 : isTikTok ? 4000 : isFacebook ? 63206 : isLinkedIn ? 3000 : INSTAGRAM_CAPTION_LIMIT;
+  const noun = isLinkedIn ? "post" : isPinterest ? "description" : "caption";
   const foldAt = isFacebook ? 125 : isLinkedIn ? 210 : FOLD_AT;
   const [topic, setTopic] = useState("");
   const [goal, setGoal] = useState<Goal>("Engagement");
@@ -1771,9 +1773,20 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
       let text = fullText.replace(/Instagram/g, platformName);
       if (isFacebook) text = text.replace(/link in (my |the )?bio/gi, "link below");
       if (isLinkedIn) text = text.replace(/link in bio/gi, "link in the comments");
+      if (isPinterest) {
+        const toPinterest = (value: string) =>
+          value.replace(/Instagram/g, "Pinterest").replace(/link in (my |the )?bio/gi, "tap the Pin for the link");
+        text = toPinterest(fullText);
+        let n = bodyLines.length;
+        while (text.length > 500 && n > 1) {
+          n -= 1;
+          text = toPinterest([hookPart, ...bodyLines.slice(0, n), ctaPart].join("\n\n"));
+        }
+        if (text.length > 500) text = text.slice(0, 500);
+      }
       return text;
     });
-  }, [goal, tone, topic, addEmojis, useCommentCta, isFacebook, isLinkedIn, platformName, shuffleKey]);
+  }, [goal, tone, topic, addEmojis, useCommentCta, isFacebook, isLinkedIn, isPinterest, platformName, shuffleKey]);
 
   async function handleCopy(index: number, text: string) {
     try {
@@ -1907,7 +1920,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
       <div role="region" aria-labelledby={`${baseId}-sum`} className="min-w-0">
         <h3 id={`${baseId}-sum`} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-semibold">
           <Sparkles className="h-5 w-5 text-[var(--poskoo-violet)]" aria-hidden="true" />
-          Your caption drafts
+          Your {noun} drafts
           <span className="rounded-md bg-[var(--poskoo-band)] px-2 py-0.5 text-xs font-semibold text-[var(--poskoo-violet)]">{goal} · {tone}</span>
         </h3>
         <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -1933,7 +1946,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
           <div className={kpi}>
             <p className={kpiLabel}>Call to action</p>
             <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{useCommentCta ? "Keyword" : "Standard"}</p>
-            <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : isLinkedIn ? "Comment, tag or link in the comments." : "Comment, tag or link in bio."}</p>
+            <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : isPinterest ? "Save, click or visit the link." : isLinkedIn ? "Comment, tag or link in the comments." : "Comment, tag or link in bio."}</p>
           </div>
         </div>
         {usingDefaultTopic && (
@@ -1948,7 +1961,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
         {/* Results */}
         <div className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 sm:p-4">
           <p className="mb-3 text-sm text-[#5f5873]">Pick a draft to preview it, or copy any card directly.</p>
-          <ul className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3" aria-label="Generated captions">
+          <ul className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3" aria-label={`Generated ${noun}s`}>
             {captions.map((captionText, index) => {
               const charCount = captionText.length;
               const isOver = charCount > captionLimit;
@@ -1964,7 +1977,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
                   <button
                     type="button"
                     aria-pressed={isSelected}
-                    aria-label={`Preview caption ${index + 1}`}
+                    aria-label={`Preview ${noun} ${index + 1}`}
                     onClick={() => { setSelected(index); setExpanded(false); }}
                     className="block min-h-[7rem] w-full rounded-t-2xl p-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
                   >
@@ -1995,7 +2008,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
                     <button
                       type="button"
                       onClick={() => handleCopy(index, captionText)}
-                      aria-label={isCopied ? "Copied" : `Copy caption ${index + 1}`}
+                      aria-label={isCopied ? "Copied" : `Copy ${noun} ${index + 1}`}
                       className={`inline-flex min-h-11 flex-none items-center gap-1.5 rounded-xl border px-3.5 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--poskoo-violet)] ${isCopied ? "border-[var(--poskoo-green)] bg-[var(--poskoo-green)]/10" : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] hover:border-[var(--poskoo-ink)]"}`}
                     >
                       {isCopied ? (
@@ -2021,7 +2034,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
             className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copiedId === current ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
-            {copiedId === current ? "Copied" : `Copy caption ${current + 1}`}
+            {copiedId === current ? "Copied" : `Copy ${noun} ${current + 1}`}
           </button>
           <button type="button" onClick={handleRegenerate} className={`${ghostBtn} w-full`}>
             <RefreshCw className="h-4 w-4" aria-hidden="true" />
@@ -2061,7 +2074,9 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
                 ? "Only the first line or so shows over the video before “more”. Keep the hook short."
                 : isFacebook
                   ? "About the first 125 characters show before “See more” on mobile. Put the point first."
-                  : isLinkedIn
+                  : isPinterest
+                    ? `About the first ${foldAt} characters show before “… more” on Pinterest. That cut-off varies by device.`
+                    : isLinkedIn
                     ? `About the first ${foldAt} characters show before “…see more” on LinkedIn. That cut-off varies by device.`
                     : `About the first ${foldAt} characters show before “… more” in the feed. That cut-off varies by device.`}
             </p>
