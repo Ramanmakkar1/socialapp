@@ -133,6 +133,7 @@ const related = [
   { href: "/instagram-auto-dm", label: "Instagram auto DM" },
   { href: "/tools/instagram-safe-zone-checker", label: "Reel and Story safe zone checker" },
   { href: "/help/getting-started", label: "Getting started" },
+  { href: "/guides/how-to-schedule-instagram-posts", label: "How to schedule Instagram posts in 2026 (full guide)" },
 ];
 
 export default function ScheduleInstagramReelsHelpPage() {

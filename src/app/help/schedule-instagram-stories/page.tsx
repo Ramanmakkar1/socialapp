@@ -141,6 +141,7 @@ const related = [
   { href: "/instagram-scheduler", label: "Instagram scheduler" },
   { href: "/tools/instagram-image-size", label: "Instagram image size guide" },
   { href: "/help/getting-started", label: "Getting started" },
+  { href: "/guides/how-to-schedule-instagram-posts", label: "How to schedule Instagram posts in 2026 (full guide)" },
 ];
 
 export default function ScheduleInstagramStoriesHelpPage() {
