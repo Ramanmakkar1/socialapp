@@ -89,6 +89,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/facebook-character-counter", name: "Facebook character counter", summary: "Check Facebook post, comment, ad and Page bio limits, with a live See more preview.", category: "create", icon: "type" },
   { href: "/tools/facebook-hashtag-generator", name: "Facebook hashtag generator", summary: "1 to 5 relevant hashtags for Facebook posts and Reels, copied in one click.", category: "create", icon: "hash" },
   { href: "/tools/facebook-caption-generator", name: "Facebook caption generator", summary: "Six Facebook post captions with a hook and call to action for any topic.", category: "create", icon: "sparkles" },
+  { href: "/tools/linkedin-caption-generator", name: "LinkedIn caption generator", summary: "Six LinkedIn post caption drafts with a hook before 'see more' and a call to action.", category: "create", icon: "sparkles" },
   { href: "/tools/x-hashtag-generator", name: "X hashtag generator", summary: "1 to 3 relevant hashtags for X (Twitter) posts that fit the 280-character limit.", category: "create", icon: "hash" },
   { href: "/tools/x-thread-maker", name: "X thread maker", summary: "Split long text into numbered X posts of up to 280 characters at sentence breaks, then copy each post.", category: "create", icon: "type" },
   { href: "/tools/threads-thread-maker", name: "Threads thread maker", summary: "Split long text into numbered Threads posts of up to 500 characters at sentence breaks, then copy each post.", category: "create", icon: "type" },
