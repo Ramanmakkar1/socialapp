@@ -10,11 +10,12 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 import { CompareNote } from "@/components/CompareNote";
+import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 const PATH = "/social-media-scheduler-comparison";
-const title = "Scheduler Comparison: Instagram, Facebook Pages, Threads";
+const title = "Social Media Scheduler Comparison: Poskoo vs Buffer & More";
 const description =
-  "Compare Poskoo's Instagram, Facebook Pages and Threads scheduling: calendar, media, auto-publishing and Instagram comment-to-DM, plus a free plan.";
+  "Compare social media schedulers: Poskoo plans and auto-publishes to Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky and Mastodon, with free plan.";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
@@ -52,9 +53,7 @@ const platformRows = [
 ];
 
 const competitorRows = [
-  { feature: "Instagram scheduling", poskoo: "Yes", buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
-  { feature: "Facebook Page scheduling", poskoo: "Yes", buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
-  { feature: "Threads scheduling", poskoo: "Yes", buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
+  { feature: "Platforms you can schedule", poskoo: LIVE_PLATFORMS_TEXT, buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
   { feature: "Week and month calendar", poskoo: "Yes", buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
   { feature: "Photos, video and carousels", poskoo: "Yes", buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
   { feature: "Publishing status and retry", poskoo: "Yes", buffer: "Check the provider", later: "Check the provider", hootsuite: "Check the provider" },
@@ -112,11 +111,11 @@ const comparisonLinks = workflows
 const faqs = [
   {
     q: "What does this social media scheduler comparison cover?",
-    a: "It compares the scheduling features Poskoo supports for Instagram, Facebook Pages and Threads: the calendar, the media you can schedule, auto-publishing, and Instagram comment-to-DM. Competitor details are marked “Check the provider” where we have not verified them.",
+    a: `It compares the scheduling features Poskoo supports for ${LIVE_PLATFORMS_TEXT}: the calendar, the media you can schedule, auto-publishing, and Instagram comment-to-DM. Competitor details are marked “Check the provider” where we have not verified them.`,
   },
   {
-    q: "Can I schedule Instagram, Facebook Pages and Threads in one place?",
-    a: "Yes. Connect each supported account through Meta's official login, then plan Instagram, Facebook Pages and Threads posts from one calendar and one publishing queue.",
+    q: "Which platforms can I schedule in one place?",
+    a: PLATFORMS_ANSWER,
   },
   {
     q: "Which platforms support Instagram comment-to-DM?",
@@ -136,7 +135,7 @@ const faqs = [
   },
   {
     q: "Does Poskoo support multiple platforms?",
-    a: "Yes. Poskoo schedules Instagram, Facebook Pages and Threads from one calendar and one publishing queue, all connected through Meta's official login.",
+    a: `Yes. Poskoo schedules ${LIVE_PLATFORMS_TEXT} from one calendar and one publishing queue.`,
   },
   {
     q: "Which scheduler is best for Instagram comment-to-DM?",
@@ -204,12 +203,12 @@ export default function SocialMediaSchedulerComparisonPage() {
           <span className="pill">Official Meta API · no password needed</span>
           <p className="eyebrow">Scheduler comparison</p>
           <h1>
-            Social media scheduler comparison for <em className="s mark">Instagram, Facebook and Threads</em>
+            Social media scheduler comparison for <em className="s mark">every network you post to</em>
           </h1>
           <p className="lede">
-            Poskoo schedules Instagram, Facebook Pages and Threads posts from one calendar, auto-publishes them, and adds
-            Instagram comment-to-DM. This page compares those features side by side and marks competitor details we have
-            not verified as “Check the provider”.
+            Poskoo schedules {LIVE_PLATFORMS_TEXT} from one calendar and auto-publishes them, and adds Instagram
+            comment-to-DM. This page compares those features side by side and marks competitor details we have not
+            verified as “Check the provider”.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -255,6 +254,14 @@ export default function SocialMediaSchedulerComparisonPage() {
             <Link className={s.vlink} href="/facebook-scheduler">Facebook Page scheduler</Link>
             {" · "}
             <Link className={s.vlink} href="/threads-scheduler">Threads scheduler</Link>
+            {" · "}
+            <Link className={s.vlink} href="/youtube-scheduler">YouTube scheduler</Link>
+            {" · "}
+            <Link className={s.vlink} href="/linkedin-scheduler">LinkedIn scheduler</Link>
+            {" · "}
+            <Link className={s.vlink} href="/bluesky-scheduler">Bluesky scheduler</Link>
+            {" · "}
+            <Link className={s.vlink} href="/mastodon-scheduler">Mastodon scheduler</Link>
           </p>
         </div>
       </section>
@@ -349,7 +356,7 @@ export default function SocialMediaSchedulerComparisonPage() {
         <div className="wrap">
           <div className="cta">
             <div>
-              <h2>Schedule Instagram, Facebook and Threads <em className="s">in one place</em></h2>
+              <h2>Schedule every network <em className="s">in one place</em></h2>
               <p>Start free. No credit card. Connect through Meta&apos;s official login.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
