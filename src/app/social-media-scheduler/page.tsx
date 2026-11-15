@@ -11,6 +11,9 @@ import { AnimArt } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/social-media-scheduler";
 const title = `Social Media Scheduler: Plan & Auto-Publish Posts | ${BRAND.name}`;
 const description = `Free social media scheduler for Instagram, Facebook, Threads, TikTok, LinkedIn, Pinterest, YouTube, X, Bluesky and Mastodon. One calendar, official APIs.`;

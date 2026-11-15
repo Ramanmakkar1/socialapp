@@ -9,6 +9,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/social-media-analytics";
 const title = `Social Media Analytics: Reach, Clicks & Leads | ${BRAND.name}`;
 const description = `Poskoo social media analytics shows post performance, reach, engagement rate, link clicks, leads and DM analytics in one dashboard, with CSV export.`;

@@ -9,6 +9,9 @@ import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/instagram-dm-lead-generation";
 const title = `Instagram DM Lead Generation: Comments to Leads | ${BRAND.name}`;
 const description = `Instagram comment-to-DM turns comments into captured leads: keyword reply, private DM, optional email gate, link delivery, click tracking and CSV export.`;

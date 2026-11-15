@@ -12,6 +12,9 @@ import { ArrowRight } from "lucide-react";
 import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const description = "Schedule Instagram posts, reels, carousels and stories, see suggested posting times, and auto-DM everyone who comments. Free plan, no credit card.";
 
 export const metadata: Metadata = withSocial({

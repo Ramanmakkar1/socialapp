@@ -10,6 +10,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/mastodon-scheduler";
 const title = `Mastodon Scheduler: Schedule Toots on Any Server | ${BRAND.name}`;
 const description = "Schedule Mastodon posts on any server with OAuth. Write up to 500 characters or your server's limit, add images or video, and pick a time with Poskoo.";

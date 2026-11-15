@@ -10,6 +10,9 @@ import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/facebook-scheduler";
 const title = `Facebook Page Scheduler: Plan & Auto-Publish | ${BRAND.name}`;
 const description = `Schedule Facebook Page posts with text, photos or video through Meta's official login. Plan Instagram and Threads content on the same calendar with ${BRAND.name}.`;

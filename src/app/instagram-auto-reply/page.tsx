@@ -9,6 +9,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/instagram-auto-reply";
 const title = `Instagram Auto-Reply FAQ: Comments, Keywords & DMs | ${BRAND.name}`;
 const description =

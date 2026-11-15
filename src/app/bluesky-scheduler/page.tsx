@@ -10,6 +10,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/bluesky-scheduler";
 const title = `Bluesky Scheduler: Schedule Bluesky Posts | ${BRAND.name}`;
 const description = "Schedule Bluesky posts with your handle and an app password. Add text and up to 4 images, pick a time, and Poskoo publishes with a clear status.";

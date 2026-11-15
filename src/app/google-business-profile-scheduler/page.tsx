@@ -10,6 +10,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/google-business-profile-scheduler";
 const title = `Google Business Profile Scheduler: Schedule Posts | ${BRAND.name}`;
 const description = "Schedule Google Business Profile posts, offers and events to your locations with the official API. Add a photo and a button like Book or Call. Free plan.";

@@ -10,6 +10,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/youtube-scheduler";
 const title = `YouTube Scheduler: Schedule Videos & Shorts | ${BRAND.name}`;
 const description = "Schedule YouTube videos and Shorts with titles, descriptions, tags and privacy settings. Poskoo uploads at your chosen time and shows clear status.";

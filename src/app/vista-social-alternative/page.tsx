@@ -11,6 +11,9 @@ import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 export const metadata: Metadata = withSocial({
   title: { absolute: `Vista Social Alternative with Instagram Auto-DM | ${BRAND.name}` },
   description:

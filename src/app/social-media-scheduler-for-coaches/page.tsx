@@ -4,6 +4,9 @@ import { BRAND } from "@/lib/brand";
 import { featureReadiness } from "@/lib/featureReadiness";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/social-media-scheduler-for-coaches";
 const title = `Social Media Scheduler for Coaches | ${BRAND.name}`;
 const description =

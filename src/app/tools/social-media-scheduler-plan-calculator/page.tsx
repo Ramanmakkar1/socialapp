@@ -3,6 +3,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import { planReadiness } from "@/lib/featureReadiness";
 import PlanFitCalculator from "./PlanFitCalculator";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/social-media-scheduler-plan-calculator",
   name: "Poskoo plan-fit calculator",

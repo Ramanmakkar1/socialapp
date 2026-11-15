@@ -10,6 +10,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/threads-scheduler";
 const title = `Threads Scheduler: Plan & Auto-Publish Posts | ${BRAND.name}`;
 const description = `Schedule Threads posts on one calendar and publish them automatically through Meta's official API. Plan text, image or video posts and track results.`;

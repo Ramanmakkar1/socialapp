@@ -9,6 +9,9 @@ import { PLAN_LIMITS } from "@/lib/planLimits";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/instagram-link-in-bio";
 const title = "Instagram Link in Bio Page: Add Links & Track Clicks";
 const description =

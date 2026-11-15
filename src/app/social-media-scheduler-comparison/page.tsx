@@ -13,6 +13,9 @@ import { CompareNote } from "@/components/CompareNote";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/social-media-scheduler-comparison";
 const title = "Social Media Scheduler Comparison: Free Plans | Poskoo";
 const description =

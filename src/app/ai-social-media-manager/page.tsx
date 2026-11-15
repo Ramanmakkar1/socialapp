@@ -9,6 +9,9 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const PATH = "/ai-social-media-manager";
 const title = `AI Social Media Manager: Captions, DMs & Leads | ${BRAND.name}`;
 const description = `An AI social media manager that drafts caption ideas, adapts them per platform, suggests DM replies, captures leads and shows analytics in Poskoo.`;
