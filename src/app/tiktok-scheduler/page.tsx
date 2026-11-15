@@ -284,6 +284,7 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-username-generator">free TikTok username generator</Link>.
             Writing your profile? Use our{" "}
             <Link className={s.vlink} href="/tools/tiktok-bio-generator">free TikTok bio generator</Link>.
+            Browse all <Link className={s.vlink} href="/tools/tiktok-tools">free TikTok tools</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Measure how each video did with the <Link className={s.vlink} href="/tools/tiktok-engagement-rate-calculator">free TikTok engagement rate calculator</Link>.
