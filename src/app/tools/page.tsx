@@ -127,6 +127,10 @@ export default function ToolsPage() {
             <Link href="/tools/x-tools">X (Twitter) tools</Link>
             <Link href="/tools/tiktok-tools">TikTok tools</Link>
             <Link href="/tools/facebook-tools">Facebook tools</Link>
+            <Link href="/tools/instagram-bio-generator">Instagram bio generator</Link>
+            <Link href="/tools/instagram-engagement-rate-calculator">Instagram engagement rate calculator</Link>
+            <Link href="/tools/youtube-title-counter">YouTube title counter</Link>
+            <Link href="/tools/linkedin-text-formatter">LinkedIn text formatter</Link>
             <Link href="/social-media-scheduler">Social media scheduler for small business</Link>
           </nav>
         </section>
