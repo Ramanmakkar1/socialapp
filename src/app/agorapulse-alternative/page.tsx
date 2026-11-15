@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
 import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -12,33 +12,33 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: `Agorapulse Alternative with Instagram Auto-DM | ${BRAND.name}` },
+  title: { absolute: "Agorapulse Alternative with Instagram Auto-DM & Free Plan" },
   description:
-    "Poskoo is an Agorapulse alternative that schedules Instagram, Facebook and Threads posts and auto-DMs every keyword commenter to capture leads. Free plan.",
+    "Poskoo is a cheaper Agorapulse alternative: schedule Instagram, Facebook, Threads, YouTube and LinkedIn posts and auto-DM keyword commenters. Free plan.",
   alternates: { canonical: `${BRAND.url}/agorapulse-alternative` },
 });
 
 const whySwitch = [
-  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page, Threads and YouTube posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },
+  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: `Plan and publish ${LIVE_PLATFORMS_TEXT} posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool.` },
   { no: "02 / Free to start", title: "Start on the Free plan", text: `${BRAND.name} Free includes 2 social accounts, 10 scheduled posts / month and 500 auto-DMs / month.` },
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
 const compare: [string, string, string, string][] = [
-  ["Social media scheduling", "Yes", "Yes", "Yes"],
-  ["Instagram, Facebook Page and Threads publishing", "Yes", "Check their site", "Depends on the tools"],
-  ["Instagram comment-to-DM automation", "Yes", "Check their site", "Depends on the DM tool"],
-  ["Email capture in the DM", "Yes", "Check their site", "Depends on the DM tool"],
+  ["Social media scheduling", "Yes", "Check their site", "Check their site"],
+  [`${LIVE_PLATFORMS_TEXT} publishing`, "Yes", "Check their site", "Check their site"],
+  ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
+  ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
   ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site", "Depends on the DM tool"],
-  ["Lead tracking from comment to DM", "Yes", "Check their site", "Depends on the DM tool"],
-  ["Price", PRICE_SUMMARY, "Check their site", "Two subscriptions"],
+  ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+  ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
+  ["Price", PRICE_SUMMARY, "Check their site", "Check their site"],
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} an Agorapulse alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
-  { q: "What is Agorapulse?", a: "Agorapulse is a social media management tool with scheduling, a social inbox and reporting. For its exact features and plans, see their site. This page focuses on what Poskoo does." },
-  { q: "Can I import my existing Agorapulse schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
+  { q: "Is Poskoo an Agorapulse alternative?", a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
+  { q: "What is Agorapulse?", a: "Agorapulse is a social media management tool for scheduling, inbox, monitoring and reporting. See their site for current plans." },
+  { q: "Can I import my Agorapulse schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
   { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
@@ -68,7 +68,7 @@ export default function AgorapulseAlternative() {
             An Agorapulse alternative that also <em className="s">auto-DMs every comment</em>
           </h1>
           <p className="lede">
-            Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, write captions with AI and track every lead.
+            Looking for an Agorapulse alternative? {BRAND.name} schedules your posts and auto-DMs everyone who comments a keyword, with a free plan and flat pricing instead of per-user seats.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
