@@ -11,8 +11,8 @@ import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/linkedin-scheduler";
-const title = "LinkedIn Scheduler: Plan and Auto-Publish LinkedIn Posts";
-const description = `Free LinkedIn scheduler: plan text and image posts on one calendar and auto-publish through LinkedIn's official API. Start with Poskoo's $0 plan.`;
+const title = "LinkedIn Scheduler: Plan and Auto-Publish Posts on Time";
+const description = `Schedule LinkedIn posts in advance and let Poskoo auto-publish them on time through the official API, with retries on failures. Start free on the $0 plan.`;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
