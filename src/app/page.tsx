@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
 import { canonicalUrl } from "@/lib/canonical";
+import { isPathIndexable } from "@/lib/indexability";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
@@ -27,6 +28,7 @@ const description = PAGE_DESCRIPTIONS["/"];
 const canonical = canonicalUrl("/");
 export const metadata: Metadata = {
  title: { absolute: title }, description, alternates: { canonical },
+ robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },
  openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };

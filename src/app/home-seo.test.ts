@@ -117,8 +117,13 @@ test("homepage route owns robots metadata and still renders the full JSON-LD gra
   // while the rendered page still ships Organization, WebSite,
   // SoftwareApplication and FAQPage nodes.
   assert.ok(
-    pageSource.includes('robots: isPathIndexable("/") ? robotsForRequestHost(host) : { index: false, follow: false },'),
-    "home page source must own the explicit robots directive",
+    pageSource.includes('robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },'),
+    "home page source must own the explicit robots directive from the shared indexability helper",
+  );
+  assert.equal(
+    pageSource.match(/import \{ isPathIndexable \} from "@\/lib\/indexability";/g)?.length,
+    1,
+    "home page must import isPathIndexable exactly once",
   );
   assert.ok(
     pageSource.includes("alternates: { canonical }"),
