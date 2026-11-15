@@ -21,6 +21,11 @@ const noFrameHeaders = [
 ];
 
 const OLD_HOST = [{ type: "host" as const, value: "socialapp.splitforms.com" }];
+// Some proxies/CDNs forward the original host in x-forwarded-host instead of
+// rewriting the Host header, so match that too.
+const OLD_FORWARDED_HOST = [
+  { type: "header" as const, key: "x-forwarded-host", value: "socialapp.splitforms.com" },
+];
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -87,6 +92,12 @@ const nextConfig: NextConfig = {
       { key: "Cloudflare-CDN-Cache-Control", value: "no-store" },
     ];
     const stagingRobots = staging ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] : [];
+    // The legacy host is always noindex, even if the staging flag is flipped,
+    // and every response (including the 301 redirects) must stay uncached.
+    const stagingNoStoreHeaders = [
+      ...noStore,
+      { key: "X-Robots-Tag", value: "noindex, nofollow" },
+    ];
     return [
       { source: "/:path*", headers: securityHeaders },
       // Later entries override the same header key from earlier ones.
@@ -124,6 +135,13 @@ const nextConfig: NextConfig = {
               },
             ],
       },
+      // Legacy staging host: apply the noindex/no-store contract to every
+      // response, including the 301 redirects above, so crawlers never index
+      // the old host. Matched by Host and by x-forwarded-host.
+      ...[
+        { source: "/:path*", has: OLD_HOST },
+        { source: "/:path*", has: OLD_FORWARDED_HOST },
+      ].map((entry) => ({ ...entry, headers: stagingNoStoreHeaders })),
     ];
   },
 };

@@ -34,3 +34,37 @@ test("old staging host redirects its home page and every other path to poskoo.co
     );
   }
 });
+
+test("old staging host responses carry the noindex/no-store header contract", async () => {
+  const headers = await config.headers!();
+
+  const matchesHost = (entry: { has?: unknown }, type: string, key?: string) =>
+    Array.isArray(entry.has) &&
+    entry.has.some((condition) => {
+      const c = condition as { type?: string; key?: string; value?: string };
+      return c.type === type && c.value === OLD_HOST && (key === undefined || c.key === key);
+    });
+
+  for (const [label, type, key] of [
+    ["Host", "host", undefined],
+    ["x-forwarded-host", "header", "x-forwarded-host"],
+  ] as const) {
+    const entry = headers.find((candidate) => matchesHost(candidate, type, key));
+    assert.ok(entry, `expected a header rule matched by ${label}`);
+    assert.equal(entry.source, "/:path*", `${label} rule must cover every path`);
+
+    const headerMap = new Map(entry.headers.map((h) => [h.key.toLowerCase(), h.value]));
+    assert.equal(
+      headerMap.get("x-robots-tag"),
+      "noindex, nofollow",
+      `${label} responses must send X-Robots-Tag: noindex, nofollow`,
+    );
+    assert.match(
+      headerMap.get("cache-control") ?? "",
+      /no-store/,
+      `${label} responses must not be cached`,
+    );
+    assert.equal(headerMap.get("cdn-cache-control"), "no-store");
+    assert.equal(headerMap.get("cloudflare-cdn-cache-control"), "no-store");
+  }
+});
