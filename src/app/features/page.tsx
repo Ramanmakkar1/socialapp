@@ -18,7 +18,7 @@ export const revalidate = 600;
 export const metadata: Metadata = withSocial({
   title: { absolute: "Poskoo Features: Scheduling, Auto-DM & AI Captions" },
   description:
-    "Explore every Poskoo feature in one place: schedule Instagram, Facebook, Threads and YouTube posts, auto-DM commenters, capture leads and use free Instagram tools.",
+    "See what Poskoo includes: scheduling for Instagram, Facebook, Threads and YouTube, auto-DMs, lead capture, AI captions and free tools. Start free today.",
   alternates: { canonical: "/features" },
 });
 
