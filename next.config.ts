@@ -58,8 +58,8 @@ const nextConfig: NextConfig = {
       { source: "/robots.txt", has: OLD_HOST, destination: "https://poskoo.com/robots.txt", permanent: true },
       {
         // Old staging host: send every page to the same path on poskoo.com.
-        // /api/* is excluded so webhooks or OAuth callbacks still registered on the old host keep working.
-        source: "/:path((?!api/).*)",
+        // /api and /api/* are excluded so webhooks or OAuth callbacks still registered on the old host keep working.
+        source: "/:path((?!api(?:/|$)).*)",
         has: OLD_HOST,
         destination: "https://poskoo.com/:path",
         permanent: true,

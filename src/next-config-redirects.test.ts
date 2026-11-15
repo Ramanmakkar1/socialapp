@@ -11,6 +11,14 @@ function hasOldHost(entry: { has?: unknown }): boolean {
   });
 }
 
+// Turn the catch-all source "/:path(<regex>)" into a matcher for the path
+// segment (without the leading slash), mirroring how Next applies the rule.
+function catchAllMatcher(source: string): RegExp {
+  const match = source.match(/^\/:path\((.*)\)$/);
+  assert.ok(match, `unexpected catch-all source: ${source}`);
+  return new RegExp(`^(?:${match[1]})$`);
+}
+
 test("old staging host redirects its home page and every other path to poskoo.com", async () => {
   const redirects = await config.redirects!();
   const oldHostEntries = redirects.filter(hasOldHost);
@@ -21,12 +29,23 @@ test("old staging host redirects its home page and every other path to poskoo.co
   assert.equal(root.destination, "https://poskoo.com/");
   assert.equal(root.permanent, true);
 
-  // (b) The catch-all must still exist and keep /api excluded so webhooks keep working.
-  const catchAll = oldHostEntries.find((entry) => entry.source.includes("(?!api/)"));
+  // (b) The catch-all must still exist and keep /api and /api/* excluded so
+  // webhooks and OAuth callbacks keep working.
+  const catchAll = oldHostEntries.find((entry) => entry.source.includes("(?!api"));
   assert.ok(catchAll, "expected the old-host catch-all redirect to still exist");
-  assert.match(catchAll.source, /\(\?!api\/\)/);
+  assert.match(catchAll.source, /\(\?!api\(\?:\/\|\$\)\)/);
+  assert.equal(catchAll.destination, "https://poskoo.com/:path");
+  assert.equal(catchAll.permanent, true);
 
-  // (c) Every old-host redirect must land on poskoo.com.
+  // (c) The header regex must exclude bare /api as well as /api/*, while
+  // still matching lookalike paths such as /apix.
+  const matches = catchAllMatcher(catchAll.source);
+  assert.equal(matches.test("api"), false, "bare /api must not be redirected");
+  assert.equal(matches.test("api/webhooks"), false, "/api/* must not be redirected");
+  assert.equal(matches.test("apix"), true, "/apix must still be redirected");
+  assert.equal(matches.test("pricing"), true, "/pricing must still be redirected");
+
+  // (d) Every old-host redirect must land on poskoo.com.
   for (const entry of oldHostEntries) {
     assert.ok(
       entry.destination.startsWith("https://poskoo.com/"),
