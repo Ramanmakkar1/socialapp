@@ -1301,7 +1301,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                             prev.map((u, i) => (i === index ? e.target.value : u)),
                           )
                         }
-                        placeholder="https://…/photo.jpg"
+                        placeholder="https://example.com/photo.jpg"
                         className="min-w-0 flex-1 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
                       />
                       {mediaUrls.length > 1 && (
