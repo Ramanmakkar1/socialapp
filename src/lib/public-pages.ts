@@ -785,5 +785,5 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/facebook-scheduler": "Schedule Facebook Page posts with text, photos or video through Meta's official login, and plan Instagram and Threads content in Poskoo too.",
   "/instagram-content-planner": "Plan an Instagram post step by step with free tools: draft a hook, write a caption, check image dimensions, preview and schedule it in Poskoo.",
   "/pricing": "Compare Poskoo Free, Pro and Agency plans. Start free with Instagram scheduling and 500 auto-DMs a month, then upgrade any time. No credit card needed.",
-  "/developers": "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp, then schedule posts and read analytics from your assistant.",
+  "/developers": "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp, then draft and schedule posts and read analytics from your assistant.",
 };

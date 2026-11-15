@@ -8,7 +8,7 @@ Stripe test mode show "Coming soon" until their env is production-ready. Rules (
 | Paid plans (Pro / Agency) | `STRIPE_SECRET_KEY` is live (`sk_live_` / `rk_live_`) + `STRIPE_BILLING_WEBHOOK_SECRET` + `STRIPE_BILLING_LIVE_PRICES=1` (set after `scripts/stripe-setup-billing.mjs` ran on the live account) + `DATABASE_URL` | pricing cards "Coming soon" / "Start free now", no checkout, /upgrade sends to sign-up |
 | Card payments (Stripe Connect products) | live `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` + `DATABASE_URL` | "Card payments are coming soon", buy pages "Checkout coming soon"; UPI unaffected |
 | E-mail | `SMTP_HOST` (+ `SMTP_*`) | forgot/reset password and verify-email say codes are coming soon (Google sign-in), reminder channels "Coming soon", UPI order page "save this link" |
-| AI ideas (captions / DM messages) | `ANTHROPIC_API_KEY` | "AI ideas are coming soon" |
+| AI ideas (captions / DM messages), "Tailor per network", campaign from a brief (calendar + MCP `create_campaign_from_brief`) | `ANTHROPIC_API_KEY` | "AI ideas are coming soon"; composer hides "Tailor per network"; campaign dialog shows "AI isn't configured yet"; MCP tool replies with the same message |
 | AI DM replies | `ANTHROPIC_API_KEY` + `AI_REPLIES_ENABLED=1` (owner hold) | Settings section "Coming soon", nothing queued |
 
 Testing overrides: `FEATURE_FORCE_READY=billing,card_payments,email,ai,ai_replies` (or `all`) skips the launch
@@ -38,7 +38,7 @@ New on 2026-11-06: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (Sign in with Goog
 | `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET` | Instagram Login (older flow) only | deauthorize / data-deletion / webhook now also accept `META_APP_SECRET` |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Sign in with Google | button hidden unless both are set; needs migration 016 |
 | `REVIEWER_EMAIL`, `REVIEWER_PASSWORD` | optional Meta App Review demo login | |
-| `ANTHROPIC_API_KEY`, `AI_MODEL` | optional AI caption helper | |
+| `ANTHROPIC_API_KEY`, `AI_MODEL`, `AI_QUALITY_MODEL` | optional AI features (`src/lib/ai.ts`) | `AI_MODEL` overrides the quick idea model (default `claude-haiku-5-5`), `AI_QUALITY_MODEL` the campaign / per-network model (default `claude-sonnet-5-5`) |
 | `NEXT_PUBLIC_ANALYTICS_DOMAIN`, `NEXT_PUBLIC_ANALYTICS_SRC` | optional analytics | |
 | `STRIPE_SECRET_KEY` | Products / Orders / Stripe Connect onboarding / checkout | platform key (restricted `rk_` key recommended; needs v2 Accounts write (`v2_account_storer_write`), Account Links + login links write, Checkout Sessions write on connected accounts). Without it Products, Orders and Settings show "Payments are not switched on yet" |
 | `STRIPE_WEBHOOK_SECRET` | `/api/stripe/webhook` | `whsec_...` of that endpoint (a **Connected accounts** endpoint, see below); without it the webhook answers 503 |
