@@ -123,6 +123,7 @@ export default function ToolsPage() {
             <Link href="/linkedin-scheduler">LinkedIn scheduler</Link>
             <Link href="/tiktok-scheduler">TikTok scheduler</Link>
             <Link href="/tools/threads-tools">Threads tools</Link>
+            <Link href="/tools/instagram-tools">Instagram tools</Link>
             <Link href="/social-media-scheduler-for-small-business">Social media scheduler for small business</Link>
           </nav>
         </section>
