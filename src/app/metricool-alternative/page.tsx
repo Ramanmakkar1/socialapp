@@ -135,7 +135,7 @@ export default function MetricoolAlternative() {
           <div className="head">
             <p className="eyebrow">Comparison</p>
             <h2>{BRAND.name} vs Metricool</h2>
-            <p>Metricool is a social media management tool for scheduling and analytics across many networks. {BRAND.name} keeps Instagram scheduling and adds comment-to-DM automation in one place. Here is an honest side-by-side.</p>
+            <p>Metricool is a social media management tool for scheduling and analytics across many networks. {BRAND.name} keeps <Link href="/instagram-scheduler">Instagram scheduling</Link> and adds <Link href="/instagram-auto-dm">comment-to-DM automation</Link> in one place. Here is an honest side-by-side.</p>
           </div>
           <div className={s.tableWrap}>
             <table className={s.table}>
@@ -192,7 +192,7 @@ export default function MetricoolAlternative() {
           <div className="cta">
             <div>
               <h2>Schedule like Metricool. <em className="s">Auto-DM every commenter</em></h2>
-              <p>Start free. No credit card. Connect Instagram in one tap.</p>
+              <p>Start free. No credit card. Connect Instagram in one tap. Compare <Link href="/pricing">Free and Pro plan pricing</Link>.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
             <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />
