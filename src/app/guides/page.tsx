@@ -8,8 +8,8 @@ import g from "@/components/guides/guides.module.css";
 import t from "@/components/tools/tools.module.css";
 import { BRAND } from "@/lib/brand";
 import { ldJson } from "@/lib/tool-schema";
+import { guidesHubJsonLd } from "@/lib/guide-schema";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
-import { GUIDES_BY_DATE, guidePath } from "@/content/guides/registry";
 
 const PATH = "/guides";
 const TITLE = "Social Media Guides: Growth, Scheduling & Auto-DM Tips";
@@ -24,23 +24,16 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description, images: [OG_IMAGE.url] },
 };
 
-const itemListJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "ItemList",
+const guidesJsonLd = guidesHubJsonLd({
   name: `${BRAND.name} guides`,
-  numberOfItems: GUIDES_BY_DATE.length,
-  itemListElement: GUIDES_BY_DATE.map((x, i) => ({
-    "@type": "ListItem",
-    position: i + 1,
-    name: x.h1,
-    url: `${BRAND.url}${guidePath(x.slug)}`,
-  })),
-};
+  description,
+  url: `${BRAND.url}${PATH}`,
+});
 
 export default function GuidesPage() {
   return (
     <PublicShell className={site.wide} breadcrumbs={[{ name: "Guides", path: PATH }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(itemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(guidesJsonLd) }} />
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
         <defs>
           <symbol id="tool-ok" viewBox="0 0 18 18">
