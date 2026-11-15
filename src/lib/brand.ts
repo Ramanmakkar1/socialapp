@@ -7,6 +7,7 @@ export const BRAND = {
   description:
     "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
+  canonicalUrl: rawUrl.replace(/\/+$/, ""),
   // Socialapp remains staging/noindex until Raman moves it to the new domain.
   // Keep this false site-wide: noindex everywhere and an empty sitemap.
   indexable: false,
