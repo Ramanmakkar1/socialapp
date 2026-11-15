@@ -125,7 +125,7 @@ export default function ToolsPage() {
             <Link href="/tools/instagram-tools">Instagram tool hub</Link>
             <Link href="/tools/youtube-tools">YouTube tools</Link>
             <Link href="/tools/x-tools">X (Twitter) tools</Link>
-            <Link href="/social-media-scheduler-for-small-business">Social media scheduler for small business</Link>
+            <Link href="/social-media-scheduler">Social media scheduler for small business</Link>
           </nav>
         </section>
 

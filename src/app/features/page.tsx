@@ -137,7 +137,7 @@ export default function FeaturesPage() {
                 the <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>{" "}
                 and the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>.
                 Running a small business? See the{" "}
-                <Link className={s.vlink} href="/social-media-scheduler-for-small-business">
+                <Link className={s.vlink} href="/social-media-scheduler">
                   social media scheduler for small business
                 </Link>
                 .

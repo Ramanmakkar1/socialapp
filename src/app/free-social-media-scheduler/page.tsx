@@ -290,7 +290,7 @@ export default function FreeSocialMediaSchedulerPage() {
               cheapest social media scheduling tools guide
             </Link>
             , see the{" "}
-            <Link className={s.vlink} href="/social-media-scheduler-for-small-business">
+            <Link className={s.vlink} href="/social-media-scheduler">
               social media scheduler for small business
             </Link>{" "}
             or compare Poskoo as a{" "}
