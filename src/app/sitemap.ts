@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
-import { isPathIndexable } from "@/lib/indexability";
+import { isPathIndexable, isSiteIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
 
 // Evaluate indexability per request so a build never freezes the staging noindex.
@@ -25,7 +25,7 @@ export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 // intended; the file stays raw XML with no XSLT styling.
 function getSitemapPaths(): PublicPath[] {
   // Staging is noindex: list nothing, on any host, until indexing is enabled.
-  if (!BRAND.indexable) return [];
+  if (!isSiteIndexable()) return [];
   // A non-canonical (staging/legacy) origin is always noindex, so never list it
   // even when the indexability flag is forced on.
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
