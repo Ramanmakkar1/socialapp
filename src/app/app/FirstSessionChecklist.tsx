@@ -32,7 +32,8 @@ export type FirstSessionChecklistProps = {
   postWithMedia: boolean;
 };
 
-type Step = { label: string; detail: string; time: string; href: string; done: boolean };
+// time is optional and defaults to ~30 sec.
+type Step = { label: string; detail: string; time?: string; href: string; done: boolean };
 
 // First-session checklist for the dashboard. Completed steps are derived on the
 // server from existing account and post data; the whole card hides once every
@@ -44,15 +45,8 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
 
   const steps: Step[] = [
     { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", time: "~30 sec", href: "/app/settings#channels", done: connected },
-    {
-      label: "Create a post with media",
-      detail:
-        "Add a photo or video and write a caption — this is the one post you'll schedule next.",
-      time: "~30 sec",
-      href: "/app/calendar?compose=1",
-      done: postWithMedia,
-    },
-    { label: "Schedule it", detail: "Pick a date and time on the calendar.", time: "~30 sec", href: "/app/calendar", done: postScheduled },
+    { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar?compose=1", done: postCreated },
+    { label: "Schedule it", detail: "Pick a date and time on the calendar.", href: "/app/calendar", done: postScheduled },
     {
       label: "Create an Auto-DM rule",
       detail:
@@ -62,12 +56,12 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
       done: hasActiveCommentRule,
     },
     {
-      label: "Create a draft post",
+      label: "Schedule a post with media",
       detail:
-        "Save a draft to come back to — drafts count toward this step.",
+        "Add a photo or video, choose your time zone and pick a date and time.",
       time: "~1 min",
       href: "/app/calendar?compose=1",
-      done: postCreated,
+      done: postWithMedia,
     },
   ];
   const doneCount = steps.filter((s) => s.done).length;
@@ -169,7 +163,7 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
                 </Link>
               )}
               <span className={home.fscDetail}>{step.detail}</span>
-              <span className={home.fscDetail}>{step.time}</span>
+              <span className={home.fscDetail}>{step.time ?? "~30 sec"}</span>
             </span>
             {index === firstOpen && <span className={home.fscNext}>Next</span>}
           </li>
