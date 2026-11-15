@@ -40,8 +40,10 @@ function FooterColumn({ title, links, extra }: { title: string; links: FooterLin
 const TOOLS: FooterLink[] = [
   { href: "/tools/instagram-hashtag-generator", label: "Instagram hashtag generator" },
   { href: "/tools/instagram-caption-counter", label: "Instagram caption counter" },
+  { href: "/tools/pinterest-description-generator", label: "Pinterest description generator" },
   { href: "/tools/x-character-counter", label: "X character counter" },
   { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
+  { href: "/tools/linkedin-caption-generator", label: "LinkedIn caption generator" },
   { href: "/tools/threads-character-counter", label: "Threads character counter" },
   { href: "/tools/bluesky-character-counter", label: "Bluesky character counter" },
   { href: "/tools/mastodon-character-counter", label: "Mastodon character counter" },
