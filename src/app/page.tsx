@@ -111,19 +111,19 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <div className="head"><p className="eyebrow">Three steps</p><h2>How Poskoo works in 3 steps</h2></div>
     <div className="howGrid">
       <article className="howStep">
-        <div className="howArt"><Image src="/landing/step-connect.webp" width={640} height={627} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="Illustration of a person connecting their Instagram, Facebook and Threads social accounts on a phone, with a padlock and checkmark showing a secure official login" /></div>
+        <div className="howArt"><Image src="/landing/step-connect.webp" width={640} height={627} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="Illustration of connecting a social account on a phone, with Instagram, Facebook and Threads icons and a secure login checkmark" /></div>
         <span className="howNo">Step 1</span>
         <h3>Connect your social media</h3>
         <p>Link Instagram, Facebook and Threads with each app&apos;s own official login. We never see your passwords.</p>
       </article>
       <article className="howStep">
-        <div className="howArt"><Image src="/landing/step-schedule.webp" width={640} height={597} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="Illustration of posts being scheduled on a content calendar, with a person placing photo cards on a wall calendar beside an alarm clock" /></div>
+        <div className="howArt"><Image src="/landing/step-schedule.webp" width={640} height={597} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="Illustration of placing photo posts on a wall calendar to schedule them, with an alarm clock" /></div>
         <span className="howNo">Step 2</span>
         <h3>Plan and schedule posts</h3>
         <p>Schedule Reels, carousels and single posts for the time you pick, in your time zone.</p>
       </article>
       <article className="howStep">
-        <div className="howArt"><Image src="/landing/step-dm.webp" width={640} height={568} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="Illustration of an automatic DM being sent after a keyword comment, showing a person catching an envelope flying from a phone with a LINK speech bubble" /></div>
+        <div className="howArt"><Image src="/landing/step-dm.webp" width={640} height={568} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="Illustration of catching an envelope flying from a phone after a keyword comment, with a LINK speech bubble showing an automatic DM" /></div>
         <span className="howNo">Step 3</span>
         <h3>Auto-DM every keyword comment</h3>
         <p>When someone comments your keyword, Poskoo sends them your link by DM.</p>
