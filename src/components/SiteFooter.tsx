@@ -149,6 +149,7 @@ export function SiteFooter() {
           { href: "/tailwind-alternative", label: "Tailwind alternative" },
           { href: "/socialbee-alternative", label: "SocialBee alternative" },
           { href: "/sendible-alternative", label: "Sendible alternative" },
+          { href: "/vista-social-alternative", label: "Vista Social alternative" },
           { href: "/later-alternative", label: "Later alternative" },
           { href: "/planoly-alternative", label: "Planoly alternative" },
           { href: "/sprout-social-alternative", label: "Sprout Social alternative" },

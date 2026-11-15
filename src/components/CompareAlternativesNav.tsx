@@ -1,7 +1,7 @@
 import Link from "next/link";
 import s from "./site.module.css";
 
-type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "zoho" | "loomly" | "tailwind" | "socialbee" | "sendible" | "linktree";
+type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "zoho" | "loomly" | "tailwind" | "socialbee" | "sendible" | "vistasocial" | "linktree";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
@@ -10,6 +10,7 @@ const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/tailwind-alternative", label: "Tailwind alternative", key: "tailwind" },
   { href: "/socialbee-alternative", label: "SocialBee alternative", key: "socialbee" },
   { href: "/sendible-alternative", label: "Sendible alternative", key: "sendible" },
+  { href: "/vista-social-alternative", label: "Vista Social alternative", key: "vistasocial" },
   { href: "/agorapulse-alternative", label: "Agorapulse alternative", key: "agorapulse" },
   { href: "/zoho-social-alternative", label: "Zoho Social alternative", key: "zoho" },
   { href: "/manychat-alternative", label: "ManyChat alternative", key: "manychat" },
