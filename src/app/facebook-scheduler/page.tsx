@@ -174,7 +174,7 @@ export default function FacebookSchedulerPage() {
             <Link className={s.vlink} href="/tools/facebook-caption-generator">Facebook caption generator</Link>. Style a headline with our{" "}
             <Link className={s.vlink} href="/tools/facebook-font-generator">Facebook font generator</Link>.{" "}
             Need a profile line? Try the free <Link className={s.vlink} href="/tools/facebook-bio-generator">Facebook bio generator</Link>. Check your header image with our{" "}
-            <Link className={s.vlink} href="/tools/facebook-cover-photo-size-checker">Facebook cover photo size checker</Link>. Not sure when to post? Find the{" "}
+            <Link className={s.vlink} href="/tools/facebook-cover-photo-size-checker">Facebook cover photo size checker</Link>. Size feed images with our <Link className={s.vlink} href="/tools/facebook-post-size-checker">Facebook post size checker</Link>. Not sure when to post? Find the{" "}
             <Link className={s.vlink} href="/tools/best-time-to-post-on-facebook">best time to post on Facebook</Link>.
           </p>
         </div>

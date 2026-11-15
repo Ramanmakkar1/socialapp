@@ -129,6 +129,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/youtube-profile-picture-size-checker", name: "YouTube profile picture size checker", summary: "Check a channel photo is square, at least 800×800, under 4 MB and safe in the circle.", category: "media", icon: "circle" },
   { href: "/tools/tiktok-profile-picture-size-checker", name: "TikTok profile picture size checker", summary: "Check a profile photo is square, at least 200×200 and safe inside the circle crop.", category: "media", icon: "circle" },
   { href: "/tools/facebook-cover-photo-size-checker", name: "Facebook cover photo size checker", summary: "See how a cover crops at 820×312 on desktop and 640×360 on phones.", category: "media", icon: "smartphone" },
+  { href: "/tools/facebook-post-size-checker", name: "Facebook post size checker", summary: "Test a feed image against Facebook's 1080×1350 and 4:5 sizes.", category: "media", icon: "image" },
   { href: "/tools/x-header-size-checker", name: "X header size checker", summary: "Test a header against X's 1500×500, 3:1 and 5 MB rules.", category: "media", icon: "smartphone" },
   { href: "/tools/tiktok-photo-size-checker", name: "TikTok photo size checker", summary: "Test a photo post or slideshow image in the 1080×1920 (9:16) frame.", category: "media", icon: "smartphone" },
   { href: "/tools/instagram-profile-picture-size-checker", name: "Instagram profile picture size checker", summary: "Check a profile photo is square, at least 320×320 and safe inside the circle crop.", category: "media", icon: "circle" },
