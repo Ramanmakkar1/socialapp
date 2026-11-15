@@ -33,9 +33,9 @@ const tools = [
     text: "Write a profile bio with emojis, line breaks and a call to action that fits your Threads profile.",
   },
   {
-    href: "/tools/threads-font-generator",
-    name: "Threads font generator",
-    text: "Create bold, italic and script Unicode text for your Threads bio, posts and display name.",
+    href: "/tools/instagram-font-generator",
+    name: "Font generator for Threads",
+    text: "Create bold, italic and script Unicode text that pastes into your Threads bio, posts and display name.",
   },
   {
     href: "/tools/threads-character-counter",

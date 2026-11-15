@@ -168,7 +168,7 @@ const config: ToolPageConfig = {
   related: [
     "/tools/tiktok-caption-counter",
     "/tools/tiktok-hashtag-generator",
-    "/tools/instagram-reel-size-checker",
+    "/tools/instagram-reels-size-checker",
     "/tiktok-scheduler",
   ],
   schema: {

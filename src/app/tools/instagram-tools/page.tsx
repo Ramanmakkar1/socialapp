@@ -115,7 +115,7 @@ const groups: { id: string; title: string; intro: string; tools: Tool[] }[] = [
         text: "Confirm your Story is 1080×1920 and clear of the app interface.",
       },
       {
-        href: "/tools/instagram-reel-size-checker",
+        href: "/tools/instagram-reels-size-checker",
         name: "Instagram Reel size checker",
         text: "Check Reel dimensions and file size before you schedule or upload.",
       },
