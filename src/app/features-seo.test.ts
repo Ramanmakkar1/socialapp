@@ -38,3 +38,19 @@ test("features SoftwareApplication reuses the brand facts and readiness helpers"
   assert.ok(!pageSource.includes("aggregateRating"), "no invented ratings");
   assert.ok(!/["']@type["']:\s*["']Review["']/.test(pageSource), "no invented reviews");
 });
+
+test("features page renders readable, encoding-safe punctuation", () => {
+  assert.ok(
+    pageSource.includes("Schedule &middot; Auto-DM &middot; AI captions &middot; Free tools"),
+    "ALL-IN-ONE pill separators must use readable middle-dot entities",
+  );
+  assert.equal(
+    pageSource.includes('aria-hidden="true">&rarr;</span>'),
+    true,
+    "CTA arrows must use the &rarr; entity",
+  );
+  assert.equal(pageSource.includes("\uFFFD"), false, "features copy must not contain replacement characters");
+  assert.equal(pageSource.includes("\u00B7"), false, "features copy must not contain raw middle-dot characters");
+  assert.equal(pageSource.includes("\u2192"), false, "features copy must not contain raw arrow characters");
+  assert.equal((pageSource.match(/<h1[\s>]/g) ?? []).length, 1, "features page must have exactly one H1");
+});

@@ -96,7 +96,7 @@ export default function FeaturesPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <header className="hero">
         <div className={s.heroText}>
-          <span className="pill"><span>ALL-IN-ONE</span>Schedule · Auto-DM · AI captions · Free tools</span>
+          <span className="pill"><span>ALL-IN-ONE</span>Schedule &middot; Auto-DM &middot; AI captions &middot; Free tools</span>
           <p className="eyebrow">Features</p>
           <h1>
             Everything Poskoo does, <em className="s mark">in one place</em>
@@ -110,7 +110,7 @@ export default function FeaturesPage() {
             turning comments into leads with automatic DMs.
           </p>
           <div className="ctas">
-            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+            <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">&rarr;</span></Link>
             <Link className="btn btn-line" href="/pricing">View pricing</Link>
           </div>
           <p className="small">Free plan. No credit card needed.</p>
@@ -128,27 +128,27 @@ export default function FeaturesPage() {
             <article className="pcard">
               <h3>Instagram scheduler</h3>
               <p>Plan feed posts, Reels and carousels on a calendar and auto-publish them.</p>
-              <Link className="go" href="/instagram-scheduler">See the Instagram scheduler <span aria-hidden="true">→</span></Link>
+              <Link className="go" href="/instagram-scheduler">See the Instagram scheduler <span aria-hidden="true">&rarr;</span></Link>
             </article>
             <article className="pcard">
               <h3>Instagram auto-DM</h3>
               <p>Send your link automatically to everyone who comments your keyword.</p>
-              <Link className="go" href="/instagram-auto-dm">See how Instagram auto-DM works <span aria-hidden="true">→</span></Link>
+              <Link className="go" href="/instagram-auto-dm">See how Instagram auto-DM works <span aria-hidden="true">&rarr;</span></Link>
             </article>
             <article className="pcard">
               <h3>Instagram DM automation</h3>
               <p>Capture emails, add a follow gate and track clicks on every auto-DM.</p>
-              <Link className="go" href="/instagram-dm-automation">Explore Instagram DM automation <span aria-hidden="true">→</span></Link>
+              <Link className="go" href="/instagram-dm-automation">Explore Instagram DM automation <span aria-hidden="true">&rarr;</span></Link>
             </article>
             <article className="pcard">
               <h3>Instagram link in bio</h3>
               <p>Turn one bio link into a page of links with click tracking.</p>
-              <Link className="go" href="/instagram-link-in-bio">Build your Instagram link in bio <span aria-hidden="true">→</span></Link>
+              <Link className="go" href="/instagram-link-in-bio">Build your Instagram link in bio <span aria-hidden="true">&rarr;</span></Link>
             </article>
             <article className="pcard">
               <h3>Pricing</h3>
               <p>Compare the Free, Pro and Agency plans and what each one includes.</p>
-              <Link className="go" href="/pricing">See Poskoo pricing and plans <span aria-hidden="true">→</span></Link>
+              <Link className="go" href="/pricing">See Poskoo pricing and plans <span aria-hidden="true">&rarr;</span></Link>
             </article>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function FeaturesPage() {
                 ))}
               </ul>
               <Link className="btn btn-line" href="/instagram-scheduler">
-                Explore the Instagram scheduler <span aria-hidden="true">→</span>
+                Explore the Instagram scheduler <span aria-hidden="true">&rarr;</span>
               </Link>
               <p className="small">
                 Also see the <Link className={s.vlink} href="/facebook-scheduler">Facebook Page scheduler</Link>,{" "}
@@ -206,7 +206,7 @@ export default function FeaturesPage() {
                 ))}
               </ul>
               <Link className="btn btn-line" href="/instagram-auto-dm">
-                See how Instagram auto-DM works <span aria-hidden="true">→</span>
+                See how Instagram auto-DM works <span aria-hidden="true">&rarr;</span>
               </Link>
               <p className="small">
                 Ready-made messages: <Link className={s.vlink} href="/instagram-auto-dm/templates">browse auto-DM templates</Link>.
@@ -235,7 +235,7 @@ export default function FeaturesPage() {
                 ))}
               </ul>
               <Link className="btn btn-line" href="/signup">
-                Try AI captions free <span aria-hidden="true">→</span>
+                Try AI captions free <span aria-hidden="true">&rarr;</span>
               </Link>
               <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p>
               <p className="small">See how it fits together on the <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> page, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link> and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>.</p>
@@ -263,7 +263,7 @@ export default function FeaturesPage() {
                 ))}
               </ul>
               <Link className="btn btn-line" href="/signup">
-                Start free and set one up <span aria-hidden="true">→</span>
+                Start free and set one up <span aria-hidden="true">&rarr;</span>
               </Link>
             </div>
             <div className="art">
@@ -289,7 +289,7 @@ export default function FeaturesPage() {
                 ))}
               </ul>
               <Link className="btn btn-line" href="/tools">
-                Browse all free Instagram tools <span aria-hidden="true">→</span>
+                Browse all free Instagram tools <span aria-hidden="true">&rarr;</span>
               </Link>
               <p className="small">
                 Popular tools:{" "}
@@ -335,7 +335,7 @@ export default function FeaturesPage() {
             <div>
               <h2>Ready to put your social media <em className="s">on autopilot?</em></h2>
               <p>Start free, connect Instagram and schedule your first post in minutes.</p>
-              <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
+              <Link className="btn" href="/signup">Start free <span aria-hidden="true">&rarr;</span></Link>
             </div>
           </div>
         </div>
