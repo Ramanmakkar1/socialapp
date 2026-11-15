@@ -69,6 +69,21 @@ test("sitemap is empty for both audited host aliases while staging is noindex", 
   }
 });
 
+test("legacy staging host is never listed even when BRAND.indexable is forced true", () => {
+  const wasUrl = BRAND.url;
+  const was = BRAND.indexable;
+  try {
+    BRAND.indexable = true;
+    for (const url of ["https://socialapp.splitforms.com", "https://www.socialapp.splitforms.com"]) {
+      BRAND.url = url;
+      assert.deepEqual(sitemap(), [], `${url} is noindex and must not appear in the sitemap`);
+    }
+  } finally {
+    BRAND.url = wasUrl;
+    BRAND.indexable = was;
+  }
+});
+
 test("approved production host returns an empty sitemap while BRAND.indexable is false", () => {
   const wasUrl = BRAND.url;
   try {

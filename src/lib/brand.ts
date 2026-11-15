@@ -1,5 +1,5 @@
 // Working name until Raman picks the real name + domain. Change it here only.
-const APPROVED_PRODUCTION_URL = "https://poskoo.com";
+export const APPROVED_PRODUCTION_URL = "https://poskoo.com";
 const rawUrl =
   process.env.NEXT_PUBLIC_SITE_URL || APPROVED_PRODUCTION_URL;
 
@@ -13,6 +13,13 @@ function normalizeSiteUrl(value: string | undefined): string | null {
   } catch {
     return null;
   }
+}
+
+// The sitemap may only ever advertise the approved production origin. A staging
+// or legacy host (e.g. socialapp.splitforms.com) is always served with a noindex
+// header, so its URLs must never be listed even if the flag is forced on.
+export function isApprovedProductionOrigin(value: string | undefined): boolean {
+  return normalizeSiteUrl(value) === APPROVED_PRODUCTION_URL;
 }
 
 // Indexing is opt-in and fails closed: the flag must be true AND the site URL
