@@ -148,8 +148,7 @@ export default function ThreadsSchedulerPage() {
           uses Meta&apos;s official API, and starts on a $0 Free plan with no credit card.
         </p>
         <p className="lede">
-          Plan Threads posts on one calendar and publish them automatically through Meta&apos;s official API. Write the
-          text, add an image or video, choose a time, and track each result in the queue.
+          Write the text, add an image or video, choose a time, and track each result in the queue.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
