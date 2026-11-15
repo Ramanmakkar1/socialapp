@@ -6,6 +6,7 @@ import { BRAND } from "@/lib/brand";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
+import { howToJsonLd } from "@/components/tools/seo";
 import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/instagram-content-planner";
@@ -77,6 +78,11 @@ const faqs = [
 ];
 
 const faq = faqJsonLd(faqs);
+const howTo = howToJsonLd({
+  name: "How to plan an Instagram post in five steps",
+  path: PATH,
+  steps,
+});
 
 // WebPage + HowTo built from the same title, description and five steps the page renders.
 const pageJsonLd = {
@@ -84,27 +90,19 @@ const pageJsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": `${BRAND.url}${PATH}#webpage`,
-      url: `${BRAND.url}${PATH}`,
+      "@id": `${BRAND.canonicalUrl}${PATH}#webpage`,
+      url: `${BRAND.canonicalUrl}${PATH}`,
       name: PAGE_TITLE,
       description: PAGE_DESCRIPTION,
       inLanguage: "en",
-      isPartOf: { "@type": "WebSite", "@id": `${BRAND.url}#website`, name: BRAND.name, url: BRAND.url },
+      isPartOf: {
+        "@type": "WebSite",
+        "@id": `${BRAND.canonicalUrl}#website`,
+        name: BRAND.name,
+        url: BRAND.canonicalUrl,
+      },
     },
-    {
-      "@type": "HowTo",
-      "@id": `${BRAND.url}${PATH}#howto`,
-      name: "How to plan an Instagram post in five steps",
-      description: PAGE_DESCRIPTION,
-      url: `${BRAND.url}${PATH}`,
-      step: steps.map((st, i) => ({
-        "@type": "HowToStep",
-        position: i + 1,
-        name: st.title,
-        text: st.text,
-        url: `${BRAND.url}${st.href}`,
-      })),
-    },
+    { "@type": howTo["@type"], name: howTo.name, step: howTo.step },
     { "@type": faq["@type"], mainEntity: faq.mainEntity },
   ],
 };
