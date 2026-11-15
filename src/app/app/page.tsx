@@ -112,6 +112,20 @@ async function followerTrend(userId: string): Promise<{ now: number | null; prev
   }
 }
 
+// An active Auto-DM rule that explicitly reacts to comments (used by the first-session checklist).
+async function hasActiveCommentRule(userId: string): Promise<boolean> {
+  if (!isDbConfigured()) return false;
+  try {
+    const rows = await query<{ n: boolean }>(
+      "select exists(select 1 from socialapp.dm_rules where user_id=$1 and status='active' and 'comment' = any(triggers)) as n",
+      [userId],
+    );
+    return rows[0]?.n ?? false;
+  } catch {
+    return false;
+  }
+}
+
 // Active comment rules with their post scope, to tell per post whether an automation covers it.
 async function commentRuleScopes(userId: string): Promise<{ media_ids: string[] }[]> {
   if (!isDbConfigured()) return [];
@@ -170,7 +184,7 @@ export default async function AppHome() {
   await connection();
   const user = await getCurrentUser();
   // Database only: nothing here calls Instagram, so the page shell renders at once. Graph reads stream in below.
-  const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek, anyChannel] = user
+  const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek, anyChannel, hasActiveComment] = user
     ? await Promise.all([
         getDashboardStats(user.id),
         getUpcomingPosts(user.id),
@@ -185,8 +199,9 @@ export default async function AppHome() {
         anyHandle(user.id),
         scheduledNextWeek(user.id),
         hasAnyChannel(user.id),
+        hasActiveCommentRule(user.id),
       ])
-    : [EMPTY_STATS, [], EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null, 0, false];
+    : [EMPTY_STATS, [], EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null, 0, false, false];
   const handle = account?.username ?? dbHandle;
   const activeCount = automations.filter((a) => a.status === "active").length;
   const status = homeStatusParts({ scheduledThisWeek: nextWeek, liveAutomations: activeCount, commentsWaiting: unanswered });
@@ -205,9 +220,7 @@ export default async function AppHome() {
     .slice(0, 5);
   const thumbs = await postThumbs(top.map((t) => t.post.id));
   const channelConnected = stats.hasAccount || anyChannel;
-  const ruleCreated = automations.length > 0 || stats.hasRule;
-  const ruleActive = automations.some((a) => a.status === "active");
-  const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && ruleCreated;
+  const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && hasActiveComment;
 
   return (
     <div className={`${instrumentSans.variable} ${home.page}`}>
@@ -251,7 +264,7 @@ export default async function AppHome() {
       )}
 
       {!checklistDone && (
-        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasScheduledPost} ruleCreated={ruleCreated} ruleActive={ruleActive} />
+        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasScheduledPost} hasActiveCommentRule={hasActiveComment} />
       )}
 
       <section className={home.section} aria-labelledby="todays-actions">

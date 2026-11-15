@@ -11,10 +11,8 @@ export type FirstSessionChecklistProps = {
   postCreated: boolean;
   /** A post is scheduled, publishing or already published. */
   postScheduled: boolean;
-  /** At least one Auto-DM rule exists for this user. */
-  ruleCreated: boolean;
-  /** At least one of those Auto-DM rules is active (not paused). */
-  ruleActive?: boolean;
+  /** An active Auto-DM rule with a comment trigger exists for this user. */
+  hasActiveCommentRule: boolean;
 };
 
 type Step = { label: string; detail: string; href: string; done: boolean };
@@ -22,7 +20,7 @@ type Step = { label: string; detail: string; href: string; done: boolean };
 // First-session checklist for the dashboard. Completed steps are derived on the
 // server from existing account and post data; the whole card hides once every
 // step is done.
-export default function FirstSessionChecklist({ connected, postCreated, postScheduled, ruleCreated, ruleActive = false }: FirstSessionChecklistProps) {
+export default function FirstSessionChecklist({ connected, postCreated, postScheduled, hasActiveCommentRule }: FirstSessionChecklistProps) {
   const steps: Step[] = [
     { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", href: "/app/settings#channels", done: connected },
     { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar?compose=1", done: postCreated },
@@ -30,11 +28,9 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
     {
       label: "Create an Auto-DM rule",
       detail:
-        ruleCreated && !ruleActive
-          ? "Your rule is paused — turn it on to reply automatically when someone comments."
-          : "Reply automatically when someone comments on your post.",
+        "Set up a keyword comment so anyone who comments with it automatically receives a DM reply.",
       href: "/app/auto-dm",
-      done: ruleCreated,
+      done: hasActiveCommentRule,
     },
   ];
   const doneCount = steps.filter((s) => s.done).length;

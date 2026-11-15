@@ -14,7 +14,7 @@ test("a draft alone does not complete the first-session checklist", () => {
   // dashboard must also require a scheduled/publishing/published post before
   // hiding the checklist.
   assert.ok(
-    pageSource.includes("const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && ruleCreated;"),
+    pageSource.includes("const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && hasActiveComment;"),
     "checklistDone must require stats.hasScheduledPost, not just postCreated",
   );
   assert.ok(
@@ -44,5 +44,25 @@ test("checklist copy distinguishes creating a post from scheduling it", () => {
   assert.ok(
     checklistSource.includes('{ label: "Schedule it", detail: "Pick a date and time on the calendar.", href: "/app/calendar", done: postScheduled }'),
     "schedule step must use postScheduled and its own copy",
+  );
+});
+
+test("the Auto-DM step requires an active rule with an explicit comment trigger", () => {
+  const fnSource = pageSource.slice(
+    pageSource.indexOf("async function hasActiveCommentRule"),
+    pageSource.indexOf("// Active comment rules with their post scope"),
+  );
+  assert.ok(fnSource.includes("'comment' = any(triggers)"), "hasActiveCommentRule must require an explicit comment trigger");
+  assert.ok(
+    !fnSource.includes("cardinality(triggers)=0") && !fnSource.includes("triggers is null"),
+    "rules without a comment trigger must not complete the Auto-DM step",
+  );
+  assert.ok(
+    checklistSource.includes('href: "/app/auto-dm"'),
+    "the Auto-DM step must link to /app/auto-dm",
+  );
+  assert.ok(
+    checklistSource.includes("done: hasActiveCommentRule"),
+    "the Auto-DM step must use the active comment rule signal",
   );
 });
