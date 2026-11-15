@@ -3,7 +3,8 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { getPlatformCopy, listText, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { ASSISTANT_TOOLS } from "@/lib/aiAssistantGuides";
 import { PLANS } from "@/lib/plans";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
@@ -37,6 +38,7 @@ const agency = plan("Agency");
 const { paidPlans, ai } = planReadiness();
 const cardPayments = featureReadiness("card_payments", process.env).ready;
 const paidNote = paidPlans ? "" : " (launching soon)";
+const platforms = getPlatformCopy();
 
 const whyLook = [
   { no: "01 / Free plan", title: "Start without a trial clock", text: `influence.so starts with a 7-day trial. ${BRAND.name} has a Free plan with ${free.items[0].text.toLowerCase()}, ${free.items[1].text.replace(" / month", " a month")} and ${free.items[2].text.replace(" / month", " a month")}, with no end date.` },
@@ -47,7 +49,7 @@ const whyLook = [
 const compare: [string, string, string][] = [
   ["Free plan", `Yes: ${free.items[0].text}, ${free.items[1].text}`, "No free plan; 7-day trial"],
   ["Unlimited posts", `Pro, ${pro.price}/month${paidNote}`, "Pro plan (about CA$98/month)"],
-  ["Networks you can publish to", `${LIVE_PLATFORMS_TEXT} today; TikTok, Pinterest, X and Google Business Profile awaiting platform approval`, "Says 32 destinations"],
+  ["Networks you can publish to", `${platforms.liveCountText} today${platforms.awaiting.length ? `; ${listText(platforms.awaiting)} awaiting platform approval` : ""}`, "Says 32 destinations"],
   ["Instagram comment-to-DM automation", "Yes", "Not listed"],
   ["Email capture in the DM, lead CSV export", "Yes", "Not listed"],
   ["Sell a digital product from a DM", cardPayments ? "Yes (card checkout, or Direct UPI in India)" : "Direct UPI in India today; card checkout launching soon", "Not listed"],
@@ -55,7 +57,7 @@ const compare: [string, string, string][] = [
   ["Instagram Stories scheduling", "Yes", "Not listed"],
   ["AI writing help", ai ? "AI caption and DM message ideas" : "Built, launching soon", "Yes, AI credits on every plan"],
   ["Campaigns with a version per channel", "No", "Yes"],
-  ["Hosted MCP server for AI assistants", "Yes (5 tools, API key)", "Yes"],
+  ["Hosted MCP server for AI assistants", `Yes (${ASSISTANT_TOOLS.length} tools, API key)`, "Yes"],
   ["Short links", "Tracked links in DMs", "Branded links and QR codes"],
   ["Interface languages", "English", "27 languages"],
   ["Client portal, multi-stage approvals", "No", "No (per their FAQ)"],
@@ -79,8 +81,8 @@ const switchSteps = [
 const faqs = [
   { q: `Is ${BRAND.name} a good influence.so alternative?`, a: `It is if you want a free plan, unlimited posts at ${pro.price} a month, or Instagram comment-to-DM with lead capture. If you need many more networks, campaigns with a version per channel, or a non-English interface, influence.so is the stronger fit today.` },
   { q: "Does influence.so have a free plan?", a: `Not when we checked on ${CHECKED_ON}. It offered a 7-day trial. Its Starter plan was US$19 a month with 50 publications and 1,500 AI credits. Check its pricing page for current prices.` },
-  { q: "Which tool supports more social networks?", a: `influence.so says it publishes to 32 destinations. ${BRAND.name} publishes to ${LIVE_PLATFORMS_TEXT} today, and TikTok, Pinterest, X and Google Business Profile are built and waiting for platform approval.` },
-  { q: "Can both tools be used from ChatGPT or Claude?", a: `Yes. Both offer a hosted MCP server. ${BRAND.name}'s has five tools (list channels, list posts, create a post, add an idea and read an analytics summary) and works with an API key on every plan, including Free.` },
+  { q: "Which tool supports more social networks?", a: `influence.so says it publishes to 32 destinations. ${platforms.answer}` },
+  { q: "Can both tools be used from ChatGPT or Claude?", a: `Yes. Both offer a hosted MCP server. ${BRAND.name}'s has ${ASSISTANT_TOOLS.length} tools, from listing channels and creating or editing posts to Auto-DM rules and an analytics summary, and works with an API key on every plan, including Free.` },
   { q: "Does influence.so do Instagram comment-to-DM?", a: `We did not find comment-to-DM, lead capture, selling in DMs, link-in-bio or Instagram Stories on influence.so when we checked. ${BRAND.name} includes all of them.` },
   { q: "Are there independent reviews of influence.so?", a: `We could not find independent reviews when we checked on ${CHECKED_ON}. Try both on a free plan or trial with your own content before you decide.` },
 ];

@@ -18,7 +18,7 @@ test("features page exposes a SoftwareApplication node on the canonical origin",
     "SoftwareApplication @id must be BRAND.canonicalUrl + '#app'",
   );
   assert.ok(
-    pageSource.includes('url: canonicalUrlForPath("/features")'),
+    pageSource.includes('url: canonicalUrl("/features")'),
     "SoftwareApplication url must be the canonical /features URL",
   );
   assert.equal(BRAND.canonicalUrl.startsWith("https://"), true);
@@ -32,7 +32,7 @@ test("features SoftwareApplication reuses the brand facts and readiness helpers"
   assert.ok(pageSource.includes('operatingSystem: "Web"'), "app operatingSystem must be Web");
   assert.ok(pageSource.includes('applicationCategory: "BusinessApplication"'), "app category must be BusinessApplication");
   assert.ok(
-    pageSource.includes("offers: softwareOffers({ paidPlans, ai: false })"),
+    pageSource.includes("offers: softwareOffers(planReadiness(process.env))"),
     "offers must use the product readiness/pricing helper, not invented prices",
   );
   assert.ok(!pageSource.includes("aggregateRating"), "no invented ratings");
@@ -82,7 +82,7 @@ test("hero copy uses readable separators and CTA arrows", () => {
 });
 
 test("feature descriptions use readable punctuation", () => {
-  const descriptions = sliceBetween("const schedulerBullets = [", "const faqs = [");
+  const descriptions = sliceBetween("const schedulerBullets = [", "const featuresFaqs = ");
   assertReadable(descriptions, "feature descriptions");
   for (const sentence of [
     "Plan feed posts, reels, carousels and stories on a week or month calendar.",
@@ -96,13 +96,13 @@ test("feature descriptions use readable punctuation", () => {
 });
 
 test("FAQ answers use readable punctuation", () => {
-  const faqBlock = sliceBetween("const faqs = [", "const jsonLd =");
+  const faqBlock = sliceBetween("const featuresFaqs = ", "const faqJsonLd =");
   assertReadable(faqBlock, "FAQ answers");
   for (const answer of [
-    "Poskoo is one app for scheduling social posts and turning Instagram comments into automatic DMs.",
-    "You can schedule and auto-publish to Instagram, Facebook Pages, Threads and YouTube from one queue.",
-    "You set a keyword such as GUIDE or LINK, and when someone comments it, Poskoo sends them your message in a DM, usually within a minute.",
-    "No. The Free plan is $0 and needs no credit card, so you can connect an account and schedule your first post without paying.",
+    "Poskoo is one app that schedules social posts, sends automatic DMs to people who comment on Instagram, captures leads and tracks results.",
+    // The networks answer is derived from the live channel registry (src/lib/platform-support.ts).
+    "a: PLATFORMS_ANSWER,",
+    "Set a keyword such as GUIDE or LINK, and Poskoo sends your message in a DM to everyone who comments it, usually within a minute.",
   ]) {
     assert.ok(faqBlock.includes(answer), `FAQ answer missing readable text: ${answer}`);
   }
@@ -144,17 +144,16 @@ test("CTA labels use readable punctuation", () => {
 });
 
 test("structured-data text uses readable punctuation", () => {
-  const jsonLdBlock = sliceBetween("const jsonLd = (paidPlans: boolean) => ({", "export default function FeaturesPage");
+  const jsonLdBlock = sliceBetween("const jsonLd = (aiReady: boolean) => ({", "export default function FeaturesPage");
   assertReadable(jsonLdBlock, "structured-data text");
   for (const value of [
     'name: "Everything Poskoo does, in one place."',
-    '"Schedule and auto-publish to Instagram, Facebook Pages, Threads and YouTube"',
+    "`Schedule and auto-publish to ${LIVE_PLATFORM_COUNT_TEXT}`",
     '"Instagram comment-to-DM automation"',
-    '"AI captions and DM message ideas"',
+    // AI features are only claimed while AI is switched on.
+    '...(aiReady ? ["AI captions and DM message ideas"] : [])',
     'name: "Instagram scheduler"',
-    'name: "Pricing"',
-    'name: faq.q',
-    'text: faq.a',
+    'name: "Poskoo pricing and plans"',
   ]) {
     assert.ok(jsonLdBlock.includes(value), `structured-data text missing readable value: ${value}`);
   }

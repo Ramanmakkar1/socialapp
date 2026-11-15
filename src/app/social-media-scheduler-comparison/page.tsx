@@ -120,7 +120,7 @@ const comparisonLinks = workflows
 const faqs = [
   {
     q: "What does this social media scheduler comparison cover?",
-    a: `It compares the scheduling features Poskoo supports for ${LIVE_PLATFORMS_TEXT}: the calendar, the media you can schedule, auto-publishing, and Instagram comment-to-DM. Competitor details are marked “Check the provider” where we have not verified them.`,
+    a: `It compares the scheduling features Poskoo supports across ${LIVE_PLATFORMS_TEXT}: the calendar, the media you can schedule, auto-publishing, and Instagram comment-to-DM. Competitor details are marked “Check the provider” where we have not verified them.`,
   },
   {
     q: "Which platforms can I schedule in one place?",
@@ -144,7 +144,7 @@ const faqs = [
   },
   {
     q: "Does Poskoo support multiple platforms?",
-    a: `Yes. Poskoo schedules ${LIVE_PLATFORMS_TEXT} from one calendar and one publishing queue.`,
+    a: `Yes. Poskoo schedules posts to ${LIVE_PLATFORMS_TEXT} from one calendar and one publishing queue.`,
   },
   {
     q: "Which scheduler is best for Instagram comment-to-DM?",
@@ -215,7 +215,7 @@ export default function SocialMediaSchedulerComparisonPage() {
             Social media scheduler comparison for <em className="s mark">every network you post to</em>
           </h1>
           <p className="lede">
-            Poskoo schedules {LIVE_PLATFORMS_TEXT} from one calendar and auto-publishes them, and adds Instagram
+            Poskoo schedules posts to {LIVE_PLATFORMS_TEXT} from one calendar and auto-publishes them, and adds Instagram
             comment-to-DM. This page compares those features side by side and marks competitor details we have not
             verified as “Check the provider”.
           </p>

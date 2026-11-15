@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -44,7 +44,7 @@ const faqs = [
   { q: `Is ${BRAND.name} a Planoly alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram, Facebook Pages and Threads scheduling and publishing today, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
   { q: "Does Planoly send automatic DMs when someone comments?", a: "Planoly is built for planning and publishing visual content. Comment-to-DM automation is not part of Planoly itself; teams usually add a tool like ManyChat for that." },
   { q: "Can I import my Planoly media library or schedule?", a: `There is no Planoly import yet. Download assets from Planoly if needed, then upload them when you create posts in ${BRAND.name}. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
-  { q: "Which platforms does each tool support?", a: `${LIVE_PLATFORMS_TEXT} scheduling and Instagram auto-DMs work today on ${BRAND.name}. Planoly supports additional networks; see their site for the current list.` },
+  { q: "Which platforms does each tool support?", a: `${PLATFORMS_ANSWER} Planoly supports additional networks; see their site for the current list.` },
   { q: "Is there a free plan?", a: `Yes. The Free plan is $0 forever and includes 2 social accounts, 10 scheduled posts per month and 500 auto-DMs per month. Every account starts on it.` },
 ];
 

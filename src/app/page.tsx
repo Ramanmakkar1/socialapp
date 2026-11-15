@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
 import { canonicalUrl } from "@/lib/canonical";
 import { isPathIndexable } from "@/lib/indexability";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, getPlatformCopy, listText } from "@/lib/platform-support";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { cancelAnswer, plansFor, plansNote } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
@@ -37,11 +37,17 @@ export const dynamic = "force-static";
 // Pricing cards follow the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
 // regenerate in the background at most every 10 minutes.
 export const revalidate = 600;
+const WORKS_COLOR: Record<string, string> = { instagram: "#E1306C", facebook: "#1877F2", threads: "var(--ink)", youtube: "#FF0033", linkedin: "#0A66C2", linkedin_pages: "#0A66C2", tiktok: "var(--ink)", pinterest: "#E60023", x: "var(--ink)", gbp: "#4285F4", bluesky: "#1185FE", mastodon: "#6364FF", tumblr: "#001935", farcaster: "#855dcd", plurk: "#ff574d" };
 const faqs = [{"q": "What is Poskoo?", "a": "Poskoo is a web app that schedules and auto-publishes your social media posts, and automatically sends an Instagram DM with your link to everyone who comments a keyword. It also captures emails in the DM, gives you a link-in-bio page and shows which posts bring in clicks and leads. It uses each platform's official API, and the Free plan costs $0."}, {"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": PLATFORMS_ANSWER}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
 export default function Home() {
 // Paid plans / AI items: "Launching soon" until featureReadiness says they're switched on.
 const r = planReadiness();
 const plans = plansFor(r);
+// Networks that can publish on this server today (keys + approvals; src/lib/platform-support.ts).
+const platforms = getPlatformCopy();
+const isLive = (id: string) => platforms.catalog.some((e) => e.id === id && e.live);
+const liveSocial = platforms.catalog.filter((e) => e.live && e.group === "social");
+const moreLive = platforms.liveCount - liveSocial.length;
 const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
 const jsonLd = homePageJsonLd(faqList, r, title);
 // The hero illustration is the first thing painted above the fold: fetch it early
@@ -59,7 +65,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <div className="wrap">
     <SiteHeader onHome />
     <header className="hero heroCenter" id="top">
-      <Link className="pill glass heroPill" href="#channels"><span>NEW</span><b>LinkedIn, Bluesky and Mastodon are here</b> <i aria-hidden="true">→</i></Link>
+      <Link className="pill glass heroPill" href="#channels"><span>NEW</span><b>Now publishing to {platforms.liveCountText}</b> <i aria-hidden="true">→</i></Link>
       <h1><span className="h1Line">Schedule posts.</span> <span className="h1Line">Auto&#8209;DM every comment.</span> <em className="s mark">Grow on Poskoo.</em></h1>
       <p className="lede">Plan every post on one calendar. Anyone who comments your keyword gets your link by DM, usually within a minute.</p>
       <div className="heroSignup">
@@ -78,7 +84,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   </div>
 </div>
 <div className="wrap">
-  <div className="works"><span>Works with</span><b><i style={{"background": "#E1306C"}}></i>Instagram</b><b><i style={{"background": "#1877F2"}}></i>Facebook</b><b><i style={{"background": "var(--ink)"}}></i>Threads</b><b><i style={{"background": "#FF0033"}}></i>YouTube</b><b><i style={{"background": "#0A66C2"}}></i>LinkedIn</b><b><i style={{"background": "#1185FE"}}></i>Bluesky</b><b><i style={{"background": "#6364FF"}}></i>Mastodon</b><span>· Official APIs only</span></div>
+  <div className="works"><span>Works with</span>{liveSocial.map((e) => <b key={e.id}><i style={{ background: WORKS_COLOR[e.id] ?? "var(--ink)" }}></i>{e.label}</b>)}{moreLive > 0 && <span>+ {moreLive} more</span>}<span>· Official APIs only</span></div>
 </div>
 
 <section className="howSection">
@@ -155,13 +161,16 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <div className="copy">
       <p className="eyebrow">Multi-channel scheduling</p>
       <h2>Write once. <em className="s">Post everywhere</em></h2>
-      <p>Schedule Instagram, Facebook Pages, Threads and YouTube posts from one calendar, each with its own caption.</p>
+      <p>Schedule posts to {platforms.liveText} from one calendar, each with its own caption.</p>
       <ul className="channels">
-        <li><span className="chIcon" style={{ background: "#E1306C" }}><Instagram size={20} aria-hidden="true" /></span><span className="chText"><b>Instagram</b><span>Feed posts, carousels, Reels and Stories</span></span><span className="chLive">Live</span></li>
-        <li><span className="chIcon" style={{ background: "#1877F2" }}><Facebook size={20} aria-hidden="true" /></span><span className="chText"><b>Facebook</b><span>Posts to your Facebook Pages</span></span><span className="chLive">Live</span></li>
-        <li><span className="chIcon" style={{ background: "var(--ink)" }}><AtSign size={20} aria-hidden="true" /></span><span className="chText"><b>Threads</b><span>Posts to your Threads profile</span></span><span className="chLive">Live</span></li>
-        <li><span className="chIcon" style={{ background: "#FF0000" }}><Youtube size={20} aria-hidden="true" /></span><span className="chText"><b>YouTube</b><span>Videos and Shorts to your channel</span></span><span className="chLive">Live</span></li>
+        {isLive("instagram") && <li><span className="chIcon" style={{ background: "#E1306C" }}><Instagram size={20} aria-hidden="true" /></span><span className="chText"><b>Instagram</b><span>Feed posts, carousels, Reels and Stories</span></span><span className="chLive">Live</span></li>}
+        {isLive("facebook") && <li><span className="chIcon" style={{ background: "#1877F2" }}><Facebook size={20} aria-hidden="true" /></span><span className="chText"><b>Facebook</b><span>Posts to your Facebook Pages</span></span><span className="chLive">Live</span></li>}
+        {isLive("threads") && <li><span className="chIcon" style={{ background: "var(--ink)" }}><AtSign size={20} aria-hidden="true" /></span><span className="chText"><b>Threads</b><span>Posts to your Threads profile</span></span><span className="chLive">Live</span></li>}
+        {isLive("youtube") && <li><span className="chIcon" style={{ background: "#FF0000" }}><Youtube size={20} aria-hidden="true" /></span><span className="chText"><b>YouTube</b><span>Videos and Shorts to your channel</span></span><span className="chLive">Live</span></li>}
       </ul>
+      {platforms.live.chat.length > 0 && <p>Chat: {listText(platforms.live.chat)}.</p>}
+      {platforms.live.blogs.length > 0 && <p>Blogs, newsletters and self-hosted: {listText(platforms.live.blogs)}.</p>}
+      {platforms.awaiting.length + platforms.soon.length > 0 && <p>Coming soon: {listText([...platforms.awaiting, ...platforms.soon])}.</p>}
       <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/linkedin-scheduler">Schedule LinkedIn posts <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link></p>
     </div>
     <div className="art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>

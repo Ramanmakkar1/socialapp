@@ -6,8 +6,7 @@ import {
   PAGE_TITLES,
   PUBLIC_PATHS,
 } from "@/lib/public-pages";
-import { networkAvailability } from "@/lib/networks/registry";
-import { channelStatuses } from "@/lib/channelStatus";
+import { getPlatformCopy, listText } from "@/lib/platform-support";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
 import { PLANS } from "@/lib/plans";
 
@@ -44,37 +43,12 @@ export async function GET() {
     return lines.length ? [`## ${heading}`, "", ...lines, ""] : [];
   });
 
-  // Only channels that can actually be connected on this server are listed as working; the rest
-  // carry the same "awaiting approval" / "not available yet" wording the Connect dialog shows.
-  const nets = networkAvailability();
-  const statuses = channelStatuses(
-    { tiktok: nets.tiktok, pinterest: nets.pinterest, x: nets.x, gbp: nets.gbp, linkedin_pages: false, tumblr: nets.tumblr, wpcom: nets.wpcom, plurk: nets.plurk, twitch: nets.twitch, farcaster: nets.farcaster },
-    process.env,
-  );
-  const coming = [
-    ["tiktok", "TikTok"],
-    ["pinterest", "Pinterest"],
-    ["x", "X (Twitter)"],
-    ["gbp", "Google Business Profile"],
-    ["tumblr", "Tumblr"],
-    ["wpcom", "WordPress.com"],
-    ["plurk", "Plurk"],
-    ["twitch", "Twitch (channel chat)"],
-    ["farcaster", "Farcaster"],
-  ] as const;
-  const live = [
-    "Instagram",
-    "Facebook Pages",
-    "Threads",
-    "YouTube (videos and Shorts)",
-    "Bluesky",
-    "Mastodon",
-    ...(nets.linkedin ? ["LinkedIn (personal profile)"] : []),
-    ...coming.filter(([id]) => statuses[id].state === "ready").map(([, l]) => l),
-  ];
-  const awaiting = coming.filter(([id]) => statuses[id].state === "awaiting").map(([, l]) => l);
-  const soon = [...coming.filter(([id]) => statuses[id].state === "soon").map(([, l]) => l), "WhatsApp", "Messenger"];
-  const list = (items: readonly string[]) => (items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`);
+  // Only networks that can publish on this server today count as live (keys + platform approvals,
+  // src/lib/platform-support.ts); the rest carry "awaiting approval" / "not available yet".
+  const platforms = getPlatformCopy();
+  const awaiting = platforms.awaiting;
+  const soon = [...platforms.soon, "WhatsApp", "Messenger"];
+  const list = listText;
 
   const { paidPlans, ai } = planReadiness();
   const cardPayments = featureReadiness("card_payments", process.env).ready;
@@ -105,8 +79,12 @@ export async function GET() {
     "",
     "## What it does",
     "",
-    `- Schedule and auto-publish posts to ${list(live)}.`,
+    `- Schedule and auto-publish posts to ${platforms.liveCountText}:`,
+    ...(platforms.live.social.length ? [`  - Social: ${list(platforms.live.social)}.`] : []),
+    ...(platforms.live.chat.length ? [`  - Chat: ${list(platforms.live.chat)}.`] : []),
+    ...(platforms.live.blogs.length ? [`  - Blogs, newsletters and self-hosted servers: ${list(platforms.live.blogs)}.`] : []),
     ...(awaiting.length ? [`- ${list(awaiting)}: publishing is built and awaiting the platform's API approval.`] : []),
+    ...(platforms.remindersReady ? ["- Instagram personal accounts and Facebook Groups work as reminders: Poskoo e-mails the post at the scheduled time for the owner to share."] : []),
     "- Automate Instagram comment-to-DM, Story-reply and DM-keyword conversations (auto-DM works on Instagram only).",
     ...(ai ? ["- Draft captions and DM message ideas with AI, tailor a caption per network, and draft a whole campaign from a brief."] : []),
     "- Capture leads: ask for an email in the DM before the link is sent.",

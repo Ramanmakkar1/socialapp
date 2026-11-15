@@ -100,7 +100,7 @@ export default function MetricoolAlternative() {
             Metricool alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            {BRAND.name} is a Metricool alternative that schedules your {LIVE_PLATFORMS_TEXT} posts and auto-DMs every keyword commenter. Metricool focuses on scheduling and analytics across many networks; {BRAND.name} also captures emails in the DM and exports your leads, all in one account. The Free plan costs $0.
+            {BRAND.name} is a Metricool alternative that schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs every keyword commenter. Metricool focuses on scheduling and analytics across many networks; {BRAND.name} also captures emails in the DM and exports your leads, all in one account. The Free plan costs $0.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>

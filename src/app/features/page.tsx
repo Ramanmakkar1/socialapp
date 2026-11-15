@@ -11,6 +11,8 @@ import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
 import { softwareOffers } from "@/lib/plans";
+import { canonicalUrl } from "@/lib/canonical";
+import { LIVE_PLATFORM_COUNT_TEXT, LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 // Payment copy follows the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
 // the page stays static and regenerates in the background at most every 10 minutes.
@@ -25,7 +27,7 @@ export const metadata: Metadata = withSocial({
 
 const schedulerBullets = [
   "Plan feed posts, reels, carousels and stories on a week or month calendar.",
-  "Auto-publish on Instagram, Facebook Pages, Threads and YouTube from one queue.",
+  `Auto-publish to ${LIVE_PLATFORMS_TEXT} from one queue.`,
   "See suggested times based on when your audience engaged with your auto-DMs.",
 ];
 
@@ -62,7 +64,7 @@ const featuresFaqs = (aiReady: boolean) => [
   },
   {
     q: "Which social networks can I schedule?",
-    a: "Poskoo schedules posts to Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon today. TikTok and Pinterest are waiting on platform approval, and X is coming later.",
+    a: PLATFORMS_ANSWER,
   },
   {
     q: "How does Instagram comment-to-DM work?",
@@ -86,16 +88,16 @@ const faqJsonLd = (faqs: { q: string; a: string }[]) => ({
   })),
 });
 
-const jsonLd = {
+const jsonLd = (aiReady: boolean) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": BRAND.url + "/features#webpage",
-      url: BRAND.url + "/features",
+      "@id": canonicalUrl("/features") + "#webpage",
+      url: canonicalUrl("/features"),
       name: "Everything Poskoo does, in one place.",
       inLanguage: "en",
-      isPartOf: { "@id": BRAND.url + "#website" },
+      isPartOf: { "@id": BRAND.canonicalUrl + "#website" },
       mainEntity: { "@id": BRAND.canonicalUrl + "#app" },
     },
     {
@@ -103,20 +105,20 @@ const jsonLd = {
       "@id": BRAND.canonicalUrl + "#app",
       name: BRAND.name,
       description: BRAND.description,
-      url: BRAND.canonicalUrl + "/features",
+      url: canonicalUrl("/features"),
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       isAccessibleForFree: true,
       isPartOf: { "@id": BRAND.canonicalUrl + "#website" },
       featureList: [
-        "Schedule and auto-publish to Instagram, Facebook Pages, Threads and YouTube",
+        `Schedule and auto-publish to ${LIVE_PLATFORM_COUNT_TEXT}`,
         "Week and month content calendar",
         "Instagram comment-to-DM automation",
-        "AI captions and DM message ideas",
+        ...(aiReady ? ["AI captions and DM message ideas"] : []),
         "Lead capture from DMs",
         "Free Instagram tools",
       ],
-      offers: softwareOffers(planReadiness()),
+      offers: softwareOffers(planReadiness(process.env)),
       publisher: publisherRef(),
       subjectOf: [
         {
@@ -146,7 +148,7 @@ const jsonLd = {
       ],
     },
   ],
-};
+});
 
 export default function FeaturesPage() {
   const cardPaymentsReady = featureReadiness("card_payments", process.env).ready;
@@ -154,7 +156,7 @@ export default function FeaturesPage() {
   const faqs = featuresFaqs(aiReady);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Features", path: "/features" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(aiReady)).replace(/</g, "\\u003c") }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqs)).replace(/</g, "\\u003c") }}
@@ -171,7 +173,7 @@ export default function FeaturesPage() {
             one app.
           </p>
           <p>
-            Poskoo is one app for planning posts, publishing on Instagram, Facebook, Threads and YouTube, and
+            Poskoo is one app for planning posts, publishing to {LIVE_PLATFORMS_TEXT}, and
             turning comments into leads with automatic DMs.
           </p>
           <div className="ctas">

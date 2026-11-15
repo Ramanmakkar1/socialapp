@@ -76,7 +76,7 @@ export default function SproutSocialAlternative() {
             Sprout Social alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            Sprout Social is an enterprise suite priced per seat. {BRAND.name} schedules your {LIVE_PLATFORMS_TEXT} posts and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
+            Sprout Social is an enterprise suite priced per seat. {BRAND.name} schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
