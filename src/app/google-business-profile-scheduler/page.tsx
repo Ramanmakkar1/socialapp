@@ -134,8 +134,7 @@ export default function GoogleBusinessProfileSchedulerPage() {
           Google Business Profile <em className="s mark">scheduler</em>
         </h1>
         <p className="lede">
-          Poskoo schedules Google Business Profile posts (updates, offers and events) to your business locations through
-          Google&apos;s official Business Profile API, so they go live at the time you pick.
+          Yes, you can schedule Google Business Profile posts: connect your business with Google&apos;s official sign-in, write an update, offer or event post, pick a location and time, and Poskoo publishes it through the Business Profile API. The Free plan is $0 with no credit card.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling GBP posts <span aria-hidden="true">→</span></Link>
