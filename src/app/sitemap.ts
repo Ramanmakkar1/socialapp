@@ -10,6 +10,8 @@ export const dynamic = "force-dynamic";
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
 // intended; public/sitemap.xsl explains it to anyone who opens the file.
 function getSitemapPaths(): PublicPath[] {
+  // Staging is noindex: list nothing, on any host, until indexing is enabled.
+  if (!BRAND.indexable) return [];
   return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
 }
 
