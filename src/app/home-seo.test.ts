@@ -128,8 +128,8 @@ test("home page WebPage node uses BRAND.url as its stable @id and url", () => {
     "WebPage url must be BRAND.url",
   );
   assert.ok(
-    homeJsonLdSource.includes("publisher: { \"@id\": BRAND.canonicalUrl + \"#org\" },"),
-    "WebPage publisher must reference the Organization node",
+    homeJsonLdSource.includes("publisher: { \"@id\": BRAND.url + \"#org\" },"),
+    "WebPage publisher must reference the Organization node via BRAND.url",
   );
   assert.ok(
     homeJsonLdSource.includes('"@type": "WebPage"'),
@@ -144,8 +144,12 @@ test("home page WebPage node uses BRAND.url as its stable @id and url", () => {
     "WebPage must declare inLanguage en",
   );
   assert.ok(
-    homeJsonLdSource.includes('isPartOf: { "@id": BRAND.canonicalUrl + "#website" },'),
-    "WebPage isPartOf must point at the WebSite node",
+    homeJsonLdSource.includes('isPartOf: { "@id": BRAND.url + "#website" },'),
+    "WebPage isPartOf must point at the WebSite node via BRAND.url",
+  );
+  assert.ok(
+    !homeJsonLdSource.includes("BRAND.canonicalUrl"),
+    "homepage JSON-LD must not reference the nonexistent BRAND.canonicalUrl",
   );
 });
 
