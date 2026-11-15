@@ -127,8 +127,9 @@ export default function BlueskySchedulerPage() {
           Schedule Bluesky posts <em className="s mark">on your own calendar</em>
         </h1>
         <p className="lede">
-          Poskoo schedules Bluesky posts with an app password: connect your handle, write the post, add up to 4 images
-          and pick a time. Your post joins the same calendar and publishing queue as your other social channels.
+          Yes, you can schedule Bluesky posts: connect your handle with a Bluesky app password (never your main
+          password), write the post, add up to 4 images and pick a time, and Poskoo publishes it for you. The Free plan
+          is $0 with no credit card, and Bluesky shares one calendar with your other channels.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling Bluesky posts <span aria-hidden="true">→</span></Link>
