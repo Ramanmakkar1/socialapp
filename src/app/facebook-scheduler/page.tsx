@@ -135,8 +135,9 @@ export default function FacebookSchedulerPage() {
           Facebook Page scheduler for <em className="s mark">consistent publishing</em>
         </h1>
         <p className="lede">
-          Compose and auto-publish Facebook Page posts from a clear calendar. Connect securely through Meta,
-          then plan Facebook, Instagram and Threads content together in {BRAND.name}.
+          Yes, you can schedule Facebook Page posts for free: connect your Page through Meta&apos;s official login,
+          write the post, add photos or a video, pick a date and time, and {BRAND.name} publishes it for you. The
+          Free plan is $0 with no credit card, and Facebook, Instagram and Threads share one calendar.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
