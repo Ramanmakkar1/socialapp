@@ -15,7 +15,7 @@ const config: ToolPageConfig = {
   path: "/tools/youtube-title-counter",
   name: "YouTube title and description character counter",
   crumb: "YouTube title counter",
-  title: "YouTube Title Counter: Free Title & Description Checker",
+  title: "YouTube Title Counter: Check 100-Character Limits | Poskoo",
   description: "Free YouTube title and description counter with real limits, search previews, tag totals and warnings. Check your video details before you publish.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "YouTube title & description counter", after: "with real limits" },
