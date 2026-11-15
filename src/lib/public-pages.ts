@@ -33,6 +33,7 @@ export const PUBLIC_PATHS = [
   "/hootsuite-alternative",
   "/meta-business-suite-alternative",
   "/linktree-alternative",
+  "/influence-alternative",
   "/privacy",
   "/terms",
   "/data-deletion",
@@ -211,11 +212,18 @@ export const PUBLIC_PATHS = [
   "/social-media-scheduler-for-small-business",
   "/social-media-scheduler-for-agencies",
   "/social-media-scheduler-for-real-estate",
+  "/social-media-scheduler-for-creators",
+  "/social-media-scheduler-for-coaches",
+  "/social-media-scheduler-for-ecommerce",
   "/free-social-media-scheduler",
   "/facebook-scheduler",
   "/instagram-content-planner",
   "/pricing",
   "/developers",
+  "/schedule-posts-with-chatgpt",
+  "/schedule-posts-with-claude",
+  "/schedule-posts-with-claude-code",
+  "/schedule-posts-with-cursor",
 ] as const;
 
 export type PublicPath = typeof PUBLIC_PATHS[number];
@@ -431,6 +439,14 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
   "/instagram-content-planner": { priority: 0.7, changeFrequency: "weekly" },
   "/pricing": { priority: 0.8, changeFrequency: "weekly" },
   "/developers": { priority: 0.7, changeFrequency: "weekly" },
+  "/influence-alternative": { priority: 0.8, changeFrequency: "weekly" },
+  "/social-media-scheduler-for-creators": { priority: 0.8, changeFrequency: "weekly" },
+  "/social-media-scheduler-for-coaches": { priority: 0.8, changeFrequency: "weekly" },
+  "/social-media-scheduler-for-ecommerce": { priority: 0.8, changeFrequency: "weekly" },
+  "/schedule-posts-with-chatgpt": { priority: 0.7, changeFrequency: "weekly" },
+  "/schedule-posts-with-claude": { priority: 0.7, changeFrequency: "weekly" },
+  "/schedule-posts-with-claude-code": { priority: 0.7, changeFrequency: "weekly" },
+  "/schedule-posts-with-cursor": { priority: 0.7, changeFrequency: "weekly" },
 };
 
 export const PAGE_TITLES: Record<PublicPath, string> = {
@@ -573,6 +589,14 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
   "/instagram-content-planner": "Instagram Content Planner",
   "/pricing": "Pricing",
   "/developers": "Developers",
+  "/influence-alternative": "Influence.so Alternative",
+  "/social-media-scheduler-for-creators": "Social Media Scheduler for Creators",
+  "/social-media-scheduler-for-coaches": "Social Media Scheduler for Coaches",
+  "/social-media-scheduler-for-ecommerce": "Social Media Scheduler for Ecommerce",
+  "/schedule-posts-with-chatgpt": "Schedule Posts with ChatGPT",
+  "/schedule-posts-with-claude": "Schedule Posts with Claude",
+  "/schedule-posts-with-claude-code": "Schedule Posts with Claude Code",
+  "/schedule-posts-with-cursor": "Schedule Posts with Cursor",
 };
 
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
@@ -786,4 +810,12 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/instagram-content-planner": "Plan an Instagram post step by step with free tools: draft a hook, write a caption, check image dimensions, preview and schedule it in Poskoo.",
   "/pricing": "Compare Poskoo Free, Pro and Agency plans. Start free with Instagram scheduling and 500 auto-DMs a month, then upgrade any time. No credit card needed.",
   "/developers": "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp, then schedule posts and read analytics from your assistant.",
+  "/influence-alternative": "Poskoo vs influence.so, checked 15 November 2026: Poskoo has a free plan, Instagram comment-to-DM, lead capture and Stories; influence.so supports more networks and AI campaigns.",
+  "/social-media-scheduler-for-creators": "Poskoo for creators: schedule Reels, Shorts and Stories, auto-DM keyword commenters, replay DMs to past comments and grow an email list with lead magnets.",
+  "/social-media-scheduler-for-coaches": "Poskoo for coaches: schedule LinkedIn profile and Instagram posts, deliver lead magnets by DM after an email gate, and send a booking link on a keyword.",
+  "/social-media-scheduler-for-ecommerce": "Poskoo for online stores: schedule product drops to Instagram, Facebook Pages and Threads, DM the product link to commenters and track the clicks.",
+  "/schedule-posts-with-chatgpt": "Connect OpenAI's Codex CLI or the OpenAI API to Poskoo's MCP server to schedule posts to Instagram, Facebook Pages, Threads and YouTube.",
+  "/schedule-posts-with-claude": "Add Poskoo's MCP server to the Claude desktop app so Claude can schedule posts, list channels and read post analytics with a Poskoo API key.",
+  "/schedule-posts-with-claude-code": "Add Poskoo to Claude Code with one claude mcp add command and schedule launch posts and changelog updates from the terminal.",
+  "/schedule-posts-with-cursor": "Add Poskoo's MCP server to Cursor's mcp.json so Cursor's agent can schedule posts about what you build and read post analytics.",
 };

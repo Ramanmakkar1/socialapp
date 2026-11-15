@@ -96,6 +96,14 @@ const workflows = [
     ],
   },
   {
+    title: "Schedule from an AI assistant",
+    text: "You write posts with ChatGPT, Claude or Cursor and want them in a real publishing queue. Poskoo's MCP server lets the assistant schedule them; influence.so also offers one.",
+    links: [
+      { label: "Influence.so alternative", href: "/influence-alternative" },
+      { label: "Schedule posts with Claude", href: "/schedule-posts-with-claude" },
+    ],
+  },
+  {
     title: "Analytics",
     text: "You want to see how scheduled posts perform, not just that they published. Compare Poskoo's reporting with an analytics-first scheduler.",
     links: [
