@@ -72,9 +72,8 @@ export default function ToolsPage() {
             {TOOLS.length} free <em className="s mark">social media tools</em> for every post
           </h1>
           <p className="lede">
-            Write captions and hashtags for Instagram, TikTok, X, LinkedIn and more, size your photos and videos,
-            plan your week and test comment-to-DM keywords. Use them before you post, or schedule the result with{" "}
-            {BRAND.name}.
+            Write captions, hashtags and hooks, size your images for every network, plan your week and test Instagram
+            comment-to-DM keywords. Use them before you post, or schedule the result with {BRAND.name}.
           </p>
           <ul className={t.catTiles} aria-label="Tool categories">
             {TOOL_CATEGORIES.map((c) => (
@@ -123,7 +122,7 @@ export default function ToolsPage() {
             <Link href="/linkedin-scheduler">LinkedIn scheduler</Link>
             <Link href="/tiktok-scheduler">TikTok scheduler</Link>
             <Link href="/tools/threads-tools">Threads tools</Link>
-            <Link href="/tools/instagram-tools">Instagram tools</Link>
+            <Link href="/tools/instagram-tools">Instagram tool hub</Link>
             <Link href="/tools/youtube-tools">YouTube tools</Link>
             <Link href="/tools/x-tools">X (Twitter) tools</Link>
             <Link href="/social-media-scheduler-for-small-business">Social media scheduler for small business</Link>
