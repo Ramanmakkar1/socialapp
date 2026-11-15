@@ -19,7 +19,9 @@ const guideUpdated = new Map(GUIDES.map((g) => [guidePath(g.slug), g.updated]));
 const latestGuide = GUIDES.map((g) => g.updated).sort().at(-1);
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return getSitemapPaths().map((path) => {
+  // Re-check indexability at the output boundary: a path that is noindex for
+  // any reason must never reach the XML, even if the candidate list changes.
+  return getSitemapPaths().filter((path) => isPathIndexable(path)).map((path) => {
     const lm = guideUpdated.get(path) ?? (path === "/guides" ? latestGuide : undefined);
     return {
       url: `${BRAND.url}${path}`,
