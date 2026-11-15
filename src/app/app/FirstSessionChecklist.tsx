@@ -1,23 +1,8 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import home from "./home.module.css";
-
-const DISMISS_KEY = "poskoo:first-session-dismissed";
-
-function subscribeDismissed() {
-  return () => {};
-}
-
-function getDismissed() {
-  try {
-    return window.localStorage.getItem(DISMISS_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
 
 export type FirstSessionChecklistProps = {
   /** An Instagram channel is connected (active social account). */
@@ -26,48 +11,22 @@ export type FirstSessionChecklistProps = {
   postCreated: boolean;
   /** A post is scheduled, publishing or already published. */
   postScheduled: boolean;
-  /** An active Auto-DM rule with a comment trigger exists for this user. */
-  hasActiveCommentRule: boolean;
-  /** A scheduled/publishing/published post with at least one media item exists. */
-  postWithMedia: boolean;
 };
 
-// time is optional and defaults to ~30 sec.
-type Step = { label: string; detail: string; time?: string; href: string; done: boolean };
+type Step = { label: string; detail: string; href: string; done: boolean };
 
 // First-session checklist for the dashboard. Completed steps are derived on the
 // server from existing account and post data; the whole card hides once every
 // step is done.
-export default function FirstSessionChecklist({ connected, postCreated, postScheduled, hasActiveCommentRule, postWithMedia }: FirstSessionChecklistProps) {
-  const storedDismissed = useSyncExternalStore(subscribeDismissed, getDismissed, () => false);
-  const [dismissedNow, setDismissedNow] = useState(false);
-  const dismissed = storedDismissed || dismissedNow;
-
+export default function FirstSessionChecklist({ connected, postCreated, postScheduled }: FirstSessionChecklistProps) {
   const steps: Step[] = [
-    { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", time: "~30 sec", href: "/app/settings#channels", done: connected },
-    { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar?compose=1", done: postCreated },
+    { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", href: "/app#connect", done: connected },
+    { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar#new", done: postCreated },
     { label: "Schedule it", detail: "Pick a date and time on the calendar.", href: "/app/calendar", done: postScheduled },
-    {
-      label: "Create an Auto-DM rule",
-      detail:
-        "Set up a keyword comment so anyone who comments with it automatically receives a DM reply.",
-      time: "~30 sec",
-      href: "/app/auto-dm",
-      done: hasActiveCommentRule,
-    },
-    {
-      label: "Schedule a post with media",
-      detail:
-        "Add a photo or video, choose your time zone and pick a date and time.",
-      time: "~1 min",
-      href: "/app/calendar?compose=1",
-      done: postWithMedia,
-    },
   ];
   const doneCount = steps.filter((s) => s.done).length;
-  if (dismissed || doneCount === steps.length) return null;
+  if (doneCount === steps.length) return null;
   const firstOpen = steps.findIndex((s) => !s.done);
-  const nextStep = steps[firstOpen];
 
   return (
     <section className={home.fsc} aria-labelledby="first-session-heading">
@@ -111,28 +70,12 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
         </svg>
         <div className={home.fscHeadText}>
           <h2 id="first-session-heading" className={home.fscTitle}>
-            Your two-minute quick start
+            Your first session
           </h2>
           <p className={home.fscSub}>
-            {doneCount} of {steps.length} done — next up: {nextStep.label}. Connect, post, schedule and add an Auto-DM in about two minutes.
+            {doneCount} of {steps.length} done — your first post is close.
           </p>
         </div>
-        <button
-          type="button"
-          className={home.fscDismiss}
-          aria-label="Dismiss first-session checklist"
-          title="Dismiss"
-          onClick={() => {
-            setDismissedNow(true);
-            try {
-              window.localStorage.setItem(DISMISS_KEY, "1");
-            } catch {
-              // Storage can be blocked; hiding for this session is enough.
-            }
-          }}
-        >
-          <X width={16} height={16} aria-hidden="true" />
-        </button>
       </div>
       <div
         className={home.fscProgress}
@@ -144,9 +87,6 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
       >
         <div className={home.fscFill} style={{ width: `${(doneCount / steps.length) * 100}%` }} />
       </div>
-      <Link href={nextStep.href} className={home.fscCta}>
-        Continue: {nextStep.label}
-      </Link>
       <ol className={home.fscSteps}>
         {steps.map((step, index) => (
           <li key={step.label} className={home.fscStep}>
@@ -163,7 +103,6 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
                 </Link>
               )}
               <span className={home.fscDetail}>{step.detail}</span>
-              <span className={home.fscDetail}>{step.time ?? "~30 sec"}</span>
             </span>
             {index === firstOpen && <span className={home.fscNext}>Next</span>}
           </li>

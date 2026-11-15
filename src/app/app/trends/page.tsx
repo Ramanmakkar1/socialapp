@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { Flame, Hash, Info } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
@@ -132,8 +131,8 @@ export default async function TrendsPage() {
             <div className={styles.soon}>
               <span className={styles.soonIcon} aria-hidden="true"><Hash width={16} height={16} /></span>
               <div>
-                <h2 id="trends-hashtags" className={styles.h2}>Hashtag trends <span className={styles.soonPill}>Needs Meta approval</span></h2>
-                <p className={styles.note}>Top posts for a hashtag need Meta&apos;s hashtag search permission, which Poskoo has applied for. Until then, you can find hashtags for your next post with our free <Link href="/tools/instagram-hashtag-generator" target="_blank" rel="noopener" className="underline font-medium">Instagram hashtag generator</Link>.</p>
+                <h2 id="trends-hashtags" className={styles.h2}>Hashtag trends <span className={styles.soonPill}>Coming soon</span></h2>
+                <p className={styles.note}>Top posts for a hashtag, waiting for Meta to approve hashtag search for Poskoo.</p>
               </div>
             </div>
           </section>

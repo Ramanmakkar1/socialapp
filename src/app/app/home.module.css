@@ -280,21 +280,6 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
 .fscHeadText { min-width: 0; }
 .fscTitle { margin: 0; color: var(--poskoo-ink); font-size: 1.15rem; font-weight: 700; letter-spacing: -.02em; }
 .fscSub { margin: 2px 0 0; color: var(--poskoo-muted); font-size: .85rem; }
-.fscDismiss {
-  display: inline-grid;
-  width: 30px;
-  height: 30px;
-  flex: none;
-  margin-left: auto;
-  place-items: center;
-  border: 1px solid transparent;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--poskoo-muted);
-  cursor: pointer;
-}
-.fscDismiss:hover { border-color: var(--poskoo-line); background: var(--poskoo-paper); color: var(--poskoo-ink); }
-.fscDismiss:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
 .fscProgress {
   height: 8px;
   overflow: hidden;
@@ -302,23 +287,6 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
   background: var(--poskoo-band);
 }
 .fscFill { height: 100%; border-radius: inherit; background: var(--poskoo-violet); }
-.fscCta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  min-height: 44px;
-  border-radius: var(--poskoo-radius-pill);
-  background: var(--poskoo-violet);
-  color: #fff;
-  padding: 10px 20px;
-  font-size: .95rem;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: var(--poskoo-shadow-card);
-}
-.fscCta:hover { filter: brightness(1.06); }
-.fscCta:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
 .fscSteps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 12px; margin: 0; padding: 0; list-style: none; }
 .fscStep {
   display: flex;

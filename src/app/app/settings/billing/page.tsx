@@ -103,7 +103,7 @@ function UpgradeCard({ plan, interval, current, picked, enabled }: { plan: PaidP
       <p className={billing.planName}>
         {plan}
         {isCurrent ? <span className={`${ui.pill} ${ui.pillMint}`}>Your plan</span> : null}
-        {!enabled && !isCurrent ? <span className={`${ui.pill} ${ui.pillSoon}`}>Launching soon</span> : null}
+        {!enabled && !isCurrent ? <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span> : null}
         {picked && !isCurrent ? <span className={`${ui.pill} ${ui.pillPeach}`}>You picked this</span> : null}
       </p>
       <p className={billing.price}>
@@ -129,9 +129,9 @@ function UpgradeCard({ plan, interval, current, picked, enabled }: { plan: PaidP
       ) : (
         <div>
           <Btn variant="line" disabled aria-describedby={`soon-${plan}`} className="w-full cursor-not-allowed opacity-60">
-            Not on sale yet
+            Coming soon
           </Btn>
-          <p id={`soon-${plan}`} className={ui.hint} style={{ marginTop: 8 }}>Paid plans are launching soon. Everything on Free works today, and you won&apos;t be charged without choosing a plan.</p>
+          <p id={`soon-${plan}`} className={ui.hint} style={{ marginTop: 8 }}>Paid plans are launching soon.</p>
         </div>
       )}
     </div>
@@ -147,7 +147,7 @@ export default async function BillingPage({
   const sp = await searchParams;
   const configured = isBillingConfigured();
   // Selling Pro / Agency needs live Stripe (src/lib/featureReadiness.ts). Until then the cards show
-  // "Launching soon" and no checkout starts; syncing an existing subscription still works.
+  // "Coming soon" and no checkout starts; syncing an existing subscription still works.
   const paidReady = isFeatureReady("billing");
   let syncNote: { warn: boolean; text: string } | null = null;
 

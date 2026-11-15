@@ -75,7 +75,7 @@ export default function WeekView({ posts, weekStart, composeBase, accounts = {},
   return (
     <div className={styles.calWrap}>
       {error && <p role="alert" className={styles.errorText}>{error}</p>}
-      {loadError && <LoadFailed {...loadError} icon="calendar" className={styles.mb} />}
+      {loadError && <LoadFailed {...loadError} className={styles.mb} />}
 
       {/* Desktop / tablet: hour rows x 7 day columns. */}
       <div className={styles.weekTable} role="table" aria-label="Posts this week by day and hour" aria-rowcount={hours.length + 1}>

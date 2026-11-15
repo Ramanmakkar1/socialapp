@@ -116,34 +116,6 @@ async function followerTrend(userId: string): Promise<{ now: number | null; prev
   }
 }
 
-// An active Auto-DM rule that explicitly reacts to comments (used by the first-session checklist).
-async function hasActiveCommentRule(userId: string): Promise<boolean> {
-  if (!isDbConfigured()) return false;
-  try {
-    const rows = await query<{ n: boolean }>(
-      "select exists(select 1 from socialapp.dm_rules where user_id=$1 and status='active' and 'comment' = any(triggers)) as n",
-      [userId],
-    );
-    return rows[0]?.n ?? false;
-  } catch {
-    return false;
-  }
-}
-
-// Scheduler milestone: a scheduled/publishing/published post that has at least one media item.
-async function hasScheduledPostWithMedia(userId: string): Promise<boolean> {
-  if (!isDbConfigured()) return false;
-  try {
-    const rows = await query<{ n: boolean }>(
-      "select exists(select 1 from socialapp.scheduled_posts where user_id=$1 and status in ('scheduled','publishing','published') and jsonb_typeof(media) = 'array' and jsonb_array_length(media) > 0) as n",
-      [userId],
-    );
-    return rows[0]?.n ?? false;
-  } catch {
-    return false;
-  }
-}
-
 // Active comment rules with their post scope, to tell per post whether an automation covers it.
 async function commentRuleScopes(userId: string): Promise<{ media_ids: string[] }[]> {
   if (!isDbConfigured()) return [];
@@ -202,7 +174,7 @@ export default async function AppHome() {
   await connection();
   const user = await getCurrentUser();
   // Database only: nothing here calls Instagram, so the page shell renders at once. Graph reads stream in below.
-  const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek, anyChannel, hasActiveComment, hasScheduledMedia] = user
+  const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek, anyChannel] = user
     ? await Promise.all([
         getDashboardStats(user.id),
         getUpcomingPosts(user.id),
@@ -217,10 +189,8 @@ export default async function AppHome() {
         anyHandle(user.id),
         scheduledNextWeek(user.id),
         hasAnyChannel(user.id),
-        hasActiveCommentRule(user.id),
-        hasScheduledPostWithMedia(user.id),
       ])
-    : [EMPTY_STATS, [], EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null, 0, false, false, false];
+    : [EMPTY_STATS, [], EMPTY_SNAPSHOT, [], null, false, 0, [], { now: null, prev: null }, [], null, 0, false];
   const handle = account?.username ?? dbHandle;
   const activeCount = automations.filter((a) => a.status === "active").length;
   const status = homeStatusParts({ scheduledThisWeek: nextWeek, liveAutomations: activeCount, commentsWaiting: unanswered });
@@ -243,7 +213,7 @@ export default async function AppHome() {
     isFeatureReadyNow("ai_replies"),
   ]);
   const channelConnected = stats.hasAccount || anyChannel;
-  const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && hasActiveComment && hasScheduledMedia;
+  const checklistDone = channelConnected && postCreated && stats.hasPost;
 
   return (
     <div className={`${instrumentSans.variable} ${home.page}`}>
@@ -287,7 +257,7 @@ export default async function AppHome() {
       )}
 
       {!checklistDone && (
-        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasScheduledPost} hasActiveCommentRule={hasActiveComment} postWithMedia={hasScheduledMedia} />
+        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasPost} />
       )}
 
       <section className={home.section} aria-labelledby="todays-actions">
@@ -409,7 +379,6 @@ export default async function AppHome() {
               title="Nothing scheduled yet"
               text="Your next queued posts will show here with local date and time."
               art="/illustrations/empty-calendar.webp"
-              artAlt="Illustration of a person pinning photo cards onto a large wall calendar, with a dog and plants nearby."
               artWidth={1536}
               artHeight={1024}
             >

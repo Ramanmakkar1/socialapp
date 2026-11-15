@@ -14,7 +14,7 @@ const MESSAGES: Record<string, { warn: boolean; text: string }> = {
   connected: { warn: false, text: "Stripe is connected. You can take payments." },
   pending: { warn: true, text: "Stripe still needs a few details before you can take payments. Continue setup when you're ready." },
   error: { warn: true, text: "We couldn't reach Stripe. Please try again." },
-  not_configured: { warn: false, text: "Card payments aren't switched on yet. Direct UPI (India) works today." },
+  not_configured: { warn: false, text: "Card payments are coming soon. Direct UPI (India) works today." },
   country: { warn: false, text: "Country saved." },
   country_error: { warn: true, text: "Pick a country from the list." },
   upi_saved: { warn: false, text: "UPI details saved. Your INR products can now be bought by UPI." },
@@ -152,7 +152,7 @@ export default async function PaymentsSettings({ userId, status }: { userId: str
               <StripeSection account={account} country={country} />
             ) : (
               <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}>
-                <span className={`${ui.pill} ${ui.pillSoon}`}>Not switched on yet</span> <strong>{FEATURE_COPY.card_payments.title}.</strong> You can already create products; buy links start taking card payments once card payments are switched on.
+                <span className={`${ui.pill} ${ui.pillSoon}`}>Coming soon</span> <strong>{FEATURE_COPY.card_payments.title}.</strong> You can already create products; buy links start taking card payments once card payments are switched on.
               </p>
             )
           ) : (
