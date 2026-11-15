@@ -14,7 +14,7 @@ import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 const PATH = "/social-media-scheduler-comparison";
-const title = "Social Media Scheduler Comparison: Features & Free Plans";
+const title = "Social Media Scheduler Comparison: Free Plans | Poskoo";
 const description =
   "Compare social media schedulers: Poskoo plans and auto-publishes to Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky and Mastodon, with free plan.";
 

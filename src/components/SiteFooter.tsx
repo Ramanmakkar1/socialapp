@@ -133,7 +133,7 @@ export function SiteFooter() {
           { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
           { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
           { href: "/google-business-profile-scheduler", label: "Google Business Profile scheduler" },
-          { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
+          { href: "/social-media-scheduler-comparison", label: "Social media scheduler comparison" },
         ]}
       />
       <FooterColumn title="Free tools" links={TOOLS.slice(0, 10)} />
