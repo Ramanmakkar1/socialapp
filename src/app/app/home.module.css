@@ -397,7 +397,9 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
 /* Dashboard "AI tools" (AiTools.tsx): one card per AI feature. */
 .aiGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
 .aiCard { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
-.aiCardHead { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.aiCardTitle { min-width: 0; flex: 1; color: var(--poskoo-ink); font-size: .95rem; }
+.aiCardHead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; }
+/* The title keeps its line; the status badge wraps under it instead of squeezing it to one letter per line. */
+.aiCardTitle { flex: 1 1 140px; min-width: 0; color: var(--poskoo-ink); font-size: .95rem; line-height: 1.3; word-break: normal; overflow-wrap: break-word; }
+.aiCardHead > span:last-child:not(:first-child) { flex: none; }
 .aiCardText { margin: 0; color: var(--poskoo-muted); font-size: .84rem; line-height: 1.45; }
 .aiCard .textLink { margin-top: auto; }

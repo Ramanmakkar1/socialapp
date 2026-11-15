@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { AlertTriangle, ArrowRight, Heart, Inbox, Link2, MessageCircle, Plus, Send, Trophy, UserPlus, Users } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
+import { TopThumb } from "./TopThumb";
 import { instrumentSans } from "@/lib/fonts";
 import { EMPTY_STATS, getDashboardStats, getRecentPosts, getUpcomingPosts, type RecentPost } from "@/lib/stats";
 import { isDbConfigured, query } from "@/lib/db";
@@ -376,12 +377,7 @@ export default async function AppHome() {
                   return (
                     <li key={post.id} className={home.topItem}>
                       <span className={home.rank} aria-hidden="true">{i === 0 ? <Trophy width={14} height={14} /> : i + 1}</span>
-                      {thumb ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- user media from arbitrary hosts
-                        <img src={thumb} alt="" className={home.topThumb} loading="lazy" />
-                      ) : (
-                        <span className={home.topThumb} aria-hidden="true" />
-                      )}
+                      <TopThumb src={thumb} className={home.topThumb} />
                       <div className={home.topText}>
                         <p className={home.topCaption}>{shortCaption(post.caption)}</p>
                         <p className={home.topMeta}>
