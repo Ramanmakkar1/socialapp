@@ -19,10 +19,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to auto-DM people who reply to your Instagram Story",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-07",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/instagram-story-reply-auto-dm`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/instagram-story-reply-auto-dm`,
 };
 
 const crumbsJsonLd = breadcrumbJsonLd([

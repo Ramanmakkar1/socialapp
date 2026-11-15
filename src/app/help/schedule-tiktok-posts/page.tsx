@@ -10,7 +10,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule TikTok Videos in Poskoo: Step-by-Step Help" },
   description:
     `Step-by-step help for scheduling TikTok videos in ${BRAND.name}: connect TikTok with its login, upload a vertical video, set privacy, pick a time and publish.`,
-  alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.url).toString() },
+  alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -107,13 +107,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule TikTok videos",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}/help/schedule-tiktok-posts#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}/help/schedule-tiktok-posts#step-${i + 1}`,
   })),
 };
 

@@ -11,7 +11,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule Instagram Carousel Posts (Free) | Poskoo" },
   description:
     "Schedule Instagram carousel posts: paste 2-10 image links, write one caption, pick a time and Poskoo publishes it. Specs, tips and fixes for failed posts.",
-  alternates: { canonical: `${BRAND.url}/help/schedule-instagram-carousel` },
+  alternates: { canonical: `${BRAND.canonicalUrl}/help/schedule-instagram-carousel` },
 });
 
 const articleJsonLd = {
@@ -19,10 +19,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to schedule an Instagram carousel post",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-07",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/schedule-instagram-carousel`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/schedule-instagram-carousel`,
 };
 
 const crumbsJsonLd = breadcrumbJsonLd([

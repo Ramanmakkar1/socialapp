@@ -92,7 +92,8 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule Instagram Stories",
   description: metadata.description,
-  url: `${BRAND.url}/help/schedule-instagram-stories`,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
+  url: `${BRAND.canonicalUrl}/help/schedule-instagram-stories`,
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,

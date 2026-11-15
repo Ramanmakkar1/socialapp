@@ -10,7 +10,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule YouTube Videos & Shorts in Poskoo: Help Guide" },
   description:
     "Step-by-step help for scheduling YouTube videos and Shorts in Poskoo: connect with Google, add the video, title, tags and privacy, then pick a time.",
-  alternates: { canonical: new URL("/help/schedule-youtube-videos", BRAND.url).toString() },
+  alternates: { canonical: new URL("/help/schedule-youtube-videos", BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -134,13 +134,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule YouTube videos and Shorts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}/help/schedule-youtube-videos#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}/help/schedule-youtube-videos#step-${i + 1}`,
   })),
 };
 

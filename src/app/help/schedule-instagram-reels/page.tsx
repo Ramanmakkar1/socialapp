@@ -19,10 +19,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to schedule Instagram Reels",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-07",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/schedule-instagram-reels`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/schedule-instagram-reels`,
 };
 
 const crumbsJsonLd = breadcrumbJsonLd([

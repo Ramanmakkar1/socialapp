@@ -10,7 +10,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule Mastodon Posts (Step by Step) | Poskoo" },
   description:
     "Schedule Mastodon posts on any server: connect with OAuth, write to your server's limit, add images or video, pick a time and track the publishing status.",
-  alternates: { canonical: new URL("/help/schedule-mastodon-posts", BRAND.url).toString() },
+  alternates: { canonical: new URL("/help/schedule-mastodon-posts", BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -122,13 +122,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule Mastodon posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}/help/schedule-mastodon-posts#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}/help/schedule-mastodon-posts#step-${i + 1}`,
   })),
 };
 

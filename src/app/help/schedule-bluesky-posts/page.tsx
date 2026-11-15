@@ -10,7 +10,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "How to Schedule Bluesky Posts (App Password Guide) | Poskoo" },
   description:
     "Schedule Bluesky posts with an app password: connect your handle, write up to 300 characters, add up to 4 images or a link, pick a time and fix errors.",
-  alternates: { canonical: new URL("/help/schedule-bluesky-posts", BRAND.url).toString() },
+  alternates: { canonical: new URL("/help/schedule-bluesky-posts", BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -125,13 +125,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule Bluesky posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}/help/schedule-bluesky-posts#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}/help/schedule-bluesky-posts#step-${i + 1}`,
   })),
 };
 

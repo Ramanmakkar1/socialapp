@@ -19,10 +19,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to schedule Instagram posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-14",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/schedule-instagram-posts`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/schedule-instagram-posts`,
 };
 
 const steps = [

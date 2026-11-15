@@ -207,8 +207,9 @@ const collectionJsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Help center",
-  url: `${BRAND.url}/help`,
+  url: `${BRAND.canonicalUrl}/help`,
   description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   mainEntity: {
     "@type": "ItemList",
     itemListElement: guides
@@ -217,7 +218,7 @@ const collectionJsonLd = {
         "@type": "ListItem",
         position: i + 1,
         name: g.title,
-        url: `${BRAND.url}${g.href}`,
+        url: `${BRAND.canonicalUrl}${g.href}`,
       })),
   },
 };

@@ -122,6 +122,7 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to auto-DM people who comment on your Instagram posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,

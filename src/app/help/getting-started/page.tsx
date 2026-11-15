@@ -56,10 +56,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "Getting started in 3 minutes",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-04",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/getting-started`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/getting-started`,
 };
 
 export default function GettingStartedHelpPage() {

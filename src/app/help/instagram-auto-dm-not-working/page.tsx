@@ -58,10 +58,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "Instagram auto DM not working? Fix it step by step",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-04",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/instagram-auto-dm-not-working`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/instagram-auto-dm-not-working`,
 };
 
 const checks = [

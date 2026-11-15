@@ -20,10 +20,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to schedule Threads posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-11",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/schedule-threads-posts`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/schedule-threads-posts`,
 };
 
 const steps = [

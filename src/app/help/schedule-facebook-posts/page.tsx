@@ -10,7 +10,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule Facebook Page Posts in Poskoo: Help Guide" },
   description:
     `Step-by-step help for scheduling Facebook Page posts in ${BRAND.name}: connect your Page with Meta login, add text and media, pick a time and publish.`,
-  alternates: { canonical: new URL("/help/schedule-facebook-posts", BRAND.url).toString() },
+  alternates: { canonical: new URL("/help/schedule-facebook-posts", BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -105,13 +105,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule Facebook Page posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}/help/schedule-facebook-posts#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}/help/schedule-facebook-posts#step-${i + 1}`,
   })),
 };
 

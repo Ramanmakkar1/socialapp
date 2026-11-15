@@ -10,7 +10,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule Pinterest Pins in Poskoo: Step-by-Step Help" },
   description:
     "Step-by-step help for scheduling Pinterest Pins in Poskoo: connect Pinterest, pick a board, add an image, title and link, then choose a time.",
-  alternates: { canonical: new URL("/help/schedule-pinterest-posts", BRAND.url).toString() },
+  alternates: { canonical: new URL("/help/schedule-pinterest-posts", BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -114,13 +114,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule Pinterest Pins",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}/help/schedule-pinterest-posts#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}/help/schedule-pinterest-posts#step-${i + 1}`,
   })),
 };
 

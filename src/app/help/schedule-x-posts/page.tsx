@@ -15,8 +15,8 @@ const description =
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
-  alternates: { canonical: new URL(PATH, BRAND.url).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
+  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -128,13 +128,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule X (Twitter) posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}${PATH}#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}${PATH}#step-${i + 1}`,
   })),
 };
 

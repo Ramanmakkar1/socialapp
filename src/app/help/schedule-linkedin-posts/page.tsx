@@ -11,7 +11,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule LinkedIn Posts in Poskoo: Step-by-Step Help" },
   description:
     `Step-by-step help for scheduling LinkedIn posts in ${BRAND.name}: connect your profile, write the post, add images, pick a time and ${BRAND.name} publishes it.`,
-  alternates: { canonical: new URL("/help/schedule-linkedin-posts", BRAND.url).toString() },
+  alternates: { canonical: new URL("/help/schedule-linkedin-posts", BRAND.canonicalUrl).toString() },
 });
 
 const steps = [
@@ -106,13 +106,14 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to schedule LinkedIn posts",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
     name: st.name,
     text: st.text,
-    url: `${BRAND.url}/help/schedule-linkedin-posts#step-${i + 1}`,
+    url: `${BRAND.canonicalUrl}/help/schedule-linkedin-posts#step-${i + 1}`,
   })),
 };
 

@@ -23,10 +23,11 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to set up an Instagram link-in-bio page",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   dateModified: "2026-11-11",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.url}/help/instagram-link-in-bio-setup`,
+  mainEntityOfPage: `${BRAND.canonicalUrl}/help/instagram-link-in-bio-setup`,
 };
 
 const crumbsJsonLd = breadcrumbJsonLd([
@@ -118,6 +119,7 @@ const howToJsonLd = {
   "@type": "HowTo",
   name: "How to set up an Instagram link-in-bio page",
   description: metadata.description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   step: steps.map((st, i) => ({
     "@type": "HowToStep",
     position: i + 1,
