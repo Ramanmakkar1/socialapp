@@ -14,7 +14,7 @@ import styles from "./landing.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LandingDemo } from "./LandingDemo";
-import { HeroVideo } from "@/components/HeroVideo";
+import { HeroArt } from "@/components/HeroArt";
 import { GoogleButton } from "@/components/GoogleButton";
 import { AnimArt, ANIM_LABELS } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
@@ -67,9 +67,9 @@ const r = planReadiness();
 const plans = plansFor(r);
 const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
 const jsonLd = pageJsonLd(faqList, r);
-// The hero poster is the first thing painted above the fold (the video fades in over it):
-// fetch it early and at high priority so it, not the lazy art below, is the LCP candidate.
-preload("/landing/hero-poster.webp?v=2", { as: "image", fetchPriority: "high" });
+// The hero illustration is the first thing painted above the fold: fetch it early
+// and at high priority so it, not the lazy art below, is the LCP candidate.
+preload("/landing/hero.webp?v=3", { as: "image", fetchPriority: "high" });
 return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
@@ -78,7 +78,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 </defs></svg>
 
 <div className="videoHero">
-  <HeroVideo src="/landing/hero-loop.mp4?v=2" poster="/landing/hero-poster.webp?v=2" />
+  <HeroArt src="/landing/hero.webp?v=3" />
   <div className="wrap">
     <SiteHeader onHome />
     <header className="hero heroCenter" id="top">

@@ -854,20 +854,20 @@
 }
 
 /* 2026-11-11 illustration pass: hero, 3 steps, demo and bento use the same doodle art as the rest of the page. */
-/* Full-screen hero over a looping Grok doodle video (public/landing/hero-loop.mp4, cream #fffae9 sky). */
+/* Full-screen hero over the cohesive doodle illustration (public/landing/hero.webp, cream #fffae9 sky). */
 .landing :global(.videoHero){
   position:relative;overflow:hidden;min-height:100svh;background:#fffae9;display:flex;flex-direction:column;
   margin-left:calc(-1 * max(16px, env(safe-area-inset-left, 0px)));margin-right:calc(-1 * max(16px, env(safe-area-inset-right, 0px)));padding-inline:max(16px, env(safe-area-inset-left, 0px))}
-.landing :global(.heroVideoFrame){
-  position:absolute;inset:0;overflow:hidden;pointer-events:none;background-repeat:no-repeat;background-size:cover;background-position:center bottom}
-.landing :global(.heroVideo){
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center bottom;opacity:0;pointer-events:none}
+.landing :global(.heroArtFrame){
+  order:2;width:100%;max-width:1040px;margin:0 auto;padding-bottom:24px}
+.landing :global(.heroArt){
+  display:block;width:100%;height:auto}
 .landing :global(.videoHero > .wrap){
-  position:relative;z-index:1;width:100%;flex:1;display:flex;flex-direction:column}
+  position:relative;z-index:1;width:100%;flex:1;display:flex;flex-direction:column;order:1}
 .landing :global(.videoHero nav.top){
   margin-top:16px;padding:10px 12px 10px 22px;border-radius:var(--poskoo-radius-pill)}
 .landing :global(.hero.heroCenter){
-  display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding-block:3vh 12vh;max-width:860px;margin-inline:auto}
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding-block:3vh 3vh;max-width:860px;margin-inline:auto}
 .landing :global(.hero.heroCenter h1){
   font-size:clamp(2.2rem, 4.6vw, 4rem);max-width:none;line-height:1.02;letter-spacing:-.035em;margin-top:6px}
 .landing :global(.hero.heroCenter h1 .h1Line),.landing :global(.hero.heroCenter h1 em){
@@ -973,10 +973,8 @@
 
 @media (max-width: 760px) {
   .landing :global(.videoHero){ min-height:0; }
-  /* Phones: the full-width bottom strip of the video (creator, link-comments, DM plane, followers). */
-  .landing :global(.heroVideoFrame){ position:relative;inset:auto;aspect-ratio:1920/600;height:auto;order:2;margin-top:4px;width:calc(100% + 2 * max(16px, env(safe-area-inset-left, 0px)));margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
-  .landing :global(.heroVideoFrame .heroVideo){ inset:auto;left:0;bottom:0;width:100%;height:auto;max-width:none;object-fit:contain; }
-  .landing :global(.heroVideoFrame){ background-size:100% auto;background-position:left bottom; }
+  /* Phones: the whole illustration sits under the copy as one centered scene, uncropped. */
+  .landing :global(.heroArtFrame){ margin-top:4px;padding-bottom:16px; }
   .landing :global(.hero.heroCenter){ padding-block:28px 8px; }
   .landing :global(.videoHero nav.top){ margin-top:10px;padding-left:16px; }
 }
