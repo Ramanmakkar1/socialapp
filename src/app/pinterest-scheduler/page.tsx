@@ -125,7 +125,8 @@ export default function PinterestSchedulerPage() {
         <p className="lede">
           Poskoo schedules Pinterest Pins through the official Pinterest API: connect your account, pick a board, add a
           destination link and image, and choose the publishing time. Your Pin joins the same calendar and publishing
-          queue as your other social posts.
+          queue as your other social posts. The Free plan is $0 with no credit card and includes 2 social accounts and 10
+          scheduled posts a month.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling Pins <span aria-hidden="true">→</span></Link>
