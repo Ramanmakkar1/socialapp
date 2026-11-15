@@ -55,6 +55,41 @@ const toolsBullets = [
   "No sign-up and no credit card needed for the free tools.",
 ];
 
+const featuresFaqs = (aiReady: boolean) => [
+  {
+    q: "What does Poskoo do?",
+    a: "Poskoo is one app that schedules social posts, sends automatic DMs to people who comment on Instagram, captures leads and tracks results.",
+  },
+  {
+    q: "Which social networks can I schedule?",
+    a: "Poskoo schedules posts to Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon today. TikTok and Pinterest are waiting on platform approval, and X is coming later.",
+  },
+  {
+    q: "How does Instagram comment-to-DM work?",
+    a: "Set a keyword such as GUIDE or LINK, and Poskoo sends your message in a DM to everyone who comments it, usually within a minute. You can capture an email first, add a follow gate and track clicks.",
+  },
+  {
+    q: "Do I need a credit card for the Free plan?",
+    a: "No. You can sign up and use the Free plan without entering any card details.",
+  },
+  {
+    q: "Does Poskoo include AI captions?",
+    a: aiReady
+      ? "Yes. AI caption ideas and DM message ideas are switched on; you edit every idea before anything is scheduled or sent."
+      : "Not yet. AI caption and DM message ideas aren't switched on yet, but you can still write and schedule everything yourself.",
+  },
+];
+
+const faqJsonLd = (faqs: { q: string; a: string }[]) => ({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+});
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -119,9 +154,15 @@ const jsonLd = {
 
 export default function FeaturesPage() {
   const cardPaymentsReady = featureReadiness("card_payments", process.env).ready;
+  const aiReady = featureReadiness("ai", process.env).ready;
+  const faqs = featuresFaqs(aiReady);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Features", path: "/features" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqs)).replace(/</g, "\\u003c") }}
+      />
       <header className="hero">
         <div className={s.heroText}>
           <span className="pill"><span>ALL-IN-ONE</span>Schedule &middot; Auto-DM &middot; AI captions &middot; Free tools</span>
@@ -359,6 +400,23 @@ export default function FeaturesPage() {
             </div>
           </div>
           <CompareAlternativesNav />
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>Poskoo features FAQs</h2>
+          </div>
+          <div className="faq">
+            {faqs.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
