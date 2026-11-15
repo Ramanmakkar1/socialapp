@@ -5,7 +5,7 @@ import { shouldPostFirstComment } from "@/lib/firstComment";
 import { graphBaseFor } from "@/lib/graphHost";
 import { canPublishToFacebook, publishToFacebookPage } from "@/lib/facebookPublish";
 import { RECONNECT_MESSAGE, publishToThreads } from "@/lib/threadsPublish";
-import { refreshYouTubeToken } from "@/lib/youtubeAuth";
+import { YouTubeAuthError, refreshYouTubeToken } from "@/lib/youtubeAuth";
 import { isNetworkId } from "@/lib/networks/common";
 import { publishNetworkTargets, type ClaimedNetworkRow } from "@/lib/networks/publish";
 import { expireReminders } from "@/lib/networks/reminderSend";
@@ -547,8 +547,13 @@ export async function publishToYouTube(opts: {
   let accessToken: string;
   try {
     accessToken = await refreshYouTubeToken(opts.refreshToken);
-  } catch {
-    return { ok: false, error: "YouTube access expired. Reconnect YouTube in Settings, then retry.", tokenDead: true };
+  } catch (err) {
+    // Only Google's invalid_grant means the refresh token is dead. A timeout, 5xx or rate limit
+    // must not disconnect the channel (that wipes the stored refresh token for good).
+    if (err instanceof YouTubeAuthError && err.tokenDead) {
+      return { ok: false, error: "YouTube access expired. Reconnect YouTube in Settings, then retry.", tokenDead: true };
+    }
+    return { ok: false, error: "Could not reach YouTube to refresh access. Press Retry in a few minutes." };
   }
 
   let bytes: Buffer;
