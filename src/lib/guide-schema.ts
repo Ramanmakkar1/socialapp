@@ -36,6 +36,8 @@ export function guidesHubJsonLd({
         name,
         description,
         url,
+        inLanguage: "en",
+        isPartOf: { "@id": `${BRAND.url}#website` },
         mainEntity: { "@id": `${url}#itemlist` },
       },
       itemList,
