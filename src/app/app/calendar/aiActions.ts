@@ -1,7 +1,9 @@
 "use server";
 
 import { requireUser } from "@/lib/auth";
-import { isFeatureReady } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { isAdmin } from "@/lib/admin";
+import type { AiAvailability } from "@/components/AiOffNote";
 import { generateCaptionIdeas, generateNetworkVariants, type CaptionIdeasResult, type VariantsResult } from "@/lib/ai";
 import { isKnownPlatform } from "@/lib/captionFit";
 import type { PlatformId } from "@/lib/platforms";
@@ -33,7 +35,7 @@ export async function suggestCaptions(input: {
       /* column may not exist yet; ignore */
     }
   }
-  if (!isFeatureReady("ai")) {
+  if (!(await isFeatureReadyNow("ai"))) {
     return {
       ok: false,
       error:
@@ -53,9 +55,10 @@ export async function suggestCaptions(input: {
   return generateCaptionIdeas({ topic, draft, tone, brandVoice });
 }
 
-export async function aiAvailable(): Promise<boolean> {
-  await requireUser();
-  return isFeatureReady("ai");
+/** Whether AI is on (env or stored key), and whether this user may switch it on (admin). */
+export async function aiAvailable(): Promise<AiAvailability> {
+  const user = await requireUser();
+  return { ready: await isFeatureReadyNow("ai"), isAdmin: isAdmin(user) };
 }
 
 async function brandVoiceFor(userId: string): Promise<string | undefined> {
@@ -81,7 +84,7 @@ export async function tailorCaptions(input: { caption: string; platforms: string
     (p): p is PlatformId => typeof p === "string" && isKnownPlatform(p),
   );
   if (platforms.length === 0) return { ok: false, error: "Select at least one network." };
-  if (!isFeatureReady("ai")) {
+  if (!(await isFeatureReadyNow("ai"))) {
     return { ok: false, error: "AI isn't configured on this server yet. You can still customize each network by hand." };
   }
   if (isDbConfigured()) {

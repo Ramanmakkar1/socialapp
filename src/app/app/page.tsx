@@ -20,6 +20,9 @@ import home from "./home.module.css";
 import { BtnLink } from "@/components/ui/kit";
 import EmptyState from "./EmptyState";
 import UpcomingPosts from "./UpcomingPosts";
+import AiTools from "./AiTools";
+import { isAdmin } from "@/lib/admin";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 
 export const metadata = { title: "Dashboard" };
 
@@ -233,7 +236,11 @@ export default async function AppHome() {
     .filter((row) => row.engagement > 0)
     .sort((a, b) => b.engagement - a.engagement)
     .slice(0, 5);
-  const thumbs = await postThumbs(top.map((t) => t.post.id));
+  const [thumbs, aiReady, aiRepliesReady] = await Promise.all([
+    postThumbs(top.map((t) => t.post.id)),
+    isFeatureReadyNow("ai"),
+    isFeatureReadyNow("ai_replies"),
+  ]);
   const channelConnected = stats.hasAccount || anyChannel;
   const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && hasActiveComment && hasScheduledMedia;
 
@@ -300,6 +307,8 @@ export default async function AppHome() {
           <TodaysActionsFeed account={account} scopes={scopes} hasAnyAccount={stats.hasAccount || dbHandle !== null} fallbackHandle={handle} />
         </Suspense>
       </section>
+
+      <AiTools ready={aiReady} repliesReady={aiRepliesReady} isAdmin={isAdmin(user)} />
 
       <section className={home.section} aria-labelledby="snapshot">
         <div className={home.sectionHead}>

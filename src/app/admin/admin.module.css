@@ -408,3 +408,22 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   .search { display: none; }
   .topbar { padding: 0 16px; gap: 10px; }
 }
+
+/* ---------- Settings forms (/admin/settings) ---------- */
+.settingsStack { display: grid; gap: 14px; max-width: 720px; }
+.settingsText { margin: 0; color: var(--poskoo-muted); font-size: 14px; line-height: 1.5; }
+.settingsRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.settingsLabel { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
+.settingsInput {
+  width: 100%;
+  max-width: 460px;
+  height: 40px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 12px;
+  background: var(--poskoo-paper, #fff);
+  padding: 0 12px;
+  font: 14px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.settingsMsgOk { margin: 0; color: color-mix(in srgb, var(--poskoo-green) 75%, var(--poskoo-ink)); font-size: 14px; font-weight: 600; }
+.settingsMsgErr { margin: 0; color: var(--poskoo-red); font-size: 14px; font-weight: 600; }
+.settingsList { margin: 0; padding-left: 18px; color: var(--poskoo-muted); font-size: 14px; line-height: 1.6; }

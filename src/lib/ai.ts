@@ -1,6 +1,7 @@
 // Server-only helper: asks Claude for caption ideas, per-network caption variants and campaign
-// drafts. The API key comes only from env vars; without ANTHROPIC_API_KEY every call returns an
-// "AI is not set up" result instead of throwing.
+// drafts. The API key is ANTHROPIC_API_KEY, else the key an admin saved in /admin/settings
+// (src/lib/aiKey.ts); without either every call returns an "AI is not set up" result instead of throwing.
+import { resolveAnthropicKey } from "@/lib/aiKey";
 import { fitCaption, isKnownPlatform, networkGuide } from "@/lib/captionFit";
 import type { PlatformId } from "@/lib/platforms";
 
@@ -15,8 +16,9 @@ const SYSTEM_PROMPT =
 
 const HASHTAG_RE = /^#[\p{L}\p{N}_]+$/u;
 
-export function isAiConfigured(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+/** True when an API key is available (env var or a key saved in the admin settings). */
+export async function isAiConfigured(): Promise<boolean> {
+  return (await resolveAnthropicKey()) !== null;
 }
 
 /** Cheap model for short idea lists; quality model for campaigns and per-network rewrites. */
@@ -41,8 +43,8 @@ export function replyText(data: unknown): string | null {
 
 /**
  * One Messages API call. Returns the reply text, or null when AI is off, the request fails or the
- * model declines. The key only ever comes from ANTHROPIC_API_KEY; AI_MODEL / AI_QUALITY_MODEL can
- * override the model ids.
+ * model declines. The key comes from resolveAnthropicKey() (env var, else the stored key);
+ * AI_MODEL / AI_QUALITY_MODEL can override the model ids.
  */
 export async function callClaude(input: {
   system: string;
@@ -51,7 +53,7 @@ export async function callClaude(input: {
   quality?: boolean;
   timeoutMs?: number;
 }): Promise<string | null> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = await resolveAnthropicKey();
   if (!apiKey) return null;
   const model = input.quality
     ? process.env.AI_QUALITY_MODEL || QUALITY_MODEL
@@ -145,8 +147,7 @@ export async function generateCaptionIdeas(input: {
   tone?: string;
   brandVoice?: string;
 }): Promise<CaptionIdeasResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return { ok: false, error: "AI is not set up yet." };
+  if (!(await isAiConfigured())) return { ok: false, error: "AI is not set up yet." };
 
   const lines = [`Topic: ${input.topic}`];
   if (input.draft) lines.push(`Current draft:\n${input.draft}`);
@@ -169,8 +170,7 @@ export async function generateDmIdeas(input: {
   tone?: string;
   brandVoice?: string;
 }): Promise<DmIdeasResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return { ok: false, error: "AI is not set up yet." };
+  if (!(await isAiConfigured())) return { ok: false, error: "AI is not set up yet." };
 
   const lines = [`What the DM is for: ${input.goal}`];
   if (input.keyword) lines.push(`Keyword they commented: ${input.keyword}`);
@@ -241,7 +241,7 @@ export async function generateNetworkVariants(input: {
   brandVoice?: string;
   maxOverrides?: Partial<Record<string, number>>;
 }): Promise<VariantsResult> {
-  if (!isAiConfigured()) return { ok: false, error: "AI is not set up yet." };
+  if (!(await isAiConfigured())) return { ok: false, error: "AI is not set up yet." };
   const platforms = input.platforms.filter(isKnownPlatform);
   if (platforms.length === 0) return { ok: false, error: "Select at least one network." };
   const lines = [
@@ -323,7 +323,7 @@ export async function generateCampaignDrafts(input: {
   brandVoice?: string;
   maxOverrides?: Partial<Record<string, number>>;
 }): Promise<CampaignDraftsResult> {
-  if (!isAiConfigured()) return { ok: false, error: "AI is not set up yet." };
+  if (!(await isAiConfigured())) return { ok: false, error: "AI is not set up yet." };
   const platforms = input.platforms.filter(isKnownPlatform);
   const lines = [
     `Brief:\n${input.brief}`,

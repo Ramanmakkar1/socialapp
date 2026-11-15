@@ -10,6 +10,7 @@ import { validateMediaFile } from "@/lib/mediaUpload";
 import { uploadWithProgress } from "@/lib/mediaUploadClient";
 import type { PlanName } from "@/lib/planLimits";
 import styles from "./calendar.module.css";
+import { AI_SETTINGS_HREF } from "@/components/AiOffNote";
 
 const TONES = ["friendly", "professional", "playful", "bold", "urgent"] as const;
 const field =
@@ -25,12 +26,25 @@ type Created = { name: string; posts: { id: string; scheduledAt: string | null; 
 /**
  * "Campaign from brief": a brief + channels in, N drafts out on the calendar. Never schedules:
  * the drafts are reviewed and scheduled one by one in the composer. When AI isn't configured on
- * the server (`aiReady` false) it explains that instead of showing the form.
+ * the server (`aiReady` false) it explains that instead of showing the form (admins get a link to
+ * the AI settings). `autoOpen` (/app/calendar?campaign=1, linked from the dashboard) opens it at once.
  */
-export default function CampaignDialog({ aiReady, channels, mediaPlan = "Free" }: { aiReady: boolean; channels: PlatformId[]; mediaPlan?: PlanName }) {
+export default function CampaignDialog({
+  aiReady,
+  aiAdmin = false,
+  autoOpen = false,
+  channels,
+  mediaPlan = "Free",
+}: {
+  aiReady: boolean;
+  aiAdmin?: boolean;
+  autoOpen?: boolean;
+  channels: PlatformId[];
+  mediaPlan?: PlanName;
+}) {
   const router = useRouter();
   const ids = useId();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(autoOpen);
   const [goal, setGoal] = useState("");
   const [offer, setOffer] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -148,9 +162,18 @@ export default function CampaignDialog({ aiReady, channels, mediaPlan = "Free" }
             <div className="p-5">
               {!aiReady ? (
                 <div role="status" className="rounded-xl bg-[var(--poskoo-band)] p-4 text-sm text-[var(--poskoo-ink)]">
-                  <p className="inline-flex items-center gap-1.5 font-semibold"><Info className="h-4 w-4" aria-hidden /> AI isn&apos;t configured yet</p>
+                  <p className="inline-flex items-center gap-1.5 font-semibold"><Info className="h-4 w-4" aria-hidden /> AI isn&apos;t switched on yet</p>
                   <p className="mt-1 text-[var(--poskoo-muted)]">
-                    Campaign drafting uses AI, which isn&apos;t switched on on this Poskoo server yet. You can still plan posts yourself with{" "}
+                    {aiAdmin ? (
+                      <>
+                        Campaign drafting uses AI. Add an Anthropic API key in{" "}
+                        <Link href={AI_SETTINGS_HREF} className="font-medium text-[var(--poskoo-violet)] underline">Admin → Settings → AI</Link>{" "}
+                        to switch it on for everyone.{" "}
+                      </>
+                    ) : (
+                      <>Campaign drafting uses AI, which is coming soon. </>
+                    )}
+                    You can still plan posts yourself with{" "}
                     <Link href="/app/calendar?compose=1" className="font-medium text-[var(--poskoo-violet)] underline">New post</Link>{" "}
                     or save ideas on the <Link href="/app/calendar?view=ideas" className="font-medium text-[var(--poskoo-violet)] underline">Ideas board</Link>.
                   </p>

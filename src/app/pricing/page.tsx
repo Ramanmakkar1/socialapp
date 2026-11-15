@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
 import { PLANS, cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
-import { planReadiness } from "@/lib/featureReadiness";
+import { planReadinessNow } from "@/lib/featureReadinessNow";
 import { PlanCta, PlanTag } from "@/components/PlanCta";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
@@ -83,8 +83,8 @@ function Check() {
   );
 }
 
-export default function PricingPage() {
-  const r = planReadiness();
+export default async function PricingPage() {
+  const r = await planReadinessNow();
   const plans = plansFor(r);
   const faqs = pricingFaqs(r);
   return (

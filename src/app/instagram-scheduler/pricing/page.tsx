@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
 import { PLANS, plansNote, softwareOffers, type Plan, type PlanReadiness } from "@/lib/plans";
-import { planReadiness } from "@/lib/featureReadiness";
+import { planReadinessNow } from "@/lib/featureReadinessNow";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
@@ -110,8 +110,8 @@ const appJsonLd = (r: PlanReadiness) => ({
 
 const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
-export default function InstagramSchedulerPricingPage() {
-  const r = planReadiness();
+export default async function InstagramSchedulerPricingPage() {
+  const r = await planReadinessNow();
   const faqs = pageFaqs(r);
   return (
     <PublicShell

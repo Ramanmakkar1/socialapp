@@ -9,6 +9,7 @@ import {
 import { networkAvailability } from "@/lib/networks/registry";
 import { channelStatuses } from "@/lib/channelStatus";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
+import { runtimeEnv } from "@/lib/featureReadinessNow";
 import { PLANS } from "@/lib/plans";
 
 const isNoindex = (path: string) => !isPathIndexable(path);
@@ -76,9 +77,10 @@ export async function GET() {
   const soon = [...coming.filter(([id]) => statuses[id].state === "soon").map(([, l]) => l), "WhatsApp", "Messenger"];
   const list = (items: readonly string[]) => (items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`);
 
-  const { paidPlans, ai } = planReadiness();
-  const cardPayments = featureReadiness("card_payments", process.env).ready;
-  const aiReplies = featureReadiness("ai_replies", process.env).ready;
+  const env = await runtimeEnv();
+  const { paidPlans, ai } = planReadiness(env);
+  const cardPayments = featureReadiness("card_payments", env).ready;
+  const aiReplies = featureReadiness("ai_replies", env).ready;
   const planLines = PLANS.map((p) => {
     const highlights = p.items.slice(0, 3).map((i) => i.text).join(", ");
     const price = p.price === "$0" ? "free forever" : `${p.price} USD ${p.per.replace("/ ", "per ")}${p.yearly ? ` (${p.yearly})` : ""}`;

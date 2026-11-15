@@ -1,7 +1,9 @@
 "use server";
 
 import { requireUser } from "@/lib/auth";
-import { isFeatureReady } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { isAdmin } from "@/lib/admin";
+import type { AiAvailability } from "@/components/AiOffNote";
 import { generateDmIdeas, type DmIdeasResult } from "@/lib/ai";
 import { consumeAiRequest } from "@/lib/aiQuota";
 import { isDbConfigured, query } from "@/lib/db";
@@ -36,7 +38,7 @@ export async function suggestDmMessages(input: {
       /* column may not exist yet; ignore */
     }
   }
-  if (!isFeatureReady("ai")) {
+  if (!(await isFeatureReadyNow("ai"))) {
     return {
       ok: false,
       error:
@@ -56,7 +58,8 @@ export async function suggestDmMessages(input: {
   return generateDmIdeas({ goal, keyword, hasLink: input.hasLink, emailGate: input.emailGate, tone, brandVoice });
 }
 
-export async function dmAiAvailable(): Promise<boolean> {
-  await requireUser();
-  return isFeatureReady("ai");
+/** Whether AI is on (env or stored key), and whether this user may switch it on (admin). */
+export async function dmAiAvailable(): Promise<AiAvailability> {
+  const user = await requireUser();
+  return { ready: await isFeatureReadyNow("ai"), isAdmin: isAdmin(user) };
 }

@@ -10,6 +10,9 @@ import { BRAND } from "@/lib/brand";
 import { listApiKeys } from "@/lib/apiKeys";
 import { isDbConfigured, query } from "@/lib/db";
 import { FEATURE_COPY, isFeatureReady } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { isAdmin } from "@/lib/admin";
+import AiOffNote, { AI_SETTINGS_HREF } from "@/components/AiOffNote";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
@@ -170,8 +173,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         [user.id]
       )
     : [];
-  // AI DM replies are on hold until the owner switches them on (src/lib/featureReadiness.ts "ai_replies").
-  const aiConfigured = isFeatureReady("ai_replies");
+  // AI DM replies need the AI key (env or saved in Admin → Settings) AND the owner's separate
+  // AI_REPLIES_ENABLED=1 switch, because they send messages without a human (featureReadiness "ai_replies").
+  const [aiConfigured, aiKeyReady] = await Promise.all([isFeatureReadyNow("ai_replies"), isFeatureReadyNow("ai")]);
+  const viewerIsAdmin = isAdmin(user);
   const emailReady = isFeatureReady("email");
   // Instagram login needs the Meta app keys on the server; until then show a clear "not yet" state.
   const connectReady = isMetaLoginConfigured() || isIgConfigured();
@@ -466,9 +471,18 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             )}
           </ul>
         </section>
-        <section className={styles.section} aria-labelledby="ai-reply-heading">
+        <section id="ai-replies" className={styles.section} aria-labelledby="ai-reply-heading">
           <h2 id="ai-reply-heading" className={styles.sectionTitle}>AI DM replies{!aiConfigured ? <> <span className={`${ui.pill} ${ui.pillSoon}`}>Not switched on</span></> : null}</h2>
-          {!aiConfigured ? <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}><strong>{FEATURE_COPY.ai_replies.title}.</strong> {FEATURE_COPY.ai_replies.body}</p> : null}
+          {!aiConfigured && !aiKeyReady ? (
+            <AiOffNote isAdmin={viewerIsAdmin}>Automatic AI replies to your DMs need AI first. Your saved instructions stay, and nothing is sent by AI until this is switched on.</AiOffNote>
+          ) : !aiConfigured && viewerIsAdmin ? (
+            <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}>
+              <strong>AI DM replies are on hold.</strong> AI is on (caption and DM ideas work), but automatic replies send messages without a human, so they have their own switch: set{" "}
+              <code>AI_REPLIES_ENABLED=1</code> in the server environment and restart when you&apos;re ready. See <Link href={AI_SETTINGS_HREF}>Admin → Settings → AI</Link>.
+            </p>
+          ) : !aiConfigured ? (
+            <p role="status" className={`${ui.notice} ${ui.noticeSoon}`}><strong>{FEATURE_COPY.ai_replies.title}.</strong> {FEATURE_COPY.ai_replies.body}</p>
+          ) : null}
           {aiAccounts.length === 0 ? (
             <p className={ui.hint}>Connect an Instagram account first, then switch on AI replies.</p>
           ) : (

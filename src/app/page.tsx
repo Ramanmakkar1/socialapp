@@ -8,7 +8,7 @@ import { isPathIndexable } from "@/lib/indexability";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { cancelAnswer, plansFor, plansNote } from "@/lib/plans";
-import { planReadiness } from "@/lib/featureReadiness";
+import { planReadinessNow } from "@/lib/featureReadinessNow";
 import { PlanCta, PlanTag } from "@/components/PlanCta";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
@@ -34,13 +34,14 @@ export const metadata: Metadata = {
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
 };
 export const dynamic = "force-static";
-// Pricing cards follow the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
+// Pricing cards follow the RUNTIME env and a stored AI key (src/lib/featureReadinessNow.ts; the Docker
+// build has no env or DB, so it fails closed to "launching soon"):
 // regenerate in the background at most every 10 minutes.
 export const revalidate = 600;
 const faqs = [{"q": "What is Poskoo?", "a": "Poskoo is a web app that schedules and auto-publishes your social media posts, and automatically sends an Instagram DM with your link to everyone who comments a keyword. It also captures emails in the DM, gives you a link-in-bio page and shows which posts bring in clicks and leads. It uses each platform's official API, and the Free plan costs $0."}, {"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": PLATFORMS_ANSWER}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
-export default function Home() {
+export default async function Home() {
 // Paid plans / AI items: "Launching soon" until featureReadiness says they're switched on.
-const r = planReadiness();
+const r = await planReadinessNow();
 const plans = plansFor(r);
 const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
 const jsonLd = homePageJsonLd(faqList, r, title);

@@ -21,6 +21,7 @@ import {
   type RuleTrigger,
 } from "./actions";
 import { dmAiAvailable, suggestDmMessages } from "./aiActions";
+import AiOffNote from "@/components/AiOffNote";
 import { PUBLIC_REPLY_MAX } from "@/lib/publicReply";
 import { formatCtr } from "@/lib/ctr";
 
@@ -204,6 +205,7 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   const [errors, setErrors] = useState<string[]>([]);
   const [pending, startTransition] = useTransition();
   const [aiOn, setAiOn] = useState<boolean | null>(null);
+  const [aiAdmin, setAiAdmin] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiGoal, setAiGoal] = useState("");
   const [aiTone, setAiTone] = useState("friendly");
@@ -216,8 +218,10 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
   useEffect(() => {
     let active = true;
     dmAiAvailable()
-      .then((available) => {
-        if (active) setAiOn(available);
+      .then((ai) => {
+        if (!active) return;
+        setAiOn(ai.ready);
+        setAiAdmin(ai.isAdmin);
       })
       .catch(() => {
         if (active) setAiOn(false);
@@ -446,9 +450,14 @@ export function RuleForm({ mode, ruleId, initial, matchModeNote, instagramAccoun
             </span>
           </div>
           {aiOn === false && (
-            <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[var(--poskoo-band)] px-2.5 py-1.5 text-xs text-[var(--poskoo-muted)]">
-              ✨ AI message ideas aren&apos;t switched on in this workspace yet. Type your DM above; {"{{link}}"} adds your link automatically.
-            </p>
+            <div className="mt-2">
+              <button type="button" disabled className={`${ui.pill} cursor-not-allowed text-xs opacity-60`}>
+                ✨ Write with AI
+              </button>
+              <AiOffNote isAdmin={aiAdmin}>
+                AI DM message ideas will appear here. For now, type your DM above; {"{{link}}"} adds your link automatically.
+              </AiOffNote>
+            </div>
           )}
           {aiOn && (
             <div className="mt-2">
