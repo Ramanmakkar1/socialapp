@@ -5,7 +5,7 @@ export const BRAND = {
   name: "Poskoo",
   tagline: "Schedule posts. Auto-DM every comment. Grow on Poskoo.",
   description:
-    "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
+    "One tool to plan and auto-publish your social posts and automatically DM everyone who comments, with AI captions and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
   canonicalUrl: rawUrl.replace(/\/+$/, ""),
   // Socialapp remains staging/noindex until Raman moves it to the new domain.
