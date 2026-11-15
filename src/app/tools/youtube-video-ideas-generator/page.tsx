@@ -117,7 +117,7 @@ const config: ToolPageConfig = {
               watches and subscribes for. Check the exact dimensions for each format with the{" "}
               <Link href="/tools/youtube-shorts-size-checker">YouTube Shorts size checker</Link>, and file the clips neatly
               into a schedule using the guide on{" "}
-              <Link href="/guides/how-to-schedule-youtube-shorts">how to schedule YouTube Shorts</Link>.
+              <Link href="/help/schedule-youtube-videos">how to schedule YouTube Shorts</Link>.
             </p>
           </>
         ),
@@ -214,7 +214,7 @@ const config: ToolPageConfig = {
       aNode: (
         <>
           Both. Turn quick tips into Shorts and expand bigger topics into long videos or tutorials. Plan Shorts with the{" "}
-          <Link href="/guides/how-to-schedule-youtube-shorts">guide to scheduling YouTube Shorts</Link> and check the frame
+          <Link href="/help/schedule-youtube-videos">guide to scheduling YouTube Shorts</Link> and check the frame
           with the{" "}
           <Link href="/tools/youtube-shorts-size-checker">YouTube Shorts size checker</Link> before you export.
         </>

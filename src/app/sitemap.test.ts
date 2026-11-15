@@ -278,7 +278,9 @@ test("every public page declares a canonical", () => {
     if (!existsSync(file)) continue; // missing route files are covered by the "real route file" test
     const text = readFileSync(file, "utf8");
     // Tool pages get their canonical from toolMetadata({ path }) (asserted below), and must pass their own path.
-    const viaToolMetadata = text.includes("toolMetadata(") && text.includes(`path: "${p}"`);
+    const viaToolMetadata =
+      text.includes("toolMetadata(") &&
+      (text.includes(`path: "${p}"`) || (text.includes(`const PATH = "${p}";`) && text.includes("path: PATH")));
     assert.ok(text.includes("canonical") || viaToolMetadata, `public page ${p} has no canonical in ${file}`);
   }
 });
@@ -286,7 +288,10 @@ test("every public page declares a canonical", () => {
 test("toolMetadata sets the canonical, title, description and social card", () => {
   const meta = toolMetadata({ path: "/tools/x", title: "T", description: "D" });
   assert.equal(meta.alternates?.canonical, "/tools/x");
-  assert.deepEqual(meta.title, { absolute: "T" });
+  // Short tool titles get the brand suffix (toolTitle); long ones stay as written.
+  assert.deepEqual(meta.title, { absolute: `T | ${BRAND.name}` });
+  const long = "A".repeat(55);
+  assert.deepEqual(toolMetadata({ path: "/tools/x", title: long, description: "D" }).title, { absolute: long });
   assert.equal(meta.description, "D");
   assert.equal((meta.openGraph as { url?: string } | undefined)?.url, "/tools/x");
   assert.ok(meta.openGraph?.images, "tool pages carry an Open Graph image");

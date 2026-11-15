@@ -117,7 +117,6 @@ const howToJsonLd = {
 };
 
 const related = [
-  { href: "/guides/how-to-schedule-facebook-posts", label: "How to schedule Facebook posts in 2026 (full guide)" },
   { href: "/facebook-scheduler", label: "Facebook post scheduler" },
   { href: "/tools/facebook-character-counter", label: "Facebook character counter" },
   { href: "/help/getting-started", label: "Getting started guide" },

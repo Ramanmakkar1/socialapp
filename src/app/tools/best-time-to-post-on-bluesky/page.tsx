@@ -134,7 +134,7 @@ const config: ToolPageConfig = {
             they publish at that time without you opening the app. You can plan a week in the calendar, then let Poskoo
             publish at the right time. New here? <Link href="/signup">Create a free account</Link> and start with one
             post. Need help getting started? Read{" "}
-            <Link href="/guides/how-to-schedule-bluesky-posts">how to schedule Bluesky posts</Link>.
+            <Link href="/help/schedule-bluesky-posts">how to schedule Bluesky posts</Link>.
           </p>
         ),
       },

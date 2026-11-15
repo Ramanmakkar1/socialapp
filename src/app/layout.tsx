@@ -13,19 +13,19 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND.canonicalUrl),
-  title: { default: `${BRAND.name} — Social media scheduler + Instagram auto-DM`, template: `%s | ${BRAND.name}` },
+  title: { default: `${BRAND.name}: Social media scheduler + Instagram auto-DM`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
   alternates: { canonical: canonicalUrl("/") },
   openGraph: {
     type: "website",
     siteName: BRAND.name,
-    title: `${BRAND.name} — Social media scheduler + Instagram auto-DM`,
+    title: `${BRAND.name}: Social media scheduler + Instagram auto-DM`,
     description: BRAND.description,
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${BRAND.name} — Social media scheduler + Instagram auto-DM`,
+    title: `${BRAND.name}: Social media scheduler + Instagram auto-DM`,
     description: BRAND.description,
   },
   // Indexing is controlled by BRAND.indexable (src/lib/brand.ts); the same isPathIndexable helper gates the sitemap.
