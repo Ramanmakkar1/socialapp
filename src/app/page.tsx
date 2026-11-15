@@ -203,6 +203,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
       <p>See reach, comments, DMs, link clicks and leads for every post, so you know what works.</p>
     </article>
   </div>
+  <p className="chLinks" style={{"marginTop": "28px"}}><Link className="go" href="/features">Explore every Poskoo feature <span aria-hidden="true">→</span></Link><Link className="go" href="/pricing">Compare plans and pricing <span aria-hidden="true">→</span></Link></p>
 </div></section>
 
 <section style={{"paddingTop": "20px"}}><div className="wrap">
@@ -270,7 +271,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
         <li><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>No credit card</li>
         <li><svg width="18" height="18" aria-hidden="true"><use href="#ok" /></svg>Official Meta API</li>
       </ul>
-      <p className="ctaLogin">Already have an account? <Link href="/login">Log in</Link></p>
+      <p className="ctaLogin">Already have an account? <Link href="/login">Log in</Link> · <Link href="/features">See all features</Link> · <Link href="/pricing">View pricing</Link></p>
     </div>
     <AnimArt name="card-leads" label="Two friends high-five next to a board of new leads" />
   </div>
