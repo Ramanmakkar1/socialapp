@@ -23,8 +23,16 @@ test("sitemap.xml route has no <url> entries while BRAND.indexable is false", as
   const was = BRAND.indexable;
   BRAND.indexable = false;
   try {
-    const body = await (await GET()).text();
+    const res = await GET();
+    const body = await res.text();
     assert.doesNotMatch(body, /<url>/, "noindex staging must stay empty");
+    assert.match(
+      body,
+      /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">\s*<\/urlset>/,
+      "noindex staging must serve an empty <urlset>",
+    );
+    assert.equal(res.headers.get("cache-control"), "no-store");
+    assert.equal(res.headers.get("x-robots-tag"), "noindex, nofollow");
   } finally {
     BRAND.indexable = was;
   }
