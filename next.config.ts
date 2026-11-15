@@ -65,6 +65,17 @@ const nextConfig: NextConfig = {
       { source: "/:path([Hh][Oo][Mm][Ee])", destination: "/", permanent: true },
     ];
   },
+  async rewrites() {
+    return {
+      // beforeFiles so this wins over the native sitemap.ts metadata route.
+      beforeFiles: [
+        // Serve the sitemap from a custom route that adds an XSL stylesheet so
+        // browsers render it as a readable page instead of a near-empty XML tree.
+        // The route still uses the same sitemap() source as src/app/sitemap.ts.
+        { source: "/sitemap.xml", destination: "/sitemap-xml" },
+      ],
+    };
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
