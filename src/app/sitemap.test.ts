@@ -69,6 +69,12 @@ test("sitemap is empty for both audited host aliases while staging is noindex", 
   }
 });
 
+test("approved production host returns an empty sitemap while BRAND.indexable is false", () => {
+  whileNoindex(() => {
+    assert.deepEqual(sitemap(), [], "the approved production host must not list noindex pages");
+  });
+});
+
 test("staging: sitemap omits the home page and robots omits the sitemap", () => {
   assert.equal(BRAND.indexable, false);
   assert.equal(sitemap().some((e) => e.url === `${BRAND.url}/`), false);

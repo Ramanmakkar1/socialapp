@@ -7,8 +7,8 @@ import { GUIDES, guidePath } from "@/content/guides/registry";
 // Evaluate indexability per request so a build never freezes the staging noindex.
 export const dynamic = "force-dynamic";
 
-// Only indexable paths are listed; while the staging noindex flag is on the
-// sitemap is empty, so a noindex page can never be listed.
+// Only indexable paths are listed. An empty sitemap while staging is noindex is
+// intended; public/sitemap.xsl explains it to anyone who opens the file.
 function getSitemapPaths(): PublicPath[] {
   return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
 }
