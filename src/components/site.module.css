@@ -127,6 +127,54 @@
   overflow-wrap: anywhere;
 }
 
+/* Trust strip under the breadcrumbs: four short proof points that wrap on
+   phones. Colours come from the Poskoo tokens, so contrast holds in dark mode
+   (the shell keeps the paper surface in both themes). */
+.trustStrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+.trustStrip li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px 12px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: var(--poskoo-radius-pill);
+  background: var(--poskoo-card);
+  color: var(--poskoo-ink);
+  font-size: .85rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.trustStrip svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--poskoo-green);
+}
+.trustStrip span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 400px) {
+  .trustStrip {
+    gap: 6px 8px;
+  }
+  .trustStrip li {
+    padding: 5px 10px;
+    font-size: .8rem;
+  }
+}
+
 /* Article / legal prose. */
 .prose {
   max-width: 760px;
