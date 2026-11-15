@@ -11,6 +11,7 @@ import { CompareNote } from "@/components/CompareNote";
 import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: "Metricool Alternative for Instagram Auto-DM | Poskoo" },
@@ -69,6 +70,16 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Metricool alternative`,
+    description:
+      "Metricool alternative for Instagram scheduling with comment-to-DM automation, lead capture and an inbox — schedule posts and turn commenters into leads.",
+    url: `${BRAND.url}/metricool-alternative`,
+  }),
+  featureList: ["Instagram scheduling", "Comment-to-DM automation", "Email capture in DMs", "Lead CSV export"],
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -78,7 +89,8 @@ function Cell({ v }: { v: string }) {
 export default function MetricoolAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Metricool alternative", path: "/metricool-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
@@ -88,7 +100,7 @@ export default function MetricoolAlternative() {
             Metricool alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            Metricool focuses on scheduling and analytics across many networks. {BRAND.name} schedules your {LIVE_PLATFORMS_TEXT} posts and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
+            {BRAND.name} is a Metricool alternative that schedules your {LIVE_PLATFORMS_TEXT} posts and auto-DMs every keyword commenter, so you can capture emails and export leads in one account, starting free.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
