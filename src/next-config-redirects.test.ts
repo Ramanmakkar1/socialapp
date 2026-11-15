@@ -11,6 +11,13 @@ function hasOldHost(entry: { has?: unknown }): boolean {
   });
 }
 
+function hasForwardedHost(entry: { has?: unknown }): boolean {
+  return Array.isArray(entry.has) && entry.has.some((condition) => {
+    const c = condition as { type?: string; key?: string; value?: string };
+    return c.type === "header" && c.key === "x-forwarded-host" && c.value === OLD_HOST;
+  });
+}
+
 // Turn the catch-all source "/:path(<regex>)" into a matcher for the path
 // segment (without the leading slash), mirroring how Next applies the rule.
 function catchAllMatcher(source: string): RegExp {
@@ -50,6 +57,42 @@ test("old staging host redirects its home page and every other path to poskoo.co
     assert.ok(
       entry.destination.startsWith("https://poskoo.com/"),
       `old-host redirect ${entry.source} must go to poskoo.com, got ${entry.destination}`,
+    );
+  }
+});
+
+test("x-forwarded-host staging requests redirect the home page, sitemap, robots and other paths", async () => {
+  const redirects = await config.redirects!();
+  const forwardedEntries = redirects.filter(hasForwardedHost);
+
+  // All four rules must exist for the forwarded-host signal.
+  for (const [source, destination] of [
+    ["/", "https://poskoo.com/"],
+    ["/sitemap.xml", "https://poskoo.com/sitemap.xml"],
+    ["/robots.txt", "https://poskoo.com/robots.txt"],
+  ] as const) {
+    const entry = forwardedEntries.find((candidate) => candidate.source === source);
+    assert.ok(entry, `expected an x-forwarded-host redirect for source '${source}'`);
+    assert.equal(entry.destination, destination);
+    assert.equal(entry.permanent, true);
+  }
+
+  const catchAll = forwardedEntries.find((entry) => entry.source.includes("(?!api"));
+  assert.ok(catchAll, "expected the x-forwarded-host catch-all redirect");
+  assert.equal(catchAll.destination, "https://poskoo.com/:path");
+  assert.equal(catchAll.permanent, true);
+
+  // The forwarded-host catch-all keeps the same API exclusion.
+  const matches = catchAllMatcher(catchAll.source);
+  assert.equal(matches.test("api"), false, "bare /api must not be redirected");
+  assert.equal(matches.test("api/webhooks"), false, "/api/* must not be redirected");
+  assert.equal(matches.test("pricing"), true, "/pricing must still be redirected");
+
+  // Every forwarded-host redirect must land on poskoo.com.
+  for (const entry of forwardedEntries) {
+    assert.ok(
+      entry.destination.startsWith("https://poskoo.com/"),
+      `x-forwarded-host redirect ${entry.source} must go to poskoo.com, got ${entry.destination}`,
     );
   }
 });
