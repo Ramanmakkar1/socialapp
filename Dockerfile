@@ -7,6 +7,12 @@ FROM node:24-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# NEXT_PUBLIC_* values are inlined at build time; .env is dockerignored, so
+# the public site settings must arrive as build args (docker-compose.yml).
+# Indexing stays off unless both are set (src/lib/brand.ts).
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_SITE_INDEXABLE
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_SITE_INDEXABLE=$NEXT_PUBLIC_SITE_INDEXABLE
 RUN npm run build
 
 FROM node:24-alpine
