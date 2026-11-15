@@ -18,7 +18,7 @@ const PATH = "/zoho-social-alternative";
 export const metadata: Metadata = withSocial({
   title: { absolute: "Zoho Social Alternative: Schedule Posts + Instagram Auto-DM" },
   description:
-    "Looking for a Zoho Social alternative? Poskoo schedules posts to 7 networks from one calendar, auto-DMs Instagram commenters and has a free plan to start.",
+    "Poskoo is a Zoho Social alternative: schedule Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky and Mastodon and auto-DM commenters. Free plan.",
   alternates: { canonical: `${BRAND.url}${PATH}` },
 });
 
