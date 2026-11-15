@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "Free Instagram bio generator: enter your name, what you do and a call to action, pick one of 8 niches and copy a bio with a live 150-character counter.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram bio generator:", mark: "bio ideas", after: "you can copy" },
-  lede: "An Instagram bio can be up to 150 characters, so it should say who you are, what you do and one next step. Enter your name, what you do and a call to action, pick a niche, and copy one of four ready-made bios with a live counter.",
+  lede: "The Instagram bio generator turns your name, what you do and a call to action into four ready-to-paste Instagram bios for your niche, with a live 150-character counter. Enter your details, pick one of 8 niches and copy the bio that fits — free, no signup, nothing uploaded.",
   art: "writing",
   artLabel: "A creator writes with a giant pencil on a phone-shaped card full of lines and emoji",
   heroPoints: ["150-char counter", "8 niches", "No signup"],
@@ -57,16 +57,16 @@ const config: ToolPageConfig = {
   guide: {
     title: "How to write an Instagram bio that works in 2026",
     intro:
-      "Your bio is the first thing a profile visitor reads after your name. In 150 characters it has to say who you are, what you offer and what to do next. This generator gives you proven layouts so you can focus on the words.",
+      "This generator writes a complete Instagram bio from three short inputs: who you are, what you do and one call to action. In 150 characters your bio has to say those things clearly, so the tool gives you four ready-made layouts per niche and a live counter, and you can focus on the words.",
     sections: [
       {
         title: "What this bio generator does",
         body: (
           <>
             <p>
-              The tool fills your three inputs into four hand-written templates for the niche you pick. Templates put each
-              idea on its own line and add a fitting emoji, then end with your call to action. Empty lines are removed, so
-              leaving <b>Name or brand</b> blank still gives a clean bio.
+              The Instagram bio generator fills your three inputs into four hand-written templates for the niche you pick.
+              Templates put each idea on its own line and add a fitting emoji, then end with your call to action. Empty
+              lines are removed, so leaving <b>Name or brand</b> blank still gives a clean bio.
             </p>
             <p>
               The counter counts characters as your browser sees them. Most emojis count as one, but some combined emojis
