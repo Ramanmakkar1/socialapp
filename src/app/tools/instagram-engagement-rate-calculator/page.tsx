@@ -7,9 +7,9 @@ const config: ToolPageConfig = {
   path: "/tools/instagram-engagement-rate-calculator",
   name: "Instagram engagement rate calculator",
   crumb: "Engagement rate calculator",
-  title: "Instagram Engagement Rate Calculator: Followers or Reach",
+  title: "Instagram Engagement Rate Calculator | Poskoo",
   description:
-    "Free Instagram engagement rate calculator: add likes, comments, saves and shares, divide by followers or reach and get the rate for one post in seconds.",
+    "Calculate Instagram engagement rate by followers or reach using likes, comments, saves and shares. Get the formula and result in seconds, free with no login.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram engagement rate", mark: "calculator" },
   lede: "Instagram engagement rate is the share of your audience that interacted with a post, shown as a percentage. Enter one post's likes, comments, saves, shares and either followers or reach and the calculator returns that post's engagement rate, plus the exact formula it used.",
