@@ -43,18 +43,21 @@ const steps = [
   {
     n: "1",
     art: "/landing/step-connect.webp",
+    alt: "Illustration of connecting Instagram, Facebook and Threads accounts on a phone",
     title: "Connect Instagram",
     text: "Sign in with Meta's official login for Business or Creator accounts. We never ask for your password.",
   },
   {
     n: "2",
     art: "/landing/step-schedule.webp",
+    alt: "Illustration of scheduling posts on a calendar with an alarm clock",
     title: "Write the post and pick a time",
     text: "Compose your caption yourself or with AI, add media, set a first comment if you want, and choose when to publish.",
   },
   {
     n: "3",
     art: "/landing/step-dm.webp",
+    alt: "Illustration of publishing a post and sending an automatic DM after a comment",
     title: "Publish and DM commenters",
     text: `${BRAND.name} publishes at the scheduled time. If you added an auto-DM rule, commenters get your message in their DMs.`,
   },
@@ -190,7 +193,7 @@ export default function InstagramScheduler() {
           <div className="howGrid">
             {steps.map((st) => (
               <article key={st.n} className="howStep">
-                <div className="howArt"><Image src={st.art} width={640} height={600} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt="" /></div>
+                <div className="howArt"><Image src={st.art} width={640} height={600} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt={st.alt} /></div>
                 <span className="howNo">Step {st.n}</span>
                 <h3>{st.title}</h3>
                 <p>{st.text}</p>
