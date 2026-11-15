@@ -13,7 +13,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Metricool Alternative for Instagram Scheduling + Auto-DM" },
+  title: { absolute: "Metricool Alternative for Instagram Auto-DM | Poskoo" },
   description:
     "Metricool alternative for Instagram scheduling with comment-to-DM automation, lead capture and an inbox — schedule posts and turn commenters into leads.",
   alternates: { canonical: "/metricool-alternative" },

@@ -11,7 +11,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "ManyChat Alternative: Instagram Comment-to-DM + Scheduler" },
+  title: { absolute: "ManyChat Alternative: Instagram Auto-DM + Scheduler | Poskoo" },
   description:
     "A ManyChat alternative with Instagram comment-to-DM automation, post scheduling and lead capture in one tool, built on the official Meta API.",
   alternates: { canonical: "/manychat-alternative" },

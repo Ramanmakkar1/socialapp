@@ -13,7 +13,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Sprout Social Alternative for Instagram DMs & Scheduling" },
+  title: { absolute: "Sprout Social Alternative for Instagram Auto-DM | Poskoo" },
   description:
     "A Sprout Social alternative that schedules Instagram posts and auto-DMs every keyword comment, with email capture, AI captions and lead export in one tool.",
   alternates: { canonical: "/sprout-social-alternative" },

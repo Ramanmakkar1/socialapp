@@ -12,7 +12,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Tailwind Alternative with Instagram Auto-DM & Free Plan" },
+  title: { absolute: "Tailwind Alternative with Instagram Auto-DM | Poskoo" },
   description:
     "Poskoo is a Tailwind alternative: schedule Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky and Mastodon posts and auto-DM commenters. Free plan.",
   alternates: { canonical: `${BRAND.url}/tailwind-alternative` },

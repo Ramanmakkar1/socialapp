@@ -13,7 +13,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Loomly Alternative with Instagram Auto-DM & Free Plan" },
+  title: { absolute: "Loomly Alternative with Instagram Auto-DM | Poskoo" },
   description:
     "Poskoo is a Loomly alternative that schedules Instagram, Facebook and Threads posts and auto-DMs every keyword commenter to capture leads. Free plan.",
   alternates: { canonical: `${BRAND.url}/loomly-alternative` },

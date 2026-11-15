@@ -12,7 +12,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: `Later Alternative With Instagram Auto-DM | ${BRAND.name}` },
+  title: { absolute: `Later Alternative with Instagram Auto-DM & Leads | ${BRAND.name}` },
   description:
     "A Later alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export. Facebook Pages and Threads too.",
   alternates: { canonical: "/later-alternative" },

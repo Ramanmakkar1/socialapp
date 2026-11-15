@@ -12,7 +12,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Agorapulse Alternative with Instagram Auto-DM & Free Plan" },
+  title: { absolute: "Agorapulse Alternative for Instagram Auto-DM | Poskoo" },
   description:
     "Poskoo is an Agorapulse alternative: schedule Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky, and Mastodon posts & auto-DM commenters. Free plan.",
   alternates: { canonical: `${BRAND.url}/agorapulse-alternative` },

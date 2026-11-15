@@ -12,7 +12,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Hootsuite Alternative for Instagram Scheduling & Auto-DM" },
+  title: { absolute: "Hootsuite Alternative for Instagram Auto-DM | Poskoo" },
   description:
     "An Instagram scheduler plus comment-to-DM automation, email capture and AI captions, with a free plan. A simpler Hootsuite alternative for Instagram.",
   alternates: { canonical: "/hootsuite-alternative" },
