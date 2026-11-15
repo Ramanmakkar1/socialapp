@@ -1,3 +1,6 @@
+// OWNER-APPROVED FOOTER DESIGN (restored 2026-11-15 from 20425b5). Keep the columns as
+// they are and roughly equal; do NOT add links, columns or layout changes without the
+// owner's approval. Link new pages from hubs (/tools, /social-media-scheduler-comparison), not here.
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -38,39 +41,34 @@ function FooterColumn({ title, links, extra }: { title: string; links: FooterLin
 }
 
 const TOOLS: FooterLink[] = [
-  { href: "/tools/instagram-hashtag-generator", label: "Instagram hashtag generator" },
-  { href: "/tools/instagram-caption-counter", label: "Instagram caption counter" },
-  { href: "/tools/pinterest-description-generator", label: "Pinterest description generator" },
+  { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
+  { href: "/tools/instagram-caption-counter", label: "Caption counter" },
   { href: "/tools/x-character-counter", label: "X character counter" },
   { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
-  { href: "/tools/linkedin-caption-generator", label: "LinkedIn caption generator" },
   { href: "/tools/threads-character-counter", label: "Threads character counter" },
   { href: "/tools/bluesky-character-counter", label: "Bluesky character counter" },
   { href: "/tools/mastodon-character-counter", label: "Mastodon character counter" },
   { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
   { href: "/tools/youtube-title-counter", label: "YouTube title counter" },
   { href: "/tools/facebook-character-counter", label: "Facebook character counter" },
-  { href: "/tools/pinterest-character-counter", label: "Pinterest character counter" },
-  { href: "/tools/instagram-font-generator", label: "Instagram font generator" },
-  { href: "/tools/instagram-bio-generator", label: "Instagram bio generator" },
-  { href: "/tools/instagram-username-generator", label: "Instagram username generator" },
-  { href: "/tools/instagram-caption-generator", label: "Instagram caption generator" },
-  { href: "/tools/instagram-image-size", label: "Instagram image sizes" },
-  { href: "/tools/social-media-image-sizes", label: "Social media image sizes" },
-  { href: "/tools/instagram-engagement-rate-calculator", label: "Instagram engagement calculator" },
-  { href: "/tools/best-time-to-post-on-social-media", label: "Best time to post" },
-  { href: "/tools/instagram-line-break-generator", label: "Instagram line breaks" },
+  { href: "/tools/instagram-font-generator", label: "Font generator" },
+  { href: "/tools/instagram-bio-generator", label: "Bio generator" },
+  { href: "/tools/instagram-username-generator", label: "Username generator" },
+  { href: "/tools/instagram-caption-generator", label: "Caption generator" },
+  { href: "/tools/instagram-image-size", label: "Image size guide" },
+  { href: "/tools/instagram-engagement-rate-calculator", label: "Engagement rate calculator" },
+  { href: "/tools/instagram-line-break-generator", label: "Line break generator" },
   { href: "/tools/instagram-comment-keyword-tester", label: "Comment keyword tester" },
-  { href: "/tools/instagram-comment-picker", label: "Instagram comment picker" },
-  { href: "/tools/instagram-dm-link-generator", label: "Instagram DM link generator" },
-  { href: "/tools/instagram-post-preview", label: "Instagram post preview" },
-  { href: "/tools/instagram-safe-zone-checker", label: "Instagram safe zone checker" },
-  { href: "/tools/instagram-highlight-cover-maker", label: "Instagram highlight covers" },
-  { href: "/tools/instagram-reel-cover-maker", label: "Instagram Reel cover maker" },
-  { href: "/tools/instagram-story-maker", label: "Instagram story maker" },
-  { href: "/tools/instagram-post-ideas-generator", label: "Instagram post ideas" },
-  { href: "/tools/instagram-hook-generator", label: "Instagram hook generator" },
-  { href: "/tools/instagram-utm-builder", label: "Instagram UTM builder" },
+  { href: "/tools/instagram-comment-picker", label: "Comment picker" },
+  { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
+  { href: "/tools/instagram-post-preview", label: "Post preview" },
+  { href: "/tools/instagram-safe-zone-checker", label: "Safe zone checker" },
+  { href: "/tools/instagram-highlight-cover-maker", label: "Highlight cover maker" },
+  { href: "/tools/instagram-reel-cover-maker", label: "Reel cover maker" },
+  { href: "/tools/instagram-story-maker", label: "Story maker" },
+  { href: "/tools/instagram-post-ideas-generator", label: "Post ideas" },
+  { href: "/tools/instagram-hook-generator", label: "Hook generator" },
+  { href: "/tools/instagram-utm-builder", label: "UTM builder" },
 ];
 
 export function SiteFooter() {
@@ -87,10 +85,6 @@ export function SiteFooter() {
           <li><i style={{ background: "#E1306C" }} aria-hidden="true" />Instagram</li>
           <li><i style={{ background: "#1877F2" }} aria-hidden="true" />Facebook</li>
           <li><i style={{ background: "var(--ink)" }} aria-hidden="true" />Threads</li>
-          <li><i style={{ background: "#FF0033" }} aria-hidden="true" />YouTube</li>
-          <li><i style={{ background: "#0A66C2" }} aria-hidden="true" />LinkedIn</li>
-          <li><i style={{ background: "#1185FE" }} aria-hidden="true" />Bluesky</li>
-          <li><i style={{ background: "#6364FF" }} aria-hidden="true" />Mastodon</li>
         </ul>
         <div className="fctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -101,24 +95,17 @@ export function SiteFooter() {
       <FooterColumn
         title="Product"
         links={[
-          { href: "/features", label: "All features" },
-          { href: "/ai-social-media-manager", label: "AI social media manager" },
-          { href: "/social-media-inbox", label: "Social media inbox" },
-          { href: "/social-media-analytics", label: "Social media analytics" },
+          { href: "/features", label: "Features" },
+          { href: "/instagram-scheduler", label: "Instagram scheduler" },
           { href: "/instagram-auto-dm", label: "Instagram auto DM" },
-          { href: "/instagram-dm-automation", label: "Instagram DM automation" },
           { href: "/instagram-auto-dm/templates", label: "Auto-DM templates" },
-          { href: "/instagram-link-in-bio", label: "Instagram link in bio" },
-          { href: "/instagram-content-planner", label: "Instagram content planner" },
-          { href: "/tools", label: "Free social media tools" },
+          { href: "/instagram-link-in-bio", label: "Link in bio" },
           { href: "/pricing", label: "Pricing" },
+          { href: "/developers", label: "API and MCP" },
         ]}
         extra={{ title: "Company", links: [
             { href: "/guides", label: "Guides" },
             { href: "/help", label: "Help center" },
-            { href: "/developers", label: "Developers (MCP)" },
-            { href: "/schedule-posts-with-chatgpt", label: "Schedule posts with ChatGPT" },
-            { href: "/schedule-posts-with-claude", label: "Schedule posts with Claude" },
             { href: "/contact", label: "Contact" },
             { href: "/privacy", label: "Privacy" },
             { href: "/terms", label: "Terms" },
@@ -128,7 +115,6 @@ export function SiteFooter() {
       <FooterColumn
         title="Schedulers"
         links={[
-          { href: "/social-media-scheduler", label: "Social media scheduler" },
           { href: "/instagram-scheduler", label: "Instagram scheduler" },
           { href: "/facebook-scheduler", label: "Facebook scheduler" },
           { href: "/threads-scheduler", label: "Threads scheduler" },
@@ -139,12 +125,7 @@ export function SiteFooter() {
           { href: "/x-scheduler", label: "X (Twitter) scheduler" },
           { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
           { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
-          { href: "/google-business-profile-scheduler", label: "Google Business Profile scheduler" },
-          { href: "/social-media-scheduler-for-agencies", label: "Scheduler for agencies" },
-          { href: "/social-media-scheduler-for-creators", label: "Scheduler for creators" },
-          { href: "/social-media-scheduler-for-coaches", label: "Scheduler for coaches" },
-          { href: "/social-media-scheduler-for-ecommerce", label: "Scheduler for ecommerce" },
-          { href: "/social-media-scheduler-comparison", label: "Social media scheduler comparison" },
+          { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
         ]}
       />
       <FooterColumn title="Free tools" links={TOOLS.slice(0, 10)} />
@@ -154,23 +135,13 @@ export function SiteFooter() {
         links={[
           { href: "/buffer-alternative", label: "Buffer alternative" },
           { href: "/publer-alternative", label: "Publer alternative" },
-          { href: "/agorapulse-alternative", label: "Agorapulse alternative" },
-          { href: "/zoho-social-alternative", label: "Zoho Social alternative" },
-          { href: "/loomly-alternative", label: "Loomly alternative" },
-          { href: "/tailwind-alternative", label: "Tailwind alternative" },
-          { href: "/socialbee-alternative", label: "SocialBee alternative" },
-          { href: "/sendible-alternative", label: "Sendible alternative" },
-          { href: "/vista-social-alternative", label: "Vista Social alternative" },
           { href: "/later-alternative", label: "Later alternative" },
           { href: "/planoly-alternative", label: "Planoly alternative" },
           { href: "/sprout-social-alternative", label: "Sprout Social alternative" },
           { href: "/metricool-alternative", label: "Metricool alternative" },
           { href: "/manychat-alternative", label: "ManyChat alternative" },
-          { href: "/linktree-alternative", label: "Linktree alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
           { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative" },
-          { href: "/influence-alternative", label: "Influence.so alternative" },
-          { href: "/social-media-scheduler-comparison", label: "All comparisons →" },
         ]}
       />
       <div className="legal">
