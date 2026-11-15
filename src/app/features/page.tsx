@@ -16,9 +16,9 @@ import { featureReadiness } from "@/lib/featureReadiness";
 export const revalidate = 600;
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Poskoo Features: Scheduling, Auto-DM & AI Captions" },
+  title: { absolute: "Social Media Scheduler Features: Auto-DM & AI | Poskoo" },
   description:
-    "See what Poskoo includes: scheduling for Instagram, Facebook, Threads and YouTube, auto-DMs, lead capture, AI captions and free tools. Start free today.",
+    "See Poskoo features: schedule social posts, auto-DM Instagram commenters, capture leads, draft AI captions and use free tools, all in one app.",
   alternates: { canonical: "/features" },
 });
 
