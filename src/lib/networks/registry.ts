@@ -1,4 +1,5 @@
 // Server only: one entry per new network: is it set up on this server, how to publish, how to refresh.
+import { safeFetch } from "@/lib/netGuard";
 import { NetworkAuthError, NETWORK_IDS, str, type Fetch, type NetAccount, type NetworkId, type PublishInput, type PublishOutcome, type TokenSet } from "@/lib/networks/common";
 import { BLUESKY_DEFAULT_SERVICE, createBlueskySession, jwtExpiresIn, publishToBluesky, refreshBlueskySession } from "@/lib/networks/bluesky";
 import { isLinkedInConfigured, publishToLinkedIn, refreshLinkedInToken } from "@/lib/networks/linkedin";
@@ -37,7 +38,7 @@ export type NetworkAdapter = {
   refreshSkewSec: number;
 };
 
-async function refreshBluesky(account: NetAccount, fetchImpl: Fetch = fetch): Promise<TokenSet> {
+async function refreshBluesky(account: NetAccount, fetchImpl: Fetch = safeFetch): Promise<TokenSet> {
   const service = str(account.meta.service) || BLUESKY_DEFAULT_SERVICE;
   try {
     if (!account.refreshToken) throw new NetworkAuthError("refresh_failed", "no refresh JWT", true);

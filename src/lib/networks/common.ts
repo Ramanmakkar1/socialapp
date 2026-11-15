@@ -3,6 +3,7 @@
 // unit tests run without the network. Tokens are never logged; error messages are redacted.
 import { createHash, randomBytes } from "node:crypto";
 import { decryptToken, encryptToken } from "@/lib/crypto";
+import { safeFetch } from "@/lib/netGuard";
 import { EXTRA_NETWORK_IDS, EXTRA_NETWORK_LABEL, type ExtraNetworkId } from "@/lib/networks/tokenNetworks";
 
 // ig_personal / fb_group are reminder channels (no posting API): Poskoo e-mails the user at the
@@ -187,17 +188,22 @@ export function mediaItems(raw: unknown): MediaItem[] {
 
 const DOWNLOAD_CONNECT_TIMEOUT_MS = 5 * 60_000;
 
-/** Download a media file into memory. The timeout covers connecting only, so big videos can stream at any speed. */
+/**
+ * Download a media file into memory. The timeout covers connecting only, so big videos can stream at
+ * any speed. Media URLs can come from the user (MCP / API), so the real fetch is swapped for
+ * safeFetch (no internal hosts, pinned DNS, redirects re-checked); injected test fetches run as is.
+ */
 export async function downloadMedia(
   url: string,
-  fetchImpl: Fetch = fetch,
+  fetchImpl: Fetch = safeFetch,
   maxBytes = 1024 * 1024 * 1024,
 ): Promise<{ ok: true; bytes: Buffer; contentType: string } | { ok: false; error: string }> {
+  const get = fetchImpl === globalThis.fetch ? safeFetch : fetchImpl;
   const connect = new AbortController();
   const timer = setTimeout(() => connect.abort(), DOWNLOAD_CONNECT_TIMEOUT_MS);
   let res: Response;
   try {
-    res = await fetchImpl(url, { signal: connect.signal, cache: "no-store" });
+    res = await get(url, { signal: connect.signal, cache: "no-store" });
   } catch (err) {
     return { ok: false, error: `Could not download the media file: ${err instanceof Error ? err.message : String(err)}` };
   } finally {

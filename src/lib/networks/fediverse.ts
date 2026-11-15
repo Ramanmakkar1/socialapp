@@ -2,6 +2,7 @@
 // Misskey (and forks such as Sharkey / Firefish that keep its API), Pixelfed (Mastodon-compatible
 // API, so publishing reuses publishToMastodon) and PeerTube (OAuth password grant against the
 // server's own local client; the password is used once and never stored).
+import { safeFetch } from "@/lib/netGuard";
 import { NetworkAuthError, obj, redact, str, tokenSetFrom, type Fetch, type NetAccount, type PublishInput, type PublishOutcome, type TokenSet } from "@/lib/networks/common";
 import { blobOf, call, downloadAll, failed, hostOf, normalizeBaseUrl } from "@/lib/networks/http";
 import { fetchInstanceLimits, publishToMastodon, verifyMastodonCredentials } from "@/lib/networks/mastodon";
@@ -20,7 +21,7 @@ function serverBase(input: string, label: string): string {
 
 // ---- Misskey --------------------------------------------------------------------------------------
 
-export async function connectMisskey(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectMisskey(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const base = serverBase(f.instance, "Misskey");
   const token = f.token.trim();
   const r = await call(`${base}/api/i`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ i: token }) }, fetchImpl, 15_000);
@@ -38,7 +39,7 @@ export async function connectMisskey(f: Fields, fetchImpl: Fetch = fetch): Promi
 }
 
 export async function publishToMisskey(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const token = input.account.accessToken;
   const base = str(input.account.meta.base);
   if (!base) return { ok: false, error: "This Misskey account has no server stored. Reconnect it in Settings.", tokenDead: true };
@@ -74,7 +75,7 @@ export async function publishToMisskey(input: PublishInput): Promise<PublishOutc
 
 // ---- Pixelfed (Mastodon-compatible API) -----------------------------------------------------------
 
-export async function connectPixelfed(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectPixelfed(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const instance = hostOf(serverBase(f.instance, "Pixelfed"));
   const token = f.token.trim();
   let profile;
@@ -102,7 +103,7 @@ export async function publishToPixelfed(input: PublishInput): Promise<PublishOut
 
 // ---- PeerTube -------------------------------------------------------------------------------------
 
-export async function connectPeerTube(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectPeerTube(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const base = serverBase(f.instance, "PeerTube");
   const username = f.username.trim();
   const password = f.password ?? "";
@@ -133,7 +134,7 @@ export async function connectPeerTube(f: Fields, fetchImpl: Fetch = fetch): Prom
 }
 
 /** grant_type=refresh_token with the server's local client. */
-export async function refreshPeerTube(account: NetAccount, fetchImpl: Fetch = fetch): Promise<TokenSet> {
+export async function refreshPeerTube(account: NetAccount, fetchImpl: Fetch = safeFetch): Promise<TokenSet> {
   const base = str(account.meta.base);
   const clientId = str(account.meta.clientId);
   const clientSecret = account.secret.clientSecret ?? "";
@@ -151,7 +152,7 @@ export function peertubeTitle(text: string): string {
 }
 
 export async function publishToPeerTube(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const token = input.account.accessToken;
   const base = str(input.account.meta.base);
   const channelId = str(input.account.meta.channelId);

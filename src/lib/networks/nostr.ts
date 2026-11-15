@@ -11,6 +11,7 @@ import { createCipheriv, createHash, createHmac, randomBytes, timingSafeEqual } 
 import { schnorr, secp256k1 } from "@noble/curves/secp256k1.js";
 import { NetworkAuthError, obj, str, type PublishInput, type PublishOutcome } from "@/lib/networks/common";
 import { normalizeBaseUrl } from "@/lib/networks/http";
+import { assertPublicUrl } from "@/lib/netGuard";
 import type { SaveAccountInput } from "@/lib/networks/store";
 
 export const NOSTR_DEFAULT_RELAYS = ["wss://relay.damus.io", "wss://nos.lol", "wss://relay.primal.net", "wss://relay.nostr.band"];
@@ -184,8 +185,12 @@ export type WsLike = {
   close(): void;
   addEventListener(type: "open" | "message" | "error" | "close", listener: (ev: { data?: unknown }) => void): void;
 };
-export type WsFactory = (url: string) => WsLike;
-const defaultWs: WsFactory = (url) => new WebSocket(url) as unknown as WsLike;
+export type WsFactory = (url: string) => WsLike | Promise<WsLike>;
+/** Checks the relay's DNS (no internal addresses) right before connecting; see src/lib/netGuard.ts. */
+const defaultWs: WsFactory = async (url) => {
+  await assertPublicUrl(url);
+  return new WebSocket(url) as unknown as WsLike;
+};
 
 /** "wss://relay.example.com" only: public host names, no ports or private names (normalizeBaseUrl rules). */
 export function normalizeRelay(input: string): string | null {
@@ -219,14 +224,13 @@ class Relay {
   }
 
   static open(url: string, wsf: WsFactory, timeoutMs: number): Promise<Relay> {
+    return Promise.resolve()
+      .then(() => wsf(url))
+      .then((ws) => Relay.wire(url, ws, timeoutMs));
+  }
+
+  private static wire(url: string, ws: WsLike, timeoutMs: number): Promise<Relay> {
     return new Promise((resolve, reject) => {
-      let ws: WsLike;
-      try {
-        ws = wsf(url);
-      } catch (err) {
-        reject(err);
-        return;
-      }
       const timer = setTimeout(() => {
         ws.close();
         reject(new Error(`${url}: timeout`));

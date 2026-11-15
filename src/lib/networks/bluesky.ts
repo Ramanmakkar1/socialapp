@@ -1,6 +1,7 @@
 // Server only: Bluesky (AT Protocol) with an app password. No developer app or env vars needed.
 // The handle + app password create a session (accessJwt ~2 h, refreshJwt ~2 months). The app
 // password is stored encrypted (social_accounts.secret_enc) so an expired session can be recreated.
+import { safeFetch } from "@/lib/netGuard";
 import {
   NetworkAuthError,
   downloadMedia,
@@ -105,7 +106,7 @@ export async function createBlueskySession(
   identifier: string,
   appPassword: string,
   service = BLUESKY_DEFAULT_SERVICE,
-  fetchImpl: Fetch = fetch,
+  fetchImpl: Fetch = safeFetch,
 ): Promise<BlueskySession> {
   const r = await xrpc(service, "com.atproto.server.createSession", { body: { identifier, password: appPassword } }, fetchImpl);
   if (!r.ok) {
@@ -125,7 +126,7 @@ export async function createBlueskySession(
 }
 
 /** com.atproto.server.refreshSession (the refresh JWT is the bearer). Throws NetworkAuthError(tokenDead) when expired. */
-export async function refreshBlueskySession(service: string, refreshJwt: string, fetchImpl: Fetch = fetch): Promise<TokenSet> {
+export async function refreshBlueskySession(service: string, refreshJwt: string, fetchImpl: Fetch = safeFetch): Promise<TokenSet> {
   const r = await xrpc(service, "com.atproto.server.refreshSession", { token: refreshJwt }, fetchImpl);
   if (!r.ok) {
     const dead = r.status === 400 || r.status === 401 || r.error === "ExpiredToken" || r.error === "InvalidToken";
@@ -244,7 +245,7 @@ async function fitImage(bytes: Buffer, contentType: string): Promise<{ bytes: Bu
 
 /** Post text + up to 4 images (or a link card) with facets. The account's accessToken is the accessJwt. */
 export async function publishToBluesky(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const token = input.account.accessToken;
   const service = str(input.account.meta.service) || BLUESKY_DEFAULT_SERVICE;
   const did = input.account.externalId;

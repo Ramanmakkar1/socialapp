@@ -2,6 +2,7 @@
 // app review): DEV (dev.to), Hashnode, Ghost, self-hosted WordPress, Discourse and Listmonk. The
 // first line of the caption becomes the title (splitTitle). Images are uploaded to the site, never
 // hot-linked: Poskoo deletes its copy once every target has published.
+import { safeFetch } from "@/lib/netGuard";
 import { createHmac } from "node:crypto";
 import { NetworkAuthError, obj, redact, str, type Fetch, type PublishInput, type PublishOutcome } from "@/lib/networks/common";
 import { blobOf, call, downloadAll, errorText, failed, hostOf, normalizeBaseUrl, textToHtml, type CallResult } from "@/lib/networks/http";
@@ -28,7 +29,7 @@ function loginError(r: CallResult, label: string, ...secrets: string[]): Network
 const DEVTO = "https://dev.to/api";
 const devtoHeaders = (key: string) => ({ "api-key": key, Accept: "application/vnd.forem.api-v1+json" });
 
-export async function connectDevto(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectDevto(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const key = f.token.trim();
   const r = await call(`${DEVTO}/users/me`, { method: "GET", headers: devtoHeaders(key) }, fetchImpl, 15_000);
   if (!r.ok || !str(r.json.id)) throw loginError(r, "DEV", key);
@@ -36,7 +37,7 @@ export async function connectDevto(f: Fields, fetchImpl: Fetch = fetch): Promise
 }
 
 export async function publishToDevto(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const key = input.account.accessToken;
   if (input.media.length > 0) return { ok: false, error: "DEV posts from Poskoo are text (Markdown) only. Remove the media or untick DEV." };
   const { title, body } = splitTitle(input.text, 128);
@@ -64,7 +65,7 @@ async function gql(token: string, query: string, variables: Record<string, unkno
   return { ...r, json: obj(r.json.data) };
 }
 
-export async function connectHashnode(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectHashnode(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const token = f.token.trim();
   const r = await gql(token, "query { me { id username publications(first: 20) { edges { node { id title url } } } } }", {}, fetchImpl);
   const me = r.ok ? obj(r.json.me) : {};
@@ -83,7 +84,7 @@ export async function connectHashnode(f: Fields, fetchImpl: Fetch = fetch): Prom
 }
 
 export async function publishToHashnode(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const token = input.account.accessToken;
   if (input.media.length > 0) return { ok: false, error: "Hashnode posts from Poskoo are text (Markdown) only. Remove the media or untick Hashnode." };
   const { title, body } = splitTitle(input.text);
@@ -113,7 +114,7 @@ export function ghostJwt(adminKey: string, nowSec = Math.floor(Date.now() / 1000
 
 const ghostHeaders = (key: string) => ({ Authorization: `Ghost ${ghostJwt(key)}`, "Accept-Version": "v5.0" });
 
-export async function connectGhost(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectGhost(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const base = siteBase(f.instance, "Ghost site");
   const key = f.token.trim();
   const auth = await call(`${base}/ghost/api/admin/posts/?limit=1&fields=id`, { method: "GET", headers: ghostHeaders(key) }, fetchImpl, 15_000);
@@ -124,7 +125,7 @@ export async function connectGhost(f: Fields, fetchImpl: Fetch = fetch): Promise
 }
 
 export async function publishToGhost(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const key = input.account.accessToken;
   const base = str(input.account.meta.base);
   if (!base) return { ok: false, error: "This Ghost site has no address stored. Reconnect it in Settings.", tokenDead: true };
@@ -172,7 +173,7 @@ function wpUrl(base: string, route: string, query = false): string {
   return query ? `${base}/?rest_route=${encodeURIComponent(route)}` : `${base}/wp-json${route}`;
 }
 
-export async function connectWordPress(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectWordPress(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const base = siteBase(f.instance, "WordPress site");
   const user = f.username.trim();
   const pass = f.token.trim();
@@ -213,7 +214,7 @@ export async function publishToWordPress(input: PublishInput): Promise<PublishOu
  * the media library; the first becomes the featured image.
  */
 export async function wpPublish(input: PublishInput, api: (route: string) => string, auth: string, label: string, secret: string): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   if (input.media.some((m) => m.type === "video")) return { ok: false, error: `${label} posts from Poskoo take images only.` };
   const uploaded: { id: number; url: string }[] = [];
   if (input.media.length > 0) {
@@ -249,7 +250,7 @@ export async function wpPublish(input: PublishInput, api: (route: string) => str
 
 const discourseHeaders = (key: string, user: string) => ({ "Api-Key": key, "Api-Username": user });
 
-export async function connectDiscourse(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectDiscourse(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const base = siteBase(f.instance, "forum");
   const key = f.token.trim();
   const user = f.username.trim();
@@ -270,7 +271,7 @@ export async function connectDiscourse(f: Fields, fetchImpl: Fetch = fetch): Pro
 }
 
 export async function publishToDiscourse(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const key = input.account.accessToken;
   const base = str(input.account.meta.base);
   const user = str(input.account.meta.user);
@@ -313,7 +314,7 @@ export function parseListIds(input: string): number[] {
 
 const listmonkHeaders = (user: string, token: string) => ({ Authorization: `token ${user}:${token}`, Accept: "application/json" });
 
-export async function connectListmonk(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectListmonk(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const base = siteBase(f.instance, "Listmonk");
   const user = f.username.trim();
   const token = f.token.trim();
@@ -335,7 +336,7 @@ export async function connectListmonk(f: Fields, fetchImpl: Fetch = fetch): Prom
 }
 
 export async function publishToListmonk(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const token = input.account.accessToken;
   const base = str(input.account.meta.base);
   const user = str(input.account.meta.user);
