@@ -10,6 +10,9 @@ import type { NetworkPanelData } from "./NetworkOptionsPanel";
 import { NETWORK_IDS } from "@/lib/networks/common";
 import { linkedinConfig } from "@/lib/networks/linkedin";
 import ComposerDialog from "./ComposerDialog";
+import CampaignDialog from "./CampaignDialog";
+import { isFeatureReady } from "@/lib/featureReadiness";
+import { ALLOWED_PLATFORMS } from "@/lib/savePost";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
 import IdeasBoard from "./IdeasBoard";
 import type { Idea } from "./IdeaCard";
@@ -434,6 +437,12 @@ export default async function CalendarPage({
   const thisMonth = now.toISOString().slice(0, 7);
   const emptyRange = !rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0;
 
+  // "Campaign from brief": connected channels first; with none connected, every channel (drafts need no connection).
+  const campaignConnected = ALLOWED_PLATFORMS.filter(
+    (p) => Boolean(accountNames[p]) || (p === "facebook" && facebookReady) || (p === "threads" && threadsReady) || (p === "youtube" && youtubeReady),
+  );
+  const campaignChannels = campaignConnected.length > 0 ? campaignConnected : ALLOWED_PLATFORMS.filter((p) => p !== "ig_personal" && p !== "fb_group");
+
   // First channel connected, no posting schedule yet: seed the default one in the browser's zone.
   const seedSchedule = scheduleRowCount === 0 && Object.keys(accountNames).some((p) => (SCHEDULABLE_PLATFORMS as readonly string[]).includes(p));
 
@@ -460,6 +469,7 @@ export default async function CalendarPage({
               <Lightbulb width={16} height={16} aria-hidden="true" /> Ideas
             </Link>
           </nav>
+          <CampaignDialog aiReady={isFeatureReady("ai")} channels={campaignChannels} mediaPlan={mediaPlan} />
           <Link href={`${reloadHref}&compose=1`} scroll={false} className={styles.newPostBtn}>
             <Plus width={18} height={18} aria-hidden="true" /> <span className={styles.newPostText}>New post</span>
           </Link>

@@ -8,7 +8,7 @@ import { rateLimit } from "@/lib/rateLimit";
 export const AI_REQUESTS_PER_MINUTE = 10;
 export const AI_REQUESTS_PER_MONTH = 300;
 
-export type AiKind = "caption_ideas" | "dm_ideas";
+export type AiKind = "caption_ideas" | "dm_ideas" | "caption_variants" | "campaign";
 export type AiQuotaResult = { ok: true } | { ok: false; error: string };
 
 export function aiBurstMessage(retryAfterMs: number): string {
