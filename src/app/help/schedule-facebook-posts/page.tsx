@@ -7,9 +7,9 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "How to Schedule Facebook Page Posts (Step-by-Step Guide)" },
+  title: { absolute: "Schedule Facebook Page Posts in Poskoo: Help Guide" },
   description:
-    `Schedule Facebook Page posts: connect your Page with Meta's official login, write the post, add an image or video link, pick a time and ${BRAND.name} publishes it.`,
+    `Step-by-step help for scheduling Facebook Page posts in ${BRAND.name}: connect your Page with Meta login, add text and media, pick a time and publish.`,
   alternates: { canonical: new URL("/help/schedule-facebook-posts", BRAND.url).toString() },
 });
 
@@ -116,6 +116,7 @@ const howToJsonLd = {
 };
 
 const related = [
+  { href: "/guides/how-to-schedule-facebook-posts", label: "How to schedule Facebook posts in 2026 (full guide)" },
   { href: "/facebook-scheduler", label: "Facebook post scheduler" },
   { href: "/tools/facebook-character-counter", label: "Facebook character counter" },
   { href: "/help/getting-started", label: "Getting started guide" },

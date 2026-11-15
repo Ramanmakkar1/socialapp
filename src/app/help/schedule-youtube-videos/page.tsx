@@ -7,9 +7,9 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "How to Schedule YouTube Videos and Shorts | Poskoo" },
+  title: { absolute: "Schedule YouTube Videos & Shorts in Poskoo: Help Guide" },
   description:
-    "Schedule YouTube videos and Shorts in Poskoo: connect with Google, add your video, title, description and tags, set privacy, then choose a publishing time.",
+    "Step-by-step help for scheduling YouTube videos and Shorts in Poskoo: connect with Google, add the video, title, tags and privacy, then pick a time.",
   alternates: { canonical: new URL("/help/schedule-youtube-videos", BRAND.url).toString() },
 });
 
@@ -145,6 +145,7 @@ const howToJsonLd = {
 };
 
 const related = [
+  { href: "/guides/how-to-schedule-youtube-shorts", label: "How to schedule YouTube Shorts in 2026 (full guide)" },
   { href: "/youtube-scheduler", label: "YouTube scheduler" },
   { href: "/tools/youtube-title-counter", label: "YouTube title and description counter" },
   { href: "/tools/best-time-to-post-on-youtube", label: "Best time to post on YouTube" },

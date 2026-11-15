@@ -7,9 +7,9 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "How to Schedule TikTok Videos (Step-by-Step Guide)" },
+  title: { absolute: "Schedule TikTok Videos in Poskoo: Step-by-Step Help" },
   description:
-    `Schedule TikTok videos in ${BRAND.name}: connect TikTok with its official login, upload a vertical video, choose who can see it, pick a time and it posts for you.`,
+    `Step-by-step help for scheduling TikTok videos in ${BRAND.name}: connect TikTok with its login, upload a vertical video, set privacy, pick a time and publish.`,
   alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.url).toString() },
 });
 
@@ -118,6 +118,7 @@ const howToJsonLd = {
 };
 
 const related = [
+  { href: "/guides/how-to-schedule-tiktok-videos", label: "How to schedule TikTok videos in 2026 (full guide)" },
   { href: "/tiktok-scheduler", label: "TikTok scheduler" },
   { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
   { href: "/tools/instagram-safe-zone-checker", label: "9:16 safe zone checker" },

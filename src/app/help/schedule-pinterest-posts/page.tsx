@@ -7,9 +7,9 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "How to Schedule Pinterest Pins (Step by Step) | Poskoo" },
+  title: { absolute: "Schedule Pinterest Pins in Poskoo: Step-by-Step Help" },
   description:
-    "Schedule Pinterest Pins: connect with Pinterest's official login, pick a board, add a JPG or PNG image, title and link, choose a time and it pins.",
+    "Step-by-step help for scheduling Pinterest Pins in Poskoo: connect Pinterest, pick a board, add an image, title and link, then choose a time.",
   alternates: { canonical: new URL("/help/schedule-pinterest-posts", BRAND.url).toString() },
 });
 
