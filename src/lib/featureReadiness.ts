@@ -118,7 +118,7 @@ export const FEATURE_COPY: Record<FeatureId, { title: string; body: string }> = 
   },
   ai: {
     title: "AI ideas aren't switched on yet",
-    body: "AI caption and DM message ideas aren't switched on yet. You can still write and schedule everything yourself.",
+    body: "AI caption ideas, per-network rewrites, campaign drafts and DM message ideas aren't switched on yet. You can still write and schedule everything yourself.",
   },
   ai_replies: {
     title: "AI DM replies aren't switched on yet",

@@ -10,7 +10,7 @@ import PostPreview from "./PostPreview";
 import { useComposerDialog } from "./ComposerDialog";
 import { COMPOSER_EMOJI, insertAtCursor } from "@/lib/captionInsert";
 import { isReminderNetwork } from "@/lib/networks/reminder";
-import { aiAvailable, suggestCaptions } from "./aiActions";
+import { aiAvailable, suggestCaptions, tailorCaptions } from "./aiActions";
 import type { CaptionIdea } from "@/lib/ai";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { insertHashtags, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
@@ -170,6 +170,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [aiIdeas, setAiIdeas] = useState<CaptionIdea[]>([]);
   const [aiError, setAiError] = useState("");
   const [aiPending, startAiTransition] = useTransition();
+  const [tailorMsg, setTailorMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [tailorPending, startTailorTransition] = useTransition();
   const dialog = useComposerDialog();
   const captionRef = useRef<HTMLTextAreaElement>(null);
   const scheduleInputRef = useRef<HTMLInputElement>(null);
@@ -1502,6 +1504,45 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
 
           {selected.length > 0 && (
             <div>
+              {aiOn && (
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={tailorPending || !mainCaption.trim()}
+                    onClick={() => {
+                      setTailorMsg(null);
+                      startTailorTransition(async () => {
+                        try {
+                          const result = await tailorCaptions({ caption: mainCaption, platforms: selected });
+                          if (!result.ok) {
+                            setTailorMsg({ kind: "err", text: result.error });
+                            return;
+                          }
+                          const tailored = selected.filter((p) => typeof result.variants[p] === "string");
+                          setCustomCaption((c) => ({ ...c, ...result.variants }));
+                          setCustomize((c) => ({ ...c, ...Object.fromEntries(tailored.map((p) => [p, true])) }));
+                          setTailorMsg({
+                            kind: "ok",
+                            text: `Tailored for ${tailored.map((p) => PLATFORMS[p].label).join(", ")}. Edit any of them below; untick “Customize” to go back to the main caption.`,
+                          });
+                        } catch {
+                          setTailorMsg({ kind: "err", text: "AI request failed. Try again." });
+                        }
+                      });
+                    }}
+                    title={mainCaption.trim() ? undefined : "Write the main caption first"}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] px-3 py-1.5 text-sm font-medium text-[var(--poskoo-violet)] disabled:opacity-60"
+                  >
+                    {tailorPending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Sparkles className="h-4 w-4" aria-hidden />}
+                    {tailorPending ? "Tailoring…" : "Tailor per network"}
+                  </button>
+                  {tailorMsg && (
+                    <p className={`text-xs ${tailorMsg.kind === "err" ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-muted)]"}`} aria-live="polite">
+                      {tailorMsg.text}
+                    </p>
+                  )}
+                </div>
+              )}
               <div role="tablist" aria-label="Customize per network" className="flex gap-1 overflow-x-auto border-b border-[var(--poskoo-line)] [scrollbar-width:none]">
                 {selected.map((platform) => {
                   const TabIcon = PLATFORM_ICON[platform];

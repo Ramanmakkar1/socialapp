@@ -71,7 +71,7 @@ const featuresFaqs = (aiReady: boolean) => [
   {
     q: "Does Poskoo include AI captions?",
     a: aiReady
-      ? "Yes. AI caption ideas and DM message ideas are switched on; you edit every idea before anything is scheduled or sent."
+      ? "Yes. AI caption ideas, per-network caption rewrites, campaign drafts from a brief and DM message ideas are switched on. Everything AI writes lands as a suggestion or a draft, and you review it before anything is scheduled or sent."
       : "Not yet. AI caption and DM message ideas aren't switched on yet, but you can still write and schedule everything yourself.",
   },
 ];

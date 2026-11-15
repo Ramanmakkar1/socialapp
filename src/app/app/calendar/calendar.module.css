@@ -1006,3 +1006,19 @@
 .tile_twitch { background: #9146ff; }
 .ico_farcaster { color: #855dcd; }
 .tile_farcaster { background: #855dcd; }
+/* "Campaign from brief" (CampaignDialog.tsx): a quieter sibling of the New post button. */
+.campaignBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 42px;
+  border: 1px solid var(--poskoo-line);
+  border-radius: 12px;
+  background: var(--poskoo-card);
+  padding: 0 1rem;
+  color: var(--poskoo-ink);
+  font-weight: 600;
+  font-size: .92rem;
+}
+.campaignBtn:hover { border-color: var(--poskoo-violet); color: var(--poskoo-violet); }
+@media (max-width: 640px) { .campaignBtn { flex: 1; justify-content: center; } }

@@ -1,8 +1,9 @@
 // Poskoo MCP server: Streamable HTTP (JSON-RPC 2.0) at /api/mcp.
 // AI assistants (Claude, ChatGPT, …) authenticate with a Poskoo API key:
 // Authorization: Bearer poskoo_…
+// A key is draft-only unless its owner ticked "Allow publishing" (src/lib/mcp.ts McpAccess).
 // See the /developers page for setup.
-import { userForApiKey } from "@/lib/apiKeys";
+import { apiKeyAccess } from "@/lib/apiKeys";
 import { callMcpTool, mcpRateLimit, MCP_TOOLS } from "@/lib/mcp";
 import { clientIp } from "@/lib/rateLimit";
 
@@ -41,8 +42,9 @@ export async function POST(req: Request) {
       { status: 429, headers: { "Retry-After": String(retryAfter) } },
     );
   }
-  const userId = await userForApiKey(key);
-  if (!userId) return unauthorized();
+  const access = await apiKeyAccess(key);
+  if (!access) return unauthorized();
+  const { userId } = access;
 
   let body: unknown;
   try {
@@ -69,14 +71,17 @@ export async function POST(req: Request) {
       return rpcResult(request.id, {
         protocolVersion: PROTOCOL_VERSION,
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "poskoo", version: "1.0.0" },
+        serverInfo: { name: "poskoo", version: "1.1.0" },
+        instructions: access.canPublish
+          ? "This key may schedule posts and switch Auto-DMs on. Confirm with the user before scheduling."
+          : "This key is draft-only: posts are saved as drafts and Auto-DMs are created paused. The user approves them in Poskoo.",
       });
     case "tools/list":
       return rpcResult(request.id, { tools: MCP_TOOLS });
     case "tools/call": {
       const name = typeof request.params?.name === "string" ? request.params.name : "";
       const args = (request.params?.arguments ?? {}) as Record<string, unknown>;
-      return rpcResult(request.id, await callMcpTool(name, args, userId));
+      return rpcResult(request.id, await callMcpTool(name, args, userId, { canPublish: access.canPublish }));
     }
     default:
       return rpcError(request.id, -32601, `Method not found: ${request.method}`);

@@ -579,6 +579,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             Connect Claude, ChatGPT or another AI assistant to Poskoo through the MCP server at{" "}
             <code style={code}>{BRAND.url}/api/mcp</code>.
             Create a key, copy it once, and share it with your assistant.
+            By default a key can only create <strong>drafts</strong> (and paused Auto-DMs) that you approve in Poskoo;
+            tick &ldquo;Allow publishing&rdquo; to let the assistant schedule posts and switch Auto-DMs on itself.
           </p>
           {apiKey === "created" && newKey && (
             <p role="status" className={ui.notice}>
@@ -591,6 +593,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           {isDbConfigured() ? (
             <form action={createApiKeyAction} style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               <input name="key_name" maxLength={60} defaultValue="" className={ui.input} placeholder="Name this key, e.g. Claude" aria-label="API key name" style={{ maxWidth: 280 }} />
+              <label className={ui.checkRow} style={{ margin: 0 }}>
+                <input type="checkbox" name="can_publish" /> Allow publishing
+              </label>
               <SubmitButton label="Create API key" pendingLabel="Creating…" size="sm" />
             </form>
           ) : (
@@ -604,6 +609,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                     <span className={styles.username}>{k.name}</span>
                     <code style={code}>{k.key_prefix}…</code>
                     <span className={k.revoked_at ? `${ui.pill} ${ui.pillPeach}` : `${ui.pill} ${ui.pillMint}`}>{k.revoked_at ? "Revoked" : "Active"}</span>
+                    {!k.revoked_at && <span className={ui.pill}>{k.can_publish === false ? "Drafts only" : "Can publish"}</span>}
                   </div>
                   <div className={styles.accountActions}>
                     <span className={ui.hint}>Created {new Date(k.created_at).toLocaleDateString()}</span>
