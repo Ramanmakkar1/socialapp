@@ -7,10 +7,8 @@ import { GUIDES, guidePath } from "@/content/guides/registry";
 // Evaluate indexability per request so a build never freezes the staging noindex.
 export const dynamic = "force-dynamic";
 
-// Only indexable paths can become sitemap candidates. This uses the same
-// isPathIndexable helper as the root layout robots meta, so a noindex page can
-// never leak into the sitemap. If BRAND.indexable is set to false this is empty,
-// including for the home page on every host alias.
+// Only indexable paths are listed; while the staging noindex flag is on the
+// sitemap is empty, so a noindex page can never be listed.
 function getSitemapPaths(): PublicPath[] {
   return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
 }
