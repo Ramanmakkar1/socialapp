@@ -100,6 +100,9 @@ export function SiteFooter() {
         title="Product"
         links={[
           { href: "/features", label: "All features" },
+          { href: "/ai-social-media-manager", label: "AI social media manager" },
+          { href: "/social-media-inbox", label: "Social media inbox" },
+          { href: "/social-media-analytics", label: "Social media analytics" },
           { href: "/instagram-auto-dm", label: "Instagram auto DM" },
           { href: "/instagram-dm-automation", label: "Instagram DM automation" },
           { href: "/instagram-auto-dm/templates", label: "Auto-DM templates" },
@@ -133,6 +136,7 @@ export function SiteFooter() {
           { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
           { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
           { href: "/google-business-profile-scheduler", label: "Google Business Profile scheduler" },
+          { href: "/social-media-scheduler-for-agencies", label: "Scheduler for agencies" },
           { href: "/social-media-scheduler-comparison", label: "Social media scheduler comparison" },
         ]}
       />
