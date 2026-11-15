@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, AtSign, Bell, CalendarClock, ChevronDown, Facebook, Hash, Info, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Bell, CalendarClock, ChevronDown, Facebook, Hash, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
 import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, nextAvailableSlots, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import PostPreview from "./PostPreview";
@@ -12,6 +12,7 @@ import { COMPOSER_EMOJI, insertAtCursor } from "@/lib/captionInsert";
 import { isReminderNetwork } from "@/lib/networks/reminder";
 import { aiAvailable, suggestCaptions, tailorCaptions } from "./aiActions";
 import type { CaptionIdea } from "@/lib/ai";
+import AiOffNote from "@/components/AiOffNote";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { insertHashtags, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
 import { parseTags } from "@/lib/tagFilter";
@@ -164,6 +165,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [isPending, startTransition] = useTransition();
   const [extrasPending, startExtrasTransition] = useTransition();
   const [aiOn, setAiOn] = useState<boolean | null>(null);
+  const [aiAdmin, setAiAdmin] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
   const [aiTone, setAiTone] = useState("friendly");
@@ -255,8 +257,10 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   useEffect(() => {
     let active = true;
     aiAvailable()
-      .then((available) => {
-        if (active) setAiOn(available);
+      .then((ai) => {
+        if (!active) return;
+        setAiOn(ai.ready);
+        setAiAdmin(ai.isAdmin);
       })
       .catch(() => {
         if (active) setAiOn(false);
@@ -971,11 +975,23 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
           </div>
           <div>
             {aiOn === false ? (
-              <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[var(--poskoo-band)] px-2.5 py-1.5 text-xs text-[var(--poskoo-muted)]">
-                <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                AI caption ideas aren&apos;t switched on in this workspace yet. Write your caption here, or get ideas from our free{" "}
-                <Link href="/tools/instagram-caption-generator" target="_blank" rel="noopener" className="underline font-medium text-[var(--poskoo-violet)]">caption generator</Link>.
-              </p>
+              <>
+                <button
+                  type="button"
+                  disabled
+                  aria-describedby={`${aiTopicId}-off`}
+                  className="mt-2 inline-flex cursor-not-allowed items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)] opacity-60"
+                >
+                  <Sparkles className="h-4 w-4" aria-hidden />
+                  Write with AI
+                </button>
+                <span id={`${aiTopicId}-off`}>
+                  <AiOffNote isAdmin={aiAdmin}>
+                    AI caption ideas will appear here. For now, write your caption yourself or get ideas from our free{" "}
+                    <Link href="/tools/instagram-caption-generator" target="_blank" rel="noopener" className="underline font-medium text-[var(--poskoo-violet)]">caption generator</Link>.
+                  </AiOffNote>
+                </span>
+              </>
             ) : (
               <button
                 type="button"
@@ -1504,6 +1520,18 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
 
           {selected.length > 0 && (
             <div>
+              {aiOn === false && (
+                <div className="mb-2">
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] px-3 py-1.5 text-sm font-medium text-[var(--poskoo-violet)] opacity-60"
+                  >
+                    <Sparkles className="h-4 w-4" aria-hidden /> Tailor per network
+                  </button>
+                  <AiOffNote isAdmin={aiAdmin}>“Tailor per network” rewrites your caption for each network. Until then, tick “Customize” on a network tab to edit it by hand.</AiOffNote>
+                </div>
+              )}
               {aiOn && (
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <button

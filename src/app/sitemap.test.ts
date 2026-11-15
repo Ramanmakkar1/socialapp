@@ -34,6 +34,24 @@ function whileNoindex(fn: () => void) {
   }
 }
 
+// Runs fn with the given env values, restoring the previous values after.
+function withEnv(values: Record<string, string | undefined>, fn: () => void) {
+  const previous = new Map<string, string | undefined>();
+  for (const [key, value] of Object.entries(values)) {
+    previous.set(key, process.env[key]);
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+  try {
+    fn();
+  } finally {
+    for (const [key, value] of previous) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+}
+
 test("sitemap stays empty while staging is noindex", () => {
   whileNoindex(() => assert.deepEqual(sitemap(), []));
 });
@@ -117,6 +135,29 @@ test("staging: sitemap omits the home page and robots omits the sitemap", () => 
   assert.equal(BRAND.indexable, false);
   assert.deepEqual(sitemap(), [], "noindex staging must list no URLs at all");
   assert.equal("sitemap" in robots(), false);
+});
+
+test("runtime env: poskoo.com is listed and socialapp.splitforms.com returns an empty sitemap", () => {
+  const wasUrl = BRAND.url;
+  try {
+    BRAND.url = "https://poskoo.com";
+    withEnv(
+      { NEXT_PUBLIC_SITE_INDEXABLE: "true", NEXT_PUBLIC_SITE_URL: "https://poskoo.com" },
+      () => {
+        assert.ok(sitemap().length > 0, "poskoo.com must list its indexable pages");
+        assert.equal("sitemap" in robots(), true, "poskoo.com robots.txt must point to the sitemap");
+      },
+    );
+    withEnv(
+      { NEXT_PUBLIC_SITE_INDEXABLE: "true", NEXT_PUBLIC_SITE_URL: "https://socialapp.splitforms.com" },
+      () => {
+        assert.deepEqual(sitemap(), [], "the noindex staging host must return zero URLs");
+        assert.equal("sitemap" in robots(), false, "the noindex staging host must omit the sitemap directive");
+      },
+    );
+  } finally {
+    BRAND.url = wasUrl;
+  }
 });
 
 test("llms.txt uses the same isPathIndexable helper as the sitemap", () => {

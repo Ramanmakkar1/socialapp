@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BRAND } from "@/lib/brand";
-import { isPathIndexable } from "@/lib/indexability";
+import { isSiteIndexable } from "@/lib/indexability";
 
 // Evaluate indexability per request so a build never freezes the staging noindex.
 export const dynamic = "force-dynamic";
@@ -36,6 +36,6 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "*", allow: "/", disallow: ROBOTS_DISALLOW },
       { userAgent: AI_AND_SEARCH_BOTS, allow: "/", disallow: ROBOTS_DISALLOW },
     ],
-    ...(isPathIndexable("/") ? { sitemap: `${BRAND.url}/sitemap.xml` } : {}),
+    ...(isSiteIndexable() ? { sitemap: `${BRAND.url}/sitemap.xml` } : {}),
   };
 }

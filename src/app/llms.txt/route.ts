@@ -8,6 +8,7 @@ import {
 } from "@/lib/public-pages";
 import { getPlatformCopy, listText } from "@/lib/platform-support";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
+import { runtimeEnv } from "@/lib/featureReadinessNow";
 import { PLANS } from "@/lib/plans";
 
 const isNoindex = (path: string) => !isPathIndexable(path);
@@ -50,9 +51,10 @@ export async function GET() {
   const soon = [...platforms.soon, "WhatsApp", "Messenger"];
   const list = listText;
 
-  const { paidPlans, ai } = planReadiness();
-  const cardPayments = featureReadiness("card_payments", process.env).ready;
-  const aiReplies = featureReadiness("ai_replies", process.env).ready;
+  const env = await runtimeEnv();
+  const { paidPlans, ai } = planReadiness(env);
+  const cardPayments = featureReadiness("card_payments", env).ready;
+  const aiReplies = featureReadiness("ai_replies", env).ready;
   const planLines = PLANS.map((p) => {
     const highlights = p.items.slice(0, 3).map((i) => i.text).join(", ");
     const price = p.price === "$0" ? "free forever" : `${p.price} USD ${p.per.replace("/ ", "per ")}${p.yearly ? ` (${p.yearly})` : ""}`;

@@ -7,6 +7,7 @@ import { getPlatformCopy, listText, LIVE_PLATFORMS_TEXT } from "@/lib/platform-s
 import { ASSISTANT_TOOLS } from "@/lib/aiAssistantGuides";
 import { PLANS } from "@/lib/plans";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -23,6 +24,10 @@ const title = `Influence.so Alternative with a Free Plan | ${BRAND.name}`;
 const description =
   "Compare Poskoo and influence.so: a free-forever plan, unlimited posts from $17/mo, Instagram comment-to-DM and lead capture, and where influence.so leads.";
 
+// The "AI writing help" row follows the runtime AI key (env or stored in Admin → Settings):
+// regenerate in the background at most every 10 minutes.
+export const revalidate = 600;
+
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
@@ -38,7 +43,7 @@ const free = plan("Free");
 const pro = plan("Pro");
 const agency = plan("Agency");
 
-const { paidPlans, ai } = planReadiness();
+const { paidPlans } = planReadiness();
 const cardPayments = featureReadiness("card_payments", process.env).ready;
 const paidNote = paidPlans ? "" : " (launching soon)";
 const platforms = getPlatformCopy();
@@ -49,6 +54,7 @@ const whyLook = [
   { no: "03 / Conversations", title: "Turn comments into DMs and leads", text: `${BRAND.name} sends an Instagram DM to everyone who comments a keyword, can ask for an email first, and exports the leads. We did not find these features on influence.so.` },
 ];
 
+const AI_ROW = "AI writing help";
 const compare: [string, string, string][] = [
   ["Free plan", `Yes: ${free.items[0].text}, ${free.items[1].text}`, "No free plan; 7-day trial"],
   ["Unlimited posts", `Pro, ${pro.price}/month${paidNote}`, "Pro plan (about CA$98/month)"],
@@ -58,7 +64,7 @@ const compare: [string, string, string][] = [
   ["Sell a digital product from a DM", cardPayments ? "Yes (card checkout, or Direct UPI in India)" : "Direct UPI in India today; card checkout launching soon", "Not listed"],
   ["Link-in-bio page", "Yes", "Not listed"],
   ["Instagram Stories scheduling", "Yes", "Not listed"],
-  ["AI writing help", ai ? "AI caption and DM message ideas" : "Built, launching soon", "Yes, AI credits on every plan"],
+  [AI_ROW, "Built, launching soon", "Yes, AI credits on every plan"],
   ["Campaigns with a version per channel", "No", "Yes"],
   ["Hosted MCP server for AI assistants", `Yes (${ASSISTANT_TOOLS.length} tools, API key)`, "Yes"],
   ["Short links", "Tracked links in DMs", "Branded links and QR codes"],
@@ -96,7 +102,9 @@ function Cell({ v }: { v: string }) {
   return <span>{v}</span>;
 }
 
-export default function InfluenceAlternative() {
+export default async function InfluenceAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string] => (row[0] === AI_ROW && ai ? [row[0], "AI caption and DM message ideas, campaigns from a brief", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Social media scheduler comparison", path: "/social-media-scheduler-comparison" }, { name: "Influence.so alternative", path: PATH }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
@@ -157,7 +165,7 @@ export default function InfluenceAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, theirs]) => (
+                {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>

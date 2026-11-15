@@ -10,6 +10,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { softwareOffers } from "@/lib/plans";
 import { canonicalUrl } from "@/lib/canonical";
 import { LIVE_PLATFORM_COUNT_TEXT, LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
@@ -150,9 +151,9 @@ const jsonLd = (aiReady: boolean) => ({
   ],
 });
 
-export default function FeaturesPage() {
+export default async function FeaturesPage() {
   const cardPaymentsReady = featureReadiness("card_payments", process.env).ready;
-  const aiReady = featureReadiness("ai", process.env).ready;
+  const aiReady = await isFeatureReadyNow("ai");
   const faqs = featuresFaqs(aiReady);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Features", path: "/features" }]}>

@@ -1,6 +1,6 @@
 "use server";
 
-import { isFeatureReady } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { deleteAccountData, disconnectAccounts } from "@/lib/accountData";
@@ -103,7 +103,7 @@ export async function saveAiReplySettings(formData: FormData): Promise<void> {
   const rawId = formData.get("account_id");
   const accountId = typeof rawId === "string" ? rawId.trim().slice(0, 64) : "";
   // AI replies on hold (src/lib/featureReadiness.ts): instructions save, the switch stays off.
-  const enabled = isFeatureReady("ai_replies") && formData.get("ai_reply_enabled") === "on";
+  const enabled = (await isFeatureReadyNow("ai_replies")) && formData.get("ai_reply_enabled") === "on";
   const rawInstructions = formData.get("ai_reply_instructions");
   const instructions = typeof rawInstructions === "string" ? rawInstructions.trim().slice(0, 1500) : "";
   const rawLink = formData.get("ai_booking_link");

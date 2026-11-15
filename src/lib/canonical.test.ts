@@ -18,6 +18,18 @@ test("canonical drops query strings and fragments", () => {
   assert.equal(canonicalUrl("/pricing/?a=1#b"), "https://poskoo.com/pricing");
 });
 
+test("canonical is pinned to the approved origin, not a NEXT_PUBLIC_SITE_URL override", () => {
+  const source = readFileSync("src/lib/canonical.ts", "utf8");
+  assert.ok(
+    source.includes('import { APPROVED_PRODUCTION_URL } from "./brand";'),
+    "canonical must pin the approved production origin",
+  );
+  assert.ok(
+    !source.includes("BRAND.canonicalUrl"),
+    "canonical must not follow a staging/env URL override",
+  );
+});
+
 test("canonical stays on poskoo.com and never the staging host", () => {
   for (const path of ["/", "/pricing", "/instagram-scheduler"]) {
     const url = canonicalUrl(path);

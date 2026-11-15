@@ -10,7 +10,7 @@ import { generateCampaignDrafts, type CampaignPostDraft } from "@/lib/ai";
 import { consumeAiRequest } from "@/lib/aiQuota";
 import { topHours } from "@/lib/bestTime";
 import { fitCaption, isKnownPlatform } from "@/lib/captionFit";
-import { isFeatureReady } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { cleanMediaUrls } from "@/lib/ideas";
 import { checkCaption, type PlatformId } from "@/lib/platforms";
 import { nextSlot, type ChannelSchedule } from "@/lib/postingSchedule";
@@ -277,7 +277,7 @@ export async function createCampaignForUser(userId: string, input: CampaignBrief
   const parsed = parseCampaignBrief(input);
   if (!parsed.ok) return parsed;
   const brief = parsed.brief;
-  if (!isFeatureReady("ai")) return { ok: false, error: AI_OFF_MESSAGE, aiOff: true };
+  if (!(await isFeatureReadyNow("ai"))) return { ok: false, error: AI_OFF_MESSAGE, aiOff: true };
 
   const quota = await consumeAiRequest(userId, "campaign");
   if (!quota.ok) return { ok: false, error: quota.error };

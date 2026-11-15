@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { resolveSiteIndexable } from "@/lib/brand";
+import { isSiteIndexable } from "@/lib/indexability";
 
 function withEnv(values: Record<string, string | undefined>, fn: () => void) {
   const previous = new Map<string, string | undefined>();
@@ -56,4 +57,15 @@ test("approved production URL without the flag stays noindex", () => {
 test("BRAND.indexable is driven by resolveSiteIndexable", () => {
   const source = readFileSync("src/lib/brand.ts", "utf8");
   assert.ok(source.includes("indexable: resolveSiteIndexable()"), "BRAND.indexable must use the env-driven resolver");
+});
+
+test("runtime indexability re-resolves the env for both audited hosts", () => {
+  withEnv(
+    { NEXT_PUBLIC_SITE_INDEXABLE: "true", NEXT_PUBLIC_SITE_URL: "https://poskoo.com" },
+    () => assert.equal(isSiteIndexable(), true, "poskoo.com must be indexable at runtime"),
+  );
+  withEnv(
+    { NEXT_PUBLIC_SITE_INDEXABLE: "true", NEXT_PUBLIC_SITE_URL: "https://socialapp.splitforms.com" },
+    () => assert.equal(isSiteIndexable(), false, "the staging host must stay noindex at runtime"),
+  );
 });

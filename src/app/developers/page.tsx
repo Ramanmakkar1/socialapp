@@ -6,7 +6,7 @@ import { ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
-import { isFeatureReady } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 
 const description =
   "Connect Claude, ChatGPT and other AI assistants to Poskoo with the MCP server at /api/mcp. Draft and schedule posts, manage Auto-DMs and read analytics.";
@@ -89,8 +89,8 @@ const collectionJsonLd = {
   description,
 };
 
-export default function DevelopersPage() {
-  const aiReady = isFeatureReady("ai");
+export default async function DevelopersPage() {
+  const aiReady = await isFeatureReadyNow("ai");
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Developers", path: "/developers" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }} />

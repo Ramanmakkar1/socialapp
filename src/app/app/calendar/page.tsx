@@ -11,7 +11,8 @@ import { NETWORK_IDS } from "@/lib/networks/common";
 import { linkedinConfig } from "@/lib/networks/linkedin";
 import ComposerDialog from "./ComposerDialog";
 import CampaignDialog from "./CampaignDialog";
-import { isFeatureReady } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { isAdmin } from "@/lib/admin";
 import { ALLOWED_PLATFORMS } from "@/lib/savePost";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
 import IdeasBoard from "./IdeasBoard";
@@ -20,7 +21,7 @@ import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
 import WeekView from "./WeekView";
-import { requireUser } from "@/lib/auth";
+import { getCurrentUser, requireUser } from "@/lib/auth";
 import { planForUser, scheduledPostsUsage } from "@/lib/planLimits";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
@@ -134,9 +135,9 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string; channel?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string; channel?: string; campaign?: string }>;
 }) {
-  const { week, view: viewParam, month, status, draft, idea, tag = "", channel = "" } = await searchParams;
+  const { week, view: viewParam, month, status, draft, idea, tag = "", channel = "", campaign } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
   const view: "week" | "month" | "list" | "ideas" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : viewParam === "ideas" ? "ideas" : "week";
   const weekStart = parseWeekParam(week);
@@ -412,6 +413,8 @@ export default async function CalendarPage({
       (!statusFilter || post.status === statusFilter),
   );
   const calendarPosts = filteredWeekRows.map(toCalendarPost);
+  // AI on (env or stored key, src/lib/featureReadinessNow.ts)? Admins get a link to switch it on.
+  const [aiReady, viewer] = await Promise.all([isFeatureReadyNow("ai"), getCurrentUser()]);
   // Channels the user can filter by: every connected channel (YouTube lives in its own table) plus any on loaded posts.
   const connectedChannels = [...new Set([...Object.keys(previewAccountNames), ...(youtubeReady ? ["youtube"] : [])])];
   const channelOptions = [...new Set([...connectedChannels, ...weekRows.flatMap((p) => p.platforms)])].sort();
@@ -470,7 +473,7 @@ export default async function CalendarPage({
               <Lightbulb width={16} height={16} aria-hidden="true" /> Ideas
             </Link>
           </nav>
-          <CampaignDialog aiReady={isFeatureReady("ai")} channels={campaignChannels} mediaPlan={mediaPlan} />
+          <CampaignDialog aiReady={aiReady} aiAdmin={isAdmin(viewer)} autoOpen={campaign === "1"} channels={campaignChannels} mediaPlan={mediaPlan} />
           <Link href={`${reloadHref}&compose=1`} scroll={false} className={styles.newPostBtn}>
             <Plus width={18} height={18} aria-hidden="true" /> <span className={styles.newPostText}>New post</span>
           </Link>

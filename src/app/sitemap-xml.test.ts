@@ -23,9 +23,40 @@ test("sitemap.xml route has no <url> entries while BRAND.indexable is false", as
   const was = BRAND.indexable;
   BRAND.indexable = false;
   try {
-    const body = await (await GET()).text();
+    const res = await GET();
+    const body = await res.text();
     assert.doesNotMatch(body, /<url>/, "noindex staging must stay empty");
+    assert.match(
+      body,
+      /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">\s*<\/urlset>/,
+      "noindex staging must serve an empty <urlset>",
+    );
+    assert.equal(res.headers.get("cache-control"), "no-store");
+    assert.equal(res.headers.get("x-robots-tag"), "noindex, nofollow");
   } finally {
+    BRAND.indexable = was;
+  }
+});
+
+test("sitemap.xml route never lists the audited noindex home URLs", async () => {
+  const wasUrl = BRAND.url;
+  const was = BRAND.indexable;
+  try {
+    // Both audited home URLs are noindex: poskoo.com while staging, and the
+    // legacy host always. Neither may appear in the served sitemap.
+    BRAND.indexable = false;
+    for (const url of ["https://poskoo.com", "https://socialapp.splitforms.com"]) {
+      BRAND.url = url;
+      const body = await (await GET()).text();
+      assert.doesNotMatch(body, /<url>/, `${url}/ is noindex and must not be listed`);
+    }
+    // The legacy host stays out even if the indexability flag is forced on.
+    BRAND.indexable = true;
+    BRAND.url = "https://socialapp.splitforms.com";
+    const legacyBody = await (await GET()).text();
+    assert.doesNotMatch(legacyBody, /<url>/, "the legacy noindex host must never be listed");
+  } finally {
+    BRAND.url = wasUrl;
     BRAND.indexable = was;
   }
 });

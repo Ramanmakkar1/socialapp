@@ -50,6 +50,13 @@ const on = (env: Env, name: string) => ["1", "true", "yes", "on"].includes((env[
 type Check = { label: string; ok: (env: Env) => boolean };
 const set = (name: string): Check => ({ label: name, ok: (env) => has(env, name) });
 const flag = (name: string): Check => ({ label: `${name}=1`, ok: (env) => on(env, name) });
+// The Anthropic key can be an env var or a key an admin saved in /admin/settings (src/lib/aiKey.ts).
+// The stored key is not in process.env: server code passes runtimeEnv() (src/lib/featureReadinessNow.ts),
+// which adds ANTHROPIC_API_KEY_STORED=1 when one exists.
+const anthropicKey: Check = {
+  label: "ANTHROPIC_API_KEY (or a key saved in Admin → Settings)",
+  ok: (env) => has(env, "ANTHROPIC_API_KEY") || on(env, "ANTHROPIC_API_KEY_STORED"),
+};
 const liveStripe: Check = { label: "STRIPE_SECRET_KEY must be a live key (sk_live_ / rk_live_)", ok: (env) => stripeMode(env.STRIPE_SECRET_KEY) === "live" };
 
 export const FEATURE_RULES: Record<FeatureId, { hard: Check[]; launch: Check[] }> = {
@@ -68,9 +75,9 @@ export const FEATURE_RULES: Record<FeatureId, { hard: Check[]; launch: Check[] }
   // Transactional e-mail (src/lib/email.ts): without SMTP nothing is delivered (only logged).
   email: { hard: [set("SMTP_HOST")], launch: [] },
   // AI caption / DM message ideas (src/lib/ai.ts).
-  ai: { hard: [set("ANTHROPIC_API_KEY")], launch: [] },
+  ai: { hard: [anthropicKey], launch: [] },
   // AI replies to incoming DMs (src/lib/aiReplyQueue.ts): on hold until the owner switches them on.
-  ai_replies: { hard: [set("ANTHROPIC_API_KEY")], launch: [flag("AI_REPLIES_ENABLED")] },
+  ai_replies: { hard: [anthropicKey], launch: [flag("AI_REPLIES_ENABLED")] },
 };
 
 function listed(env: Env, name: string, id: FeatureId): boolean {
@@ -96,7 +103,10 @@ export function allFeatureReadiness(env: Env): Record<FeatureId, FeatureReadines
   return out;
 }
 
-/** Server-side shortcut: is this feature switched on for real users right now? */
+/**
+ * Server-side shortcut from env vars only. For "ai" / "ai_replies" use isFeatureReadyNow()
+ * (src/lib/featureReadinessNow.ts), which also sees a key saved in the admin settings.
+ */
 export function isFeatureReady(id: FeatureId, env: Env = process.env): boolean {
   return featureReadiness(id, env).ready;
 }
@@ -143,7 +153,7 @@ export function reminderChannelStatus(name: string, env: Env): ChannelStatus {
   };
 }
 
-/** What the public pricing cards need (src/lib/plans.ts plansFor). */
+/** What the public pricing cards need (src/lib/plans.ts plansFor). Pages use planReadinessNow(). */
 export function planReadiness(env: Env = process.env): { paidPlans: boolean; ai: boolean } {
   return { paidPlans: featureReadiness("billing", env).ready, ai: featureReadiness("ai", env).ready };
 }

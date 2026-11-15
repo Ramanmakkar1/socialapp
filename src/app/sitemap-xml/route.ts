@@ -5,6 +5,7 @@
 // browsers show a "This site uses XSLT" warning and render a purple HTML page for
 // a URL that crawlers expect to be plain XML. next.config rewrites /sitemap.xml here.
 import sitemap from "@/app/sitemap";
+import { BRAND } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -46,9 +47,16 @@ export async function GET() {
 ${urls}${urls ? "\n" : ""}</urlset>
 `;
 
-  return new Response(body, {
-    headers: {
-      "content-type": "application/xml; charset=utf-8",
-    },
-  });
+  const headers: Record<string, string> = {
+    "content-type": "application/xml; charset=utf-8",
+    // Never let a CDN or browser serve a cached sitemap: the staging noindex
+    // must take effect immediately and an empty index must not be cached.
+    "cache-control": "no-store",
+  };
+  // While staging is noindex, tell crawlers not to index the XML itself.
+  if (!BRAND.indexable) {
+    headers["x-robots-tag"] = "noindex, nofollow";
+  }
+
+  return new Response(body, { headers });
 }

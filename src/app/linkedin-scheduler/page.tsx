@@ -14,8 +14,8 @@ import { AnimArt } from "@/components/AnimArt";
 export const revalidate = 600;
 
 const PATH = "/linkedin-scheduler";
-const title = "LinkedIn Scheduler: Plan and Auto-Publish LinkedIn Posts";
-const description = `Free LinkedIn scheduler: plan text and image posts on one calendar and auto-publish through LinkedIn's official API. Start with Poskoo's $0 plan.`;
+const title = "LinkedIn Scheduler: Plan and Auto-Publish Posts on Time";
+const description = `Schedule LinkedIn posts in advance and let Poskoo auto-publish them on time through the official API, with retries on failures. Start free on the $0 plan.`;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
@@ -108,6 +108,8 @@ const appJsonLd = {
     description,
     url: `${BRAND.canonicalUrl}${PATH}`,
   }),
+  applicationSubCategory: "Social media scheduling",
+  inLanguage: "en",
   featureList: [
     "LinkedIn text post scheduling",
     "Up to 20 images per post",
@@ -146,7 +148,7 @@ export default function LinkedInSchedulerPage() {
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <Link className="btn btn-line" href="/app/calendar">Open the calendar</Link>
+          <Link className="btn btn-line" href="/signup">Open the calendar</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
         </div>
@@ -158,6 +160,11 @@ export default function LinkedInSchedulerPage() {
           <div className="head">
             <p className="eyebrow">LinkedIn scheduling features</p>
             <h2>What you can <em className="s">schedule on LinkedIn.</em></h2>
+            <p className="lede">
+              A LinkedIn scheduler is a tool that saves your posts and publishes them to LinkedIn at the date and time
+              you choose, so you do not have to be online. Poskoo does this through LinkedIn&apos;s official API, on the
+              same calendar as Instagram, Facebook and Threads.
+            </p>
           </div>
           <div className="cards">
             {features.map((feature) => (

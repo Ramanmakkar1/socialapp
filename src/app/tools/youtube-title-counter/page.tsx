@@ -15,17 +15,17 @@ const config: ToolPageConfig = {
   path: "/tools/youtube-title-counter",
   name: "YouTube title and description character counter",
   crumb: "YouTube title counter",
-  title: "YouTube Title Counter: 100-Character Limit Checker | Poskoo",
-  description: "Check YouTube title, description and tag limits in your browser. See search previews, trim over-limit text and prepare video details before publishing.",
+  title: "YouTube Title Counter: Check 100-Character Limits | Poskoo",
+  description: "Paste your YouTube title, description or tags to see live character counts, search previews and over-limit warnings before you publish your video.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "YouTube title & description counter", after: "with real limits" },
-  lede: "YouTube titles can be up to 100 characters, but search shows about the first 70. Descriptions allow 5,000 characters, with about 157 visible above the fold; tags have a 500-character total limit.",
+  lede: "A YouTube title counter is a free tool that checks your video title, description and tags against YouTube's character limits as you type. It shows the 100-character title cap, the 5,000-character description limit and the 500-character tag total, with a preview of what viewers see in search and on the watch page.",
   art: "writing",
   artLabel: "A creator writes YouTube video details beside a character meter and search preview",
   heroPoints: ["100-character title limit", "5,000-character description", "500-character tag total"],
   toolTitle: "Check your YouTube video details",
   toolNote: "Free · nothing leaves your browser",
-  stepsTitle: "How to use the YouTube character counter",
+  stepsTitle: "How do I check YouTube title and description character counts?",
   steps: [
     {
       title: "Choose title, description or tags",
@@ -43,7 +43,7 @@ const config: ToolPageConfig = {
       art: "card-schedule",
     },
   ],
-  featuresTitle: "Check every YouTube text field before publishing",
+  featuresTitle: "How do I keep a YouTube title within 100 characters?",
   features: [
     {
       title: "Real limits in one place",
@@ -62,7 +62,7 @@ const config: ToolPageConfig = {
     },
   ],
   guide: {
-    title: "YouTube title, description and tag limits",
+    title: "What are YouTube's title and description character limits?",
     intro: "YouTube allows 100 characters in a title, 5,000 in a description and 500 across all tags. Search and watch pages show only the opening, so front-load the useful information.",
     sections: [
       {
@@ -90,6 +90,19 @@ const config: ToolPageConfig = {
             the first <b>157 characters</b> of a description above Show more. These are approximate display lengths, not
             separate publishing limits. The exact cut-off can vary by device, layout and search result. Need a starting
             point? Generate title ideas with the <Link href="/tools/youtube-title-generator">free YouTube title generator</Link>.
+          </p>
+        ),
+      },
+      {
+        title: "How do I optimize a YouTube title for search and clicks?",
+        body: (
+          <p>
+            Put the main keyword and the payoff in the first 60–70 characters, then add a short qualifier such as the year,
+            format or result. Specific, readable titles beat vague ones: &quot;How to Schedule Instagram Reels in 2026&quot;
+            tells viewers and search more than &quot;My New Video&quot;. Avoid all-caps and angle brackets, and check the
+            title still makes sense where search cuts it at about 70 characters. For ideas, start with the{" "}
+            <Link href="/tools/youtube-title-generator">free YouTube title generator</Link>, then pair the title with a
+            correctly sized image using the <Link href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link>.
           </p>
         ),
       },

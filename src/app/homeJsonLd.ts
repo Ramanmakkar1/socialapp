@@ -1,9 +1,10 @@
 import { BRAND } from "@/lib/brand";
 import { softwareOffers, type PlanReadiness } from "@/lib/plans";
 
-// Home page JSON-LD graph. The Organization (#org) and WebSite (#website) nodes
-// are emitted once by the root layout; this graph links to them by @id so the
-// page, app and FAQ stay part of the same entity graph.
+// Home page JSON-LD graph. The root layout also emits Organization and WebSite
+// nodes; this graph repeats them (same @ids) so the homepage itself carries a
+// complete Organization + WebSite + SoftwareApplication entity graph, and the
+// page, app and FAQ stay linked to the same entities.
 export const homePageJsonLd = (
   faqs: { q: string; a: string }[],
   r: PlanReadiness,
@@ -16,6 +17,15 @@ export const homePageJsonLd = (
       "@id": BRAND.url + "#org",
       name: BRAND.name,
       url: BRAND.url,
+    },
+    {
+      "@type": "WebSite",
+      "@id": BRAND.url + "#website",
+      url: BRAND.url,
+      name: BRAND.name,
+      publisher: { "@id": BRAND.url + "#org" },
+      inLanguage: "en",
+      description: BRAND.description,
     },
     {
       "@type": "WebPage",
@@ -42,6 +52,18 @@ export const homePageJsonLd = (
       mainEntityOfPage: { "@id": BRAND.url },
       publisher: { "@id": BRAND.url + "#org" },
       offers: softwareOffers(r),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": BRAND.url + "#breadcrumb",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: BRAND.url,
+        },
+      ],
     },
     {
       "@type": "FAQPage",

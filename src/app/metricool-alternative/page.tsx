@@ -103,7 +103,7 @@ export default function MetricoolAlternative() {
             Metricool alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            {BRAND.name} is a Metricool alternative that schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs every keyword commenter. Metricool focuses on scheduling and analytics across many networks; {BRAND.name} also captures emails in the DM and exports your leads, all in one account. The Free plan costs $0.
+            Yes, {BRAND.name} is a Metricool alternative for teams that want Instagram scheduling plus comment-to-DM automation in one account. It schedules your {LIVE_PLATFORMS_TEXT} posts and auto-DMs every keyword commenter, while Metricool focuses on scheduling and analytics across many networks. {BRAND.name} also captures emails in the DM and exports your leads, all in one account. The Free plan costs $0.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -138,8 +138,10 @@ export default function MetricoolAlternative() {
           <div className="head">
             <p className="eyebrow">Comparison</p>
             <h2>{BRAND.name} vs Metricool</h2>
-            <p>Metricool is a social media management tool for scheduling and analytics across many networks. {BRAND.name} keeps Instagram scheduling and adds comment-to-DM automation in one place. Here is an honest side-by-side.</p>
+            <p>Metricool is a social media management tool for scheduling and analytics across many networks. {BRAND.name} keeps <Link href="/instagram-scheduler">Instagram scheduling</Link> and adds <Link href="/instagram-auto-dm">comment-to-DM automation</Link> in one place. Here is an honest side-by-side.</p>
           </div>
+          <h3>How scheduling and automation differ</h3>
+          <p>Both tools schedule posts on a calendar, but Metricool centers on multi-network publishing and analytics, while {BRAND.name} pairs scheduling with automation: a comment keyword triggers an automatic DM, and the DM can capture the commenter&apos;s email before sending the link. In Metricool, that lead flow needs a separate chatbot tool.</p>
           <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
@@ -195,7 +197,7 @@ export default function MetricoolAlternative() {
           <div className="cta">
             <div>
               <h2>Schedule like Metricool. <em className="s">Auto-DM every commenter</em></h2>
-              <p>Start free. No credit card. Connect Instagram in one tap.</p>
+              <p>Start free. No credit card. Connect Instagram in one tap. Compare <Link href="/pricing">Free and Pro plan pricing</Link>.</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
             </div>
             <Image sizes="(max-width: 960px) 100vw, 50vw" src="/landing/card-leads.webp" width={900} height={900} loading="lazy" alt="Two friends high-five next to a board of new leads" />

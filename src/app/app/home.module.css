@@ -393,3 +393,11 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
   letter-spacing: 0;
   vertical-align: middle;
 }
+
+/* Dashboard "AI tools" (AiTools.tsx): one card per AI feature. */
+.aiGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.aiCard { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
+.aiCardHead { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.aiCardTitle { min-width: 0; flex: 1; color: var(--poskoo-ink); font-size: .95rem; }
+.aiCardText { margin: 0; color: var(--poskoo-muted); font-size: .84rem; line-height: 1.45; }
+.aiCard .textLink { margin-top: auto; }

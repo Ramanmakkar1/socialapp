@@ -1,4 +1,6 @@
-// Server-only helper: AI replies to Instagram DMs. The API key comes only from env vars.
+// Server-only helper: AI replies to Instagram DMs. The API key is ANTHROPIC_API_KEY, else the key an
+// admin saved in /admin/settings (src/lib/aiKey.ts).
+import { resolveAnthropicKey } from "@/lib/aiKey";
 
 export type AiReplySettings = {
   enabled: boolean;
@@ -109,7 +111,7 @@ export async function generateAiDmReply(
   history: ChatTurn[],
   opts: { timeoutMs?: number; known?: { email?: string | null; phone?: string | null } } = {}
 ): Promise<AiDmReplyResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = await resolveAnthropicKey();
   if (!apiKey) return { ok: false, error: "AI is not set up yet." };
 
   const { system, messages } = buildAiReplyPrompt(settings, history, opts.known);
