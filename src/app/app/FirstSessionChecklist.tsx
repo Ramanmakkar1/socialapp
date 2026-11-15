@@ -1,8 +1,23 @@
 "use client";
 
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import home from "./home.module.css";
+
+const DISMISS_KEY = "poskoo:first-session-dismissed";
+
+function subscribeDismissed() {
+  return () => {};
+}
+
+function getDismissed() {
+  try {
+    return window.localStorage.getItem(DISMISS_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export type FirstSessionChecklistProps = {
   /** An Instagram channel is connected (active social account). */
@@ -13,6 +28,8 @@ export type FirstSessionChecklistProps = {
   postScheduled: boolean;
   /** An active Auto-DM rule with a comment trigger exists for this user. */
   hasActiveCommentRule: boolean;
+  /** A scheduled/publishing/published post with at least one media item exists. */
+  postWithMedia: boolean;
 };
 
 type Step = { label: string; detail: string; href: string; done: boolean };
@@ -20,7 +37,11 @@ type Step = { label: string; detail: string; href: string; done: boolean };
 // First-session checklist for the dashboard. Completed steps are derived on the
 // server from existing account and post data; the whole card hides once every
 // step is done.
-export default function FirstSessionChecklist({ connected, postCreated, postScheduled, hasActiveCommentRule }: FirstSessionChecklistProps) {
+export default function FirstSessionChecklist({ connected, postCreated, postScheduled, hasActiveCommentRule, postWithMedia }: FirstSessionChecklistProps) {
+  const storedDismissed = useSyncExternalStore(subscribeDismissed, getDismissed, () => false);
+  const [dismissedNow, setDismissedNow] = useState(false);
+  const dismissed = storedDismissed || dismissedNow;
+
   const steps: Step[] = [
     { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", href: "/app/settings#channels", done: connected },
     { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar?compose=1", done: postCreated },
@@ -32,9 +53,16 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
       href: "/app/auto-dm",
       done: hasActiveCommentRule,
     },
+    {
+      label: "Schedule a post with media",
+      detail:
+        "Connect an account, add a photo or video, choose your time zone and pick a date and time.",
+      href: "/app/calendar?compose=1",
+      done: postWithMedia,
+    },
   ];
   const doneCount = steps.filter((s) => s.done).length;
-  if (doneCount === steps.length) return null;
+  if (dismissed || doneCount === steps.length) return null;
   const firstOpen = steps.findIndex((s) => !s.done);
 
   return (
@@ -85,6 +113,22 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
             {doneCount} of {steps.length} done — your first post is close.
           </p>
         </div>
+        <button
+          type="button"
+          className={home.fscDismiss}
+          aria-label="Dismiss first-session checklist"
+          title="Dismiss"
+          onClick={() => {
+            setDismissedNow(true);
+            try {
+              window.localStorage.setItem(DISMISS_KEY, "1");
+            } catch {
+              // Storage can be blocked; hiding for this session is enough.
+            }
+          }}
+        >
+          <X width={16} height={16} aria-hidden="true" />
+        </button>
       </div>
       <div
         className={home.fscProgress}

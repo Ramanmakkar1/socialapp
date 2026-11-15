@@ -280,6 +280,21 @@ a.more:hover { background: rgba(255, 255, 255, .1); }
 .fscHeadText { min-width: 0; }
 .fscTitle { margin: 0; color: var(--poskoo-ink); font-size: 1.15rem; font-weight: 700; letter-spacing: -.02em; }
 .fscSub { margin: 2px 0 0; color: var(--poskoo-muted); font-size: .85rem; }
+.fscDismiss {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  margin-left: auto;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--poskoo-muted);
+  cursor: pointer;
+}
+.fscDismiss:hover { border-color: var(--poskoo-line); background: var(--poskoo-paper); color: var(--poskoo-ink); }
+.fscDismiss:focus-visible { outline: 2px solid var(--poskoo-violet); outline-offset: 2px; }
 .fscProgress {
   height: 8px;
   overflow: hidden;

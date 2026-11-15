@@ -14,8 +14,8 @@ test("a draft alone does not complete the first-session checklist", () => {
   // dashboard must also require a scheduled/publishing/published post before
   // hiding the checklist.
   assert.ok(
-    pageSource.includes("const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && hasActiveComment;"),
-    "checklistDone must require stats.hasScheduledPost, not just postCreated",
+    pageSource.includes("const checklistDone = channelConnected && postCreated && stats.hasScheduledPost && hasActiveComment && hasScheduledMedia;"),
+    "checklistDone must require stats.hasScheduledPost and the media milestone, not just postCreated",
   );
   assert.ok(
     pageSource.includes("postScheduled={stats.hasScheduledPost}"),
@@ -64,5 +64,27 @@ test("the Auto-DM step requires an active rule with an explicit comment trigger"
   assert.ok(
     checklistSource.includes("done: hasActiveCommentRule"),
     "the Auto-DM step must use the active comment rule signal",
+  );
+});
+
+test("the scheduler milestone follows Auto-DM and requires a scheduled post with media", () => {
+  const autoDmIndex = checklistSource.indexOf('href: "/app/auto-dm"');
+  const milestoneIndex = checklistSource.indexOf('label: "Schedule a post with media"');
+  assert.ok(autoDmIndex > -1 && milestoneIndex > autoDmIndex, "the media milestone must come after the Auto-DM step");
+  assert.ok(
+    checklistSource.includes("done: postWithMedia"),
+    "the media milestone must use the scheduled-post-with-media signal",
+  );
+  assert.ok(
+    pageSource.includes("hasScheduledPostWithMedia(user.id)"),
+    "the dashboard must derive the media milestone from existing post data",
+  );
+  assert.ok(
+    pageSource.includes("jsonb_array_length(media) > 0"),
+    "the media milestone must require at least one media item",
+  );
+  assert.ok(
+    checklistSource.includes("DISMISS_KEY") && checklistSource.includes("Dismiss first-session checklist"),
+    "the checklist must stay dismissible",
   );
 });
