@@ -734,3 +734,15 @@ a.connectCard:hover { border-color: var(--poskoo-pill-border); box-shadow: 0 6px
 .badge_discourse { background: #231f20; }
 .netBg_listmonk { background: #0055d4; }
 .badge_listmonk { background: #0055d4; }
+.netBg_nostr { background: #8e30eb; }
+.badge_nostr { background: #8e30eb; }
+.netBg_tumblr { background: #001935; }
+.badge_tumblr { background: #001935; }
+.netBg_wpcom { background: #3858e9; }
+.badge_wpcom { background: #3858e9; }
+.netBg_plurk { background: #ff574d; }
+.badge_plurk { background: #ff574d; }
+.netBg_twitch { background: #9146ff; }
+.badge_twitch { background: #9146ff; }
+.netBg_farcaster { background: #855dcd; }
+.badge_farcaster { background: #855dcd; }

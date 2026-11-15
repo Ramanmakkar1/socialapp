@@ -7,9 +7,9 @@ import {
   toLocalInputValue,
   type ComposerDraftInitial,
 } from "./composerDraft.ts";
-import { TOKEN_NETWORK_IDS } from "./networks/tokenNetworks.ts";
+import { EXTRA_NETWORK_IDS } from "./networks/tokenNetworks.ts";
 
-const TOKEN_OFF = Object.fromEntries(TOKEN_NETWORK_IDS.map((id) => [id, false]));
+const TOKEN_OFF = Object.fromEntries(EXTRA_NETWORK_IDS.map((id) => [id, false]));
 
 function draft(overrides: Partial<ComposerDraftInitial> = {}): ComposerDraftInitial {
   return {

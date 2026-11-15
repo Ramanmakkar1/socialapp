@@ -994,3 +994,15 @@
 .tile_discourse { background: #231f20; }
 .ico_listmonk { color: #0055d4; }
 .tile_listmonk { background: #0055d4; }
+.ico_nostr { color: #8e30eb; }
+.tile_nostr { background: #8e30eb; }
+.ico_tumblr { color: var(--poskoo-ink); }
+.tile_tumblr { background: #001935; }
+.ico_wpcom { color: #3858e9; }
+.tile_wpcom { background: #3858e9; }
+.ico_plurk { color: #ff574d; }
+.tile_plurk { background: #ff574d; }
+.ico_twitch { color: #9146ff; }
+.tile_twitch { background: #9146ff; }
+.ico_farcaster { color: #855dcd; }
+.tile_farcaster { background: #855dcd; }

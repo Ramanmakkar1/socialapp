@@ -1,7 +1,7 @@
 // Pure helpers for the post composer: draft -> initial state, and the exact schedule instant.
 // No React, no DB: safe to unit test.
 import { PLATFORM_IDS, type PlatformId } from "@/lib/platforms";
-import { TOKEN_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
+import { EXTRA_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
 
 export type ComposerDraftInitial = {
   id: string;
@@ -35,7 +35,7 @@ export type ComposerState = {
 };
 
 /** Networks added 2026-11-11: restored from a draft like YouTube (enabled + custom caption). */
-const NEW_NETWORKS: PlatformId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group", ...TOKEN_NETWORK_IDS];
+const NEW_NETWORKS: PlatformId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group", ...EXTRA_NETWORK_IDS];
 const LIVE: PlatformId[] = ["instagram", "youtube", ...NEW_NETWORKS];
 
 function fill<T>(value: T, over: Partial<Record<PlatformId, T>> = {}): Record<PlatformId, T> {

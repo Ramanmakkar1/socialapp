@@ -48,10 +48,20 @@ export async function GET() {
   // carry the same "awaiting approval" / "not available yet" wording the Connect dialog shows.
   const nets = networkAvailability();
   const statuses = channelStatuses(
-    { tiktok: nets.tiktok, pinterest: nets.pinterest, x: nets.x, gbp: nets.gbp, linkedin_pages: false },
+    { tiktok: nets.tiktok, pinterest: nets.pinterest, x: nets.x, gbp: nets.gbp, linkedin_pages: false, tumblr: nets.tumblr, wpcom: nets.wpcom, plurk: nets.plurk, twitch: nets.twitch, farcaster: nets.farcaster },
     process.env,
   );
-  const coming = [["tiktok", "TikTok"], ["pinterest", "Pinterest"], ["x", "X (Twitter)"], ["gbp", "Google Business Profile"]] as const;
+  const coming = [
+    ["tiktok", "TikTok"],
+    ["pinterest", "Pinterest"],
+    ["x", "X (Twitter)"],
+    ["gbp", "Google Business Profile"],
+    ["tumblr", "Tumblr"],
+    ["wpcom", "WordPress.com"],
+    ["plurk", "Plurk"],
+    ["twitch", "Twitch (channel chat)"],
+    ["farcaster", "Farcaster"],
+  ] as const;
   const live = [
     "Instagram",
     "Facebook Pages",

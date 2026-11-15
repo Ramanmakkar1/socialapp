@@ -5,7 +5,7 @@ import { bodyJson, bytes, json, mockFetch } from "../../test-utils/mockFetch.ts"
 import type { NetAccount, NetworkId } from "./common.ts";
 import { NETWORK_IDS } from "./common.ts";
 import { normalizeBaseUrl, textToHtml } from "./http.ts";
-import { splitTitle, tokenMediaError, TOKEN_NETWORK_IDS, TOKEN_NETWORKS } from "./tokenNetworks.ts";
+import { splitTitle, extraMediaError, TOKEN_NETWORK_IDS, TOKEN_NETWORKS } from "./tokenNetworks.ts";
 import {
   connectDiscord,
   connectMatrix,
@@ -68,14 +68,14 @@ test("titles: first line (without #) is the title, the rest the body", () => {
 test("media rules per network when saving", () => {
   const img = { type: "image" as const, url: "https://cdn/a.jpg" };
   const vid = { type: "video" as const, url: "https://cdn/a.mp4" };
-  assert.match(tokenMediaError("slack", [img], true) ?? "", /text only/);
-  assert.equal(tokenMediaError("slack", [], true), null);
-  assert.match(tokenMediaError("pixelfed", [], true) ?? "", /at least one image/);
-  assert.equal(tokenMediaError("pixelfed", [], false), null);
-  assert.match(tokenMediaError("peertube", [img], true) ?? "", /one video/);
-  assert.equal(tokenMediaError("peertube", [vid], true), null);
-  assert.match(tokenMediaError("wordpress", [vid], true) ?? "", /images only/);
-  assert.equal(tokenMediaError("telegram", [img, vid], true), null);
+  assert.match(extraMediaError("slack", [img], true) ?? "", /text only/);
+  assert.equal(extraMediaError("slack", [], true), null);
+  assert.match(extraMediaError("pixelfed", [], true) ?? "", /at least one image/);
+  assert.equal(extraMediaError("pixelfed", [], false), null);
+  assert.match(extraMediaError("peertube", [img], true) ?? "", /one video/);
+  assert.equal(extraMediaError("peertube", [vid], true), null);
+  assert.match(extraMediaError("wordpress", [vid], true) ?? "", /images only/);
+  assert.equal(extraMediaError("telegram", [img, vid], true), null);
   assert.match(networkTargetError("devto", [img], {}, true) ?? "", /text only/);
 });
 

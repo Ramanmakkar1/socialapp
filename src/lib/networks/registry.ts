@@ -12,6 +12,21 @@ import { publishToDevto, publishToDiscourse, publishToGhost, publishToHashnode, 
 import { publishToDiscord, publishToMatrix, publishToMattermost, publishToSlack, publishToTelegram } from "@/lib/networks/chat";
 import { publishToMisskey, publishToPeerTube, publishToPixelfed, refreshPeerTube } from "@/lib/networks/fediverse";
 import { isTokenNetwork } from "@/lib/networks/tokenNetworks";
+import { publishToNostr } from "@/lib/networks/nostr";
+import {
+  isFarcasterConfigured,
+  isPlurkConfigured,
+  isTumblrConfigured,
+  isTwitchConfigured,
+  isWpcomConfigured,
+  publishToFarcaster,
+  publishToPlurk,
+  publishToTumblr,
+  publishToTwitch,
+  publishToWpcom,
+  refreshTumblrToken,
+  refreshTwitchToken,
+} from "@/lib/networks/apps";
 
 export type NetworkAdapter = {
   configured: () => boolean;
@@ -72,6 +87,13 @@ export const NETWORKS: Record<NetworkId, NetworkAdapter> = {
   wordpress: { configured: () => true, publish: publishToWordPress, refreshSkewSec: 0 },
   discourse: { configured: () => true, publish: publishToDiscourse, refreshSkewSec: 0 },
   listmonk: { configured: () => true, publish: publishToListmonk, refreshSkewSec: 0 },
+  nostr: { configured: () => true, publish: (input) => publishToNostr(input), refreshSkewSec: 0 },
+  // App networks (src/lib/networks/apps.ts): need the owner's client keys in env vars.
+  tumblr: { configured: isTumblrConfigured, publish: publishToTumblr, refresh: needsRefreshToken(refreshTumblrToken, "Tumblr"), refreshSkewSec: 5 * 60 },
+  wpcom: { configured: isWpcomConfigured, publish: publishToWpcom, refreshSkewSec: 0 },
+  plurk: { configured: isPlurkConfigured, publish: publishToPlurk, refreshSkewSec: 0 },
+  twitch: { configured: isTwitchConfigured, publish: publishToTwitch, refresh: needsRefreshToken(refreshTwitchToken, "Twitch"), refreshSkewSec: 10 * 60 },
+  farcaster: { configured: isFarcasterConfigured, publish: publishToFarcaster, refreshSkewSec: 0 },
 };
 
 /** Which new networks can be connected on this server (Bluesky / Mastodon need no keys). */
@@ -93,7 +115,13 @@ export function connectHref(platform: string): string {
     case "pinterest":
     case "x":
     case "gbp":
+    case "tumblr":
+    case "wpcom":
+    case "plurk":
+    case "twitch":
       return `/api/${platform}/connect`;
+    case "farcaster":
+      return "/app/settings?connect=farcaster#connect";
     case "bluesky":
     case "mastodon":
     case "ig_personal":

@@ -1,15 +1,16 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
-import { ArrowLeft, AtSign, Bell, Check, Facebook, Instagram, Loader2, PartyPopper, Plus, RotateCcw, Youtube, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, AtSign, Bell, Check, Facebook, Instagram, Loader2, PartyPopper, Plus, RotateCcw, Youtube, X } from "lucide-react";
 import { BlueskyIcon, GbpIcon, LinkedInIcon, MastodonIcon, NEW_NETWORK_ICON, PinterestIcon, TikTokIcon, XIcon } from "@/components/brandIcons";
 import { unavailableStatus, type ChannelStatus, type ComingChannel } from "@/lib/channelStatus";
 import type { ReminderNetworkId } from "@/lib/networks/reminder";
-import { isTokenNetwork, TOKEN_NETWORK_IDS, TOKEN_NETWORK_LABEL, TOKEN_NETWORKS, type TokenNetworkId } from "@/lib/networks/tokenNetworks";
+import { isExtraNetwork, isTokenNetwork, TOKEN_NETWORK_IDS, type AppNetworkId, EXTRA_NETWORK_LABEL, TOKEN_NETWORKS, type TokenNetworkId } from "@/lib/networks/tokenNetworks";
 import {
   channelInterestAction,
   connectBlueskyAction,
+  connectFarcasterAction,
   connectGbpLocationsAction,
   connectReminderAction,
   connectTokenNetworkAction,
@@ -45,14 +46,22 @@ export type ConnectAvailability = {
   /** Keyless networks: always available. */
   bluesky?: boolean;
   mastodon?: boolean;
+  /** App networks: their client keys are set (src/lib/networks/apps.ts). */
+  tumblr?: boolean;
+  wpcom?: boolean;
+  plurk?: boolean;
+  twitch?: boolean;
+  farcaster?: boolean;
+  /** Neynar client id for "Sign in with Neynar" (public; only set when Farcaster is configured). */
+  farcasterClientId?: string;
   /** Pills + explanations for channels that are built but not switched on (src/lib/channelStatus.ts). */
   statuses?: Partial<Record<ComingChannel, ChannelStatus>>;
   /** Reminder channels work by e-mail: "Coming soon" while no mailer is set up (src/lib/featureReadiness.ts). */
   reminderStatuses?: Partial<Record<ReminderNetworkId, ChannelStatus>>;
 };
 
-type NetworkId = "instagram" | "facebook" | "threads" | "youtube" | "tiktok" | "linkedin" | "pinterest" | "x" | "bluesky" | "mastodon" | "gbp" | TokenNetworkId;
-type Step = "instagram" | "facebook" | "linkedin" | "bluesky" | "mastodon";
+type NetworkId = "instagram" | "facebook" | "threads" | "youtube" | "tiktok" | "linkedin" | "pinterest" | "x" | "bluesky" | "mastodon" | "gbp" | TokenNetworkId | AppNetworkId;
+type Step = "instagram" | "facebook" | "linkedin" | "bluesky" | "mastodon" | "farcaster";
 
 export type Network = {
   id: NetworkId;
@@ -93,6 +102,11 @@ export function networks(a: ConnectAvailability): Network[] {
     { id: "pinterest", name: "Pinterest", sub: "Business or Profile", icon: icon(PinterestIcon), href: "/api/pinterest/connect", status: coming(a, "pinterest", "Pinterest") },
     { id: "gbp", name: "Google Business", sub: "Profile", icon: icon(GbpIcon), href: "/api/gbp/connect", status: coming(a, "gbp", "Google Business Profile") },
     { id: "x", name: "Twitter / X", sub: "Profile", icon: icon(XIcon), href: "/api/x/connect", status: coming(a, "x", "X") },
+    { id: "tumblr", name: "Tumblr", sub: "Blog", icon: icon(NEW_NETWORK_ICON.tumblr), href: "/api/tumblr/connect", status: coming(a, "tumblr", "Tumblr") },
+    { id: "wpcom", name: "WordPress.com", sub: "Site", icon: icon(NEW_NETWORK_ICON.wpcom), href: "/api/wpcom/connect", status: coming(a, "wpcom", "WordPress.com") },
+    { id: "farcaster", name: "Farcaster", sub: "Profile", icon: icon(NEW_NETWORK_ICON.farcaster), step: "farcaster", status: coming(a, "farcaster", "Farcaster") },
+    { id: "twitch", name: "Twitch", sub: "Channel chat", icon: icon(NEW_NETWORK_ICON.twitch), href: "/api/twitch/connect", status: coming(a, "twitch", "Twitch") },
+    { id: "plurk", name: "Plurk", sub: "Profile", icon: icon(NEW_NETWORK_ICON.plurk), href: "/api/plurk/connect", status: coming(a, "plurk", "Plurk") },
   ];
 }
 
@@ -105,7 +119,7 @@ const LABEL: Record<string, string> = {
   instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube", tiktok: "TikTok",
   linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", bluesky: "Bluesky", mastodon: "Mastodon", gbp: "Google Business Profile",
   ig_personal: "Instagram (personal)", fb_group: "Facebook Group",
-  ...TOKEN_NETWORK_LABEL,
+  ...EXTRA_NETWORK_LABEL,
 };
 
 /** Plain-words message for a failed connect (?connect_error=<code>&net=<network>). */
@@ -150,7 +164,7 @@ type View =
 const IG_FLOW_KEY = "poskoo.igFlow";
 
 function retryHref(net: string): string | null {
-  if (net === "bluesky" || net === "mastodon" || net === "ig_personal" || net === "fb_group" || isTokenNetwork(net)) return null;
+  if (net === "bluesky" || net === "mastodon" || net === "ig_personal" || net === "fb_group" || net === "farcaster" || isTokenNetwork(net)) return null;
   if (net === "facebook") return "/api/instagram/connect?via=facebook";
   return `/api/${net}/connect`;
 }
@@ -158,6 +172,7 @@ function retryHref(net: string): string | null {
 function retryView(net: string): View {
   if (net === "ig_personal" || net === "fb_group") return { kind: "reminder", platform: net };
   if (isTokenNetwork(net)) return { kind: "token", net };
+  if (net === "farcaster") return { kind: "farcaster" };
   return { kind: net === "bluesky" ? "bluesky" : "mastodon" };
 }
 
@@ -222,6 +237,7 @@ export default function ConnectChannelDialog({
         : { kind: "reminder", platform: c };
     }
     else if (isTokenNetwork(c)) next = { kind: "token", net: c };
+    else if (c === "farcaster") next = { kind: "farcaster" };
     else if (url.hash === "#connect" || c === "1") next = { kind: "grid" };
     try {
       const saved = window.localStorage.getItem(IG_FLOW_KEY);
@@ -515,6 +531,8 @@ export default function ConnectChannelDialog({
 
           {view.kind === "token" && <TokenForm key={view.net} net={view.net} back={back} />}
 
+          {view.kind === "farcaster" && <FarcasterSignIn clientId={a.farcasterClientId ?? ""} back={back} />}
+
           {view.kind === "bluesky" && (
             <form action={bsAction} className={styles.connectStep}>
               {back}
@@ -568,7 +586,7 @@ export default function ConnectChannelDialog({
               <p className={styles.connectSuccess}>
                 <PartyPopper width={22} height={22} aria-hidden="true" />
                 <span>
-                  <b>{view.handle ? (view.handle.includes(" ") || view.handle.startsWith("@") || view.net === "fb_group" || isTokenNetwork(view.net) ? view.handle : `@${view.handle}`) : (LABEL[view.net] ?? "Your channel")}</b> is connected
+                  <b>{view.handle ? (view.handle.includes(" ") || view.handle.startsWith("@") || view.net === "fb_group" || isExtraNetwork(view.net) ? view.handle : `@${view.handle}`) : (LABEL[view.net] ?? "Your channel")}</b> is connected
                   {view.handle && LABEL[view.net] ? ` to ${LABEL[view.net]}` : ""}.
                 </span>
               </p>
@@ -675,6 +693,11 @@ function TokenForm({ net, back }: { net: TokenNetworkId; back: ReactNode }) {
       {back}
       <input type="hidden" name="network" value={net} />
       <p className={styles.connectLead}>Connect {spec.label} with {spec.fields.some((f) => f.name === "webhook") ? "a webhook" : "a token"}.</p>
+      {spec.warning && (
+        <p role="note" className={styles.connectError}>
+          <AlertTriangle width={14} height={14} aria-hidden="true" className={cc.inlineIcon} /> {spec.warning}
+        </p>
+      )}
       {spec.fields.map((f) => (
         <label key={f.name} className={styles.connectLabel}>
           {f.label} {f.optional && <span className={cc.optional}>(optional)</span>}
@@ -700,6 +723,49 @@ function TokenForm({ net, back }: { net: TokenNetworkId; back: ReactNode }) {
         {pending ? <Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> : <Icon width={16} height={16} aria-hidden="true" />} Connect {spec.label}
       </button>
     </form>
+  );
+}
+
+// Farcaster: "Sign in with Neynar" (Neynar's script opens Warpcast approval in a popup). On success
+// the browser hands the signer UUID + fid to the server, which checks both with Neynar.
+type NeynarSignIn = { signer_uuid?: string; fid?: number | string };
+declare global {
+  interface Window {
+    poskooNeynarSignIn?: (data: NeynarSignIn) => void;
+  }
+}
+// Neynar's hosted SIWN widget (docs.neynar.com "Sign in with Neynar").
+const SIWN_SCRIPT = "https://neynarxyz.github.io/siwn/raw/1.2.0/index.js";
+
+function FarcasterSignIn({ clientId, back }: { clientId: string; back: ReactNode }) {
+  const [error, setError] = useState("");
+  const [pending, start] = useTransition();
+  useEffect(() => {
+    window.poskooNeynarSignIn = (data) => {
+      start(async () => {
+        const r = await connectFarcasterAction(String(data.signer_uuid ?? ""), String(data.fid ?? ""));
+        if (r?.error) setError(r.error);
+      });
+    };
+    if (!document.querySelector(`script[src="${SIWN_SCRIPT}"]`)) {
+      const s = document.createElement("script");
+      s.src = SIWN_SCRIPT;
+      s.async = true;
+      document.body.appendChild(s);
+    }
+    return () => {
+      delete window.poskooNeynarSignIn;
+    };
+  }, []);
+  return (
+    <div className={styles.connectStep}>
+      {back}
+      <p className={styles.connectLead}>Sign in with Farcaster, then approve Poskoo in Warpcast.</p>
+      <div className="neynar_signin" data-client_id={clientId} data-success-callback="poskooNeynarSignIn" data-theme="light" />
+      <p className={styles.connectFoot}>Poskoo can only post casts you schedule; it can&apos;t read your messages. Casts are text only, up to 320 bytes.</p>
+      {pending && <p className={styles.connectLead}><Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> Connecting…</p>}
+      {error && <p role="alert" className={styles.connectError}>{error}</p>}
+    </div>
   );
 }
 

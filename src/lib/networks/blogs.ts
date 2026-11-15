@@ -198,33 +198,42 @@ export async function connectWordPress(f: Fields, fetchImpl: Fetch = fetch): Pro
 }
 
 export async function publishToWordPress(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
   const pass = input.account.accessToken;
   const base = str(input.account.meta.base);
   const user = str(input.account.meta.user);
   const q = input.account.meta.restQuery === true;
   if (!base || !user) return { ok: false, error: "This WordPress site has no address stored. Reconnect it in Settings.", tokenDead: true };
-  if (input.media.some((m) => m.type === "video")) return { ok: false, error: "WordPress posts from Poskoo take images only." };
   const auth = `Basic ${Buffer.from(`${user}:${pass}`).toString("base64")}`;
+  return wpPublish(input, (route) => wpUrl(base, route, q), auth, "WordPress", pass);
+}
+
+/**
+ * WordPress REST v2 publish, shared by self-hosted sites (application password) and WordPress.com
+ * (OAuth bearer token against public-api.wordpress.com/wp/v2/sites/<id>). Images are uploaded to
+ * the media library; the first becomes the featured image.
+ */
+export async function wpPublish(input: PublishInput, api: (route: string) => string, auth: string, label: string, secret: string): Promise<PublishOutcome> {
+  const fetchImpl = input.fetchImpl ?? fetch;
+  if (input.media.some((m) => m.type === "video")) return { ok: false, error: `${label} posts from Poskoo take images only.` };
   const uploaded: { id: number; url: string }[] = [];
   if (input.media.length > 0) {
     const dl = await downloadAll(input.media, fetchImpl, 50 * MB);
     if (!dl.ok) return dl;
     for (const file of dl.files) {
       const up = await call(
-        wpUrl(base, "/wp/v2/media", q),
+        api("/wp/v2/media"),
         { method: "POST", headers: { Authorization: auth, "Content-Type": file.contentType, "Content-Disposition": `attachment; filename="${file.filename}"` }, body: new Uint8Array(file.bytes) },
         fetchImpl,
         5 * 60_000,
       );
-      if (!up.ok) return failed("WordPress", "image upload", up, pass);
+      if (!up.ok) return failed(label, "image upload", up, secret);
       uploaded.push({ id: Number(up.json.id), url: str(up.json.source_url) });
     }
   }
   const { title, body } = splitTitle(input.text);
   const content = [textToHtml(body), ...uploaded.slice(1).map((u) => `<figure class="wp-block-image"><img src="${u.url}" alt=""></figure>`)].join("\n");
   const r = await call(
-    wpUrl(base, "/wp/v2/posts", q),
+    api("/wp/v2/posts"),
     {
       method: "POST",
       headers: { Authorization: auth, "Content-Type": "application/json" },
@@ -232,7 +241,7 @@ export async function publishToWordPress(input: PublishInput): Promise<PublishOu
     },
     fetchImpl,
   );
-  if (!r.ok) return failed("WordPress", "post", r, pass);
+  if (!r.ok) return failed(label, "post", r, secret);
   return { ok: true, id: str(r.json.id), url: str(r.json.link) || undefined };
 }
 

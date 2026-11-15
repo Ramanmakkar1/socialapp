@@ -2,7 +2,7 @@
 import { AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { engagementRate } from "@/lib/engagementRate";
-import { TOKEN_NETWORK_LABEL } from "@/lib/networks/tokenNetworks";
+import { EXTRA_NETWORK_LABEL } from "@/lib/networks/tokenNetworks";
 
 export type CalendarPost = {
   id: string;
@@ -27,7 +27,7 @@ export const PLATFORM_ICON: Record<string, typeof Instagram> = { instagram: Inst
 export const PLATFORM_LABEL: Record<string, string> = {
   instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube",
   tiktok: "TikTok", bluesky: "Bluesky", mastodon: "Mastodon", linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", gbp: "Google Business Profile", ig_personal: "Instagram (personal)", fb_group: "Facebook Group",
-  ...TOKEN_NETWORK_LABEL,
+  ...EXTRA_NETWORK_LABEL,
 };
 
 export const STATUS_LABEL: Record<string, string> = {

@@ -1,4 +1,4 @@
-import { TOKEN_PLATFORMS } from "@/lib/networks/tokenNetworks";
+import { EXTRA_PLATFORMS } from "@/lib/networks/tokenNetworks";
 
 export const PLATFORMS = {
   instagram: {
@@ -69,7 +69,7 @@ export const PLATFORMS = {
     counter: "x",
   },
   // Telegram, Discord, Matrix, WordPress, ... (src/lib/networks/tokenNetworks.ts).
-  ...TOKEN_PLATFORMS,
+  ...EXTRA_PLATFORMS,
 } as const;
 
 export type PlatformId = keyof typeof PLATFORMS;

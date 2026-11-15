@@ -24,7 +24,7 @@ import {
 } from "@/lib/emailTemplates";
 import { maskEmail } from "@/lib/referrals";
 import { graceEndsAt } from "@/lib/billingState";
-import { TOKEN_NETWORK_LABEL } from "@/lib/networks/tokenNetworks";
+import { EXTRA_NETWORK_LABEL } from "@/lib/networks/tokenNetworks";
 
 /** Runs `task` after the response is sent (Next `after`), or detached outside a request. */
 export function inBackground(label: string, task: () => Promise<unknown>): void {
@@ -201,7 +201,7 @@ const PLATFORM_LABEL: Record<string, string> = {
   linkedin: "LinkedIn",
   pinterest: "Pinterest",
   x: "X",
-  ...TOKEN_NETWORK_LABEL,
+  ...EXTRA_NETWORK_LABEL,
 };
 
 /** "Scheduled post failed" alert: at most one e-mail per post, ever. */

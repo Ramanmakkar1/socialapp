@@ -4,6 +4,7 @@ import {
   Brackets,
   Clapperboard,
   Code,
+  Earth,
   createLucideIcon,
   Facebook,
   Gamepad2,
@@ -16,12 +17,17 @@ import {
   Mail,
   MessageCircle,
   MessagesSquare,
+  NotebookPen,
   PenLine,
+  RadioTower,
   Send,
+  Smile,
   Sparkles,
   Store,
+  Tv,
+  Zap,
 } from "lucide-react";
-import { TOKEN_NETWORK_COLOR } from "@/lib/networks/tokenNetworks";
+import { EXTRA_NETWORK_COLOR } from "@/lib/networks/tokenNetworks";
 
 export const TikTokIcon = createLucideIcon("tiktok", [
   ["path", { d: "M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5", key: "tk1" }],
@@ -85,6 +91,12 @@ export const NEW_NETWORK_ICON = {
   wordpress: Globe,
   discourse: MessageCircle,
   listmonk: Mail,
+  nostr: Zap,
+  tumblr: NotebookPen,
+  wpcom: Earth,
+  plurk: Smile,
+  twitch: Tv,
+  farcaster: RadioTower,
 };
 
 export const NEW_NETWORK_COLOR = {
@@ -97,5 +109,5 @@ export const NEW_NETWORK_COLOR = {
   gbp: "#4285f4",
   ig_personal: "#d62976",
   fb_group: "#1877f2",
-  ...TOKEN_NETWORK_COLOR,
+  ...EXTRA_NETWORK_COLOR,
 };

@@ -4,6 +4,7 @@ import { connectDevto, connectDiscourse, connectGhost, connectHashnode, connectL
 import { connectDiscord, connectMatrix, connectMattermost, connectSlack, connectTelegram } from "@/lib/networks/chat";
 import type { Fetch } from "@/lib/networks/common";
 import { connectMisskey, connectPeerTube, connectPixelfed } from "@/lib/networks/fediverse";
+import { connectNostr } from "@/lib/networks/nostr";
 import type { SaveAccountInput } from "@/lib/networks/store";
 import { TOKEN_NETWORKS, type TokenNetworkId } from "@/lib/networks/tokenNetworks";
 
@@ -24,6 +25,8 @@ const CONNECT: Record<TokenNetworkId, Connect> = {
   wordpress: connectWordPress,
   discourse: connectDiscourse,
   listmonk: connectListmonk,
+  // Nostr talks to relays over WebSocket, not fetch.
+  nostr: (fields) => connectNostr(fields),
 };
 
 /** The spec's fields from the form (trimmed, capped); a missing required field -> its label. */

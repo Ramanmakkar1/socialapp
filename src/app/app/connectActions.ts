@@ -12,6 +12,7 @@ import { createBlueskySession, jwtExpiresIn, normalizeHandle, normalizeService }
 import { completeConnect, settingsResultUrl } from "@/lib/networks/routes";
 import { connectPendingGbp, pendingGbpLocations } from "@/lib/networks/gbpConnect";
 import { connectTokenNetwork, readTokenFields } from "@/lib/networks/tokenConnect";
+import { connectFarcasterSigner, isFarcasterConfigured } from "@/lib/networks/apps";
 import { isTokenNetwork, TOKEN_NETWORKS } from "@/lib/networks/tokenNetworks";
 
 export type BlueskyConnectState = { error: string } | null;
@@ -69,6 +70,23 @@ export async function connectTokenNetworkAction(_prev: TokenConnectState, formDa
     if (err instanceof NetworkAuthError) return { error: err.message };
     console.error(`${network} connect failed`, "unexpected");
     return { error: `Something went wrong while connecting ${TOKEN_NETWORKS[network].label}. Please try again.` };
+  }
+  redirect(`${target.pathname}${target.search}${target.hash}`);
+}
+
+/** Farcaster: the browser's "Sign in with Neynar" result (checked with Neynar before it's stored). */
+export async function connectFarcasterAction(signerUuid: string, fid: string): Promise<TokenConnectState> {
+  const user = await requireUser();
+  if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
+  if (!isFarcasterConfigured()) return { error: "Connecting Farcaster isn't switched on on this server yet." };
+  let target: URL;
+  try {
+    const input = await connectFarcasterSigner(String(signerUuid).slice(0, 64), String(fid).slice(0, 20));
+    target = await completeConnect(user.id, "farcaster", input);
+  } catch (err) {
+    if (err instanceof NetworkAuthError) return { error: err.message };
+    console.error("farcaster connect failed", "unexpected");
+    return { error: "Something went wrong while connecting Farcaster. Please try again." };
   }
   redirect(`${target.pathname}${target.search}${target.hash}`);
 }

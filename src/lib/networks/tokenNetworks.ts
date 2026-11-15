@@ -19,6 +19,7 @@ export const TOKEN_NETWORK_IDS = [
   "wordpress",
   "discourse",
   "listmonk",
+  "nostr",
 ] as const;
 
 export type TokenNetworkId = (typeof TOKEN_NETWORK_IDS)[number];
@@ -53,6 +54,8 @@ export type TokenNetworkSpec = {
   maxMedia: number;
   /** Blogs / newsletters / forums: the first line of the caption becomes the title. */
   titled?: boolean;
+  /** Shown above the form in a warning box (e.g. "use a dedicated key"). */
+  warning?: string;
 };
 
 const SERVER = (placeholder: string, label = "Server address"): TokenField => ({ name: "instance", label, placeholder, type: "url" });
@@ -247,19 +250,66 @@ export const TOKEN_NETWORKS: Record<TokenNetworkId, TokenNetworkSpec> = {
     maxMedia: 0,
     titled: true,
   },
+  nostr: {
+    label: "Nostr",
+    sub: "Profile",
+    color: "#8e30eb",
+    captionMax: 10000,
+    fields: [
+      { name: "key", label: "Bunker link or private key", placeholder: "bunker://… or nsec1…", type: "password" },
+      { name: "relays", label: "Relays", placeholder: "wss://relay.damus.io, wss://nos.lol", optional: true },
+    ],
+    help: "Best: a bunker:// link from a remote signer (nsec.app, Amber, nsecBunker). Your key stays in the signer; Poskoo asks it to sign each note, so the signer must be online at posting time. Leave relays empty to use popular public relays.",
+    helpUrl: "https://nsec.app",
+    warning: "Only paste an nsec if it's a dedicated key for scheduled posts. Poskoo stores it encrypted, but anyone with your nsec controls that identity forever.",
+    media: "none",
+    maxMedia: 0,
+  },
 };
 
-export const TOKEN_NETWORK_LABEL = Object.fromEntries(TOKEN_NETWORK_IDS.map((id) => [id, TOKEN_NETWORKS[id].label])) as Record<TokenNetworkId, string>;
-export const TOKEN_NETWORK_COLOR = Object.fromEntries(TOKEN_NETWORK_IDS.map((id) => [id, TOKEN_NETWORKS[id].color])) as Record<TokenNetworkId, string>;
+// ---- Networks connected through an OAuth app (or Neynar's sign-in) that the Poskoo owner registers.
+// They need server env vars; until then the Connect card shows "Not available yet" (channelStatus.ts).
+
+export const APP_NETWORK_IDS = ["tumblr", "wpcom", "plurk", "twitch", "farcaster"] as const;
+export type AppNetworkId = (typeof APP_NETWORK_IDS)[number];
+export type AppNetworkSpec = Omit<TokenNetworkSpec, "fields" | "help" | "helpUrl" | "warning">;
+
+export const APP_NETWORKS: Record<AppNetworkId, AppNetworkSpec> = {
+  // NPF text blocks; Poskoo splits long text into paragraphs.
+  tumblr: { label: "Tumblr", sub: "Blog", color: "#001935", captionMax: 20000, media: "images", maxMedia: 10 },
+  wpcom: { label: "WordPress.com", sub: "Site", color: "#3858e9", captionMax: 100000, media: "images", maxMedia: 10, titled: true },
+  // plurkAdd content: max 360 characters.
+  plurk: { label: "Plurk", sub: "Profile", color: "#ff574d", captionMax: 360, media: "none", maxMedia: 0 },
+  // Helix Send Chat Message: max 500 characters, text only.
+  twitch: { label: "Twitch", sub: "Channel chat", color: "#9146ff", captionMax: 500, media: "none", maxMedia: 0 },
+  // Casts: 320 bytes for regular accounts (longer casts need Farcaster Pro).
+  farcaster: { label: "Farcaster", sub: "Profile", color: "#855dcd", captionMax: 320, media: "none", maxMedia: 0 },
+};
+
+export function isAppNetwork(value: unknown): value is AppNetworkId {
+  return typeof value === "string" && (APP_NETWORK_IDS as readonly string[]).includes(value);
+}
+
+/** Every network defined in this file (token + app). */
+export const EXTRA_NETWORK_IDS = [...TOKEN_NETWORK_IDS, ...APP_NETWORK_IDS] as const;
+export type ExtraNetworkId = TokenNetworkId | AppNetworkId;
+export const EXTRA_NETWORKS: Record<ExtraNetworkId, AppNetworkSpec> = { ...TOKEN_NETWORKS, ...APP_NETWORKS };
+
+export function isExtraNetwork(value: unknown): value is ExtraNetworkId {
+  return isTokenNetwork(value) || isAppNetwork(value);
+}
+
+export const EXTRA_NETWORK_LABEL = Object.fromEntries(EXTRA_NETWORK_IDS.map((id) => [id, EXTRA_NETWORKS[id].label])) as Record<ExtraNetworkId, string>;
+export const EXTRA_NETWORK_COLOR = Object.fromEntries(EXTRA_NETWORK_IDS.map((id) => [id, EXTRA_NETWORKS[id].color])) as Record<ExtraNetworkId, string>;
 
 /** PLATFORMS entries (src/lib/platforms.ts). */
-export const TOKEN_PLATFORMS = Object.fromEntries(
-  TOKEN_NETWORK_IDS.map((id) => [id, { label: TOKEN_NETWORKS[id].label, captionMax: TOKEN_NETWORKS[id].captionMax }]),
-) as Record<TokenNetworkId, { label: string; captionMax: number }>;
+export const EXTRA_PLATFORMS = Object.fromEntries(
+  EXTRA_NETWORK_IDS.map((id) => [id, { label: EXTRA_NETWORKS[id].label, captionMax: EXTRA_NETWORKS[id].captionMax }]),
+) as Record<ExtraNetworkId, { label: string; captionMax: number }>;
 
 /** Save-time media rule for a token network; null when the mix is fine. */
-export function tokenMediaError(id: TokenNetworkId, media: MediaItem[], scheduling: boolean): string | null {
-  const spec = TOKEN_NETWORKS[id];
+export function extraMediaError(id: ExtraNetworkId, media: MediaItem[], scheduling: boolean): string | null {
+  const spec = EXTRA_NETWORKS[id];
   const videos = media.filter((m) => m.type === "video").length;
   const images = media.length - videos;
   switch (spec.media) {
