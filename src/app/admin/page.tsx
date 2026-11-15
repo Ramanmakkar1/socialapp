@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getBillingSummary } from "@/lib/adminBilling";
 import { requireAdmin } from "@/lib/admin";
 import { isDbConfigured, query } from "@/lib/db";
 import KpiCard from "./ui/KpiCard";
@@ -155,8 +156,16 @@ async function getOverview(): Promise<Overview> {
         .map((p) => ({ name: p[0].toUpperCase() + p.slice(1), count: counts[p], color: PLAN_COLOR[p] }));
       if (data.planMix.length === 0) data.planMix = [{ name: "Free", count: data.totalUsers, color: PLAN_COLOR.free }];
     } else {
-      data.paidUsers = 0;
-      data.mrr = null;
+      // No users.plan column: plans live in billing_subscriptions, so take MRR
+      // and paying users from the same summary /admin/billing uses.
+      try {
+        const billing = await getBillingSummary();
+        data.paidUsers = billing.paying;
+        data.mrr = Math.round(billing.mrrCents) / 100;
+      } catch {
+        data.paidUsers = 0;
+        data.mrr = null;
+      }
       data.planMix = data.totalUsers > 0 ? [{ name: "Free", count: data.totalUsers, color: PLAN_COLOR.free }] : [];
     }
 
