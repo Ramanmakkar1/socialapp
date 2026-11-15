@@ -272,7 +272,8 @@ export default function XSchedulerPage() {
             Need a profile refresh? Try the <Link className={s.vlink} href="/tools/x-bio-generator">free X bio generator</Link>.
             Short on ideas? Start from a draft with the <Link className={s.vlink} href="/tools/tweet-generator">free tweet generator</Link>.
             Not sure when to post? Find the{" "}
-            <Link className={s.vlink} href="/tools/best-time-to-post-on-x">best time to post on X</Link>.
+            <Link className={s.vlink} href="/tools/best-time-to-post-on-x">best time to post on X</Link>. You can also{" "}
+            <Link className={s.vlink} href="/tools/x-tools">browse all free X tools</Link>.
           </p>
         </div>
       </section>
