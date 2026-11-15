@@ -168,8 +168,10 @@ export async function createApiKeyAction(formData: FormData): Promise<void> {
   const user = await requireUser();
   const raw = formData.get("key_name");
   const name = typeof raw === "string" ? raw.trim().slice(0, 60) : "";
+  // Unticked (the default): the assistant can only create drafts and paused Auto-DMs to approve.
+  const canPublish = formData.get("can_publish") === "on";
   if (!isDbConfigured()) redirect("/app/settings?api_key=error");
-  const result = await createApiKey(user.id, name);
+  const result = await createApiKey(user.id, name, canPublish);
   if ("error" in result) redirect("/app/settings?api_key=error");
   revalidatePath("/app/settings");
   redirect(`/app/settings?api_key=created&key=${encodeURIComponent(result.key)}`);

@@ -7,6 +7,7 @@ import { hashToken } from "./password.ts";
 const U1 = "11111111-1111-4111-8111-111111111111";
 const U2 = "22222222-2222-4222-8222-222222222222";
 const POST_ID = "33333333-3333-4333-8333-333333333333";
+const PUBLISH = { canPublish: true };
 
 async function withPool<T>(handlers: FakeHandler[], run: () => Promise<T>): Promise<T> {
   const { pool } = createFakePool(handlers);
@@ -105,7 +106,7 @@ const createHandlers = (connected: boolean): FakeHandler[] => [
 test("create_post: requires a caption and a known channel", async () => {
   const noCaption = await withPool([], () => callMcpTool("create_post", {}, U1));
   assert.match(text(noCaption), /caption is required/);
-  const badChannel = await withPool([], () => callMcpTool("create_post", { caption: "hi", channel: "tiktok" }, U1));
+  const badChannel = await withPool([], () => callMcpTool("create_post", { caption: "hi", channel: "myspace" }, U1));
   assert.match(text(badChannel), /channel must be one of/);
 });
 
@@ -136,9 +137,10 @@ test("create_post: schedules an Instagram post with the same rules as the calend
       "create_post",
       { caption: "Hello world", mediaUrl: "https://ex.com/a.jpg", channel: "instagram", scheduleAt: at },
       U1,
+      PUBLISH,
     ),
   );
-  assert.deepEqual(json(result), { ok: true, postId: POST_ID });
+  assert.deepEqual(json(result), { ok: true, postId: POST_ID, status: "scheduled" });
   assert.equal(insertParams?.[0], U1);
   assert.equal(insertParams?.[3], "scheduled");
 });
@@ -161,9 +163,9 @@ test("create_post: “next slot” picks the next free slot from the channel sch
     };
   }
   const result = await withPool(handlers, () =>
-    callMcpTool("create_post", { caption: "Hello world", mediaUrl: "https://ex.com/a.jpg", channel: "instagram", scheduleAt: "next slot" }, U1),
+    callMcpTool("create_post", { caption: "Hello world", mediaUrl: "https://ex.com/a.jpg", channel: "instagram", scheduleAt: "next slot" }, U1, PUBLISH),
   );
-  assert.deepEqual(json(result), { ok: true, postId: POST_ID });
+  assert.deepEqual(json(result), { ok: true, postId: POST_ID, status: "scheduled" });
   const scheduledAt = insertParams?.[2] as unknown as Date | string;
   assert.ok(new Date(scheduledAt).getTime() > Date.now() + 60_000);
 });
@@ -174,9 +176,157 @@ test("create_post: an unconnected Instagram account is rejected, like in the cal
       "create_post",
       { caption: "Hello world", mediaUrl: "https://ex.com/a.jpg", channel: "instagram", scheduleAt: new Date(Date.now() + 3600_000).toISOString() },
       U1,
+      PUBLISH,
     ),
   );
   assert.match(text(result), /Connect Instagram/);
+});
+
+test("create_post: a draft-only key saves a draft (even when asked to schedule) and says it needs approval", async () => {
+  let insertParams: unknown[] | null = null;
+  const handlers = createHandlers(false);
+  const insert = handlers.find((h) => h.match.toString().includes("insert into scheduled_posts"));
+  if (insert) {
+    insert.reply = (params) => {
+      insertParams = params;
+      return [{ id: POST_ID }];
+    };
+  }
+  const at = new Date(Date.now() + 3600_000).toISOString();
+  const result = json(
+    await withPool(handlers, () =>
+      callMcpTool("create_post", { caption: "Hello", mediaUrl: "https://ex.com/a.jpg", channel: "instagram", scheduleAt: at, mode: "schedule" }, U1),
+    ),
+  ) as { ok: boolean; status: string; needsApproval?: boolean; plannedFor: string };
+  assert.equal(result.status, "draft");
+  assert.equal(result.needsApproval, true);
+  assert.equal(result.plannedFor, at);
+  assert.equal(insertParams?.[3], "draft", "never scheduled, even though Instagram is not connected");
+});
+
+test("create_post: several channels, a carousel and per-network captions", async () => {
+  const targets: unknown[][] = [];
+  let media: unknown = null;
+  const handlers: FakeHandler[] = [
+    { match: /select exists \(select 1 from information_schema\.columns/, reply: () => [{ exists: false }] },
+    { match: /^insert into scheduled_posts \(user_id/, reply: (p) => { media = p[4]; return [{ id: POST_ID }]; } },
+    { match: /^insert into post_targets \(post_id/, reply: (p) => { targets.push(p); return []; } },
+  ];
+  const result = json(
+    await withPool(handlers, () =>
+      callMcpTool(
+        "create_post",
+        {
+          caption: "Our new studio is open",
+          channels: ["instagram", "x", "linkedin"],
+          mediaUrls: ["https://ex.com/a.jpg", "https://ex.com/b.png"],
+          captions: { x: "Studio open!" },
+          mode: "draft",
+          scheduleAt: new Date(Date.now() + 3600_000).toISOString(),
+        },
+        U1,
+        PUBLISH,
+      ),
+    ),
+  ) as { status: string; needsApproval?: boolean };
+  assert.equal(result.status, "draft");
+  assert.equal(result.needsApproval, undefined, "a publishing key that asks for a draft gets no approval note");
+  assert.equal(JSON.parse(String(media)).length, 2);
+  assert.deepEqual(targets.map((t) => [t[1], t[2]]).sort(), [["instagram", null], ["linkedin", null], ["x", "Studio open!"]]);
+});
+
+const storedDraft = (status: string) => [
+  { match: /^select to_jsonb\(p\) as row from socialapp\.scheduled_posts/, reply: (p: unknown[]) => (p[0] === POST_ID && p[1] === U1 ? [{ row: { id: POST_ID, caption: "Old", status, scheduled_at: null, media: [{ type: "image", url: "https://ex.com/a.jpg" }], first_comment: null, ig_format: "feed", dm_rule_id: null } }] : []) },
+  { match: /^select to_jsonb\(t\) as row from socialapp\.post_targets/, reply: () => [{ row: { platform: "instagram", caption_override: null } }, { row: { platform: "x", caption_override: "Old X" } }] },
+] as FakeHandler[];
+
+test("update_post: edits a draft, keeps its channels and media, and drops an override set to \"\"", async () => {
+  let update: unknown[] | null = null;
+  const targets: unknown[][] = [];
+  const handlers: FakeHandler[] = [
+    ...storedDraft("draft"),
+    { match: /select exists \(select 1 from information_schema\.columns/, reply: () => [{ exists: false }] },
+    { match: /^select status, scheduled_at from scheduled_posts where id = \$1 and user_id = \$2 for update/, reply: () => [{ status: "draft", scheduled_at: null }] },
+    { match: /^select 1 from post_targets where post_id = \$1 and status <> 'pending'/, reply: () => [] },
+    { match: /^update scheduled_posts set caption=/, reply: (p) => { update = p; return [{ id: POST_ID }]; } },
+    { match: /^delete from post_targets/, reply: () => [] },
+    { match: /^insert into post_targets/, reply: (p) => { targets.push(p); return []; } },
+  ];
+  const result = json(await withPool(handlers, () => callMcpTool("update_post", { postId: POST_ID, caption: "New", captions: { x: "" } }, U1)));
+  assert.deepEqual(result, { ok: true, postId: POST_ID, status: "draft" });
+  assert.equal(update?.[1], "New");
+  assert.equal(update?.[3], "draft");
+  assert.deepEqual(targets.map((t) => [t[1], t[2]]).sort(), [["instagram", null], ["x", null]]);
+});
+
+test("update_post / delete_post: a draft-only key can't touch scheduled posts or schedule a draft", async () => {
+  const scheduled = await withPool(storedDraft("scheduled"), () => callMcpTool("update_post", { postId: POST_ID, caption: "x" }, U1));
+  assert.match(text(scheduled), /drafts only/);
+  const approve = await withPool(storedDraft("draft"), () => callMcpTool("update_post", { postId: POST_ID, mode: "schedule" }, U1));
+  assert.match(text(approve), /can't schedule/);
+  const other = await withPool(storedDraft("draft"), () => callMcpTool("update_post", { postId: POST_ID }, U2));
+  assert.match(text(other), /Post not found/);
+
+  const statusRow = (status: string): FakeHandler[] => [
+    { match: /^select status from socialapp\.scheduled_posts where id=\$1 and user_id=\$2/, reply: () => [{ status }] },
+  ];
+  assert.match(text(await withPool(statusRow("scheduled"), () => callMcpTool("delete_post", { postId: POST_ID }, U1))), /drafts only/);
+  assert.match(text(await withPool([], () => callMcpTool("delete_post", { postId: "nope" }, U1))), /postId must be/);
+});
+
+test("get_post_status: per-network status for the owner's post only", async () => {
+  const handlers: FakeHandler[] = [
+    { match: /^select p\.id, p\.status, p\.scheduled_at, p\.caption from socialapp\.scheduled_posts p where p\.id=\$1 and p\.user_id=\$2/, reply: (p) => (p[1] === U1 ? [{ id: POST_ID, status: "published", scheduled_at: new Date("2026-12-01T09:00:00Z"), caption: "Hi" }] : []) },
+    { match: /^select platform, status, error, published_at, external_post_id from socialapp\.post_targets/, reply: () => [
+      { platform: "instagram", status: "published", error: null, published_at: new Date("2026-12-01T09:00:05Z"), external_post_id: "ig1" },
+      { platform: "x", status: "failed", error: "Token expired", published_at: null, external_post_id: null },
+    ] },
+  ];
+  const result = json(await withPool(handlers, () => callMcpTool("get_post_status", { postId: POST_ID }, U1))) as { networks: { platform: string; status: string; error: string | null }[] };
+  assert.equal(result.networks.length, 2);
+  assert.equal(result.networks[1].error, "Token expired");
+  assert.match(text(await withPool(handlers, () => callMcpTool("get_post_status", { postId: POST_ID }, U2))), /Post not found/);
+});
+
+test("list_contacts: scoped to the owner, search and email filters reach the query", async () => {
+  let seen: { sql: string; params: unknown[] } | null = null;
+  const handlers: FakeHandler[] = [
+    { match: /from socialapp\.contacts c left join socialapp\.dm_rules r/, reply: (params, sql) => { seen = { sql, params }; return [{ username: "ana", name: null, email: "a@x.com", phone: null, tags: ["vip"], created_at: new Date("2026-11-01T00:00:00Z"), last_seen_at: null, rule_name: "Guide" }]; } },
+  ];
+  const rows = json(await withPool(handlers, () => callMcpTool("list_contacts", { search: "an", withEmail: true, limit: 5 }, U1))) as { email: string; automation: string }[];
+  assert.equal(rows[0].email, "a@x.com");
+  assert.equal(rows[0].automation, "Guide");
+  assert.equal(seen!.params[0], U1);
+  assert.match(seen!.sql, /c\.user_id = \$1/);
+  assert.match(seen!.sql, /c\.email is not null/);
+  assert.match(seen!.sql, /limit 5$/);
+});
+
+test("create_dm_rule: draft-only keys create it paused; publishing keys may activate it", async () => {
+  const statuses: unknown[] = [];
+  const handlers: FakeHandler[] = [
+    { match: /^insert into socialapp\.dm_rules/, reply: (p) => { statuses.push(p[12]); return [{ id: "r1" }]; } },
+    { match: /^update socialapp\.dm_rules set public_reply/, reply: () => [] },
+  ];
+  const args = { name: "Guide", keywords: ["guide"], dmText: "Hi {{username}}, here it is: {{link}}", linkUrl: "https://ex.com/guide", activate: true };
+  const paused = json(await withPool(handlers, () => callMcpTool("create_dm_rule", args, U1))) as { status: string };
+  assert.equal(paused.status, "paused");
+  const active = json(await withPool(handlers, () => callMcpTool("create_dm_rule", args, U1, PUBLISH))) as { status: string };
+  assert.equal(active.status, "active");
+  assert.deepEqual(statuses, ["paused", "active"]);
+  const bad = await withPool(handlers, () => callMcpTool("create_dm_rule", { ...args, linkUrl: "" }, U1));
+  assert.match(text(bad), /link/);
+});
+
+test("create_campaign_from_brief: explains when AI is not configured", async () => {
+  const saved = process.env.ANTHROPIC_API_KEY;
+  delete process.env.ANTHROPIC_API_KEY;
+  try {
+    const result = await withPool([], () => callMcpTool("create_campaign_from_brief", { goal: "Sell tickets", channels: ["instagram"] }, U1));
+    assert.match(text(result), /AI isn't configured/);
+  } finally {
+    if (saved !== undefined) process.env.ANTHROPIC_API_KEY = saved;
+  }
 });
 
 // --- add_idea --------------------------------------------------------------
@@ -263,7 +413,7 @@ function mcpRequest(body: unknown, key?: string): Request {
 
 const routeHandlers: FakeHandler[] = [
   {
-    match: /^select id, user_id from socialapp\.api_keys/,
+    match: /^select id, user_id, .* from socialapp\.api_keys/,
     reply: (params) => (params[0] === hashToken(KEY) ? [{ id: "k1", user_id: U1 }] : []),
   },
   { match: /^update socialapp\.api_keys set last_used_at=now\(\)/, reply: () => [] },
@@ -292,7 +442,19 @@ test("route: initialize, tools/list and tools/call work for a valid key", async 
   const listBody = (await list.json()) as { result: { tools: { name: string }[] } };
   assert.deepEqual(
     listBody.result.tools.map((t) => t.name).sort(),
-    ["add_idea", "create_post", "get_analytics_summary", "list_channels", "list_posts"],
+    [
+      "add_idea",
+      "create_campaign_from_brief",
+      "create_dm_rule",
+      "create_post",
+      "delete_post",
+      "get_analytics_summary",
+      "get_post_status",
+      "list_channels",
+      "list_contacts",
+      "list_posts",
+      "update_post",
+    ],
   );
   assert.equal(listBody.result.tools.length, MCP_TOOLS.length);
 
