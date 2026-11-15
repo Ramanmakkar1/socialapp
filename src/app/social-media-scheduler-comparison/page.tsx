@@ -14,7 +14,7 @@ import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 const PATH = "/social-media-scheduler-comparison";
-const title = "Social Media Scheduler Comparison: Poskoo vs Buffer & More";
+const title = "Social Media Scheduler Comparison: Features & Free Plans";
 const description =
   "Compare social media schedulers: Poskoo plans and auto-publishes to Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky and Mastodon, with free plan.";
 
@@ -325,9 +325,9 @@ export default function SocialMediaSchedulerComparisonPage() {
                 <tr>
                   <th className={s.th} scope="col">Feature</th>
                   <th className={`${s.th} ${s.oursCol}`} scope="col">{BRAND.name}</th>
-                  <th className={s.th} scope="col">Buffer</th>
-                  <th className={s.th} scope="col">Later</th>
-                  <th className={s.th} scope="col">Hootsuite</th>
+                  <th className={s.th} scope="col"><Link className={s.vlink} href="/buffer-alternative">Buffer</Link></th>
+                  <th className={s.th} scope="col"><Link className={s.vlink} href="/later-alternative">Later</Link></th>
+                  <th className={s.th} scope="col"><Link className={s.vlink} href="/hootsuite-alternative">Hootsuite</Link></th>
                 </tr>
               </thead>
               <tbody>
@@ -344,7 +344,12 @@ export default function SocialMediaSchedulerComparisonPage() {
             </table>
           </div>
           <p className="small" style={{ marginTop: 16, textAlign: "center" }}>
-            Compare plans on the <Link className={s.vlink} href="/pricing">Poskoo pricing page</Link>.
+            Compare plans on the <Link className={s.vlink} href="/pricing">Poskoo pricing page</Link>. Or read the full comparisons:{" "}
+            <Link className={s.vlink} href="/buffer-alternative">Poskoo vs Buffer</Link>
+            {" · "}
+            <Link className={s.vlink} href="/later-alternative">Poskoo vs Later</Link>
+            {" · "}
+            <Link className={s.vlink} href="/hootsuite-alternative">Poskoo vs Hootsuite</Link>
           </p>
           <CompareNote />
         </div>
