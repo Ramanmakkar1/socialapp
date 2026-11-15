@@ -22,7 +22,7 @@ function resolveSitemapLastModified(): Date {
 export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
-// intended; public/sitemap.xsl explains it to anyone who opens the file.
+// intended; the file stays raw XML with no XSLT styling.
 function getSitemapPaths(): PublicPath[] {
   // Staging is noindex: list nothing, on any host, until indexing is enabled.
   if (!BRAND.indexable) return [];
