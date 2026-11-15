@@ -5,8 +5,8 @@
 //     LINKEDIN_PAGES_ENABLED=1),
 //   - CHANNEL_STATUS_<ID>=ready|awaiting|soon overrides the wording (ready still needs the keys).
 
-export type ComingChannel = "tiktok" | "pinterest" | "x" | "gbp" | "linkedin_pages";
-export const COMING_CHANNELS: ComingChannel[] = ["tiktok", "pinterest", "x", "gbp", "linkedin_pages"];
+export type ComingChannel = "tiktok" | "pinterest" | "x" | "gbp" | "linkedin_pages" | "tumblr" | "wpcom" | "plurk" | "twitch" | "farcaster";
+export const COMING_CHANNELS: ComingChannel[] = ["tiktok", "pinterest", "x", "gbp", "linkedin_pages", "tumblr", "wpcom", "plurk", "twitch", "farcaster"];
 
 export type ChannelState = "ready" | "awaiting" | "soon";
 
@@ -52,6 +52,37 @@ export const CHANNEL_STATUS_CONFIG: Record<ComingChannel, Config> = {
     whenOff: "awaiting",
     why: "Posting to company Pages needs LinkedIn's Community Management API, which LinkedIn approves separately. Posting to your personal LinkedIn profile works today.",
   },
+  // Built; switched on once Poskoo's app keys are set on the server (no platform review needed).
+  tumblr: {
+    name: "Tumblr",
+    reviewer: "Tumblr",
+    whenOff: "soon",
+    why: "Posting to your Tumblr blog is built. We're registering Poskoo's Tumblr app and switching it on soon.",
+  },
+  wpcom: {
+    name: "WordPress.com",
+    reviewer: "WordPress.com",
+    whenOff: "soon",
+    why: "Posting to WordPress.com sites is built and switches on soon. Self-hosted WordPress sites can connect today with an application password.",
+  },
+  plurk: {
+    name: "Plurk",
+    reviewer: "Plurk",
+    whenOff: "soon",
+    why: "Posting to Plurk is built. We're registering Poskoo's Plurk app and switching it on soon.",
+  },
+  twitch: {
+    name: "Twitch",
+    reviewer: "Twitch",
+    whenOff: "soon",
+    why: "Twitch has no API for posts, so Poskoo sends your message to your own channel's chat. It's built and switches on soon.",
+  },
+  farcaster: {
+    name: "Farcaster",
+    reviewer: "Neynar",
+    whenOff: "soon",
+    why: "Casting to Farcaster goes through Neynar's signer service. It's built and switches on once Poskoo's Neynar plan is set up.",
+  },
 };
 
 function asState(v: string | undefined): ChannelState | null {
@@ -76,9 +107,10 @@ export function channelStatus(id: ComingChannel, configured: boolean, override?:
 }
 
 /** Every coming channel's status (server side: pass process.env and which keys are configured). */
-export function channelStatuses(configured: Record<ComingChannel, boolean>, env: Record<string, string | undefined>): Record<ComingChannel, ChannelStatus> {
+export function channelStatuses(configured: Partial<Record<ComingChannel, boolean>>, env: Record<string, string | undefined>): Record<ComingChannel, ChannelStatus> {
   const out = {} as Record<ComingChannel, ChannelStatus>;
-  for (const id of COMING_CHANNELS) out[id] = channelStatus(id, configured[id], env[envKey(id)]);
+  // A channel missing from `configured` counts as not configured.
+  for (const id of COMING_CHANNELS) out[id] = channelStatus(id, configured[id] === true, env[envKey(id)]);
   return out;
 }
 

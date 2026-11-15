@@ -12,6 +12,7 @@
     "test": "npx --yes tsx@4 --test \"src/**/*.test.ts\" src/lib/rewind.test.mjs"
   },
   "dependencies": {
+    "@noble/curves": "^2.4.0",
     "clsx": "^2",
     "lucide-react": "^0",
     "next": "16.4.4",

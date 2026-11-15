@@ -7,6 +7,9 @@ import {
   toLocalInputValue,
   type ComposerDraftInitial,
 } from "./composerDraft.ts";
+import { EXTRA_NETWORK_IDS } from "./networks/tokenNetworks.ts";
+
+const TOKEN_OFF = Object.fromEntries(EXTRA_NETWORK_IDS.map((id) => [id, false]));
 
 function draft(overrides: Partial<ComposerDraftInitial> = {}): ComposerDraftInitial {
   return {
@@ -41,8 +44,8 @@ test("draft opened by URL: the first render already holds every saved field", ()
   assert.equal(state.mainCaption, "Draft one caption");
   assert.equal(state.firstComment, "#tags");
   assert.deepEqual(state.tags, ["Launch"]);
-  assert.deepEqual(state.enabled, { instagram: true, facebook: false, threads: false, youtube: false, tiktok: false, bluesky: false, mastodon: false, linkedin: false, pinterest: false, x: false, gbp: false, ig_personal: false, fb_group: false });
-  assert.deepEqual(state.customize, { instagram: true, facebook: false, threads: false, youtube: false, tiktok: false, bluesky: false, mastodon: false, linkedin: false, pinterest: false, x: false, gbp: false, ig_personal: false, fb_group: false });
+  assert.deepEqual(state.enabled, { instagram: true, facebook: false, threads: false, youtube: false, tiktok: false, bluesky: false, mastodon: false, linkedin: false, pinterest: false, x: false, gbp: false, ig_personal: false, fb_group: false, ...TOKEN_OFF });
+  assert.deepEqual(state.customize, { instagram: true, facebook: false, threads: false, youtube: false, tiktok: false, bluesky: false, mastodon: false, linkedin: false, pinterest: false, x: false, gbp: false, ig_personal: false, fb_group: false, ...TOKEN_OFF });
   assert.equal(state.customCaption.instagram, "IG only text");
   assert.deepEqual(state.mediaUrls, ["https://cdn.example.com/a.jpg", "https://cdn.example.com/b.jpg"]);
   assert.equal(state.igFormat, "feed");

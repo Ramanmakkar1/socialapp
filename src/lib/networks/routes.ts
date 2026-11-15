@@ -93,12 +93,14 @@ export async function finishOAuth(
   connect: (code: string, flow: OAuthFlow) => Promise<SaveAccountInput>,
   /** Optional next step after a successful connect (LinkedIn Pages: the page picker). */
   next?: (input: SaveAccountInput, done: URL) => URL,
+  /** Query parameter holding the code (OAuth 1.0a: "oauth_verifier"). */
+  codeParam = "code",
 ): Promise<NextResponse> {
   // Outside the try so the /login redirect is not swallowed.
   const user = await requireUser();
   try {
     const url = new URL(request.url);
-    const code = url.searchParams.get("code");
+    const code = url.searchParams.get(codeParam);
     const state = url.searchParams.get("state");
     const error = url.searchParams.get("error");
     const store = await cookies();

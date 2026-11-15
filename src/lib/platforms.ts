@@ -1,3 +1,5 @@
+import { EXTRA_PLATFORMS } from "@/lib/networks/tokenNetworks";
+
 export const PLATFORMS = {
   instagram: {
     label: "Instagram",
@@ -66,6 +68,8 @@ export const PLATFORMS = {
     captionMax: 280,
     counter: "x",
   },
+  // Telegram, Discord, Matrix, WordPress, ... (src/lib/networks/tokenNetworks.ts).
+  ...EXTRA_PLATFORMS,
 } as const;
 
 export type PlatformId = keyof typeof PLATFORMS;

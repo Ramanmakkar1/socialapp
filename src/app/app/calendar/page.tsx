@@ -25,6 +25,7 @@ import { facebookPageStatus, type FacebookSourceAccount } from "@/lib/facebookPu
 import { IDEA_BY_ID_SQL, IDEAS_LIST_SQL, ideaComposerPrefill, normalizeIdeaStatus, type IdeaRow } from "@/lib/ideas";
 import { allPostTags, hasColumn, postMatchesTag } from "@/lib/tagFilter";
 import styles from "./calendar.module.css";
+import { isExtraNetwork, EXTRA_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
 
 export const metadata = { title: "Calendar" };
 
@@ -41,7 +42,7 @@ type WeekPost = {
   error: string | null;
 };
 
-const CHANNEL_ORDER = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group"];
+const CHANNEL_ORDER = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group", ...EXTRA_NETWORK_IDS];
 
 const MONTH_FMT = { month: "long", year: "numeric", timeZone: "UTC" } as const;
 
@@ -383,7 +384,7 @@ export default async function CalendarPage({
         [user.id],
       );
       for (const a of accRows) {
-        const name = a.username ? (a.platform === "linkedin" || a.platform === "gbp" || a.platform === "fb_group" ? a.username : `@${a.username.replace(/^@/, "")}`) : (a.page_name ?? a.platform);
+        const name = a.username ? (a.platform === "linkedin" || a.platform === "gbp" || a.platform === "fb_group" || isExtraNetwork(a.platform) ? a.username : `@${a.username.replace(/^@/, "")}`) : (a.page_name ?? a.platform);
         // Composer preview: the account the post would go out as, even if it needs reconnecting.
         if (!previewAccountNames[a.platform]) previewAccountNames[a.platform] = name;
         if (a.status !== "active" || accountNames[a.platform]) continue;

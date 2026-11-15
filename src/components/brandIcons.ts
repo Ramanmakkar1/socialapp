@@ -1,6 +1,33 @@
 // Simple line marks for networks lucide has no icon for. Built with createLucideIcon so they are
 // drop-in replacements wherever a lucide icon is used (same props, same `typeof Instagram` type).
-import { createLucideIcon, Facebook, Instagram, Linkedin, Store } from "lucide-react";
+import {
+  Brackets,
+  Clapperboard,
+  Code,
+  Earth,
+  createLucideIcon,
+  Facebook,
+  Gamepad2,
+  Ghost,
+  Globe,
+  Hash,
+  Image as ImageIcon,
+  Instagram,
+  Linkedin,
+  Mail,
+  MessageCircle,
+  MessagesSquare,
+  NotebookPen,
+  PenLine,
+  RadioTower,
+  Send,
+  Smile,
+  Sparkles,
+  Store,
+  Tv,
+  Zap,
+} from "lucide-react";
+import { EXTRA_NETWORK_COLOR } from "@/lib/networks/tokenNetworks";
 
 export const TikTokIcon = createLucideIcon("tiktok", [
   ["path", { d: "M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5", key: "tk1" }],
@@ -49,6 +76,27 @@ export const NEW_NETWORK_ICON = {
   // Reminder channels (no posting API, Poskoo e-mails a reminder).
   ig_personal: Instagram,
   fb_group: Facebook,
+  // Token networks: plain line icons (no brand logos).
+  telegram: Send,
+  discord: Gamepad2,
+  slack: Hash,
+  mattermost: MessagesSquare,
+  matrix: Brackets,
+  misskey: Sparkles,
+  pixelfed: ImageIcon,
+  peertube: Clapperboard,
+  devto: Code,
+  hashnode: PenLine,
+  ghost: Ghost,
+  wordpress: Globe,
+  discourse: MessageCircle,
+  listmonk: Mail,
+  nostr: Zap,
+  tumblr: NotebookPen,
+  wpcom: Earth,
+  plurk: Smile,
+  twitch: Tv,
+  farcaster: RadioTower,
 };
 
 export const NEW_NETWORK_COLOR = {
@@ -61,4 +109,5 @@ export const NEW_NETWORK_COLOR = {
   gbp: "#4285f4",
   ig_personal: "#d62976",
   fb_group: "#1877f2",
+  ...EXTRA_NETWORK_COLOR,
 };

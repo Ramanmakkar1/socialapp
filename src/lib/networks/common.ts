@@ -3,11 +3,14 @@
 // unit tests run without the network. Tokens are never logged; error messages are redacted.
 import { createHash, randomBytes } from "node:crypto";
 import { decryptToken, encryptToken } from "@/lib/crypto";
+import { EXTRA_NETWORK_IDS, EXTRA_NETWORK_LABEL, type ExtraNetworkId } from "@/lib/networks/tokenNetworks";
 
 // ig_personal / fb_group are reminder channels (no posting API): Poskoo e-mails the user at the
 // scheduled time instead of publishing (src/lib/networks/reminder.ts).
-export type NetworkId = "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp" | "ig_personal" | "fb_group";
-export const NETWORK_IDS: NetworkId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group"];
+// Token networks (Telegram, Discord, Matrix, WordPress, ...) connect with a token / key / webhook
+// instead of a reviewed OAuth app (src/lib/networks/tokenNetworks.ts).
+export type NetworkId = "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp" | "ig_personal" | "fb_group" | ExtraNetworkId;
+export const NETWORK_IDS: NetworkId[] = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group", ...EXTRA_NETWORK_IDS];
 
 export const NETWORK_LABEL: Record<NetworkId, string> = {
   tiktok: "TikTok",
@@ -19,6 +22,7 @@ export const NETWORK_LABEL: Record<NetworkId, string> = {
   gbp: "Google Business Profile",
   ig_personal: "Instagram (personal)",
   fb_group: "Facebook Group",
+  ...EXTRA_NETWORK_LABEL,
 };
 
 export function isNetworkId(value: unknown): value is NetworkId {

@@ -1,5 +1,6 @@
 // Server only: the connected channels shown in the app sidebar (Buffer-style channel list).
 import { isDbConfigured, query } from "@/lib/db";
+import { isExtraNetwork } from "@/lib/networks/tokenNetworks";
 
 export type SidebarChannel = {
   platform: "instagram" | "facebook" | "threads" | "youtube" | string;
@@ -20,7 +21,7 @@ export function buildChannels(accounts: AccountRow[], youtube: { title: string; 
   for (const a of accounts) {
     // LinkedIn (member name) and Google Business Profile (location title) are names, not handles: no "@" in front of it.
     const name =
-      (a.username && (a.platform === "linkedin" || a.platform === "gbp" || a.platform === "fb_group" ? a.username : `@${a.username.replace(/^@/, "")}`)) || a.page_name || a.platform;
+      (a.username && (a.platform === "linkedin" || a.platform === "gbp" || a.platform === "fb_group" || isExtraNetwork(a.platform) ? a.username : `@${a.username.replace(/^@/, "")}`)) || a.page_name || a.platform;
     out.push({ platform: a.platform, name, status: a.status, scheduled: countOf(a.platform) });
   }
   for (const y of youtube) {

@@ -18,6 +18,7 @@ import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
 import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { connectHref, networkAvailability } from "@/lib/networks/registry";
+import { neynarConfig } from "@/lib/networks/apps";
 import { linkedinConfig } from "@/lib/networks/linkedin";
 import { channelStatuses } from "@/lib/channelStatus";
 import { isFeatureReady, reminderChannelStatus } from "@/lib/featureReadiness";
@@ -245,8 +246,21 @@ async function AppShell({ children }: { children: ReactNode }) {
   };
   // "Awaiting approval" / "Coming soon" pills for channels whose keys or approval are missing.
   availability.linkedinPages = Boolean(availability.linkedin) && linkedinConfig().companyPages;
+  // Public client id for the "Sign in with Neynar" widget (only when Farcaster is switched on).
+  if (availability.farcaster) availability.farcasterClientId = neynarConfig().clientId;
   availability.statuses = channelStatuses(
-    { tiktok: Boolean(availability.tiktok), pinterest: Boolean(availability.pinterest), x: Boolean(availability.x), gbp: Boolean(availability.gbp), linkedin_pages: availability.linkedinPages },
+    {
+      tiktok: Boolean(availability.tiktok),
+      pinterest: Boolean(availability.pinterest),
+      x: Boolean(availability.x),
+      gbp: Boolean(availability.gbp),
+      linkedin_pages: availability.linkedinPages,
+      tumblr: Boolean(availability.tumblr),
+      wpcom: Boolean(availability.wpcom),
+      plurk: Boolean(availability.plurk),
+      twitch: Boolean(availability.twitch),
+      farcaster: Boolean(availability.farcaster),
+    },
     process.env,
   );
   availability.reminderStatuses = {

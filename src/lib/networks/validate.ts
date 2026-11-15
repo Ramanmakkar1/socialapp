@@ -1,6 +1,7 @@
 // Pure: per-network rules checked when a post is saved (composer and MCP), and the options stored
 // in post_targets.net_options. Safe to import on the client (no server-only modules).
 import type { MediaItem, NetworkId } from "@/lib/networks/common";
+import { isExtraNetwork, extraMediaError } from "@/lib/networks/tokenNetworks";
 import { gbpOptionsError, parseGbpOptions, parsePinterestOptions, parseTikTokOptions, pinterestOptionsError, tiktokOptionsError } from "@/lib/networks/options";
 
 function obj(v: unknown): Record<string, unknown> {
@@ -56,5 +57,7 @@ export function networkTargetError(platform: NetworkId, media: MediaItem[], rawO
     case "fb_group":
       // Reminder channels: the owner posts it by hand, so any caption / media mix is fine.
       return null;
+    default:
+      return isExtraNetwork(platform) ? extraMediaError(platform, media, scheduling) : null;
   }
 }
