@@ -102,6 +102,10 @@ export default function FeaturesPage() {
             Everything Poskoo does, <em className="s mark">in one place</em>
           </h1>
           <p className="lede">
+            Poskoo combines social scheduling, Instagram comment-to-DM automation, lead capture and analytics in
+            one app.
+          </p>
+          <p>
             Poskoo is one app for planning posts, publishing on Instagram, Facebook, Threads and YouTube, and
             turning comments into leads with automatic DMs.
           </p>
@@ -113,6 +117,42 @@ export default function FeaturesPage() {
         </div>
         <div className="hero-art"><AnimArt name="features" label="A creator points at an open toolbox of calendar, chat, mail, chart and link tools" /></div>
       </header>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Explore Poskoo</p>
+            <h2>Go straight to what you need</h2>
+          </div>
+          <div className="cards">
+            <article className="pcard">
+              <h3>Instagram scheduler</h3>
+              <p>Plan feed posts, Reels and carousels on a calendar and auto-publish them.</p>
+              <Link className="go" href="/instagram-scheduler">See the Instagram scheduler <span aria-hidden="true">→</span></Link>
+            </article>
+            <article className="pcard">
+              <h3>Instagram auto-DM</h3>
+              <p>Send your link automatically to everyone who comments your keyword.</p>
+              <Link className="go" href="/instagram-auto-dm">See how Instagram auto-DM works <span aria-hidden="true">→</span></Link>
+            </article>
+            <article className="pcard">
+              <h3>Instagram DM automation</h3>
+              <p>Capture emails, add a follow gate and track clicks on every auto-DM.</p>
+              <Link className="go" href="/instagram-dm-automation">Explore Instagram DM automation <span aria-hidden="true">→</span></Link>
+            </article>
+            <article className="pcard">
+              <h3>Instagram link in bio</h3>
+              <p>Turn one bio link into a page of links with click tracking.</p>
+              <Link className="go" href="/instagram-link-in-bio">Build your Instagram link in bio <span aria-hidden="true">→</span></Link>
+            </article>
+            <article className="pcard">
+              <h3>Pricing</h3>
+              <p>Compare the Free, Pro and Agency plans and what each one includes.</p>
+              <Link className="go" href="/pricing">See Poskoo pricing and plans <span aria-hidden="true">→</span></Link>
+            </article>
+          </div>
+        </div>
+      </section>
 
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
