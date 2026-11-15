@@ -1,12 +1,13 @@
 import Link from "next/link";
 import s from "./site.module.css";
 
-type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "zoho" | "loomly" | "socialbee" | "sendible" | "linktree";
+type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "zoho" | "loomly" | "tailwind" | "socialbee" | "sendible" | "linktree";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
   { href: "/publer-alternative", label: "Publer alternative", key: "publer" },
   { href: "/loomly-alternative", label: "Loomly alternative", key: "loomly" },
+  { href: "/tailwind-alternative", label: "Tailwind alternative", key: "tailwind" },
   { href: "/socialbee-alternative", label: "SocialBee alternative", key: "socialbee" },
   { href: "/sendible-alternative", label: "Sendible alternative", key: "sendible" },
   { href: "/agorapulse-alternative", label: "Agorapulse alternative", key: "agorapulse" },
