@@ -70,9 +70,32 @@ test("sitemap is empty for both audited host aliases while staging is noindex", 
 });
 
 test("approved production host returns an empty sitemap while BRAND.indexable is false", () => {
-  whileNoindex(() => {
-    assert.deepEqual(sitemap(), [], "the approved production host must not list noindex pages");
-  });
+  const wasUrl = BRAND.url;
+  try {
+    // Pin the approved production origin: the empty result must not depend on
+    // NEXT_PUBLIC_SITE_URL happening to be unset in the test environment.
+    BRAND.url = "https://poskoo.com";
+    whileNoindex(() => {
+      assert.deepEqual(sitemap(), [], "the approved production host must not list noindex pages");
+    });
+  } finally {
+    BRAND.url = wasUrl;
+  }
+});
+
+test("approved production host is populated only when BRAND.indexable is true", () => {
+  const wasUrl = BRAND.url;
+  const was = BRAND.indexable;
+  try {
+    BRAND.url = "https://poskoo.com";
+    BRAND.indexable = true;
+    const urls = sitemap().map((entry) => entry.url);
+    assert.ok(urls.includes("https://poskoo.com/"), "the production sitemap must list the home page once indexing is enabled");
+    assert.ok(urls.length > 0, "the production sitemap must not be empty once indexing is enabled");
+  } finally {
+    BRAND.url = wasUrl;
+    BRAND.indexable = was;
+  }
 });
 
 test("staging: sitemap omits the home page and robots omits the sitemap", () => {
