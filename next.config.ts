@@ -107,6 +107,10 @@ const nextConfig: NextConfig = {
     const stagingNoStoreHeaders = [
       ...noStore,
       { key: "X-Robots-Tag", value: "noindex, nofollow" },
+      // The legacy host 308-redirects to poskoo.com, but a crawler that does not
+      // follow the redirect still sees this response. Advertise the final-domain
+      // canonical here too, so the audited URL never reports "No canonical link".
+      { key: "Link", value: '<https://poskoo.com/>; rel="canonical"' },
     ];
     return [
       { source: "/:path*", headers: securityHeaders },

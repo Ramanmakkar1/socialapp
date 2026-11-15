@@ -128,5 +128,10 @@ test("old staging host responses carry the noindex/no-store header contract", as
     );
     assert.equal(headerMap.get("cdn-cache-control"), "no-store");
     assert.equal(headerMap.get("cloudflare-cdn-cache-control"), "no-store");
+    assert.equal(
+      headerMap.get("link"),
+      '<https://poskoo.com/>; rel="canonical"',
+      `${label} responses must advertise the final-domain canonical`,
+    );
   }
 });
