@@ -25,7 +25,7 @@ const description = PAGE_DESCRIPTIONS["/"];
 // The trailing slash is load-bearing: new URL("/", base) normalises the root
 // path to the bare origin (https://poskoo.com), which Next then renders as the
 // canonical href. canonicalUrl() keeps that "/" explicitly and always builds
-// from BRAND.url, dropping any query string or fragment.
+// from the approved production origin, dropping any query string or fragment.
 const canonical = canonicalUrl("/");
 export const metadata: Metadata = {
  title: { absolute: title }, description, alternates: { canonical },

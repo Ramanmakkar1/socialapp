@@ -1,15 +1,16 @@
-import { BRAND } from "./brand";
+import { APPROVED_PRODUCTION_URL } from "./brand";
 
 /**
  * Build the absolute, self-referencing canonical URL for a route.
  *
- * - Always uses the approved origin in BRAND.canonicalUrl (never a request/staging host).
+ * - Always uses the approved production origin (never the staging host and never
+ *   a NEXT_PUBLIC_SITE_URL override, so a staging deploy cannot leak into the tag).
  * - The root normalises to exactly one trailing slash: "https://poskoo.com/".
  * - Other paths have no trailing slash.
  * - Query strings and fragments are dropped, since they are not canonicals.
  */
 export function canonicalUrl(path = "/"): string {
-  const origin = BRAND.canonicalUrl.replace(/\/+$/, "");
+  const origin = APPROVED_PRODUCTION_URL.replace(/\/+$/, "");
   // Drop any query string or fragment before looking at the path.
   const clean = (path || "/").split(/[?#]/, 1)[0];
   if (clean === "" || clean === "/") return `${origin}/`;
