@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "Free Instagram bio generator: enter your name, what you do and a call to action, pick one of 8 niches and copy a bio with a live 150-character counter.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram bio generator:", mark: "bio ideas", after: "you can copy" },
-  lede: "Fill in your name, what you do and one call to action, pick a niche, and get four ready-to-copy bios with emojis, line breaks and a 150-character counter.",
+  lede: "An Instagram bio can be up to 150 characters, so it should say who you are, what you do and one next step. Enter your name, what you do and a call to action, pick a niche, and copy one of four ready-made bios with a live counter.",
   art: "writing",
   artLabel: "A creator writes with a giant pencil on a phone-shaped card full of lines and emoji",
   heroPoints: ["150-char counter", "8 niches", "No signup"],
