@@ -138,6 +138,7 @@ const config: ToolPageConfig = {
       {
         title: "How to use engagement rate well",
         body: (
+          <>
           <ul>
             <li>
               <b>Compare like with like.</b> Short videos, longer videos and photo carousels behave differently, so
@@ -164,6 +165,12 @@ const config: ToolPageConfig = {
               <Link href="/tools/instagram-engagement-rate-calculator">Instagram engagement rate calculator</Link>.
             </li>
           </ul>
+          <p>
+            Once you know your rate, use the{" "}
+            <Link href="/tools/tiktok-money-calculator">TikTok money calculator</Link> to estimate what a sponsored
+            video and Creator Rewards could pay.
+          </p>
+          </>
         ),
       },
       {
@@ -206,6 +213,7 @@ const config: ToolPageConfig = {
   related: [
     "/tools/tiktok-caption-generator",
     "/tools/tiktok-hashtag-generator",
+    "/tools/tiktok-money-calculator",
     "/tools/best-time-to-post-on-tiktok",
     "/tools/instagram-engagement-rate-calculator",
     "/tools/social-media-analytics-report",
