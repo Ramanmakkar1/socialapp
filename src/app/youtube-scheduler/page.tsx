@@ -166,6 +166,9 @@ export default function YouTubeSchedulerPage() {
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             Posting a Short? Check the file first with our free <Link className={s.vlink} href="/tools/youtube-shorts-size-checker">YouTube Shorts size checker</Link> so it fills the 9:16 screen, then keep text clear of the interface with the <Link className={s.vlink} href="/tools/youtube-shorts-safe-zone-checker">YouTube Shorts safe zone checker</Link>. Refreshing your channel? Check your channel photo with the <Link className={s.vlink} href="/tools/youtube-profile-picture-size-checker">YouTube profile picture size checker</Link> and your banner with the <Link className={s.vlink} href="/tools/youtube-banner-size-checker">YouTube banner size checker</Link>. Track how each upload performs with the <Link className={s.vlink} href="/tools/youtube-engagement-rate-calculator">free YouTube engagement rate calculator</Link>.
           </p>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Browse all <Link className={s.vlink} href="/tools/youtube-tools">free YouTube tools</Link>.
+          </p>
         </div>
       </section>
 
