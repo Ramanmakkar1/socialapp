@@ -115,9 +115,13 @@ const nextConfig: NextConfig = {
       })),
       {
         source: "/",
-        headers: staging
-          ? [...noStore, { key: "X-Robots-Tag", value: "noindex, nofollow" }]
-          : [
+        headers: [
+          // Pair the HTML <link rel="canonical"> with an HTTP Link header so
+          // crawlers that only inspect headers still get the production origin.
+          { key: "Link", value: '<https://poskoo.com/>; rel="canonical"' },
+          ...(staging
+            ? [...noStore, { key: "X-Robots-Tag", value: "noindex, nofollow" }]
+            : [
               {
                 key: "Cache-Control",
                 value: "public, s-maxage=3600, stale-while-revalidate=86400",
@@ -133,7 +137,8 @@ const nextConfig: NextConfig = {
                 key: "Cloudflare-CDN-Cache-Control",
                 value: "public, s-maxage=3600, stale-while-revalidate=86400",
               },
-            ],
+            ]),
+        ],
       },
       // Legacy staging host: apply the noindex/no-store contract to every
       // response, including the 301 redirects above, so crawlers never index
