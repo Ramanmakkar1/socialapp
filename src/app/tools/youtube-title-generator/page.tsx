@@ -65,7 +65,8 @@ const config: ToolPageConfig = {
             YouTube allows up to <b>100 characters</b> in a title. Search results and many mobile views show only about
             the first <b>70 characters</b>, so treat 70 as your practical target and keep the most important words at the
             front. Any title over 100 characters is rejected by YouTube. Check a finished title with the{" "}
-            <Link href="/tools/youtube-title-counter">free YouTube title counter</Link> before you publish.
+            <Link href="/tools/youtube-title-counter">free YouTube title counter</Link> before you publish. Need a topic
+            first? Try the <Link href="/tools/youtube-video-ideas-generator">YouTube video ideas generator</Link>.
           </p>
         ),
       },
@@ -116,6 +117,7 @@ const config: ToolPageConfig = {
   ],
   related: [
     "/tools/youtube-title-counter",
+    "/tools/youtube-video-ideas-generator",
     "/tools/youtube-tag-generator",
     "/tools/youtube-description-generator",
     "/tools/best-time-to-post-on-youtube",

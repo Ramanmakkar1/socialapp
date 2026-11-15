@@ -59,6 +59,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-hook-generator", name: "Hook generator", summary: "Ready-to-copy Reel hooks for any topic across eight hook styles.", category: "create", icon: "megaphone" },
   { href: "/tools/tiktok-hook-generator", name: "TikTok hook generator", summary: "Scroll-stopping first lines for your TikTok videos, grouped by hook style.", category: "create", icon: "megaphone" },
   { href: "/tools/tiktok-video-ideas-generator", name: "TikTok video ideas generator", summary: "Six TikTok video ideas for your niche, each with a hook and caption starter.", category: "create", icon: "lightbulb" },
+  { href: "/tools/youtube-video-ideas-generator", name: "YouTube video ideas generator", summary: "Six YouTube video ideas for your niche, each with a hook and description starter.", category: "create", icon: "lightbulb" },
   { href: "/tools/instagram-post-ideas-generator", name: "Post ideas generator", summary: "Six post ideas for your niche: Reels, carousels and Stories with caption starters.", category: "create", icon: "lightbulb" },
   { href: "/tools/instagram-bio-generator", name: "Bio generator", summary: "Instagram bio ideas for your niche with emojis, line breaks and a call to action.", category: "create", icon: "user" },
   { href: "/tools/tiktok-bio-generator", name: "TikTok bio generator", summary: "Short TikTok bio ideas for your niche that fit the 80-character limit.", category: "create", icon: "user" },

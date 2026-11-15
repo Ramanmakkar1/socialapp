@@ -23,10 +23,28 @@ const TIKTOK_FORMAT_LABELS: Record<string, string> = {
   story: "Story",
   post: "Photo post",
 };
-const forPlatform = (text: string, platform: "instagram" | "tiktok") =>
-  platform === "tiktok"
-    ? text.replace(/\bReels\b/g, "TikTok videos").replace(/\bReel\b/g, "TikTok video")
-    : text;
+const YOUTUBE_FORMAT_LABELS: Record<string, string> = {
+  reel: "Long video",
+  carousel: "Tutorial",
+  story: "Short",
+  post: "List video",
+};
+const forPlatform = (text: string, platform: "instagram" | "tiktok" | "youtube") => {
+  if (platform === "tiktok") {
+    return text.replace(/\bReels\b/g, "TikTok videos").replace(/\bReel\b/g, "TikTok video");
+  }
+  if (platform === "youtube") {
+    return text
+      .replace(/\bReels\b/g, "Shorts")
+      .replace(/\bReel\b/g, "Short")
+      .replace(/\bposts\b/g, "videos")
+      .replace(/\bpost\b/g, "video")
+      .replace(/\bcaptions\b/g, "descriptions")
+      .replace(/\bcaption\b/g, "description")
+      .replace(/\bfollowers\b/g, "subscribers");
+  }
+  return text;
+};
 const FORMAT_ICON: Record<string, LucideIcon> = { reel: Video, carousel: Images, story: MessageSquareQuote, post: Square };
 const FORMAT_HEX: Record<string, string> = { reel: "#6b4eff", carousel: "#ff8a5b", story: "#1fa971", post: "#c6a700" };
 
@@ -35,7 +53,7 @@ const ghostBtn = "inline-flex min-h-10 items-center justify-center gap-1.5 round
 const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
-export default function PostIdeasGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" }) {
+export default function PostIdeasGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "youtube" }) {
   const [nicheId, setNicheId] = useState<string>("creator");
   const [format, setFormat] = useState<string>("all");
   const [seed, setSeed] = useState(1);
@@ -43,7 +61,7 @@ export default function PostIdeasGenerator({ platform = "instagram" }: { platfor
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nicheSelectId = useId();
 
-  const formatLabels = platform === "tiktok" ? TIKTOK_FORMAT_LABELS : FORMAT_LABELS;
+  const formatLabels = platform === "tiktok" ? TIKTOK_FORMAT_LABELS : platform === "youtube" ? YOUTUBE_FORMAT_LABELS : FORMAT_LABELS;
 
   const ideas = useMemo<Idea[]>(() => {
     const picked = pickIdeas(nicheId, {
@@ -51,7 +69,7 @@ export default function PostIdeasGenerator({ platform = "instagram" }: { platfor
       count: 6,
       seed,
     });
-    if (platform !== "tiktok") return picked;
+    if (platform === "instagram") return picked;
     return picked.map((idea) => ({
       ...idea,
       title: forPlatform(idea.title, platform),
