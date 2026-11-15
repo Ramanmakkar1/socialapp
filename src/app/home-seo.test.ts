@@ -110,3 +110,25 @@ test("home page JSON-LD includes SoftwareApplication and FAQPage", () => {
     "home page JSON-LD must include a FAQPage node",
   );
 });
+
+test("homepage route owns robots metadata and still renders the full JSON-LD graph", () => {
+  // Regression guard for noindex_in_sitemap, missing_canonical and no_schema:
+  // the home route must keep its own robots directive (not rely on inheritance)
+  // while the rendered page still ships Organization, WebSite,
+  // SoftwareApplication and FAQPage nodes.
+  assert.ok(
+    pageSource.includes('robots: isPathIndexable("/") ? robotsForRequestHost(host) : { index: false, follow: false },'),
+    "home page source must own the explicit robots directive",
+  );
+  assert.ok(
+    pageSource.includes("alternates: { canonical }"),
+    "home page source must keep the absolute self-canonical",
+  );
+  const rendered = `${layoutSource}\n${pageSource}`;
+  for (const type of ["Organization", "WebSite", "SoftwareApplication", "FAQPage"]) {
+    assert.ok(
+      rendered.includes(`"@type": "${type}"`),
+      `homepage route must render ${type} JSON-LD`,
+    );
+  }
+});
