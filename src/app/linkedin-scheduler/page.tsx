@@ -12,7 +12,7 @@ import { AnimArt } from "@/components/AnimArt";
 
 const PATH = "/linkedin-scheduler";
 const title = "LinkedIn Scheduler: Plan and Auto-Publish LinkedIn Posts";
-const description = `Schedule LinkedIn posts on one calendar and publish them automatically through LinkedIn's official API. Plan text and image posts, then track results.`;
+const description = `Free LinkedIn scheduler: plan text and image posts on one calendar and auto-publish through LinkedIn's official API. Start with Poskoo's $0 plan.`;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
