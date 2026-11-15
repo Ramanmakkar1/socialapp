@@ -147,7 +147,7 @@ export default function InstagramScheduler() {
         <span className="pill"><span>NEW</span>Schedule posts · auto-DM on publish</span>
         <h1>Instagram scheduler that <em className="s mark">auto-DMs every comment</em></h1>
         <p className="lede">
-          {BRAND.name} is an Instagram scheduler: plan posts, reels, carousels and stories on a calendar and it publishes them for you at the time you pick. Add a comment-to-DM rule and everyone who comments gets your link in their DMs.
+          Yes, you can schedule Instagram posts for free: connect your account through Meta&apos;s official login, plan posts, reels, carousels and stories on a calendar, pick a time, and {BRAND.name} publishes them for you. The Free plan is $0 with no credit card, and a comment-to-DM rule sends your link to everyone who comments.
         </p>
         <form className="glassBar glass schedBar" action="/signup" method="get">
           <label className="sr-only" htmlFor="sched-email">Email</label>
