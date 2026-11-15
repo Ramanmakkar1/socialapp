@@ -8,6 +8,7 @@ const guideDescription = (slug: string) => guideBySlug(slug)?.description ?? "";
 export const PUBLIC_PATHS = [
   "/",
   "/features",
+  "/social-media-analytics",
   "/social-media-inbox",
   "/instagram-auto-dm",
   "/instagram-auto-dm/templates",
@@ -215,6 +216,7 @@ export type PublicPath = typeof PUBLIC_PATHS[number];
 export const META: Record<PublicPath, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
   "/": { priority: 1, changeFrequency: "weekly" },
   "/features": { priority: 0.9, changeFrequency: "weekly" },
+  "/social-media-analytics": { priority: 0.8, changeFrequency: "weekly" },
   "/social-media-inbox": { priority: 0.8, changeFrequency: "weekly" },
   "/instagram-auto-dm": { priority: 0.8, changeFrequency: "weekly" },
   "/instagram-auto-dm/templates": { priority: 0.7, changeFrequency: "weekly" },
@@ -418,7 +420,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
 };
 
 export const PAGE_TITLES: Record<PublicPath, string> = {
-  "/": "Home", "/features": "Features", "/social-media-inbox": "Social Media Inbox", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates", "/instagram-link-in-bio": "Instagram Link in Bio",
+  "/": "Home", "/features": "Features", "/social-media-analytics": "Social Media Analytics", "/social-media-inbox": "Social Media Inbox", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates", "/instagram-link-in-bio": "Instagram Link in Bio",
   "/instagram-dm-automation": "Instagram DM Automation",
   "/instagram-dm-lead-generation": "Instagram DM Lead Generation",
   "/buffer-alternative": "Buffer Alternative", "/manychat-alternative": "ManyChat Alternative",
@@ -557,6 +559,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/": "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, AI captions and free tools. Plan, publish and grow your content in one place.",
   "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI captions, lead capture, free tools and comparisons, all in one workspace.",
+  "/social-media-analytics": "Poskoo social media analytics shows post performance, reach, engagement rate, link clicks, leads and DM analytics in one dashboard, with CSV export.",
   "/social-media-inbox": "A social media inbox brings every comment and DM from all your channels into one shared place, with AI suggestions, keyword automation and lead capture.",
   "/instagram-auto-dm": "Automatically DM anyone who comments a keyword with your link, then capture their email with Poskoo auto-DM rules. It works on every post you pick.",
   "/instagram-auto-dm/templates": "Pre-built auto-DM message templates for giveaways, promotions and lead generation, ready to customise for your brand and send to your audience in Poskoo.",
