@@ -118,8 +118,7 @@ export default function MastodonSchedulerPage() {
           Schedule Mastodon posts <em className="s mark">on any server</em>
         </h1>
         <p className="lede">
-          Poskoo schedules Mastodon posts on any server: connect your account, write up to 500 characters (or your server&apos;s limit), add images or a video, pick a time and Poskoo publishes it for you.
-          Your post joins the same calendar and publishing queue as your other social channels.
+          Yes, you can schedule Mastodon posts on any server: connect your account, write up to 500 characters (or your server&apos;s limit), add images or a video, pick a time, and Poskoo publishes it for you. The Free plan is $0 with no credit card, and Mastodon shares one calendar with your other channels.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling Mastodon posts <span aria-hidden="true">→</span></Link>
