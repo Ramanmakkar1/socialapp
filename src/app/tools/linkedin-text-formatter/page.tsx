@@ -17,13 +17,13 @@ import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import FormatterTool from "./FormatterTool";
 
 const PATH = "/tools/linkedin-text-formatter";
-const description = "Free LinkedIn text formatter: create bold and italic Unicode text for posts and headlines, add bullets, copy text and check the 3,000-character post limit.";
+const description = "Make LinkedIn posts stand out in seconds: turn plain text into bold, italic and bulleted Unicode styles, then copy and paste straight into LinkedIn.";
 
 const config: ToolPageConfig = {
   path: "/tools/linkedin-text-formatter",
   name: "LinkedIn Text Formatter",
   crumb: "LinkedIn Text Formatter",
-  title: "LinkedIn Text Formatter: Bold & Italic Text Free | Poskoo",
+  title: "LinkedIn Text Formatter: Free Bold & Italic Text Tool",
   description,
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "LinkedIn Text Formatter" },
