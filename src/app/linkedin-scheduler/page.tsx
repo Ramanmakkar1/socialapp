@@ -143,7 +143,7 @@ export default function LinkedInSchedulerPage() {
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
-          <Link className="btn btn-line" href="/app/calendar">Open the calendar</Link>
+          <Link className="btn btn-line" href="/signup">Open the calendar</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
         </div>
