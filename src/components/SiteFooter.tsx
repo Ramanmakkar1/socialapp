@@ -117,6 +117,8 @@ export function SiteFooter() {
             { href: "/guides", label: "Guides" },
             { href: "/help", label: "Help center" },
             { href: "/developers", label: "Developers (MCP)" },
+            { href: "/schedule-posts-with-chatgpt", label: "Schedule posts with ChatGPT" },
+            { href: "/schedule-posts-with-claude", label: "Schedule posts with Claude" },
             { href: "/contact", label: "Contact" },
             { href: "/privacy", label: "Privacy" },
             { href: "/terms", label: "Terms" },
@@ -139,6 +141,9 @@ export function SiteFooter() {
           { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
           { href: "/google-business-profile-scheduler", label: "Google Business Profile scheduler" },
           { href: "/social-media-scheduler-for-agencies", label: "Scheduler for agencies" },
+          { href: "/social-media-scheduler-for-creators", label: "Scheduler for creators" },
+          { href: "/social-media-scheduler-for-coaches", label: "Scheduler for coaches" },
+          { href: "/social-media-scheduler-for-ecommerce", label: "Scheduler for ecommerce" },
           { href: "/social-media-scheduler-comparison", label: "Social media scheduler comparison" },
         ]}
       />
@@ -164,6 +169,7 @@ export function SiteFooter() {
           { href: "/linktree-alternative", label: "Linktree alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
           { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative" },
+          { href: "/influence-alternative", label: "Influence.so alternative" },
           { href: "/social-media-scheduler-comparison", label: "All comparisons →" },
         ]}
       />

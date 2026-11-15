@@ -217,6 +217,24 @@ export default function DevelopersPage() {
         </div>
       </section>
 
+      <section style={{ paddingTop: 24 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Step-by-step guides</p>
+            <h2>Setup for your assistant</h2>
+          </div>
+          <p className="lede" style={{ maxWidth: 720 }}>
+            <Link className={s.vlink} href="/schedule-posts-with-chatgpt">Schedule posts with ChatGPT</Link>
+            {" · "}
+            <Link className={s.vlink} href="/schedule-posts-with-claude">Schedule posts with Claude</Link>
+            {" · "}
+            <Link className={s.vlink} href="/schedule-posts-with-claude-code">Schedule posts with Claude Code</Link>
+            {" · "}
+            <Link className={s.vlink} href="/schedule-posts-with-cursor">Schedule posts with Cursor</Link>
+          </p>
+        </div>
+      </section>
+
       <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
         Questions? Email {BRAND.supportEmail} and we will help you connect your assistant.
       </p>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import s from "./site.module.css";
 
-type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "zoho" | "loomly" | "tailwind" | "socialbee" | "sendible" | "vistasocial" | "linktree";
+type ComparePage = "buffer" | "manychat" | "later" | "metricool" | "planoly" | "sprout" | "hootsuite" | "meta" | "publer" | "agorapulse" | "zoho" | "loomly" | "tailwind" | "socialbee" | "sendible" | "vistasocial" | "linktree" | "influence";
 
 const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/buffer-alternative", label: "Buffer alternative", key: "buffer" },
@@ -21,6 +21,7 @@ const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/hootsuite-alternative", label: "Hootsuite alternative", key: "hootsuite" },
   { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative", key: "meta" },
   { href: "/linktree-alternative", label: "Linktree alternative", key: "linktree" },
+  { href: "/influence-alternative", label: "Influence.so alternative", key: "influence" },
 ];
 
 export function CompareAlternativesNav({ current }: { current?: ComparePage }) {
