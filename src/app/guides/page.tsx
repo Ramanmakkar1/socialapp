@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
 import site from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
@@ -48,6 +49,10 @@ export default function GuidesPage() {
           <h1>
             Grow on social media with <em className="s mark">practical guides</em>
           </h1>
+          <p className={g.answer}>
+            {BRAND.name} helps you plan social posts on one calendar and automate Instagram comment-to-DM replies, so
+            every comment can become a lead.
+          </p>
           <p className="lede">
             These guides teach Instagram growth, content planning, scheduling and comment-to-lead automation, step by
             step. Plain-English walkthroughs on picking a niche, planning content, scheduling posts and turning
@@ -57,6 +62,12 @@ export default function GuidesPage() {
             <AnimArt name="writing" label="A creator writes on a giant phone screen with a big pencil while a puppy watches" />
           </div>
         </header>
+
+        <nav className={g.hubLinks} aria-label="Poskoo product pages">
+          <Link href="/instagram-scheduler">Instagram scheduler</Link>
+          <Link href="/instagram-auto-dm">Instagram auto-DM</Link>
+          <Link href="/pricing">Pricing and free plan</Link>
+        </nav>
 
         <section className={t.section} aria-label="All guides">
           <GuidesDirectory />
