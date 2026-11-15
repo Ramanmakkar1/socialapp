@@ -8,7 +8,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-const description = `Step-by-step guides for ${BRAND.name}: connect Instagram, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`;
+const description = `Step-by-step ${BRAND.name} help guides: connect Instagram, schedule posts, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: `Instagram Scheduling & Auto-DM Help Guides | ${BRAND.name}` },
@@ -203,7 +203,7 @@ export default function HelpHubPage() {
             Help <em className="s">center</em>
           </h1>
           <p className="lede">
-            Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
+            The {BRAND.name} Help center covers connecting Instagram, scheduling posts, and fixing comment-to-DM issues, with step-by-step guides for every feature.
           </p>
         </div>
         <div className="hero-art"><AnimArt name="help" label="A creator reads on a giant open book under a lightbulb and a signpost" /></div>
