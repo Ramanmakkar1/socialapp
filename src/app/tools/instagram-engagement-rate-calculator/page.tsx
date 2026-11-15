@@ -137,6 +137,13 @@ const config: ToolPageConfig = {
             <li>
               <b>Read the parts.</b> A post with many saves but few likes is still doing a job; the total rate hides that.
             </li>
+            <li>
+              <b>Turn your rate into a price.</b> Use the{" "}
+              <Link href="/tools/instagram-money-calculator">
+                estimate sponsored post pay with the Instagram money calculator
+              </Link>{" "}
+              to see a sponsored-post range.
+            </li>
           </ul>
         ),
       },
@@ -178,6 +185,7 @@ const config: ToolPageConfig = {
   ],
   related: [
     "/tools/social-media-analytics-report",
+    "/tools/instagram-money-calculator",
     "/tools/instagram-posting-frequency-calculator",
     "/tools/instagram-comment-to-dm-calculator",
     "/tools/instagram-caption-counter",
