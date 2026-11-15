@@ -2,6 +2,7 @@
 // Telegram (Bot API), Discord / Slack / Mattermost (incoming webhooks), Matrix (client-server API).
 // Every connect* function checks the credentials once and returns what store.ts saves; every
 // publish* function takes a fetchImpl so tests run without the network.
+import { safeFetch } from "@/lib/netGuard";
 import { NetworkAuthError, obj, redact, str, type Fetch, type PublishInput, type PublishOutcome } from "@/lib/networks/common";
 import { blobOf, call, downloadAll, failed, hostOf, normalizeBaseUrl } from "@/lib/networks/http";
 import type { SaveAccountInput } from "@/lib/networks/store";
@@ -30,7 +31,7 @@ function tg(token: string, method: string): string {
   return `https://api.telegram.org/bot${token}/${method}`;
 }
 
-export async function connectTelegram(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectTelegram(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const token = f.token.trim();
   if (!looksLikeBotToken(token)) throw new NetworkAuthError("bad_login", "That doesn't look like a bot token. Copy it from @BotFather (it looks like 123456789:AA…).");
   const chat = normalizeTelegramChat(f.chat);
@@ -58,7 +59,7 @@ export async function connectTelegram(f: Fields, fetchImpl: Fetch = fetch): Prom
 }
 
 export async function publishToTelegram(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const token = input.account.accessToken;
   const chatId = str(input.account.meta.chatId);
   if (!chatId) return { ok: false, error: "This Telegram channel has no chat stored. Reconnect it in Settings.", tokenDead: true };
@@ -130,7 +131,7 @@ export function normalizeDiscordWebhook(input: string): { url: string; id: strin
   return m ? { url: `https://discord.com/api/webhooks/${m[1]}/${m[2]}`, id: m[1] } : null;
 }
 
-export async function connectDiscord(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectDiscord(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const hook = normalizeDiscordWebhook(f.webhook);
   if (!hook) throw new NetworkAuthError("bad_login", "Paste the whole webhook URL, e.g. https://discord.com/api/webhooks/123…/abc…");
   const r = await call(hook.url, { method: "GET" }, fetchImpl, 15_000);
@@ -145,7 +146,7 @@ export async function connectDiscord(f: Fields, fetchImpl: Fetch = fetch): Promi
 }
 
 export async function publishToDiscord(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const url = input.account.accessToken;
   const content = input.text.trim();
   let init: RequestInit;
@@ -189,7 +190,7 @@ export async function connectSlack(f: Fields): Promise<SaveAccountInput> {
 }
 
 export async function publishToSlack(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const url = input.account.accessToken;
   if (input.media.length > 0) return { ok: false, error: "Slack webhooks post text only. Remove the media or untick Slack." };
   const r = await call(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: slackEscape(input.text.trim()) }) }, fetchImpl, 30_000);
@@ -215,7 +216,7 @@ export async function connectMattermost(f: Fields): Promise<SaveAccountInput> {
 }
 
 export async function publishToMattermost(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const url = input.account.accessToken;
   if (input.media.length > 0) return { ok: false, error: "Mattermost webhooks post text only. Remove the media or untick Mattermost." };
   const r = await call(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: input.text.trim() }) }, fetchImpl, 30_000);
@@ -226,7 +227,7 @@ export async function publishToMattermost(input: PublishInput): Promise<PublishO
 // ---- Matrix (client-server API) -------------------------------------------------------------------
 
 /** The client API base for a homeserver name (/.well-known/matrix/client discovery, else the name itself). */
-export async function discoverMatrixBase(server: string, fetchImpl: Fetch = fetch): Promise<string | null> {
+export async function discoverMatrixBase(server: string, fetchImpl: Fetch = safeFetch): Promise<string | null> {
   const base = normalizeBaseUrl(server);
   if (!base) return null;
   const wk = await call(`https://${hostOf(base)}/.well-known/matrix/client`, { method: "GET" }, fetchImpl, 10_000);
@@ -238,7 +239,7 @@ function mx(base: string, path: string): string {
   return `${base}/_matrix/client/v3${path}`;
 }
 
-export async function connectMatrix(f: Fields, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export async function connectMatrix(f: Fields, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   const token = f.token.trim();
   const room = f.room.trim();
   if (!/^[!#][^:\s]+:[^\s]+$/.test(room)) throw new NetworkAuthError("bad_login", "Enter the room as #alias:server or !id:server.");
@@ -269,7 +270,7 @@ export async function connectMatrix(f: Fields, fetchImpl: Fetch = fetch): Promis
 }
 
 export async function publishToMatrix(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const token = input.account.accessToken;
   const base = str(input.account.meta.base);
   const roomId = str(input.account.meta.roomId);

@@ -1,5 +1,6 @@
 // Server only: check a token network's credentials once and turn them into a stored account.
 // The Connect dialog's generic token form posts here (connectTokenNetworkAction).
+import { safeFetch } from "@/lib/netGuard";
 import { connectDevto, connectDiscourse, connectGhost, connectHashnode, connectListmonk, connectWordPress } from "@/lib/networks/blogs";
 import { connectDiscord, connectMatrix, connectMattermost, connectSlack, connectTelegram } from "@/lib/networks/chat";
 import type { Fetch } from "@/lib/networks/common";
@@ -41,6 +42,6 @@ export function readTokenFields(network: TokenNetworkId, get: (name: string) => 
   return { fields };
 }
 
-export function connectTokenNetwork(network: TokenNetworkId, fields: Record<string, string>, fetchImpl: Fetch = fetch): Promise<SaveAccountInput> {
+export function connectTokenNetwork(network: TokenNetworkId, fields: Record<string, string>, fetchImpl: Fetch = safeFetch): Promise<SaveAccountInput> {
   return CONNECT[network](fields, fetchImpl);
 }

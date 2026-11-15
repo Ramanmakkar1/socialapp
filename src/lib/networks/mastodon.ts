@@ -2,6 +2,7 @@
 // the first time someone from that instance connects; client id/secret are stored per instance
 // (mastodon_apps, secret encrypted). OAuth authorization code flow with PKCE (instances that do
 // not support PKCE ignore it). No env vars needed.
+import { safeFetch } from "@/lib/netGuard";
 import { BRAND } from "@/lib/brand";
 import {
   NetworkAuthError,
@@ -50,7 +51,7 @@ export function normalizeInstance(input: string): string | null {
 /** POST /api/v1/apps on the instance. */
 export async function registerMastodonApp(
   instance: string,
-  fetchImpl: Fetch = fetch,
+  fetchImpl: Fetch = safeFetch,
 ): Promise<{ clientId: string; clientSecret: string; redirectUri: string }> {
   const redirectUri = mastodonRedirectUri();
   let res: Response;
@@ -92,7 +93,7 @@ export async function exchangeMastodonCode(
   app: { clientId: string; clientSecret: string },
   code: string,
   verifier: string,
-  fetchImpl: Fetch = fetch,
+  fetchImpl: Fetch = safeFetch,
 ): Promise<TokenSet> {
   let res: Response;
   try {
@@ -147,7 +148,7 @@ async function api(
 
 export type MastodonProfile = { id: string; username: string; acct: string; url: string; avatar: string | null };
 
-export async function verifyMastodonCredentials(instance: string, token: string, fetchImpl: Fetch = fetch): Promise<MastodonProfile> {
+export async function verifyMastodonCredentials(instance: string, token: string, fetchImpl: Fetch = safeFetch): Promise<MastodonProfile> {
   const r = await api(instance, token, "/api/v1/accounts/verify_credentials", {}, fetchImpl);
   if (!r.ok || !str(r.json.id)) throw new NetworkAuthError("profile_failed", `Mastodon profile request failed (${r.ok ? "no id" : r.error})`);
   return {
@@ -160,7 +161,7 @@ export async function verifyMastodonCredentials(instance: string, token: string,
 }
 
 /** Character + attachment limits of the instance (/api/v2/instance, falling back to v1). */
-export async function fetchInstanceLimits(instance: string, fetchImpl: Fetch = fetch): Promise<{ maxChars: number; maxMedia: number }> {
+export async function fetchInstanceLimits(instance: string, fetchImpl: Fetch = safeFetch): Promise<{ maxChars: number; maxMedia: number }> {
   for (const path of ["/api/v2/instance", "/api/v1/instance"]) {
     try {
       const res = await fetchImpl(`https://${instance}${path}`, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
@@ -219,7 +220,7 @@ async function uploadMedia(
 
 /** POST /api/v1/statuses with media attachments. Idempotency-Key makes a retried request safe. */
 export async function publishToMastodon(input: PublishInput): Promise<PublishOutcome> {
-  const fetchImpl = input.fetchImpl ?? fetch;
+  const fetchImpl = input.fetchImpl ?? safeFetch;
   const sleep = input.sleep ?? defaultSleep;
   const instance = str(input.account.meta.instance);
   if (!instance) return { ok: false, error: "This Mastodon account has no server stored. Reconnect Mastodon in Settings.", tokenDead: true };
