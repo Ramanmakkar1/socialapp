@@ -96,12 +96,36 @@
   font-size: .9rem;
   margin: 0 0 20px;
 }
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crumbs li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
 .crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .crumbs a:hover { color: var(--poskoo-ink); }
+.crumbs [aria-current="page"] {
+  color: var(--poskoo-ink);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
 
 /* Article / legal prose. */
 .prose {

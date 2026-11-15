@@ -52,16 +52,18 @@ export default function PublicShell({
       <main className={`wrap ${s.main}`}>
         {crumbs && (
           <nav aria-label="Breadcrumb" className={s.crumbs}>
-            {crumbs.map((c, i) => (
-              <span key={c.path + c.name}>
-                {i > 0 && <span aria-hidden="true"> / </span>}
-                {i === crumbs.length - 1 ? (
-                  <span aria-current="page">{c.name}</span>
-                ) : (
-                  <Link href={c.path}>{c.name}</Link>
-                )}
-              </span>
-            ))}
+            <ol>
+              {crumbs.map((c, i) => (
+                <li key={c.path + c.name}>
+                  {i > 0 && <span aria-hidden="true"> / </span>}
+                  {i === crumbs.length - 1 ? (
+                    <span aria-current="page">{c.name}</span>
+                  ) : (
+                    <Link href={c.path}>{c.name}</Link>
+                  )}
+                </li>
+              ))}
+            </ol>
           </nav>
         )}
         {children}
