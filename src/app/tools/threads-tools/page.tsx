@@ -148,6 +148,7 @@ export default function ThreadsToolsPage() {
             <Link href="/tools/threads-caption-generator">Threads caption generator</Link>
             <Link href="/help/schedule-threads-posts">How to schedule Threads posts</Link>
             <Link href="/tools">All free social media tools</Link>
+            <Link href="/tools/instagram-tools">Instagram tools</Link>
           </nav>
         </section>
 
