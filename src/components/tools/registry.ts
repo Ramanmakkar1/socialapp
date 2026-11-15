@@ -148,6 +148,7 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/best-time-to-post-on-linkedin", name: "Best time to post on LinkedIn", summary: "Three starting LinkedIn post times per day for your B2B audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-tiktok", name: "Best time to post on TikTok", summary: "Get starting TikTok posting windows for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-threads", name: "Best time to post on Threads", summary: "Get starting Threads posting windows for your audience and time zone.", category: "plan", icon: "calendar" },
+  { href: "/tools/best-time-to-post-on-bluesky", name: "Best time to post on Bluesky", summary: "Get starting Bluesky posting windows for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-youtube", name: "Best time to post on YouTube", summary: "Get starting YouTube upload windows for your audience and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/best-time-to-post-on-pinterest", name: "Best time to post on Pinterest", summary: "Get starting Pinterest posting windows for your niche and time zone.", category: "plan", icon: "calendar" },
   { href: "/tools/instagram-posting-frequency-calculator", name: "Posting frequency calculator", summary: "Turn your weekly time budget into a realistic posting range and plan.", category: "plan", icon: "gauge" },
@@ -184,6 +185,7 @@ const SCHEDULE_TOOLS = new Set([
   "/tools/best-time-to-post-on-x",
   "/tools/best-time-to-post-on-linkedin",
   "/tools/best-time-to-post-on-threads",
+  "/tools/best-time-to-post-on-bluesky",
   "/tools/best-time-to-post-on-youtube",
   "/tools/best-time-to-post-on-pinterest",
 ]);

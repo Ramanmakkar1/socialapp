@@ -53,6 +53,11 @@ const platforms = [
     href: "/tools/best-time-to-post-on-threads",
   },
   {
+    name: "Bluesky",
+    windows: "Weekdays 8–10 am, 12–1 pm and 7–9 pm; weekends 10 am (tech, journalism and creators)",
+    href: "/tools/best-time-to-post-on-bluesky",
+  },
+  {
     name: "YouTube",
     windows: "Weekdays 2 pm, 4 pm and 6 pm; weekends 10 am and 2 pm (gaming)",
     href: "/tools/best-time-to-post-on-youtube",
