@@ -16,9 +16,6 @@ import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
-// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
-export const revalidate = 600;
-
 const PATH = "/influence-alternative";
 const title = `Influence.so Alternative with a Free Plan | ${BRAND.name}`;
 const description =

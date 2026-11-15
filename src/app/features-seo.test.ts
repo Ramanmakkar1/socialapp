@@ -144,7 +144,7 @@ test("CTA labels use readable punctuation", () => {
 });
 
 test("structured-data text uses readable punctuation", () => {
-  const jsonLdBlock = sliceBetween("const jsonLd = (aiReady: boolean) => ({", "export default function FeaturesPage");
+  const jsonLdBlock = sliceBetween("const jsonLd = (aiReady: boolean) => ({", "export default async function FeaturesPage");
   assertReadable(jsonLdBlock, "structured-data text");
   for (const value of [
     'name: "Everything Poskoo does, in one place."',
