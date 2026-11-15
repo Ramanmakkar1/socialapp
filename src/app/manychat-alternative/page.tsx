@@ -11,7 +11,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "ManyChat Alternative: Instagram Auto-DM + Scheduler | Poskoo" },
+  title: { absolute: "ManyChat Alternative: Instagram Auto-DM + Scheduler" },
   description:
     "A ManyChat alternative with Instagram comment-to-DM automation, post scheduling and lead capture in one tool, built on the official Meta API.",
   alternates: { canonical: "/manychat-alternative" },
@@ -73,7 +73,7 @@ export default function ManyChatAlternative() {
             The ManyChat alternative that also <em className="s">schedules your posts</em>
           </h1>
           <p className="lede">
-            DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
+            Poskoo is a ManyChat alternative for Instagram: comment-to-DM automation, lead capture and post scheduling in one tool, with a $0 Free plan that includes 500 auto-DMs a month. DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
