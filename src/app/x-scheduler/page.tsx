@@ -123,8 +123,9 @@ export default function XSchedulerPage() {
           Schedule Tweets <em className="s mark">and posts on X</em>
         </h1>
         <p className="lede">
-          Poskoo schedules posts to X (Twitter) through X&apos;s official API: connect your account, write the post, add up
-          to 4 images or one video, and pick a time.
+          Yes, you can schedule tweets for free: connect your X account with X&apos;s official sign-in, write the post,
+          add up to 4 images or one video, pick a date and time, and Poskoo publishes it for you. The Free plan is $0
+          with no credit card.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling posts <span aria-hidden="true">→</span></Link>
