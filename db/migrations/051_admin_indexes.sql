@@ -1,5 +1,6 @@
--- Indexes for the admin pages (/admin/users, /admin/posts, /admin/billing, /admin/audit). Additive only; the
--- pages work without them (just slower on big tables), so this can run before or after the deploy.
+-- Indexes for the admin pages (/admin/users, /admin/posts, /admin/billing, /admin/audit,
+-- /admin/system). Additive only; the pages work without them (just slower on big tables), so
+-- this can run before or after the deploy.
 begin;
 
 -- Per-user channel counts and the user search (social_accounts had no user_id index).
@@ -13,5 +14,8 @@ create index if not exists stripe_events_received_idx on socialapp.stripe_events
 
 -- /admin/audit filters by action (and lists the distinct actions).
 create index if not exists admin_audit_action_idx on socialapp.admin_audit (action, created_at desc);
+
+-- /admin/system: when refresh-insights last wrote insights.
+create index if not exists post_targets_insights_at_idx on socialapp.post_targets (insights_at desc) where insights_at is not null;
 
 commit;

@@ -29,6 +29,8 @@ const OLD_FORWARDED_HOST = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // /admin/system compares db/migrations with socialapp.schema_migrations: ship the .sql files with that route.
+  outputFileTracingIncludes: { "/admin/system": ["./db/migrations/*.sql"] },
   // Render metadata in <head> for every user agent, so crawlers and audits always see title/description/canonical.
   htmlLimitedBots: /.*/,
   // The largest source image on the site is 1536px wide. Capping the generated
