@@ -72,8 +72,10 @@ export default function ToolsPage() {
             {TOOLS.length} free <em className="s mark">social media tools</em> for every post
           </h1>
           <p className="lede">
-            Write captions, hashtags and hooks, size your images for every network, plan your week and test Instagram
-            comment-to-DM keywords. Use them before you post, or schedule the result with {BRAND.name}.
+            Write captions, hashtags and hooks, size your images for every network, plan your week, test Instagram
+            comment-to-DM keywords and check YouTube metadata with the{" "}
+            <Link href="/tools/youtube-title-counter">YouTube title counter</Link>. Use them before you post, or
+            schedule the result with {BRAND.name}.
           </p>
           <ul className={t.catTiles} aria-label="Tool categories">
             {TOOL_CATEGORIES.map((c) => (
