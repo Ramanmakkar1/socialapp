@@ -8,7 +8,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: `How to Schedule Instagram Stories (Step by Step) | ${BRAND.name}` },
+  title: { absolute: `Schedule Instagram Stories: Complete Guide | ${BRAND.name}` },
   description:
     `Schedule Instagram Stories: pick the Story format, paste one public image or video link, choose a time and ${BRAND.name} publishes it for you.`,
   alternates: { canonical: "/help/schedule-instagram-stories" },
