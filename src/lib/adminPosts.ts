@@ -3,10 +3,14 @@
 // reuses retryFailedPost (src/lib/postRetry.ts), the same code path as the calendar's Retry.
 import { query } from "@/lib/db";
 import { ADMIN_PAGE_SIZE, pageSlice, pageWindow } from "@/lib/adminPaging";
+import { NETWORK_IDS } from "@/lib/networks/common";
 
 /** scheduled_posts.status values (001_init.sql check constraint). */
 export const POST_STATUSES = ["failed", "publishing", "scheduled", "published", "draft"] as const;
 export type PostStatus = (typeof POST_STATUSES)[number];
+
+/** Every post_targets.platform value: the Meta/Google core plus the networks in src/lib/networks. */
+export const ADMIN_NETWORKS: readonly string[] = ["instagram", "facebook", "threads", "youtube", ...NETWORK_IDS];
 
 export type AdminPostTarget = { platform: string; status: string; error: string | null; publishedAt: string | null };
 export type AdminPostRow = {

@@ -5,4 +5,7 @@ begin;
 -- Per-user channel counts and the user search (social_accounts had no user_id index).
 create index if not exists social_accounts_user_id_idx on socialapp.social_accounts (user_id);
 
+-- /admin/posts lists all users' posts newest activity first.
+create index if not exists scheduled_posts_updated_idx on socialapp.scheduled_posts (updated_at desc);
+
 commit;
