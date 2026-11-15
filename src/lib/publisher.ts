@@ -694,6 +694,20 @@ async function claimDueTargets(
   }
 }
 
+/**
+ * Claims due posts ONE at a time (up to `limit` posts). Claiming the whole batch up front let the
+ * last posts of a long run (video polling, YouTube uploads) sit claimed for over
+ * STUCK_PUBLISHING_MS, so the next minute's run "recovered" them as failed while this run was
+ * still about to publish them (false failure e-mail; a Retry then posted twice).
+ */
+async function* claimEach(limit: number, platform: string): AsyncGenerator<ClaimedRow> {
+  for (let n = 0; n < limit; n += 1) {
+    const rows = await claimDueTargets(1, platform);
+    if (rows.length === 0) return;
+    yield* rows;
+  }
+}
+
 export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   const result: PublishResult = { published: 0, failed: 0, skipped: 0, recovered: 0 };
   const pool = getPool();
@@ -702,9 +716,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   } catch (err) {
     console.error("publisher: stuck-claim recovery failed", err instanceof Error ? err.message : err);
   }
-  const claimed = { rows: await claimDueTargets(limit, "instagram") };
-
-  for (const row of claimed.rows) {
+  for await (const row of claimEach(limit, "instagram")) {
     let token = "";
     const accounts = await pool.query<AccountRow>(
       `select id, external_id, access_token_enc, auth_type from socialapp.social_accounts
@@ -795,8 +807,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
-  const fbRows = await claimDueTargets(limit, "facebook");
-  for (const row of fbRows) {
+  for await (const row of claimEach(limit, "facebook")) {
     let token = "";
     const accounts = await pool.query<{
       id: string;
@@ -876,8 +887,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
-  const thRows = await claimDueTargets(limit, "threads");
-  for (const row of thRows) {
+  for await (const row of claimEach(limit, "threads")) {
     let token = "";
     let counted = false;
     try {
@@ -957,8 +967,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
-  const ytRows = await claimDueTargets(limit, "youtube");
-  for (const row of ytRows) {
+  for await (const row of claimEach(limit, "youtube")) {
     let token = "";
     try {
       const channels = await pool.query<{

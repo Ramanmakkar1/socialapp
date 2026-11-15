@@ -77,7 +77,7 @@ test("publish loop: a reminder outcome marks the target 'reminded', never publis
   const result = await publishNetworkTargets(
     5,
     {
-      claim: async () => [row],
+      claim: (() => { let done = false; return async () => (done ? [] : ((done = true), [row])); })(),
       markFailed: async () => void calls.push("failed"),
       refreshPostStatus: async () => void calls.push("refresh"),
       loadAccount: async () => account,

@@ -52,6 +52,7 @@ function publisherDb(posts: Post[], targets: Target[], accounts: Account[] = [])
         posts
           .filter((p) => p.status === "scheduled" && p.scheduled_at <= Date.now() &&
             targets.some((t) => t.post_id === p.id && t.platform === String(params[1]) && t.status === "pending"))
+          .slice(0, Number(params[0]))
           .map((p) => ({ id: p.id })),
     },
     {
@@ -290,6 +291,38 @@ test("publisher: a failed Instagram target does not strand the post's other netw
     // The real status SQL (emulated above) must rank pending/publishing targets before failed ones.
     const statusSql = calls.find((c) => /update socialapp\.scheduled_posts p set status = case/.test(c.sql))?.sql ?? "";
     assert.ok(statusSql.indexOf("status='pending'") >= 0 && statusSql.indexOf("status='pending'") < statusSql.indexOf("status='failed'"));
+  } finally {
+    globalThis.fetch = realFetch;
+    restore();
+  }
+});
+
+test("publisher: due posts are claimed one at a time, so none waits claimed behind a long run", async () => {
+  const posts: Post[] = [
+    { id: "p1", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - 2 * MIN, updated_at: Date.now() - 10 * MIN },
+    { id: "p2", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [
+    { id: "t1", post_id: "p1", platform: "threads", status: "pending", error: null },
+    { id: "t2", post_id: "p2", platform: "threads", status: "pending", error: null },
+  ];
+  const accounts: Account[] = [];
+  const { pool } = createFakePool(publisherDb(posts, targets, accounts));
+  const restore = installFakePool(pool);
+  accounts.push({ id: "acc-th", external_id: "12345", access_token_enc: encryptToken("th-token"), status: "active" });
+  const claimedWhilePublishing: number[] = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => {
+    claimedWhilePublishing.push(targets.filter((t) => t.status === "publishing").length);
+    if (String(url).endsWith("/threads")) return new Response(JSON.stringify({ id: "container-1" }));
+    return new Response(JSON.stringify({ id: "thread-post-1" }));
+  }) as typeof fetch;
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    const result = await publishDuePosts();
+    assert.equal(result.published, 2);
+    assert.deepEqual([...new Set(claimedWhilePublishing)], [1], "only the post being published is claimed");
+    assert.deepEqual(posts.map((p) => p.status), ["published", "published"]);
   } finally {
     globalThis.fetch = realFetch;
     restore();

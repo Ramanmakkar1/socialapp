@@ -65,61 +65,66 @@ export async function publishNetworkTargets(limit: number, deps: NetworkPublishD
 
   for (const platform of platforms) {
     const label = NETWORK_LABEL[platform];
-    let rows: ClaimedNetworkRow[] = [];
-    try {
-      rows = await deps.claim(limit, platform);
-    } catch (err) {
-      console.error(`publisher: claiming ${platform} targets failed`, err instanceof Error ? err.message : err);
-      continue;
-    }
-    for (const row of rows) {
-      let token = "";
+    // One post per claim (up to `limit`), so nothing sits claimed while earlier posts publish and
+    // gets "recovered" as interrupted by an overlapping run (see claimEach in publisher.ts).
+    for (let n = 0; n < limit; n += 1) {
+      let rows: ClaimedNetworkRow[] = [];
       try {
-        let account = await loadAccount(row.user_id, platform);
-        if (!account) {
-          await deps.markFailed(row.id, row.post_id, `No ${label} account connected. Connect ${label} in Settings, then retry.`, token);
-          result.failed += 1;
-          continue;
-        }
-        try {
-          account = await ensureFresh(account);
-        } catch (err) {
-          const dead = err instanceof NetworkAuthError ? err.tokenDead : false;
-          if (dead) await markExpired(account.id).catch(() => undefined);
-          const message = err instanceof Error ? err.message : String(err);
-          await deps.markFailed(row.id, row.post_id, dead ? reconnect(label) : `${label}: could not refresh access (${message}). It will be retried on Retry.`, account.accessToken);
-          result.failed += 1;
-          continue;
-        }
-        token = account.accessToken;
-        const options = obj(row.net_options);
-        const outcome = await publish(platform, {
-          account,
-          text: row.caption_override ?? row.caption,
-          media: mediaItems(row.media),
-          options,
-          idempotencyKey: row.id,
-        });
-        if (outcome.ok && outcome.reminded) {
-          // Reminder channels: the e-mail went out; the owner posts it and marks it as posted.
-          await (deps.markReminded ?? markReminded)(row.id, account.id);
-          await deps.refreshPostStatus(row.post_id);
-          result.reminded = (result.reminded ?? 0) + 1;
-        } else if (outcome.ok) {
-          await markPublished(row.id, outcome.url ?? outcome.id, account.id);
-          if (outcome.mediaPending) await (deps.holdMedia ?? holdTargetMedia)(row.id);
-          await deps.refreshPostStatus(row.post_id);
-          result.published += 1;
-        } else {
-          if (outcome.tokenDead) await markExpired(account.id).catch(() => undefined);
-          const error = outcome.tokenDead ? `${reconnect(label)} (${outcome.error})` : outcome.error;
-          await deps.markFailed(row.id, row.post_id, error, token);
-          result.failed += 1;
-        }
+        rows = await deps.claim(1, platform);
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        await deps.markFailed(row.id, row.post_id, `${label} publishing failed: ${message}`, token).catch(() => undefined);
-        result.failed += 1;
+        console.error(`publisher: claiming ${platform} targets failed`, err instanceof Error ? err.message : err);
+        break;
+      }
+      if (rows.length === 0) break;
+      for (const row of rows) {
+        let token = "";
+        try {
+          let account = await loadAccount(row.user_id, platform);
+          if (!account) {
+            await deps.markFailed(row.id, row.post_id, `No ${label} account connected. Connect ${label} in Settings, then retry.`, token);
+            result.failed += 1;
+            continue;
+          }
+          try {
+            account = await ensureFresh(account);
+          } catch (err) {
+            const dead = err instanceof NetworkAuthError ? err.tokenDead : false;
+            if (dead) await markExpired(account.id).catch(() => undefined);
+            const message = err instanceof Error ? err.message : String(err);
+            await deps.markFailed(row.id, row.post_id, dead ? reconnect(label) : `${label}: could not refresh access (${message}). It will be retried on Retry.`, account.accessToken);
+            result.failed += 1;
+            continue;
+          }
+          token = account.accessToken;
+          const options = obj(row.net_options);
+          const outcome = await publish(platform, {
+            account,
+            text: row.caption_override ?? row.caption,
+            media: mediaItems(row.media),
+            options,
+            idempotencyKey: row.id,
+          });
+          if (outcome.ok && outcome.reminded) {
+            // Reminder channels: the e-mail went out; the owner posts it and marks it as posted.
+            await (deps.markReminded ?? markReminded)(row.id, account.id);
+            await deps.refreshPostStatus(row.post_id);
+            result.reminded = (result.reminded ?? 0) + 1;
+          } else if (outcome.ok) {
+            await markPublished(row.id, outcome.url ?? outcome.id, account.id);
+            if (outcome.mediaPending) await (deps.holdMedia ?? holdTargetMedia)(row.id);
+            await deps.refreshPostStatus(row.post_id);
+            result.published += 1;
+          } else {
+            if (outcome.tokenDead) await markExpired(account.id).catch(() => undefined);
+            const error = outcome.tokenDead ? `${reconnect(label)} (${outcome.error})` : outcome.error;
+            await deps.markFailed(row.id, row.post_id, error, token);
+            result.failed += 1;
+          }
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          await deps.markFailed(row.id, row.post_id, `${label} publishing failed: ${message}`, token).catch(() => undefined);
+          result.failed += 1;
+        }
       }
     }
   }

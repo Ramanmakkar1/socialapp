@@ -38,13 +38,14 @@ function harness(rows: ClaimedNetworkRow[]) {
   const published: { id: string; ext: string }[] = [];
   const expired: string[] = [];
   const refreshed: string[] = [];
+  let claimed = false; // the claim hands out the due rows once, then nothing is left
   return {
     failed,
     published,
     expired,
     refreshed,
     deps: {
-      claim: async (_n: number, platform: string) => (platform === "bluesky" ? rows : []),
+      claim: async (_n: number, platform: string) => (platform === "bluesky" && !claimed ? ((claimed = true), rows) : []),
       markFailed: async (id: string, _p: string, error: string) => void failed.push({ id, error }),
       refreshPostStatus: async (p: string) => void refreshed.push(p),
       markPublished: async (id: string, ext: string) => void published.push({ id, ext }),
