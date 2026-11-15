@@ -241,6 +241,15 @@ export default function InstagramScheduler() {
       </section>
 
       <section>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <h2>Schedule Instagram posts and auto-DM commenters <em className="s">from one place</em></h2>
+          <p className="small">
+            {BRAND.name} is a scheduler and an <Link className={s.vlink} href="/instagram-auto-dm">Instagram comment-to-DM automation</Link> tool in one. Set up <Link className={s.vlink} href="/help/auto-dm-instagram-comments">auto-DM on Instagram comments</Link>, follow the guides to <Link className={s.vlink} href="/help/schedule-instagram-posts">schedule Instagram posts</Link> and <Link className={s.vlink} href="/help/schedule-instagram-reels">schedule Instagram Reels</Link>, then compare <Link className={s.vlink} href="/pricing">plans and limits</Link> and see <Link className={s.vlink} href="/features">everything in {BRAND.name}</Link>.
+          </p>
+        </div>
+      </section>
+
+      <section>
         <div className="wrap">
           <nav className="relChips" aria-label="Related pages">
             <span>Keep exploring</span>

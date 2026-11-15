@@ -246,6 +246,15 @@ export default function InstagramAutoDm() {
       </section>
 
       <section style={{ paddingTop: 20 }}>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <h2>Auto-DM commenters and <em className="s">schedule the posts</em> behind them</h2>
+          <p className="small">
+            {BRAND.name} runs <Link className={s.vlink} href="/help/auto-dm-instagram-comments">Instagram comment-to-DM automation</Link> and a full <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>, so you can attach a rule to a post before it goes live. Follow the <Link className={s.vlink} href="/help/schedule-instagram-reels">schedule Instagram Reels</Link> guide, fix issues with <Link className={s.vlink} href="/help/instagram-auto-dm-not-working">auto-DM not working</Link>, set up <Link className={s.vlink} href="/help/instagram-story-reply-auto-dm">Story reply auto-DMs</Link>, then check <Link className={s.vlink} href="/pricing">pricing</Link> and <Link className={s.vlink} href="/features">all features</Link>.
+          </p>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="split">
             <div className="copy">
