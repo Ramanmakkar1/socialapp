@@ -424,6 +424,8 @@
   flex-direction:column;
   gap:14px;
   min-width:0;
+  opacity:1;
+  translate:0 0;
   transition:transform .3s, box-shadow .3s;
 }
 
@@ -460,8 +462,6 @@
 @media (prefers-reduced-motion: no-preference) {
   .landing :global(.howStep) {
     animation:howIn .7s ease both;
-    animation-timeline:view();
-    animation-range:entry 0% cover 28%;
   }
   @keyframes howIn {
     from { opacity:0; translate:0 24px; }
