@@ -138,6 +138,17 @@ test("homepage route owns robots metadata and still renders the full JSON-LD gra
   }
 });
 
+test("homepage robots directive is conditional, not a hardcoded noindex", () => {
+  // The audit conflict is only cleared if the home route emits noindex while
+  // staging AND index,follow once production indexing is approved. Guard both
+  // branches so a future edit cannot collapse this to a single hardcoded value.
+  const directive = pageSource.match(/robots: isPathIndexable\("\/"\) \? (\{[^}]*\}) : (\{[^}]*\}),/);
+  assert.ok(directive, "home page must declare a conditional robots directive from isPathIndexable('/')");
+  assert.equal(directive[1], "{ index: true, follow: true }", "approved production branch must be index,follow");
+  assert.equal(directive[2], "{ index: false, follow: false }", "staging branch must be noindex,nofollow");
+  assert.equal(isPathIndexable("/"), false, "staging must currently resolve the home page to noindex,nofollow");
+});
+
 test("homepage step illustrations keep descriptive alt text", () => {
   // Regression guard for the empty-alt audit: each of the three "How Poskoo
   // works" images must carry descriptive alt text, not alt="".
