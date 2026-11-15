@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "Free Threads post preview: write your post, watch the 500-character counter and see it in a phone mockup, then copy the text. Runs in your browser.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "Threads post preview", after: "and 500-character counter" },
-  lede: "Write your Threads post, watch the 500-character count update as you type, and see how it reads on a phone before you publish.",
+  lede: "A Threads post can be up to 500 characters. Write your post here, watch the 500-character count update as you type, and see how it reads on a phone before you publish.",
   art: "visual",
   artLabel: "A creator measures a photo frame with a ruler next to phone screens of different shapes",
   heroPoints: ["500-char limit", "Live phone mockup", "No signup"],
