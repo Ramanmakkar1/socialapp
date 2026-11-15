@@ -6,6 +6,7 @@ import { body as bestInstagramAutoDmTools2026 } from "./best-instagram-auto-dm-t
 import { body as cheapestSocialMediaSchedulingTools2026 } from "./cheapest-social-media-scheduling-tools-2026";
 import { body as howToScheduleInstagramPosts } from "./how-to-schedule-instagram-posts";
 import { body as howToScheduleTiktokVideos } from "./how-to-schedule-tiktok-videos";
+import { body as howToGetMoreInstagramFollowers } from "./how-to-get-more-instagram-followers";
 
 /** Article body per registry slug. Every GUIDES entry must have one (checked by the article page). */
 export const GUIDE_BODIES: Record<string, GuideBody> = {
@@ -16,4 +17,5 @@ export const GUIDE_BODIES: Record<string, GuideBody> = {
   "cheapest-social-media-scheduling-tools-2026": cheapestSocialMediaSchedulingTools2026,
   "how-to-schedule-instagram-posts": howToScheduleInstagramPosts,
   "how-to-schedule-tiktok-videos": howToScheduleTiktokVideos,
+  "how-to-get-more-instagram-followers": howToGetMoreInstagramFollowers,
 };

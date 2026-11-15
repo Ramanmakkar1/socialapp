@@ -112,6 +112,70 @@ export const GUIDES: GuideEntry[] = [
     ],
   },
   {
+    slug: "how-to-get-more-instagram-followers",
+    title: "How to Get More Instagram Followers in 2026 (30-Day Plan)",
+    description:
+      "A practical 30-day plan to get more Instagram followers in 2026: what to post, how often, hooks, hashtags, profile tips and turning comments into leads.",
+    h1: "How to get more Instagram followers in 2026",
+    subtitle:
+      "What actually grows an account, how often to post, hooks that stop the scroll, and a 30-day plan you can start this week.",
+    crumb: "Get more Instagram followers",
+    excerpt: "What grows an account, how often to post and a 30-day plan to start.",
+    category: "growth",
+    author: "Poskoo team",
+    published: "2026-11-14",
+    updated: "2026-11-14",
+    wordCount: 2050,
+    cover: {
+      src: "/guides/best-instagram-niches-2026.webp",
+      width: 1029,
+      height: 698,
+      alt: "A creator holding a phone watches a follower count rise beside floating Reels, carousel and comment cards",
+    },
+    takeaways: [
+      "Post original Reels and carousels on one clear topic 3-5 times a week, and keep the schedule for months.",
+      "Hook viewers in the first second by naming the problem and promising a specific fix.",
+      "Reply to every comment and DM, and give people a reason to follow: a series, a freebie or a clear promise.",
+      "Hashtags label a post; keywords in your caption and on-screen text do more of the work.",
+      "Turn comments into leads with a keyword and comment-to-DM automation, then follow up in DMs.",
+    ],
+    faqs: [
+      {
+        q: "How many followers do you need to make money?",
+        a: "For affiliate links, services, UGC and digital products there is no official minimum. You can earn with a small, engaged audience. Platform ad programs set their own thresholds, so treat those as a bonus rather than the plan.",
+      },
+      {
+        q: "Is it better to post Reels or carousels for growth?",
+        a: "Both can grow an account. As a general guide, Reels can reach people who don't follow you yet, while carousels are easy to save and share. Post both for a few weeks and check your Insights to see which format brings more new reach for your topic.",
+      },
+      {
+        q: "Why am I losing followers?",
+        a: "Small drops are normal and often just people tidying their feed. Bigger drops can follow a change in topic, a run of low-value posts or a long gap between posts. Check whether your recent posts still match the promise in your bio.",
+      },
+      {
+        q: "How long does it take to grow on Instagram?",
+        a: "It varies by topic, format and how consistently you post. Most accounts need weeks to months of steady posting and replying before growth compounds. Judge progress monthly, not daily.",
+      },
+      {
+        q: "Do I need to post every day?",
+        a: "No. Three to five good posts a week that you can keep up for months usually beat a daily plan you abandon. Consistency matters more than volume.",
+      },
+      {
+        q: "Can I grow without showing my face?",
+        a: "Yes, if the content is original. Recipes, plant care, art process, screen recordings and product demos can grow without a face. What matters is that you make the content and that it helps a specific audience.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-posting-frequency-calculator",
+      "/tools/instagram-hook-generator",
+      "/tools/instagram-hashtag-generator",
+      "/tools/instagram-bio-generator",
+      "/tools/instagram-post-ideas-generator",
+      "/tools/instagram-engagement-rate-calculator",
+    ],
+    related: ["best-instagram-niches-2026", "social-media-seo-2026"],
+  },
+  {
     slug: "how-to-make-money-on-social-media-2026",
     title: "How to Make Money on Social Media in 2026 (Real Plan)",
     description:
