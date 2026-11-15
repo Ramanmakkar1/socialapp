@@ -80,9 +80,12 @@ export type YouTubeFailure = "exchange_failed" | "no_refresh_token" | "channel_n
 
 export class YouTubeAuthError extends Error {
   readonly reason: YouTubeFailure;
-  constructor(reason: YouTubeFailure) {
+  /** Google rejected the grant itself (invalid_grant: revoked / expired refresh token): reconnect needed. */
+  readonly tokenDead: boolean;
+  constructor(reason: YouTubeFailure, tokenDead = false) {
     super(reason);
     this.reason = reason;
+    this.tokenDead = tokenDead;
   }
 }
 
@@ -103,7 +106,7 @@ async function tokenRequest(body: Record<string, string>): Promise<TokenResponse
     signal: AbortSignal.timeout(10_000),
   });
   const json = (await res.json().catch(() => null)) as TokenResponse | null;
-  if (!res.ok) throw new YouTubeAuthError("exchange_failed");
+  if (!res.ok) throw new YouTubeAuthError("exchange_failed", json?.error === "invalid_grant");
   return json ?? {};
 }
 

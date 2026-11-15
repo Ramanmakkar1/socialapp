@@ -282,6 +282,29 @@ test("youtube: a dead refresh token marks the channel disconnected and fails the
   }
 });
 
+test("youtube: a temporary token-endpoint failure keeps the channel and its refresh token", async () => {
+  const { posts, targets, channels } = ytFixture();
+  const { pool } = createFakePool(ytDb(posts, targets, channels));
+  const restore = installFakePool(pool);
+  const savedToken = channels[0].refresh_token_enc;
+  const yt = makeYouTubeFetch({ token: { status: 503, body: { error: "backend_error" } } });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = yt.fetch;
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    const result = await publishDuePosts();
+    assert.equal(result.failed, 1);
+    assert.equal(channels[0].status, "active");
+    assert.equal(channels[0].refresh_token_enc, savedToken);
+    assert.equal(targets[0].status, "failed");
+    assert.match(targets[0].error ?? "", /Retry/);
+    assert.doesNotMatch(targets[0].error ?? "", /Reconnect/);
+  } finally {
+    globalThis.fetch = realFetch;
+    restore();
+  }
+});
+
 test("youtube: a 403 quotaExceeded keeps the channel connected (post stays queued)", async () => {
   const { posts, targets, channels } = ytFixture();
   const { pool } = createFakePool(ytDb(posts, targets, channels));

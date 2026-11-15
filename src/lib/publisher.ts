@@ -5,7 +5,7 @@ import { shouldPostFirstComment } from "@/lib/firstComment";
 import { graphBaseFor } from "@/lib/graphHost";
 import { canPublishToFacebook, publishToFacebookPage } from "@/lib/facebookPublish";
 import { RECONNECT_MESSAGE, publishToThreads } from "@/lib/threadsPublish";
-import { refreshYouTubeToken } from "@/lib/youtubeAuth";
+import { YouTubeAuthError, refreshYouTubeToken } from "@/lib/youtubeAuth";
 import { isNetworkId } from "@/lib/networks/common";
 import { publishNetworkTargets, type ClaimedNetworkRow } from "@/lib/networks/publish";
 import { expireReminders } from "@/lib/networks/reminderSend";
@@ -263,14 +263,15 @@ export async function refreshPostStatus(postId: string): Promise<void> {
   const pool = getPool();
   // A reminder target ('reminded': e-mail sent, owner still has to post it) keeps the post in
   // 'publishing' until it is marked as posted or its 7-day hold ends (src/lib/networks/reminderSend.ts).
+  // A failed target only fails the post once no other target is still pending or publishing: the
+  // claim only picks 'scheduled' posts, so failing the post early would strand its other networks.
   const updated = await pool.query<{ status: string }>(
     `update socialapp.scheduled_posts p set status = case
+      when exists(select 1 from socialapp.post_targets where post_id=p.id and status='publishing') then p.status
+      when exists(select 1 from socialapp.post_targets where post_id=p.id and status='pending') then 'scheduled'
       when exists(select 1 from socialapp.post_targets where post_id=p.id and status='failed') then 'failed'
-      when not exists(select 1 from socialapp.post_targets where post_id=p.id and status in ('pending','publishing'))
-        and exists(select 1 from socialapp.post_targets where post_id=p.id and status='reminded') then 'publishing'
-      when not exists(select 1 from socialapp.post_targets where post_id=p.id and status in ('pending','publishing')) then 'published'
-      when not exists(select 1 from socialapp.post_targets where post_id=p.id and status='publishing') then 'scheduled'
-      else p.status
+      when exists(select 1 from socialapp.post_targets where post_id=p.id and status='reminded') then 'publishing'
+      else 'published'
     end, updated_at=now() where p.id=$1 returning p.status`,
     [postId],
   );
@@ -546,8 +547,13 @@ export async function publishToYouTube(opts: {
   let accessToken: string;
   try {
     accessToken = await refreshYouTubeToken(opts.refreshToken);
-  } catch {
-    return { ok: false, error: "YouTube access expired. Reconnect YouTube in Settings, then retry.", tokenDead: true };
+  } catch (err) {
+    // Only Google's invalid_grant means the refresh token is dead. A timeout, 5xx or rate limit
+    // must not disconnect the channel (that wipes the stored refresh token for good).
+    if (err instanceof YouTubeAuthError && err.tokenDead) {
+      return { ok: false, error: "YouTube access expired. Reconnect YouTube in Settings, then retry.", tokenDead: true };
+    }
+    return { ok: false, error: "Could not reach YouTube to refresh access. Press Retry in a few minutes." };
   }
 
   let bytes: Buffer;
@@ -693,6 +699,20 @@ async function claimDueTargets(
   }
 }
 
+/**
+ * Claims due posts ONE at a time (up to `limit` posts). Claiming the whole batch up front let the
+ * last posts of a long run (video polling, YouTube uploads) sit claimed for over
+ * STUCK_PUBLISHING_MS, so the next minute's run "recovered" them as failed while this run was
+ * still about to publish them (false failure e-mail; a Retry then posted twice).
+ */
+async function* claimEach(limit: number, platform: string): AsyncGenerator<ClaimedRow> {
+  for (let n = 0; n < limit; n += 1) {
+    const rows = await claimDueTargets(1, platform);
+    if (rows.length === 0) return;
+    yield* rows;
+  }
+}
+
 export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   const result: PublishResult = { published: 0, failed: 0, skipped: 0, recovered: 0 };
   const pool = getPool();
@@ -701,9 +721,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   } catch (err) {
     console.error("publisher: stuck-claim recovery failed", err instanceof Error ? err.message : err);
   }
-  const claimed = { rows: await claimDueTargets(limit, "instagram") };
-
-  for (const row of claimed.rows) {
+  for await (const row of claimEach(limit, "instagram")) {
     let token = "";
     const accounts = await pool.query<AccountRow>(
       `select id, external_id, access_token_enc, auth_type from socialapp.social_accounts
@@ -794,8 +812,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
-  const fbRows = await claimDueTargets(limit, "facebook");
-  for (const row of fbRows) {
+  for await (const row of claimEach(limit, "facebook")) {
     let token = "";
     const accounts = await pool.query<{
       id: string;
@@ -875,8 +892,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
-  const thRows = await claimDueTargets(limit, "threads");
-  for (const row of thRows) {
+  for await (const row of claimEach(limit, "threads")) {
     let token = "";
     let counted = false;
     try {
@@ -956,8 +972,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }
   }
 
-  const ytRows = await claimDueTargets(limit, "youtube");
-  for (const row of ytRows) {
+  for await (const row of claimEach(limit, "youtube")) {
     let token = "";
     try {
       const channels = await pool.query<{

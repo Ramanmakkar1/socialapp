@@ -11,7 +11,7 @@ async function run(outcome: { ok: true; id: string; mediaPending?: boolean }) {
   await publishNetworkTargets(
     5,
     {
-      claim: async () => [row],
+      claim: (() => { let done = false; return async () => (done ? [] : ((done = true), [row])); })(),
       markFailed: async () => {
         calls.push("failed");
       },
