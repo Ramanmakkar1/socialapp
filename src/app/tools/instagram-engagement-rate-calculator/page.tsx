@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "Free Instagram engagement rate calculator: add likes, comments, saves and shares, divide by followers or reach and get the rate for one post in seconds.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram engagement rate", mark: "calculator" },
-  lede: "Instagram engagement rate = (likes + comments + saves + shares) ÷ followers × 100, or ÷ reach for a single post. Enter one post's numbers below to get its rate as a percentage.",
+  lede: "Instagram engagement rate is the share of your audience that interacted with a post, shown as a percentage. Enter one post's likes, comments, saves, shares and either followers or reach and the calculator returns that post's engagement rate, plus the exact formula it used.",
   art: "analytics",
   artLabel: "A creator waters a growing bar chart while hearts float up",
   heroPoints: ["By followers or reach", "Saves and shares count", "No login"],
@@ -173,6 +173,14 @@ const config: ToolPageConfig = {
     {
       q: "Do saves and shares count?",
       a: "In this calculator, yes. They are optional fields: fill them in from the post's insights for a fuller picture, or leave them blank and they count as zero.",
+    },
+    {
+      q: "Which numbers do I enter in the calculator?",
+      a: "Enter the post's likes and comments, then choose either followers or reach as the base. Saves and shares are optional: type them in from the post's insights for a fuller rate, or leave them blank and they count as zero.",
+    },
+    {
+      q: "What is a good engagement rate on Instagram?",
+      a: "There is no single pass mark. A rough common range is about 1-5% by followers, and reach-based rates usually look higher because reach is smaller than followers. Judge a post against your own recent posts in the same format rather than against a stranger's account.",
     },
     {
       q: "Does the calculator connect to my Instagram account?",
