@@ -68,7 +68,7 @@ export default function BufferAlternative() {
             The Buffer alternative that also <em className="s">turns comments into leads</em>
           </h1>
           <p className="lede">
-            Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email and track every lead.
+            {BRAND.name} is a Buffer alternative that schedules your Instagram, Facebook Page and Threads posts and also DMs everyone who comments a keyword, so you can capture their email and track every lead. It starts on a $0 Free plan with no credit card.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
