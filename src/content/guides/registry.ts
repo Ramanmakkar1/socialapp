@@ -421,6 +421,68 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["cheapest-social-media-scheduling-tools-2026", "best-instagram-auto-dm-tools-2026"],
   },
+  {
+    slug: "how-to-schedule-tiktok-videos",
+    title: "How to Schedule TikTok Videos in 2026 (Step by Step)",
+    description:
+      "Schedule TikTok videos free in TikTok Studio or Poskoo's official TikTok API scheduler, with steps, timing tips, size limits and fixes for failed posts.",
+    h1: "How to schedule TikTok videos",
+    subtitle:
+      "The exact steps for TikTok Studio and Poskoo, the size and caption limits, and how to fix a video that failed.",
+    crumb: "How to schedule TikTok videos",
+    excerpt: "Schedule TikTok videos free in TikTok Studio or Poskoo, with steps and fixes.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-14",
+    updated: "2026-11-14",
+    wordCount: 1387,
+    cover: {
+      src: "/guides/cheapest-social-media-scheduling-tools-2026.webp",
+      width: 1280,
+      height: 720,
+      alt: "A creator holding a phone drops a coin into a piggy bank beside a spiral calendar filled with scheduled post cards for the week",
+    },
+    takeaways: [
+      "You can schedule TikTok videos free in TikTok Studio on a desktop, or in Poskoo using TikTok's official Content Posting API.",
+      "TikTok Studio accepts a schedule up to about 10 days ahead; Poskoo plans ahead on a week or month calendar across channels.",
+      "Both routes are official, so neither asks for your TikTok password and you can revoke access at any time.",
+      "Vertical 9:16 video fills the screen best, and a video must be at least 3 seconds and no longer than 10 minutes.",
+      "Poskoo shows Published or Failed status in the queue, so you can fix the cause and retry a failed post.",
+    ],
+    faqs: [
+      {
+        q: "Can you schedule TikToks on the mobile app?",
+        a: "TikTok Studio's scheduler is built for a desktop browser, so scheduling works best on a computer. On a phone you can still film, edit and post directly in the TikTok app. A scheduler such as Poskoo lets you pick the date and time from its browser interface.",
+      },
+      {
+        q: "How far ahead can you schedule a TikTok?",
+        a: "At the time of writing, TikTok Studio accepts a schedule up to about 10 days ahead. For a longer campaign, plan on the week or month calendar in a scheduler such as Poskoo, where you can edit, reschedule or delete a post before it is due.",
+      },
+      {
+        q: "Does scheduling hurt TikTok reach?",
+        a: "No. Scheduling does not change how the video is published: TikTok receives the same file and caption at the time you choose, exactly as if you had posted it from the app. Content and audience still matter most.",
+      },
+      {
+        q: "Is scheduling TikTok videos free?",
+        a: "Yes. TikTok Studio's scheduler is free to use once you sign in with your TikTok account. You do not need to pay to schedule a video there.",
+      },
+      {
+        q: "What video length does TikTok accept?",
+        a: "TikTok accepts MP4 and MOV video. In Poskoo a video must be at least 3 seconds and no longer than 10 minutes, with a 1 GB limit per file. Vertical 9:16 video, such as 1080 by 1920, fills the screen best.",
+      },
+      {
+        q: "Why did my scheduled TikTok fail?",
+        a: "The most common causes are an expired connection, missing posting permission, a video that is too long or too large, a visibility option that is no longer available, the daily posting limit, and photo posts linked from an unverified domain. Fix the cause, then retry the same post from the queue.",
+      },
+    ],
+    tools: [
+      "/tools/best-time-to-post-on-tiktok",
+      "/tools/tiktok-video-size-checker",
+      "/tools/tiktok-caption-counter",
+      "/tools/tiktok-hashtag-generator",
+    ],
+    related: ["cheapest-social-media-scheduling-tools-2026", "social-media-seo-2026"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
