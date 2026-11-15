@@ -162,7 +162,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
         <li><span className="chIcon" style={{ background: "var(--ink)" }}><AtSign size={20} aria-hidden="true" /></span><span className="chText"><b>Threads</b><span>Posts to your Threads profile</span></span><span className="chLive">Live</span></li>
         <li><span className="chIcon" style={{ background: "#FF0000" }}><Youtube size={20} aria-hidden="true" /></span><span className="chText"><b>YouTube</b><span>Videos and Shorts to your channel</span></span><span className="chLive">Live</span></li>
       </ul>
-      <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link></p>
+      <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/linkedin-scheduler">Schedule LinkedIn posts <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link></p>
     </div>
     <div className="art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
   </div>
@@ -203,7 +203,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
       <p>See reach, comments, DMs, link clicks and leads for every post, so you know what works.</p>
     </article>
   </div>
-  <p className="chLinks" style={{"marginTop": "28px"}}><Link className="go" href="/features">Explore every Poskoo feature <span aria-hidden="true">→</span></Link><Link className="go" href="/pricing">Compare plans and pricing <span aria-hidden="true">→</span></Link></p>
+  <p className="chLinks" style={{"marginTop": "28px"}}><Link className="go" href="/features">Explore every Poskoo feature <span aria-hidden="true">→</span></Link><Link className="go" href="/pricing">Compare plans and pricing <span aria-hidden="true">→</span></Link><Link className="go" href="/tools/youtube-title-counter">YouTube title and description counter <span aria-hidden="true">→</span></Link></p>
 </div></section>
 
 <section style={{"paddingTop": "20px"}}><div className="wrap">
