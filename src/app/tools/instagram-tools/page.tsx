@@ -422,6 +422,8 @@ export default function InstagramToolsPage() {
             <Link href="/instagram-dm-automation">Instagram DM automation</Link>
             <Link href="/instagram-link-in-bio">Link in bio page</Link>
             <Link href="/tools/threads-tools">Threads tools</Link>
+            <Link href="/tools/facebook-tools">Facebook tools</Link>
+            <Link href="/tools/tiktok-tools">TikTok tools</Link>
             <Link href="/tools">All free social media tools</Link>
           </nav>
         </section>
