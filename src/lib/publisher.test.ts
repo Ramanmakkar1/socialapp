@@ -16,9 +16,11 @@ function publisherDb(posts: Post[], targets: Target[], accounts: Account[] = [])
     const p = postOf(postId);
     if (!p) return;
     const ts = targets.filter((t) => t.post_id === postId);
-    if (ts.some((t) => t.status === "failed")) p.status = "failed";
-    else if (!ts.some((t) => t.status === "pending" || t.status === "publishing")) p.status = "published";
-    else if (!ts.some((t) => t.status === "publishing")) p.status = "scheduled";
+    if (ts.some((t) => t.status === "publishing")) return void (p.updated_at = Date.now());
+    if (ts.some((t) => t.status === "pending")) p.status = "scheduled";
+    else if (ts.some((t) => t.status === "failed")) p.status = "failed";
+    else if (ts.some((t) => t.status === "reminded")) p.status = "publishing";
+    else p.status = "published";
     p.updated_at = Date.now();
   };
   const handlers: FakeHandler[] = [
@@ -252,6 +254,42 @@ test("publisher: a dead Threads token marks the account expired and fails the ta
     assert.equal(targets[0].status, "failed");
     assert.match(targets[0].error ?? "", /Threads access expired or was removed/);
     assert.equal(posts[0].status, "failed");
+  } finally {
+    globalThis.fetch = realFetch;
+    restore();
+  }
+});
+
+test("publisher: a failed Instagram target does not strand the post's other networks", async () => {
+  const posts: Post[] = [
+    { id: "multi", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [
+    { id: "t-multi-ig", post_id: "multi", platform: "instagram", status: "pending", error: null },
+    { id: "t-multi-th", post_id: "multi", platform: "threads", status: "pending", error: null },
+  ];
+  const accounts: Account[] = [];
+  const { pool, calls } = createFakePool(publisherDb(posts, targets, accounts));
+  const restore = installFakePool(pool);
+  // Threads only: the Instagram target has no connected account and fails first.
+  accounts.push({ id: "acc-th", external_id: "12345", access_token_enc: encryptToken("th-token"), status: "active" });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => {
+    if (String(url).endsWith("/threads")) return new Response(JSON.stringify({ id: "container-1" }));
+    return new Response(JSON.stringify({ id: "thread-post-1" }));
+  }) as typeof fetch;
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    const result = await publishDuePosts();
+    assert.equal(targets[0].status, "failed");
+    assert.equal(targets[1].status, "published", "Threads still publishes after Instagram failed");
+    assert.equal(result.published, 1);
+    assert.equal(result.failed, 1);
+    // Once nothing is left to publish, the post shows as failed so the owner can Retry Instagram.
+    assert.equal(posts[0].status, "failed");
+    // The real status SQL (emulated above) must rank pending/publishing targets before failed ones.
+    const statusSql = calls.find((c) => /update socialapp\.scheduled_posts p set status = case/.test(c.sql))?.sql ?? "";
+    assert.ok(statusSql.indexOf("status='pending'") >= 0 && statusSql.indexOf("status='pending'") < statusSql.indexOf("status='failed'"));
   } finally {
     globalThis.fetch = realFetch;
     restore();
