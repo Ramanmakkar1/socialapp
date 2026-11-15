@@ -198,6 +198,7 @@ export default function FeaturesPage() {
                 Try AI captions free <span aria-hidden="true">→</span>
               </Link>
               <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p>
+              <p className="small">See how it fits together on the <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> page, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link> and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>.</p>
             </div>
             <div className="art">
               <AnimArt name="feat-ai" label="An AI helper drafts a caption idea" />
