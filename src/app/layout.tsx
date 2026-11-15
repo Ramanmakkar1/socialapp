@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BRAND.canonicalUrl),
   title: { default: `${BRAND.name} — Social media scheduler + Instagram auto-DM`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: BRAND.name,
