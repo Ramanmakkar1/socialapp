@@ -64,6 +64,7 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
   const doneCount = steps.filter((s) => s.done).length;
   if (dismissed || doneCount === steps.length) return null;
   const firstOpen = steps.findIndex((s) => !s.done);
+  const nextStep = steps[firstOpen];
 
   return (
     <section className={home.fsc} aria-labelledby="first-session-heading">
@@ -110,7 +111,7 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
             Your first session
           </h2>
           <p className={home.fscSub}>
-            {doneCount} of {steps.length} done — your first post is close.
+            {doneCount} of {steps.length} done — next up: {nextStep.label}.
           </p>
         </div>
         <button
@@ -140,6 +141,9 @@ export default function FirstSessionChecklist({ connected, postCreated, postSche
       >
         <div className={home.fscFill} style={{ width: `${(doneCount / steps.length) * 100}%` }} />
       </div>
+      <Link href={nextStep.href} className={home.fscCta}>
+        Continue: {nextStep.label}
+      </Link>
       <ol className={home.fscSteps}>
         {steps.map((step, index) => (
           <li key={step.label} className={home.fscStep}>

@@ -88,3 +88,38 @@ test("the scheduler milestone follows Auto-DM and requires a scheduled post with
     "the checklist must stay dismissible",
   );
 });
+
+test("a prominent CTA points at the first incomplete step and keeps the step links", () => {
+  // The next-action CTA must be derived from the same firstOpen index as the
+  // "Next" badge, not hardcoded to any particular step.
+  assert.ok(
+    checklistSource.includes("const firstOpen = steps.findIndex((s) => !s.done);"),
+    "the first incomplete step must be derived from the steps list",
+  );
+  assert.ok(
+    checklistSource.includes("const nextStep = steps[firstOpen];"),
+    "the CTA must use the first incomplete step",
+  );
+  assert.ok(
+    checklistSource.includes("<Link href={nextStep.href} className={home.fscCta}>"),
+    "the CTA must link to the first incomplete step's existing href",
+  );
+  assert.ok(
+    checklistSource.includes("Continue: {nextStep.label}"),
+    "the CTA must use a Continue: {step.label} label",
+  );
+
+  // The CTA must render above the numbered list and the list must keep its
+  // per-step links so completed and remaining steps are unchanged.
+  const ctaIndex = checklistSource.indexOf("<Link href={nextStep.href} className={home.fscCta}>");
+  const listIndex = checklistSource.indexOf("<ol className={home.fscSteps}>");
+  assert.ok(ctaIndex > -1 && listIndex > ctaIndex, "the CTA must sit above the numbered step list");
+  assert.ok(
+    checklistSource.includes('<Link href={step.href} className={home.fscLink}>'),
+    "remaining steps must keep their existing links",
+  );
+  assert.ok(
+    checklistSource.includes('{doneCount} of {steps.length} done'),
+    "the subheading must keep the progress count",
+  );
+});
