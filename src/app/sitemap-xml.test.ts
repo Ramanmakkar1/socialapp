@@ -60,3 +60,17 @@ test("sitemap.xml route never lists the audited noindex home URLs", async () => 
     BRAND.indexable = was;
   }
 });
+
+test("sitemap.xml route serves no URLs when the request host is the noindex legacy host", async () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const legacy = await GET(new Request("https://socialapp.splitforms.com/sitemap.xml"));
+    assert.doesNotMatch(await legacy.text(), /<url>/, "the legacy noindex host must serve an empty sitemap");
+
+    const canonical = await GET(new Request("https://poskoo.com/sitemap.xml"));
+    assert.match(await canonical.text(), /<url>/, "the canonical host must still list its indexable pages");
+  } finally {
+    BRAND.indexable = was;
+  }
+});
