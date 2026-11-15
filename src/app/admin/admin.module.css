@@ -427,3 +427,38 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
 .settingsMsgOk { margin: 0; color: color-mix(in srgb, var(--poskoo-green) 75%, var(--poskoo-ink)); font-size: 14px; font-weight: 600; }
 .settingsMsgErr { margin: 0; color: var(--poskoo-red); font-size: 14px; font-weight: 600; }
 .settingsList { margin: 0; padding-left: 18px; color: var(--poskoo-muted); font-size: 14px; line-height: 1.6; }
+
+/* ---------- List pages: filters, pager, detail key/values, row actions ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filterInput,
+.filterSelect {
+  height: 38px;
+  border: 1.5px solid var(--poskoo-line);
+  border-radius: 12px;
+  background: var(--poskoo-card);
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--poskoo-ink);
+}
+.filterInput { min-width: 240px; flex: 1 1 240px; max-width: 420px; }
+.pager { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-top: 1.5px solid var(--poskoo-line); font-size: 13px; color: var(--poskoo-muted); }
+.pager .act { margin-left: auto; display: flex; gap: 8px; }
+.btnOff { opacity: 0.45; pointer-events: none; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 0; font-size: 14px; }
+.kv dt { color: var(--poskoo-muted); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.inlineForm { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.actionMsgOk { color: color-mix(in srgb, var(--poskoo-green) 75%, var(--poskoo-ink)); font-size: 13px; font-weight: 600; }
+.actionMsgErr { color: var(--poskoo-red); font-size: 13px; font-weight: 600; }
+.errText { color: var(--poskoo-red); font-size: 12.5px; max-width: 420px; overflow-wrap: anywhere; }
+.mono { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.muted { color: var(--poskoo-muted); font-size: 13px; }
+.note { margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--poskoo-band); color: var(--poskoo-ink); font-size: 13.5px; line-height: 1.5; }
+.targets { display: flex; flex-direction: column; gap: 6px; }
+.target { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.kpis4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) {
+  .kpis4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filterInput { min-width: 0; }
+}
