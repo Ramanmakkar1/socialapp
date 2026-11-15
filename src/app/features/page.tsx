@@ -9,7 +9,8 @@ import ToolsHeroIllustration from "@/components/ToolsHeroIllustration";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
-import { featureReadiness } from "@/lib/featureReadiness";
+import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
+import { softwareOffers } from "@/lib/plans";
 
 // Payment copy follows the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
 // the page stays static and regenerates in the background at most every 10 minutes.
@@ -75,6 +76,7 @@ const jsonLd = {
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       isAccessibleForFree: true,
+      isPartOf: { "@id": BRAND.canonicalUrl + "#website" },
       featureList: [
         "Schedule and auto-publish to Instagram, Facebook Pages, Threads and YouTube",
         "Week and month content calendar",
@@ -83,8 +85,34 @@ const jsonLd = {
         "Lead capture from DMs",
         "Free Instagram tools",
       ],
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      offers: softwareOffers(planReadiness()),
       publisher: publisherRef(),
+      subjectOf: [
+        {
+          "@type": "WebPage",
+          "@id": BRAND.canonicalUrl + "/instagram-scheduler#webpage",
+          url: BRAND.canonicalUrl + "/instagram-scheduler",
+          name: "Instagram scheduler",
+        },
+        {
+          "@type": "WebPage",
+          "@id": BRAND.canonicalUrl + "/instagram-auto-dm#webpage",
+          url: BRAND.canonicalUrl + "/instagram-auto-dm",
+          name: "Instagram auto-DM",
+        },
+        {
+          "@type": "WebPage",
+          "@id": BRAND.canonicalUrl + "/instagram-link-in-bio#webpage",
+          url: BRAND.canonicalUrl + "/instagram-link-in-bio",
+          name: "Instagram link in bio",
+        },
+        {
+          "@type": "WebPage",
+          "@id": BRAND.canonicalUrl + "/pricing#webpage",
+          url: BRAND.canonicalUrl + "/pricing",
+          name: "Poskoo pricing and plans",
+        },
+      ],
     },
   ],
 };
