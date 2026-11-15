@@ -120,7 +120,7 @@ export default function PostList({
       {tab === "queue" ? (
         <QueueView posts={posts} tz={tz} composeHref={composeHref} onOpen={openPost} />
       ) : loadError ? (
-        <LoadFailed message={loadError.message} reloadHref={loadError.reloadHref} className={styles.mt} />
+        <LoadFailed message={loadError.message} reloadHref={loadError.reloadHref} icon="calendar" className={styles.mt} />
       ) : (
         <>
           <div className={styles.listControls}>

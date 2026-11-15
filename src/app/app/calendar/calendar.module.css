@@ -150,7 +150,41 @@
   background: var(--poskoo-peach);
   padding: 14px 16px;
 }
-.loadFailed p { margin: 0 0 10px; color: var(--poskoo-ink); font-size: .95rem; }
+.loadFailedIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--poskoo-card);
+  border: 1.5px solid var(--poskoo-coral);
+  color: var(--poskoo-coral);
+  margin-bottom: 10px;
+}
+.loadFailedText {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--poskoo-ink);
+  font-size: .95rem;
+  line-height: 1.45;
+}
+.loadFailedAlertIcon { flex-shrink: 0; margin-top: 3px; color: var(--poskoo-coral); }
+.loadFailedActions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.loadFailedHelp {
+  color: var(--poskoo-violet);
+  font-weight: 600;
+  font-size: .9rem;
+  text-decoration: none;
+}
+.loadFailedHelp:hover { text-decoration: underline; }
+.loadFailedHelp:focus-visible,
+.loadFailed .btn:focus-visible {
+  outline: 2px solid var(--poskoo-violet);
+  outline-offset: 2px;
+}
 
 /* ---------- Composer window ---------- */
 .dialogBackdrop {

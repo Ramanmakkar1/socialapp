@@ -62,7 +62,7 @@ export default function MonthView({ posts, monthStart, composeBase, accounts = {
   return (
     <div className={styles.calWrap}>
       {error && <p role="alert" className={styles.errorText}>{error}</p>}
-      {loadError && <LoadFailed {...loadError} className={styles.mb} />}
+      {loadError && <LoadFailed {...loadError} icon="calendar" className={styles.mb} />}
       <div className={styles.monthGrid}>
         {WEEKDAYS.map((name) => (
           <p key={name} className={styles.monthHead} aria-hidden="true">{name}</p>
