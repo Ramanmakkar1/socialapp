@@ -2,7 +2,9 @@
 
 import { requireUser } from "@/lib/auth";
 import { isFeatureReady } from "@/lib/featureReadiness";
-import { generateCaptionIdeas, type CaptionIdeasResult } from "@/lib/ai";
+import { generateCaptionIdeas, generateNetworkVariants, type CaptionIdeasResult, type VariantsResult } from "@/lib/ai";
+import { isKnownPlatform } from "@/lib/captionFit";
+import type { PlatformId } from "@/lib/platforms";
 import { consumeAiRequest } from "@/lib/aiQuota";
 import { isDbConfigured, query } from "@/lib/db";
 
@@ -54,4 +56,55 @@ export async function suggestCaptions(input: {
 export async function aiAvailable(): Promise<boolean> {
   await requireUser();
   return isFeatureReady("ai");
+}
+
+async function brandVoiceFor(userId: string): Promise<string | undefined> {
+  if (!isDbConfigured()) return undefined;
+  try {
+    const rows = await query<{ brand_voice: string | null }>("select brand_voice from socialapp.users where id=$1", [userId]);
+    return rows[0]?.brand_voice?.trim().slice(0, 500) || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Composer "Tailor per network": one caption per selected network, fitted to each network's limits.
+ * The composer puts them in the per-network fields (post_targets.caption_override at save time).
+ */
+export async function tailorCaptions(input: { caption: string; platforms: string[] }): Promise<VariantsResult> {
+  const user = await requireUser();
+  const caption = typeof input?.caption === "string" ? input.caption.trim() : "";
+  if (!caption) return { ok: false, error: "Write the main caption first, then tailor it per network." };
+  if (caption.length > 5000) return { ok: false, error: "The caption is too long to tailor (5,000 characters max)." };
+  const platforms = (Array.isArray(input.platforms) ? input.platforms : []).filter(
+    (p): p is PlatformId => typeof p === "string" && isKnownPlatform(p),
+  );
+  if (platforms.length === 0) return { ok: false, error: "Select at least one network." };
+  if (!isFeatureReady("ai")) {
+    return { ok: false, error: "AI isn't configured on this server yet. You can still customize each network by hand." };
+  }
+  if (isDbConfigured()) {
+    try {
+      const quota = await consumeAiRequest(user.id, "caption_variants");
+      if (!quota.ok) return { ok: false, error: quota.error };
+    } catch (err) {
+      console.error("ai quota check failed for user", user.id, err instanceof Error ? err.message : err);
+      return { ok: false, error: "AI suggestions are not available right now. Please try again." };
+    }
+  }
+  // Mastodon servers can allow more than 500 characters (stored when the account was connected).
+  const maxOverrides: Partial<Record<string, number>> = {};
+  if (platforms.includes("mastodon") && isDbConfigured()) {
+    try {
+      const [row] = await query<{ max: number | null }>(
+        "select (meta->>'maxChars')::int as max from socialapp.social_accounts where user_id=$1 and platform='mastodon' and status='active' order by created_at limit 1",
+        [user.id],
+      );
+      if (row?.max) maxOverrides.mastodon = row.max;
+    } catch {
+      /* default 500 */
+    }
+  }
+  return generateNetworkVariants({ caption, platforms, brandVoice: await brandVoiceFor(user.id), maxOverrides });
 }

@@ -147,3 +147,16 @@ test("createCampaignForUser: with AI off it says so and writes nothing", async (
     if (saved !== undefined) process.env.ANTHROPIC_API_KEY = saved;
   }
 });
+
+test("parseVariants: one caption per requested network, each fitted to the network's limits", async () => {
+  const { parseVariants } = await import("./ai.ts");
+  const reply = JSON.stringify({ x: "word ".repeat(80), linkedin: "Professional take", myspace: "ignored", threads: "" });
+  const out = parseVariants(reply, ["x", "linkedin", "threads"]);
+  assert.deepEqual(Object.keys(out).sort(), ["linkedin", "x"]);
+  assert.deepEqual(checkCaption("x", out.x ?? "").errors, []);
+  assert.equal(out.linkedin, "Professional take");
+  assert.deepEqual(parseVariants("not json", ["x"]), {});
+  // A Mastodon server with a higher limit keeps the longer text.
+  const long = "a".repeat(700);
+  assert.equal(parseVariants(JSON.stringify({ mastodon: long }), ["mastodon"], { mastodon: 1000 }).mastodon, long);
+});
