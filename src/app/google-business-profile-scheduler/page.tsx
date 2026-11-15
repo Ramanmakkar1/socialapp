@@ -17,8 +17,8 @@ const description = "Schedule Google Business Profile posts, offers and events t
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
-  alternates: { canonical: new URL(PATH, BRAND.url).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
+  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
   twitter: { card: "summary_large_image", title, description },
 });
 
@@ -100,7 +100,7 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} Google Business Profile scheduler`,
     description,
-    url: `${BRAND.url}${PATH}`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
     "Google Business Profile updates, offers and events",

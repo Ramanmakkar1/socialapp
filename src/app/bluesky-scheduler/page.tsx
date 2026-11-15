@@ -17,8 +17,8 @@ const description = "Schedule Bluesky posts with your handle and an app password
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
-  alternates: { canonical: new URL(PATH, BRAND.url).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
+  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
   twitter: { card: "summary_large_image", title, description },
 });
 
@@ -94,7 +94,7 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} Bluesky scheduler`,
     description,
-    url: `${BRAND.url}${PATH}`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
     "Bluesky handle and app password connection",

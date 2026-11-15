@@ -111,7 +111,7 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} Threads scheduler`,
     description,
-    url: `${BRAND.url}${PATH}`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
     "Threads text, image and video post scheduling",

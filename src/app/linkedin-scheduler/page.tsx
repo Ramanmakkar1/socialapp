@@ -17,7 +17,7 @@ const description = `Schedule LinkedIn posts on one calendar and publish them au
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
-  alternates: { canonical: new URL(PATH, BRAND.url).toString() },
+  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
 });
@@ -103,7 +103,7 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} LinkedIn scheduler`,
     description,
-    url: `${BRAND.url}${PATH}`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
     "LinkedIn text post scheduling",

@@ -100,18 +100,18 @@ const faqJsonLd = {
 const webPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "@id": `${BRAND.url}/instagram-scheduler#webpage`,
-  url: `${BRAND.url}/instagram-scheduler`,
+  "@id": `${BRAND.canonicalUrl}/instagram-scheduler#webpage`,
+  url: `${BRAND.canonicalUrl}/instagram-scheduler`,
   name: "Instagram scheduler that auto-DMs every comment",
   description,
-  isPartOf: { "@id": `${BRAND.url}#website` },
+  isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
 };
 
 const appJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: BRAND.name,
-  url: `${BRAND.url}/instagram-scheduler`,
+  url: `${BRAND.canonicalUrl}/instagram-scheduler`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description,

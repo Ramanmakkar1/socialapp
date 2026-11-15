@@ -148,7 +148,7 @@ const appJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: `${BRAND.name} social media scheduler`,
-  url: `${BRAND.url}${PATH}`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description,
@@ -173,7 +173,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: link.label,
-    url: `${BRAND.url}${link.href}`,
+    url: `${BRAND.canonicalUrl}${link.href}`,
   })),
 };
 

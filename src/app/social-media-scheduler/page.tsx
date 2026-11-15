@@ -127,9 +127,9 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} social media scheduler`,
     description,
-    url: `${BRAND.url}${PATH}`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
   }),
-  "@id": `${BRAND.url}${PATH}#software`,
+  "@id": `${BRAND.canonicalUrl}${PATH}#software`,
   featureList: [
     "Schedule posts to 10 social platforms from one calendar",
     "Official platform APIs and OAuth login",
@@ -144,12 +144,12 @@ const appJsonLd = {
 const webPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "@id": `${BRAND.url}${PATH}#webpage`,
-  url: `${BRAND.url}${PATH}`,
+  "@id": `${BRAND.canonicalUrl}${PATH}#webpage`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
   name: title,
   description,
-  isPartOf: { "@id": `${BRAND.url}#website` },
-  about: { "@id": `${BRAND.url}${PATH}#software` },
+  isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
+  about: { "@id": `${BRAND.canonicalUrl}${PATH}#software` },
 };
 
 export default function SocialMediaSchedulerPage() {

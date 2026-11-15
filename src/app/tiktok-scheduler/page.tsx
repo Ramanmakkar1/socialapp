@@ -17,7 +17,7 @@ const description = `Schedule TikTok videos and photo posts on one calendar and 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
-  alternates: { canonical: new URL(PATH, BRAND.url).toString() },
+  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
   openGraph: { title, description, url: PATH },
   twitter: { card: "summary_large_image", title, description },
 });
@@ -99,7 +99,7 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} TikTok scheduler`,
     description,
-    url: `${BRAND.url}${PATH}`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
     "TikTok video and photo post scheduling",

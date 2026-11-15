@@ -7,7 +7,7 @@ export type Crumb = { name: string; url: string };
 
 /** Reference to the site Organization defined in src/app/layout.tsx (same @id), so every page points at one entity. */
 export function publisherRef() {
-  return { "@type": "Organization", "@id": `${BRAND.url}#org`, name: BRAND.name, legalName: BRAND.company, url: BRAND.url };
+  return { "@type": "Organization", "@id": `${BRAND.canonicalUrl}#org`, name: BRAND.name, legalName: BRAND.company, url: BRAND.canonicalUrl };
 }
 
 /**

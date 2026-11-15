@@ -59,19 +59,19 @@ const faqJsonLd = {
 const webPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "@id": `${BRAND.url}/instagram-auto-dm#webpage`,
-  url: `${BRAND.url}/instagram-auto-dm`,
+  "@id": `${BRAND.canonicalUrl}/instagram-auto-dm#webpage`,
+  url: `${BRAND.canonicalUrl}/instagram-auto-dm`,
   name: "They comment. You get the lead",
   description:
     "Auto-DM everyone who comments a keyword on your Instagram posts and reels. Official Meta API, email capture, follow gate and a simpler ManyChat alternative.",
-  isPartOf: { "@id": `${BRAND.url}#website` },
+  isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
 };
 
 const appJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: BRAND.name,
-  url: `${BRAND.url}/instagram-auto-dm`,
+  url: `${BRAND.canonicalUrl}/instagram-auto-dm`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description:

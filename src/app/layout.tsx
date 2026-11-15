@@ -11,7 +11,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BRAND.url),
+  metadataBase: new URL(BRAND.canonicalUrl),
   title: { default: `${BRAND.name} — Social media scheduler + Instagram auto-DM`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
   openGraph: {
@@ -35,15 +35,15 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": BRAND.url + "#org",
+      "@id": BRAND.canonicalUrl + "#org",
       name: BRAND.name,
       legalName: BRAND.company,
-      url: BRAND.url,
+      url: BRAND.canonicalUrl,
       email: BRAND.supportEmail,
       sameAs: BRAND.social,
       logo: {
         "@type": "ImageObject",
-        url: BRAND.url + "/brand/poskoo-icon-1024.png",
+        url: BRAND.canonicalUrl + "/brand/poskoo-icon-1024.png",
         width: 1024,
         height: 1024,
       },
@@ -57,10 +57,10 @@ const jsonLd = {
     },
     {
       "@type": "WebSite",
-      "@id": BRAND.url + "#website",
-      url: BRAND.url,
+      "@id": BRAND.canonicalUrl + "#website",
+      url: BRAND.canonicalUrl,
       name: BRAND.name,
-      publisher: { "@id": BRAND.url + "#org" },
+      publisher: { "@id": BRAND.canonicalUrl + "#org" },
       inLanguage: "en",
       description: BRAND.description,
     },

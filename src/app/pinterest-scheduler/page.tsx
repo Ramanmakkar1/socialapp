@@ -17,8 +17,8 @@ const description = "Schedule Pinterest Pins to any board with the official API.
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
   description,
-  alternates: { canonical: new URL(PATH, BRAND.url).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.url).toString() },
+  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
   twitter: { card: "summary_large_image", title, description },
 });
 
@@ -90,7 +90,7 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} Pinterest scheduler`,
     description,
-    url: `${BRAND.url}${PATH}`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
     "Pinterest board selection",

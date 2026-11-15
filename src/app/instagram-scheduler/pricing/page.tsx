@@ -101,7 +101,7 @@ const appJsonLd = (r: PlanReadiness) => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: BRAND.name,
-  url: `${BRAND.url}${PATH}`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   offers: softwareOffers(r),
