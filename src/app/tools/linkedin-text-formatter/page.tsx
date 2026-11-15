@@ -27,7 +27,7 @@ const config: ToolPageConfig = {
   description,
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "LinkedIn Text Formatter" },
-  lede: "Turn text into Unicode bold and italic you can paste into LinkedIn posts, headlines and About sections. Add a bullet list, copy any style and check the post length as you type.",
+  lede: "LinkedIn has no bold or italic button, so you bold text by converting it to Unicode bold characters and pasting them into your post, headline or About section. Type below, copy a style, add bullets and check the 3,000-character limit.",
   art: "writing",
   artLabel: "A creator writes a LinkedIn post with a giant pencil and styled letters on a phone-shaped card",
   heroPoints: ["5 useful text styles", "One-click bullets", "3,000-character counter"],
