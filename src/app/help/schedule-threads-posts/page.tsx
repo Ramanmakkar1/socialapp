@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { guideBySlug, guidePath } from "@/content/guides/registry";
 import { publisherRef } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "How to Schedule Threads Posts: A Step-by-Step Guide" },
+  title: { absolute: "Schedule Threads Posts in Poskoo: Step-by-Step Help" },
   description:
-    `Schedule Threads posts: connect Threads with Meta's login, write up to 500 characters, add one image or video link, pick a time and ${BRAND.name} publishes it.`,
+    `Step-by-step help for scheduling Threads posts in ${BRAND.name}: connect Threads, write up to 500 characters, add media, pick a time and ${BRAND.name} publishes it.`,
   alternates: { canonical: "/help/schedule-threads-posts" },
 });
 
@@ -113,6 +114,9 @@ const faqJsonLd = {
 };
 
 const related = [
+  ...(guideBySlug("how-to-schedule-threads-posts")
+    ? [{ href: guidePath("how-to-schedule-threads-posts"), label: "How to schedule Threads posts in 2026 (full guide)" }]
+    : []),
   { href: "/threads-scheduler", label: "Threads scheduler" },
   { href: "/tools/threads-character-counter", label: "Threads character counter" },
   { href: "/tools/best-time-to-post-on-threads", label: "Best time to post on Threads" },

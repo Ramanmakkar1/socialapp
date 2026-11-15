@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { guideBySlug, guidePath } from "@/content/guides/registry";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "How to Schedule LinkedIn Posts (Step-by-Step Guide)" },
+  title: { absolute: "Schedule LinkedIn Posts in Poskoo: Step-by-Step Help" },
   description:
-    `Schedule LinkedIn posts in ${BRAND.name}: connect your profile with LinkedIn's official sign-in, write the post, add images, pick a time and it publishes.`,
+    `Step-by-step help for scheduling LinkedIn posts in ${BRAND.name}: connect your profile, write the post, add images, pick a time and ${BRAND.name} publishes it.`,
   alternates: { canonical: new URL("/help/schedule-linkedin-posts", BRAND.url).toString() },
 });
 
@@ -116,6 +117,9 @@ const howToJsonLd = {
 };
 
 const related = [
+  ...(guideBySlug("how-to-schedule-linkedin-posts")
+    ? [{ href: guidePath("how-to-schedule-linkedin-posts"), label: "How to schedule LinkedIn posts in 2026 (full guide)" }]
+    : []),
   { href: "/linkedin-scheduler", label: "LinkedIn post scheduler" },
   { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
   { href: "/help/schedule-facebook-posts", label: "Schedule Facebook Page posts" },

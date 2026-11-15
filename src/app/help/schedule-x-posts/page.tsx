@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { guideBySlug, guidePath } from "@/content/guides/registry";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
 const PATH = "/help/schedule-x-posts";
-const title = "How to Schedule X (Twitter) Posts: Step-by-Step | Poskoo";
+const title = "Schedule X (Twitter) Posts in Poskoo: Step-by-Step Help";
 const description =
-  "Schedule X (Twitter) posts in Poskoo: connect your X account, write the post, add images or one video, pick a time and Poskoo publishes it for you.";
+  "Step-by-step help for scheduling X (Twitter) posts in Poskoo: connect X, write the post, add images or one video, pick a time and Poskoo publishes it.";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
@@ -138,6 +139,9 @@ const howToJsonLd = {
 };
 
 const related = [
+  ...(guideBySlug("how-to-schedule-tweets")
+    ? [{ href: guidePath("how-to-schedule-tweets"), label: "How to schedule tweets on X in 2026 (full guide)" }]
+    : []),
   { href: "/x-scheduler", label: "X scheduler features and media limits" },
   { href: "/tools/x-character-counter", label: "X character counter (280-character check)" },
   { href: "/tools/best-time-to-post-on-x", label: "Best time to post on X" },
