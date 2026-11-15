@@ -174,6 +174,11 @@ export default function FeaturesPage() {
               </Link>
               <p className="small">
                 Also see the <Link className={s.vlink} href="/facebook-scheduler">Facebook Page scheduler</Link>,{" "}
+                the <Link className={s.vlink} href="/threads-scheduler">Threads scheduler</Link>,{" "}
+                the <Link className={s.vlink} href="/youtube-scheduler">YouTube video scheduler</Link>,{" "}
+                the <Link className={s.vlink} href="/linkedin-scheduler">LinkedIn scheduler</Link>,{" "}
+                the <Link className={s.vlink} href="/bluesky-scheduler">Bluesky scheduler</Link>,{" "}
+                the <Link className={s.vlink} href="/mastodon-scheduler">Mastodon scheduler</Link>,{" "}
                 the <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>{" "}
                 and the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>.
                 Running a small business? See the{" "}
