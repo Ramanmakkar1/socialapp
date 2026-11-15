@@ -69,10 +69,6 @@ const featuresFaqs = (aiReady: boolean) => [
     a: "Set a keyword such as GUIDE or LINK, and Poskoo sends your message in a DM to everyone who comments it, usually within a minute. You can capture an email first, add a follow gate and track clicks.",
   },
   {
-    q: "Do I need a credit card for the Free plan?",
-    a: "No. You can sign up and use the Free plan without entering any card details.",
-  },
-  {
     q: "Does Poskoo include AI captions?",
     a: aiReady
       ? "Yes. AI caption ideas and DM message ideas are switched on; you edit every idea before anything is scheduled or sent."
