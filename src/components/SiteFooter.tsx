@@ -157,6 +157,7 @@ export function SiteFooter() {
           { href: "/linktree-alternative", label: "Linktree alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
           { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative" },
+          { href: "/social-media-scheduler-comparison", label: "All comparisons →" },
         ]}
       />
       <div className="legal">
