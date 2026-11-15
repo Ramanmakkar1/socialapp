@@ -7,7 +7,7 @@ import { NetworkAuthError, type NetworkId } from "@/lib/networks/common";
 import { NETWORKS } from "@/lib/networks/registry";
 import { markAccountExpired, refreshUnderLock } from "@/lib/networks/store";
 
-const REFRESHABLE: NetworkId[] = ["tiktok", "bluesky", "linkedin", "pinterest", "x", "gbp"];
+const REFRESHABLE: NetworkId[] = ["tiktok", "bluesky", "linkedin", "pinterest", "x", "gbp", "peertube"];
 
 export type NetworkRefreshResult = { refreshed: number; failed: number; expired: number };
 

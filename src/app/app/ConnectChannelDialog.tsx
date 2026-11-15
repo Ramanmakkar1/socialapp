@@ -3,14 +3,16 @@
 import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeft, AtSign, Bell, Check, Facebook, Instagram, Loader2, PartyPopper, Plus, RotateCcw, Youtube, X } from "lucide-react";
-import { BlueskyIcon, GbpIcon, LinkedInIcon, MastodonIcon, PinterestIcon, TikTokIcon, XIcon } from "@/components/brandIcons";
+import { BlueskyIcon, GbpIcon, LinkedInIcon, MastodonIcon, NEW_NETWORK_ICON, PinterestIcon, TikTokIcon, XIcon } from "@/components/brandIcons";
 import { unavailableStatus, type ChannelStatus, type ComingChannel } from "@/lib/channelStatus";
 import type { ReminderNetworkId } from "@/lib/networks/reminder";
+import { isTokenNetwork, TOKEN_NETWORK_IDS, TOKEN_NETWORK_LABEL, TOKEN_NETWORKS, type TokenNetworkId } from "@/lib/networks/tokenNetworks";
 import {
   channelInterestAction,
   connectBlueskyAction,
   connectGbpLocationsAction,
   connectReminderAction,
+  connectTokenNetworkAction,
   gbpPickListAction,
   linkedinPagesListAction,
   saveLinkedInPagesAction,
@@ -19,6 +21,7 @@ import {
   type GbpPickResult,
   type LinkedInPagesResult,
   type ReminderConnectState,
+  type TokenConnectState,
 } from "./connectActions";
 import styles from "./shell.module.css";
 import cc from "./connectChannel.module.css";
@@ -48,7 +51,7 @@ export type ConnectAvailability = {
   reminderStatuses?: Partial<Record<ReminderNetworkId, ChannelStatus>>;
 };
 
-type NetworkId = "instagram" | "facebook" | "threads" | "youtube" | "tiktok" | "linkedin" | "pinterest" | "x" | "bluesky" | "mastodon" | "gbp";
+type NetworkId = "instagram" | "facebook" | "threads" | "youtube" | "tiktok" | "linkedin" | "pinterest" | "x" | "bluesky" | "mastodon" | "gbp" | TokenNetworkId;
 type Step = "instagram" | "facebook" | "linkedin" | "bluesky" | "mastodon";
 
 export type Network = {
@@ -60,6 +63,8 @@ export type Network = {
   href?: string;
   /** Opens a step inside the dialog instead of a link. */
   step?: Step;
+  /** Token networks: opens the token / webhook form inside the dialog. */
+  token?: TokenNetworkId;
   /** Not switched on yet: the card shows a pill and opens an explanation with "Notify me". */
   status?: ChannelStatus;
 };
@@ -91,10 +96,16 @@ export function networks(a: ConnectAvailability): Network[] {
   ];
 }
 
+/** Chat, blogs and self-hosted networks: a token, key or webhook, no app review (src/lib/networks/tokenNetworks.ts). */
+export function tokenNetworks(): Network[] {
+  return TOKEN_NETWORK_IDS.map((id) => ({ id, name: TOKEN_NETWORKS[id].label, sub: TOKEN_NETWORKS[id].sub, icon: icon(NEW_NETWORK_ICON[id]), token: id }));
+}
+
 const LABEL: Record<string, string> = {
   instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube", tiktok: "TikTok",
   linkedin: "LinkedIn", pinterest: "Pinterest", x: "X", bluesky: "Bluesky", mastodon: "Mastodon", gbp: "Google Business Profile",
   ig_personal: "Instagram (personal)", fb_group: "Facebook Group",
+  ...TOKEN_NETWORK_LABEL,
 };
 
 /** Plain-words message for a failed connect (?connect_error=<code>&net=<network>). */
@@ -129,6 +140,7 @@ type View =
   | { kind: Step }
   | { kind: "status"; id: string; name: string; icon: ReactNode; bg: string; status: ChannelStatus }
   | { kind: "reminder"; platform: ReminderNetworkId }
+  | { kind: "token"; net: TokenNetworkId }
   | { kind: "request" }
   | { kind: "pick" }
   | { kind: "pickLinkedin" }
@@ -138,13 +150,14 @@ type View =
 const IG_FLOW_KEY = "poskoo.igFlow";
 
 function retryHref(net: string): string | null {
-  if (net === "bluesky" || net === "mastodon" || net === "ig_personal" || net === "fb_group") return null;
+  if (net === "bluesky" || net === "mastodon" || net === "ig_personal" || net === "fb_group" || isTokenNetwork(net)) return null;
   if (net === "facebook") return "/api/instagram/connect?via=facebook";
   return `/api/${net}/connect`;
 }
 
 function retryView(net: string): View {
   if (net === "ig_personal" || net === "fb_group") return { kind: "reminder", platform: net };
+  if (isTokenNetwork(net)) return { kind: "token", net };
   return { kind: net === "bluesky" ? "bluesky" : "mastodon" };
 }
 
@@ -186,6 +199,7 @@ export default function ConnectChannelDialog({
   const ref = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const list = networks(availability);
+  const moreList = tokenNetworks();
   const [view, setView] = useState<View>({ kind: "grid" });
   const [igFlow, setIgFlow] = useState<"instagram" | "facebook">("instagram");
   const [bsState, bsAction, bsPending] = useActionState<BlueskyConnectState, FormData>(connectBlueskyAction, null);
@@ -207,6 +221,7 @@ export default function ConnectChannelDialog({
         ? { kind: "status", id: c, name: LABEL[c], icon: icon(c === "ig_personal" ? Instagram : Facebook), bg: styles[`netBg_${c === "ig_personal" ? "instagram" : "facebook"}`] ?? "", status: soon }
         : { kind: "reminder", platform: c };
     }
+    else if (isTokenNetwork(c)) next = { kind: "token", net: c };
     else if (url.hash === "#connect" || c === "1") next = { kind: "grid" };
     try {
       const saved = window.localStorage.getItem(IG_FLOW_KEY);
@@ -292,6 +307,7 @@ export default function ConnectChannelDialog({
     : view.kind === "pickLinkedin" ? "Select the LinkedIn Pages to connect"
     : view.kind === "request" ? "Request a channel"
     : view.kind === "reminder" ? (view.platform === "ig_personal" ? "Add an Instagram personal account" : "Add a Facebook Group")
+    : view.kind === "token" ? `Connect ${TOKEN_NETWORKS[view.net].label}`
     : "Connect a new channel";
 
   return (
@@ -338,6 +354,14 @@ export default function ConnectChannelDialog({
                     ) : (
                       <a href={n.href} className={cc.card}><CardBody n={n} /></a>
                     )}
+                  </li>
+                ))}
+              </ul>
+              <p className={styles.connectLead}>Chat, blogs and self-hosted</p>
+              <ul className={cc.grid}>
+                {moreList.map((n) => (
+                  <li key={n.id}>
+                    <button type="button" className={cc.card} onClick={() => go({ kind: "token", net: n.token! })}><CardBody n={n} /></button>
                   </li>
                 ))}
                 <li>
@@ -489,6 +513,8 @@ export default function ConnectChannelDialog({
 
           {view.kind === "request" && <RequestForm back={back} />}
 
+          {view.kind === "token" && <TokenForm key={view.net} net={view.net} back={back} />}
+
           {view.kind === "bluesky" && (
             <form action={bsAction} className={styles.connectStep}>
               {back}
@@ -542,7 +568,7 @@ export default function ConnectChannelDialog({
               <p className={styles.connectSuccess}>
                 <PartyPopper width={22} height={22} aria-hidden="true" />
                 <span>
-                  <b>{view.handle ? (view.handle.includes(" ") || view.handle.startsWith("@") || view.net === "fb_group" ? view.handle : `@${view.handle}`) : (LABEL[view.net] ?? "Your channel")}</b> is connected
+                  <b>{view.handle ? (view.handle.includes(" ") || view.handle.startsWith("@") || view.net === "fb_group" || isTokenNetwork(view.net) ? view.handle : `@${view.handle}`) : (LABEL[view.net] ?? "Your channel")}</b> is connected
                   {view.handle && LABEL[view.net] ? ` to ${LABEL[view.net]}` : ""}.
                 </span>
               </p>
@@ -633,6 +659,45 @@ function RequestForm({ back }: { back: ReactNode }) {
       {state && !state.ok && <p role="alert" className={styles.connectError}>{state.error}</p>}
       <button type="submit" className={styles.connectPrimary} disabled={pending}>
         {pending ? <Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> : null} Send request
+      </button>
+    </form>
+  );
+}
+
+// Token networks: one form per network from its spec (token / key / webhook / server address).
+// The secret is checked against the network once, then stored encrypted; it is never shown again.
+function TokenForm({ net, back }: { net: TokenNetworkId; back: ReactNode }) {
+  const [state, action, pending] = useActionState<TokenConnectState, FormData>(connectTokenNetworkAction, null);
+  const spec = TOKEN_NETWORKS[net];
+  const Icon = NEW_NETWORK_ICON[net];
+  return (
+    <form action={action} className={styles.connectStep}>
+      {back}
+      <input type="hidden" name="network" value={net} />
+      <p className={styles.connectLead}>Connect {spec.label} with {spec.fields.some((f) => f.name === "webhook") ? "a webhook" : "a token"}.</p>
+      {spec.fields.map((f) => (
+        <label key={f.name} className={styles.connectLabel}>
+          {f.label} {f.optional && <span className={cc.optional}>(optional)</span>}
+          <input
+            name={f.name}
+            required={!f.optional}
+            type={f.type === "password" ? "password" : "text"}
+            inputMode={f.type === "url" ? "url" : undefined}
+            autoCapitalize="none"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder={f.placeholder}
+            className={styles.connectInput}
+          />
+        </label>
+      ))}
+      <p className={styles.connectFoot}>
+        {spec.help}
+        {spec.helpUrl && <> <a href={spec.helpUrl} target="_blank" rel="noreferrer">How to get it</a></>}
+      </p>
+      {state?.error && <p role="alert" className={styles.connectError}>{state.error}</p>}
+      <button type="submit" className={styles.connectPrimary} disabled={pending}>
+        {pending ? <Loader2 width={16} height={16} className="animate-spin" aria-hidden="true" /> : <Icon width={16} height={16} aria-hidden="true" />} Connect {spec.label}
       </button>
     </form>
   );

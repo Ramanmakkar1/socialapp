@@ -8,6 +8,10 @@ import { isTikTokConfigured, publishToTikTok, refreshTikTokToken } from "@/lib/n
 import { isXConfigured, publishToX, refreshXToken } from "@/lib/networks/x";
 import { isGbpConfigured, publishToGbp, refreshGbpToken } from "@/lib/networks/gbp";
 import { publishReminder } from "@/lib/networks/reminderSend";
+import { publishToDevto, publishToDiscourse, publishToGhost, publishToHashnode, publishToListmonk, publishToWordPress } from "@/lib/networks/blogs";
+import { publishToDiscord, publishToMatrix, publishToMattermost, publishToSlack, publishToTelegram } from "@/lib/networks/chat";
+import { publishToMisskey, publishToPeerTube, publishToPixelfed, refreshPeerTube } from "@/lib/networks/fediverse";
+import { isTokenNetwork } from "@/lib/networks/tokenNetworks";
 
 export type NetworkAdapter = {
   configured: () => boolean;
@@ -52,6 +56,22 @@ export const NETWORKS: Record<NetworkId, NetworkAdapter> = {
   // Reminder channels (no posting API): an e-mail to the owner instead of a publish. Need no keys.
   ig_personal: { configured: () => true, publish: publishReminder, refreshSkewSec: 0 },
   fb_group: { configured: () => true, publish: publishReminder, refreshSkewSec: 0 },
+  // Token networks (src/lib/networks/tokenNetworks.ts): the user brings a token / key / webhook, so
+  // they need no keys on this server. Only PeerTube tokens expire (1 day, refresh token 2 weeks).
+  telegram: { configured: () => true, publish: publishToTelegram, refreshSkewSec: 0 },
+  discord: { configured: () => true, publish: publishToDiscord, refreshSkewSec: 0 },
+  slack: { configured: () => true, publish: publishToSlack, refreshSkewSec: 0 },
+  mattermost: { configured: () => true, publish: publishToMattermost, refreshSkewSec: 0 },
+  matrix: { configured: () => true, publish: publishToMatrix, refreshSkewSec: 0 },
+  misskey: { configured: () => true, publish: publishToMisskey, refreshSkewSec: 0 },
+  pixelfed: { configured: () => true, publish: publishToPixelfed, refreshSkewSec: 0 },
+  peertube: { configured: () => true, publish: publishToPeerTube, refresh: refreshPeerTube, refreshSkewSec: 10 * 60 },
+  devto: { configured: () => true, publish: publishToDevto, refreshSkewSec: 0 },
+  hashnode: { configured: () => true, publish: publishToHashnode, refreshSkewSec: 0 },
+  ghost: { configured: () => true, publish: publishToGhost, refreshSkewSec: 0 },
+  wordpress: { configured: () => true, publish: publishToWordPress, refreshSkewSec: 0 },
+  discourse: { configured: () => true, publish: publishToDiscourse, refreshSkewSec: 0 },
+  listmonk: { configured: () => true, publish: publishToListmonk, refreshSkewSec: 0 },
 };
 
 /** Which new networks can be connected on this server (Bluesky / Mastodon need no keys). */
@@ -80,6 +100,8 @@ export function connectHref(platform: string): string {
     case "fb_group":
       return `/app/settings?connect=${platform}#connect`;
     default:
+      // Token networks open their form inside the Connect dialog.
+      if (isTokenNetwork(platform)) return `/app/settings?connect=${platform}#connect`;
       return "/api/instagram/connect";
   }
 }

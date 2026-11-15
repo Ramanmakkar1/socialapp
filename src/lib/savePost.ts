@@ -12,11 +12,14 @@ import { hasColumn, parseTags, tagValidationError } from "@/lib/tagFilter";
 import { isNetworkId, NETWORK_LABEL } from "@/lib/networks/common";
 import { networkTargetError, normalizeNetOptions } from "@/lib/networks/validate";
 import { scheduledMediaError } from "@/lib/mediaLifecycle";
+import { TOKEN_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
 
 export const ALLOWED_PLATFORMS: PlatformId[] = [
   "instagram", "facebook", "threads", "youtube", "tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp",
   // Reminder channels (src/lib/networks/reminder.ts).
   "ig_personal", "fb_group",
+  // Token networks (src/lib/networks/tokenNetworks.ts).
+  ...TOKEN_NETWORK_IDS,
 ];
 
 export type SavePostInput = {

@@ -34,9 +34,10 @@ import type { PlanName } from "@/lib/planLimits";
 import ui from "@/components/ui/ui.module.css";
 import { NEW_NETWORK_COLOR, NEW_NETWORK_ICON } from "@/components/brandIcons";
 import NetworkOptionsPanel, { type NetworkPanelData } from "./NetworkOptionsPanel";
+import { TOKEN_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
 
-const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group"];
-const NEW_NETWORKS = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group"] as const;
+const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group", ...TOKEN_NETWORK_IDS];
+const NEW_NETWORKS = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group", ...TOKEN_NETWORK_IDS] as const;
 const NET_COLOR: Record<PlatformId, string> = { instagram: "#d62976", facebook: "#1877f2", threads: "#000", youtube: "#ff0000", ...NEW_NETWORK_COLOR };
 
 const PLATFORM_ICON: Record<PlatformId, typeof Instagram> = {

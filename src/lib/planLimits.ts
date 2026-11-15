@@ -4,6 +4,7 @@ import { isDbConfigured, query } from "@/lib/db";
 import { referralBonusDms } from "@/lib/referrals";
 import { planFromBilling, type BillingRow } from "@/lib/billingState";
 import { isAdminEmail } from "@/lib/admin";
+import type { NetworkId } from "@/lib/networks/common";
 
 export type PlanName = "Free" | "Pro" | "Agency";
 export type PlanLimits = {
@@ -133,7 +134,7 @@ export type ConnectTarget =
   | {
       kind: "social";
       /** ig_personal / fb_group are reminder channels: they hold a slot like any other channel. */
-      platform: "instagram" | "facebook" | "threads" | "tiktok" | "bluesky" | "mastodon" | "linkedin" | "pinterest" | "x" | "gbp" | "ig_personal" | "fb_group";
+      platform: "instagram" | "facebook" | "threads" | NetworkId;
       externalId: string;
     }
   | { kind: "youtube"; channelId: string };

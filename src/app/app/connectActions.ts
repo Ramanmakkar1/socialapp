@@ -11,6 +11,8 @@ import { NetworkAuthError } from "@/lib/networks/common";
 import { createBlueskySession, jwtExpiresIn, normalizeHandle, normalizeService } from "@/lib/networks/bluesky";
 import { completeConnect, settingsResultUrl } from "@/lib/networks/routes";
 import { connectPendingGbp, pendingGbpLocations } from "@/lib/networks/gbpConnect";
+import { connectTokenNetwork, readTokenFields } from "@/lib/networks/tokenConnect";
+import { isTokenNetwork, TOKEN_NETWORKS } from "@/lib/networks/tokenNetworks";
 
 export type BlueskyConnectState = { error: string } | null;
 
@@ -42,6 +44,31 @@ export async function connectBlueskyAction(_prev: BlueskyConnectState, formData:
     if (err instanceof NetworkAuthError) return { error: err.message };
     console.error("bluesky connect failed", "unexpected");
     target = settingsResultUrl("bluesky", "error");
+  }
+  redirect(`${target.pathname}${target.search}${target.hash}`);
+}
+
+export type TokenConnectState = { error: string } | null;
+
+/**
+ * Token networks (Telegram, Discord, Matrix, WordPress, ...): the Connect dialog's generic form.
+ * The credentials are checked against the network once, then stored encrypted like OAuth tokens.
+ */
+export async function connectTokenNetworkAction(_prev: TokenConnectState, formData: FormData): Promise<TokenConnectState> {
+  const user = await requireUser();
+  if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
+  const network = String(formData.get("network") ?? "");
+  if (!isTokenNetwork(network)) return { error: "Unknown channel." };
+  const read = readTokenFields(network, (name) => String(formData.get(name) ?? ""));
+  if ("missing" in read) return { error: `Enter the ${read.missing.toLowerCase()}.` };
+  let target: URL;
+  try {
+    const input = await connectTokenNetwork(network, read.fields);
+    target = await completeConnect(user.id, network, input);
+  } catch (err) {
+    if (err instanceof NetworkAuthError) return { error: err.message };
+    console.error(`${network} connect failed`, "unexpected");
+    return { error: `Something went wrong while connecting ${TOKEN_NETWORKS[network].label}. Please try again.` };
   }
   redirect(`${target.pathname}${target.search}${target.hash}`);
 }
