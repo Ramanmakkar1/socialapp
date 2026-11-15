@@ -4,15 +4,20 @@ import { softwareOffers, type PlanReadiness } from "@/lib/plans";
 // Home page JSON-LD graph. The Organization (#org) and WebSite (#website) nodes
 // are emitted once by the root layout; this graph links to them by @id so the
 // page, app and FAQ stay part of the same entity graph.
-export const homePageJsonLd = (faqs: { q: string; a: string }[], r: PlanReadiness) => ({
+export const homePageJsonLd = (
+  faqs: { q: string; a: string }[],
+  r: PlanReadiness,
+  title: string = BRAND.name,
+) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebPage",
       "@id": BRAND.url,
       url: BRAND.url,
-      name: BRAND.name,
+      name: title,
       description: BRAND.description,
+      inLanguage: "en",
       isPartOf: { "@id": BRAND.canonicalUrl + "#website" },
       publisher: { "@id": BRAND.canonicalUrl + "#org" },
       primaryImageOfPage: {

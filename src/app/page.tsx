@@ -43,7 +43,7 @@ export default function Home() {
 const r = planReadiness();
 const plans = plansFor(r);
 const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
-const jsonLd = homePageJsonLd(faqList, r);
+const jsonLd = homePageJsonLd(faqList, r, title);
 // The hero illustration is the first thing painted above the fold: fetch it early
 // and at high priority so it, not the lazy art below, is the LCP candidate.
 preload("/landing/hero.webp?v=3", { as: "image", fetchPriority: "high" });

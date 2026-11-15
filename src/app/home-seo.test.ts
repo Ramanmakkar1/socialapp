@@ -131,6 +131,22 @@ test("home page WebPage node uses BRAND.url as its stable @id and url", () => {
     homeJsonLdSource.includes("publisher: { \"@id\": BRAND.canonicalUrl + \"#org\" },"),
     "WebPage publisher must reference the Organization node",
   );
+  assert.ok(
+    homeJsonLdSource.includes('"@type": "WebPage"'),
+    "home page JSON-LD must include a WebPage node",
+  );
+  assert.ok(
+    homeJsonLdSource.includes("url: BRAND.url,"),
+    "WebPage must use the production root URL expression",
+  );
+  assert.ok(
+    homeJsonLdSource.includes('inLanguage: "en",'),
+    "WebPage must declare inLanguage en",
+  );
+  assert.ok(
+    homeJsonLdSource.includes('isPartOf: { "@id": BRAND.canonicalUrl + "#website" },'),
+    "WebPage isPartOf must point at the WebSite node",
+  );
 });
 
 test("home page imports the exported homePageJsonLd helper and renders its script", () => {
@@ -146,8 +162,8 @@ test("home page imports the exported homePageJsonLd helper and renders its scrip
     "page.tsx must import homePageJsonLd from ./homeJsonLd",
   );
   assert.ok(
-    pageSource.includes("const jsonLd = homePageJsonLd(faqList, r);"),
-    "page.tsx must call the imported homePageJsonLd helper",
+    pageSource.includes("const jsonLd = homePageJsonLd(faqList, r, title);"),
+    "page.tsx must call the imported homePageJsonLd helper with the homepage title",
   );
   assert.ok(
     pageSource.includes('type="application/ld+json"'),
