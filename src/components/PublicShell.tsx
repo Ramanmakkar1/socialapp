@@ -75,7 +75,7 @@ export default function PublicShell({
           dangerouslySetInnerHTML={{
             __html: ldJson(
               breadcrumbJsonLd(
-                crumbs.map((c) => ({ name: c.name, url: BRAND.url + (c.path === "/" ? "/" : c.path) }))
+                crumbs.map((c) => ({ name: c.name, url: BRAND.canonicalUrl + (c.path === "/" ? "/" : c.path) }))
               )
             ),
           }}
