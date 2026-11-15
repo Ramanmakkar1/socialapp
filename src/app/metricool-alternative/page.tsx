@@ -14,9 +14,9 @@ import { AnimArt } from "@/components/AnimArt";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Metricool Alternative: Instagram Auto-DM | Poskoo" },
+  title: { absolute: "Metricool Alternative: Scheduler + Auto-DM | Poskoo" },
   description:
-    "Metricool alternative for Instagram scheduling with comment-to-DM automation, lead capture and an inbox — schedule posts and turn commenters into leads.",
+    "Compare Poskoo with Metricool: schedule social posts, add Instagram comment-to-DM automation, capture leads and start free with no credit card today.",
   alternates: { canonical: "/metricool-alternative" },
 });
 
