@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import robots from "./robots.ts";
 import { GET as llmsTxt } from "./llms.txt/route.ts";
-import sitemap from "./sitemap.ts";
+import sitemap, { SITEMAP_LAST_MODIFIED } from "./sitemap.ts";
 import nextConfig from "../../next.config.ts";
 import { BRAND } from "@/lib/brand";
 import { isPathIndexable } from "@/lib/indexability";
@@ -197,6 +197,26 @@ test("robots names the major AI and search crawlers and allows public pages", ()
     assert.ok(agents.includes(bot), `${bot} missing from robots.txt`);
   }
   for (const rule of rules) assert.equal(rule.allow, "/");
+});
+
+test("sitemap uses one stable lastModified date across repeated calls", () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    assert.ok(SITEMAP_LAST_MODIFIED instanceof Date, "SITEMAP_LAST_MODIFIED must be a Date");
+    assert.ok(!Number.isNaN(SITEMAP_LAST_MODIFIED.getTime()), "SITEMAP_LAST_MODIFIED must be a valid Date");
+    const first = sitemap();
+    const second = sitemap();
+    assert.ok(first.length > 0, "the production sitemap must have entries for this regression");
+    const firstTimes = first.map((entry) => new Date(entry.lastModified as Date | string).getTime());
+    const secondTimes = second.map((entry) => new Date(entry.lastModified as Date | string).getTime());
+    assert.deepEqual(secondTimes, firstTimes, "repeated sitemap calls must return the same lastModified values");
+    for (const time of firstTimes) {
+      assert.equal(time, SITEMAP_LAST_MODIFIED.getTime(), "every entry must use SITEMAP_LAST_MODIFIED");
+    }
+  } finally {
+    BRAND.indexable = was;
+  }
 });
 
 test("sitemap lists only indexable pages once BRAND.indexable is true", () => {
