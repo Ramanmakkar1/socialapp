@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { MCP_TOOLS } from "@/lib/mcp";
+import { ALLOWED_PLATFORMS } from "@/lib/savePost";
 import { ASSISTANT_GUIDES, ASSISTANT_ORDER, ASSISTANT_TOOLS } from "@/lib/aiAssistantGuides";
 
 // The "schedule posts with <assistant>" pages must only promise tools the MCP server really has.
@@ -21,7 +22,9 @@ test("every example prompt names a real MCP tool", () => {
 test("assistant pages only claim the channels create_post accepts", () => {
   const createPost = MCP_TOOLS.find((t) => t.name === "create_post");
   const channel = (createPost?.inputSchema.properties as Record<string, { enum?: string[] }>).channel;
-  assert.deepEqual(channel.enum, ["instagram", "facebook", "threads", "youtube"], "update the copy in aiAssistantGuides.ts when MCP channels change");
+  // The copy promises "every connected channel"; that only holds while
+  // create_post accepts the whole platform registry.
+  assert.deepEqual([...(channel.enum ?? [])].sort(), [...ALLOWED_PLATFORMS].sort(), "update the copy in aiAssistantGuides.ts when MCP channels change");
 });
 
 test("assistant page titles and descriptions fit search snippets and are unique", () => {

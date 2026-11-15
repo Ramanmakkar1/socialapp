@@ -27,22 +27,29 @@ export type AssistantGuide = {
   faqs: { q: string; a: string }[];
 };
 
-/** The five tools the Poskoo MCP server exposes today (names must match MCP_TOOLS). */
+/** The tools the Poskoo MCP server exposes today (names must match MCP_TOOLS). */
 export const ASSISTANT_TOOLS: { name: string; text: string }[] = [
   { name: "list_channels", text: "Lists the channels connected to your Poskoo account and their status." },
   { name: "list_posts", text: "Lists your drafts, scheduled, published and failed posts, newest first (up to 100)." },
-  { name: "create_post", text: "Schedules a post: caption, an optional public image or video link, a channel and a time, or the next free slot." },
+  { name: "create_post", text: "Drafts or schedules a post to any of your connected channels: caption, optional per-network captions, up to 10 public image or video links, and a time or the next free slot." },
+  { name: "update_post", text: "Edits a draft or scheduled post that hasn't started publishing: caption, channels, media or time." },
+  { name: "delete_post", text: "Deletes a draft, scheduled or failed post (never one that is publishing or published)." },
+  { name: "get_post_status", text: "Shows whether a post is pending, publishing, published or failed on each network, with the error if there is one." },
   { name: "add_idea", text: "Saves a post idea to your Poskoo ideas board." },
+  { name: "list_contacts", text: "Lists contacts your Instagram Auto-DMs have captured, with any email or phone they shared." },
+  { name: "create_dm_rule", text: "Creates an Instagram Auto-DM: comment a keyword, get a DM (optionally after sharing an email)." },
+  { name: "create_campaign_from_brief", text: "Drafts a whole campaign from a short brief with Poskoo's AI, as drafts for you to review (when AI is switched on for your account)." },
   { name: "get_analytics_summary", text: "Summarises reach, likes, comments and saves for published posts over 7, 30 or 90 days." },
 ];
 
 /** Limits that apply to every assistant, straight from src/lib/mcp.ts and the plan limits. */
 export const ASSISTANT_LIMITS: string[] = [
-  "Through MCP, create_post publishes to Instagram, Facebook Pages, Threads and YouTube. LinkedIn, Bluesky and Mastodon posts are scheduled in the Poskoo calendar for now.",
+  "create_post works with every channel you have connected in Poskoo. Use list_channels to see which ones the assistant can post to.",
+  "New API keys are drafts-only: posts arrive as drafts and Auto-DMs start paused until you approve them in Poskoo. Tick \"Allow publishing\" on a key to let the assistant schedule directly.",
   "Media must be a public https link to a .jpg or .png image or an .mp4 video. The assistant cannot upload a file from your computer.",
   "Your plan limits still apply. On the Free plan that means 10 scheduled posts a month across 2 accounts.",
   "Each API key can make 60 requests a minute. Keys are stored hashed and can be revoked in Settings at any time.",
-  "The assistant cannot create or edit Instagram auto-DM rules, read your inbox or export leads. Do that in the Poskoo app.",
+  "The assistant can create Auto-DM rules and list captured contacts, but it cannot read your inbox. Do that in the Poskoo app.",
 ];
 
 const API_KEY_STEP = {
@@ -52,7 +59,7 @@ const API_KEY_STEP = {
 
 const CONNECT_CHANNEL_STEP = {
   title: "Connect a channel in Poskoo",
-  text: "The assistant schedules to the channels you have already connected. Connect Instagram, a Facebook Page, Threads or YouTube in Poskoo first, then come back to your assistant.",
+  text: "The assistant schedules to the channels you have already connected. Connect your channels in Poskoo first (Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky, Mastodon and more), then come back to your assistant.",
 };
 
 export const ASSISTANT_GUIDES: Record<AssistantSlug, AssistantGuide> = {
@@ -62,7 +69,7 @@ export const ASSISTANT_GUIDES: Record<AssistantSlug, AssistantGuide> = {
     name: "ChatGPT",
     title: `Schedule Social Media Posts with ChatGPT | ${BRAND.name}`,
     description:
-      "Connect OpenAI's tools to Poskoo's MCP server so the posts you draft with ChatGPT get scheduled to Instagram, Facebook, Threads and YouTube.",
+      "Connect OpenAI's tools to Poskoo's MCP server so the posts you draft with ChatGPT get scheduled to your connected channels.",
     h1Lead: "Schedule social media posts with",
     h1Em: "ChatGPT",
     lede:
@@ -107,7 +114,7 @@ export const ASSISTANT_GUIDES: Record<AssistantSlug, AssistantGuide> = {
       },
       {
         q: "Which networks can ChatGPT schedule to through Poskoo?",
-        a: "Instagram, Facebook Pages, Threads and YouTube through the create_post tool. LinkedIn, Bluesky and Mastodon are live in the Poskoo calendar but not in the MCP tool yet.",
+        a: "Every channel you have connected in Poskoo. create_post takes a list of channels, and list_channels shows which ones are connected.",
       },
       {
         q: "Does it cost extra?",
@@ -167,7 +174,7 @@ export const ASSISTANT_GUIDES: Record<AssistantSlug, AssistantGuide> = {
     faqs: [
       {
         q: "Can Claude post to social media?",
-        a: "Yes, through Poskoo. Once Poskoo's MCP server is added, Claude can schedule posts to your connected Instagram, Facebook Page, Threads and YouTube channels, and Poskoo publishes them through each platform's official API.",
+        a: "Yes, through Poskoo. Once Poskoo's MCP server is added, Claude can draft and schedule posts to any channel you have connected, and Poskoo publishes them through each platform's official API.",
       },
       {
         q: "Does this work on claude.ai in the browser?",
@@ -233,7 +240,7 @@ export const ASSISTANT_GUIDES: Record<AssistantSlug, AssistantGuide> = {
       },
       {
         q: "Which networks does it post to?",
-        a: "Instagram, Facebook Pages, Threads and YouTube through the create_post tool. LinkedIn, Bluesky and Mastodon are live in the Poskoo calendar but not in the MCP tool yet.",
+        a: "Every channel you have connected in Poskoo. create_post takes a list of channels, and list_channels shows which ones are connected.",
       },
       {
         q: "Is my API key safe?",
@@ -296,7 +303,7 @@ export const ASSISTANT_GUIDES: Record<AssistantSlug, AssistantGuide> = {
       },
       {
         q: "Can Cursor publish to LinkedIn through Poskoo?",
-        a: "Not through MCP yet. The create_post tool covers Instagram, Facebook Pages, Threads and YouTube. LinkedIn personal profile posts are scheduled in the Poskoo calendar.",
+        a: "Yes, if your LinkedIn profile is connected in Poskoo. create_post accepts any connected channel, LinkedIn included.",
       },
       {
         q: "Do I need a paid Poskoo plan?",

@@ -814,7 +814,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/social-media-scheduler-for-creators": "Poskoo for creators: schedule Reels, Shorts and Stories, auto-DM keyword commenters, replay DMs to past comments and grow an email list with lead magnets.",
   "/social-media-scheduler-for-coaches": "Poskoo for coaches: schedule LinkedIn profile and Instagram posts, deliver lead magnets by DM after an email gate, and send a booking link on a keyword.",
   "/social-media-scheduler-for-ecommerce": "Poskoo for online stores: schedule product drops to Instagram, Facebook Pages and Threads, DM the product link to commenters and track the clicks.",
-  "/schedule-posts-with-chatgpt": "Connect OpenAI's Codex CLI or the OpenAI API to Poskoo's MCP server to schedule posts to Instagram, Facebook Pages, Threads and YouTube.",
+  "/schedule-posts-with-chatgpt": "Connect OpenAI's Codex CLI or the OpenAI API to Poskoo's MCP server to draft and schedule posts to every social channel you connect.",
   "/schedule-posts-with-claude": "Add Poskoo's MCP server to the Claude desktop app so Claude can schedule posts, list channels and read post analytics with a Poskoo API key.",
   "/schedule-posts-with-claude-code": "Add Poskoo to Claude Code with one claude mcp add command and schedule launch posts and changelog updates from the terminal.",
   "/schedule-posts-with-cursor": "Add Poskoo's MCP server to Cursor's mcp.json so Cursor's agent can schedule posts about what you build and read post analytics.",
