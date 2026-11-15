@@ -133,7 +133,8 @@ export default function YouTubeSchedulerPage() {
         </h1>
         <p className="lede">
           Poskoo schedules YouTube videos and Shorts through Google&apos;s official YouTube Data API. Connect your channel,
-          add your video and details, choose a time, and Poskoo uploads it with a clear success or failure status.
+          add your video and details, choose a time, and Poskoo uploads it with a clear success or failure status. The Free
+          plan is $0 with no credit card and includes 2 social accounts and 10 scheduled posts a month.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling YouTube videos <span aria-hidden="true">→</span></Link>
