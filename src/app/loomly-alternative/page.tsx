@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
 import { PRICE_SUMMARY } from "@/lib/plans";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -12,41 +13,42 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: `Loomly Alternative with Instagram Auto-DM | ${BRAND.name}` },
+  title: { absolute: "Loomly Alternative with Instagram Auto-DM & Free Plan" },
   description:
     "Poskoo is a Loomly alternative that schedules Instagram, Facebook and Threads posts and auto-DMs every keyword commenter to capture leads. Free plan.",
   alternates: { canonical: `${BRAND.url}/loomly-alternative` },
 });
 
 const whySwitch = [
-  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: "Plan and publish Instagram, Facebook Page, Threads and YouTube posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool." },
+  { no: "01 / One tool", title: "Scheduling + auto-DM in one tool", text: `Plan and publish ${LIVE_PLATFORMS_TEXT} posts, then reply to every keyword comment with a DM — without juggling a scheduler and a separate chatbot tool.` },
   { no: "02 / Free to start", title: "Start on the Free plan", text: `${BRAND.name} Free includes 2 social accounts, 10 scheduled posts / month and 500 auto-DMs / month.` },
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
 const compare: [string, string, string, string][] = [
-  ["Social media scheduling", "Yes", "Yes", "Yes"],
-  ["Instagram, Facebook Page and Threads publishing", "Yes", "Check their site", "Depends on the tools"],
-  ["Instagram comment-to-DM automation", "Yes", "Check their site", "Depends on the DM tool"],
-  ["Email capture in the DM", "Yes", "Check their site", "Depends on the DM tool"],
+  ["Social media scheduling", "Yes", "Check their site", "Check their site"],
+  ["Instagram, Facebook Page and Threads publishing", "Yes", "Check their site", "Check their site"],
+  ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
+  ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
   ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site", "Depends on the DM tool"],
-  ["Lead tracking from comment to DM", "Yes", "Check their site", "Depends on the DM tool"],
-  ["Price", PRICE_SUMMARY, "Check their site", "Two subscriptions"],
+  ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+  ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
+  ["Price", PRICE_SUMMARY, "Check their site", "Check their site"],
 ];
 
-const faqs = [
-  { q: `Is ${BRAND.name} a Loomly alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
-  { q: "What is Loomly?", a: "Loomly is a social media calendar and scheduling tool for teams. For its exact features and plans, see their site." },
-  { q: "Can I import my existing Loomly schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
-  { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+const faqs: { q: string; a: ReactNode; text: string }[] = [
+  { q: `Is ${BRAND.name} a Loomly alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.`, text: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
+  { q: "What is Loomly?", a: "Loomly is a social media calendar and collaboration tool for planning, approving and publishing posts. See their site for current plans.", text: "Loomly is a social media calendar and collaboration tool for planning, approving and publishing posts. See their site for current plans." },
+  { q: "Does Poskoo have a content calendar?", a: <>Yes. {BRAND.name} has week and month calendar views plus a queue, so you can plan posts and see what publishes next. Try the free <Link href="/tools/social-media-content-calendar">social media content calendar</Link>.</>, text: `Yes. ${BRAND.name} has week and month calendar views plus a queue, so you can plan posts and see what publishes next. Try the free social media content calendar at ${BRAND.url}/tools/social-media-content-calendar.` },
+  { q: "Can I import my existing Loomly schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.`, text: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
+  { q: "Which platforms are supported?", a: PLATFORMS_ANSWER, text: PLATFORMS_ANSWER },
+  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape.", text: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.text } })),
 };
 
 function Cell({ v }: { v: string }) {
