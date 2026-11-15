@@ -44,6 +44,18 @@ export const homePageJsonLd = (
       offers: softwareOffers(r),
     },
     {
+      "@type": "BreadcrumbList",
+      "@id": BRAND.url + "#breadcrumb",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: BRAND.url,
+        },
+      ],
+    },
+    {
       "@type": "FAQPage",
       "@id": BRAND.url + "/#faq",
       isPartOf: { "@id": BRAND.url },

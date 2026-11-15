@@ -154,6 +154,21 @@ test("home page WebPage node uses BRAND.url as its stable @id and url", () => {
   );
 });
 
+test("homepage JSON-LD includes a BreadcrumbList with the canonical root URL", () => {
+  assert.ok(
+    homeJsonLdSource.includes('"@type": "BreadcrumbList"'),
+    "homepage JSON-LD must include a BreadcrumbList node",
+  );
+  assert.ok(
+    homeJsonLdSource.includes('name: "Home",'),
+    "BreadcrumbList must include a Home item",
+  );
+  assert.ok(
+    homeJsonLdSource.includes("item: BRAND.url,"),
+    "BreadcrumbList Home item must point at the canonical root URL",
+  );
+});
+
 test("home page imports the exported homePageJsonLd helper and renders its script", () => {
   // Regression guard for no_schema: the page must import the same helper name
   // that homeJsonLd.ts exports, and the rendered page must still emit the
