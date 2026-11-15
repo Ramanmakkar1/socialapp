@@ -259,6 +259,8 @@ export default function YouTubeToolsPage() {
             <Link href="/signup">Free plan</Link>
             <Link href="/guides/how-to-schedule-youtube-shorts">How to schedule YouTube Shorts</Link>
             <Link href="/tools/instagram-tools">Instagram tools</Link>
+            <Link href="/tools/threads-tools">Threads tools</Link>
+            <Link href="/tools/tiktok-tools">TikTok tools</Link>
           </nav>
         </section>
 
