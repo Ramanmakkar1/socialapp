@@ -923,6 +923,14 @@
   transform:translateY(-1px);box-shadow:0 4px 0 var(--ink)}
 .landing :global(.glassBar button:active){
   transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.landing :global(.heroSignup) :global(.glassBar button){
+  min-height:50px;border:1px solid color-mix(in srgb, var(--ink) 18%, transparent);background:var(--lime);box-shadow:0 2px 0 color-mix(in srgb, var(--ink) 16%, transparent)}
+.landing :global(.heroSignup) :global(.glassBar button:hover){
+  transform:translateY(-1px);box-shadow:0 3px 0 color-mix(in srgb, var(--ink) 20%, transparent)}
+.landing :global(.heroSignup) :global(.glassBar button:active){
+  transform:translateY(1px);box-shadow:0 1px 0 color-mix(in srgb, var(--ink) 14%, transparent)}
+.landing :global(.heroSignup) :global(.glassBar button:focus-visible){
+  outline:3px solid var(--violet);outline-offset:3px}
 .landing :global(.heroOr){
   width:70%;display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .landing :global(.heroOr)::before,.landing :global(.heroOr)::after{
