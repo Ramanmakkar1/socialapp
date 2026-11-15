@@ -73,7 +73,7 @@ export default function LaterAlternative() {
             Later alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            Keep a visual calendar for Instagram, Facebook Pages and Threads, and auto-DM everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads without a second subscription.
+            {BRAND.name} is a Later alternative with a visual calendar for Instagram, Facebook Pages and Threads that also auto-DMs everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads, starting on a $0 Free plan.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
