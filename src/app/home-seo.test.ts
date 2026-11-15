@@ -10,6 +10,7 @@ import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 // node:test process. Read the source instead and lock the exact expressions.
 const pageSource = readFileSync("src/app/page.tsx", "utf8");
 const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
+const homeJsonLdSource = readFileSync("src/app/homeJsonLd.ts", "utf8");
 
 test("staging homepage is noindex and excluded from the sitemap", () => {
   assert.equal(BRAND.indexable, false);
@@ -102,12 +103,38 @@ test("audited staging URL serves one clean canonical on the final domain", () =>
 
 test("home page JSON-LD includes SoftwareApplication and FAQPage", () => {
   assert.ok(
-    pageSource.includes('"@type": "SoftwareApplication"'),
+    homeJsonLdSource.includes('"@type": "SoftwareApplication"'),
     "home page JSON-LD must include a SoftwareApplication node",
   );
   assert.ok(
-    pageSource.includes('"@type": "FAQPage"'),
+    homeJsonLdSource.includes('"@type": "FAQPage"'),
     "home page JSON-LD must include a FAQPage node",
+  );
+});
+
+test("home page imports the exported homePageJsonLd helper and renders its script", () => {
+  // Regression guard for no_schema: the page must import the same helper name
+  // that homeJsonLd.ts exports, and the rendered page must still emit the
+  // application/FAQ JSON-LD script.
+  assert.ok(
+    homeJsonLdSource.includes("export const homePageJsonLd ="),
+    "homeJsonLd.ts must export homePageJsonLd",
+  );
+  assert.ok(
+    pageSource.includes('import { homePageJsonLd } from "./homeJsonLd";'),
+    "page.tsx must import homePageJsonLd from ./homeJsonLd",
+  );
+  assert.ok(
+    pageSource.includes("const jsonLd = homePageJsonLd(faqList, r);"),
+    "page.tsx must call the imported homePageJsonLd helper",
+  );
+  assert.ok(
+    pageSource.includes('type="application/ld+json"'),
+    "home page must render an application/ld+json script",
+  );
+  assert.ok(
+    pageSource.includes("dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd)"),
+    "home page must serialise the JSON-LD graph into the script",
   );
 });
 
@@ -129,7 +156,7 @@ test("homepage route owns robots metadata and still renders the full JSON-LD gra
     pageSource.includes("alternates: { canonical }"),
     "home page source must keep the absolute self-canonical",
   );
-  const rendered = `${layoutSource}\n${pageSource}`;
+  const rendered = `${layoutSource}\n${pageSource}\n${homeJsonLdSource}`;
   for (const type of ["Organization", "WebSite", "SoftwareApplication", "FAQPage"]) {
     assert.ok(
       rendered.includes(`"@type": "${type}"`),
