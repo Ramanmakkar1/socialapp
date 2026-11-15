@@ -132,8 +132,9 @@ export default function TikTokSchedulerPage() {
           Schedule TikTok videos and <em className="s mark">post them automatically</em>
         </h1>
         <p className="lede">
-          Poskoo connects through TikTok&apos;s official login and API and posts your video at the date and time you
-          choose. Plan TikTok next to Instagram, Threads and Facebook on one calendar.
+          Yes, you can schedule TikTok posts: connect your account with TikTok&apos;s official login, upload a video,
+          write the caption, pick a date and time, and Poskoo posts it for you through TikTok&apos;s API. The Free plan
+          is $0 with no credit card, and TikTok sits on the same calendar as Instagram, Threads and Facebook.
         </p>
         <p className="lede">
           Upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it
