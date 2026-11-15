@@ -12,6 +12,12 @@ export const homePageJsonLd = (
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "Organization",
+      "@id": BRAND.url + "#org",
+      name: BRAND.name,
+      url: BRAND.url,
+    },
+    {
       "@type": "WebPage",
       "@id": BRAND.url,
       url: BRAND.url,
@@ -33,7 +39,6 @@ export const homePageJsonLd = (
       operatingSystem: "Web",
       url: BRAND.url,
       image: BRAND.url + "/landing/hero.webp",
-      description: BRAND.description,
       mainEntityOfPage: { "@id": BRAND.url },
       publisher: { "@id": BRAND.url + "#org" },
       offers: softwareOffers(r),
