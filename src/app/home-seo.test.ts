@@ -132,3 +132,19 @@ test("homepage route owns robots metadata and still renders the full JSON-LD gra
     );
   }
 });
+
+test("homepage step illustrations keep descriptive alt text", () => {
+  // Regression guard for the empty-alt audit: each of the three "How Poskoo
+  // works" images must carry descriptive alt text, not alt="".
+  const steps = [
+    { src: "/landing/step-connect.webp", alt: "connecting their Instagram, Facebook and Threads social accounts" },
+    { src: "/landing/step-schedule.webp", alt: "posts being scheduled on a content calendar" },
+    { src: "/landing/step-dm.webp", alt: "automatic DM being sent after a keyword comment" },
+  ];
+  for (const { src, alt } of steps) {
+    const tag = pageSource.match(new RegExp(`<Image[^>]*src="${src}"[^>]*>`))?.[0];
+    assert.ok(tag, `homepage must render the ${src} step illustration`);
+    assert.ok(!tag.includes('alt=""'), `${src} must not use an empty alt attribute`);
+    assert.ok(tag.includes(alt), `${src} alt text must describe ${alt}`);
+  }
+});
