@@ -203,11 +203,31 @@ export default function HelpHubPage() {
             Help <em className="s">center</em>
           </h1>
           <p className="lede">
-            The {BRAND.name} Help center covers connecting Instagram, scheduling posts, and fixing comment-to-DM issues, with step-by-step guides for every feature.
+            {BRAND.name} Help answers how to connect your social accounts, schedule posts, and set up Instagram comment-to-DM automation, with step-by-step guides for every feature.
           </p>
         </div>
         <div className="hero-art"><AnimArt name="help" label="A creator reads on a giant open book under a lightbulb and a signpost" /></div>
       </header>
+
+      <div className="wrap">
+        <nav aria-label="Popular help topics" className={s.chipRow}>
+          <p>Popular topics</p>
+          <div>
+            <Link className={s.chip} href="/instagram-scheduler">
+              Instagram post scheduler
+            </Link>
+            <Link className={s.chip} href="/instagram-auto-dm">
+              Instagram auto-DM setup
+            </Link>
+            <Link className={s.chip} href="/pricing">
+              Plans and pricing
+            </Link>
+            <Link className={s.chip} href="/contact">
+              Contact support
+            </Link>
+          </div>
+        </nav>
+      </div>
 
       <section style={{ paddingTop: 40 }}>
         <div className="wrap">
