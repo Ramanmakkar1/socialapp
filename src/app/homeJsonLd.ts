@@ -9,12 +9,12 @@ export const homePageJsonLd = (faqs: { q: string; a: string }[], r: PlanReadines
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": BRAND.canonicalUrl + "/#webpage",
-      url: BRAND.canonicalUrl + "/",
-      name: `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`,
+      "@id": BRAND.url,
+      url: BRAND.url,
+      name: BRAND.name,
       description: BRAND.description,
       isPartOf: { "@id": BRAND.canonicalUrl + "#website" },
-      about: { "@id": BRAND.canonicalUrl + "#org" },
+      publisher: { "@id": BRAND.canonicalUrl + "#org" },
       primaryImageOfPage: {
         "@type": "ImageObject",
         url: BRAND.canonicalUrl + "/landing/hero.webp",
@@ -29,14 +29,14 @@ export const homePageJsonLd = (faqs: { q: string; a: string }[], r: PlanReadines
       url: BRAND.canonicalUrl,
       image: BRAND.canonicalUrl + "/landing/hero.webp",
       description: BRAND.description,
-      mainEntityOfPage: { "@id": BRAND.canonicalUrl + "/#webpage" },
+      mainEntityOfPage: { "@id": BRAND.url },
       publisher: { "@id": BRAND.canonicalUrl + "#org" },
       offers: softwareOffers(r),
     },
     {
       "@type": "FAQPage",
       "@id": BRAND.canonicalUrl + "/#faq",
-      isPartOf: { "@id": BRAND.canonicalUrl + "/#webpage" },
+      isPartOf: { "@id": BRAND.url },
       mainEntity: faqs.map((f) => ({
         "@type": "Question",
         name: f.q,

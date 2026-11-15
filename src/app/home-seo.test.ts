@@ -101,7 +101,11 @@ test("audited staging URL serves one clean canonical on the final domain", () =>
   assert.ok(!canonical.includes("//", "https://".length), "canonical must have a single slash at the root");
 });
 
-test("home page JSON-LD includes SoftwareApplication and FAQPage", () => {
+test("home page JSON-LD includes WebPage, SoftwareApplication and FAQPage", () => {
+  assert.ok(
+    homeJsonLdSource.includes('"@type": "WebPage"'),
+    "home page JSON-LD must include a WebPage node",
+  );
   assert.ok(
     homeJsonLdSource.includes('"@type": "SoftwareApplication"'),
     "home page JSON-LD must include a SoftwareApplication node",
@@ -109,6 +113,23 @@ test("home page JSON-LD includes SoftwareApplication and FAQPage", () => {
   assert.ok(
     homeJsonLdSource.includes('"@type": "FAQPage"'),
     "home page JSON-LD must include a FAQPage node",
+  );
+});
+
+test("home page WebPage node uses BRAND.url as its stable @id and url", () => {
+  // The audit requires the home WebPage to be identified by the bare home URL,
+  // not a fragment-suffixed @id, so the entity resolves to https://poskoo.com.
+  assert.ok(
+    homeJsonLdSource.includes('"@id": BRAND.url,'),
+    "WebPage @id must be exactly BRAND.url",
+  );
+  assert.ok(
+    homeJsonLdSource.includes("url: BRAND.url,"),
+    "WebPage url must be BRAND.url",
+  );
+  assert.ok(
+    homeJsonLdSource.includes("publisher: { \"@id\": BRAND.canonicalUrl + \"#org\" },"),
+    "WebPage publisher must reference the Organization node",
   );
 });
 
@@ -157,7 +178,7 @@ test("homepage route owns robots metadata and still renders the full JSON-LD gra
     "home page source must keep the absolute self-canonical",
   );
   const rendered = `${layoutSource}\n${pageSource}\n${homeJsonLdSource}`;
-  for (const type of ["Organization", "WebSite", "SoftwareApplication", "FAQPage"]) {
+  for (const type of ["Organization", "WebSite", "WebPage", "SoftwareApplication", "FAQPage"]) {
     assert.ok(
       rendered.includes(`"@type": "${type}"`),
       `homepage route must render ${type} JSON-LD`,
