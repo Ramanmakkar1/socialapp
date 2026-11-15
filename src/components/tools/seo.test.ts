@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { toolMetadata, toolTitle } from "./seo.ts";
+import { toolMetadata, toolTitle, webAppJsonLd } from "./seo.ts";
 
 test("tool titles add the Poskoo suffix while they fit the 50-character template", () => {
   assert.equal(toolTitle("Instagram bio generator"), "Instagram bio generator | Poskoo");
@@ -23,4 +23,14 @@ test("toolMetadata applies the suffix to the title, Open Graph and Twitter card"
   assert.deepEqual(meta.title, { absolute: "Free X tool | Poskoo" });
   assert.equal(meta.openGraph?.title, "Free X tool | Poskoo");
   assert.equal(meta.twitter?.title, "Free X tool | Poskoo");
+});
+
+test("webAppJsonLd emits a free SoftwareApplication that runs on the web", () => {
+  const jsonLd = webAppJsonLd({ name: "Free X tool", description: "D", path: "/tools/x" });
+  assert.equal(jsonLd["@type"], "SoftwareApplication");
+  assert.equal(jsonLd.operatingSystem, "Web");
+  assert.equal(jsonLd.isAccessibleForFree, true);
+  assert.deepEqual(jsonLd.offers, { "@type": "Offer", price: "0", priceCurrency: "USD" });
+  assert.equal(jsonLd.publisher["@type"], "Organization");
+  assert.equal(jsonLd.publisher.name, "Poskoo");
 });

@@ -28,7 +28,7 @@ export function toolMetadata({ path, title, description }: { path: string; title
 
 export type AppCategory = "BusinessApplication" | "MultimediaApplication" | "DesignApplication" | "UtilitiesApplication";
 
-/** WebApplication JSON-LD: a free tool that runs in the browser. No ratings or reviews are claimed. */
+/** SoftwareApplication JSON-LD: a free tool that runs in the browser. No ratings or reviews are claimed. */
 export function webAppJsonLd({ name, description, path, category = "BusinessApplication", features }: {
   name: string;
   description: string;
@@ -38,7 +38,7 @@ export function webAppJsonLd({ name, description, path, category = "BusinessAppl
 }) {
   return {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
+    "@type": "SoftwareApplication",
     name,
     description,
     url: `${BRAND.url}${path}`,
