@@ -1,4 +1,4 @@
--- Indexes for the admin pages (/admin/users, /admin/posts, /admin/billing). Additive only; the
+-- Indexes for the admin pages (/admin/users, /admin/posts, /admin/billing, /admin/audit). Additive only; the
 -- pages work without them (just slower on big tables), so this can run before or after the deploy.
 begin;
 
@@ -10,5 +10,8 @@ create index if not exists scheduled_posts_updated_idx on socialapp.scheduled_po
 
 -- /admin/billing shows the newest Stripe webhook events.
 create index if not exists stripe_events_received_idx on socialapp.stripe_events (received_at desc);
+
+-- /admin/audit filters by action (and lists the distinct actions).
+create index if not exists admin_audit_action_idx on socialapp.admin_audit (action, created_at desc);
 
 commit;
