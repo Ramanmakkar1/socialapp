@@ -105,6 +105,8 @@ const appJsonLd = {
     description,
     url: `${BRAND.canonicalUrl}${PATH}`,
   }),
+  applicationSubCategory: "Social media scheduling",
+  inLanguage: "en",
   featureList: [
     "LinkedIn text post scheduling",
     "Up to 20 images per post",
@@ -155,6 +157,11 @@ export default function LinkedInSchedulerPage() {
           <div className="head">
             <p className="eyebrow">LinkedIn scheduling features</p>
             <h2>What you can <em className="s">schedule on LinkedIn.</em></h2>
+            <p className="lede">
+              A LinkedIn scheduler is a tool that saves your posts and publishes them to LinkedIn at the date and time
+              you choose, so you do not have to be online. Poskoo does this through LinkedIn&apos;s official API, on the
+              same calendar as Instagram, Facebook and Threads.
+            </p>
           </div>
           <div className="cards">
             {features.map((feature) => (
