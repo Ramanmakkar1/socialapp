@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { BRAND } from "./src/lib/brand";
 
 // Security headers for every response. Public pages may only be framed by Poskoo itself;
 // the signed-in app, admin, auth pages and API can never be framed (clickjacking).
@@ -77,6 +78,15 @@ const nextConfig: NextConfig = {
     };
   },
   async headers() {
+    // While staging is noindex, the home HTML and metadata routes must not be
+    // cached with an indexable body. Fail closed at the browser, origin and CDN.
+    const staging = !BRAND.indexable;
+    const noStore = [
+      { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, max-age=0" },
+      { key: "CDN-Cache-Control", value: "no-store" },
+      { key: "Cloudflare-CDN-Cache-Control", value: "no-store" },
+    ];
+    const stagingRobots = staging ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] : [];
     return [
       { source: "/:path*", headers: securityHeaders },
       // Later entries override the same header key from earlier ones.
@@ -86,34 +96,33 @@ const nextConfig: NextConfig = {
       })),
       // Staging indexability can flip between deploys. A sitemap or robots
       // response cached from an earlier indexable state must never outlive the
-      // change, so fail closed at the browser, origin and CDN layers.
+      // change, so fail closed at the browser, origin and CDN layers. The
+      // X-Robots-Tag keeps a crawler from indexing the staging copies.
       ...["/sitemap.xml", "/robots.txt"].map((source) => ({
         source,
-        headers: [
-          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, max-age=0" },
-          { key: "CDN-Cache-Control", value: "no-store" },
-          { key: "Cloudflare-CDN-Cache-Control", value: "no-store" },
-        ],
+        headers: [...noStore, ...stagingRobots],
       })),
       {
         source: "/",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, s-maxage=3600, stale-while-revalidate=86400",
-          },
-          // Cloudflare ignores the browser Cache-Control for HTML by default.
-          // These headers let the edge cache the prerendered home page too, so
-          // repeat visits are served from the CDN instead of the origin.
-          {
-            key: "CDN-Cache-Control",
-            value: "public, s-maxage=3600, stale-while-revalidate=86400",
-          },
-          {
-            key: "Cloudflare-CDN-Cache-Control",
-            value: "public, s-maxage=3600, stale-while-revalidate=86400",
-          },
-        ],
+        headers: staging
+          ? [...noStore, { key: "X-Robots-Tag", value: "noindex, nofollow" }]
+          : [
+              {
+                key: "Cache-Control",
+                value: "public, s-maxage=3600, stale-while-revalidate=86400",
+              },
+              // Cloudflare ignores the browser Cache-Control for HTML by default.
+              // These headers let the edge cache the prerendered home page too, so
+              // repeat visits are served from the CDN instead of the origin.
+              {
+                key: "CDN-Cache-Control",
+                value: "public, s-maxage=3600, stale-while-revalidate=86400",
+              },
+              {
+                key: "Cloudflare-CDN-Cache-Control",
+                value: "public, s-maxage=3600, stale-while-revalidate=86400",
+              },
+            ],
       },
     ];
   },
