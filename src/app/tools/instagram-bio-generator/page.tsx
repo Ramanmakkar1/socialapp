@@ -7,9 +7,9 @@ const config: ToolPageConfig = {
   path: "/tools/instagram-bio-generator",
   name: "Instagram bio generator",
   crumb: "Bio generator",
-  title: "Instagram Bio Generator: Free Bio Ideas You Can Copy",
+  title: "Instagram Bio Generator: Free Ideas to Copy | Poskoo",
   description:
-    "Free Instagram bio generator: enter your name, what you do and a call to action, pick one of 8 niches and copy a bio with a live 150-character counter.",
+    "Generate Instagram bio ideas from your niche, name and call to action. Copy a bio with a live 150-character counter—free, private and no signup.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram bio generator:", mark: "bio ideas", after: "you can copy" },
   lede: "The Instagram bio generator turns your name, what you do and a call to action into four ready-to-paste Instagram bios for your niche, with a live 150-character counter. Enter your details, pick one of 8 niches and copy the bio that fits — free, no signup, nothing uploaded.",
