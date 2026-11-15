@@ -3,7 +3,9 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PRICE_SUMMARY } from "@/lib/plans";
+import { PRICE_SUMMARY, softwareOffers } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
+import { publisherRef } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -54,6 +56,18 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const productJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: `${BRAND.name} — ManyChat alternative`,
+  description:
+    "Instagram comment-to-DM automation, lead capture and post scheduling in one tool, built on the official Meta API.",
+  brand: { "@type": "Brand", name: BRAND.name },
+  url: `${BRAND.canonicalUrl}/manychat-alternative`,
+  offers: softwareOffers(planReadiness()),
+  publisher: publisherRef(),
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -64,13 +78,14 @@ export default function ManyChatAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "ManyChat alternative", path: "/manychat-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
         <div className={s.heroText}>
           <span className="pill">Official Instagram API · no password needed</span>
           <h1>
-            The ManyChat alternative that also <em className="s">schedules your posts</em>
+            {BRAND.name} is the <em className="s">ManyChat alternative</em> for Instagram auto-DM and scheduling
           </h1>
           <p className="lede">
             Poskoo is a ManyChat alternative for Instagram: comment-to-DM automation, lead capture and post scheduling in one tool, with a $0 Free plan that includes 500 auto-DMs a month. DM everyone who comments a keyword on your posts and Reels, ask for their email before the link, and plan the posts themselves in the same tool. No second subscription for a scheduler.
