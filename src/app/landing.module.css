@@ -1275,6 +1275,19 @@
 .landing :global(.navr .btn){
   white-space:nowrap}
 
+/* Mobile tap targets: 44px minimum for the homepage's small interactive links. */
+.landing :global(.pcard .go),
+.landing :global(.chLinks .go),
+.landing :global(.heroLogin a),
+.landing :global(.ctaLogin a){
+  display:inline-flex;align-items:center;min-height:44px}
+.landing :global(footer.rich a),
+.landing :global(footer.rich .fhelp a),
+.landing :global(footer.rich .legalLinks a){
+  display:inline-flex;align-items:center;min-height:44px}
+.landing :global(.links a){
+  display:inline-flex;align-items:center;min-height:44px}
+
 /* "Stop paying here and there": centred once the split stacks. */
 @media (max-width: 960px){
   .landing :global(.subSplit .copy){ text-align:center;display:flex;flex-direction:column;align-items:center; }
