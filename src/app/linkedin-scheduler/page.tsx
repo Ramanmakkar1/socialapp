@@ -137,8 +137,9 @@ export default function LinkedInSchedulerPage() {
           Schedule LinkedIn posts and <em className="s mark">publish them on time</em>
         </h1>
         <p className="lede">
-          Poskoo connects through LinkedIn&apos;s official sign-in and API and publishes your post at the scheduled
-          time. Write the text, add images, choose a date and time, and let the queue handle the rest.
+          Yes, you can schedule LinkedIn posts for free: connect your profile with LinkedIn&apos;s official sign-in,
+          write a post of up to 3,000 characters with up to 20 images, pick a date and time, and Poskoo publishes it
+          automatically.
         </p>
         <p className="lede">
           Plan LinkedIn next to Instagram, Facebook and Threads on one calendar, so every channel stays on schedule.
