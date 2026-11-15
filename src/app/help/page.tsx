@@ -170,6 +170,39 @@ const resources = [
   },
 ];
 
+const faqs = [
+  {
+    q: "How do I get started with Poskoo?",
+    a: "Sign in, connect Instagram in Settings, create your first auto-DM rule from a template, then schedule a post in the calendar. The getting started guide walks through all three steps in about three minutes.",
+  },
+  {
+    q: "Which Instagram account type do I need for auto-DM?",
+    a: "You need a free Instagram Business or Creator account. Connect it through Meta's official login in Settings — Poskoo never asks for your Instagram password.",
+  },
+  {
+    q: "Where can I find troubleshooting help?",
+    a: "Start with the Instagram auto DM not working guide for a step-by-step checklist covering the connection, message access, active rules, keywords, gates and the send queue. If you are still stuck, contact support and we reply within one business day.",
+  },
+  {
+    q: "Do I need to give Poskoo my social media passwords?",
+    a: "No. Every account connects through the platform's official login or app password, so Poskoo never sees or stores your passwords.",
+  },
+  {
+    q: "Can I schedule posts for platforms other than Instagram?",
+    a: "Yes. Poskoo also schedules Facebook Pages, Threads, LinkedIn, TikTok, Pinterest, X, YouTube, Bluesky and Mastodon from the same calendar.",
+  },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
 const collectionJsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
@@ -195,6 +228,10 @@ export default function HelpHubPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd) }}
       />
       <header className="hero">
         <div className={s.heroText}>
@@ -245,6 +282,23 @@ export default function HelpHubPage() {
                   {g.go} <span aria-hidden="true">→</span>
                 </Link>
               </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Questions</p>
+            <h2>FAQ</h2>
+          </div>
+          <div className="faq">
+            {faqs.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
             ))}
           </div>
         </div>
