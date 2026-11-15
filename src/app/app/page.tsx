@@ -404,6 +404,7 @@ export default async function AppHome() {
               title="Nothing scheduled yet"
               text="Your next queued posts will show here with local date and time."
               art="/illustrations/empty-calendar.webp"
+              artAlt="Illustration of a person pinning photo cards onto a large wall calendar, with a dog and plants nearby."
               artWidth={1536}
               artHeight={1024}
             >
