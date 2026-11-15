@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "Free Instagram engagement rate calculator: add likes, comments, saves and shares, divide by followers or reach and get the rate for one post in seconds.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram engagement rate", mark: "calculator" },
-  lede: "Enter the likes, comments, saves and shares from one post, choose followers or reach as the base, and get its engagement rate as a percentage.",
+  lede: "Instagram engagement rate = (likes + comments + saves + shares) ÷ followers × 100, or ÷ reach for a single post. Enter one post's numbers below to get its rate as a percentage.",
   art: "analytics",
   artLabel: "A creator waters a growing bar chart while hearts float up",
   heroPoints: ["By followers or reach", "Saves and shares count", "No login"],
