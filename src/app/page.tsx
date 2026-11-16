@@ -230,7 +230,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
       <p>See reach, comments, DMs, link clicks and leads for every post, so you know what works.</p>
     </article>
   </div>
-  <p className="chLinks" style={{"marginTop": "28px"}}><Link className="go" href="/features">Explore every Poskoo feature <span aria-hidden="true">→</span></Link><Link className="go" href="/pricing">Compare plans and pricing <span aria-hidden="true">→</span></Link><Link className="go" href="/metricool-alternative">Metricool alternative with Instagram auto-DM <span aria-hidden="true">→</span></Link><Link className="go" href="/tools/youtube-title-counter">YouTube title and description counter <span aria-hidden="true">→</span></Link></p>
+  <p className="chLinks" style={{"marginTop": "28px"}}><Link className="go" href="/features">Explore every Poskoo feature <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-inbox">See the social media inbox <span aria-hidden="true">→</span></Link><Link className="go" href="/pricing">Compare plans and pricing <span aria-hidden="true">→</span></Link><Link className="go" href="/metricool-alternative">Metricool alternative with Instagram auto-DM <span aria-hidden="true">→</span></Link><Link className="go" href="/tools/youtube-title-counter">YouTube title and description counter <span aria-hidden="true">→</span></Link></p>
 </div></section>
 
 <section style={{"paddingTop": "20px"}}><div className="wrap">
