@@ -420,7 +420,7 @@
 
 /* Mobile header: logo + Start free + menu button; links live in a modal sheet. */
 .landing :global(.menuBtn){
-  display:none;flex:none;width:44px;height:44px;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer}
+  display:none;flex:none;width:48px;height:48px;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer}
 .landing :global(.menuBtn:focus-visible),.landing :global(.menuSheet button:focus-visible){
   outline:3px solid var(--violet);outline-offset:3px}
 .landing :global(.menuSheet){
@@ -434,7 +434,7 @@
 .landing :global(.menuTitle){
   font:600 .78rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .landing :global(.menuClose){
-  width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+  width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 .landing :global(.menuSheet ul){
   list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .landing :global(.menuSheet li a){

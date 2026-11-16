@@ -350,6 +350,11 @@
 .hubPage { min-width: 0; }
 :global(body):has(.hubPage):has([aria-label="Cookie notice"]) { padding-top: 64px; }
 :global(body):has(.hubPage) [aria-label="Cookie notice"] { top: 8px; bottom: auto; }
+/* Tool pages put the form at the top, so a bottom-docked cookie bar covers the
+   first controls (Tone, Add emojis, keyword CTA). Dock it to the top and reserve
+   its height, same as the hub, so no form control is obscured on phones. */
+:global(body):has(.toolFirst):has([aria-label="Cookie notice"]) { padding-top: 64px; }
+:global(body):has(.toolFirst) [aria-label="Cookie notice"] { top: 8px; bottom: auto; }
 .picks { padding-top: 30px; }
 .pickGrid {
   list-style: none; margin: 0; padding: 0;
