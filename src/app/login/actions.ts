@@ -40,7 +40,8 @@ export async function signupAction(_prev: AuthState, formData: FormData): Promis
   try {
     const user = await createUser(email, password, name || undefined);
     if (!user) {
-      return { error: "An account with this email already exists. Log in instead." };
+      // Neutral wording: never confirm whether an account exists for this email.
+      return { error: "Couldn't create an account with that email. Try logging in or resetting your password." };
     }
     await attributeReferralFromCookie(user.id);
     const userAgent = (await headers()).get("user-agent") ?? undefined;

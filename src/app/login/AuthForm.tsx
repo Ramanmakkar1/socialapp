@@ -69,6 +69,15 @@ export default function AuthForm({
           <p className={a.lede}>
             {signup ? "Schedule posts and automate Instagram DMs." : "Welcome back. Log in to your dashboard."}
           </p>
+          {signup && (
+            <p className={a.reassure}>
+              <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="var(--poskoo-green)" />
+                <path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Free plan, no card needed
+            </p>
+          )}
           {googleEnabled && (
             <>
               <GoogleButton className={`btn btn-line ${a.google}`} />
@@ -95,8 +104,10 @@ export default function AuthForm({
                 autoComplete={signup ? "new-password" : "current-password"}
                 required
                 minLength={signup ? 8 : undefined}
+                aria-describedby={signup ? "password-rule" : undefined}
                 className={INPUT}
               />
+              {signup && <p id="password-rule" className={a.hint}>At least 8 characters.</p>}
             </div>
             {!signup && (
               <div className={a.forgot}>
@@ -116,6 +127,12 @@ export default function AuthForm({
             >
               {pending ? "Please wait…" : signup ? "Create account" : "Log in"}
             </button>
+            {signup && (
+              <p className={a.consent}>
+                By creating an account you agree to the <Link href="/terms" className={a.textLink}>Terms</Link> and{" "}
+                <Link href="/privacy" className={a.textLink}>Privacy Policy</Link>.
+              </p>
+            )}
           </form>
           {notice && (
             <p role="status" className={`${ui.notice} ${a.googleNotice}`}>{notice}</p>

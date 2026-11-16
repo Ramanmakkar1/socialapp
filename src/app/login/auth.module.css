@@ -213,3 +213,30 @@
   border-color: var(--poskoo-pill-border);
   color: var(--poskoo-ink);
 }
+
+/* Signup: reassurance line, password rule and consent line. */
+.card p.reassure {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: var(--poskoo-band);
+  padding: 5px 12px 5px 8px;
+  color: var(--poskoo-ink);
+  font-size: .86rem;
+  font-weight: 600;
+}
+.card p.hint {
+  margin-top: 6px;
+  color: var(--poskoo-muted);
+  font-size: .82rem;
+}
+.card p.consent {
+  margin-top: -4px;
+  color: var(--poskoo-muted);
+  font-size: .82rem;
+  line-height: 1.5;
+  text-align: center;
+}
+.card p.consent a.textLink { font-size: inherit; }
