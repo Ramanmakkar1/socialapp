@@ -80,22 +80,38 @@ export function toolBreadcrumbs(path: string, crumb: string): { name: string; pa
 }
 
 /**
- * Next product CTA for one tool page, derived from its route path (`config.path`).
- * Comment/DM tools hand off to auto DM, planning tools to the scheduler, everything else to the tools hub.
+ * Next product CTA for one tool page, derived from its registry category (`config.path`).
+ * Create, media and planning tools hand off to the scheduler, comment/DM tools to auto DM.
+ * Labels and blurbs match what the visitor just made, so the next step feels obvious.
  */
 export function nextActionFor(path: string): { href: string; label: string; blurb: string } {
-  if (/comment|-dm|dm-|keyword|reply/.test(path)) {
+  const category = toolByHref(path)?.category;
+  if (category === "dm") {
     return {
       href: "/instagram-auto-dm",
-      label: "Instagram auto DM",
-      blurb: "Instagram auto DM sends your link to everyone who comments your keyword, automatically.",
+      label: "Automate this DM",
+      blurb: "Set up this comment-to-DM flow in Instagram auto DM and reply to every commenter automatically.",
     };
   }
-  if (/calendar|schedul|best-time|time-zone|checklist|frequency/.test(path)) {
+  if (category === "media") {
     return {
       href: "/instagram-scheduler",
-      label: "Instagram scheduler",
-      blurb: "Instagram scheduler puts the posting times you worked out here on autopilot.",
+      label: "Schedule this visual",
+      blurb: "Schedule the post with the media you just prepared — Poskoo publishes it at the right time.",
+    };
+  }
+  if (category === "plan") {
+    return {
+      href: "/instagram-scheduler",
+      label: "Put this plan on autopilot",
+      blurb: "Add these posting times to your Instagram scheduler calendar and let the queue publish them.",
+    };
+  }
+  if (category === "create") {
+    return {
+      href: "/instagram-scheduler",
+      label: "Schedule the post you just prepared",
+      blurb: "Schedule the post you just prepared — pick a time and Poskoo publishes it for you.",
     };
   }
   return {
