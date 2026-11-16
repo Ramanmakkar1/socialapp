@@ -40,35 +40,30 @@ function FooterColumn({ title, links, extra }: { title: string; links: FooterLin
   );
 }
 
-const TOOLS: FooterLink[] = [
+// Ten links per column so every column is the same height (owner request 2026-11-15).
+const FREE_TOOLS: FooterLink[] = [
   { href: "/tools/instagram-hashtag-generator", label: "Hashtag generator" },
-  { href: "/tools/instagram-caption-counter", label: "Caption counter" },
-  { href: "/tools/x-character-counter", label: "X character counter" },
-  { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
-  { href: "/tools/threads-character-counter", label: "Threads character counter" },
-  { href: "/tools/bluesky-character-counter", label: "Bluesky character counter" },
-  { href: "/tools/mastodon-character-counter", label: "Mastodon character counter" },
-  { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
-  { href: "/tools/youtube-title-counter", label: "YouTube title counter" },
-  { href: "/tools/facebook-character-counter", label: "Facebook character counter" },
-  { href: "/tools/instagram-font-generator", label: "Font generator" },
-  { href: "/tools/instagram-bio-generator", label: "Bio generator" },
-  { href: "/tools/instagram-username-generator", label: "Username generator" },
   { href: "/tools/instagram-caption-generator", label: "Caption generator" },
+  { href: "/tools/instagram-bio-generator", label: "Bio generator" },
+  { href: "/tools/instagram-font-generator", label: "Font generator" },
+  { href: "/tools/instagram-caption-counter", label: "Caption counter" },
   { href: "/tools/instagram-image-size", label: "Image size guide" },
-  { href: "/tools/instagram-engagement-rate-calculator", label: "Engagement rate calculator" },
+  { href: "/tools/instagram-engagement-rate-calculator", label: "Engagement calculator" },
   { href: "/tools/instagram-line-break-generator", label: "Line break generator" },
-  { href: "/tools/instagram-comment-keyword-tester", label: "Comment keyword tester" },
-  { href: "/tools/instagram-comment-picker", label: "Comment picker" },
-  { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
   { href: "/tools/instagram-post-preview", label: "Post preview" },
+  { href: "/tools/instagram-username-generator", label: "Username generator" },
+];
+const MORE_TOOLS: FooterLink[] = [
+  { href: "/tools/instagram-comment-picker", label: "Comment picker" },
+  { href: "/tools/instagram-comment-keyword-tester", label: "Keyword tester" },
+  { href: "/tools/instagram-dm-link-generator", label: "DM link generator" },
   { href: "/tools/instagram-safe-zone-checker", label: "Safe zone checker" },
-  { href: "/tools/instagram-highlight-cover-maker", label: "Highlight cover maker" },
   { href: "/tools/instagram-reel-cover-maker", label: "Reel cover maker" },
-  { href: "/tools/instagram-story-maker", label: "Story maker" },
-  { href: "/tools/instagram-post-ideas-generator", label: "Post ideas" },
+  { href: "/tools/instagram-highlight-cover-maker", label: "Highlight covers" },
   { href: "/tools/instagram-hook-generator", label: "Hook generator" },
-  { href: "/tools/instagram-utm-builder", label: "UTM builder" },
+  { href: "/tools/instagram-post-ideas-generator", label: "Post ideas" },
+  { href: "/tools/x-character-counter", label: "X character counter" },
+  { href: "/tools", label: "All free tools →" },
 ];
 
 export function SiteFooter() {
@@ -102,15 +97,10 @@ export function SiteFooter() {
           { href: "/instagram-link-in-bio", label: "Link in bio" },
           { href: "/pricing", label: "Pricing" },
           { href: "/developers", label: "API and MCP" },
+          { href: "/guides", label: "Guides" },
+          { href: "/help", label: "Help center" },
+          { href: "/contact", label: "Contact" },
         ]}
-        extra={{ title: "Company", links: [
-            { href: "/guides", label: "Guides" },
-            { href: "/help", label: "Help center" },
-            { href: "/contact", label: "Contact" },
-            { href: "/privacy", label: "Privacy" },
-            { href: "/terms", label: "Terms" },
-            { href: "/data-deletion", label: "Data deletion" },
-          ] }}
       />
       <FooterColumn
         title="Schedulers"
@@ -125,11 +115,10 @@ export function SiteFooter() {
           { href: "/x-scheduler", label: "X (Twitter) scheduler" },
           { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
           { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
-          { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
         ]}
       />
-      <FooterColumn title="Free tools" links={TOOLS.slice(0, 10)} />
-      <FooterColumn title="More free tools" links={[...TOOLS.slice(10), { href: "/tools", label: "All free tools →" }]} />
+      <FooterColumn title="Free tools" links={FREE_TOOLS} />
+      <FooterColumn title="More free tools" links={MORE_TOOLS} />
       <FooterColumn
         title="Compare"
         links={[
@@ -141,7 +130,8 @@ export function SiteFooter() {
           { href: "/metricool-alternative", label: "Metricool alternative" },
           { href: "/manychat-alternative", label: "ManyChat alternative" },
           { href: "/hootsuite-alternative", label: "Hootsuite alternative" },
-          { href: "/meta-business-suite-alternative", label: "Meta Business Suite alternative" },
+          { href: "/meta-business-suite-alternative", label: "Meta Business Suite alt." },
+          { href: "/social-media-scheduler-comparison", label: "Compare schedulers" },
         ]}
       />
       <div className="legal">
