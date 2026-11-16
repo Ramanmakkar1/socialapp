@@ -190,6 +190,116 @@ export default function SocialMediaInboxPage() {
 
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Supported conversations</p>
+            <h2>Supported conversations in one shared inbox</h2>
+            <p>
+              The inbox covers the conversations that usually decide a sale: public comments,
+              direct messages and replies. Each channel is connected once through the official
+              platform login, so new activity appears in the same queue without anyone copying
+              answers between apps.
+            </p>
+          </div>
+          <div className="cards">
+            <article className="pcard">
+              <h3>Instagram comments and DMs</h3>
+              <p>
+                Read new comments on your posts and reels, reply publicly, and continue the
+                conversation in a direct message when someone asks for a link or price.
+              </p>
+            </article>
+            <article className="pcard">
+              <h3>Facebook Page comments and messages</h3>
+              <p>
+                Page comments, Messenger-style messages and questions from your Facebook audience
+                sit beside the Instagram threads, so a small team can cover both in one pass.
+              </p>
+            </article>
+            <article className="pcard">
+              <h3>Threads replies</h3>
+              <p>
+                Replies on Threads join the same list, which keeps a cross-posted campaign easy to
+                monitor instead of splitting the follow-up between networks.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="split">
+            <div className="copy">
+              <p className="eyebrow">Triage workflow</p>
+              <h2>Triage workflow: from new message to closed</h2>
+              <p>
+                Triage is the routine that stops busy conversations from slipping through. The
+                inbox is built around a short loop that anyone on the team can follow, even during
+                a launch or a busy week.
+              </p>
+              <ol>
+                <li>
+                  <strong>See what is new.</strong> Filter to unanswered conversations so the
+                  oldest open question is at the top, not buried under notifications.
+                </li>
+                <li>
+                  <strong>Sort by intent.</strong> Separate buying questions and link requests from
+                  general comments, complaints and spam, so the sales conversations get answered
+                  first.
+                </li>
+                <li>
+                  <strong>Reply or automate.</strong> Send a suggested reply, answer by hand, or
+                  let a keyword rule handle the repeat questions such as PRICE or LINK.
+                </li>
+                <li>
+                  <strong>Capture and close.</strong> Save the lead if the chat needs a follow-up,
+                  then mark the conversation answered so the next person knows it is handled.
+                </li>
+              </ol>
+            </div>
+            <div className="art">
+              <AnimArt name="features" label="A creator follows a short triage loop from new message to answered conversation" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Saved replies</p>
+            <h2>Saved replies for the questions you answer every day</h2>
+            <p>
+              Saved replies are reusable answers for the messages that repeat: shipping times,
+              sizing, how to book, where to find a link. Keep the wording ready, personalise the
+              first line, and send in a couple of clicks instead of retyping the same paragraph.
+            </p>
+            <p>
+              Pair saved replies with AI suggestions when a message needs something new. The
+              suggestion gives you a starting draft, and the saved reply covers the standard parts
+              of the answer, so speed never turns into a copy-paste tone.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Inbox vs scheduling</p>
+            <h2>How the inbox differs from ordinary post scheduling</h2>
+            <p>
+              Post scheduling is about publishing: you plan a post, pick a time and the tool pushes
+              it out. The inbox is about what happens afterwards. It collects the comments and
+              DMs a post creates, keeps them in one queue, and helps you reply, automate and save
+              leads. Scheduling fills the calendar; the inbox clears the conversations it starts.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Why it matters</p>
