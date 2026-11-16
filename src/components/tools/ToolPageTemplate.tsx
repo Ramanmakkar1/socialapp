@@ -7,7 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { TOOLS, toolByHref, toolPlatform, type ToolIconName, type ToolPlatform } from "./registry";
 import { ToolIcon } from "./ToolIcon";
 import { RelatedToolsCarousel } from "./RelatedToolsCarousel";
-import { faqJsonLd, howToJsonLd, ldJson, webAppJsonLd, type AppCategory, type ToolFaq } from "./seo";
+import { faqJsonLd, howToJsonLd, ldJson, webAppJsonLd, webPageJsonLd, type AppCategory, type ToolFaq } from "./seo";
 import t from "./tools.module.css";
 
 export { toolMetadata } from "./seo";
@@ -368,6 +368,11 @@ export function ToolPageTemplate({
       path: config.path,
       category: config.schema?.category,
       features: config.schema?.features,
+    }),
+    webPageJsonLd({
+      name: config.name,
+      description: config.description,
+      path: config.path,
     }),
     faqJsonLd(config.faqs),
   ];

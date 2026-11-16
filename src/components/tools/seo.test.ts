@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { toolMetadata, toolTitle, webAppJsonLd } from "./seo.ts";
+import { toolMetadata, toolTitle, webAppJsonLd, webPageJsonLd } from "./seo.ts";
+
+const templateSource = readFileSync("src/components/tools/ToolPageTemplate.tsx", "utf8");
 
 test("tool titles add the Poskoo suffix while they fit the 50-character template", () => {
   assert.equal(toolTitle("Instagram bio generator"), "Instagram bio generator | Poskoo");
@@ -33,4 +36,21 @@ test("webAppJsonLd emits a free SoftwareApplication that runs on the web", () =>
   assert.deepEqual(jsonLd.offers, { "@type": "Offer", price: "0", priceCurrency: "USD" });
   assert.equal(jsonLd.publisher["@type"], "Organization");
   assert.equal(jsonLd.publisher.name, "Poskoo");
+});
+
+test("webPageJsonLd describes the canonical tool page", () => {
+  const jsonLd = webPageJsonLd({ name: "Free X tool", description: "D", path: "/tools/x" });
+  assert.equal(jsonLd["@type"], "WebPage");
+  assert.equal(jsonLd.name, "Free X tool");
+  assert.equal(jsonLd.description, "D");
+  assert.ok(jsonLd.url.endsWith("/tools/x"));
+  assert.equal(jsonLd["@id"], `${jsonLd.url}#webpage`);
+});
+
+test("tool template emits WebPage JSON-LD from the page config", () => {
+  assert.match(
+    templateSource,
+    /webPageJsonLd\(\{\s*name: config\.name,\s*description: config\.description,\s*path: config\.path,\s*\}\)/,
+    "ToolPageTemplate must call webPageJsonLd with config.name, config.description and config.path",
+  );
 });

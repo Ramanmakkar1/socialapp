@@ -28,6 +28,19 @@ export function toolMetadata({ path, title, description }: { path: string; title
 
 export type AppCategory = "BusinessApplication" | "MultimediaApplication" | "DesignApplication" | "UtilitiesApplication";
 
+/** WebPage JSON-LD for a free tool page. */
+export function webPageJsonLd({ name, description, path }: { name: string; description: string; path: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${BRAND.canonicalUrl}${path}#webpage`,
+    url: `${BRAND.canonicalUrl}${path}`,
+    name,
+    description,
+    isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
+  };
+}
+
 /** SoftwareApplication JSON-LD: a free tool that runs in the browser. No ratings or reviews are claimed. */
 export function webAppJsonLd({ name, description, path, category = "BusinessApplication", features }: {
   name: string;
