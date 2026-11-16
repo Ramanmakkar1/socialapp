@@ -2,8 +2,10 @@
 // src/app/landing.module.css). Paid plans that aren't on sale yet (featureReadiness "billing")
 // send people to the Free sign-up with a "Paid plans launching soon" pill, never to a checkout.
 // /upgrade links are plain <a>: a route handler that must not be prefetched.
+import type { ReactNode } from "react";
 import Link from "next/link";
 import type { Plan } from "@/lib/plans";
+import { PLAN_LIMITS, type PlanName } from "@/lib/planLimits";
 
 export function PlanTag({ plan }: { plan: Plan }) {
   if (plan.comingSoon) return <span className="tag">Coming soon</span>;
@@ -64,6 +66,50 @@ export function PlanCards({ plans }: { plans: Plan[] }) {
           <PlanCta plan={p} />
         </div>
       ))}
+    </div>
+  );
+}
+
+type CompareRow = { label: string; cell: (p: Plan) => ReactNode };
+const n = (v: number | null) => (v === null ? "Unlimited" : v.toLocaleString("en-US"));
+const yes = (p: Plan, re: RegExp): ReactNode => {
+  const item = p.items.find((i) => re.test(i.text));
+  if (!item) return <span className="cmpNo" aria-label="Not included">—</span>;
+  return item.soon ? <SoonBadge /> : <span className="cmpYes">Included</span>;
+};
+
+/** Compact Free / Pro / Agency table from the enforced limits (planLimits.ts) and the plan items. */
+export function PlanCompareTable({ plans }: { plans: Plan[] }) {
+  const rows: CompareRow[] = [
+    { label: "Price", cell: (p) => `${p.price} ${p.per}` },
+    { label: "Social accounts", cell: (p) => n(PLAN_LIMITS[p.name as PlanName].socialAccounts) },
+    { label: "Scheduled posts a month", cell: (p) => n(PLAN_LIMITS[p.name as PlanName].scheduledPostsPerMonth) },
+    { label: "Auto-DMs a month", cell: (p) => n(PLAN_LIMITS[p.name as PlanName].autoDmsPerMonth) },
+    { label: "Link-in-bio links", cell: (p) => n(PLAN_LIMITS[p.name as PlanName].bioLinks) },
+    { label: "AI captions and DM ideas", cell: (p) => yes(p, /^AI /) },
+    { label: "Email capture in DMs", cell: (p) => yes(p, /^Email capture/) },
+    { label: "Click + lead analytics", cell: (p) => yes(p, /^Click \+ lead/) },
+    { label: "Priority support", cell: (p) => yes(p, /^Priority support/) },
+  ];
+  return (
+    <div className="cmpWrap">
+      <table className="cmpTable">
+        <caption className="sr-only">Plan comparison: Free, Pro and Agency</caption>
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            {plans.map((p) => <th key={p.name} scope="col" className={p.popular ? "cmpPop" : undefined}>{p.name}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.label}>
+              <th scope="row">{row.label}</th>
+              {plans.map((p) => <td key={p.name} className={p.popular ? "cmpPop" : undefined}>{row.cell(p)}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

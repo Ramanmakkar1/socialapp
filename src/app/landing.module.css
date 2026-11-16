@@ -254,6 +254,30 @@
 /* "Soon" on a feature line that isn't switched on yet: same badge everywhere. */
 .landing :global(.soonBadge){
   display:inline-block;vertical-align:.1em;margin-left:2px;font-size:.68rem;font-weight:700;line-height:1;letter-spacing:.02em;padding:.22rem .45rem;border-radius:999px;background:var(--poskoo-band);color:var(--violet);white-space:nowrap}
+/* Compact plan comparison under the pricing cards. */
+.landing :global(.cmpWrap){
+  max-width:880px;margin:40px auto 0;border:1.5px solid var(--line);border-radius:var(--poskoo-radius-panel);background:var(--card);overflow:hidden}
+.landing :global(.cmpTable){
+  width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums}
+.landing :global(.cmpTable th),.landing :global(.cmpTable td){
+  padding:11px 14px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.landing :global(.cmpTable tr:last-child > *){
+  border-bottom:0}
+.landing :global(.cmpTable thead th){
+  font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.landing :global(.cmpTable th[scope="row"]),.landing :global(.cmpTable thead th:first-child){
+  text-align:left;font-weight:600}
+.landing :global(.cmpTable .cmpPop){
+  background:var(--poskoo-band)}
+.landing :global(.cmpYes){
+  font-weight:600;color:#14744d}
+.landing :global(.cmpNo){
+  color:var(--muted)}
+@media (max-width: 480px){
+  .landing :global(.cmpTable){font-size:.82rem}
+  .landing :global(.cmpTable th),.landing :global(.cmpTable td){padding:9px 6px}
+  .landing :global(.cmpTable th[scope="row"]){padding-left:10px}
+}
 .landing :global(.faq){
   max-width:760px;margin-inline:auto;display:flex;flex-direction:column;gap:10px}
 .landing :global(details){

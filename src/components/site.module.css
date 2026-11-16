@@ -1146,3 +1146,16 @@
   white-space: normal;
   text-align: center;
 }
+
+/* /pricing: on phones the plan cards come right after the hero copy (the hero
+   drawing is decorative and pushed the cards ~1,200px down). */
+@media (max-width: 899px) {
+  .shell.pub .pricingHero :global(.hero-art) { display: none; }
+  .shell.pub .pricingHero { padding-bottom: 0; }
+}
+.cmpTitle {
+  margin: 48px 0 0;
+  text-align: center;
+  font-size: 1.4rem;
+}
+.cmpTitle + :global(.cmpWrap) { margin-top: 16px; }

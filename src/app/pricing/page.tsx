@@ -7,7 +7,7 @@ import { publisherRef } from "@/lib/tool-schema";
 import { PLANS, cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
 import { planReadinessNow } from "@/lib/featureReadinessNow";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
-import { PlanCards } from "@/components/PlanCta";
+import { PlanCards, PlanCompareTable } from "@/components/PlanCta";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
@@ -81,7 +81,7 @@ export default async function PricingPage() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Pricing", path: PATH }]}>
       {[faqJsonLd(faqs), appJsonLd(r)].map((data) => <script key={data["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(data) }} />)}
-      <header className="hero">
+      <header className={`hero ${s.pricingHero}`}>
         <div className={s.heroText}>
           <span className="pill">Free plan · no credit card · official Meta API</span>
           <h1>
@@ -101,6 +101,8 @@ export default async function PricingPage() {
           <h2 className="sr-only">{BRAND.name} plans and prices</h2>
           <PlanCards plans={plans} />
           <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{plansNote(r)}</p>
+          <h3 className={s.cmpTitle}>Compare plans</h3>
+          <PlanCompareTable plans={plans} />
           <p className="small" style={{ textAlign: "center", marginTop: "10px" }}>
             Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}
             by accounts, scheduled posts and auto-DMs, or use the free{" "}
@@ -125,11 +127,11 @@ export default async function PricingPage() {
             <div className="art">
               <Image
                 sizes="(max-width: 960px) 100vw, 50vw"
-                src="/landing/onesub.webp"
-                width={1400}
-                height={933}
+                src="/landing/multichannel.webp"
+                width={1536}
+                height={1024}
                 loading="lazy"
-                alt="A happy creator in an armchair holds one membership card while app cards and bills fly away"
+                alt="A creator at a laptop sends one post that splits to several phones and screens"
               />
             </div>
           </div>
