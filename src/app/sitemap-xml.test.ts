@@ -92,6 +92,29 @@ test("sitemap.xml route serves no URLs when the request host is the noindex lega
   }
 });
 
+test("sitemap.xml route matches the legacy host exactly, not by substring", async () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    for (const host of [
+      "evil-socialapp.splitforms.com",
+      "socialapp.splitforms.com.evil.com",
+      "socialapp.splitforms.com:3000",
+    ]) {
+      const body = await (
+        await GET(new Request(`http://0.0.0.0:3000/sitemap.xml`, { headers: { host } }))
+      ).text();
+      assert.doesNotMatch(
+        body,
+        /<url>/,
+        `similar-but-not-equal host ${host} must not be treated as the legacy host`,
+      );
+    }
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
 test("sitemap.xml route uses the visitor's host, not the server's internal bind address", async () => {
   // Regression 2026-11-15: in the standalone server request.url is http://0.0.0.0:3000/…,
   // which emptied the production sitemap. The proxy passes the real host in headers.

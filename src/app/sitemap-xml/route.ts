@@ -34,12 +34,17 @@ export async function GET(request?: Request) {
   // Use the host the visitor asked for (proxy headers first). request.url inside the
   // standalone server is the internal bind address (0.0.0.0:3000), which made every
   // production request look like a staging host and emptied the sitemap (2026-11-15).
+  // The host is matched exactly (hostname only, optional port stripped) by
+  // isApprovedProductionOrigin in sitemap.ts: a substring match would noindex
+  // unrelated hosts such as evil-socialapp.splitforms.com.
   const requestHost = request
     ? (
         request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
         request.headers.get("host") ||
         new URL(request.url).host
-      ).toLowerCase()
+      )
+        .toLowerCase()
+        .replace(/:\d+$/, "")
     : null;
   const urls = (await sitemap(requestHost))
     .map((entry) => {
