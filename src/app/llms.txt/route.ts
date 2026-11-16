@@ -1,5 +1,5 @@
-import { BRAND } from "@/lib/brand";
-import { isPathIndexable } from "@/lib/indexability";
+import { APPROVED_PRODUCTION_URL, BRAND } from "@/lib/brand";
+import { isPathIndexable, isSiteIndexable } from "@/lib/indexability";
 import {
   META,
   PAGE_DESCRIPTIONS,
@@ -11,7 +11,13 @@ import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
 import { runtimeEnv } from "@/lib/featureReadinessNow";
 import { PLANS } from "@/lib/plans";
 
-const isNoindex = (path: string) => !isPathIndexable(path);
+// On production, honour per-page noindex. On staging the whole site is noindex,
+// but public pages still belong in llms.txt; only private paths are skipped.
+const isNoindex = (path: string) => isSiteIndexable() && !isPathIndexable(path);
+
+// llms.txt always points at the public production origin, even when served from
+// a staging host, so models never pick up a staging URL.
+const SITE_URL = APPROVED_PRODUCTION_URL;
 
 /** Page groups, matched in order. New pages (help, tools, guides) fall into a group by their path. */
 const GROUPS: { heading: string; match: (path: string) => boolean }[] = [
@@ -26,9 +32,7 @@ const GROUPS: { heading: string; match: (path: string) => boolean }[] = [
 ];
 
 export async function GET() {
-  if (!BRAND.indexable) {
-    return new Response("Not found", { status: 404 });
-  }
+  const indexable = isSiteIndexable();
 
   const grouped = new Map<string, string[]>(GROUPS.map((g) => [g.heading, []]));
   for (const path of PUBLIC_PATHS) {
@@ -37,7 +41,7 @@ export async function GET() {
     const description = PAGE_DESCRIPTIONS[path];
     if (!description) continue;
     const heading = GROUPS.find((g) => g.match(path))!.heading;
-    grouped.get(heading)!.push(`- [${title}](${BRAND.url}${path === "/" ? "/" : path}): ${description}`);
+    grouped.get(heading)!.push(`- [${title}](${SITE_URL}${path === "/" ? "/" : path}): ${description}`);
   }
   const pageSections = GROUPS.flatMap(({ heading }) => {
     const lines = grouped.get(heading)!;
@@ -70,12 +74,12 @@ export async function GET() {
     "## About",
     "",
     `- ${BRAND.name} is a social media scheduler and Instagram comment-to-DM automation tool made by ${BRAND.company}.`,
-    `- Official website: ${BRAND.url}`,
+    `- Official website: ${SITE_URL}`,
     `- Tagline: ${BRAND.tagline}`,
-    `- Support: ${BRAND.supportEmail} or ${BRAND.url}/contact`,
-    `- Plans and the free plan: ${BRAND.url}/pricing`,
-    `- Free tools (character counters, caption, hashtag and image-size tools): ${BRAND.url}/tools`,
-    `- Help center: ${BRAND.url}/help`,
+    `- Support: ${BRAND.supportEmail} or ${SITE_URL}/contact`,
+    `- Plans and the free plan: ${SITE_URL}/pricing`,
+    `- Free tools (character counters, caption, hashtag and image-size tools): ${SITE_URL}/tools`,
+    `- Help center: ${SITE_URL}/help`,
     "",
     `${BRAND.name} is a web app for creators and small businesses. It schedules and auto-publishes social posts through each network's official API, and it sends an automatic Instagram DM to everyone who comments a keyword. It is made by ${BRAND.company}. Support: ${BRAND.supportEmail}.`,
     "",
@@ -100,7 +104,7 @@ export async function GET() {
     "",
     "## AI assistants (MCP)",
     "",
-    `- MCP server (Streamable HTTP): ${BRAND.url}/api/mcp. Authenticate with a Poskoo API key as a Bearer token; setup guide: ${BRAND.url}/developers`,
+    `- MCP server (Streamable HTTP): ${SITE_URL}/api/mcp. Authenticate with a Poskoo API key as a Bearer token; setup guide: ${SITE_URL}/developers`,
     `- Tools: list_channels, list_posts, create_post (any connected channel, up to 10 media links, per-network captions), update_post, delete_post, get_post_status, add_idea, list_contacts, create_dm_rule, ${ai ? "create_campaign_from_brief (AI drafts a whole campaign from a brief), " : ""}get_analytics_summary.`,
     "- API keys are draft-only by default: the assistant creates drafts and paused Auto-DMs that the account owner approves. Keys with \"Allow publishing\" may schedule posts.",
     "",
@@ -120,6 +124,8 @@ export async function GET() {
   return new Response(body, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
+      // Served on staging too, but never indexable there; site-wide noindex is unchanged.
+      ...(indexable ? {} : { "X-Robots-Tag": "noindex" }),
       "Cache-Control": "public, max-age=3600",
     },
   });
