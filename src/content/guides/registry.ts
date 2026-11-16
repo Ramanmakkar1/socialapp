@@ -1119,6 +1119,70 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["how-to-cross-post-on-social-media", "social-media-seo-2026"],
   },
+  {
+    slug: "how-to-cross-post-on-social-media",
+    title: "How to Cross-Post on Social Media Without Looking Lazy",
+    description:
+      "How to cross-post on social media the right way: what to tailor on each network, one idea turned into five native posts, watermark rules and a checklist.",
+    h1: "How to cross-post on social media without looking lazy",
+    subtitle:
+      "Share one idea everywhere, but change the format, first line, hashtags, links and call to action for each network. A worked example and a checklist inside.",
+    crumb: "Cross-posting done right",
+    excerpt: "What to change per network, a worked example and a checklist.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1610,
+    cover: {
+      src: "/illustrations/free-tools.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman with a paintbrush unpacks a blue toolbox full of a hashtag, ruler, scissors, magnifying glass and photo cards, a puppy beside her",
+    },
+    takeaways: [
+      "Cross-post the idea, not the copy: change the format, first line, length, hashtags, links and call to action per network.",
+      "Upload clean original files. Instagram lists no visible watermarks as a condition for recommendations.",
+      "Keep replies, trend formats and platform features such as polls or comment keywords native to one network.",
+      "Stagger networks by an hour or two so you can answer the first replies on each.",
+      "In Poskoo, write one caption, tick the networks, then customise each network's version before scheduling.",
+    ],
+    faqs: [
+      {
+        q: "Is cross-posting bad for reach?",
+        a: "Cross-posting itself is not the problem. Posts that look pasted in, carry another app's watermark or ignore a network's format tend to do worse. Tailor the format, first line, hashtags and call to action, and upload clean files.",
+      },
+      {
+        q: "What is the difference between cross-posting and repurposing?",
+        a: "Cross-posting publishes the same piece on several networks with small edits. Repurposing turns one piece into a new format, such as a blog post into a carousel or a short video. Most calendars use both.",
+      },
+      {
+        q: "Should I post to every network at the same time?",
+        a: "Not necessarily. Staggering networks by an hour or two lets you reply to each wave of comments while the post is fresh, and leaving a day between near-identical versions helps if the same people follow you in two places.",
+      },
+      {
+        q: "Can I cross-post TikToks to Instagram Reels?",
+        a: "Yes, but upload the original video from your editor rather than a download with the TikTok watermark. Instagram says content with visible watermarks is not eligible for recommendations.",
+      },
+      {
+        q: "Which networks can Poskoo cross-post to?",
+        a: "Poskoo publishes today to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles, Bluesky and Mastodon. TikTok, Pinterest, X and LinkedIn Pages are waiting on platform approval.",
+      },
+      {
+        q: "Can I write a different caption for each network in Poskoo?",
+        a: "Yes. Write the main caption, then tick Customize on a network's tab to give that network its own version. The composer checks each version against that network's character limit.",
+      },
+    ],
+    tools: [
+      "/tools/social-media-image-sizes",
+      "/tools/social-media-post-generator",
+      "/tools/instagram-caption-formatter",
+      "/tools/threads-character-counter",
+      "/tools/bluesky-character-counter",
+      "/tools/instagram-safe-zone-checker",
+    ],
+    related: ["threads-vs-bluesky-for-brands", "how-to-schedule-instagram-posts"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
