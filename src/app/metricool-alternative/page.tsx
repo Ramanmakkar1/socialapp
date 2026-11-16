@@ -144,7 +144,7 @@ export default function MetricoolAlternative() {
           <h3>How scheduling and automation differ</h3>
           <p>Both tools schedule posts on a calendar, but Metricool centers on multi-network publishing and analytics, while {BRAND.name} pairs scheduling with automation: a comment keyword triggers an automatic DM, and the DM can capture the commenter&apos;s email before sending the link. In Metricool, that lead flow needs a separate chatbot tool.</p>
           <div className={s.tableWrap}>
-            <table className={s.table}>
+            <table className={`${s.table} ${s.stack}`}>
               <thead>
                 <tr className={s.tr}>
                   <th scope="col" className={s.th}>Feature</th>
@@ -156,8 +156,8 @@ export default function MetricoolAlternative() {
                 {compare.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
-                    <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
-                    <td className={s.td} style={{ textAlign: "center" }}><Cell v={theirs} /></td>
+                    <td data-label={BRAND.name} className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
+                    <td data-label="Metricool" className={s.td} style={{ textAlign: "center" }}><Cell v={theirs} /></td>
                   </tr>
                 ))}
               </tbody>
