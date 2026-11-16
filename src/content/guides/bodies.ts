@@ -12,6 +12,7 @@ import { body as howToGetMoreCommentsOnInstagram } from "./how-to-get-more-comme
 import { body as howToFindYourBestTimeToPost } from "./how-to-find-your-best-time-to-post";
 import { body as socialMediaContentCalendarGuide } from "./social-media-content-calendar-guide";
 import { body as instagramReelsStrategyForSmallBusiness } from "./instagram-reels-strategy-for-small-business";
+import { body as linkInBioBestPractices } from "./link-in-bio-best-practices";
 
 /** Article body per registry slug. Every GUIDES entry must have one (checked by the article page). */
 export const GUIDE_BODIES: Record<string, GuideBody> = {
@@ -28,4 +29,5 @@ export const GUIDE_BODIES: Record<string, GuideBody> = {
   "how-to-find-your-best-time-to-post": howToFindYourBestTimeToPost,
   "social-media-content-calendar-guide": socialMediaContentCalendarGuide,
   "instagram-reels-strategy-for-small-business": instagramReelsStrategyForSmallBusiness,
+  "link-in-bio-best-practices": linkInBioBestPractices,
 };

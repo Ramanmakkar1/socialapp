@@ -862,6 +862,69 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["how-to-get-more-instagram-followers", "instagram-comment-to-dm-automation-guide"],
   },
+  {
+    slug: "link-in-bio-best-practices",
+    title: "Link in Bio Best Practices: What to Put on Yours",
+    description:
+      "Link in bio best practices: what to put on the page, in what order, how to word links, track clicks with UTMs and keep it in step with your latest posts.",
+    h1: "Link in bio best practices: what to put on yours and how to get clicks",
+    subtitle:
+      "One main action, three to five links, labels that say what people get, and a page that changes when your posts do. With examples for creators, local businesses and coaches.",
+    crumb: "Link in bio best practices",
+    excerpt: "What to put on your link-in-bio page, in what order, and how to track clicks.",
+    category: "auto-dm",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1790,
+    cover: {
+      src: "/guides/how-to-make-money-on-social-media-2026.webp",
+      width: 1280,
+      height: 720,
+      alt: "A creator with a phone sends dotted paths out to a chain link, a gift box, a download folder, a video camera and a shop card, beside a piggy bank catching a coin",
+    },
+    takeaways: [
+      "Put one main action at the top of your link-in-bio page and keep the whole list to three to five links.",
+      "Instagram allows up to five bio links, but only the first shows in your bio; the rest sit behind a tap.",
+      "Write labels that start with a verb and say what people get, such as \"Free 7-day meal plan (PDF)\".",
+      "Track clicks per link and add UTM parameters so you can see what visitors do after the click.",
+      "Update the top link whenever a post says \"link in bio\", and review the page once a month.",
+    ],
+    faqs: [
+      {
+        q: "How many links should a link-in-bio page have?",
+        a: "Three to five is enough for most accounts. Put the one action you most want first, then the link from your latest post, a free resource, your main offer and one contact or trust link. More links usually means fewer clicks on the ones that matter.",
+      },
+      {
+        q: "Can you add more than one link to an Instagram bio?",
+        a: "Yes. Since April 2023 Instagram lets you add up to five links under Edit profile, then Links. Only the first link shows directly in your bio; the others appear in a pop-up when someone taps to see more.",
+      },
+      {
+        q: "Do I still need a link-in-bio tool if Instagram allows five links?",
+        a: "Not always. If you have one main destination, the native link is enough. A link-in-bio page helps when you promote different things from different posts, want click counts per link, or use the same link on several platforms.",
+      },
+      {
+        q: "How do I track clicks on my link in bio?",
+        a: "Use a link-in-bio tool that counts clicks per link, and add UTM parameters such as utm_source=instagram and utm_campaign=bio to each destination so your website analytics can show sign-ups and sales from those visits.",
+      },
+      {
+        q: "What should my first link in bio be?",
+        a: "The action that matches what you are posting about right now: the freebie from this week's Reel, a booking page or a product launch. Change it when your content moves on.",
+      },
+      {
+        q: "Is Poskoo's link in bio free?",
+        a: "Yes. The Free plan includes a link-in-bio page with up to 5 links, four colour themes and click counts per link. The Pro plan raises the limit to 20 links and is launching soon.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-utm-builder",
+      "/tools/instagram-bio-generator",
+      "/tools/instagram-dm-link-generator",
+      "/tools/instagram-comment-to-dm-preview",
+      "/tools/instagram-profile-picture-size-checker",
+    ],
+    related: ["how-to-grow-email-list-from-instagram", "instagram-comment-to-dm-automation-guide"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
