@@ -50,7 +50,7 @@ export function GuideTable({ caption, head, rows }: { caption?: string; head: st
           {rows.map((r, i) => (
             <tr key={i}>
               {r.map((cell, j) =>
-                j === 0 ? <th key={j} scope="row">{cell}</th> : <td key={j}>{cell}</td>
+                j === 0 ? <th key={j} scope="row">{cell}</th> : <td key={j} data-label={head[j]}>{cell}</td>
               )}
             </tr>
           ))}

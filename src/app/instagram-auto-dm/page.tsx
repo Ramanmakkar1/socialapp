@@ -225,7 +225,7 @@ export default function InstagramAutoDm() {
             <p>Both send comment-to-DM messages. {BRAND.name} also schedules your posts.</p>
           </div>
           <div className={s.tableWrap}>
-            <table className={s.table}>
+            <table className={`${s.table} ${s.stack}`}>
               <thead>
                 <tr>
                   <th className={s.th}>Feature</th>
@@ -237,8 +237,8 @@ export default function InstagramAutoDm() {
                 {compare.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
-                    <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700 }}><Cell v={ours} /></td>
-                    <td className={s.td} style={{ color: "var(--poskoo-muted)" }}><Cell v={theirs} /></td>
+                    <td data-label={BRAND.name} className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700 }}><Cell v={ours} /></td>
+                    <td data-label="ManyChat" className={s.td} style={{ color: "var(--poskoo-muted)" }}><Cell v={theirs} /></td>
                   </tr>
                 ))}
               </tbody>

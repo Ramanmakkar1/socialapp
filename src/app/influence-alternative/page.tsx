@@ -159,7 +159,7 @@ export default async function InfluenceAlternative() {
             </p>
           </div>
           <div className={s.tableWrap}>
-            <table className={s.table}>
+            <table className={`${s.table} ${s.stack}`}>
               <thead>
                 <tr className={s.tr}>
                   <th scope="col" className={s.th}>Feature</th>
@@ -171,8 +171,8 @@ export default async function InfluenceAlternative() {
                 {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
-                    <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
-                    <td className={s.td} style={{ textAlign: "center" }}><Cell v={theirs} /></td>
+                    <td data-label={BRAND.name} className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
+                    <td data-label="influence.so" className={s.td} style={{ textAlign: "center" }}><Cell v={theirs} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -196,7 +196,7 @@ export default async function InfluenceAlternative() {
             </p>
           </div>
           <div className={s.tableWrap}>
-            <table className={s.table}>
+            <table className={`${s.table} ${s.stack}`}>
               <thead>
                 <tr className={s.tr}>
                   <th scope="col" className={s.th}>Tool</th>
@@ -209,9 +209,9 @@ export default async function InfluenceAlternative() {
                 {pricing.map((row) => (
                   <tr key={`${row.tool}-${row.plan}`} className={s.tr}>
                     <td className={`${s.td}${row.tool === BRAND.name ? ` ${s.oursCol}` : ""}`} style={{ fontWeight: 700 }}>{row.tool}</td>
-                    <td className={s.td}>{row.plan}</td>
-                    <td className={s.td}>{row.price}</td>
-                    <td className={s.td}>{row.includes}</td>
+                    <td data-label="Plan" className={s.td}>{row.plan}</td>
+                    <td data-label="Price" className={s.td}>{row.price}</td>
+                    <td data-label="Includes" className={s.td}>{row.includes}</td>
                   </tr>
                 ))}
               </tbody>

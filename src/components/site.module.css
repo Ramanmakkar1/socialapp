@@ -309,6 +309,21 @@
 .td:last-child, .th:last-child { text-align: center; }
 .tr:last-child .td { border-bottom: 0; }
 .oursCol { background: var(--poskoo-band); }
+/* Opt-in (className={`${s.table} ${s.stack}`} + data-label on each value cell):
+   on phones each row becomes a card with labelled values. */
+@media (max-width: 640px) {
+  .tableWrap:has(> .stack) { overflow: visible; border: 0; background: none; box-shadow: none; border-radius: 0; }
+  .table.stack { min-width: 0; }
+  .table.stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .table.stack tbody, .table.stack tr, .table.stack td { display: block; }
+  .table.stack tr { margin: 0 0 12px; border: 1.5px solid var(--poskoo-line); border-radius: 16px; background: var(--poskoo-card); overflow: hidden; }
+  .table.stack td { padding: 10px 14px; text-align: left !important; }
+  .table.stack td:first-child { font-weight: 700; background: var(--poskoo-paper); }
+  .table.stack td[data-label] { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); gap: 12px; }
+  .table.stack td[data-label]::before { content: attr(data-label); font-weight: 600; color: var(--poskoo-muted); }
+  .table.stack .tr:last-child .td { border-bottom: 1px solid var(--poskoo-line); }
+  .table.stack .tr .td:last-child { border-bottom: 0; }
+}
 
 /* Chip row for CompareAlternativesNav — pill chips like the landing .chips,
    but self-contained (no landing.module.css import). Higher specificity than
