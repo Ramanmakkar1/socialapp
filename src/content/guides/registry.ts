@@ -547,6 +547,69 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["cheapest-social-media-scheduling-tools-2026", "social-media-seo-2026"],
   },
+  {
+    slug: "instagram-comment-to-dm-automation-guide",
+    title: "Instagram Comment-to-DM Automation: The 2026 Playbook",
+    description:
+      "How Instagram comment-to-DM automation works under Meta's rules, with keyword lists, DM templates, follow and email gates, and a step-by-step setup.",
+    h1: "Instagram comment-to-DM automation: the complete playbook",
+    subtitle:
+      "Meta's rules in plain English, keywords people actually type, DM templates to copy, and how to set it up and measure it.",
+    crumb: "Comment-to-DM playbook",
+    excerpt: "Meta's rules, keyword lists, DM templates and a step-by-step setup.",
+    category: "auto-dm",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1790,
+    cover: {
+      src: "/landing/hero.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman sits on a giant phone showing a post with a GUIDE comment bubble, beside a calendar of scheduled posts, while an envelope with a link flies to a waving man holding a coffee and a dog looks on",
+    },
+    takeaways: [
+      "Comment-to-DM automation sends a private message to anyone who comments your keyword, using Meta's official API.",
+      "Meta allows one private reply per comment, sent within 7 days; follow-ups need the person to reply first.",
+      "Pick one short keyword per offer, add variants like GUIDE and GUIDES, and use contains match by default.",
+      "Deliver the promised link in the first two lines of the DM and end with a question to start a real conversation.",
+      "Track keyword comments, DMs sent, link clicks and leads, and fix the weakest step first.",
+    ],
+    faqs: [
+      {
+        q: "Is Instagram comment-to-DM automation allowed?",
+        a: "Yes, when it runs through Meta's official Instagram API. Private replies are a documented feature for Business and Creator accounts. Avoid tools that ask for your password or message people who never commented.",
+      },
+      {
+        q: "How many DMs can I send per comment?",
+        a: "Meta allows one private reply per comment, sent within 7 days of the comment. If the person replies, a standard messaging window opens and you can continue the conversation.",
+      },
+      {
+        q: "Do I need a Business or Creator account?",
+        a: "Yes. Automated DMs only work on Instagram professional accounts. Switching from a personal account is free and takes about a minute in the Instagram app.",
+      },
+      {
+        q: "What makes a good comment keyword?",
+        a: "A short, uncommon word that says what the person gets, such as GUIDE, PRICE or SHOP. Add common variants such as plurals, and show the keyword in the caption and on the post itself.",
+      },
+      {
+        q: "Can I collect emails with comment-to-DM?",
+        a: "Yes. In Poskoo, turn on Ask for email first and the DM asks for an address before sending the link. Captured emails are saved in Leads and can be exported as CSV. Check the pricing page for which plan includes email capture.",
+      },
+      {
+        q: "Why didn't my auto-DM send?",
+        a: "Common causes are a comment that doesn't match the keyword, an exact match rule when people wrote a sentence, a paused rule, or a disconnected account. Test your keywords first and check the rule's activity.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-comment-keyword-tester",
+      "/tools/instagram-comment-to-dm-preview",
+      "/tools/instagram-comment-to-dm-calculator",
+      "/tools/instagram-dm-link-generator",
+      "/tools/instagram-utm-builder",
+    ],
+    related: ["best-instagram-auto-dm-tools-2026", "how-to-get-more-comments-on-instagram"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
