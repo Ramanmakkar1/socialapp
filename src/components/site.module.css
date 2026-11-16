@@ -1185,9 +1185,10 @@
   .shell.pub .pricingHero :global(.hero-art) { display: none; }
   .shell.pub .pricingHero { padding-bottom: 0; }
 }
-.cmpTitle {
+/* Doubled class: beats the landing's `.landing h3 { margin: 0 }`. */
+.cmpTitle.cmpTitle {
   margin: 48px 0 0;
   text-align: center;
   font-size: 1.4rem;
 }
-.cmpTitle + :global(.cmpWrap) { margin-top: 16px; }
+.cmpTitle.cmpTitle + :global(.cmpWrap) { margin-top: 16px; }

@@ -222,8 +222,8 @@
   display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:stretch;padding-top:14px}
 .landing :global(.plan){
   background:var(--card);border:1.5px solid var(--line);border-radius:var(--poskoo-radius-panel);padding:28px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:visible;min-width:0}
-/* Cards with a pill on the top edge get extra room so the pill never crowds the plan name. */
-.landing :global(.plan.tagged){
+/* Room for the pill on the top edge, on every card so the plan names stay level. */
+.landing :global(.plans > .plan){
   padding-top:34px}
 .landing :global(.plan.pop){
   border:2px solid var(--ink);box-shadow:6px 6px 0 var(--peach)}
@@ -266,7 +266,7 @@
   width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums}
 .landing :global(.cmpTable th),.landing :global(.cmpTable td){
   padding:11px 14px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
-.landing :global(.cmpTable tr:last-child > *){
+.landing :global(.cmpTable tbody tr:last-child > *){
   border-bottom:0}
 .landing :global(.cmpTable thead th){
   font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
