@@ -1309,3 +1309,49 @@ test("sendDueDms: a rate-limit stop releases the claimed rows it did not attempt
     }
   );
 });
+
+// ---- Fair share of the global per-run budget across Instagram accounts ----
+
+function busyWorld(dueByAccount: Record<string, number>) {
+  const accounts: MockSocialAccount[] = Object.keys(dueByAccount).map((id, i) => ({
+    id, external_id: `ig-${id}`, status: "active", dm_cooldown_until: null, access_token_enc: "", created_at: i + 1,
+  }));
+  const rules: RuleRow[] = Object.keys(dueByAccount).map((id) => ({ id: `rule-${id}`, user_id: "user-1", social_account_id: id, status: "active" }));
+  const queue: MockDmQueueRow[] = [];
+  let n = 0;
+  for (const [id, count] of Object.entries(dueByAccount)) {
+    for (let i = 0; i < count; i++) {
+      n += 1;
+      // The busy account's rows are the oldest, so oldest-first would hand it the whole budget.
+      queue.push(baseQueueRow({ id: `q-${id}-${i}`, social_account_id: id, rule_id: `rule-${id}`, comment_id: `c-${id}-${i}`, created_at: Date.now() - 60_000 + (id === "busy" ? 0 : 10_000) + n }));
+    }
+  }
+  return { accounts, rules, queue };
+}
+
+async function sentPerAccount(dueByAccount: Record<string, number>, limit: number) {
+  const perAccount: Record<string, number> = {};
+  globalThis.fetch = async (url) => {
+    const acct = String(url).split("/").at(-2)!.replace(/^ig-/, "");
+    perAccount[acct] = (perAccount[acct] ?? 0) + 1;
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const w = busyWorld(dueByAccount);
+  const result = await withSendDueDmsEnv(w.accounts, w.queue, w.rules, async () => {
+    const { sendDueDms } = await import("./sender.ts");
+    return sendDueDms(limit);
+  });
+  return { perAccount, result };
+}
+
+test("sendDueDms: one busy account cannot starve the others; the global ceiling still holds", async () => {
+  const { perAccount, result } = await sentPerAccount({ busy: 100, small1: 20, small2: 20 }, 30);
+  assert.equal(result.sent, 30, "global ceiling");
+  assert.deepEqual(perAccount, { busy: 10, small1: 10, small2: 10 });
+});
+
+test("sendDueDms: budget an account does not need goes to the accounts that still have DMs due", async () => {
+  const { perAccount, result } = await sentPerAccount({ busy: 100, quiet: 2 }, 20);
+  assert.equal(result.sent, 20);
+  assert.deepEqual(perAccount, { busy: 18, quiet: 2 });
+});
