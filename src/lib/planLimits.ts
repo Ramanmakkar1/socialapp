@@ -1,6 +1,7 @@
 // Plan limits as numbers, enforced on the server. The numbers mirror the plan cards in
 // src/lib/plans.ts (planLimits.test.ts fails if they drift apart). Prices are not here.
 import { isDbConfigured, query } from "@/lib/db";
+import { BIO_LINK_LIMITS } from "@/lib/bioLinkLimits";
 import { referralBonusDms } from "@/lib/referrals";
 import { planFromBilling, type BillingRow } from "@/lib/billingState";
 import { isAdminEmail } from "@/lib/admin";
@@ -17,9 +18,9 @@ export type PlanLimits = {
 };
 
 export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
-  Free: { socialAccounts: 2, scheduledPostsPerMonth: 10, autoDmsPerMonth: 500, bioLinks: 5 },
-  Pro: { socialAccounts: 5, scheduledPostsPerMonth: null, autoDmsPerMonth: 2_500, bioLinks: 20 },
-  Agency: { socialAccounts: 25, scheduledPostsPerMonth: null, autoDmsPerMonth: 10_000, bioLinks: 20 },
+  Free: { socialAccounts: 2, scheduledPostsPerMonth: 10, autoDmsPerMonth: 500, bioLinks: BIO_LINK_LIMITS.Free },
+  Pro: { socialAccounts: 5, scheduledPostsPerMonth: null, autoDmsPerMonth: 2_500, bioLinks: BIO_LINK_LIMITS.Pro },
+  Agency: { socialAccounts: 25, scheduledPostsPerMonth: null, autoDmsPerMonth: 10_000, bioLinks: BIO_LINK_LIMITS.Agency },
 };
 
 /**

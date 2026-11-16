@@ -5,7 +5,7 @@ import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
-import { PLAN_LIMITS } from "@/lib/planLimits";
+import { BIO_LINK_LIMITS } from "@/lib/bioLinkLimits";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 
@@ -25,8 +25,8 @@ export const metadata: Metadata = withSocial({
   twitter: { card: "summary_large_image", title, description },
 });
 
-const freeLinks = PLAN_LIMITS.Free.bioLinks;
-const paidLinks = PLAN_LIMITS.Pro.bioLinks;
+const freeLinks = BIO_LINK_LIMITS.Free;
+const paidLinks = BIO_LINK_LIMITS.Pro;
 
 const steps = [
   {
@@ -287,7 +287,7 @@ export default function InstagramLinkInBioPage() {
                 </tr>
                 <tr className={s.tr}>
                   <td className={s.td}>Agency</td>
-                  <td className={s.td} style={{ fontWeight: 700 }}>{PLAN_LIMITS.Agency.bioLinks} links</td>
+                  <td className={s.td} style={{ fontWeight: 700 }}>{BIO_LINK_LIMITS.Agency} links</td>
                 </tr>
               </tbody>
             </table>
