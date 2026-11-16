@@ -8,6 +8,7 @@ const guideDescription = (slug: string) => guideBySlug(slug)?.description ?? "";
 export const PUBLIC_PATHS = [
   "/",
   "/features",
+  "/features/instagram-comment-to-dm",
   "/ai-social-media-manager",
   "/social-media-analytics",
   "/social-media-inbox",
@@ -245,6 +246,7 @@ export type PublicPath = typeof PUBLIC_PATHS[number];
 export const META: Record<PublicPath, { priority: number; changeFrequency: "weekly" | "yearly" }> = {
   "/": { priority: 1, changeFrequency: "weekly" },
   "/features": { priority: 0.9, changeFrequency: "weekly" },
+  "/features/instagram-comment-to-dm": { priority: 0.8, changeFrequency: "weekly" },
   "/ai-social-media-manager": { priority: 0.8, changeFrequency: "weekly" },
   "/social-media-analytics": { priority: 0.8, changeFrequency: "weekly" },
   "/social-media-inbox": { priority: 0.8, changeFrequency: "weekly" },
@@ -478,7 +480,7 @@ export const META: Record<PublicPath, { priority: number; changeFrequency: "week
 };
 
 export const PAGE_TITLES: Record<PublicPath, string> = {
-  "/": "Poskoo Home", "/features": "Features", "/ai-social-media-manager": "AI Social Media Manager", "/social-media-analytics": "Social Media Analytics", "/social-media-inbox": "Social Media Inbox", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates", "/instagram-link-in-bio": "Instagram Link in Bio",
+  "/": "Poskoo Home", "/features": "Features", "/features/instagram-comment-to-dm": "Instagram Comment-to-DM Automation", "/ai-social-media-manager": "AI Social Media Manager", "/social-media-analytics": "Social Media Analytics", "/social-media-inbox": "Social Media Inbox", "/instagram-auto-dm": "Instagram Auto-DM", "/instagram-auto-dm/templates": "Auto-DM Templates", "/instagram-link-in-bio": "Instagram Link in Bio",
   "/instagram-dm-automation": "Instagram DM Automation",
   "/instagram-dm-lead-generation": "Instagram DM Lead Generation",
   "/buffer-alternative": "Buffer Alternative", "/manychat-alternative": "ManyChat Alternative",
@@ -632,6 +634,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/": "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, a link-in-bio page and free tools. Plan, publish and grow your content in one place.",
   "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI captions, lead capture, free tools and comparisons, all in one workspace.",
+  "/features/instagram-comment-to-dm": "Instagram comment-to-DM automation: keyword triggers, automatic DM link delivery, optional email capture, pauses, retries and click tracking in Poskoo.",
   "/ai-social-media-manager": "An AI social media manager that drafts caption ideas, adapts them per platform, suggests DM replies, captures leads and shows analytics in Poskoo.",
   "/social-media-analytics": "Poskoo social media analytics shows post performance, reach, engagement rate, link clicks, leads and DM analytics in one dashboard, with CSV export.",
   "/social-media-inbox": "A social media inbox brings every comment and DM from all your channels into one shared place, with AI suggestions, keyword automation and lead capture.",

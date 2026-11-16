@@ -298,6 +298,7 @@ export default async function FeaturesPage() {
               </Link>
               <p className="small">
                 Ready-made messages: <Link className={s.vlink} href="/instagram-auto-dm/templates">browse auto-DM templates</Link>.
+                {" "}Or read the <Link className={s.vlink} href="/features/instagram-comment-to-dm">Instagram comment-to-DM feature guide</Link>.
               </p>
             </div>
             <div className="art">
