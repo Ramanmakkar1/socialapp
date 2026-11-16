@@ -9,6 +9,7 @@ import { body as howToScheduleTiktokVideos } from "./how-to-schedule-tiktok-vide
 import { body as howToGetMoreInstagramFollowers } from "./how-to-get-more-instagram-followers";
 import { body as instagramCommentToDmAutomationGuide } from "./instagram-comment-to-dm-automation-guide";
 import { body as howToGetMoreCommentsOnInstagram } from "./how-to-get-more-comments-on-instagram";
+import { body as howToFindYourBestTimeToPost } from "./how-to-find-your-best-time-to-post";
 
 /** Article body per registry slug. Every GUIDES entry must have one (checked by the article page). */
 export const GUIDE_BODIES: Record<string, GuideBody> = {
@@ -22,4 +23,5 @@ export const GUIDE_BODIES: Record<string, GuideBody> = {
   "how-to-get-more-instagram-followers": howToGetMoreInstagramFollowers,
   "instagram-comment-to-dm-automation-guide": instagramCommentToDmAutomationGuide,
   "how-to-get-more-comments-on-instagram": howToGetMoreCommentsOnInstagram,
+  "how-to-find-your-best-time-to-post": howToFindYourBestTimeToPost,
 };

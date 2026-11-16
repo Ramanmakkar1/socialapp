@@ -669,6 +669,71 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["instagram-comment-to-dm-automation-guide", "how-to-get-more-instagram-followers"],
   },
+  {
+    slug: "how-to-find-your-best-time-to-post",
+    title: "Best Time to Post on Social Media: Find Your Own in 2026",
+    description:
+      "There is no universal best time to post. Find yours: pick starting slots, read each platform's audience data, run a 2-3 week test and log results the right way.",
+    h1: "How to find your best time to post on social media",
+    subtitle:
+      "A simple method instead of a generic chart: where to find your audience data on each platform, how to run a fair timing test and how to handle time zones.",
+    crumb: "Find your best time to post",
+    excerpt: "Skip the generic charts: test your own slots and keep the winners.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1910,
+    cover: {
+      src: "/landing/multichannel.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman on a yellow beanbag with a laptop sends paper planes to phones, tablets and a desktop screen, each with a clock, while a dog sits beside her",
+    },
+    takeaways: [
+      "There is no single best time for every account: the best time is when your own audience is online.",
+      "Start with two or three slots (morning, lunch, evening) on your audience's clock, then check each platform's audience data.",
+      "Test the slots for two to three weeks with the same format, scheduled to the exact minute, and log results at 48 hours.",
+      "Compare like with like, use rates rather than totals, and look for a pattern instead of one viral post.",
+      "Re-test every few months, because audiences, seasons and platforms change.",
+    ],
+    faqs: [
+      {
+        q: "What is the best time to post on social media?",
+        a: "There is no single best time for every account. Good starting points are before work, lunchtime and the evening in your audience's time zone, but the real answer comes from your own analytics and a two to three week test of a few slots.",
+      },
+      {
+        q: "Where can I see when my Instagram followers are online?",
+        a: "With a professional account, open Insights from your professional dashboard and look at your followers. The Most active times chart shows the hours and days your followers use Instagram.",
+      },
+      {
+        q: "Does posting time affect reach?",
+        a: "It can help a little. Feeds are ranked rather than shown in time order, but a post that gets early views and replies has a better chance of being shown to more people. Content quality matters more than timing.",
+      },
+      {
+        q: "Should I post at the same time on every platform?",
+        a: "No. People use LinkedIn, Instagram, Threads and YouTube at different times and in different moods. Test each platform separately and keep the slots that win on each one.",
+      },
+      {
+        q: "How long should a posting time test run?",
+        a: "Two to three weeks is usually enough for a first answer, with at least three or four posts per slot. Rotate slots across days so no slot always gets the best day, then keep the winner and test a new slot next month.",
+      },
+      {
+        q: "What if my followers are in different time zones?",
+        a: "Post on the clock of your largest audience region. With two big regions, look for an overlapping hour or alternate slots on different days. If your audience is spread worldwide, timing matters less than a steady rhythm.",
+      },
+    ],
+    tools: [
+      "/tools/best-time-to-post-on-social-media",
+      "/tools/best-time-to-post-on-instagram",
+      "/tools/best-time-to-post-on-linkedin",
+      "/tools/best-time-to-post-on-threads",
+      "/tools/best-time-to-post-on-tiktok",
+      "/tools/instagram-time-zone-converter",
+      "/tools/instagram-engagement-rate-calculator",
+    ],
+    related: ["social-media-content-calendar-guide", "how-to-schedule-instagram-posts"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
