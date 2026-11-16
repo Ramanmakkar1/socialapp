@@ -624,7 +624,7 @@
     column-gap: clamp(40px, 5vw, 80px);
     justify-items: stretch;
     text-align: left;
-    padding-block: 24px 40px;
+    padding-block: 24px 64px;
   }
   .shell.sched .heroText {
     align-items: flex-start;
