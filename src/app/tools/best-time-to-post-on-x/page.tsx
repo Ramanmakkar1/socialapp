@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
+import t from "@/components/tools/tools.module.css";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-x",
@@ -11,7 +12,7 @@ const config: ToolPageConfig = {
     "Find the best time to post on X (Twitter) with a free finder. Pick your audience and time zone to get weekday and weekend slots to test. No signup.",
   pill: "Free · runs in your browser · nothing is saved",
   h1: { before: "Best time to post on", mark: "X (Twitter)" },
-  lede: "A good starting point for X (Twitter) is weekdays around 8–10 am and 12 pm in your audience's local time, with an early-evening test. Try these slots for two weeks and keep the ones your X analytics show working.",
+  lede: "The best time to post on X (Twitter) is when your own followers are most active: for most accounts that is weekdays around 8–10 am and 12 pm in your audience's local time, with an early-evening test. Use these as starting points, then let your X audience analytics refine them into the slots that work for you.",
   art: "card-schedule",
   artLabel: "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
   heroPoints: ["Your audience's time zone", "3 slots per day", "No signup"],
@@ -97,6 +98,123 @@ const config: ToolPageConfig = {
         ),
       },
       {
+        title: "Best weekday and weekend times on X",
+        body: (
+          <>
+            <p>
+              Weekdays are where most X activity happens. A safe first test is <b>Monday to Friday, 8–10 am and 12 pm</b>
+              in your audience&apos;s local time, with an early-evening post (around 5–7 pm) for news and creator accounts.
+              B2B and SaaS audiences tend to respond to the 8–10 am workday window; creators and ecommerce audiences
+              often do better with a midday and an evening slot.
+            </p>
+            <p>
+              <b>Weekends are quieter on X</b>, so a single later slot around 10 am is usually enough. Post on the days
+              you can sustain, and compare weekend results with your weekday slots in your X analytics before adding
+              more.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Posting across time zones",
+        body: (
+          <>
+            <p>
+              The slots below are <b>local times in each audience zone</b> — the same 8–10 am, 12 pm and 5–7 pm windows,
+              on each zone&apos;s own clock. They are not converted from US Eastern time. Pick the zone where most of your
+              followers live, and post at those local times.
+            </p>
+            <div className={t.tableWrap}>
+              <table className={t.table}>
+                <caption className="sr-only">
+                  Starting post times as local times in each audience time zone
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Audience zone</th>
+                    <th scope="col">Morning slot (local)</th>
+                    <th scope="col">Midday slot (local)</th>
+                    <th scope="col">Evening slot (local)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>US East (New York, EDT/EST)</td>
+                    <td>8–10 am</td>
+                    <td>12 pm</td>
+                    <td>5–7 pm</td>
+                  </tr>
+                  <tr>
+                    <td>US West (Los Angeles, PDT/PST)</td>
+                    <td>8–10 am</td>
+                    <td>12 pm</td>
+                    <td>5–7 pm</td>
+                  </tr>
+                  <tr>
+                    <td>UK (London, GMT/BST)</td>
+                    <td>8–10 am</td>
+                    <td>12 pm</td>
+                    <td>5–7 pm</td>
+                  </tr>
+                  <tr>
+                    <td>India (Mumbai, IST)</td>
+                    <td>8–10 am</td>
+                    <td>12 pm</td>
+                    <td>5–7 pm</td>
+                  </tr>
+                  <tr>
+                    <td>Europe (Berlin, CET/CEST)</td>
+                    <td>8–10 am</td>
+                    <td>12 pm</td>
+                    <td>5–7 pm</td>
+                  </tr>
+                  <tr>
+                    <td>Singapore (SGT)</td>
+                    <td>8–10 am</td>
+                    <td>12 pm</td>
+                    <td>5–7 pm</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              If you post to several zones at once, use the{" "}
+              <Link href="/tools/instagram-time-zone-converter">time zone converter</Link> to convert a single slot into
+              each zone&apos;s local time, or schedule one post per zone with the{" "}
+              <Link href="/x-scheduler">X scheduler</Link>.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Measuring your results",
+        body: (
+          <>
+            <p>
+              The only way to know your best time is to measure it. In the <b>Analytics view on x.com</b>, compare
+              impressions, engagement rate and replies for posts at each slot you tested.
+            </p>
+            <ul>
+              <li>
+                <b>Track per slot, not per day:</b> group your posts by the time slot you used, so a slow day does not
+                look like a bad time.
+              </li>
+              <li>
+                <b>Give it two weeks:</b> a single post is noise; two weeks of slots shows a pattern.
+              </li>
+              <li>
+                <b>Keep the winner, drop the weakest,</b> then test one new time. Change one thing at a time so you
+                know what made the difference.
+              </li>
+            </ul>
+            <p>
+              Your own X post analytics always beat a general rule — the tables above are starting points, not
+              measurements of your account.
+            </p>
+          </>
+        ),
+      },
+      {
         title: "Best time by content type",
         body: (
           <>
@@ -153,6 +271,10 @@ const config: ToolPageConfig = {
     {
       q: "Should you post on X on weekends?",
       a: "Weekends can be quieter on X, but they still work for some accounts, especially creators and news. Try a later weekend slot such as 10 am and compare it with your weekday results. Post on the days you can sustain, and let your X analytics decide.",
+    },
+    {
+      q: "What time should I post on X if my audience is in a different time zone?",
+      a: "Post at the slot in your audience's local time, not yours. For example, 8–10 am for a UK audience means 8–10 am London time (GMT/BST), and 8–10 am for an India audience means 8–10 am IST — the same windows on each zone's own clock. Use the time zone converter to translate a slot into each zone, and your X analytics to see which zone's slots perform best.",
     },
     {
       q: "How often should you post on X?",
