@@ -51,6 +51,7 @@ test("old staging host redirects its home page and every other path to poskoo.co
   assert.equal(matches.test("api/webhooks"), false, "/api/* must not be redirected");
   assert.equal(matches.test("apix"), true, "/apix must still be redirected");
   assert.equal(matches.test("pricing"), true, "/pricing must still be redirected");
+  assert.equal(matches.test("sitemap.xml"), false, "/sitemap.xml must not be redirected to the canonical sitemap");
 
   // (d) Every old-host redirect must land on poskoo.com.
   for (const entry of oldHostEntries) {
@@ -65,10 +66,11 @@ test("x-forwarded-host staging requests redirect the home page, sitemap, robots 
   const redirects = await config.redirects!();
   const forwardedEntries = redirects.filter(hasForwardedHost);
 
-  // All four rules must exist for the forwarded-host signal.
+  // The forwarded-host home and robots rules must still exist. The sitemap is
+  // deliberately NOT redirected: the legacy host must serve an empty sitemap so
+  // its noindex pages are never listed (the route empties a non-canonical host).
   for (const [source, destination] of [
     ["/", "https://poskoo.com/"],
-    ["/sitemap.xml", "https://poskoo.com/sitemap.xml"],
     ["/robots.txt", "https://poskoo.com/robots.txt"],
   ] as const) {
     const entry = forwardedEntries.find((candidate) => candidate.source === source);
@@ -76,6 +78,12 @@ test("x-forwarded-host staging requests redirect the home page, sitemap, robots 
     assert.equal(entry.destination, destination);
     assert.equal(entry.permanent, true);
   }
+
+  assert.equal(
+    forwardedEntries.some((candidate) => candidate.source === "/sitemap.xml"),
+    false,
+    "the legacy host must not redirect /sitemap.xml to the canonical sitemap",
+  );
 
   const catchAll = forwardedEntries.find((entry) => entry.source.includes("(?!api"));
   assert.ok(catchAll, "expected the x-forwarded-host catch-all redirect");
@@ -87,6 +95,7 @@ test("x-forwarded-host staging requests redirect the home page, sitemap, robots 
   assert.equal(matches.test("api"), false, "bare /api must not be redirected");
   assert.equal(matches.test("api/webhooks"), false, "/api/* must not be redirected");
   assert.equal(matches.test("pricing"), true, "/pricing must still be redirected");
+  assert.equal(matches.test("sitemap.xml"), false, "/sitemap.xml must not be redirected to the canonical sitemap");
 
   // Every forwarded-host redirect must land on poskoo.com.
   for (const entry of forwardedEntries) {

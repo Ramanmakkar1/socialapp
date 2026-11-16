@@ -57,21 +57,24 @@ const nextConfig: NextConfig = {
       // Old staging host: redirect the bare root, sitemap and robots explicitly. The catch-all below needs :path to match an empty string for "/", and the cached home page must never be served on the old host.
       { source: "/", has: OLD_HOST, destination: "https://poskoo.com/", permanent: true },
       { source: "/", has: OLD_FORWARDED_HOST, destination: "https://poskoo.com/", permanent: true },
-      { source: "/sitemap.xml", has: OLD_HOST, destination: "https://poskoo.com/sitemap.xml", permanent: true },
-      { source: "/sitemap.xml", has: OLD_FORWARDED_HOST, destination: "https://poskoo.com/sitemap.xml", permanent: true },
+      // Do NOT redirect the legacy /sitemap.xml to the canonical sitemap: the
+      // legacy host is always noindex, and serving poskoo.com URLs there made
+      // the audited noindex home page look like it was listed in the sitemap.
+      // It falls through to the sitemap route, which returns an empty <urlset>
+      // for a non-canonical host.
       { source: "/robots.txt", has: OLD_HOST, destination: "https://poskoo.com/robots.txt", permanent: true },
       { source: "/robots.txt", has: OLD_FORWARDED_HOST, destination: "https://poskoo.com/robots.txt", permanent: true },
       {
         // Old staging host: send every page to the same path on poskoo.com.
         // /api and /api/* are excluded so webhooks or OAuth callbacks still registered on the old host keep working.
-        source: "/:path((?!api(?:/|$)).*)",
+        source: "/:path((?!api(?:/|$))(?!sitemap\\.xml$).*)",
         has: OLD_HOST,
         destination: "https://poskoo.com/:path",
         permanent: true,
       },
       // Same catch-all for proxies/CDNs that forward the original host header.
       {
-        source: "/:path((?!api(?:/|$)).*)",
+        source: "/:path((?!api(?:/|$))(?!sitemap\\.xml$).*)",
         has: OLD_FORWARDED_HOST,
         destination: "https://poskoo.com/:path",
         permanent: true,
