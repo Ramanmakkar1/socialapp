@@ -5,17 +5,20 @@
 //      same helper as social_accounts.access_token_enc) in socialapp.app_settings
 //      (db/migrations/050_app_settings.sql).
 //
-// The stored key is cached in memory for 60 seconds (on globalThis, so every route bundle in the
-// process shares it) and the cache is dropped on save / remove. During `next build` and without a
-// database it is never read: the build fails closed to "AI not configured", and static pages pick
-// the key up when they revalidate at runtime.
+// The stored key is cached in memory for 10 minutes (on globalThis, so every route bundle in the
+// process shares it) and the cache is dropped on save / remove, so an admin change is still picked
+// up immediately. During `next build` and without a database it is never read: the build fails
+// closed to "AI not configured", and static pages pick the key up when they revalidate at runtime.
 //
 // Never log a key or put it in an error message; only the last 4 characters (`hint`) leave here.
 import { decryptToken, encryptToken } from "@/lib/crypto";
 import { isDbConfigured, query } from "@/lib/db";
 
 export const ANTHROPIC_KEY_SETTING = "anthropic_api_key";
-const CACHE_MS = 60_000;
+// The homepage revalidates every 10 minutes, so a 10-minute cache means an ISR
+// regeneration normally reuses the last answer instead of querying the database.
+// Saves/removes call bustAnthropicKeyCache(), so admin changes are still instant.
+const CACHE_MS = 10 * 60_000;
 // Keep serving the last known answer while a refresh is in flight so a page
 // render (or an ISR regeneration) never waits on a cold/slow database.
 const STALE_MS = 10 * 60_000;

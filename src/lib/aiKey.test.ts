@@ -66,7 +66,7 @@ test("resolveAnthropicKey: falls back to the stored key, cached, and readiness f
       assert.equal(await resolveAnthropicKey(), FAKE_KEY);
       assert.equal(await isFeatureReadyNow("ai"), true);
       assert.deepEqual(await planReadinessNow(), { paidPlans: false, ai: true });
-      assert.equal(calls.length, 1, "second and third reads come from the 60 s cache");
+      assert.equal(calls.length, 1, "second and third reads come from the in-memory cache");
     });
   } finally {
     restore();
