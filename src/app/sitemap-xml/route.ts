@@ -5,7 +5,7 @@
 // browsers show a "This site uses XSLT" warning and render a purple HTML page for
 // a URL that crawlers expect to be plain XML. next.config rewrites /sitemap.xml here.
 import sitemap from "@/app/sitemap";
-import { BRAND } from "@/lib/brand";
+import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -25,8 +25,14 @@ function formatLastMod(value: Date | string | undefined): string | null {
   return date.toISOString();
 }
 
-export async function GET() {
-  const urls = (await sitemap())
+export async function GET(request?: Request) {
+  // A non-canonical (staging/legacy) host is always noindex, so it must never
+  // advertise URLs in its sitemap even if a redirect is bypassed. The canonical
+  // host keeps the normal sitemap; tests call GET() without a request.
+  const requestHost = request ? new URL(request.url).host.toLowerCase() : null;
+  const hostIsIndexable =
+    requestHost === null || isApprovedProductionOrigin(`https://${requestHost}`);
+  const urls = (hostIsIndexable ? await sitemap() : [])
     .map((entry) => {
       const lastmod = formatLastMod(entry.lastModified);
       const changefreq = entry.changeFrequency

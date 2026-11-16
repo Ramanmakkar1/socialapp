@@ -91,3 +91,18 @@ test("fetchMediaInsights rethrows permission errors instead of retrying per metr
   await assert.rejects(fetchMediaInsights("m1", "tok", null, "feed", fakeFetch));
   assert.equal(calls, 1);
 });
+
+test("fetchMediaInsights sends the token in the Authorization header, never in the URL", async () => {
+  const seen: { url: string; auth: string | undefined }[] = [];
+  const fakeFetch = (async (url: string, init?: RequestInit) => {
+    seen.push({ url, auth: (init?.headers as Record<string, string> | undefined)?.Authorization });
+    return jsonResponse(200, { data: [{ name: "reach", values: [{ value: 1 }] }] });
+  }) as unknown as typeof fetch;
+  const { fetchMediaInsights } = await import("./insights.ts");
+  await fetchMediaInsights("m-1", "secret-token", "facebook_login", "feed", fakeFetch);
+  assert.ok(seen.length > 0);
+  for (const s of seen) {
+    assert.doesNotMatch(s.url, /access_token|secret-token/);
+    assert.equal(s.auth, "Bearer secret-token");
+  }
+});

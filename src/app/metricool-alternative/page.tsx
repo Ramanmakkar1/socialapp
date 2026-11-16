@@ -18,7 +18,7 @@ import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 export const revalidate = 600;
 
 export const metadata: Metadata = withSocial({
-  title: { absolute: "Metricool Alternative: Scheduler + Auto-DM | Poskoo" },
+  title: { absolute: "Metricool Alternative: Free Scheduler + Auto-DM | Poskoo" },
   description:
     "Compare Poskoo with Metricool: schedule social posts, add Instagram comment-to-DM automation, capture leads and start free with no credit card today.",
   alternates: { canonical: "/metricool-alternative" },

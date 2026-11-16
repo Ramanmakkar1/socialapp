@@ -76,8 +76,11 @@ async function requestInsights(
   authType: string | null | undefined,
   fetchImpl: typeof fetch,
 ): Promise<MediaInsights> {
-  const params = new URLSearchParams({ metric: metrics.join(","), access_token: token });
+  // Token in the Authorization header (both graph.instagram.com and graph.facebook.com accept it),
+  // never in the URL where proxies, logs and error messages would keep it.
+  const params = new URLSearchParams({ metric: metrics.join(",") });
   const res = await fetchImpl(`${graphBaseFor(authType)}/${encodeURIComponent(mediaId)}/insights?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
     signal: AbortSignal.timeout(15_000),
   });

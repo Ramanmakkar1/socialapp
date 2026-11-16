@@ -1,7 +1,9 @@
 // Per-user limits for user-started AI actions (caption ideas, DM message ideas):
 // a short burst limit per minute (in memory, src/lib/rateLimit.ts) and a monthly quota (DB, migration 039).
-// No plan gating here on purpose (owner decision pending).
+// Plan gating (AI is a Pro / Agency feature) runs first, through src/lib/planFeatures.ts; it is only
+// enforced once paid plans are on sale (see the ROLLOUT note there).
 import { query } from "@/lib/db";
+import { requirePlanFeature } from "@/lib/planFeatures";
 import { utcMonthRange } from "@/lib/planLimits";
 import { rateLimit } from "@/lib/rateLimit";
 
@@ -29,6 +31,9 @@ function isMissingTable(err: unknown): boolean {
  * statement, so parallel clicks cannot go far past the quota.
  */
 export async function consumeAiRequest(userId: string, kind: AiKind, now = new Date()): Promise<AiQuotaResult> {
+  // Every user-started AI action (captions, per-network variants, DM ideas, campaign drafts) passes here.
+  const gate = await requirePlanFeature(userId, "ai");
+  if (!gate.ok) return { ok: false, error: gate.error };
   const burst = rateLimit(`ai:${userId}`, AI_REQUESTS_PER_MINUTE, 60_000, now.getTime());
   if (!burst.ok) return { ok: false, error: aiBurstMessage(burst.retryAfterMs) };
   const { start } = utcMonthRange(now);

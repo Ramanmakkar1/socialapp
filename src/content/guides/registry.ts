@@ -547,6 +547,642 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["cheapest-social-media-scheduling-tools-2026", "social-media-seo-2026"],
   },
+  {
+    slug: "instagram-comment-to-dm-automation-guide",
+    title: "Instagram Comment-to-DM Automation: The 2026 Playbook",
+    description:
+      "How Instagram comment-to-DM automation works under Meta's rules, with keyword lists, DM templates, follow and email gates, and a step-by-step setup.",
+    h1: "Instagram comment-to-DM automation: the complete playbook",
+    subtitle:
+      "Meta's rules in plain English, keywords people actually type, DM templates to copy, and how to set it up and measure it.",
+    crumb: "Comment-to-DM playbook",
+    excerpt: "Meta's rules, keyword lists, DM templates and a step-by-step setup.",
+    category: "auto-dm",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1790,
+    cover: {
+      src: "/landing/hero.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman sits on a giant phone showing a post with a GUIDE comment bubble, beside a calendar of scheduled posts, while an envelope with a link flies to a waving man holding a coffee and a dog looks on",
+    },
+    takeaways: [
+      "Comment-to-DM automation sends a private message to anyone who comments your keyword, using Meta's official API.",
+      "Meta allows one private reply per comment, sent within 7 days; follow-ups need the person to reply first.",
+      "Pick one short keyword per offer, add variants like GUIDE and GUIDES, and use contains match by default.",
+      "Deliver the promised link in the first two lines of the DM and end with a question to start a real conversation.",
+      "Track keyword comments, DMs sent, link clicks and leads, and fix the weakest step first.",
+    ],
+    faqs: [
+      {
+        q: "Is Instagram comment-to-DM automation allowed?",
+        a: "Yes, when it runs through Meta's official Instagram API. Private replies are a documented feature for Business and Creator accounts. Avoid tools that ask for your password or message people who never commented.",
+      },
+      {
+        q: "How many DMs can I send per comment?",
+        a: "Meta allows one private reply per comment, sent within 7 days of the comment. If the person replies, a standard messaging window opens and you can continue the conversation.",
+      },
+      {
+        q: "Do I need a Business or Creator account?",
+        a: "Yes. Automated DMs only work on Instagram professional accounts. Switching from a personal account is free and takes about a minute in the Instagram app.",
+      },
+      {
+        q: "What makes a good comment keyword?",
+        a: "A short, uncommon word that says what the person gets, such as GUIDE, PRICE or SHOP. Add common variants such as plurals, and show the keyword in the caption and on the post itself.",
+      },
+      {
+        q: "Can I collect emails with comment-to-DM?",
+        a: "Yes. In Poskoo, turn on Ask for email first and the DM asks for an address before sending the link. Captured emails are saved in Leads and can be exported as CSV. Check the pricing page for which plan includes email capture.",
+      },
+      {
+        q: "Why didn't my auto-DM send?",
+        a: "Common causes are a comment that doesn't match the keyword, an exact match rule when people wrote a sentence, a paused rule, or a disconnected account. Test your keywords first and check the rule's activity.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-comment-keyword-tester",
+      "/tools/instagram-comment-to-dm-preview",
+      "/tools/instagram-comment-to-dm-calculator",
+      "/tools/instagram-dm-link-generator",
+      "/tools/instagram-utm-builder",
+    ],
+    related: ["best-instagram-auto-dm-tools-2026", "how-to-get-more-comments-on-instagram"],
+  },
+  {
+    slug: "how-to-get-more-comments-on-instagram",
+    title: "How to Get More Comments on Instagram: 12 Tactics",
+    description:
+      "12 ways to get more comments on Instagram, with sample captions, a reply routine, what to avoid and how to turn comments into DMs and leads.",
+    h1: "How to get more comments on Instagram (and turn them into leads)",
+    subtitle:
+      "Twelve tactics with sample captions, a reply routine that keeps people talking, and a two-week plan to find what works for you.",
+    crumb: "Get more Instagram comments",
+    excerpt: "12 tactics, sample captions and a 2-week plan to get more comments.",
+    category: "growth",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1670,
+    cover: {
+      src: "/illustrations/empty-inbox.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman on a purple beanbag holds a phone while colourful chat bubbles fly into a giant phone, with a dog asleep beside her",
+    },
+    takeaways: [
+      "Ask one specific, easy question per post; \"A or B?\" gets more replies than \"Thoughts?\".",
+      "Put the question on screen and say it out loud in Reels, not only in the caption.",
+      "Reply to every comment early and ask something back to turn single comments into threads.",
+      "Skip engagement bait, comment pods and bought comments: they add noise, not customers.",
+      "Use a keyword call to action with comment-to-DM automation to turn comments into leads.",
+    ],
+    faqs: [
+      {
+        q: "Why am I getting views but no comments on Instagram?",
+        a: "Usually because the post doesn't ask for a comment, or asks in a way that takes effort. End with one specific question or an A-or-B choice, put it on screen, and reply quickly to the first comments.",
+      },
+      {
+        q: "Do comments help Instagram reach?",
+        a: "Comments show that people found a post worth responding to, along with saves and shares. Treat them as one signal of interest rather than a guaranteed reach boost, and focus on content people want to talk about.",
+      },
+      {
+        q: "Are comment pods allowed on Instagram?",
+        a: "They are a poor idea. Pods bring comments from people who are not your audience, make your Insights harder to read and can look inauthentic. Real replies from your niche are worth more.",
+      },
+      {
+        q: "How quickly should I reply to comments?",
+        a: "As soon as you can, ideally in the first hour after posting. Early replies keep the conversation going while the post is being shown, and they encourage others to join in.",
+      },
+      {
+        q: "What is a keyword comment call to action?",
+        a: "A line such as \"Comment GUIDE and I'll send you the checklist\". When someone comments the keyword, comment-to-DM automation sends them the link in a private message.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-engagement-rate-calculator",
+      "/tools/instagram-hook-generator",
+      "/tools/instagram-caption-generator",
+      "/tools/instagram-comment-picker",
+      "/tools/instagram-comment-keyword-tester",
+    ],
+    related: ["instagram-comment-to-dm-automation-guide", "how-to-get-more-instagram-followers"],
+  },
+  {
+    slug: "how-to-find-your-best-time-to-post",
+    title: "Best Time to Post on Social Media: Find Your Own in 2026",
+    description:
+      "There is no universal best time to post. Find yours: pick starting slots, read each platform's audience data, run a 2-3 week test and log results the right way.",
+    h1: "How to find your best time to post on social media",
+    subtitle:
+      "A simple method instead of a generic chart: where to find your audience data on each platform, how to run a fair timing test and how to handle time zones.",
+    crumb: "Find your best time to post",
+    excerpt: "Skip the generic charts: test your own slots and keep the winners.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1910,
+    cover: {
+      src: "/landing/multichannel.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman on a yellow beanbag with a laptop sends paper planes to phones, tablets and a desktop screen, each with a clock, while a dog sits beside her",
+    },
+    takeaways: [
+      "There is no single best time for every account: the best time is when your own audience is online.",
+      "Start with two or three slots (morning, lunch, evening) on your audience's clock, then check each platform's audience data.",
+      "Test the slots for two to three weeks with the same format, scheduled to the exact minute, and log results at 48 hours.",
+      "Compare like with like, use rates rather than totals, and look for a pattern instead of one viral post.",
+      "Re-test every few months, because audiences, seasons and platforms change.",
+    ],
+    faqs: [
+      {
+        q: "What is the best time to post on social media?",
+        a: "There is no single best time for every account. Good starting points are before work, lunchtime and the evening in your audience's time zone, but the real answer comes from your own analytics and a two to three week test of a few slots.",
+      },
+      {
+        q: "Where can I see when my Instagram followers are online?",
+        a: "With a professional account, open Insights from your professional dashboard and look at your followers. The Most active times chart shows the hours and days your followers use Instagram.",
+      },
+      {
+        q: "Does posting time affect reach?",
+        a: "It can help a little. Feeds are ranked rather than shown in time order, but a post that gets early views and replies has a better chance of being shown to more people. Content quality matters more than timing.",
+      },
+      {
+        q: "Should I post at the same time on every platform?",
+        a: "No. People use LinkedIn, Instagram, Threads and YouTube at different times and in different moods. Test each platform separately and keep the slots that win on each one.",
+      },
+      {
+        q: "How long should a posting time test run?",
+        a: "Two to three weeks is usually enough for a first answer, with at least three or four posts per slot. Rotate slots across days so no slot always gets the best day, then keep the winner and test a new slot next month.",
+      },
+      {
+        q: "What if my followers are in different time zones?",
+        a: "Post on the clock of your largest audience region. With two big regions, look for an overlapping hour or alternate slots on different days. If your audience is spread worldwide, timing matters less than a steady rhythm.",
+      },
+    ],
+    tools: [
+      "/tools/best-time-to-post-on-social-media",
+      "/tools/best-time-to-post-on-instagram",
+      "/tools/best-time-to-post-on-linkedin",
+      "/tools/best-time-to-post-on-threads",
+      "/tools/best-time-to-post-on-tiktok",
+      "/tools/instagram-time-zone-converter",
+      "/tools/instagram-engagement-rate-calculator",
+    ],
+    related: ["social-media-content-calendar-guide", "how-to-schedule-instagram-posts"],
+  },
+  {
+    slug: "social-media-content-calendar-guide",
+    title: "Social Media Content Calendar: Plan a Month in an Hour",
+    description:
+      "How to build a social media content calendar in one hour: goals, content pillars, a format mix, a sample 4-week plan you can copy and a weekly batching routine.",
+    h1: "How to plan a social media content calendar (a month in one hour)",
+    subtitle:
+      "A timed, step-by-step method with content pillars, a full sample month for a small business, a weekly batching routine and a 15-minute monthly review.",
+    crumb: "Social media content calendar",
+    excerpt: "Plan a month of posts in an hour, with a sample calendar you can copy.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1850,
+    cover: {
+      src: "/illustrations/empty-calendar.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman kneels beside a giant spiral wall calendar, pinning colourful photo cards into its squares, while a dog lies in the plants beside her",
+    },
+    takeaways: [
+      "A content calendar only needs five columns: date, platform, format, content pillar and a one-line idea.",
+      "Time-box the hour: 10 minutes on goal and pillars, 15 on ideas, 10 on a format mix, 15 filling the calendar and 10 scheduling week one.",
+      "Three or four content pillars (teach, show, prove, sell) mean you never start from a blank page.",
+      "Batch each week in one sitting and leave one open slot a week for reactive posts.",
+      "Review the month in 15 minutes before planning the next: goal, top three posts, best pillar and what you skipped.",
+    ],
+    faqs: [
+      {
+        q: "What should a social media content calendar include?",
+        a: "At minimum the date, the platform, the format (Reel, carousel, photo, text post), the content pillar it belongs to and a one-line idea specific enough to make. A status column and a link to the caption or media are useful extras.",
+      },
+      {
+        q: "How far ahead should I plan social media content?",
+        a: "A month is a practical horizon for most small businesses: far enough to plan launches and events, short enough to stay relevant. Batch and schedule one week at a time, and keep one open slot a week for timely posts.",
+      },
+      {
+        q: "How many posts a week should be on my calendar?",
+        a: "Plan the number you can keep for three months. For many small teams that is three to five feed posts a week plus Stories. If you planned five and made three last month, plan four this month.",
+      },
+      {
+        q: "Is a spreadsheet good enough for a content calendar?",
+        a: "Yes. A spreadsheet works well for planning. Poskoo's free content calendar template exports a CSV for Google Sheets or Excel. Once you post to several networks, a scheduler with a calendar view saves you copying posts into each app.",
+      },
+      {
+        q: "Can AI plan my social media calendar?",
+        a: "AI assistants such as ChatGPT or Claude are useful for brainstorming ideas from your goal and pillars. Edit what they suggest so it sounds like you and check any facts. Poskoo's MCP server can let an assistant create draft posts in your account for review.",
+      },
+      {
+        q: "What are content pillars?",
+        a: "Content pillars are the three or four recurring themes you post about, such as teaching, behind the scenes, customer proof and offers. They make planning faster and help new visitors understand what your account is about.",
+      },
+    ],
+    tools: [
+      "/tools/social-media-content-calendar",
+      "/tools/instagram-post-ideas-generator",
+      "/tools/social-media-post-generator",
+      "/tools/best-time-to-post-on-social-media",
+      "/tools/instagram-posting-frequency-calculator",
+      "/tools/instagram-hook-generator",
+    ],
+    related: ["how-to-find-your-best-time-to-post", "how-to-cross-post-on-social-media"],
+  },
+  {
+    slug: "instagram-reels-strategy-for-small-business",
+    title: "Instagram Reels Strategy for Small Business (2026)",
+    description:
+      "An Instagram Reels strategy for small businesses: 8 formats with examples, hooks, length, safe zones, a weekly routine and how to turn views into DMs.",
+    h1: "Instagram Reels strategy for small businesses",
+    subtitle:
+      "Eight Reel formats with real examples, hooks for the first two seconds, a weekly routine that fits around work, and a way to turn views into customers.",
+    crumb: "Reels strategy for small business",
+    excerpt: "8 Reel formats, hooks and a weekly routine that turns views into DMs.",
+    category: "growth",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1720,
+    cover: {
+      src: "/illustrations/analytics.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman waters a row of rising green bar-chart plants with a watering can while hearts and an upward arrow float above, a dog beside her",
+    },
+    takeaways: [
+      "Post two or three original Reels a week; Instagram recommends originals and drops aggregators from recommendations.",
+      "Rotate three formats: one that shows skill, one that builds trust and one that helps the viewer.",
+      "Say, show and write your hook in the first two seconds, with no greeting first.",
+      "Film in one weekly batch on your phone, then schedule the Reels so posting never depends on a quiet moment.",
+      "End each Reel with one comment keyword and judge it by non-follower reach, shares and saves, not likes.",
+    ],
+    faqs: [
+      {
+        q: "How many Reels should a small business post each week?",
+        a: "Two or three a week is a realistic target for most small businesses. Pick a number you can keep for three months. A steady rhythm teaches you more than a burst of daily posting that stops after two weeks.",
+      },
+      {
+        q: "How long should an Instagram Reel be?",
+        a: "As long as the idea needs. Reels can be up to three minutes, but quick tips often work at 7 to 20 seconds and explainers at 30 to 60 seconds. Check where viewers drop off in Insights and tighten the next one.",
+      },
+      {
+        q: "Do I need to show my face in Reels?",
+        a: "No. Hands at work, a process, a before and after or a product demo all work without a face. Showing the team now and then does help people trust a small business, so try it once you are comfortable.",
+      },
+      {
+        q: "Can I repost my TikTok videos as Reels?",
+        a: "Yes, if they are your own videos. Download or export a clean file without another app's watermark first. Instagram does not treat watermarked content as eligible for recommendations.",
+      },
+      {
+        q: "Should I use trending audio?",
+        a: "Only when it fits the video. Clear speech or original sound that explains your work is usually more useful to a small business than a trending song with no connection to what you sell.",
+      },
+      {
+        q: "Can I schedule Instagram Reels?",
+        a: "Yes. Instagram lets professional accounts schedule in the app, and Poskoo schedules Reels from a browser alongside your other posts, then can auto-DM everyone who comments your keyword.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-reels-size-checker",
+      "/tools/instagram-safe-zone-checker",
+      "/tools/instagram-reel-cover-maker",
+      "/tools/instagram-hook-generator",
+      "/tools/instagram-post-ideas-generator",
+      "/tools/instagram-engagement-rate-calculator",
+    ],
+    related: ["how-to-get-more-instagram-followers", "instagram-comment-to-dm-automation-guide"],
+  },
+  {
+    slug: "link-in-bio-best-practices",
+    title: "Link in Bio Best Practices: What to Put on Yours",
+    description:
+      "Link in bio best practices: what to put on the page, in what order, how to word links, track clicks with UTMs and keep it in step with your latest posts.",
+    h1: "Link in bio best practices: what to put on yours and how to get clicks",
+    subtitle:
+      "One main action, three to five links, labels that say what people get, and a page that changes when your posts do. With examples for creators, local businesses and coaches.",
+    crumb: "Link in bio best practices",
+    excerpt: "What to put on your link-in-bio page, in what order, and how to track clicks.",
+    category: "auto-dm",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1790,
+    cover: {
+      src: "/guides/how-to-make-money-on-social-media-2026.webp",
+      width: 1280,
+      height: 720,
+      alt: "A creator with a phone sends dotted paths out to a chain link, a gift box, a download folder, a video camera and a shop card, beside a piggy bank catching a coin",
+    },
+    takeaways: [
+      "Put one main action at the top of your link-in-bio page and keep the whole list to three to five links.",
+      "Instagram allows up to five bio links, but only the first shows in your bio; the rest sit behind a tap.",
+      "Write labels that start with a verb and say what people get, such as \"Free 7-day meal plan (PDF)\".",
+      "Track clicks per link and add UTM parameters so you can see what visitors do after the click.",
+      "Update the top link whenever a post says \"link in bio\", and review the page once a month.",
+    ],
+    faqs: [
+      {
+        q: "How many links should a link-in-bio page have?",
+        a: "Three to five is enough for most accounts. Put the one action you most want first, then the link from your latest post, a free resource, your main offer and one contact or trust link. More links usually means fewer clicks on the ones that matter.",
+      },
+      {
+        q: "Can you add more than one link to an Instagram bio?",
+        a: "Yes. Since April 2023 Instagram lets you add up to five links under Edit profile, then Links. Only the first link shows directly in your bio; the others appear in a pop-up when someone taps to see more.",
+      },
+      {
+        q: "Do I still need a link-in-bio tool if Instagram allows five links?",
+        a: "Not always. If you have one main destination, the native link is enough. A link-in-bio page helps when you promote different things from different posts, want click counts per link, or use the same link on several platforms.",
+      },
+      {
+        q: "How do I track clicks on my link in bio?",
+        a: "Use a link-in-bio tool that counts clicks per link, and add UTM parameters such as utm_source=instagram and utm_campaign=bio to each destination so your website analytics can show sign-ups and sales from those visits.",
+      },
+      {
+        q: "What should my first link in bio be?",
+        a: "The action that matches what you are posting about right now: the freebie from this week's Reel, a booking page or a product launch. Change it when your content moves on.",
+      },
+      {
+        q: "Is Poskoo's link in bio free?",
+        a: "Yes. The Free plan includes a link-in-bio page with up to 5 links, four colour themes and click counts per link. The Pro plan raises the limit to 20 links and is launching soon.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-utm-builder",
+      "/tools/instagram-bio-generator",
+      "/tools/instagram-dm-link-generator",
+      "/tools/instagram-comment-to-dm-preview",
+      "/tools/instagram-profile-picture-size-checker",
+    ],
+    related: ["how-to-grow-email-list-from-instagram", "instagram-comment-to-dm-automation-guide"],
+  },
+  {
+    slug: "how-to-grow-email-list-from-instagram",
+    title: "How to Grow Your Email List From Instagram (2026)",
+    description:
+      "Grow your email list from Instagram: lead magnet ideas, where to promote them, comment-to-DM email capture, consent basics and a 3-email welcome sequence.",
+    h1: "How to grow your email list from Instagram",
+    subtitle:
+      "Pick a freebie people want, promote it in every spot on your profile, collect emails in DMs with clear consent, and welcome new subscribers properly.",
+    crumb: "Grow an email list from Instagram",
+    excerpt: "Lead magnets, comment-to-DM email capture and a 3-email welcome sequence.",
+    category: "auto-dm",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1680,
+    cover: {
+      src: "/illustrations/empty-leads.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman holding a big horseshoe magnet pulls in envelopes and round contact portraits that drop into a red box, a dog lying beside her",
+    },
+    takeaways: [
+      "Followers are rented; an email list is the audience you own if reach drops or your account has trouble.",
+      "Offer one small, specific freebie tied to what you sell, usable in under 15 minutes.",
+      "Promote it in your bio link, Stories, Reels, carousel last slides, comment and DM keywords and a Highlight.",
+      "Ask for the email in the DM with a plain consent line, then send the link straight away.",
+      "Follow CAN-SPAM basics, check local rules such as GDPR or CASL, and send a short welcome sequence.",
+    ],
+    faqs: [
+      {
+        q: "What is the best lead magnet for Instagram?",
+        a: "A small, specific resource connected to what you sell: a checklist, template, short plan, discount or early access. If people already ask you for it in DMs, it is a strong first choice.",
+      },
+      {
+        q: "Can I collect emails directly in Instagram DMs?",
+        a: "Yes. A comment-to-DM tool can ask for an email in the private reply and send the link once the person answers. Say clearly in the DM that they are joining your email list.",
+      },
+      {
+        q: "Is it legal to email people who commented on my post?",
+        a: "Only with permission to email them. A comment is a request for the freebie, not consent to marketing. Tell people they are joining your list, include an unsubscribe link and follow the rules where your subscribers live. This is not legal advice.",
+      },
+      {
+        q: "Should I use a landing page or collect emails in DMs?",
+        a: "Both work. DMs are easiest for comment keywords on Reels and carousels. A landing page suits your bio link, Story stickers and ads, where you have room to explain the offer.",
+      },
+      {
+        q: "How do I get Instagram leads into my email tool?",
+        a: "In Poskoo, captured contacts appear in your leads list and can be exported as a CSV, which most email tools can import. Use a separate tag or list so you know they came from Instagram.",
+      },
+      {
+        q: "How often should I email my new subscribers?",
+        a: "Send a short welcome sequence over the first week, then weekly or every two weeks. A steady rhythm matters more than a high frequency.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-utm-builder",
+      "/tools/instagram-dm-link-generator",
+      "/tools/instagram-comment-keyword-tester",
+      "/tools/instagram-comment-to-dm-preview",
+      "/tools/instagram-comment-to-dm-calculator",
+      "/tools/instagram-bio-generator",
+    ],
+    related: ["instagram-comment-to-dm-automation-guide", "link-in-bio-best-practices"],
+  },
+  {
+    slug: "linkedin-posting-strategy-for-founders",
+    title: "LinkedIn Posting Strategy for Founders and Coaches",
+    description:
+      "LinkedIn posting strategy for founders and coaches: fix your profile, choose content pillars, write strong openers, post 2-3 times a week, use a 4-week plan.",
+    h1: "A LinkedIn posting strategy for founders and coaches",
+    subtitle:
+      "Profile fixes, content pillars, opening lines that earn the \"...more\" tap, three sample posts and a four-week plan you can keep alongside running a business.",
+    crumb: "LinkedIn strategy for founders",
+    excerpt: "Profile, content pillars, hooks, sample posts and a 4-week LinkedIn plan.",
+    category: "ideas",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1790,
+    cover: {
+      src: "/landing/onesub.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman relaxing in a blue armchair holds up a star badge while post cards fly out of an open window, with a piggy bank, a potted plant and a dog nearby",
+    },
+    takeaways: [
+      "Fix your headline, About section and Featured items before you post: every good post sends people to your profile.",
+      "Pick three or four content pillars you can talk about for a year and list 20 ideas under each.",
+      "The first lines before \"...more\" decide whether anyone reads the rest, so write them like a headline.",
+      "Two or three posts a week from your personal profile, plus daily comments on other posts, is a pace you can keep.",
+      "Judge posts by members reached, comments, profile views and DMs, not by likes.",
+    ],
+    faqs: [
+      {
+        q: "How often should a founder post on LinkedIn?",
+        a: "Two or three times a week is a realistic pace for most founders and coaches. Pick fixed days, write in one batch and schedule the posts, so the plan survives busy weeks.",
+      },
+      {
+        q: "Should I post from my personal profile or my company Page?",
+        a: "For founders and coaches, the personal profile usually reaches more of the right people, because posts go to your own network first and people follow people. Use the company Page for product news, jobs and credibility.",
+      },
+      {
+        q: "What should founders post about on LinkedIn?",
+        a: "Pick three or four pillars: lessons from building, how-to posts for your customer, your point of view on your industry, and client stories or proof. Rotate through them and make sure some posts connect to the problem your offer solves.",
+      },
+      {
+        q: "Do hashtags matter on LinkedIn?",
+        a: "They are a small detail. A clear opening line and a useful post matter far more. If you use hashtags, keep to a couple of specific ones that describe the topic.",
+      },
+      {
+        q: "Can I schedule LinkedIn posts?",
+        a: "Yes. LinkedIn's post composer has a clock icon for picking a future time. Poskoo also schedules text and image posts to personal LinkedIn profiles; publishing to company Pages is waiting on LinkedIn's API approval.",
+      },
+      {
+        q: "How do I know if my LinkedIn posts are working?",
+        a: "Open a post's analytics and look at members reached, out-of-network impressions, comments and profile views, then note which posts start DMs or calls. Compare posts with an engagement rate calculator rather than counting likes.",
+      },
+    ],
+    tools: [
+      "/tools/linkedin-hook-generator",
+      "/tools/linkedin-headline-generator",
+      "/tools/linkedin-summary-generator",
+      "/tools/linkedin-post-preview",
+      "/tools/linkedin-text-formatter",
+      "/tools/linkedin-character-counter",
+      "/tools/linkedin-engagement-rate-calculator",
+      "/tools/best-time-to-post-on-linkedin",
+    ],
+    related: ["how-to-find-your-best-time-to-post", "how-to-cross-post-on-social-media"],
+  },
+  {
+    slug: "threads-vs-bluesky-for-brands",
+    title: "Threads vs Bluesky: Which Should Your Brand Use in 2026?",
+    description:
+      "Threads vs Bluesky for brands: who is on each, limits, tone and discovery compared, which business fits where, sample posts and a 30-day plan to test both.",
+    h1: "Threads vs Bluesky: should your brand be there, and how to start",
+    subtitle:
+      "A side-by-side comparison, a fit table by business type, sample posts for each app and a 30-day plan to test both without doubling your work.",
+    crumb: "Threads vs Bluesky",
+    excerpt: "Which text app fits your brand, what to post and a 30-day test.",
+    category: "ideas",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1700,
+    cover: {
+      src: "/illustrations/connect-account.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman plugs a cable from a big phone into a smiling cloud, with a padlock speech bubble and a dog watching",
+    },
+    takeaways: [
+      "Start with Threads if your customers already follow you on Instagram; start with Bluesky if your buyers are in tech, media or research.",
+      "Threads posts can run to 500 characters and Bluesky posts to 300, so draft at 300 and both will fit.",
+      "On Bluesky, use your own domain as your handle and get into starter packs and topic feeds for your niche.",
+      "Replies matter more than posts on both apps: plan as much time for conversation as for publishing.",
+      "Test both for 30 days at three posts a week, then judge on replies, profile visits and link clicks, not followers.",
+    ],
+    faqs: [
+      {
+        q: "Is Threads or Bluesky better for business?",
+        a: "It depends on where your customers are. Threads suits consumer brands, creators and local businesses that already have an Instagram audience. Bluesky suits tech, media, research and B2B brands whose audience values direct, expert posts. Many brands test both for a month and keep the one that brings more conversations.",
+      },
+      {
+        q: "How many people use Threads?",
+        a: "In August 2025, Instagram head Adam Mosseri said Threads had passed 400 million monthly active users, as reported by TechCrunch.",
+      },
+      {
+        q: "What is the character limit on Threads and Bluesky?",
+        a: "A Threads post can have up to 500 characters and up to 5 links. A Bluesky post can have up to 300 characters, counted as graphemes, so most emoji count as one.",
+      },
+      {
+        q: "Can I use my website as my Bluesky handle?",
+        a: "Yes. Bluesky lets you set your own domain as your handle by adding a DNS record, and recommends it for official organisations because it works as a form of verification.",
+      },
+      {
+        q: "Can I post to Threads and Bluesky at the same time?",
+        a: "Yes. A scheduler such as Poskoo publishes to both. Write the post once, customise the Threads and Bluesky versions in their own tabs, pick a time and schedule it.",
+      },
+      {
+        q: "Do Threads posts show up on Mastodon?",
+        a: "Only if you turn on fediverse sharing in your Threads account settings. Then your future public posts can be seen and followed from Mastodon and other fediverse servers.",
+      },
+    ],
+    tools: [
+      "/tools/threads-character-counter",
+      "/tools/bluesky-character-counter",
+      "/tools/threads-post-generator",
+      "/tools/threads-bio-generator",
+      "/tools/threads-tools",
+      "/tools/instagram-utm-builder",
+    ],
+    related: ["how-to-cross-post-on-social-media", "social-media-seo-2026"],
+  },
+  {
+    slug: "how-to-cross-post-on-social-media",
+    title: "How to Cross-Post on Social Media Without Looking Lazy",
+    description:
+      "How to cross-post on social media the right way: what to tailor on each network, one idea turned into five native posts, watermark rules and a checklist.",
+    h1: "How to cross-post on social media without looking lazy",
+    subtitle:
+      "Share one idea everywhere, but change the format, first line, hashtags, links and call to action for each network. A worked example and a checklist inside.",
+    crumb: "Cross-posting done right",
+    excerpt: "What to change per network, a worked example and a checklist.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1610,
+    cover: {
+      src: "/illustrations/free-tools.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman with a paintbrush unpacks a blue toolbox full of a hashtag, ruler, scissors, magnifying glass and photo cards, a puppy beside her",
+    },
+    takeaways: [
+      "Cross-post the idea, not the copy: change the format, first line, length, hashtags, links and call to action per network.",
+      "Upload clean original files. Instagram lists no visible watermarks as a condition for recommendations.",
+      "Keep replies, trend formats and platform features such as polls or comment keywords native to one network.",
+      "Stagger networks by an hour or two so you can answer the first replies on each.",
+      "In Poskoo, write one caption, tick the networks, then customise each network's version before scheduling.",
+    ],
+    faqs: [
+      {
+        q: "Is cross-posting bad for reach?",
+        a: "Cross-posting itself is not the problem. Posts that look pasted in, carry another app's watermark or ignore a network's format tend to do worse. Tailor the format, first line, hashtags and call to action, and upload clean files.",
+      },
+      {
+        q: "What is the difference between cross-posting and repurposing?",
+        a: "Cross-posting publishes the same piece on several networks with small edits. Repurposing turns one piece into a new format, such as a blog post into a carousel or a short video. Most calendars use both.",
+      },
+      {
+        q: "Should I post to every network at the same time?",
+        a: "Not necessarily. Staggering networks by an hour or two lets you reply to each wave of comments while the post is fresh, and leaving a day between near-identical versions helps if the same people follow you in two places.",
+      },
+      {
+        q: "Can I cross-post TikToks to Instagram Reels?",
+        a: "Yes, but upload the original video from your editor rather than a download with the TikTok watermark. Instagram says content with visible watermarks is not eligible for recommendations.",
+      },
+      {
+        q: "Which networks can Poskoo cross-post to?",
+        a: "Poskoo publishes today to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles, Bluesky and Mastodon. TikTok, Pinterest, X and LinkedIn Pages are waiting on platform approval.",
+      },
+      {
+        q: "Can I write a different caption for each network in Poskoo?",
+        a: "Yes. Write the main caption, then tick Customize on a network's tab to give that network its own version. The composer checks each version against that network's character limit.",
+      },
+    ],
+    tools: [
+      "/tools/social-media-image-sizes",
+      "/tools/social-media-post-generator",
+      "/tools/instagram-caption-formatter",
+      "/tools/threads-character-counter",
+      "/tools/bluesky-character-counter",
+      "/tools/instagram-safe-zone-checker",
+    ],
+    related: ["threads-vs-bluesky-for-brands", "how-to-schedule-instagram-posts"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */

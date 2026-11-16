@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { linkTokenError } from "@/lib/rules";
-import { createDmRuleForUser, resolveSocialAccountId, UUID_RE, validateFormInput, type RuleFormInput } from "@/lib/dmRuleCreate";
+import { createDmRuleForUser, emailCapturePlanError, resolveSocialAccountId, UUID_RE, validateFormInput, type RuleFormInput } from "@/lib/dmRuleCreate";
 import { RewindError, rewindRule } from "@/lib/rewind";
 import { cleanPublicReply } from "@/lib/publicReply";
 import { detachMagnetIfLinkChanged } from "@/lib/leadMagnets";
@@ -65,6 +65,8 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
   if (errors.length > 0) {
     return { ok: false, errors };
   }
+  const planError = await emailCapturePlanError(user.id, input);
+  if (planError) return { ok: false, errors: [planError] };
   let account: Awaited<ReturnType<typeof resolveSocialAccountId>>;
   try {
     account = await resolveSocialAccountId(user.id, input.socialAccountId);

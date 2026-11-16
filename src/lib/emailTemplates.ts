@@ -616,6 +616,58 @@ Fix the reason, then press Retry on the post: ${link}${textFooter()}`;
   return { subject, preheader, html, text };
 }
 
+/** Auto-DMs stopped for the rest of the month (plan limit). Sent at most once per UTC month. */
+export function dmLimitReachedEmail(d: { name?: string | null; limit: number; plan: string; resetsOn: Date; canUpgrade: boolean }): RenderedEmail {
+  const limit = d.limit.toLocaleString("en-US");
+  const resets = d.resetsOn.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" });
+  const subject = "Your auto-DMs are paused until next month";
+  const preheader = `You reached this month's ${limit} auto-DMs on the ${d.plan} plan.`;
+  const link = absoluteUrl(d.canUpgrade ? "/app/settings/billing" : "/app/auto-dm");
+  const next = d.canUpgrade
+    ? "Upgrade your plan to send more this month, or wait for the reset."
+    : "New comments are still saved; replies start again automatically after the reset.";
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.postFailed,
+    body: `${h1("Auto-DMs are paused.")}
+${p(`${esc(greet(d.name))} Your account sent ${esc(limit)} automatic DMs this month, the limit on the ${esc(d.plan)} plan. Comments that match your automations now get no DM until ${esc(resets)} (UTC).`)}
+${p(esc(next))}
+${button(d.canUpgrade ? "See plans" : "Open Auto-DM", link)}`,
+    footerNote: "We send this at most once a month.",
+  });
+  const text = `${greet(d.name)}
+
+Your account sent ${limit} automatic DMs this month, the limit on the ${d.plan} plan. Comments that match your automations now get no DM until ${resets} (UTC).
+${next}
+
+${link}${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
+/** A connected channel's access ran out (token expired or revoked): reconnect to resume. */
+export function reconnectNeededEmail(d: { name?: string | null; platform: string; account?: string | null }): RenderedEmail {
+  const who = d.account ? `${d.platform} (${d.account})` : d.platform;
+  const subject = `Reconnect ${d.platform} to keep posting`;
+  const preheader = `Poskoo lost access to ${who}. Reconnect it in one step.`;
+  const link = absoluteUrl("/app/settings");
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.postFailed,
+    body: `${h1(`Reconnect ${esc(d.platform)}.`)}
+${p(`${esc(greet(d.name))} Poskoo's access to ${esc(who)} expired or was removed, so scheduled posts${d.platform === "Instagram" ? " and auto-DMs" : ""} for it are paused.`)}
+${p("Reconnect it in Settings; nothing you scheduled is lost.")}
+${button("Reconnect", link)}`,
+    footerNote: "We send this once each time a channel needs reconnecting.",
+  });
+  const text = `${greet(d.name)}
+
+Poskoo's access to ${who} expired or was removed, so scheduled posts${d.platform === "Instagram" ? " and auto-DMs" : ""} for it are paused.
+Reconnect it in Settings; nothing you scheduled is lost: ${link}${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
 // ---- Reminder channels (Instagram personal, Facebook Groups) ----------------------------------
 
 /** The caption in a copy-friendly box (pre-wrap, select-all on tap in most clients). */
@@ -785,6 +837,8 @@ export const PREVIEWS: Record<string, () => RenderedEmail> = {
   "upi-to-confirm": () => upiOrderToConfirmEmail({ name: "Priya", buyerEmail: "buyer@example.com", buyerName: "Ravi Kumar", product: "Reels Hook Guide", amountCents: 49900, currency: "inr", utr: "412345678901", orderRef: "PK7XQ2M9AB" }),
   reminder: () =>
     reminderEmail({ name: "Jamie", channel: "Instagram (personal)", account: "@jamie.makes", caption: "Sunday market haul 🌿\n\nWhich one should I style first?\n\n#slowliving #markethaul", media: [{ label: "Photo 1", url: absoluteUrl("/media/image-placeholder.svg") }], openLabel: "Open Instagram", openUrl: "https://www.instagram.com/jamie.makes/", doneUrl: absoluteUrl("/api/reminders/done?t=sample"), holdDays: 7 }),
+  "dm-limit": () => dmLimitReachedEmail({ name: "Jamie", limit: 500, plan: "Free", resetsOn: new Date("2026-12-01T00:00:00Z"), canUpgrade: true }),
+  "reconnect-needed": () => reconnectNeededEmail({ name: "Jamie", platform: "LinkedIn", account: "Jamie Rivera" }),
   "post-failed": () =>
     postFailedEmail({ name: "Jamie", platform: "Instagram", caption: "5 hooks that doubled my reel views this month (save this!)", error: "Instagram needs an image or video", scheduledFor: new Date("2026-11-12T15:00:00Z") }),
 };

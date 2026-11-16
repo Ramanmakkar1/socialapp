@@ -78,6 +78,16 @@ export async function monthlyAutoDmLimit(userId: string): Promise<{ plan: PlanNa
   return { plan, limit: autoDmLimitWithBonus(plan, bonus), bonus };
 }
 
+/** Dashboard flag: automated DMs are paused for the rest of the UTC month (same count the sender uses). */
+export function autoDmLimitReached(sentThisMonth: number, limit: number): boolean {
+  return limit >= 0 && sentThisMonth >= limit;
+}
+
+/** Text for the dashboard alert while auto-DMs are paused by the monthly limit. */
+export function autoDmLimitBanner(limit: number, plan: PlanName): string {
+  return `Auto-DMs are paused: you reached this month's ${limit.toLocaleString("en-US")} auto-DMs on the ${plan} plan. They start again on the 1st (UTC).`;
+}
+
 export function autoDmLimitMessage(limit: number, plan: PlanName): string {
   return `Monthly auto-DM limit reached (${limit.toLocaleString("en-US")} on the ${plan} plan). Auto-DMs start again on the 1st of next month (UTC).${upgradeHint(plan)}`;
 }
