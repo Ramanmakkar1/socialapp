@@ -74,3 +74,22 @@ test("sitemap.xml route serves no URLs when the request host is the noindex lega
     BRAND.indexable = was;
   }
 });
+
+test("sitemap.xml route uses the visitor's host, not the server's internal bind address", async () => {
+  // Regression 2026-11-15: in the standalone server request.url is http://0.0.0.0:3000/…,
+  // which emptied the production sitemap. The proxy passes the real host in headers.
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const viaProxy = await GET(new Request("http://0.0.0.0:3000/sitemap.xml", { headers: { host: "poskoo.com" } }));
+    assert.match(await viaProxy.text(), /<url>/, "a poskoo.com request behind the proxy must list pages");
+
+    const forwarded = await GET(new Request("http://0.0.0.0:3000/sitemap.xml", { headers: { host: "127.0.0.1:4338", "x-forwarded-host": "poskoo.com" } }));
+    assert.match(await forwarded.text(), /<url>/, "x-forwarded-host must win over the internal host");
+
+    const legacy = await GET(new Request("http://0.0.0.0:3000/sitemap.xml", { headers: { host: "socialapp.splitforms.com" } }));
+    assert.doesNotMatch(await legacy.text(), /<url>/, "the legacy host stays empty behind the proxy too");
+  } finally {
+    BRAND.indexable = was;
+  }
+});

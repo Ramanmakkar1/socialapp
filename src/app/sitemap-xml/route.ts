@@ -29,7 +29,16 @@ export async function GET(request?: Request) {
   // A non-canonical (staging/legacy) host is always noindex, so it must never
   // advertise URLs in its sitemap even if a redirect is bypassed. The canonical
   // host keeps the normal sitemap; tests call GET() without a request.
-  const requestHost = request ? new URL(request.url).host.toLowerCase() : null;
+  // Use the host the visitor asked for (proxy headers first). request.url inside the
+  // standalone server is the internal bind address (0.0.0.0:3000), which made every
+  // production request look like a staging host and emptied the sitemap (2026-11-15).
+  const requestHost = request
+    ? (
+        request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
+        request.headers.get("host") ||
+        new URL(request.url).host
+      ).toLowerCase()
+    : null;
   const hostIsIndexable =
     requestHost === null || isApprovedProductionOrigin(`https://${requestHost}`);
   const urls = (hostIsIndexable ? await sitemap() : [])
