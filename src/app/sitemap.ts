@@ -29,7 +29,8 @@ function getSitemapPaths(): PublicPath[] {
   // A non-canonical (staging/legacy) origin is always noindex, so never list it
   // even when the indexability flag is forced on.
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
-  return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
+  // The homepage is noindex, so it must never be listed in the sitemap.
+  return PUBLIC_PATHS.filter((path) => path !== "/" && isPathIndexable(path));
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
