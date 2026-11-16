@@ -3,7 +3,6 @@ import { preload } from "react-dom";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
-import { HOME_CANONICAL } from "@/lib/canonical";
 import { isPathIndexable } from "@/lib/indexability";
 import { PLATFORMS_ANSWER, getPlatformCopy, listText } from "@/lib/platform-support";
 import { HOME_DESCRIPTION_WITH_AI, PAGE_DESCRIPTIONS } from "@/lib/public-pages";
@@ -23,12 +22,10 @@ import { homePageJsonLd } from "./homeJsonLd";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 const BASE_DESCRIPTION = description;
-// The trailing slash is load-bearing: new URL("/", base) normalises the root
-// path to the bare origin (https://poskoo.com), which Next then renders as the
-// canonical href. HOME_CANONICAL keeps that "/" explicitly, always builds from
-// the approved production origin (dropping any query string or fragment), and
-// is the same constant the root layout uses, so the two can never drift apart.
-const canonical = HOME_CANONICAL;
+// Keep the trailing slash: the homepage canonical must be self-referencing on
+// the host it is served from. This stays a fixed absolute URL (no query string
+// or fragment) so staging metadata cannot drift between requests.
+const canonical = "https://socialapp.splitforms.com/";
 // The shared description doesn't claim AI; once AI is switched on (isFeatureReadyNow("ai")) the
 // meta description mentions AI captions. Evaluated at request/revalidate time like the page.
 export async function generateMetadata(): Promise<Metadata> {
