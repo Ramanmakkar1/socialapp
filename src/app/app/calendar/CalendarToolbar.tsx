@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronLeft, ChevronRight, Globe } from "lucide-react";
-import { PLATFORM_LABEL } from "./calendarUtils";
+import { CalendarOff, ChevronDown, ChevronLeft, ChevronRight, Globe, Layers } from "lucide-react";
+import { PLATFORM_ICON, PLATFORM_LABEL } from "./calendarUtils";
+import { parseChannels, toggleChannel } from "./weekGrid";
 import styles from "./calendar.module.css";
+
+/** A draft with no date: listed under "No date" and opened in the composer. */
+export type NoDatePost = { id: string; caption: string; platforms: string[] };
 
 type Props = {
   view: "week" | "month";
@@ -18,20 +22,47 @@ type Props = {
   /** Platforms the user can filter by. */
   channels: string[];
   tags: string[];
+  /** Drafts without a time (hidden from the grid). */
+  noDate?: NoDatePost[];
+  /** Time zone of the user's posting schedule (Settings), offered next to the browser zone. */
+  scheduleTz?: string;
 };
 
 // Calendar toolbar (Buffer-style): ‹ › range, Today, Week/Month, then Channels / status / tag filters
-// and the viewer's time zone. Filters live in the URL so the server filters the posts.
-export default function CalendarToolbar({ view, label, subLabel, prevHref, nextHref, todayHref, isCurrent, channels, tags }: Props) {
+// No date drafts and the time zone. Filters live in the URL (?channel=a,b&status=&tag=&tz=) so the
+// server filters the posts and a reload or shared link keeps them.
+export default function CalendarToolbar({ view, label, subLabel, prevHref, nextHref, todayHref, isCurrent, channels, tags, noDate = [], scheduleTz }: Props) {
   const router = useRouter();
   const pathname = usePathname() ?? "/app/calendar";
   const params = useSearchParams();
   const id = useId();
   const [tz, setTz] = useState("");
+  const [zones, setZones] = useState<string[]>([]);
+  const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- browser time zone is only known after hydration
     setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    setZones(typeof Intl.supportedValuesOf === "function" ? Intl.supportedValuesOf("timeZone") : []);
   }, []);
+  // Close an open dropdown (Channels, No date) on a click outside it or Escape.
+  useEffect(() => {
+    const closeOthers = (target: EventTarget | null) => {
+      barRef.current?.querySelectorAll("details[open]").forEach((d) => {
+        if (!(target instanceof Node) || !d.contains(target)) d.removeAttribute("open");
+      });
+    };
+    const onDown = (e: PointerEvent) => closeOthers(e.target);
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeOthers(null); };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+  const selectedChannels = parseChannels(params.get("channel"));
+  const tzParam = params.get("tz") ?? "";
+  const zoneOptions = [...new Set([scheduleTz, tzParam, "UTC", ...zones].filter((z): z is string => Boolean(z) && z !== tz))];
 
   function setParam(name: string, value: string) {
     const next = new URLSearchParams(params.toString());
@@ -45,7 +76,7 @@ export default function CalendarToolbar({ view, label, subLabel, prevHref, nextH
   function setView(v: string) {
     const next = new URLSearchParams();
     next.set("view", v);
-    for (const k of ["channel", "status", "tag"]) {
+    for (const k of ["channel", "status", "tag", "tz"]) {
       const val = params.get(k);
       if (val) next.set(k, val);
     }
@@ -55,7 +86,7 @@ export default function CalendarToolbar({ view, label, subLabel, prevHref, nextH
   const unit = view === "month" ? "month" : "week";
 
   return (
-    <div className={styles.toolbar}>
+    <div className={styles.toolbar} ref={barRef}>
       <div className={styles.toolbarNav}>
         <Link href={prevHref} className={styles.arrowBtn} aria-label={`Previous ${unit}`}><ChevronLeft width={18} height={18} aria-hidden="true" /></Link>
         <Link href={nextHref} className={styles.arrowBtn} aria-label={`Next ${unit}`}><ChevronRight width={18} height={18} aria-hidden="true" /></Link>
@@ -75,14 +106,33 @@ export default function CalendarToolbar({ view, label, subLabel, prevHref, nextH
       </div>
       <div className={styles.toolbarFilters}>
         {channels.length > 1 && (
-          <span className={styles.selectWrap}>
-            <label htmlFor={`${id}-ch`} className={styles.srOnly}>Channels</label>
-            <select id={`${id}-ch`} value={params.get("channel") ?? ""} onChange={(e) => setParam("channel", e.target.value)} className={styles.toolSelect}>
-              <option value="">All channels</option>
-              {channels.map((c) => <option key={c} value={c}>{PLATFORM_LABEL[c] ?? c}</option>)}
-            </select>
-            <ChevronDown width={14} height={14} aria-hidden="true" />
-          </span>
+          <details className={styles.dropdown}>
+            <summary className={styles.toolSelect} aria-label={`Channels: ${selectedChannels.length ? selectedChannels.map((c) => PLATFORM_LABEL[c] ?? c).join(", ") : "all"}`}>
+              <Layers width={14} height={14} aria-hidden="true" />
+              Channels
+              {selectedChannels.length > 0 && <span className={styles.dropdownCount}>{selectedChannels.length}</span>}
+              <ChevronDown width={14} height={14} aria-hidden="true" />
+            </summary>
+            <div className={styles.dropdownPanel} role="group" aria-label="Show channels">
+              {channels.map((c) => {
+                const Icon = PLATFORM_ICON[c] ?? PLATFORM_ICON.threads;
+                return (
+                  <label key={c} className={styles.dropdownItem}>
+                    <input
+                      type="checkbox"
+                      checked={selectedChannels.includes(c)}
+                      onChange={() => setParam("channel", toggleChannel(selectedChannels, c).join(","))}
+                    />
+                    <Icon width={15} height={15} className={styles[`ico_${c}`]} aria-hidden="true" />
+                    {PLATFORM_LABEL[c] ?? c}
+                  </label>
+                );
+              })}
+              {selectedChannels.length > 0 && (
+                <button type="button" className={styles.dropdownClear} onClick={() => setParam("channel", "")}>Show all channels</button>
+              )}
+            </div>
+          </details>
         )}
         <span className={styles.selectWrap}>
           <label htmlFor={`${id}-st`} className={styles.srOnly}>Post status</label>
@@ -105,9 +155,38 @@ export default function CalendarToolbar({ view, label, subLabel, prevHref, nextH
             <ChevronDown width={14} height={14} aria-hidden="true" />
           </span>
         )}
-        <span className={styles.tzLabel} title="Times are shown in your browser's time zone">
-          <Globe width={14} height={14} aria-hidden="true" />
-          <span suppressHydrationWarning>{tz ? tz.replace(/_/g, " ") : "UTC"}</span>
+        {view === "week" && (
+          <details className={styles.dropdown}>
+            <summary className={styles.toolSelect} aria-label={`No date: ${noDate.length} ${noDate.length === 1 ? "draft" : "drafts"} without a time`}>
+              <CalendarOff width={14} height={14} aria-hidden="true" />
+              No date
+              <span className={styles.dropdownCount}>{noDate.length}</span>
+            </summary>
+            <div className={styles.dropdownPanel}>
+              {noDate.length === 0 ? (
+                <p className={styles.dropdownEmpty}>Every post has a date.</p>
+              ) : (
+                noDate.map((p) => {
+                  const Icon = PLATFORM_ICON[p.platforms[0]] ?? PLATFORM_ICON.threads;
+                  return (
+                    <Link key={p.id} href={`/app/calendar?view=week&draft=${p.id}`} scroll={false} className={styles.dropdownItem}>
+                      <Icon width={14} height={14} className={styles[`ico_${p.platforms[0]}`]} aria-hidden="true" />
+                      <span className={styles.noDateCaption}>{p.caption.trim() || "(no caption)"}</span>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          </details>
+        )}
+        <span className={styles.selectWrap}>
+          <label htmlFor={`${id}-tz`} className={styles.srOnly}>Time zone</label>
+          <Globe width={14} height={14} aria-hidden="true" className={styles.selectIconLeft} />
+          <select id={`${id}-tz`} value={tzParam && tzParam !== tz ? tzParam : ""} onChange={(e) => setParam("tz", e.target.value)} className={`${styles.toolSelect} ${styles.tzSelect}`}>
+            <option value="" suppressHydrationWarning>{tz ? `${tz.replace(/_/g, " ")} (yours)` : "Your time zone"}</option>
+            {zoneOptions.map((z) => <option key={z} value={z}>{z.replace(/_/g, " ")}{z === scheduleTz ? " (posting schedule)" : ""}</option>)}
+          </select>
+          <ChevronDown width={14} height={14} aria-hidden="true" />
         </span>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { engagementRate } from "@/lib/engagementRate";
 import { EXTRA_NETWORK_LABEL } from "@/lib/networks/tokenNetworks";
+import type { PostKind } from "./weekGrid";
 
 export type CalendarPost = {
   id: string;
@@ -18,6 +19,8 @@ export type CalendarPost = {
   /** Public link to the live post when the app can derive one. */
   permalink?: string | null;
   error?: string | null;
+  /** Post type badge (story / reel / carousel / ...), week grid. */
+  kind?: PostKind;
 };
 
 /** platform -> account handle shown in the popover ("@brewhouse.coffee"). */

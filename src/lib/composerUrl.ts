@@ -10,6 +10,7 @@ export function hrefWithoutComposer(pathname: string, params: URLSearchParams): 
   next.delete("compose");
   next.delete("draft");
   next.delete("day");
+  next.delete("at");
   const q = next.toString();
   return q ? `${pathname}?${q}` : pathname;
 }
@@ -30,4 +31,15 @@ export function dayPrefill(day: string | null, now = new Date()): Date | null {
   next.setHours(next.getHours() + 1);
   // A past day (not today) has no sensible slot: use the next full hour from now.
   return next;
+}
+
+/**
+ * Start time for a post created from an empty week-grid slot (?compose=1&at=<ISO instant>).
+ * Null for a malformed or past instant, so the caller falls back to `day` / the default.
+ */
+export function slotPrefill(at: string | null, now = new Date()): Date | null {
+  if (!at || at.length > 40 || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(at)) return null;
+  const d = new Date(at);
+  if (Number.isNaN(d.getTime()) || d.getTime() <= now.getTime()) return null;
+  return d;
 }

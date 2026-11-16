@@ -97,14 +97,40 @@ export async function reschedulePostForUser(
 ): Promise<MutationResult> {
   if (!UUID_RE.test(id)) return { ok: false, error: "Invalid post." };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return { ok: false, error: "Invalid day." };
+  return movePostForUser(id, userId, (state) => movedInstant(state.scheduled_at, dateKey), "Pick a day in the future.", beforeUpdate);
+}
+
+/**
+ * Moves a scheduled post or draft to an exact instant (week grid: drop on another day + hour).
+ * Same guards as reschedulePostForUser.
+ */
+export async function reschedulePostToInstantForUser(
+  id: string,
+  userId: string,
+  iso: string,
+  beforeUpdate?: (next: Date, state: PostState) => Promise<string | null>,
+): Promise<MutationResult> {
+  if (!UUID_RE.test(id)) return { ok: false, error: "Invalid post." };
+  const at = typeof iso === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/.test(iso) ? new Date(iso) : null;
+  if (!at || Number.isNaN(at.getTime())) return { ok: false, error: "Invalid time." };
+  return movePostForUser(id, userId, () => at, "Pick a time in the future.", beforeUpdate);
+}
+
+async function movePostForUser(
+  id: string,
+  userId: string,
+  target: (state: PostState) => Date | null,
+  pastError: string,
+  beforeUpdate?: (next: Date, state: PostState) => Promise<string | null>,
+): Promise<MutationResult> {
   const state = await postState(id, userId);
   if (!state) return { ok: false, error: blockedReason(null, "moved") };
   if ((state.status !== "scheduled" && state.status !== "draft") || state.started) {
     return { ok: false, error: blockedReason(state, "moved") };
   }
-  const next = movedInstant(state.scheduled_at, dateKey);
+  const next = target(state);
   if (!next) return { ok: false, error: "Invalid day." };
-  if (next.getTime() <= Date.now() + 60_000) return { ok: false, error: "Pick a day in the future." };
+  if (next.getTime() <= Date.now() + 60_000) return { ok: false, error: pastError };
   if (beforeUpdate) {
     const problem = await beforeUpdate(next, state);
     if (problem) return { ok: false, error: problem };

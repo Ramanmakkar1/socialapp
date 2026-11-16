@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import ScheduleSeeder from "../settings/ScheduleSeeder";
 import { CalendarDays, Lightbulb, List, Plus } from "lucide-react";
-import CalendarToolbar from "./CalendarToolbar";
+import CalendarToolbar, { type NoDatePost } from "./CalendarToolbar";
 import { PLATFORM_LABEL, weekMonthLabel, type AccountNames, type CalendarPost } from "./calendarUtils";
 import CalendarEmptyState from "./CalendarEmptyState";
 import Composer from "./Composer";
@@ -27,7 +27,8 @@ import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
 import { facebookPageStatus, type FacebookSourceAccount } from "@/lib/facebookPublish";
 import { IDEA_BY_ID_SQL, IDEAS_LIST_SQL, ideaComposerPrefill, normalizeIdeaStatus, type IdeaRow } from "@/lib/ideas";
-import { allPostTags, hasColumn, postMatchesTag } from "@/lib/tagFilter";
+import { allPostTags, hasColumn } from "@/lib/tagFilter";
+import { filterPosts, parseChannels, parseStatus, postKind, sundayOnOrBefore } from "./weekGrid";
 import styles from "./calendar.module.css";
 import { isExtraNetwork, EXTRA_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
 
@@ -41,6 +42,7 @@ type WeekPost = {
   platforms: string[];
   tags?: string[];
   media: unknown;
+  ig_format?: string | null;
   insights: CalendarPost["insights"];
   fb_post_id: string | null;
   error: string | null;
@@ -63,6 +65,7 @@ function thumbOf(media: unknown): { thumb: string | null; thumbIsVideo: boolean 
 // Calendar card data: first media item as the thumbnail, a public link when one can be derived.
 function toCalendarPost(row: WeekPost): CalendarPost {
   const { thumb, thumbIsVideo } = thumbOf(row.media);
+  const mediaCount = Array.isArray(row.media) ? row.media.length : 0;
   return {
     id: row.id,
     caption: row.caption ?? "",
@@ -74,6 +77,7 @@ function toCalendarPost(row: WeekPost): CalendarPost {
     insights: row.insights ?? null,
     permalink: row.fb_post_id && /^[0-9_]+$/.test(row.fb_post_id) ? `https://www.facebook.com/${row.fb_post_id}` : null,
     error: row.error,
+    kind: postKind({ igFormat: row.ig_format, mediaCount, isVideo: thumbIsVideo, platforms: row.platforms }),
   };
 }
 
@@ -103,14 +107,19 @@ function mondayUtcStart(d: Date): Date {
   return date;
 }
 
+// The week grid runs Sunday to Saturday (Poskoo has no week-start setting).
+function sundayUtcStart(d: Date): Date {
+  return new Date(`${sundayOnOrBefore(d.toISOString().slice(0, 10))}T00:00:00.000Z`);
+}
+
 function parseWeekParam(week: string | undefined): Date {
   if (week && /^\d{4}-\d{2}-\d{2}$/.test(week)) {
     const parsed = new Date(`${week}T00:00:00.000Z`);
     if (!Number.isNaN(parsed.getTime())) {
-      return mondayUtcStart(parsed);
+      return sundayUtcStart(parsed);
     }
   }
-  return mondayUtcStart(new Date());
+  return sundayUtcStart(new Date());
 }
 
 function weekQueryParam(d: Date): string {
@@ -135,9 +144,9 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string; channel?: string; campaign?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string; channel?: string; campaign?: string; tz?: string }>;
 }) {
-  const { week, view: viewParam, month, status, draft, idea, tag = "", channel = "", campaign } = await searchParams;
+  const { week, view: viewParam, month, status, draft, idea, tag = "", channel = "", campaign, tz = "" } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
   const view: "week" | "month" | "list" | "ideas" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : viewParam === "ideas" ? "ideas" : "week";
   const weekStart = parseWeekParam(week);
@@ -168,6 +177,8 @@ export default async function CalendarPage({
 
   let rows: (Post & { media?: unknown })[] = [];
   let weekRows: WeekPost[] = [];
+  let noDateRows: WeekPost[] = [];
+  let scheduleTz: string | undefined;
   let rules: RuleOption[] = [];
   let publishedRows: PublishedPost[] = [];
   let commentHourRows: { hour: number; count: number }[] = [];
@@ -346,16 +357,17 @@ export default async function CalendarPage({
     // Channels that have a usable posting schedule (at least one time) drive the
     // composer's "Add to queue" / "Next available". Missing table = none set.
     try {
-      const schedRows = await query<{ platform: string; times: string[] }>(
-        "select platform, times from socialapp.posting_schedules where user_id=$1",
+      const schedRows = await query<{ platform: string; times: string[]; timezone: string | null }>(
+        "select platform, times, timezone from socialapp.posting_schedules where user_id=$1",
         [user.id],
       );
+      scheduleTz = schedRows.find((r) => r.timezone)?.timezone ?? undefined;
       schedulePlatforms = [...new Set(schedRows.filter((r) => (r.times ?? []).length > 0).map((r) => r.platform))];
       scheduleRowCount = schedRows.length;
     } catch {
       schedulePlatforms = [];
     }
-    const [rulesRes, upcomingRes, rangeRes, publishedRes] = await Promise.allSettled([
+    const [rulesRes, upcomingRes, rangeRes, publishedRes, noDateRes] = await Promise.allSettled([
       query<RuleOption>(
         "select id, name, status from socialapp.dm_rules where user_id = $1 order by created_at desc",
         [user.id],
@@ -365,7 +377,7 @@ export default async function CalendarPage({
         [user.id],
       ),
       query<WeekPost>(
-        `select p.id, p.caption, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, p.media,
+        `select p.id, p.caption, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, p.media, p.ig_format,
            coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms,
            (array_agg(t.insights) filter (where t.platform = 'instagram' and t.insights is not null))[1] as insights,
            (array_agg(t.external_post_id) filter (where t.platform = 'facebook' and t.status = 'published'))[1] as fb_post_id,
@@ -377,6 +389,17 @@ export default async function CalendarPage({
         "select p.id, p.caption, p.media, max(t.published_at) as published_at, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status = 'published' group by p.id order by max(t.published_at) desc nulls last limit 10",
         [user.id],
       ),
+      // "No date": drafts saved without a time (they have no slot on the grid).
+      view === "week"
+        ? query<WeekPost>(
+            `select p.id, p.caption, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.status, p.media, p.ig_format,
+               coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms,
+               null as insights, null as fb_post_id, null as error
+             from scheduled_posts p left join post_targets t on t.post_id = p.id
+             where p.user_id = $1 and p.status = 'draft' and p.scheduled_at is null group by p.id order by p.created_at desc limit 50`,
+            [user.id],
+          )
+        : Promise.resolve([] as WeekPost[]),
     ]);
     if (rulesRes.status === "fulfilled") rules = rulesRes.value;
     else rulesFailed = true;
@@ -400,18 +423,17 @@ export default async function CalendarPage({
     if (rangeRes.status === "fulfilled") weekRows = rangeRes.value;
     else weekRowsFailed = true;
     if (publishedRes.status === "fulfilled") publishedRows = publishedRes.value;
+    if (noDateRes.status === "fulfilled") noDateRows = noDateRes.value;
     else publishedFailed = true;
   }
 
   const bestHoursUtc = topHours(commentHourRows, 3).map((r) => r.hour);
   const allTags = allPostTags(weekRows);
-  const statusFilter = ["scheduled", "draft", "published", "failed"].includes(status ?? "") ? status : "";
-  const filteredWeekRows = weekRows.filter(
-    (post) =>
-      postMatchesTag(post, tag) &&
-      (!channel || post.platforms.includes(channel)) &&
-      (!statusFilter || post.status === statusFilter),
-  );
+  const statusFilter = parseStatus(status);
+  const channels = parseChannels(channel);
+  const filteredWeekRows = filterPosts(weekRows, { channels, status: statusFilter, tag });
+  const noDatePosts: NoDatePost[] = filterPosts(noDateRows, { channels, status: statusFilter === "draft" ? "" : statusFilter, tag })
+    .map((p) => ({ id: p.id, caption: p.caption ?? "", platforms: p.platforms }));
   const calendarPosts = filteredWeekRows.map(toCalendarPost);
   // AI on (env or stored key, src/lib/featureReadinessNow.ts)? Admins get a link to switch it on.
   const [aiReady, viewer] = await Promise.all([isFeatureReadyNow("ai"), getCurrentUser()]);
@@ -433,11 +455,16 @@ export default async function CalendarPage({
     platforms: row.platforms,
     ...thumbOf(row.media),
   }));
-  const filterQuery = [channel && `channel=${encodeURIComponent(channel)}`, statusFilter && `status=${statusFilter}`, tag && `tag=${encodeURIComponent(tag)}`].filter(Boolean).map((q) => `&${q}`).join("");
+  const filterQuery = [
+    channels.length > 0 && `channel=${encodeURIComponent(channels.join(","))}`,
+    statusFilter && `status=${statusFilter}`,
+    tag && `tag=${encodeURIComponent(tag)}`,
+    tz && /^[A-Za-z0-9_+\-/]{1,64}$/.test(tz) && `tz=${encodeURIComponent(tz)}`,
+  ].filter(Boolean).map((q) => `&${q}`).join("");
   const weekEndDay = new Date(weekStart.getTime() + 6 * 86_400_000);
   const shortDay = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
   const now = new Date();
-  const thisWeek = weekQueryParam(mondayUtcStart(now));
+  const thisWeek = weekQueryParam(sundayUtcStart(now));
   const thisMonth = now.toISOString().slice(0, 7);
   const emptyRange = !rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0;
 
@@ -513,6 +540,7 @@ export default async function CalendarPage({
             isCurrent={monthQueryParam(monthStart) === thisMonth}
             channels={channelOptions}
             tags={allTags}
+            scheduleTz={scheduleTz}
           />
           <MonthView
             posts={calendarPosts}
@@ -539,11 +567,13 @@ export default async function CalendarPage({
             isCurrent={weekQueryParam(weekStart) === thisWeek}
             channels={channelOptions}
             tags={allTags}
+            noDate={noDatePosts}
+            scheduleTz={scheduleTz}
           />
           <WeekView
             posts={calendarPosts}
             weekStart={weekStart}
-            composeBase={`/app/calendar?view=week&week=${weekQueryParam(weekStart)}&compose=1`}
+            composeBase={`/app/calendar?view=week&week=${weekQueryParam(weekStart)}${filterQuery}&compose=1`}
             accounts={accountNames}
             loadError={
               weekRowsFailed

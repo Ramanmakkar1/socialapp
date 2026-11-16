@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured } from "@/lib/db";
 import { scheduledPostLimitError } from "@/lib/planLimits";
-import { reschedulePostForUser, UUID_RE } from "@/lib/postMutations";
+import { reschedulePostForUser, reschedulePostToInstantForUser, UUID_RE } from "@/lib/postMutations";
 
 export async function reschedulePost(
   id: string,
@@ -31,6 +31,35 @@ export async function reschedulePost(
     return { ok: true };
   } catch (err) {
     console.error("reschedulePost failed", id, err instanceof Error ? err.message : err);
+    return { ok: false, error: "Could not move post." };
+  }
+}
+
+/** Week grid: move a draft / scheduled post to an exact time (ISO instant), same guards and plan limit. */
+export async function reschedulePostAt(
+  id: string,
+  iso: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (typeof id !== "string" || !UUID_RE.test(id)) {
+    return { ok: false, error: "Invalid post." };
+  }
+  if (typeof iso !== "string" || iso.length > 40) {
+    return { ok: false, error: "Invalid time." };
+  }
+  if (!isDbConfigured()) {
+    return { ok: false, error: "Database not configured" };
+  }
+
+  const user = await requireUser();
+  try {
+    const result = await reschedulePostToInstantForUser(id, user.id, iso, (next, state) =>
+      state.status === "scheduled" ? scheduledPostLimitError(user.id, next, id) : Promise.resolve(null));
+    if (!result.ok) return result;
+    revalidatePath("/app/calendar");
+    revalidatePath("/app");
+    return { ok: true };
+  } catch (err) {
+    console.error("reschedulePostAt failed", id, err instanceof Error ? err.message : err);
     return { ok: false, error: "Could not move post." };
   }
 }

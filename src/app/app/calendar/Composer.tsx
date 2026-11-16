@@ -27,7 +27,7 @@ import {
   type ComposerDraftInitial,
   type ScheduleOrigin,
 } from "@/lib/composerDraft";
-import { dayPrefill, hrefWithoutComposer } from "@/lib/composerUrl";
+import { dayPrefill, hrefWithoutComposer, slotPrefill } from "@/lib/composerUrl";
 import { instagramAspectWarning, mediaKindFromUrl, validateMediaFile } from "@/lib/mediaUpload";
 import { checkMediaForTargets, formatBytes, maxBytesForTargets, type MediaFacts } from "@/lib/mediaLimits";
 import { probeMediaFile, UploadCancelled, uploadWithProgress } from "@/lib/mediaUploadClient";
@@ -239,14 +239,16 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   }, [draftScheduledAt]);
 
   // "+" on a calendar day opens /app/calendar?compose=1&day=YYYY-MM-DD: pre-fill that day's time.
+  // An empty week-grid slot opens ...&at=<ISO instant>: pre-fill that exact time.
   const dayParam = searchParams.get("day");
+  const atParam = searchParams.get("at");
   const hasDraft = Boolean(initialDraft) || Boolean(initialIdea);
   useEffect(() => {
     if (hasDraft) return;
-    const at = dayPrefill(dayParam);
+    const at = slotPrefill(atParam) ?? dayPrefill(dayParam);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- local wall time is only known in the browser
     if (at) setScheduledAt(toLocalInputValue(at));
-  }, [dayParam, hasDraft]);
+  }, [dayParam, atParam, hasDraft]);
 
   useEffect(() => {
     // Client-only: avoids SSR UTC vs browser timezone hydration mismatch.

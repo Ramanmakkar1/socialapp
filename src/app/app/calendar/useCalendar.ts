@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useOptimistic, useState, useTransition } from "react";
 import type { DragEvent } from "react";
-import { reschedulePost } from "./rescheduleActions";
+import { useSearchParams } from "next/navigation";
+import { reschedulePost, reschedulePostAt } from "./rescheduleActions";
 import { movedToLocalDay, withMovedPost, type CalendarPost } from "./calendarUtils";
+import { movedToSlot, slotId } from "./weekGrid";
+import { isValidTimeZone } from "@/lib/postingSchedule";
 
 // Shared state for the week and month calendars: browser time zone, drag-and-drop
 // rescheduling (through the guarded reschedulePost action) and the open post popover.
@@ -14,7 +17,10 @@ export function useCalendar(serverPosts: CalendarPost[]) {
   const [posts, movePost] = useOptimistic(serverPosts, (cur, move: { id: string; at: string }) => withMovedPost(cur, move.id, move.at));
   const [error, setError] = useState<string | null>(null);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
-  const [tz, setTz] = useState("");
+  const [browserTz, setTz] = useState("");
+  // ?tz= (toolbar time zone picker) overrides the browser zone once that is known.
+  const tzParam = useSearchParams()?.get("tz") ?? "";
+  const tz = browserTz && tzParam && isValidTimeZone(tzParam) ? tzParam : browserTz;
   const [open, setOpen] = useState<{ post: CalendarPost; anchor: HTMLElement } | null>(null);
 
   useEffect(() => {
@@ -27,14 +33,16 @@ export function useCalendar(serverPosts: CalendarPost[]) {
   }, []);
   const closePost = useCallback(() => setOpen(null), []);
 
-  function dropProps(key: string, current: CalendarPost[]) {
+  // Month grid: drop on a day (keeps the time). Week grid: pass `hour` to drop on a day + hour slot (keeps the minutes).
+  function dropProps(key: string, current: CalendarPost[], hour?: number) {
+    const overKey = hour === undefined ? key : slotId(key, hour);
     return {
       onDragOver: (e: DragEvent<HTMLElement>) => {
         e.preventDefault();
-        if (dragOverKey !== key) setDragOverKey(key);
+        if (dragOverKey !== overKey) setDragOverKey(overKey);
       },
       onDragLeave: () => {
-        if (dragOverKey === key) setDragOverKey(null);
+        if (dragOverKey === overKey) setDragOverKey(null);
       },
       onDrop: (e: DragEvent<HTMLElement>) => {
         e.preventDefault();
@@ -44,13 +52,13 @@ export function useCalendar(serverPosts: CalendarPost[]) {
         if (current.some((p) => p.id === id)) return;
         const post = posts.find((p) => p.id === id);
         if (!post?.scheduled_at) return;
-        const at = movedToLocalDay(post.scheduled_at, key, tz);
+        const at = hour === undefined ? movedToLocalDay(post.scheduled_at, key, tz) : movedToSlot(post.scheduled_at, key, hour, tz);
         setError(null);
         setOpen(null);
         startTransition(async () => {
           movePost({ id, at });
           try {
-            const res = await reschedulePost(id, at.slice(0, 10));
+            const res = hour === undefined ? await reschedulePost(id, at.slice(0, 10)) : await reschedulePostAt(id, at);
             if (!res.ok) setError(res.error ?? "Could not move post.");
           } catch {
             setError("Could not move post. Please try again.");

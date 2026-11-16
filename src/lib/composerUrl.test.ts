@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { composerOpenFromParams, dayPrefill, hrefWithoutComposer } from "./composerUrl";
+import { composerOpenFromParams, dayPrefill, hrefWithoutComposer, slotPrefill } from "./composerUrl";
 
 test("composerOpenFromParams: compose or draft opens it", () => {
   assert.equal(composerOpenFromParams(new URLSearchParams("compose=1")), true);
@@ -24,4 +24,13 @@ test("dayPrefill: 9:00 on a future day, next full hour when past, null when bad"
   assert.equal(dayPrefill("2026-02-31", now), null);
   assert.equal(dayPrefill("nope", now), null);
   assert.equal(dayPrefill(null, now), null);
+});
+
+test("slotPrefill: an empty week slot pre-fills its exact time, never a past or bad one", () => {
+  const now = new Date("2026-11-15T12:00:00Z");
+  assert.equal(slotPrefill("2026-11-17T02:30:00.000Z", now)?.toISOString(), "2026-11-17T02:30:00.000Z");
+  assert.equal(slotPrefill("2026-11-14T02:30:00.000Z", now), null);
+  assert.equal(slotPrefill("tomorrow", now), null);
+  assert.equal(slotPrefill(null, now), null);
+  assert.equal(hrefWithoutComposer("/app/calendar", new URLSearchParams("view=week&compose=1&at=2026-11-17T02:30:00.000Z")), "/app/calendar?view=week");
 });
