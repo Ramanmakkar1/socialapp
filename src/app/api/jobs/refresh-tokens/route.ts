@@ -1,6 +1,7 @@
 // Run once a day (same cron as send-dms, with x-cron-secret).
 import { timingSafeEqual } from "node:crypto";
 import { isDbConfigured } from "@/lib/db";
+import { notifyExpiredAccounts } from "@/lib/emailNotify";
 import { UNATTACHED_KEEP_DAYS } from "@/lib/mediaLimits";
 import { mediaReferenceTexts, releasePublishedMediaSweep } from "@/lib/mediaLifecycle";
 import { cleanupUnusedMedia } from "@/lib/mediaStorage";
@@ -23,6 +24,13 @@ export async function POST(request: Request) {
   }
   try {
     const result = await refreshExpiringTokens();
+    // "Reconnect <network>" e-mails for channels whose access expired (all networks, once per expiry).
+    let reconnectEmails = 0;
+    try {
+      reconnectEmails = await notifyExpiredAccounts();
+    } catch (err) {
+      console.error("reconnect e-mails failed", err instanceof Error ? err.message : err);
+    }
     // Daily: remove uploads older than 7 days that no post, idea, automation, bio page,
     // lead magnet or product mentions any more, then catch up on published posts' files.
     let media = { deleted: 0, freedBytes: 0 };
@@ -33,7 +41,7 @@ export async function POST(request: Request) {
     } catch (err) {
       console.error("media cleanup failed", err instanceof Error ? err.message : err);
     }
-    return Response.json({ status: "ok", ...result, mediaDeleted: media.deleted, mediaFreedBytes: media.freedBytes });
+    return Response.json({ status: "ok", ...result, reconnectEmails, mediaDeleted: media.deleted, mediaFreedBytes: media.freedBytes });
   } catch (err) {
     console.error("refresh-tokens job failed", err instanceof Error ? err.message : err);
     return Response.json({ status: "error" }, { status: 500 });

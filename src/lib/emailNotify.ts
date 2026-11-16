@@ -7,10 +7,12 @@ import { sendEmail } from "@/lib/email";
 import {
   absoluteUrl,
   buyerReceiptEmail,
+  dmLimitReachedEmail,
   newDeviceEmail,
   newOrderEmail,
   passwordChangedEmail,
   postFailedEmail,
+  reconnectNeededEmail,
   referralBonusEmail,
   subscriptionCanceledEmail,
   subscriptionPaymentFailedEmail,
@@ -272,4 +274,57 @@ export async function notifyBillingPaymentFailed(userId: string, d: { invoiceId:
   const rows = await query<{ past_due_since: Date | null }>("select past_due_since from socialapp.billing_subscriptions where user_id=$1", [userId]);
   const graceEnds = graceEndsAt(rows[0]?.past_due_since ?? null);
   await send(to.email, subscriptionPaymentFailedEmail({ name: to.name, plan: d.plan, amountCents: d.amountCents, currency: d.currency, graceEnds }), "billing_failed");
+}
+
+/** UTC calendar month key, e.g. "2026-11". */
+export function utcMonthKey(at: Date): string {
+  return at.toISOString().slice(0, 7);
+}
+
+/**
+ * "Your auto-DMs are paused" when a user hits the monthly auto-DM limit: at most one e-mail per user
+ * per UTC month (email_sends key dm-limit:<user>:<YYYY-MM>, which is also the record that it happened).
+ */
+export async function notifyDmLimitReached(
+  userId: string,
+  d: { limit: number; plan: string; canUpgrade: boolean },
+  now: Date = new Date(),
+): Promise<void> {
+  if (!(await claimEmailKey(`dm-limit:${userId}:${utcMonthKey(now)}`))) return;
+  const to = await billingRecipient(userId);
+  if (!to) return;
+  const resetsOn = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  await send(to.email, dmLimitReachedEmail({ name: to.name, limit: d.limit, plan: d.plan, resetsOn, canUpgrade: d.canUpgrade }), "dm_limit");
+}
+
+/** Only channels that expired recently are e-mailed (no flood for accounts that expired long ago). */
+export const RECONNECT_EMAIL_WINDOW_DAYS = 14;
+
+/**
+ * "Reconnect <network>" e-mails for every connected channel (Instagram, Threads, Facebook, TikTok,
+ * LinkedIn, Pinterest, X, Bluesky, GBP, ...) whose access expired: the token jobs, the publisher and
+ * the DM sender mark such accounts status='expired' (updated_at = when). One e-mail per expiry
+ * (email_sends key reconnect:<account>:<updated_at>), so a reconnect followed by a new expiry
+ * e-mails again. Run daily from the refresh-tokens job. Returns how many were sent.
+ */
+export async function notifyExpiredAccounts(limit = 100): Promise<number> {
+  const rows = await query<{ id: string; platform: string; username: string | null; updated_at: Date; email: string; name: string | null }>(
+    `select a.id, a.platform, a.username, a.updated_at, u.email, u.name
+     from socialapp.social_accounts a join socialapp.users u on u.id = a.user_id
+     where a.status = 'expired' and a.updated_at > now() - ($2::int * interval '1 day')
+     order by a.updated_at limit $1`,
+    [limit, RECONNECT_EMAIL_WINDOW_DAYS],
+  );
+  let sent = 0;
+  for (const r of rows) {
+    try {
+      if (!(await claimEmailKey(`reconnect:${r.id}:${new Date(r.updated_at).toISOString()}`))) continue;
+      const handle = r.username ? (r.platform === "instagram" || r.platform === "threads" ? `@${r.username}` : r.username) : null;
+      await send(r.email, reconnectNeededEmail({ name: r.name, platform: PLATFORM_LABEL[r.platform] ?? r.platform, account: handle }), "reconnect");
+      sent += 1;
+    } catch (err) {
+      console.error("[email:reconnect] failed for account", r.id, err instanceof Error ? err.message.slice(0, 160) : "unknown");
+    }
+  }
+  return sent;
 }

@@ -7,6 +7,8 @@ import { recordLeadMagnetDelivery } from "@/lib/leadMagnets";
 import { FOLLOW_NUDGE_MESSAGE } from "@/lib/messages";
 import { hasUnresolvedLinkToken } from "@/lib/rules";
 import { autoDmLimitMessage, monthlyAutoDmLimit } from "@/lib/planLimits";
+import { inBackground, notifyDmLimitReached } from "@/lib/emailNotify";
+import { isFeatureReady } from "@/lib/featureReadiness";
 import { DM_WINDOW_MS, lastInboundMessageAt, withinWindow } from "@/lib/inbox";
 import {
   MAX_ATTEMPTS,
@@ -192,6 +194,8 @@ type RunState = {
   monthlyByUser: Map<string, number>;
   /** Monthly limit per user (plan + referral bonus), read once per run through the pool. */
   limitByUser: Map<string, Awaited<ReturnType<typeof monthlyAutoDmLimit>>>;
+  /** Users whose monthly-limit e-mail was already triggered this run. */
+  limitNotified: Set<string>;
 };
 
 type AccountOutcome = {
@@ -340,6 +344,14 @@ async function sendForAccount(pool: pg.Pool, account: AccountRow, token: string,
             [row.id, autoDmLimitMessage(limits.limit, limits.plan)]
           );
           run.result.skipped += 1;
+          if (!run.limitNotified.has(row.user_id)) {
+            // Tell the user once a month that auto-DMs stopped (never blocks or fails the send loop).
+            run.limitNotified.add(row.user_id);
+            const l = limits;
+            inBackground("dm_limit", () =>
+              notifyDmLimitReached(row.user_id, { limit: l.limit, plan: l.plan, canUpgrade: l.plan !== "Agency" && isFeatureReady("billing") }),
+            );
+          }
           continue;
         }
       }
@@ -508,7 +520,7 @@ async function sendForAccount(pool: pg.Pool, account: AccountRow, token: string,
  * be one budget spent oldest-account-first). The hourly per-account limit still applies on top.
  */
 export async function sendDueDms(limit = 50): Promise<SendResult> {
-  const run: RunState = { result: { sent: 0, retried: 0, failed: 0, skipped: 0 }, monthlyByUser: new Map(), limitByUser: new Map() };
+  const run: RunState = { result: { sent: 0, retried: 0, failed: 0, skipped: 0 }, monthlyByUser: new Map(), limitByUser: new Map(), limitNotified: new Set() };
   const pool = getPool();
   const accounts = await pool.query<AccountRow>(
     `select id, external_id, access_token_enc, auth_type from socialapp.social_accounts

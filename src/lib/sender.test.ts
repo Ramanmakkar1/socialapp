@@ -224,6 +224,9 @@ function inboundEventRow(accountExternalId: string, senderId: string, at: Date) 
 /** Refer-and-earn bonus DMs returned for every user by the harness (planLimits.monthlyAutoDmLimit). */
 let harnessReferralBonus = 0;
 
+/** email_sends keys claimed through the harness pool (claimEmailKey), kept across runs like the table. */
+const harnessEmailKeys = new Set<string>();
+
 /** recordLeadMagnetDelivery calls seen by the harness pool (follow_check deliveries). */
 const magnetDeliveries: { userId: string; ruleId: string; contactId: string }[] = [];
 
@@ -263,6 +266,15 @@ function installSendDueDmsHarness(
     }
     if (sql.includes("from socialapp.referrals where referrer_user_id=$1 and qualified_at is not null")) {
       return { rows: [{ n: harnessReferralBonus }] };
+    }
+    if (sql.startsWith("insert into socialapp.email_sends")) {
+      const key = String(params?.[0]);
+      if (harnessEmailKeys.has(key)) return { rows: [] };
+      harnessEmailKeys.add(key);
+      return { rows: [{ key }] };
+    }
+    if (sql.startsWith("select email, name from socialapp.users where id=$1")) {
+      return { rows: [{ email: "owner@example.com", name: "Owner" }] };
     }
     if (sql.includes("insert into socialapp.lead_magnet_deliveries")) {
       magnetDeliveries.push({ userId: String(params?.[0]), ruleId: String(params?.[1]), contactId: String(params?.[2]) });
@@ -1354,4 +1366,44 @@ test("sendDueDms: budget an account does not need goes to the accounts that stil
   const { perAccount, result } = await sentPerAccount({ busy: 100, quiet: 2 }, 20);
   assert.equal(result.sent, 20);
   assert.deepEqual(perAccount, { busy: 18, quiet: 2 });
+});
+
+test("sendDueDms: hitting the monthly limit triggers one 'auto-DMs paused' e-mail per user per month", async () => {
+  harnessEmailKeys.clear();
+  globalThis.fetch = async () => ({ ok: true, text: async () => "" }) as Response;
+  const previousInfo = console.info;
+  const mails: string[] = [];
+  console.info = (msg?: unknown) => void mails.push(String(msg));
+  try {
+    await withSendDueDmsEnv(
+      oneAccount(),
+      [
+        baseQueueRow({ id: "q-a", social_account_id: "acc-1", comment_id: "c-a" }),
+        baseQueueRow({ id: "q-b", social_account_id: "acc-1", comment_id: "c-b" }),
+      ],
+      oneRule,
+      async (ctx) => {
+        const connect = ctx.pool.connect.bind(ctx.pool);
+        (ctx.pool as unknown as { connect: () => Promise<unknown> }).connect = async () => {
+          const client = (await connect()) as unknown as { query: (sql: string, params?: unknown[]) => Promise<unknown> };
+          const original = client.query;
+          client.query = async (sql: string, params: unknown[] = []) =>
+            sql.includes("kind <> 'manual_reply'") ? { rows: [{ n: 500 }] } : original(sql, params);
+          return client;
+        };
+        const { sendDueDms } = await import("./sender.ts");
+        const { utcMonthKey } = await import("./emailNotify.ts");
+        const first = await sendDueDms(50);
+        assert.equal(first.skipped, 2);
+        await new Promise((r) => setTimeout(r, 20));
+        ctx.queue.forEach((q) => { q.status = "pending"; });
+        await sendDueDms(50);
+        await new Promise((r) => setTimeout(r, 20));
+        assert.deepEqual([...harnessEmailKeys], [`dm-limit:user-1:${utcMonthKey(new Date())}`]);
+        assert.equal(mails.filter((m) => m.includes("[email:dm_limit]")).length, 1, "one e-mail for two runs and two skipped DMs");
+      }
+    );
+  } finally {
+    console.info = previousInfo;
+  }
 });

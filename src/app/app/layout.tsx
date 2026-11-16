@@ -7,7 +7,7 @@ import { isDbConfigured, query } from "@/lib/db";
 import { instrumentSans } from "@/lib/fonts";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
-import { monthlyAutoDmLimit, PLAN_LIMITS, type PlanName } from "@/lib/planLimits";
+import { autoDmLimitBanner, autoDmLimitReached, monthlyAutoDmLimit, PLAN_LIMITS, type PlanName } from "@/lib/planLimits";
 import { getBilling, type StoredBilling } from "@/lib/billing";
 import { graceEndsAt, planFromBilling } from "@/lib/billingState";
 import { cookies } from "next/headers";
@@ -295,6 +295,16 @@ async function AppShell({ children }: { children: ReactNode }) {
           : "Your account is on the Free plan until the payment goes through."
       }`,
       action: <BtnA href="/app/settings/billing" size="sm">Update payment</BtnA>,
+    });
+  }
+  // Auto-DMs stopped by the monthly limit (same count the send worker enforces); an e-mail goes out too.
+  if (autoDmLimitReached(dmsThisMonth, dmLimit)) {
+    const canUpgrade = plan !== "Agency" && isFeatureReady("billing");
+    alerts.push({
+      id: "dm-limit",
+      tone: "danger",
+      text: autoDmLimitBanner(dmLimit, plan),
+      action: <BtnA href={canUpgrade ? "/app/settings/billing#plans" : "/app/auto-dm/activity"} size="sm">{canUpgrade ? "See plans" : "View activity"}</BtnA>,
     });
   }
   if (upgradeIntent) {
