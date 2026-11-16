@@ -82,9 +82,15 @@ export default function WeekView({ posts, weekStart, composeBase, accounts = {},
     const body = bodyRef.current;
     if (!tz || !body || scrolledFor.current === scrollKey) return;
     scrolledFor.current = scrollKey;
-    const row = body.querySelector<HTMLElement>(`[data-hour="${scrollTarget}"]`);
-    const head = body.querySelector<HTMLElement>("[data-head]");
-    if (row) body.scrollTop = row.offsetTop - (head?.offsetHeight ?? 0);
+    const place = () => {
+      const row = body.querySelector<HTMLElement>(`[data-hour="${scrollTarget}"]`);
+      const head = body.querySelector<HTMLElement>("[data-head]");
+      if (row) body.scrollTop = row.offsetTop - (head?.offsetHeight ?? 0);
+    };
+    place();
+    // Again after the next frame, in case styles or fonts were still settling row heights.
+    const raf = requestAnimationFrame(place);
+    return () => cancelAnimationFrame(raf);
   }, [tz, scrollKey, scrollTarget]);
 
   // Days and hours depend on the browser time zone, which is only known after hydration.

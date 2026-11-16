@@ -47,8 +47,14 @@ export default function WeekPostCard({ post, tz, editHref, onOpen }: {
       </span>
       {hasMedia && (
         <span className={styles.wcThumb} aria-hidden="true">
-          <TopThumb src={post.thumb} className={styles.wcThumbImg} />
-          {post.thumbIsVideo && <Play className={styles.playIcon} width={12} height={12} />}
+          {post.thumbIsVideo && !post.thumb ? (
+            <span className={styles.wcThumbVideo}><Play width={14} height={14} /></span>
+          ) : (
+            <>
+              <TopThumb src={post.thumb} className={styles.wcThumbImg} />
+              {post.thumbIsVideo && <Play className={styles.playIcon} width={12} height={12} />}
+            </>
+          )}
         </span>
       )}
     </>

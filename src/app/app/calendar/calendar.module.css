@@ -1052,10 +1052,11 @@
 .dayTab {
   position: relative;
   display: flex;
-  min-height: 52px;
+  min-height: 58px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 0 0 8px;
   border: 1px solid var(--poskoo-line);
   border-radius: 10px;
   background: var(--poskoo-card);
@@ -1063,7 +1064,7 @@
   font: 600 .7rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
   cursor: pointer;
 }
-.dayTab strong { color: var(--poskoo-ink); font-size: .95rem; }
+.dayTab strong { color: var(--poskoo-ink); font-size: .95rem; line-height: 1.2; }
 .dayTabToday, .dayTabToday strong { color: var(--poskoo-violet); }
 .dayTab[aria-selected="true"] { border-color: var(--poskoo-ink); background: var(--poskoo-ink); color: #fff; }
 .dayTab[aria-selected="true"] strong { color: #fff; }
@@ -1118,3 +1119,4 @@
 .tgCell.cellOver { background: var(--poskoo-band); box-shadow: inset 0 0 0 2px var(--poskoo-violet); }
 .selectWrap > .selectIconLeft { right: auto; left: 10px; }
 .tzSelect { max-width: 220px; padding-left: 1.9rem; text-overflow: ellipsis; }
+.wcThumbVideo { display: grid; width: 100%; height: 100%; place-items: center; color: var(--poskoo-muted); }
