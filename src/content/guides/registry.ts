@@ -798,6 +798,70 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["how-to-find-your-best-time-to-post", "how-to-cross-post-on-social-media"],
   },
+  {
+    slug: "instagram-reels-strategy-for-small-business",
+    title: "Instagram Reels Strategy for Small Business (2026)",
+    description:
+      "An Instagram Reels strategy for small businesses: 8 formats with examples, hooks, length, safe zones, a weekly routine and how to turn views into DMs.",
+    h1: "Instagram Reels strategy for small businesses",
+    subtitle:
+      "Eight Reel formats with real examples, hooks for the first two seconds, a weekly routine that fits around work, and a way to turn views into customers.",
+    crumb: "Reels strategy for small business",
+    excerpt: "8 Reel formats, hooks and a weekly routine that turns views into DMs.",
+    category: "growth",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1720,
+    cover: {
+      src: "/illustrations/analytics.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman waters a row of rising green bar-chart plants with a watering can while hearts and an upward arrow float above, a dog beside her",
+    },
+    takeaways: [
+      "Post two or three original Reels a week; Instagram recommends originals and drops aggregators from recommendations.",
+      "Rotate three formats: one that shows skill, one that builds trust and one that helps the viewer.",
+      "Say, show and write your hook in the first two seconds, with no greeting first.",
+      "Film in one weekly batch on your phone, then schedule the Reels so posting never depends on a quiet moment.",
+      "End each Reel with one comment keyword and judge it by non-follower reach, shares and saves, not likes.",
+    ],
+    faqs: [
+      {
+        q: "How many Reels should a small business post each week?",
+        a: "Two or three a week is a realistic target for most small businesses. Pick a number you can keep for three months. A steady rhythm teaches you more than a burst of daily posting that stops after two weeks.",
+      },
+      {
+        q: "How long should an Instagram Reel be?",
+        a: "As long as the idea needs. Reels can be up to three minutes, but quick tips often work at 7 to 20 seconds and explainers at 30 to 60 seconds. Check where viewers drop off in Insights and tighten the next one.",
+      },
+      {
+        q: "Do I need to show my face in Reels?",
+        a: "No. Hands at work, a process, a before and after or a product demo all work without a face. Showing the team now and then does help people trust a small business, so try it once you are comfortable.",
+      },
+      {
+        q: "Can I repost my TikTok videos as Reels?",
+        a: "Yes, if they are your own videos. Download or export a clean file without another app's watermark first. Instagram does not treat watermarked content as eligible for recommendations.",
+      },
+      {
+        q: "Should I use trending audio?",
+        a: "Only when it fits the video. Clear speech or original sound that explains your work is usually more useful to a small business than a trending song with no connection to what you sell.",
+      },
+      {
+        q: "Can I schedule Instagram Reels?",
+        a: "Yes. Instagram lets professional accounts schedule in the app, and Poskoo schedules Reels from a browser alongside your other posts, then can auto-DM everyone who comments your keyword.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-reels-size-checker",
+      "/tools/instagram-safe-zone-checker",
+      "/tools/instagram-reel-cover-maker",
+      "/tools/instagram-hook-generator",
+      "/tools/instagram-post-ideas-generator",
+      "/tools/instagram-engagement-rate-calculator",
+    ],
+    related: ["how-to-get-more-instagram-followers", "instagram-comment-to-dm-automation-guide"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
