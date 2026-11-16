@@ -14,7 +14,7 @@ import { AnimArt } from "@/components/AnimArt";
 export const revalidate = 600;
 
 const PATH = "/linkedin-scheduler";
-const title = "LinkedIn Scheduler: Plan and Auto-Publish Posts on Time";
+const title = "LinkedIn Scheduler: Schedule and Publish Posts Easily";
 const description = `Schedule LinkedIn posts in advance and let Poskoo auto-publish them on time through the official API, with retries on failures. Start free on the $0 plan.`;
 
 export const metadata: Metadata = withSocial({
@@ -154,9 +154,9 @@ export default function LinkedInSchedulerPage() {
           Schedule LinkedIn posts and <em className="s mark">publish them on time</em>
         </h1>
         <p className="lede">
-          Yes, you can schedule LinkedIn posts on the $0 Free plan (no credit card): connect your profile with LinkedIn&apos;s official sign-in,
-          write a post of up to 3,000 characters with up to 20 images, pick a date and time, and Poskoo publishes it
-          automatically. LinkedIn sits on the same calendar as Instagram, Facebook and Threads.
+          A LinkedIn scheduler is a tool that saves your LinkedIn posts and publishes them automatically at the date and
+          time you choose. Poskoo publishes to your profile or a company page through LinkedIn&apos;s official API, so your
+          posts go live even when you are busy or offline.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -171,7 +171,7 @@ export default function LinkedInSchedulerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">LinkedIn scheduling features</p>
-            <h2>What you can <em className="s">schedule on LinkedIn.</em></h2>
+            <h2>Supported LinkedIn <em className="s">scheduling workflows.</em></h2>
             <p className="lede">
               A LinkedIn scheduler is a tool that saves your posts and publishes them to LinkedIn at the date and time
               you choose, so you do not have to be online. Poskoo does this through LinkedIn&apos;s official API, on the
@@ -258,6 +258,36 @@ export default function LinkedInSchedulerPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Who it is for</p>
+            <h2>Who a LinkedIn scheduler is for</h2>
+            <p className="lede">
+              A LinkedIn scheduler suits anyone who posts to LinkedIn regularly but cannot be online at the best time
+              every day. That includes:
+            </p>
+          </div>
+          <div className="cards">
+            <article className="pcard">
+              <span className="no">01 / Founders</span>
+              <h3>Founders and solo marketers</h3>
+              <p>Plan a week of thought-leadership posts in one sitting, then stay visible without interrupting your workday.</p>
+            </article>
+            <article className="pcard">
+              <span className="no">02 / B2B teams</span>
+              <h3>B2B marketing teams</h3>
+              <p>Keep your company page and team members posting on a steady cadence, with every planned post visible in one calendar.</p>
+            </article>
+            <article className="pcard">
+              <span className="no">03 / Agencies</span>
+              <h3>Agencies and consultants</h3>
+              <p>Manage several client profiles from one queue, schedule posts in advance and check what published or failed.</p>
+            </article>
           </div>
         </div>
       </section>
