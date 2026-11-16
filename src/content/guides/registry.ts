@@ -610,6 +610,65 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["best-instagram-auto-dm-tools-2026", "how-to-get-more-comments-on-instagram"],
   },
+  {
+    slug: "how-to-get-more-comments-on-instagram",
+    title: "How to Get More Comments on Instagram: 12 Tactics",
+    description:
+      "12 ways to get more comments on Instagram, with sample captions, a reply routine, what to avoid and how to turn comments into DMs and leads.",
+    h1: "How to get more comments on Instagram (and turn them into leads)",
+    subtitle:
+      "Twelve tactics with sample captions, a reply routine that keeps people talking, and a two-week plan to find what works for you.",
+    crumb: "Get more Instagram comments",
+    excerpt: "12 tactics, sample captions and a 2-week plan to get more comments.",
+    category: "growth",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1670,
+    cover: {
+      src: "/illustrations/empty-inbox.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman on a purple beanbag holds a phone while colourful chat bubbles fly into a giant phone, with a dog asleep beside her",
+    },
+    takeaways: [
+      "Ask one specific, easy question per post; \"A or B?\" gets more replies than \"Thoughts?\".",
+      "Put the question on screen and say it out loud in Reels, not only in the caption.",
+      "Reply to every comment early and ask something back to turn single comments into threads.",
+      "Skip engagement bait, comment pods and bought comments: they add noise, not customers.",
+      "Use a keyword call to action with comment-to-DM automation to turn comments into leads.",
+    ],
+    faqs: [
+      {
+        q: "Why am I getting views but no comments on Instagram?",
+        a: "Usually because the post doesn't ask for a comment, or asks in a way that takes effort. End with one specific question or an A-or-B choice, put it on screen, and reply quickly to the first comments.",
+      },
+      {
+        q: "Do comments help Instagram reach?",
+        a: "Comments show that people found a post worth responding to, along with saves and shares. Treat them as one signal of interest rather than a guaranteed reach boost, and focus on content people want to talk about.",
+      },
+      {
+        q: "Are comment pods allowed on Instagram?",
+        a: "They are a poor idea. Pods bring comments from people who are not your audience, make your Insights harder to read and can look inauthentic. Real replies from your niche are worth more.",
+      },
+      {
+        q: "How quickly should I reply to comments?",
+        a: "As soon as you can, ideally in the first hour after posting. Early replies keep the conversation going while the post is being shown, and they encourage others to join in.",
+      },
+      {
+        q: "What is a keyword comment call to action?",
+        a: "A line such as \"Comment GUIDE and I'll send you the checklist\". When someone comments the keyword, comment-to-DM automation sends them the link in a private message.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-engagement-rate-calculator",
+      "/tools/instagram-hook-generator",
+      "/tools/instagram-caption-generator",
+      "/tools/instagram-comment-picker",
+      "/tools/instagram-comment-keyword-tester",
+    ],
+    related: ["instagram-comment-to-dm-automation-guide", "how-to-get-more-instagram-followers"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
