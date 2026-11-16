@@ -263,7 +263,8 @@ export default async function FeaturesPage() {
                 the <Link className={s.vlink} href="/bluesky-scheduler">Bluesky scheduler</Link>,{" "}
                 the <Link className={s.vlink} href="/mastodon-scheduler">Mastodon scheduler</Link>,{" "}
                 the <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>{" "}
-                and the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>.
+                the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>{" "}
+                and the <Link className={s.vlink} href="/features/social-media-content-calendar">social media content calendar</Link>.
                 Running a small business? See the{" "}
                 <Link className={s.vlink} href="/social-media-scheduler">
                   social media scheduler for small business
