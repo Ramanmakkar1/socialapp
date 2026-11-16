@@ -2,6 +2,7 @@
 import { isDbConfigured, query } from "@/lib/db";
 import type { MediaInsights } from "@/lib/insights";
 import { clickCountSql, uniqueClickCountSql } from "./links";
+import { planFeatureAllowed } from "./planFeatures";
 
 export type DashboardStats = {
   scheduled: number;
@@ -32,6 +33,12 @@ export async function getRuleStats(userId: string): Promise<RuleStats[]> {
   if (!isDbConfigured()) {
     return [];
   }
+  const [rows, analytics] = await Promise.all([loadRuleStats(userId), planFeatureAllowed(userId, "click_lead_analytics")]);
+  // Click + lead analytics are a Pro / Agency feature (enforced once paid plans are on sale).
+  return analytics ? rows : rows.map((r) => ({ ...r, leads: 0, clicks: 0, uniqueClicks: 0 }));
+}
+
+function loadRuleStats(userId: string): Promise<RuleStats[]> {
   return query<RuleStats>(
     `select r.id, r.name, r.status,
       (select count(*)::int from socialapp.dm_queue q where q.rule_id = r.id and q.status = 'sent') as "dmsSent",
@@ -179,7 +186,9 @@ export async function getDailyActivity(userId: string): Promise<DailyActivityRow
     return [];
   }
   try {
-    return await query<DailyActivityRow>(
+    // Lead counts are part of click + lead analytics (Pro / Agency, enforced once paid plans are on sale).
+    const leadsAllowed = await planFeatureAllowed(userId, "click_lead_analytics");
+    const rows = await query<DailyActivityRow>(
       `with days as (
         select generate_series(
           (now() at time zone 'UTC')::date - 13,
@@ -198,6 +207,7 @@ export async function getDailyActivity(userId: string): Promise<DailyActivityRow
       order by d.day`,
       [userId]
     );
+    return leadsAllowed ? rows : rows.map((r) => ({ ...r, leads: 0 }));
   } catch {
     return [];
   }

@@ -2,6 +2,7 @@
 // Auto-DM page (src/app/app/auto-dm/actions.ts) and the MCP create_dm_rule tool, so both validate
 // with the same rules (src/lib/rules.ts validateRule) and write the same row.
 import { query } from "@/lib/db";
+import { requirePlanFeature } from "@/lib/planFeatures";
 import { validateRule, type DmRule } from "@/lib/rules";
 import { cleanPublicReply } from "@/lib/publicReply";
 import { isMissingColumnError } from "@/lib/ruleMedia";
@@ -105,6 +106,16 @@ export async function resolveSocialAccountId(
 }
 
 /**
+ * Email capture in DMs is a Pro / Agency feature: a rule that asks for an email is refused on Free
+ * (only enforced once paid plans are on sale, src/lib/planFeatures.ts). Used by create and update.
+ */
+export async function emailCapturePlanError(userId: string, input: Pick<RuleFormInput, "emailGate">): Promise<string | null> {
+  if (!input.emailGate) return null;
+  const gate = await requirePlanFeature(userId, "email_capture");
+  return gate.ok ? null : gate.error;
+}
+
+/**
  * Validates and inserts one rule for `userId`. `status` is 'active' from the Auto-DM page; the MCP
  * tool creates rules 'paused' unless the API key may publish, so the owner switches them on.
  */
@@ -117,6 +128,8 @@ export async function createDmRuleForUser(
   if (errors.length > 0) {
     return { ok: false, errors };
   }
+  const planError = await emailCapturePlanError(userId, input);
+  if (planError) return { ok: false, errors: [planError] };
   let account: Awaited<ReturnType<typeof resolveSocialAccountId>>;
   try {
     account = await resolveSocialAccountId(userId, input.socialAccountId);
