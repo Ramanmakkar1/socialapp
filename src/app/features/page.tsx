@@ -228,6 +228,11 @@ export default async function FeaturesPage() {
               <p>Compare the Free, Pro and Agency plans and what each one includes.</p>
               <Link className="go" href="/pricing">See Poskoo pricing and plans <span aria-hidden="true">&rarr;</span></Link>
             </article>
+            <article className="pcard">
+              <h3>Free tools</h3>
+              <p>Caption counters, hashtag and bio generators, size checkers and more, no signup.</p>
+              <Link className="go" href="/tools">Browse the free social media tools <span aria-hidden="true">&rarr;</span></Link>
+            </article>
           </div>
         </div>
       </section>

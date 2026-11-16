@@ -944,6 +944,20 @@
   }
 }
 
+/* Four steps (AI assistant setup guides): 4 across on desktop, 2 x 2 on
+   tablets, never 3 + a lone 4th. */
+@media (min-width: 1100px) {
+  .shell.pub :global(.howGrid:has(> .howStep:nth-child(4):last-child)) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 641px) and (max-width: 1099px) {
+  .shell.pub :global(.howGrid:has(> .howStep:nth-child(4):last-child)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+  }
+}
+
 /* Two-card rows and other card counts: keep cards straight here too. */
 .shell.pub :global(.wrap .cards:has(> .pcard:nth-child(2):last-child)) {
   grid-template-columns: repeat(2, minmax(0, 1fr));

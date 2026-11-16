@@ -147,6 +147,14 @@ export function AiAssistantGuidePage({ slug }: { slug: AssistantSlug }) {
                 <p>{t.text}</p>
               </article>
             ))}
+            {/* One link card completes a 3-column row that would otherwise end with a gap. */}
+            {ASSISTANT_TOOLS.length % 3 === 2 && (
+              <article className="pcard">
+                <h3>Full reference</h3>
+                <p>Every tool in one list, API key setup and what the assistant can and can&apos;t touch.</p>
+                <Link className="go" href="/developers">Open the developers page <span aria-hidden="true">→</span></Link>
+              </article>
+            )}
           </div>
         </div>
       </section>
