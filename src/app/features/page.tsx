@@ -411,6 +411,10 @@ export default async function FeaturesPage() {
                 <li>Official Meta API with no password sharing.</li>
                 <li>Free plan to test the whole workflow, then Pro or Agency when you grow.</li>
               </ul>
+              <p className="small">
+                Coming from Hootsuite? Read the{" "}
+                <Link className={s.vlink} href="/hootsuite-alternative">Hootsuite alternative with Instagram auto-DM</Link>.
+              </p>
             </div>
             <div className="art">
               <AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" />
