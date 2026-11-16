@@ -31,7 +31,8 @@ test("canonical is pinned to the approved origin, not a NEXT_PUBLIC_SITE_URL ove
   );
 });
 
-test("canonical stays on poskoo.com and never the staging host", () => {
+test("metadata canonical origin stays on poskoo.com and never the staging host", () => {
+  assert.equal(BRAND.canonicalUrl, "https://poskoo.com");
   for (const path of ["/", "/pricing", "/instagram-scheduler"]) {
     const url = canonicalUrl(path);
     assert.ok(url.startsWith("https://poskoo.com"), `${path} must use the final domain`);

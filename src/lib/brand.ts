@@ -37,7 +37,9 @@ export const BRAND = {
   description:
     "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
-  canonicalUrl: rawUrl.replace(/\/+$/, ""),
+  // Canonicals and metadataBase always use the final production origin, even
+  // when NEXT_PUBLIC_SITE_URL points at the legacy staging host.
+  canonicalUrl: APPROVED_PRODUCTION_URL,
   // Socialapp remains staging/noindex until Raman moves it to the new domain.
   // Defaults to false; only an explicit flag + approved production URL enables it.
   indexable: resolveSiteIndexable(),
