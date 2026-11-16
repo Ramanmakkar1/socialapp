@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
-import { PLANS, plansNote, softwareOffers, type Plan, type PlanReadiness } from "@/lib/plans";
+import { PLANS, plansFor, plansNote, softwareOffers, type Plan, type PlanReadiness } from "@/lib/plans";
 import { planReadinessNow } from "@/lib/featureReadinessNow";
 import PublicShell from "@/components/PublicShell";
+import { SoonBadge } from "@/components/PlanCta";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -33,6 +34,12 @@ function limitFor(plan: Plan, matches: string[]) {
   const item = itemFor(plan, matches);
   if (!item) return "—";
   return item.soon ? `${item.text} (launching soon)` : item.text;
+}
+
+/** Table cell: the item text, with the shared "Soon" badge when it isn't switched on yet. */
+function cellFor(plan: Plan, value: (plan: Plan) => string) {
+  const text = value(plan);
+  return text.endsWith(" (launching soon)") ? <>{text.replace(/ \(launching soon\)$/, "")} <SoonBadge /></> : text;
 }
 
 const allRows: { label: string; value: (plan: Plan) => string }[] = [
@@ -113,6 +120,7 @@ const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 export default async function InstagramSchedulerPricingPage() {
   const r = await planReadinessNow();
   const faqs = pageFaqs(r);
+  const plans = plansFor(r);
   return (
     <PublicShell
       breadcrumbs={[
@@ -157,7 +165,7 @@ export default async function InstagramSchedulerPricingPage() {
               <thead>
                 <tr className={s.tr}>
                   <th scope="col" className={s.th}>Feature</th>
-                  {PLANS.map((plan) => (
+                  {plans.map((plan) => (
                     <th key={plan.name} scope="col" className={`${s.th} ${plan.name === "Pro" ? s.oursCol : ""}`}>
                       {plan.name}
                     </th>
@@ -168,13 +176,13 @@ export default async function InstagramSchedulerPricingPage() {
                 {rows.map((row) => (
                   <tr key={row.label} className={s.tr}>
                     <td className={s.td} style={{ fontWeight: 600 }}>{row.label}</td>
-                    {PLANS.map((plan) => (
+                    {plans.map((plan) => (
                       <td
                         key={plan.name}
                         className={`${s.td} ${plan.name === "Pro" ? s.oursCol : ""}`}
                         style={plan.name === "Pro" ? { fontWeight: 600 } : undefined}
                       >
-                        {row.value(plan)}
+                        {cellFor(plan, row.value)}
                       </td>
                     ))}
                   </tr>
