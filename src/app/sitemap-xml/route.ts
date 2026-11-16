@@ -5,7 +5,7 @@
 // browsers render the styled page in public/sitemap.xsl (title, lang, viewport,
 // one <h1>) instead of a bare XML tree. next.config rewrites /sitemap.xml here.
 import sitemap from "@/app/sitemap";
-import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +41,7 @@ export async function GET(request?: Request) {
         new URL(request.url).host
       ).toLowerCase()
     : null;
-  const hostIsIndexable =
-    requestHost === null || isApprovedProductionOrigin(`https://${requestHost}`);
-  const urls = (hostIsIndexable ? await sitemap() : [])
+  const urls = (await sitemap(requestHost))
     .map((entry) => {
       const lastmod = formatLastMod(entry.lastModified);
       const changefreq = entry.changeFrequency

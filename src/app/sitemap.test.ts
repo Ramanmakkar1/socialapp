@@ -102,6 +102,17 @@ test("legacy staging host is never listed even when BRAND.indexable is forced tr
   }
 });
 
+test("sitemap generator returns nothing for the noindex legacy request host", () => {
+  const was = BRAND.indexable;
+  try {
+    BRAND.indexable = true;
+    assert.deepEqual(sitemap("socialapp.splitforms.com"), [], "the legacy noindex host must not list any URL");
+    assert.ok(sitemap("poskoo.com").length > 0, "the approved production host must still list its pages");
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
 test("approved production host returns an empty sitemap while BRAND.indexable is false", () => {
   const wasUrl = BRAND.url;
   try {

@@ -23,11 +23,14 @@ export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
 // intended; the file stays raw XML with no XSLT styling.
-function getSitemapPaths(): PublicPath[] {
+function getSitemapPaths(host?: string | null): PublicPath[] {
   // Staging is noindex: list nothing, on any host, until indexing is enabled.
   if (!isSiteIndexable()) return [];
   // A non-canonical (staging/legacy) origin is always noindex, so never list it
-  // even when the indexability flag is forced on.
+  // even when the indexability flag is forced on. When the caller knows the
+  // request host, use it: the legacy host must serve an empty sitemap even if
+  // a redirect is bypassed.
+  if (host && !isApprovedProductionOrigin(`https://${host}`)) return [];
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
   // isPathIndexable is the single source of truth: a noindex page (including
   // the homepage while staging is noindex) is never listed, and it is listed
@@ -35,11 +38,11 @@ function getSitemapPaths(): PublicPath[] {
   return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
   // Re-check indexability at the output boundary: a path that is noindex for
   // any reason must never reach the XML, even if the candidate list changes.
   const hostIsIndexable = isApprovedProductionOrigin(BRAND.url);
-  return getSitemapPaths()
+  return getSitemapPaths(host)
     .filter((path) => hostIsIndexable && isPathIndexable(path))
     .map((path) => {
       return {
