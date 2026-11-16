@@ -1,13 +1,15 @@
-// /sitemap.xml must be machine-readable raw XML.
+// Browser-friendly /sitemap.xml.
 //
-// This route serialises the SAME sitemap() entries as sitemap.ts. It deliberately
-// emits no XSL stylesheet processing instruction: an XML-to-HTML transform made
-// browsers show a "This site uses XSLT" warning and render a purple HTML page for
-// a URL that crawlers expect to be plain XML. next.config rewrites /sitemap.xml here.
+// This route serialises the SAME sitemap() entries as sitemap.ts and adds an XSL
+// stylesheet processing instruction. Crawlers still receive plain XML, while
+// browsers render the styled page in public/sitemap.xsl (title, lang, viewport,
+// one <h1>) instead of a bare XML tree. next.config rewrites /sitemap.xml here.
 import sitemap from "@/app/sitemap";
 import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
+
+const STYLESHEET_HREF = "/sitemap.xsl";
 
 function xmlEscape(value: string): string {
   return value
@@ -58,6 +60,7 @@ export async function GET(request?: Request) {
     .join("\n");
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="${STYLESHEET_HREF}"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}${urls ? "\n" : ""}</urlset>
 `;

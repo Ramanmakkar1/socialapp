@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { GET } from "./sitemap-xml/route.ts";
 import { BRAND } from "@/lib/brand";
 
-test("sitemap.xml route serves raw XML with no XSLT stylesheet", async () => {
+test("sitemap.xml serves XML with the browser stylesheet, not an HTML document", async () => {
   const was = BRAND.indexable;
   BRAND.indexable = true;
   try {
@@ -11,12 +12,28 @@ test("sitemap.xml route serves raw XML with no XSLT stylesheet", async () => {
     assert.equal(res.status, 200);
     assert.match(res.headers.get("content-type") ?? "", /application\/xml/);
     const body = await res.text();
-    assert.doesNotMatch(body, /<\?xml-stylesheet/, "sitemap.xml must not reference an XSL stylesheet");
-    assert.doesNotMatch(body, /<html[\s>]/i, "sitemap.xml must stay raw XML, not an HTML document");
+    assert.match(
+      body,
+      /<\?xml-stylesheet type="text\/xsl" href="\/sitemap\.xsl"\?>/,
+      "sitemap.xml must reference the XSL stylesheet so browsers can render it",
+    );
+    assert.doesNotMatch(body, /<html[\s>]/i, "sitemap.xml must stay XML, not an HTML response body");
     assert.match(body, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
   } finally {
     BRAND.indexable = was;
   }
+});
+
+test("sitemap.xsl renders a titled, lang-tagged, mobile viewport page with one H1", () => {
+  const xsl = readFileSync("public/sitemap.xsl", "utf8");
+  assert.match(xsl, /<html lang="en">/, "rendered sitemap page must declare its language");
+  assert.match(
+    xsl,
+    /<meta name="viewport" content="width=device-width, initial-scale=1"\/>/,
+    "rendered sitemap page must include the mobile viewport meta",
+  );
+  assert.match(xsl, /<title>XML Sitemap — Poskoo<\/title>/, "rendered sitemap page must have a title");
+  assert.equal((xsl.match(/<h1[\s>]/g) ?? []).length, 1, "rendered sitemap page must have exactly one H1");
 });
 
 test("sitemap.xml route has no <url> entries while BRAND.indexable is false", async () => {
