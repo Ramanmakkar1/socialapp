@@ -734,6 +734,70 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["social-media-content-calendar-guide", "how-to-schedule-instagram-posts"],
   },
+  {
+    slug: "social-media-content-calendar-guide",
+    title: "Social Media Content Calendar: Plan a Month in an Hour",
+    description:
+      "How to build a social media content calendar in one hour: goals, content pillars, a format mix, a sample 4-week plan you can copy and a weekly batching routine.",
+    h1: "How to plan a social media content calendar (a month in one hour)",
+    subtitle:
+      "A timed, step-by-step method with content pillars, a full sample month for a small business, a weekly batching routine and a 15-minute monthly review.",
+    crumb: "Social media content calendar",
+    excerpt: "Plan a month of posts in an hour, with a sample calendar you can copy.",
+    category: "scheduling",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1850,
+    cover: {
+      src: "/illustrations/empty-calendar.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman kneels beside a giant spiral wall calendar, pinning colourful photo cards into its squares, while a dog lies in the plants beside her",
+    },
+    takeaways: [
+      "A content calendar only needs five columns: date, platform, format, content pillar and a one-line idea.",
+      "Time-box the hour: 10 minutes on goal and pillars, 15 on ideas, 10 on a format mix, 15 filling the calendar and 10 scheduling week one.",
+      "Three or four content pillars (teach, show, prove, sell) mean you never start from a blank page.",
+      "Batch each week in one sitting and leave one open slot a week for reactive posts.",
+      "Review the month in 15 minutes before planning the next: goal, top three posts, best pillar and what you skipped.",
+    ],
+    faqs: [
+      {
+        q: "What should a social media content calendar include?",
+        a: "At minimum the date, the platform, the format (Reel, carousel, photo, text post), the content pillar it belongs to and a one-line idea specific enough to make. A status column and a link to the caption or media are useful extras.",
+      },
+      {
+        q: "How far ahead should I plan social media content?",
+        a: "A month is a practical horizon for most small businesses: far enough to plan launches and events, short enough to stay relevant. Batch and schedule one week at a time, and keep one open slot a week for timely posts.",
+      },
+      {
+        q: "How many posts a week should be on my calendar?",
+        a: "Plan the number you can keep for three months. For many small teams that is three to five feed posts a week plus Stories. If you planned five and made three last month, plan four this month.",
+      },
+      {
+        q: "Is a spreadsheet good enough for a content calendar?",
+        a: "Yes. A spreadsheet works well for planning. Poskoo's free content calendar template exports a CSV for Google Sheets or Excel. Once you post to several networks, a scheduler with a calendar view saves you copying posts into each app.",
+      },
+      {
+        q: "Can AI plan my social media calendar?",
+        a: "AI assistants such as ChatGPT or Claude are useful for brainstorming ideas from your goal and pillars. Edit what they suggest so it sounds like you and check any facts. Poskoo's MCP server can let an assistant create draft posts in your account for review.",
+      },
+      {
+        q: "What are content pillars?",
+        a: "Content pillars are the three or four recurring themes you post about, such as teaching, behind the scenes, customer proof and offers. They make planning faster and help new visitors understand what your account is about.",
+      },
+    ],
+    tools: [
+      "/tools/social-media-content-calendar",
+      "/tools/instagram-post-ideas-generator",
+      "/tools/social-media-post-generator",
+      "/tools/best-time-to-post-on-social-media",
+      "/tools/instagram-posting-frequency-calculator",
+      "/tools/instagram-hook-generator",
+    ],
+    related: ["how-to-find-your-best-time-to-post", "how-to-cross-post-on-social-media"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
