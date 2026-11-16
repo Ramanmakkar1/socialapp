@@ -54,6 +54,12 @@ a.inkFill:hover {
   transform: translateY(-1px);
 }
 button.inkFill:disabled { transform: none; }
+/* Links: out-rank the public pages' `.landing a { color: inherit }` (0,1,1), which
+   otherwise turned the label dark on the dark pill. The doubled class gives (0,2,1),
+   so stylesheet order doesn't matter. */
+a.inkFill.inkFill,
+a.inkFill.inkFill:visited,
+a.inkFill.inkFill:hover { color: #fff; }
 
 /* Serif-italic accent word, like the landing's em.s (replaces .gradient-text). */
 .accent {
