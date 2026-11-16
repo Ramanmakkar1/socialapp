@@ -16,6 +16,7 @@ export default function NotFound() {
           <p className="lede">The link may be old or mistyped. Here is where you can go next.</p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/">Back to home</Link>
+            <Link className="btn btn-line" href="/tools">Browse free tools</Link>
             <Link className="btn btn-line" href="/pricing">See pricing</Link>
             <Link className="btn btn-line" href="/help">Visit help</Link>
             <Link className="btn btn-line" href="/contact">Contact us</Link>
