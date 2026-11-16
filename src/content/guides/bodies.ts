@@ -14,6 +14,7 @@ import { body as socialMediaContentCalendarGuide } from "./social-media-content-
 import { body as instagramReelsStrategyForSmallBusiness } from "./instagram-reels-strategy-for-small-business";
 import { body as linkInBioBestPractices } from "./link-in-bio-best-practices";
 import { body as howToGrowEmailListFromInstagram } from "./how-to-grow-email-list-from-instagram";
+import { body as linkedinPostingStrategyForFounders } from "./linkedin-posting-strategy-for-founders";
 
 /** Article body per registry slug. Every GUIDES entry must have one (checked by the article page). */
 export const GUIDE_BODIES: Record<string, GuideBody> = {
@@ -32,4 +33,5 @@ export const GUIDE_BODIES: Record<string, GuideBody> = {
   "instagram-reels-strategy-for-small-business": instagramReelsStrategyForSmallBusiness,
   "link-in-bio-best-practices": linkInBioBestPractices,
   "how-to-grow-email-list-from-instagram": howToGrowEmailListFromInstagram,
+  "linkedin-posting-strategy-for-founders": linkedinPostingStrategyForFounders,
 };

@@ -989,6 +989,72 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["instagram-comment-to-dm-automation-guide", "link-in-bio-best-practices"],
   },
+  {
+    slug: "linkedin-posting-strategy-for-founders",
+    title: "LinkedIn Posting Strategy for Founders and Coaches",
+    description:
+      "LinkedIn posting strategy for founders and coaches: fix your profile, choose content pillars, write strong openers, post 2-3 times a week, use a 4-week plan.",
+    h1: "A LinkedIn posting strategy for founders and coaches",
+    subtitle:
+      "Profile fixes, content pillars, opening lines that earn the \"...more\" tap, three sample posts and a four-week plan you can keep alongside running a business.",
+    crumb: "LinkedIn strategy for founders",
+    excerpt: "Profile, content pillars, hooks, sample posts and a 4-week LinkedIn plan.",
+    category: "ideas",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1790,
+    cover: {
+      src: "/landing/onesub.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman relaxing in a blue armchair holds up a star badge while post cards fly out of an open window, with a piggy bank, a potted plant and a dog nearby",
+    },
+    takeaways: [
+      "Fix your headline, About section and Featured items before you post: every good post sends people to your profile.",
+      "Pick three or four content pillars you can talk about for a year and list 20 ideas under each.",
+      "The first lines before \"...more\" decide whether anyone reads the rest, so write them like a headline.",
+      "Two or three posts a week from your personal profile, plus daily comments on other posts, is a pace you can keep.",
+      "Judge posts by members reached, comments, profile views and DMs, not by likes.",
+    ],
+    faqs: [
+      {
+        q: "How often should a founder post on LinkedIn?",
+        a: "Two or three times a week is a realistic pace for most founders and coaches. Pick fixed days, write in one batch and schedule the posts, so the plan survives busy weeks.",
+      },
+      {
+        q: "Should I post from my personal profile or my company Page?",
+        a: "For founders and coaches, the personal profile usually reaches more of the right people, because posts go to your own network first and people follow people. Use the company Page for product news, jobs and credibility.",
+      },
+      {
+        q: "What should founders post about on LinkedIn?",
+        a: "Pick three or four pillars: lessons from building, how-to posts for your customer, your point of view on your industry, and client stories or proof. Rotate through them and make sure some posts connect to the problem your offer solves.",
+      },
+      {
+        q: "Do hashtags matter on LinkedIn?",
+        a: "They are a small detail. A clear opening line and a useful post matter far more. If you use hashtags, keep to a couple of specific ones that describe the topic.",
+      },
+      {
+        q: "Can I schedule LinkedIn posts?",
+        a: "Yes. LinkedIn's post composer has a clock icon for picking a future time. Poskoo also schedules text and image posts to personal LinkedIn profiles; publishing to company Pages is waiting on LinkedIn's API approval.",
+      },
+      {
+        q: "How do I know if my LinkedIn posts are working?",
+        a: "Open a post's analytics and look at members reached, out-of-network impressions, comments and profile views, then note which posts start DMs or calls. Compare posts with an engagement rate calculator rather than counting likes.",
+      },
+    ],
+    tools: [
+      "/tools/linkedin-hook-generator",
+      "/tools/linkedin-headline-generator",
+      "/tools/linkedin-summary-generator",
+      "/tools/linkedin-post-preview",
+      "/tools/linkedin-text-formatter",
+      "/tools/linkedin-character-counter",
+      "/tools/linkedin-engagement-rate-calculator",
+      "/tools/best-time-to-post-on-linkedin",
+    ],
+    related: ["how-to-find-your-best-time-to-post", "how-to-cross-post-on-social-media"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
