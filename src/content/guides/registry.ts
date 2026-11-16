@@ -925,6 +925,70 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["how-to-grow-email-list-from-instagram", "instagram-comment-to-dm-automation-guide"],
   },
+  {
+    slug: "how-to-grow-email-list-from-instagram",
+    title: "How to Grow Your Email List From Instagram (2026)",
+    description:
+      "Grow your email list from Instagram: lead magnet ideas, where to promote them, comment-to-DM email capture, consent basics and a 3-email welcome sequence.",
+    h1: "How to grow your email list from Instagram",
+    subtitle:
+      "Pick a freebie people want, promote it in every spot on your profile, collect emails in DMs with clear consent, and welcome new subscribers properly.",
+    crumb: "Grow an email list from Instagram",
+    excerpt: "Lead magnets, comment-to-DM email capture and a 3-email welcome sequence.",
+    category: "auto-dm",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1680,
+    cover: {
+      src: "/illustrations/empty-leads.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman holding a big horseshoe magnet pulls in envelopes and round contact portraits that drop into a red box, a dog lying beside her",
+    },
+    takeaways: [
+      "Followers are rented; an email list is the audience you own if reach drops or your account has trouble.",
+      "Offer one small, specific freebie tied to what you sell, usable in under 15 minutes.",
+      "Promote it in your bio link, Stories, Reels, carousel last slides, comment and DM keywords and a Highlight.",
+      "Ask for the email in the DM with a plain consent line, then send the link straight away.",
+      "Follow CAN-SPAM basics, check local rules such as GDPR or CASL, and send a short welcome sequence.",
+    ],
+    faqs: [
+      {
+        q: "What is the best lead magnet for Instagram?",
+        a: "A small, specific resource connected to what you sell: a checklist, template, short plan, discount or early access. If people already ask you for it in DMs, it is a strong first choice.",
+      },
+      {
+        q: "Can I collect emails directly in Instagram DMs?",
+        a: "Yes. A comment-to-DM tool can ask for an email in the private reply and send the link once the person answers. Say clearly in the DM that they are joining your email list.",
+      },
+      {
+        q: "Is it legal to email people who commented on my post?",
+        a: "Only with permission to email them. A comment is a request for the freebie, not consent to marketing. Tell people they are joining your list, include an unsubscribe link and follow the rules where your subscribers live. This is not legal advice.",
+      },
+      {
+        q: "Should I use a landing page or collect emails in DMs?",
+        a: "Both work. DMs are easiest for comment keywords on Reels and carousels. A landing page suits your bio link, Story stickers and ads, where you have room to explain the offer.",
+      },
+      {
+        q: "How do I get Instagram leads into my email tool?",
+        a: "In Poskoo, captured contacts appear in your leads list and can be exported as a CSV, which most email tools can import. Use a separate tag or list so you know they came from Instagram.",
+      },
+      {
+        q: "How often should I email my new subscribers?",
+        a: "Send a short welcome sequence over the first week, then weekly or every two weeks. A steady rhythm matters more than a high frequency.",
+      },
+    ],
+    tools: [
+      "/tools/instagram-utm-builder",
+      "/tools/instagram-dm-link-generator",
+      "/tools/instagram-comment-keyword-tester",
+      "/tools/instagram-comment-to-dm-preview",
+      "/tools/instagram-comment-to-dm-calculator",
+      "/tools/instagram-bio-generator",
+    ],
+    related: ["instagram-comment-to-dm-automation-guide", "link-in-bio-best-practices"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
