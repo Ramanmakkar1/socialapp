@@ -7,7 +7,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
-import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { faqJsonLd, ldJson, publisherRef, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -102,6 +102,18 @@ const faqs = [
   },
 ];
 
+const webPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${BRAND.canonicalUrl}${PATH}#webpage`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
+  name: title,
+  description,
+  inLanguage: "en",
+  isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
+  publisher: publisherRef(),
+};
+
 const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} LinkedIn scheduler`,
@@ -126,7 +138,7 @@ const appJsonLd = {
 export default function LinkedInSchedulerPage() {
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "LinkedIn scheduler", path: PATH }]}>
-      {[appJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[webPageJsonLd, appJsonLd, faqJsonLd(faqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
