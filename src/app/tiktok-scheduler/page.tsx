@@ -17,7 +17,7 @@ export const revalidate = 600;
 const PATH = "/tiktok-scheduler";
 const title = `TikTok Scheduler: Plan and Auto-Post TikTok Videos | ${BRAND.name}`;
 const description = `Schedule TikTok videos and photo posts on one calendar and publish them automatically through TikTok's official API. Plan ahead and post on time.`;
-const SOON_DESCRIPTION = "Plan TikTok videos and photo posts on one calendar. TikTok publishing in Poskoo is built and waiting on TikTok platform approval; Instagram, Threads and Facebook work today.";
+const SOON_DESCRIPTION = "Plan TikTok videos and photo posts on one calendar. TikTok publishing is built and awaiting TikTok approval; Instagram, Threads and Facebook work today.";
 
 // The description only says publishing works once TikTok is live (src/lib/platform-support.ts).
 export async function generateMetadata(): Promise<Metadata> {
