@@ -15,6 +15,7 @@ import { body as instagramReelsStrategyForSmallBusiness } from "./instagram-reel
 import { body as linkInBioBestPractices } from "./link-in-bio-best-practices";
 import { body as howToGrowEmailListFromInstagram } from "./how-to-grow-email-list-from-instagram";
 import { body as linkedinPostingStrategyForFounders } from "./linkedin-posting-strategy-for-founders";
+import { body as threadsVsBlueskyForBrands } from "./threads-vs-bluesky-for-brands";
 
 /** Article body per registry slug. Every GUIDES entry must have one (checked by the article page). */
 export const GUIDE_BODIES: Record<string, GuideBody> = {
@@ -34,4 +35,5 @@ export const GUIDE_BODIES: Record<string, GuideBody> = {
   "link-in-bio-best-practices": linkInBioBestPractices,
   "how-to-grow-email-list-from-instagram": howToGrowEmailListFromInstagram,
   "linkedin-posting-strategy-for-founders": linkedinPostingStrategyForFounders,
+  "threads-vs-bluesky-for-brands": threadsVsBlueskyForBrands,
 };

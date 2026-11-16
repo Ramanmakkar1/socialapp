@@ -1055,6 +1055,70 @@ export const GUIDES: GuideEntry[] = [
     ],
     related: ["how-to-find-your-best-time-to-post", "how-to-cross-post-on-social-media"],
   },
+  {
+    slug: "threads-vs-bluesky-for-brands",
+    title: "Threads vs Bluesky: Which Should Your Brand Use in 2026?",
+    description:
+      "Threads vs Bluesky for brands: who is on each, limits, tone and discovery compared, which business fits where, sample posts and a 30-day plan to test both.",
+    h1: "Threads vs Bluesky: should your brand be there, and how to start",
+    subtitle:
+      "A side-by-side comparison, a fit table by business type, sample posts for each app and a 30-day plan to test both without doubling your work.",
+    crumb: "Threads vs Bluesky",
+    excerpt: "Which text app fits your brand, what to post and a 30-day test.",
+    category: "ideas",
+    author: "Poskoo team",
+    published: "2026-11-15",
+    updated: "2026-11-15",
+    wordCount: 1700,
+    cover: {
+      src: "/illustrations/connect-account.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A woman plugs a cable from a big phone into a smiling cloud, with a padlock speech bubble and a dog watching",
+    },
+    takeaways: [
+      "Start with Threads if your customers already follow you on Instagram; start with Bluesky if your buyers are in tech, media or research.",
+      "Threads posts can run to 500 characters and Bluesky posts to 300, so draft at 300 and both will fit.",
+      "On Bluesky, use your own domain as your handle and get into starter packs and topic feeds for your niche.",
+      "Replies matter more than posts on both apps: plan as much time for conversation as for publishing.",
+      "Test both for 30 days at three posts a week, then judge on replies, profile visits and link clicks, not followers.",
+    ],
+    faqs: [
+      {
+        q: "Is Threads or Bluesky better for business?",
+        a: "It depends on where your customers are. Threads suits consumer brands, creators and local businesses that already have an Instagram audience. Bluesky suits tech, media, research and B2B brands whose audience values direct, expert posts. Many brands test both for a month and keep the one that brings more conversations.",
+      },
+      {
+        q: "How many people use Threads?",
+        a: "In August 2025, Instagram head Adam Mosseri said Threads had passed 400 million monthly active users, as reported by TechCrunch.",
+      },
+      {
+        q: "What is the character limit on Threads and Bluesky?",
+        a: "A Threads post can have up to 500 characters and up to 5 links. A Bluesky post can have up to 300 characters, counted as graphemes, so most emoji count as one.",
+      },
+      {
+        q: "Can I use my website as my Bluesky handle?",
+        a: "Yes. Bluesky lets you set your own domain as your handle by adding a DNS record, and recommends it for official organisations because it works as a form of verification.",
+      },
+      {
+        q: "Can I post to Threads and Bluesky at the same time?",
+        a: "Yes. A scheduler such as Poskoo publishes to both. Write the post once, customise the Threads and Bluesky versions in their own tabs, pick a time and schedule it.",
+      },
+      {
+        q: "Do Threads posts show up on Mastodon?",
+        a: "Only if you turn on fediverse sharing in your Threads account settings. Then your future public posts can be seen and followed from Mastodon and other fediverse servers.",
+      },
+    ],
+    tools: [
+      "/tools/threads-character-counter",
+      "/tools/bluesky-character-counter",
+      "/tools/threads-post-generator",
+      "/tools/threads-bio-generator",
+      "/tools/threads-tools",
+      "/tools/instagram-utm-builder",
+    ],
+    related: ["how-to-cross-post-on-social-media", "social-media-seo-2026"],
+  },
 ];
 
 /** Minutes to read at ≈230 words per minute, at least 1. */
