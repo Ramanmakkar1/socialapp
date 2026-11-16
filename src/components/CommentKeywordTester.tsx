@@ -1,17 +1,20 @@
 "use client";
 
 import { useId, useState } from "react";
+import { CheckCircle2, MessageCircle } from "lucide-react";
 import { matchComment, type MatchableRule } from "@/lib/match";
 
 type Props = {
   keywords: string[];
   matchType: MatchableRule["match_type"];
   commentTrigger: boolean;
+  /** "Keyword simulation only" pill. Off where the surrounding card already says it (free tool page). */
+  showBadge?: boolean;
 };
 
 const SAMPLES = ["GUIDE", "guide!", "send GUIDE please", "hello", ""];
 
-export default function CommentKeywordTester({ keywords, matchType, commentTrigger }: Props) {
+export default function CommentKeywordTester({ keywords, matchType, commentTrigger, showBadge = true }: Props) {
   const id = useId();
   const [comment, setComment] = useState("");
   const match = matchComment(comment, [{
@@ -32,27 +35,20 @@ export default function CommentKeywordTester({ keywords, matchType, commentTrigg
     <section aria-labelledby={`${id}-title`} className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 id={`${id}-title`} className="text-sm font-semibold text-[var(--poskoo-ink)]">Try your keywords</h3>
-        <span className="rounded-full bg-[var(--poskoo-card)] px-2.5 py-1 text-xs font-medium text-[#3d3450]">Keyword simulation only</span>
+        {showBadge && <span className="rounded-full bg-[var(--poskoo-card)] px-2.5 py-1 text-xs font-medium text-[#3d3450]">Keyword simulation only</span>}
       </div>
-      <div className="mt-3 flex items-center gap-3">
-        <svg viewBox="0 0 200 128" aria-hidden="true" focusable="false" className="w-28 shrink-0 sm:w-36">
-          <ellipse cx="98" cy="115" rx="86" ry="8" fill="var(--poskoo-violet)" opacity=".08" />
-          <rect x="60" y="12" width="126" height="86" rx="16" fill="var(--poskoo-card)" stroke="var(--poskoo-line)" />
-          <rect x="72" y="24" width="44" height="6" rx="3" fill="var(--poskoo-violet)" opacity=".3" />
-          <path d="M84 42h77a9 9 0 0 1 9 9v17a9 9 0 0 1-9 9h-47l-13 9v-9H84a9 9 0 0 1-9-9V51a9 9 0 0 1 9-9Z" fill="var(--poskoo-violet)" opacity=".12" />
-          <text x="122" y="63" textAnchor="middle" fill="var(--poskoo-violet)" fontSize="12" fontWeight="600">{matched ? "Match!" : "Try it"}</text>
-          <path d="M18 108V82c0-15 37-15 37 0v26" fill="var(--poskoo-violet)" />
-          <circle cx="36" cy="55" r="15" fill="var(--poskoo-coral)" />
-          <path d="M21 54c-5-23 35-25 31 0l-9-10-22 10Z" fill="var(--poskoo-ink)" />
-          <path d="m49 83 18 8 13-19" fill="none" stroke="var(--poskoo-coral)" strokeWidth="9" strokeLinecap="round" />
-          <rect x="75" y="58" width="14" height="23" rx="4" fill="#3d3450" transform="rotate(15 82 70)" />
-          <path d="m178 5 2 6 6 2-6 2-2 6-2-6-6-2 6-2Z" fill="var(--poskoo-coral)" className="motion-safe:animate-pulse motion-reduce:animate-none" />
-        </svg>
-        <p role="status" aria-live="polite" aria-atomic="true" className="min-w-0 break-words rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 text-sm text-[#3d3450]">
-          {feedback}
-        </p>
-      </div>
-      <label htmlFor={`${id}-comment`} className="mt-3 block text-sm font-medium text-[#3d3450]">Example comment</label>
+      <p
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className={`!mt-3 flex min-w-0 items-start gap-2.5 break-words rounded-xl border p-3 text-sm ${matched ? "border-[var(--poskoo-green)] bg-[color-mix(in_srgb,var(--poskoo-mint)_55%,var(--poskoo-card))] text-[var(--poskoo-ink)]" : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[#3d3450]"}`}
+      >
+        {matched
+          ? <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-[#14744d]" aria-hidden="true" />
+          : <MessageCircle className="mt-0.5 h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />}
+        <span className="min-w-0">{feedback}</span>
+      </p>
+      <label htmlFor={`${id}-comment`} className="!mt-4 block text-sm font-medium text-[#3d3450]">Example comment</label>
       <input
         id={`${id}-comment`}
         type="text"
@@ -74,15 +70,15 @@ export default function CommentKeywordTester({ keywords, matchType, commentTrigg
           </button>
         ))}
       </div>
-      <p id={`${id}-mode`} className="mt-3 text-xs leading-relaxed text-[#3d3450]">
-        {matchType === "exact"
-          ? "Exact: the entire normalized comment must equal a keyword. GUIDE and guide! match GUIDE; send GUIDE please does not."
-          : "Contains: matches a whole word or phrase anywhere in the comment. GUIDE, guide! and send GUIDE please match GUIDE; guidebook does not."}
-        {" "}Both modes ignore case, accents and punctuation, collapse spaces and remove leading @mentions. Samples use your current keywords; add GUIDE above to try these examples.
-      </p>
-      <p id={`${id}-scope`} className="mt-2 text-xs leading-relaxed text-[#3d3450]">
-        Local preview only: nothing is saved or sent, and no webhooks are called. Account connection, rule status, post scope and delivery permissions still determine real sending.
-      </p>
+      <div className="!mt-4 space-y-1.5 rounded-xl bg-[var(--poskoo-card)]/60 px-3 py-2.5 text-xs leading-relaxed text-[var(--poskoo-muted)]">
+        <p id={`${id}-mode`}>
+          {matchType === "exact"
+            ? "Exact: the whole comment must equal a keyword (GUIDE and guide! match; send GUIDE please doesn't)."
+            : "Contains: the keyword can appear anywhere as a whole word (send GUIDE please matches; guidebook doesn't)."}
+          {" "}Case, accents, punctuation and leading @mentions are ignored.
+        </p>
+        <p id={`${id}-scope`} className="!mt-1.5">Local preview only: nothing is saved or sent. Real sending also depends on the connected account, rule status and post scope.</p>
+      </div>
     </section>
   );
 }

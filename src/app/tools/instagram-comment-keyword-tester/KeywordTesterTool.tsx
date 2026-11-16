@@ -1,14 +1,14 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
-import { ArrowRight, Check, Copy, Info, KeyRound, MessageCircle, Send, SlidersHorizontal, Tags } from "lucide-react";
+import { ArrowRight, Check, Copy, KeyRound, MessageCircle, Send, SlidersHorizontal, Tags } from "lucide-react";
 import CommentKeywordTester from "@/components/CommentKeywordTester";
 import type { MatchableRule } from "@/lib/match";
 
 const INPUT =
   "mt-2 min-h-11 w-full min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-base text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]/30";
-const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
-const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
+const stat = "inline-flex min-w-0 items-center gap-2 rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-1.5 text-[var(--poskoo-ink)]";
+const statLabel = "flex items-center gap-1 text-xs font-medium text-[var(--poskoo-muted)]";
 
 function parseKeywords(raw: string): string[] {
   return raw
@@ -22,12 +22,6 @@ const MATCH_TYPES: { value: MatchableRule["match_type"]; label: string }[] = [
   { value: "exact", label: "Comment matches exactly" },
 ];
 
-const MATCH_TYPE_HELP: Record<MatchableRule["match_type"], string> = {
-  contains:
-    "Contains: after the same normalization as production, the comment must include the keyword as a whole word or phrase (space-padded), so “send GUIDE please” matches GUIDE but “guidebook” does not.",
-  exact:
-    "Exact: after normalization, the entire comment must equal the keyword—GUIDE and guide! match GUIDE, but “send GUIDE please” does not.",
-};
 
 export default function KeywordTesterTool() {
   const keywordsId = useId();
@@ -106,34 +100,35 @@ export default function KeywordTesterTool() {
         </div>
       </div>
 
-      {/* Rule summary */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <div className={kpi}>
-          <p className={kpiLabel}><Tags className="h-3.5 w-3.5" aria-hidden="true" />Keywords</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{keywords.length}</p>
-          <p className="mt-1 text-xs text-[#3d3450]">{keywords.length ? "Any one of them triggers the rule." : "Add at least one keyword."}</p>
+      {/* Rule summary: one compact row (was four oversized stat cards). */}
+      <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
+      <dl className="contents" aria-label="Rule summary">
+        <div className={stat}>
+          <dt className={statLabel}><Tags className="h-3.5 w-3.5" aria-hidden="true" />Keywords</dt>
+          <dd className="font-bold tabular-nums">{keywords.length}</dd>
         </div>
-        <div className={kpi}>
-          <p className={kpiLabel}><SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />Match type</p>
-          <p className="mt-1 text-2xl font-bold capitalize text-[var(--poskoo-ink)]">{matchType}</p>
-          <p className="mt-1 text-xs text-[#3d3450]">{matchType === "contains" ? "Most forgiving for real comments." : "Strict: no extra words."}</p>
+        <div className={stat}>
+          <dt className={statLabel}><SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />Match</dt>
+          <dd className="font-bold capitalize">{matchType}</dd>
         </div>
-        <div className={kpi}>
-          <p className={kpiLabel}>Duplicates</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${dupes ? "text-[#c4410f]" : "text-[var(--poskoo-ink)]"}`}>{dupes}</p>
-          <p className="mt-1 text-xs text-[#3d3450]">{dupes ? "Same keyword listed twice (case ignored)." : "Every keyword is unique."}</p>
+        <div className={`${stat} ${dupes ? "border-[var(--poskoo-coral)]" : ""}`}>
+          <dt className={statLabel}>Duplicates</dt>
+          <dd className={`font-bold tabular-nums ${dupes ? "text-[#b2380a]" : ""}`}>{dupes}</dd>
         </div>
-        <div className={kpi}>
-          <p className={kpiLabel}>Longest keyword</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{longest}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
-          <p className="mt-1 text-xs text-[#3d3450]">Short, distinct words are easiest to type.</p>
+        <div className={stat}>
+          <dt className={statLabel}>Longest</dt>
+          <dd className="font-bold tabular-nums">{longest} chars</dd>
         </div>
+      </dl>
+        <p className="text-xs text-[var(--poskoo-muted)] sm:ml-1">
+          {!keywords.length ? "Add at least one keyword." : dupes ? "Remove the repeated keyword (case is ignored)." : "Short, distinct keywords are easiest to type."}
+        </p>
       </div>
 
       <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start 2xl:grid-cols-[minmax(0,1fr)_380px]">
         {/* Live tester (shared component) */}
         <div className="min-w-0 [&>section]:!py-4 sm:[&>section]:!p-5">
-          <CommentKeywordTester keywords={keywords} matchType={matchType} commentTrigger />
+          <CommentKeywordTester keywords={keywords} matchType={matchType} commentTrigger showBadge={false} />
         </div>
 
         {/* Rule card */}
@@ -158,10 +153,10 @@ export default function KeywordTesterTool() {
               </span>
             </li>
             <li aria-hidden="true" className="flex justify-center"><ArrowRight className="h-4 w-4 rotate-90 text-[#5f5873]" /></li>
-            <li className="flex items-start gap-2.5 rounded-xl bg-[var(--poskoo-violet)] p-3 text-white">
-              <Send className="mt-0.5 h-4 w-4 flex-none" aria-hidden="true" />
+            <li className="flex items-start gap-2.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-band)] p-3">
+              <Send className="mt-0.5 h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
               <span className="min-w-0">
-                <span className="block text-[11px] font-semibold uppercase tracking-wide opacity-80">Then</span>
+                <span className="block text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]">Then</span>
                 Poskoo can send your DM (in the app, once connected).
               </span>
             </li>
@@ -170,21 +165,13 @@ export default function KeywordTesterTool() {
             type="button"
             onClick={copyKeywords}
             disabled={!keywords.length}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
+            className="btn btn-dark w-full justify-center disabled:opacity-40"
           >
             {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied ? "Copied" : `Copy keywords (${keywords.length})`}
           </button>
           <span className="sr-only" aria-live="polite">{copied ? "Keywords copied to clipboard" : ""}</span>
         </aside>
-      </div>
-
-      <div className="flex items-start gap-2 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4">
-        <Info className="mt-0.5 h-4 w-4 flex-none text-[var(--poskoo-violet)]" aria-hidden="true" />
-        <div className="min-w-0">
-          <p className="text-xs leading-relaxed text-[#3d3450]">{MATCH_TYPE_HELP.contains}</p>
-          <p className="!mt-2 text-xs leading-relaxed text-[#3d3450]">{MATCH_TYPE_HELP.exact}</p>
-        </div>
       </div>
     </div>
   );
