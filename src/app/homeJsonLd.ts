@@ -16,7 +16,16 @@ export const homePageJsonLd = (
       "@type": "Organization",
       "@id": BRAND.url + "#org",
       name: BRAND.name,
+      legalName: BRAND.company,
       url: BRAND.url,
+      email: BRAND.supportEmail,
+      sameAs: BRAND.social,
+      logo: {
+        "@type": "ImageObject",
+        url: BRAND.url + "/brand/poskoo-icon-1024.png",
+        width: 1024,
+        height: 1024,
+      },
     },
     {
       "@type": "WebSite",
