@@ -105,6 +105,11 @@ export default async function DevelopersPage() {
             <code style={{ fontFamily: "ui-monospace, monospace" }}>{MCP_URL}</code> with your Poskoo API key, and it
             can draft and schedule posts, set up Auto-DMs and read your analytics — with the same checks the Poskoo app uses.
           </p>
+          <div className="ctas">
+            <Link className="btn btn-dark" href="/signup">Get your API key <span aria-hidden="true">→</span></Link>
+            <Link className="btn btn-line" href="/app/settings#api-keys">I have an account: open API keys</Link>
+          </div>
+          <p className="small">API keys work on every plan, including Free. No credit card needed.</p>
         </div>
         <div className="hero-art"><AnimArt name="developers" label="A developer types code on a laptop while a plug connects to a socket and gears turn" /></div>
       </header>
