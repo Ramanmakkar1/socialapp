@@ -127,10 +127,10 @@ export const GUIDES: GuideEntry[] = [
     updated: "2026-11-14",
     wordCount: 2050,
     cover: {
-      src: "/guides/best-instagram-niches-2026.webp",
-      width: 1029,
-      height: 698,
-      alt: "A creator holding a phone watches a follower count rise beside floating Reels, carousel and comment cards",
+      src: "/landing/card-dm.webp",
+      width: 1024,
+      height: 1024,
+      alt: "A relaxed creator on a beanbag while DMs fly out of his phone to new followers",
     },
     takeaways: [
       "Post original Reels and carousels on one clear topic 3-5 times a week, and keep the schedule for months.",
@@ -392,7 +392,7 @@ export const GUIDES: GuideEntry[] = [
     faqs: [
       {
         q: "What is the cheapest social media scheduler?",
-        a: "Meta Business Suite is free for Facebook and Instagram. For other networks, Buffer and Publer have free plans for up to 3 channels, and their paid plans start around $5 a month for one channel. For five accounts, flat plans such as Poskoo Pro ($14 a month billed yearly) cost less.",
+        a: "Meta Business Suite is free for Facebook and Instagram. For other networks, Buffer and Publer have free plans for up to 3 channels, and their paid plans start around $5 a month for one channel. For five accounts, flat plans such as Metricool Starter or Poskoo Pro (priced at $14 a month billed yearly once it launches) cost less.",
       },
       {
         q: "Is there a completely free social media scheduler?",
@@ -439,10 +439,10 @@ export const GUIDES: GuideEntry[] = [
     updated: "2026-11-13",
     wordCount: 1540,
     cover: {
-      src: "/guides/cheapest-social-media-scheduling-tools-2026.webp",
-      width: 1280,
-      height: 720,
-      alt: "A creator holding a phone drops a gold coin into a pink piggy bank next to a spiral calendar filled with scheduled post cards",
+      src: "/landing/card-schedule.webp",
+      width: 1024,
+      height: 1024,
+      alt: "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
     },
     takeaways: [
       "You can schedule Instagram posts free in the Instagram app on a Professional account, in Meta Business Suite, or with a scheduler like Poskoo.",
@@ -501,10 +501,10 @@ export const GUIDES: GuideEntry[] = [
     updated: "2026-11-14",
     wordCount: 1387,
     cover: {
-      src: "/guides/cheapest-social-media-scheduling-tools-2026.webp",
-      width: 1280,
-      height: 720,
-      alt: "A creator holding a phone drops a coin into a piggy bank beside a spiral calendar filled with scheduled post cards for the week",
+      src: "/landing/multichannel.webp",
+      width: 1536,
+      height: 1024,
+      alt: "A creator at a laptop sends one post that splits to several phones and screens",
     },
     takeaways: [
       "You can schedule TikTok videos free in TikTok Studio on a desktop, or in Poskoo using TikTok's official Content Posting API.",

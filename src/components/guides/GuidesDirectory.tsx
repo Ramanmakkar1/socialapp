@@ -32,7 +32,8 @@ export function GuidesDirectory() {
         <button type="button" className={g.filter} aria-pressed={cat === "all"} onClick={() => setCat("all")}>
           All<span>{GUIDES_BY_DATE.length}</span>
         </button>
-        {GUIDE_CATEGORIES.map((c) => (
+        {/* Topics with no guide yet aren't offered as filters (no "Content ideas 0" chip). */}
+        {GUIDE_CATEGORIES.filter((c) => GUIDES_BY_DATE.some((x) => x.category === c.id)).map((c) => (
           <button key={c.id} type="button" className={g.filter} aria-pressed={cat === c.id} onClick={() => setCat(c.id)}>
             {c.label}
             <span>{GUIDES_BY_DATE.filter((x) => x.category === c.id).length}</span>
