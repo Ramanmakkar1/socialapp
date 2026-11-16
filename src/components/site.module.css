@@ -309,6 +309,9 @@
 .td:last-child, .th:last-child { text-align: center; }
 .tr:last-child .td { border-bottom: 0; }
 .oursCol { background: var(--poskoo-band); }
+/* "Yes" in comparison tables: dark green passes AA on the lavender column (~5.3:1;
+   the brand green #1fa971 was 2.65:1 there). */
+.yes { color: #14744d; font-weight: 700; }
 /* Opt-in (className={`${s.table} ${s.stack}`} + data-label on each value cell):
    on phones each row becomes a card with labelled values. */
 @media (max-width: 640px) {

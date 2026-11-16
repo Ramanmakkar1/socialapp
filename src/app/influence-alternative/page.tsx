@@ -100,7 +100,7 @@ const faqs = [
 ];
 
 function Cell({ v }: { v: string }) {
-  if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
+  if (v === "Yes") return <span className={s.yes}>Yes</span>;
   if (v === "No" || v === "Not listed") return <span style={{ color: "var(--poskoo-muted)" }}>{v}</span>;
   return <span>{v}</span>;
 }
