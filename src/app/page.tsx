@@ -6,9 +6,9 @@ import { BRAND } from "@/lib/brand";
 import { canonicalUrl } from "@/lib/canonical";
 import { isPathIndexable } from "@/lib/indexability";
 import { PLATFORMS_ANSWER, getPlatformCopy, listText } from "@/lib/platform-support";
-import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
+import { HOME_DESCRIPTION_WITH_AI, PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { cancelAnswer, plansFor, plansNote } from "@/lib/plans";
-import { planReadinessNow } from "@/lib/featureReadinessNow";
+import { isFeatureReadyNow, planReadinessNow } from "@/lib/featureReadinessNow";
 import { PlanCards } from "@/components/PlanCta";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
@@ -22,17 +22,23 @@ import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 import { homePageJsonLd } from "./homeJsonLd";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
+const BASE_DESCRIPTION = description;
 // The trailing slash is load-bearing: new URL("/", base) normalises the root
 // path to the bare origin (https://poskoo.com), which Next then renders as the
 // canonical href. canonicalUrl() keeps that "/" explicitly and always builds
 // from the approved production origin, dropping any query string or fragment.
 const canonical = canonicalUrl("/");
-export const metadata: Metadata = {
+// The shared description doesn't claim AI; once AI is switched on (isFeatureReadyNow("ai")) the
+// meta description mentions AI captions. Evaluated at request/revalidate time like the page.
+export async function generateMetadata(): Promise<Metadata> {
+ const description = (await isFeatureReadyNow("ai")) ? HOME_DESCRIPTION_WITH_AI : BASE_DESCRIPTION;
+ return {
  title: { absolute: title }, description, alternates: { canonical },
  robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },
  openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
-};
+ };
+}
 export const dynamic = "force-static";
 // Pricing cards follow the RUNTIME env and a stored AI key (src/lib/featureReadinessNow.ts; the Docker
 // build has no env or DB, so it fails closed to "launching soon"):

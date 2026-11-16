@@ -12,6 +12,7 @@ import { publisherRef } from "@/lib/tool-schema";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { softwareOffers } from "@/lib/plans";
+import { SoonBadge } from "@/components/PlanCta";
 import { canonicalUrl } from "@/lib/canonical";
 import { LIVE_PLATFORM_COUNT_TEXT, LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
@@ -19,12 +20,21 @@ import { LIVE_PLATFORM_COUNT_TEXT, LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from 
 // the page stays static and regenerates in the background at most every 10 minutes.
 export const revalidate = 600;
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: "Social Media Scheduler Features: Auto-DM & AI | Poskoo" },
-  description:
-    "See Poskoo features: schedule social posts, auto-DM Instagram commenters, capture leads, draft AI captions and use free tools, all in one app.",
-  alternates: { canonical: "/features" },
-});
+// Title and description only mention AI once it is switched on (isFeatureReadyNow("ai")).
+export async function generateMetadata(): Promise<Metadata> {
+  const aiReady = await isFeatureReadyNow("ai");
+  return withSocial({
+    title: {
+      absolute: aiReady
+        ? "Social Media Scheduler Features: Auto-DM & AI | Poskoo"
+        : "Social Media Scheduler Features: Auto-DM & Leads | Poskoo",
+    },
+    description: aiReady
+      ? "See Poskoo features: schedule social posts, auto-DM Instagram commenters, capture leads, draft AI captions and use free tools, all in one app."
+      : "See Poskoo features: schedule social posts, auto-DM Instagram commenters, capture leads, share a link-in-bio page and use free tools, all in one app.",
+    alternates: { canonical: "/features" },
+  });
+}
 
 const schedulerBullets = [
   "Plan feed posts, reels, carousels and stories on a week or month calendar.",
@@ -164,7 +174,7 @@ export default async function FeaturesPage() {
       />
       <header className="hero">
         <div className={s.heroText}>
-          <span className="pill"><span>ALL-IN-ONE</span>Schedule &middot; Auto-DM &middot; AI captions &middot; Free tools</span>
+          <span className="pill"><span>ALL-IN-ONE</span>{aiReady ? <>Schedule &middot; Auto-DM &middot; AI captions &middot; Free tools</> : <>Schedule &middot; Auto-DM &middot; Link in bio &middot; Free tools</>}</span>
           <p className="eyebrow">Features</p>
           <h1>
             Everything Poskoo does, <em className="s mark">in one place</em>
@@ -296,11 +306,12 @@ export default async function FeaturesPage() {
         <div className="wrap">
           <div className="split">
             <div className="copy">
-              <p className="eyebrow">AI captions</p>
-              <h2>Captions in <em className="s">your brand voice</em></h2>
+              <p className="eyebrow">AI captions{aiReady ? null : <> <SoonBadge /></>}</p>
+              <h2>{aiReady ? <>Captions in <em className="s">your brand voice</em></> : <>AI captions, <em className="s">coming soon</em></>}</h2>
               <p>
-                Ask AI for caption ideas and DM message ideas that follow the brand voice you save. You review and
-                edit every idea before anything is scheduled or sent.
+                {aiReady
+                  ? "Ask AI for caption ideas and DM message ideas that follow the brand voice you save. You review and edit every idea before anything is scheduled or sent."
+                  : "AI caption and DM message ideas aren't switched on yet. When they are, you'll ask for ideas that follow the brand voice you save, and review every idea before anything is scheduled or sent."}
               </p>
               <ul>
                 {aiBullets.map((item) => (
@@ -308,9 +319,9 @@ export default async function FeaturesPage() {
                 ))}
               </ul>
               <Link className="btn btn-line" href="/signup">
-                Try AI captions free <span aria-hidden="true">&rarr;</span>
+                {aiReady ? "Try AI captions free" : "Start free, write captions yourself"} <span aria-hidden="true">&rarr;</span>
               </Link>
-              <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p>
+              {aiReady ? <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p> : null}
               <p className="small">See how it fits together on the <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> page, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link> and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>.</p>
             </div>
             <div className="art">

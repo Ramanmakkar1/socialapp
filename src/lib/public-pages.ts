@@ -604,7 +604,7 @@ export const PAGE_TITLES: Record<PublicPath, string> = {
 };
 
 export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
-  "/": "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, AI captions and free tools. Plan, publish and grow your content in one place.",
+  "/": "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, a link-in-bio page and free tools. Plan, publish and grow your content in one place.",
   "/features": "Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI captions, lead capture, free tools and comparisons, all in one workspace.",
   "/ai-social-media-manager": "An AI social media manager that drafts caption ideas, adapts them per platform, suggests DM replies, captures leads and shows analytics in Poskoo.",
   "/social-media-analytics": "Poskoo social media analytics shows post performance, reach, engagement rate, link clicks, leads and DM analytics in one dashboard, with CSV export.",
@@ -825,3 +825,7 @@ export const PAGE_DESCRIPTIONS: Record<PublicPath, string> = {
   "/schedule-posts-with-claude-code": "Add Poskoo to Claude Code with one claude mcp add command and schedule launch posts and changelog updates from the terminal.",
   "/schedule-posts-with-cursor": "Add Poskoo's MCP server to Cursor's mcp.json so Cursor's agent can schedule posts about what you build and read post analytics.",
 };
+
+/** Home meta description once AI is switched on (src/app/page.tsx generateMetadata). */
+export const HOME_DESCRIPTION_WITH_AI =
+  "Poskoo is an Instagram scheduler and auto-DM tool with lead capture, AI captions and free tools. Plan, publish and grow your content in one place.";

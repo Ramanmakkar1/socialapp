@@ -6,6 +6,8 @@ import { BRAND } from "@/lib/brand";
 import { publisherRef } from "@/lib/tool-schema";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { SoonBadge } from "@/components/PlanCta";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { ArrowRight } from "lucide-react";
@@ -33,7 +35,7 @@ const formats: { name: string; ratio: string; shape: [number, number]; media: st
   { name: "Story", ratio: "9:16 (1080×1920)", shape: [9, 16], media: "Image or video", rows: [["Schedule & auto-publish", true], ["Suggested times", true], ["First comment", "Not on Stories (API limit)"], ["AI captions", "No captions on Stories (API limit)"], ["Comment-to-DM", "Via story replies"]], guide: "/help/schedule-instagram-stories" },
 ];
 
-const benefits: { title: string; text: string; art: AnimName }[] = [
+const benefits: { title: string; text: string; art: AnimName; soon?: boolean }[] = [
   { title: "Week and month calendar", text: "Drag and drop posts across a week or month view so you can plan your feed at a glance.", art: "feat-calendar" },
   { title: "Posts, reels, carousels and stories", text: "Schedule feed posts, reels, multi-image carousels and stories from one composer.", art: "visual" },
   { title: "Suggested times to post", text: "See suggested publish times based on when your audience engaged with your auto-DMs, not generic guesses.", art: "analytics" },
@@ -55,7 +57,7 @@ const steps = [
     art: "/landing/step-schedule.webp",
     alt: "Illustration of writing and scheduling an Instagram post on a calendar",
     title: "Write the post and pick a time",
-    text: "Compose your caption yourself or with AI, add media, set a first comment if you want, and choose when to publish.",
+    text: "Compose your caption, add media, set a first comment if you want, and choose when to publish.",
   },
   {
     n: "3",
@@ -113,7 +115,7 @@ const webPageJsonLd = {
   isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
 };
 
-const appJsonLd = {
+const appJsonLd = (aiReady: boolean) => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: BRAND.name,
@@ -126,14 +128,22 @@ const appJsonLd = {
     "Week and month calendar",
     "Suggested posting times",
     "First comment with hashtags",
-    "AI caption writing",
+    ...(aiReady ? ["AI caption writing"] : []),
     "Comment-to-DM automation on publish",
   ],
   offers: softwareOffers(planReadiness()),
   publisher: publisherRef(),
-};
+});
 
-export default function InstagramScheduler() {
+export default async function InstagramScheduler() {
+  // AI caption copy says "soon" until AI is switched on (featureReadiness "ai", incl. a key saved in admin).
+  const aiReady = await isFeatureReadyNow("ai");
+  const shownBenefits = aiReady
+    ? benefits
+    : benefits.map((b) => (b.title === "Write with AI" ? { ...b, soon: true, text: "AI caption drafts in your brand voice are coming soon. Until then, write captions yourself and schedule them in the same flow." } : b));
+  const shownFormats = aiReady
+    ? formats
+    : formats.map((f) => ({ ...f, rows: f.rows.map(([label, v]): [string, Mark] => (label === "AI captions" && v === true ? [label, "Coming soon"] : [label, v])) }));
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Instagram scheduler", path: "/instagram-scheduler" }]}>
       <script
@@ -142,7 +152,7 @@ export default function InstagramScheduler() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd(aiReady)).replace(/</g, "\\u003c") }}
       />
       <script
         type="application/ld+json"
@@ -179,10 +189,10 @@ export default function InstagramScheduler() {
             <h2>Everything you need to <em className="s">schedule Instagram</em></h2>
           </div>
           <div className="bento">
-            {benefits.map((b) => (
+            {shownBenefits.map((b) => (
               <article key={b.title} className="bentoCard">
                 <div className="bentoArt"><AnimArt name={b.art} label={ANIM_LABELS[b.art]} /></div>
-                <h3>{b.title}</h3>
+                <h3>{b.title}{b.soon ? <> <SoonBadge /></> : null}</h3>
                 <p>{b.text}</p>
               </article>
             ))}
@@ -213,7 +223,7 @@ export default function InstagramScheduler() {
             <h2>What you can schedule for each <em className="s">Instagram format</em></h2>
           </div>
           <div className="formatGrid">
-            {formats.map((f) => (
+            {shownFormats.map((f) => (
               <article key={f.name} className="formatCard">
                 <div className="formatTop">
                   <span className="formatShape" style={{ aspectRatio: `${f.shape[0]} / ${f.shape[1]}` }} aria-hidden="true"><i /></span>
