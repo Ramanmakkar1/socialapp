@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { BRAND } from "@/lib/brand";
-import { canonicalUrl } from "@/lib/canonical";
+import { canonicalUrl, HOME_CANONICAL } from "@/lib/canonical";
 import { isPathIndexable } from "@/lib/indexability";
 
 test("root canonical is the approved origin with exactly one trailing slash", () => {
@@ -10,6 +10,7 @@ test("root canonical is the approved origin with exactly one trailing slash", ()
   assert.equal(canonicalUrl(""), "https://poskoo.com/");
   assert.equal(canonicalUrl(), "https://poskoo.com/");
   assert.equal(canonicalUrl("?utm_source=x"), "https://poskoo.com/");
+  assert.equal(HOME_CANONICAL, "https://poskoo.com/");
 });
 
 test("canonical drops query strings and fragments", () => {

@@ -17,3 +17,10 @@ export function canonicalUrl(path = "/"): string {
   const withLeadingSlash = clean.startsWith("/") ? clean : `/${clean}`;
   return `${origin}${withLeadingSlash.replace(/\/+$/, "")}`;
 }
+
+/**
+ * The canonical URL of the site root. The home page is the one route the daily
+ * audit probes on the legacy staging host, so both the page metadata and the
+ * root layout default must resolve to this exact final-domain value.
+ */
+export const HOME_CANONICAL = canonicalUrl("/");
