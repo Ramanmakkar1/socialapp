@@ -14,8 +14,8 @@ const pageSource = readFileSync("src/app/page.tsx", "utf8");
 
 test("home page renders the self-referencing canonical on the final domain", () => {
   assert.ok(
-    pageSource.includes('const canonical = canonicalUrl("/");'),
-    "home page must build the absolute canonical via canonicalUrl() from BRAND.url",
+    pageSource.includes("const canonical = HOME_CANONICAL;"),
+    "home page must use the shared absolute canonical constant",
   );
   assert.ok(
     pageSource.includes("alternates: { canonical }"),
