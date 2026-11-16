@@ -407,3 +407,20 @@
   .platformFilters { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
   .platformFilters::-webkit-scrollbar { display: none; }
 }
+
+/* ---------- Phones: the tool comes right after the title ----------
+   ToolPageTemplate pages only (.toolFirst). The hero becomes display:contents so its pill and
+   H1 stay on top, the tool card follows, and the long intro moves below it. The hero art and the
+   "Use the free tool" jump button are hidden: the tool is already on screen. */
+@media (max-width: 899px) {
+  .page.toolFirst { display: flex; flex-direction: column; }
+  .page.toolFirst > * { order: 10; }
+  .page.toolFirst > .hero.hero { display: contents; }
+  .page.toolFirst > .hero.hero > :global(.pill) { order: 1; align-self: center; margin-top: 12px; }
+  .page.toolFirst > .hero.hero > h1 { order: 2; align-self: center; margin: 14px auto 0; }
+  .page.toolFirst > .toolSection { order: 3; }
+  .page.toolFirst > .hero.hero > :global(.lede) { order: 4; align-self: center; margin: 28px auto 0; }
+  .page.toolFirst > .hero.hero > .points { order: 5; margin-top: 14px; }
+  .page.toolFirst > .hero.hero > .heroCtas,
+  .page.toolFirst > .hero.hero > :global(.hero-art) { display: none; }
+}

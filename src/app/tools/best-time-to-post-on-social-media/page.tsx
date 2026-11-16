@@ -88,7 +88,7 @@ export default function BestTimeToPostOnSocialMediaPage() {
     <PublicShell
       className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
-        { name: "Free Instagram tools", path: "/tools" },
+        { name: "Free social media tools", path: "/tools" },
         { name: "Best time to post (all platforms)", path: PATH },
       ]}
     >

@@ -4,7 +4,7 @@ import { ArrowDown, ArrowRight, BookOpen } from "lucide-react";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { BRAND } from "@/lib/brand";
-import { TOOLS, toolByHref, type ToolIconName } from "./registry";
+import { TOOLS, toolByHref, toolPlatform, type ToolIconName, type ToolPlatform } from "./registry";
 import { ToolIcon } from "./ToolIcon";
 import { RelatedToolsCarousel } from "./RelatedToolsCarousel";
 import { faqJsonLd, howToJsonLd, ldJson, webAppJsonLd, type AppCategory, type ToolFaq } from "./seo";
@@ -61,6 +61,23 @@ export type ToolPageConfig = {
 };
 
 const DEFAULT_STEP_ART: AnimName[] = ["writing", "visual", "card-schedule"];
+
+/** Platform hubs that exist under /tools; the breadcrumb goes through one when the tool has it. */
+const PLATFORM_HUBS: Partial<Record<ToolPlatform, { name: string; path: string }>> = {
+  instagram: { name: "Instagram tools", path: "/tools/instagram-tools" },
+  tiktok: { name: "TikTok tools", path: "/tools/tiktok-tools" },
+  x: { name: "X tools", path: "/tools/x-tools" },
+  youtube: { name: "YouTube tools", path: "/tools/youtube-tools" },
+  facebook: { name: "Facebook tools", path: "/tools/facebook-tools" },
+  threads: { name: "Threads tools", path: "/tools/threads-tools" },
+};
+
+/** "Free social media tools" › platform hub (if any) › tool. */
+export function toolBreadcrumbs(path: string, crumb: string): { name: string; path: string }[] {
+  const tool = toolByHref(path);
+  const hub = tool ? PLATFORM_HUBS[toolPlatform(tool)] : undefined;
+  return [{ name: "Free social media tools", path: "/tools" }, ...(hub && hub.path !== path ? [hub] : []), { name: crumb, path }];
+}
 
 const slug = (s: string) =>
   s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
@@ -332,10 +349,7 @@ export function ToolPageTemplate({
   }
   return (
     <PublicShell
-      breadcrumbs={[
-        { name: "Free Instagram tools", path: "/tools" },
-        { name: crumb, path: config.path },
-      ]}
+      breadcrumbs={toolBreadcrumbs(config.path, crumb)}
     >
       {jsonLd.map((data, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(data) }} />
@@ -348,7 +362,7 @@ export function ToolPageTemplate({
           </symbol>
         </defs>
       </svg>
-      <div className={t.page}>
+      <div className={`${t.page} ${t.toolFirst}`}>
         <ToolHero config={config} />
         <ToolCard title={config.toolTitle} note={config.toolNote} icon={toolByHref(config.path)?.icon}>
           {children}
