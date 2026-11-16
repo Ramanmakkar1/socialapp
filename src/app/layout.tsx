@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { BRAND } from "@/lib/brand";
-import { HOME_CANONICAL } from "@/lib/canonical";
 import CookieNoticeGate from "@/components/CookieNoticeGate";
 import { isPathIndexable } from "@/lib/indexability";
 import Analytics from "@/components/Analytics";
@@ -15,7 +14,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(BRAND.canonicalUrl),
   title: { default: `${BRAND.name}: Social media scheduler + Instagram auto-DM`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
-  alternates: { canonical: HOME_CANONICAL },
+  // Self-referencing canonical for the staging homepage. The home route also
+  // sets this explicitly; other public routes override it with their own path.
+  alternates: { canonical: "https://socialapp.splitforms.com/" },
   openGraph: {
     type: "website",
     siteName: BRAND.name,
