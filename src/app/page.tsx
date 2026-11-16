@@ -55,6 +55,13 @@ const platforms = getPlatformCopy();
 const isLive = (id: string) => platforms.catalog.some((e) => e.id === id && e.live);
 const liveSocial = platforms.catalog.filter((e) => e.live && e.group === "social");
 const moreLive = platforms.liveCount - liveSocial.length;
+// "Works with" strip (below the hero): the four core networks lead (owner decision 2026-11-15),
+// then every other live social network in catalog order.
+const WORKS_LEAD = ["instagram", "facebook", "threads", "youtube"];
+const worksWith = [
+  ...WORKS_LEAD.map((id) => platforms.catalog.find((e) => e.id === id)).filter((e) => e !== undefined),
+  ...liveSocial.filter((e) => !WORKS_LEAD.includes(e.id)),
+];
 const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
 const jsonLd = homePageJsonLd(faqList, r, title);
 // The hero poster is the first thing painted above the fold (the video fades in over it):
@@ -93,7 +100,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   </div>
 </div>
 <div className="wrap">
-  <div className="works"><span>Works with</span>{liveSocial.map((e) => <b key={e.id}><i style={{ background: WORKS_COLOR[e.id] ?? "var(--ink)" }}></i>{e.label}</b>)}{moreLive > 0 && <span>+ {moreLive} more</span>}<span>· Official APIs only</span></div>
+  <div className="works"><span>Works with</span>{worksWith.map((e) => <b key={e.id}><i style={{ background: WORKS_COLOR[e.id] ?? "var(--ink)" }}></i>{e.label}</b>)}{moreLive > 0 && <span>+ {moreLive} more</span>}<span>· Official APIs only</span></div>
 </div>
 
 <section className="howSection">
