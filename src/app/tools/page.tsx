@@ -124,10 +124,14 @@ export default function ToolsPage() {
             <Link href="/linkedin-scheduler">LinkedIn scheduler</Link>
             <Link href="/tiktok-scheduler">TikTok scheduler</Link>
             <Link href="/tools/threads-tools">Threads tools</Link>
+            <Link href="/tools/best-time-to-post-on-threads">Best time to post on Threads</Link>
             <Link href="/tools/instagram-tools">Instagram tool hub</Link>
             <Link href="/tools/youtube-tools">YouTube tools</Link>
+            <Link href="/tools/youtube-video-ideas-generator">YouTube video ideas generator</Link>
             <Link href="/tools/x-tools">X (Twitter) tools</Link>
             <Link href="/tools/tiktok-tools">TikTok tools</Link>
+            <Link href="/tools/tiktok-hook-generator">TikTok hook generator</Link>
+            <Link href="/tools/tiktok-money-calculator">TikTok money calculator</Link>
             <Link href="/tools/facebook-tools">Facebook tools</Link>
             <Link href="/tools/instagram-bio-generator">Instagram bio generator</Link>
             <Link href="/tools/instagram-engagement-rate-calculator">Instagram engagement rate calculator</Link>
