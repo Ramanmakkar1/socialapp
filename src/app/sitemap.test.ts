@@ -191,6 +191,20 @@ test("admin descendants inherit noindex and stay out of the production sitemap",
   }
 });
 
+test("descendants of an always-noindex route are never indexable", () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    for (const path of ["/admin/users", "/data-deletion/status/abc", "/app/review-guide", "/login/help"]) {
+      assert.equal(isPathIndexable(path), false, `${path} must inherit noindex from its parent route`);
+    }
+    assert.equal(isPathIndexable("/data-deletion"), true, "the public parent page stays indexable");
+    assert.equal(isPathIndexable("/login-help"), true, "a string prefix must not match an unrelated sibling path");
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
 test("sitemap and layout share the same indexability helper", () => {
   const sitemapSource = readFileSync("src/app/sitemap.ts", "utf8");
   const layoutSource = readFileSync("src/app/layout.tsx", "utf8");

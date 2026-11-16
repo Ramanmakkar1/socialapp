@@ -25,11 +25,21 @@ export function isSiteIndexable(): boolean {
   return resolveSiteIndexable();
 }
 
+// True for a noindex path and every descendant of it, so a new page nested under
+// an always-noindex route can never become indexable (or enter the sitemap) by
+// accident.
+function isUnderNoindexRoute(path: string): boolean {
+  for (const noindex of ALWAYS_NOINDEX_PATHS) {
+    if (path === noindex || path.startsWith(`${noindex}/`)) return true;
+  }
+  return false;
+}
+
 // Single source of truth for indexability. The root layout robots meta and the
 // sitemap both call this, so a noindex page can never be listed in the sitemap.
 export function isPathIndexable(path: string): boolean {
   if (!isSiteIndexable()) return false;
-  if (ALWAYS_NOINDEX_PATHS.has(path)) return false;
+  if (isUnderNoindexRoute(path)) return false;
   if (path === "/app" || path.startsWith("/app/")) return false;
   return true;
 }
