@@ -22,6 +22,11 @@ export const homePageJsonLd = (
       description: BRAND.description,
       slogan: BRAND.tagline,
       sameAs: BRAND.social,
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: BRAND.supportEmail,
+      },
       logo: {
         "@type": "ImageObject",
         url: BRAND.url + "/brand/poskoo-icon-1024.png",
@@ -69,8 +74,11 @@ export const homePageJsonLd = (
       ],
       url: BRAND.url,
       image: BRAND.url + "/landing/hero.webp",
+      sameAs: BRAND.social,
+      isAccessibleForFree: true,
       mainEntityOfPage: { "@id": BRAND.url },
       publisher: { "@id": BRAND.url + "#org" },
+      creator: { "@id": BRAND.url + "#org" },
       offers: softwareOffers(r),
     },
     {
