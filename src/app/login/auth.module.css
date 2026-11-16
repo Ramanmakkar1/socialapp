@@ -217,6 +217,8 @@
 /* Signup: reassurance line, password rule and consent line. */
 .card p.reassure {
   display: inline-flex;
+  align-self: flex-start;
+  width: fit-content;
   align-items: center;
   gap: 8px;
   margin-top: 12px;

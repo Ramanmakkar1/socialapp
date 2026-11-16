@@ -376,6 +376,9 @@
 /* Keep the offset shadow inside the column so it never touches the page edge. */
 .landing :global(.plan.pop){
   margin-right:6px}
+/* Stacked cards don't need to line up: drop the empty note slot under Free. */
+.landing :global(.planNote:empty){
+  display:none}
 
 }
 

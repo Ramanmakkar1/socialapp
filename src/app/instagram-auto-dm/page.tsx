@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { priceSummary, softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { publisherRef } from "@/lib/tool-schema";
 import { CompareNote } from "@/components/CompareNote";
 import PublicShell from "@/components/PublicShell";
@@ -89,7 +90,10 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function InstagramAutoDm() {
+export default async function InstagramAutoDm() {
+  // "AI-written DM message ideas" says Soon until AI is switched on.
+  const aiReady = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string] => (row[0] === "AI-written DM message ideas" && !aiReady ? [row[0], "Coming soon", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Instagram auto-DM", path: "/instagram-auto-dm" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
@@ -234,7 +238,7 @@ export default function InstagramAutoDm() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, theirs]) => (
+                {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td data-label={BRAND.name} className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700 }}><Cell v={ours} /></td>
