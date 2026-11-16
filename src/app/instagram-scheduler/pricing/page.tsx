@@ -78,7 +78,7 @@ const pageFaqs = (r: PlanReadiness) => [
   {
     q: "Can I upgrade to Pro or Agency today?",
     a: r.paidPlans
-      ? `Yes. Press "Choose Pro" or "Choose Agency" on the pricing page, or open Settings > Plan & billing after you log in. You pay by card through Stripe. ${plansNote(r)}`
+      ? `Yes. Press "Upgrade to Pro" or "Upgrade to Agency" on the pricing page, or open Settings > Plan & billing after you log in. You pay by card through Stripe. ${plansNote(r)}`
       : `Not yet. ${plansNote(r)}`,
   },
   {

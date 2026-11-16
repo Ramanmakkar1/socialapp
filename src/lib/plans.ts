@@ -30,7 +30,7 @@ export const PLANS: Plan[] = [
       { text: "Email capture in DMs" },
       { text: "Click + lead analytics" },
     ],
-    cta: "Choose Pro",
+    cta: "Upgrade to Pro",
     ctaHref: "/upgrade?plan=pro&interval=month",
   },
   {
@@ -49,7 +49,7 @@ export const PLANS: Plan[] = [
       { text: "Click + lead analytics" },
       { text: "Priority support" },
     ],
-    cta: "Choose Agency",
+    cta: "Upgrade to Agency",
     ctaHref: "/upgrade?plan=agency&interval=month",
   },
 ];
@@ -78,6 +78,9 @@ export const PLAN_FIT_LIMITS: PlanFitLimit[] = PLANS.map((p) => ({
   dmsPerMonth: limitFromText(planItem(p, /auto-dms?/i)),
 }));
 
+/** Paid-plan button while billing isn't live: there is no waitlist, so people start free and upgrade later. */
+export const PAID_SOON_CTA = "Start free, upgrade at launch";
+
 /** Which plan features are switched on (from src/lib/featureReadiness.ts, decided at runtime). */
 export type PlanReadiness = { paidPlans: boolean; ai: boolean };
 
@@ -90,7 +93,7 @@ export function plansFor(r: PlanReadiness): Plan[] {
   return PLANS.map((p) => {
     const items = p.items.map((i) => (!r.ai && /^AI /.test(i.text) ? { ...i, soon: true } : i));
     if (p.name === "Free" || r.paidPlans) return { ...p, items };
-    return { ...p, items, comingSoon: true, cta: "Start free now", ctaHref: "/signup", yearlyHref: undefined };
+    return { ...p, items, comingSoon: true, cta: PAID_SOON_CTA, ctaHref: "/signup", yearlyHref: undefined };
   });
 }
 

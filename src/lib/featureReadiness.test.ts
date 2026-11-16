@@ -112,6 +112,7 @@ test("pricing cards: paid plans say not switched on and point to the Free sign-u
   for (const p of plans.filter((x) => x.name !== "Free")) {
     assert.equal(p.comingSoon, true);
     assert.equal(p.ctaHref, "/signup");
+    assert.equal(p.cta, "Start free, upgrade at launch");
     assert.equal(p.yearlyHref, undefined);
     assert.ok(p.items.some((i) => /^AI /.test(i.text) && i.soon));
     assert.ok(!p.ctaHref.startsWith("/upgrade"));
@@ -128,6 +129,8 @@ test("pricing cards when live: unchanged checkout links", () => {
   assert.deepEqual(r, { paidPlans: true, ai: true });
   const plans = plansFor(r);
   assert.equal(plans.find((p) => p.name === "Pro")!.ctaHref, "/upgrade?plan=pro&interval=month");
+  assert.equal(plans.find((p) => p.name === "Pro")!.cta, "Upgrade to Pro");
+  assert.equal(plans.find((p) => p.name === "Agency")!.cta, "Upgrade to Agency");
   assert.ok(plans.every((p) => !p.comingSoon && p.items.every((i) => !i.soon)));
   assert.equal(softwareOffers(r).length, PLANS.length);
 });
