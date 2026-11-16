@@ -200,6 +200,10 @@ test("descendants of an always-noindex route are never indexable", () => {
     }
     assert.equal(isPathIndexable("/data-deletion"), true, "the public parent page stays indexable");
     assert.equal(isPathIndexable("/login-help"), true, "a string prefix must not match an unrelated sibling path");
+    // Checkout/thank-you product pages and short-link redirects are noindex.
+    for (const path of ["/p", "/p/sample", "/p/sample/success", "/l", "/l/abc123"]) {
+      assert.equal(isPathIndexable(path), false, `${path} is a noindex flow page and must not be indexable`);
+    }
   } finally {
     BRAND.indexable = was;
   }

@@ -11,6 +11,11 @@ export const ALWAYS_NOINDEX_PATHS = new Set([
   "/data-deletion/status",
   "/app/review-guide",
   "/admin",
+  // Product checkout/thank-you pages and short-link redirects are per-user
+  // flows (their metadata or X-Robots-Tag is always noindex), so they must
+  // never be listed even if a future public-path list includes them.
+  "/p",
+  "/l",
 ]);
 
 // Snapshot of the module-load value. BRAND.indexable is also the explicit test
