@@ -79,6 +79,32 @@ export function toolBreadcrumbs(path: string, crumb: string): { name: string; pa
   return [{ name: "Free social media tools", path: "/tools" }, ...(hub && hub.path !== path ? [hub] : []), { name: crumb, path }];
 }
 
+/**
+ * Next product CTA for one tool page, derived from its route path (`config.path`).
+ * Comment/DM tools hand off to auto DM, planning tools to the scheduler, everything else to the tools hub.
+ */
+export function nextActionFor(path: string): { href: string; label: string; blurb: string } {
+  if (/comment|-dm|dm-|keyword|reply/.test(path)) {
+    return {
+      href: "/instagram-auto-dm",
+      label: "Instagram auto DM",
+      blurb: "Instagram auto DM sends your link to everyone who comments your keyword, automatically.",
+    };
+  }
+  if (/calendar|schedul|best-time|time-zone|checklist|frequency/.test(path)) {
+    return {
+      href: "/instagram-scheduler",
+      label: "Instagram scheduler",
+      blurb: "Instagram scheduler puts the posting times you worked out here on autopilot.",
+    };
+  }
+  return {
+    href: "/tools",
+    label: "All free social media tools",
+    blurb: "Browse the rest of the free tools for your next post.",
+  };
+}
+
 const slug = (s: string) =>
   s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 
@@ -260,6 +286,8 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
   const own = toolByHref(self);
   const fill = TOOLS.filter((x) => x.href !== self && x.category === own?.category && !picked.includes(x));
   const tools = [...picked, ...fill].slice(0, Math.max(picked.length, 8));
+  // One intent-matched product CTA, derived from the tool's own route path.
+  const nextAction = nextActionFor(self);
   return (
     <section className={`${t.section} ${t.related}`} aria-labelledby="related-title">
       <div className={t.relHead}>
@@ -272,9 +300,8 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
       <RelatedToolsCarousel tools={tools} />
       <nav className="relChips" aria-label="Keep exploring">
         <span>Ready to post?</span>
-        <Link href="/instagram-scheduler">Instagram scheduler</Link>
-        <Link href="/instagram-auto-dm">Instagram auto DM</Link>
-        <Link href="/tools">All free social media tools</Link>
+        <span>{nextAction.blurb}</span>
+        <Link href={nextAction.href}>{nextAction.label}</Link>
       </nav>
     </section>
   );
