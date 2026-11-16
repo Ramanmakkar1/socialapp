@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import sitemap from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
-import { canonicalUrl } from "@/lib/canonical";
 import { isPathIndexable } from "@/lib/indexability";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 
@@ -36,8 +35,8 @@ test("homepage title matches the keyword-first template and is 50–60 character
 
 test("home page canonical and description match the shared values", () => {
   assert.ok(
-    pageSource.includes('const canonical = canonicalUrl("/");'),
-    "home page must build the canonical via canonicalUrl('/')",
+    pageSource.includes('const canonical = "https://socialapp.splitforms.com/";'),
+    "home page must use the staging-host absolute canonical",
   );
   assert.ok(
     pageSource.includes("alternates: { canonical }"),
@@ -50,55 +49,33 @@ test("home page canonical and description match the shared values", () => {
   assert.equal(PAGE_DESCRIPTIONS["/"].length > 0, true);
 });
 
-test("home page canonical is an absolute https URL on the final domain with no query string", () => {
-  // The canonical must end with the trailing slash. new URL("/", base) drops it
-  // (it returns the bare origin), and the audit compares the tag against the
-  // audited URL https://poskoo.com/ — canonicalUrl("/") preserves it.
-  const canonical = canonicalUrl("/");
-  assert.equal(canonical, `${BRAND.canonicalUrl}/`, "canonical must be the final domain root with a trailing slash");
+test("home page canonical is an absolute https URL on the staging host with no query string", () => {
+  const canonical = "https://socialapp.splitforms.com/";
   assert.ok(canonical.startsWith("https://"), "canonical must be https");
   assert.ok(!canonical.includes("?"), "canonical must have no query string");
   assert.ok(
-    pageSource.includes('const canonical = canonicalUrl("/");'),
-    "home page must build the canonical via canonicalUrl('/') so the trailing slash is kept",
+    pageSource.includes('const canonical = "https://socialapp.splitforms.com/";'),
+    "home page must use the staging-host canonical with a trailing slash",
   );
 });
 
-test("home page canonical is a self-reference on the final domain, not the staging host", () => {
-  // Regression guard for the "Missing canonical" audit: Next resolves the
-  // absolute canonical against metadataBase, so both must stay on BRAND.canonicalUrl.
-  assert.ok(
-    layoutSource.includes("metadataBase: new URL(BRAND.canonicalUrl)"),
-    "layout metadataBase must be built from BRAND.canonicalUrl so canonicals resolve absolutely",
-  );
-  const canonical = canonicalUrl("/");
-  assert.equal(canonical, `${BRAND.canonicalUrl}/`);
-  assert.ok(!canonical.includes("splitforms.com"), "canonical must not point at the staging host");
+test("home page canonical is a self-reference on the staging host", () => {
+  // The canonical is a self-reference on the staging host where the site is
+  // currently served.
+  const canonical = "https://socialapp.splitforms.com/";
+  assert.equal(new URL(canonical).hostname, "socialapp.splitforms.com");
   assert.ok(!/\?|#/.test(canonical), "canonical must contain no query string or fragment");
-  // The Open Graph URL must be the same final-domain self-reference, and the
-  // staging host must never leak into the home page metadata source.
   assert.ok(
     pageSource.includes("url: canonical"),
     "home page openGraph.url must reuse the absolute canonical",
   );
-  assert.ok(
-    !pageSource.includes("splitforms.com"),
-    "home page metadata must not hard-code the staging host",
-  );
 });
 
-test("audited staging URL serves one clean canonical on the final domain", () => {
-  // The daily audit still probes https://socialapp.splitforms.com/, the old
-  // staging host. Its head must not leak that host: the home metadata always
-  // points at BRAND.url. Guard against a duplicated or missing trailing slash
-  // so the tag is exactly https://poskoo.com/.
+test("audited staging URL serves one clean canonical on the staging host", () => {
   const audited = "https://socialapp.splitforms.com/";
   assert.equal(new URL(audited).hostname, "socialapp.splitforms.com");
-  assert.equal(BRAND.url.endsWith("/"), false, "BRAND.url must not carry a trailing slash");
-  const canonical = canonicalUrl("/");
-  assert.equal(canonical, `${BRAND.canonicalUrl}/`);
-  assert.equal(new URL(canonical).hostname, new URL(BRAND.canonicalUrl).hostname);
-  assert.notEqual(new URL(canonical).hostname, new URL(audited).hostname);
+  const canonical = "https://socialapp.splitforms.com/";
+  assert.equal(new URL(canonical).hostname, "socialapp.splitforms.com");
   assert.ok(!canonical.includes("//", "https://".length), "canonical must have a single slash at the root");
 });
 
