@@ -37,7 +37,9 @@ export function webPageJsonLd({ name, description, path }: { name: string; descr
     url: `${BRAND.canonicalUrl}${path}`,
     name,
     description,
-    isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
+    inLanguage: "en",
+    isPartOf: { "@type": "WebSite", "@id": `${BRAND.canonicalUrl}#website`, name: BRAND.name, url: BRAND.canonicalUrl },
+    publisher: publisherRef(),
   };
 }
 

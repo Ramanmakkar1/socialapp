@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { BRAND } from "@/lib/brand";
 import { toolMetadata, toolTitle, webAppJsonLd, webPageJsonLd } from "./seo.ts";
 
 const templateSource = readFileSync("src/components/tools/ToolPageTemplate.tsx", "utf8");
@@ -45,6 +46,12 @@ test("webPageJsonLd describes the canonical tool page", () => {
   assert.equal(jsonLd.description, "D");
   assert.ok(jsonLd.url.endsWith("/tools/x"));
   assert.equal(jsonLd["@id"], `${jsonLd.url}#webpage`);
+  assert.equal(jsonLd.url, `${BRAND.canonicalUrl}/tools/x`);
+  assert.equal(jsonLd["@id"], `${BRAND.canonicalUrl}/tools/x#webpage`);
+  assert.equal(jsonLd.inLanguage, "en");
+  assert.equal(jsonLd.isPartOf["@type"], "WebSite");
+  assert.equal(jsonLd.publisher["@type"], "Organization");
+  assert.equal(jsonLd.publisher.name, "Poskoo");
 });
 
 test("tool template emits WebPage JSON-LD from the page config", () => {
