@@ -12,7 +12,7 @@ import {
 
 const fieldClass =
   "mt-2 min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base outline-none focus:border-[var(--poskoo-violet)]";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 export default function UsernameTool({ platform = "instagram" }: { platform?: UsernamePlatform }) {
@@ -85,10 +85,10 @@ export default function UsernameTool({ platform = "instagram" }: { platform?: Us
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <div className={kpi}><p className={kpiLabel}>Ideas</p><p className="mt-1 text-2xl font-bold tabular-nums">{results.length}</p></div>
-            <div className={kpi}><p className={kpiLabel}>Shortest</p><p className="mt-1 text-2xl font-bold tabular-nums">{shortest}<span className="text-sm font-medium text-[#5f5873]"> chars</span></p></div>
-            <div className={kpi}><p className={kpiLabel}>Average length</p><p className="mt-1 text-2xl font-bold tabular-nums">{average}<span className="text-sm font-medium text-[#5f5873]"> / {max}</span></p></div>
-            <div className={kpi}><p className={kpiLabel}>No dots or underscores</p><p className="mt-1 text-2xl font-bold tabular-nums">{plain}</p></div>
+            <div className={kpi}><p className={kpiLabel}>Ideas</p><p className="mt-0.5 text-xl font-bold tabular-nums">{results.length}</p></div>
+            <div className={kpi}><p className={kpiLabel}>Shortest</p><p className="mt-0.5 text-xl font-bold tabular-nums">{shortest}<span className="text-sm font-medium text-[#5f5873]"> chars</span></p></div>
+            <div className={kpi}><p className={kpiLabel}>Average length</p><p className="mt-0.5 text-xl font-bold tabular-nums">{average}<span className="text-sm font-medium text-[#5f5873]"> / {max}</span></p></div>
+            <div className={kpi}><p className={kpiLabel}>No dots or underscores</p><p className="mt-0.5 text-xl font-bold tabular-nums">{plain}</p></div>
           </div>
 
           <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
@@ -124,7 +124,7 @@ export default function UsernameTool({ platform = "instagram" }: { platform?: Us
                 <p className="mt-2 text-xs tabular-nums text-[#3d3450]">{current?.length ?? 0} of {max} characters</p>
               </div>
               <button type="button" onClick={() => current && copy(current, "picked")}
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px">
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)]">
                 {copied === "picked" ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
                 {copied === "picked" ? "Copied" : "Copy this username"}
               </button>

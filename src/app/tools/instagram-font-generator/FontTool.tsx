@@ -9,7 +9,7 @@ const PLATFORM_LIMITS = {
   x: { limit: 160, label: "X bio" },
   facebook: { limit: 101, label: "Facebook intro" },
 } as const;
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 export default function FontTool({
@@ -70,17 +70,17 @@ export default function FontTool({
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}>Font styles</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{FONT_STYLES.length}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{FONT_STYLES.length}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Unicode styles, copy and paste.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Characters</p>
-          <p aria-live="polite" className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{chars}</p>
+          <p aria-live="polite" className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{chars}</p>
           <p className="mt-1 text-xs text-[#3d3450]">{lines} {lines === 1 ? "line" : "lines"} of plain text.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>{preview.label} length</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${over ? "text-[var(--poskoo-red)]" : "text-[var(--poskoo-ink)]"}`}>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${over ? "text-[var(--poskoo-red)]" : "text-[var(--poskoo-ink)]"}`}>
             {styledLen}
             <span className="text-base font-medium text-[#5f5873]"> / {limit}</span>
           </p>
@@ -90,7 +90,7 @@ export default function FontTool({
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>{label} fit</p>
-          <p className={`mt-1 text-2xl font-bold ${over ? "text-[var(--poskoo-red)]" : "text-[var(--poskoo-green)]"}`}>{!text ? "—" : over ? "Too long" : "Fits"}</p>
+          <p className={`mt-0.5 text-xl font-bold ${over ? "text-[var(--poskoo-red)]" : "text-[var(--poskoo-green)]"}`}>{!text ? "—" : over ? "Too long" : "Fits"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Styled letters can count as 2 characters.</p>
         </div>
       </div>
@@ -155,7 +155,7 @@ export default function FontTool({
             )}
           </div>
           <button type="button" onClick={() => copy(`aside-${preview.id}`, styled)} disabled={!text}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40 disabled:hover:translate-y-0">
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40 disabled:hover:translate-y-0">
             {copied === `aside-${preview.id}` ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied === `aside-${preview.id}` ? "Copied" : `Copy ${preview.label.toLowerCase()}`}
           </button>

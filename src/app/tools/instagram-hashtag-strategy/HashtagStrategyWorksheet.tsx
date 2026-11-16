@@ -38,7 +38,7 @@ const TIERS: { key: Tier; label: string; color: string; chip: string }[] = [
   { key: "niche", label: "Niche", color: "#1fa971", chip: "bg-[#1fa971]/12 text-[#146b43]" },
   { key: "branded", label: "Branded", color: "#ff8a5b", chip: "bg-[#ff8a5b]/15 text-[#a8410f]" },
 ];
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 export default function HashtagStrategyWorksheet() {
@@ -154,7 +154,7 @@ export default function HashtagStrategyWorksheet() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}>Draft tags</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${draftCount > 30 ? "text-[var(--poskoo-red)]" : "text-[var(--poskoo-ink)]"}`}>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${draftCount > 30 ? "text-[var(--poskoo-red)]" : "text-[var(--poskoo-ink)]"}`}>
             {draftCount}
             <span className="text-base font-medium text-[#5f5873]"> / 30</span>
           </p>
@@ -180,12 +180,12 @@ export default function HashtagStrategyWorksheet() {
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Duplicates</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${duplicates ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{duplicates}</p>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${duplicates ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{duplicates}</p>
           <p className="mt-1 text-xs text-[#3d3450]">{duplicates ? "Same tag used twice in this draft." : "No repeated tags."}</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Saved sets</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{sets.length}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{sets.length}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Stored in this browser.</p>
         </div>
       </div>
@@ -263,7 +263,7 @@ export default function HashtagStrategyWorksheet() {
           <button
             type="button"
             onClick={copySelected}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copyStatus === "copied" ? (
               <Check className="h-5 w-5 text-[var(--poskoo-lime)]" />

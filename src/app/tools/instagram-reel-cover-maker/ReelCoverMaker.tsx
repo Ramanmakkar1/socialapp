@@ -123,8 +123,8 @@ const valueChip = "rounded-md bg-[var(--poskoo-band)] px-1.5 tabular-nums text-[
 const ghostBtn =
   "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
 const primaryBtn =
-  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 export default function ReelCoverMaker() {
@@ -218,7 +218,7 @@ export default function ReelCoverMaker() {
             <ImagePlus className="h-3 w-3" aria-hidden="true" />
             Photo
           </p>
-          <p className="mt-1 truncate whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 truncate whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {img ? `${img.naturalWidth}×${img.naturalHeight}` : "—"}
           </p>
           <p className="mt-1 truncate text-xs text-[#3d3450]">{img && fileName ? fileName : "No photo chosen yet."}</p>
@@ -228,7 +228,7 @@ export default function ReelCoverMaker() {
             <Maximize2 className="h-3 w-3" aria-hidden="true" />
             Export
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {REEL_W}×{REEL_H}
           </p>
           <p className="mt-1 text-xs text-[#3d3450]">9:16 PNG, crop guides left out.</p>
@@ -238,7 +238,7 @@ export default function ReelCoverMaker() {
             <ZoomIn className="h-3 w-3" aria-hidden="true" />
             Zoom
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{zoom.toFixed(2)}×</p>
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{zoom.toFixed(2)}×</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
             <i className="block h-full rounded-full bg-[var(--poskoo-violet)]" style={{ width: `${((zoom - 1) / 2) * 100}%` }} />
           </div>
@@ -248,7 +248,7 @@ export default function ReelCoverMaker() {
             <Type className="h-3 w-3" aria-hidden="true" />
             Title
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {titleLines}
             <span className="text-base font-medium text-[#5f5873]"> / 3 lines</span>
           </p>

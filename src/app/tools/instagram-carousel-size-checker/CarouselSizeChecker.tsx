@@ -76,7 +76,7 @@ function readDimensions(file: File): Promise<Loaded> {
 }
 
 const ghostBtn = "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const checker = "bg-[repeating-conic-gradient(#f3eeff_0%_25%,#ffffff_0%_50%)] [background-size:16px_16px]";
 
@@ -207,24 +207,24 @@ export default function CarouselSizeChecker() {
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-live="polite">
             <div className={kpi}>
               <p className={kpiLabel}><Images className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Slides</p>
-              <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{slides.length}</p>
+              <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{slides.length}</p>
               <p className="mt-1 text-xs text-[#3d3450]">In the order you picked them.</p>
             </div>
             <div className={kpi}>
               <p className={kpiLabel}><HardDrive className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Total file size</p>
-              <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{formatBytes(totalBytes)}</p>
+              <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{formatBytes(totalBytes)}</p>
               <p className="mt-1 text-xs text-[#3d3450]">{largest && slides.length > 1 ? `Largest: slide ${slides.indexOf(largest) + 1}, ${formatBytes(largest.bytes)}` : "Read from the file itself."}</p>
             </div>
             <div className={kpi}>
               <p className={kpiLabel}><Ratio className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Aspect ratio</p>
-              <p className="mt-1 text-xl font-bold sm:text-2xl text-[var(--poskoo-ink)]">
+              <p className="mt-1 text-lg font-bold sm:text-xl text-[var(--poskoo-ink)]">
                 {sameRatio === null ? first.ratioLabel : sameRatio ? `Same · ${first.ratioLabel}` : "Mixed"}
               </p>
               <p className="mt-1 text-xs text-[#3d3450]">First slide: {first.width}×{first.height} px</p>
             </div>
             <div className={kpi}>
               <p className={kpiLabel}>{matchCount === slides.length ? <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" aria-hidden="true" /> : <AlertTriangle className="h-3.5 w-3.5 text-[var(--poskoo-coral)]" aria-hidden="true" />}Match first slide</p>
-              <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{matchCount}<span className="text-base font-medium text-[#5f5873]"> / {slides.length}</span></p>
+              <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{matchCount}<span className="text-base font-medium text-[#5f5873]"> / {slides.length}</span></p>
               <div className="mt-2 flex h-2 gap-0.5" aria-hidden="true">
                 {slides.map((s) => (
                   <i key={s.id} className="flex-1 rounded-full" style={{ background: Math.abs(s.ratioValue - first.ratioValue) < 0.005 ? "var(--poskoo-green)" : "var(--poskoo-coral)" }} />

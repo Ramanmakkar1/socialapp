@@ -10,7 +10,7 @@ const SAMPLE =
 
 const igMax = PLATFORM_LIMITS.instagram.max;
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 const STYLES: { value: BlankLineStyle; label: string }[] = [
@@ -51,7 +51,7 @@ export default function LineBreakTool() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}><Type className="h-3 w-3" aria-hidden="true" />Characters (formatted)</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${overBy > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${overBy > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>
             {chars.toLocaleString("en-US")}
             {igMax !== null && <span className="text-base font-medium text-[#5f5873]"> / {igMax.toLocaleString("en-US")}</span>}
           </p>
@@ -66,17 +66,17 @@ export default function LineBreakTool() {
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Lines</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{lines}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{lines}</p>
           <p className="mt-1 text-xs text-[#3d3450]">In the formatted caption.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Blank lines kept</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{blanks}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{blanks}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Filled with {blankLine === "dot" ? "a dot" : "an invisible blank"}.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Spacing</p>
-          <p className={`mt-1 text-2xl font-bold ${needsFix ? "text-[#a8410f]" : "text-[var(--poskoo-ink)]"}`}>{!text.trim() ? "—" : needsFix ? "Fixed" : "Clean"}</p>
+          <p className={`mt-0.5 text-xl font-bold ${needsFix ? "text-[#a8410f]" : "text-[var(--poskoo-ink)]"}`}>{!text.trim() ? "—" : needsFix ? "Fixed" : "Clean"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">{needsFix ? "Draft would collapse; output won't." : "Nothing would collapse."}</p>
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function LineBreakTool() {
             type="button"
             onClick={copy}
             disabled={!formatted}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied ? "Copied" : "Copy"}

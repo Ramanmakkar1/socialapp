@@ -18,7 +18,7 @@ const FORMATS: Format[] = [
 
 const ICON: Record<FormatKey, LucideIcon> = { reels: Video, carousel: Images, feed: Square, story: MessageSquareQuote };
 const HEX: Record<FormatKey, string> = { reels: "#6b4eff", carousel: "#ff8a5b", feed: "#1fa971", story: "#c6a700" };
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 const HOURS_MIN = 1;
@@ -80,24 +80,24 @@ export default function FrequencyCalculator() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}><CalendarDays className="h-3 w-3" aria-hidden="true" />Posts / week</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{rangeText}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{rangeText}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Slowest to fastest format.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Sample week</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{result ? result.sampleTotal : "—"}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{result ? result.sampleTotal : "—"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Budget split evenly across formats.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Clock className="h-3 w-3" aria-hidden="true" />Time used</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{usedMinutes}<span className="text-base font-medium text-[#5f5873]"> / {hours * 60} min</span></p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{usedMinutes}<span className="text-base font-medium text-[#5f5873]"> / {hours * 60} min</span></p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
             <i className="block h-full rounded-full bg-[var(--poskoo-violet)]" style={{ width: `${Math.min(100, (usedMinutes / (hours * 60)) * 100)}%` }} />
           </div>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Formats</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{active.length}<span className="text-base font-medium text-[#5f5873]"> / {FORMATS.length}</span></p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{active.length}<span className="text-base font-medium text-[#5f5873]"> / {FORMATS.length}</span></p>
           <p className="mt-1 truncate text-xs text-[#3d3450]">{active.length ? active.map((f) => f.label).join(", ") : "None selected"}</p>
         </div>
       </div>
@@ -210,7 +210,7 @@ export default function FrequencyCalculator() {
             type="button"
             onClick={copyPlan}
             disabled={!result}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied ? "Copied" : "Copy plan"}

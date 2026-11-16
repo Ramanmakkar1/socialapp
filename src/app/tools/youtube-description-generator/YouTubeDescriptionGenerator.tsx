@@ -10,9 +10,9 @@ const CTA_PLACEHOLDER = "Subscribe for a new video every week.";
 const CHAPTER_RE = /^\d{1,2}:\d{2}(:\d{2})?\s+\S/;
 
 const field = "mt-2 min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base text-[var(--poskoo-ink)] outline-none focus:border-[var(--poskoo-violet)]";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
-const primaryBtn = "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40";
+const primaryBtn = "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40";
 
 function cleanLines(value: string) {
   return value
@@ -186,7 +186,7 @@ export default function YouTubeDescriptionGenerator() {
                 <FileText className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />
                 Total
               </p>
-              <p aria-live="polite" className={`mt-1 text-2xl font-bold tabular-nums ${over ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>
+              <p aria-live="polite" className={`mt-0.5 text-xl font-bold tabular-nums ${over ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>
                 {total.toLocaleString("en-US")}
                 <span className="text-base font-medium text-[#5f5873]"> / {DESCRIPTION_LIMIT.toLocaleString("en-US")}</span>
               </p>
@@ -202,7 +202,7 @@ export default function YouTubeDescriptionGenerator() {
                 <PenLine className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />
                 First line
               </p>
-              <p className={`mt-1 text-2xl font-bold tabular-nums ${firstLineOver ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>
+              <p className={`mt-0.5 text-xl font-bold tabular-nums ${firstLineOver ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>
                 {built.firstLine.length}
                 <span className="text-base font-medium text-[#5f5873]"> / {FIRST_LINE_LIMIT}</span>
               </p>
@@ -213,7 +213,7 @@ export default function YouTubeDescriptionGenerator() {
                 <ListOrdered className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />
                 Chapters
               </p>
-              <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{built.chapterCount}</p>
+              <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{built.chapterCount}</p>
               <p className="mt-1 text-xs text-[#5f5873]">Valid “mm:ss Title” lines.</p>
             </div>
             <div className={kpi}>
@@ -221,7 +221,7 @@ export default function YouTubeDescriptionGenerator() {
                 <Hash className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />
                 Hashtags
               </p>
-              <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{built.hashtagCount}</p>
+              <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{built.hashtagCount}</p>
               <p className="mt-1 text-xs text-[#5f5873]">Up to {MAX_HASHTAGS} are used.</p>
             </div>
           </div>

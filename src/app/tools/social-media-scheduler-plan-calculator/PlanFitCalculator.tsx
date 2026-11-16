@@ -5,7 +5,7 @@ import { useId, useMemo, useState } from "react";
 import { ArrowRight, Check, Info, Minus, Sparkles } from "lucide-react";
 import { PLAN_FIT_LIMITS, type PlanFitLimit } from "@/lib/plans";
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 type InputKey = "accounts" | "postsPerMonth" | "dmsPerMonth";
@@ -76,7 +76,7 @@ export default function PlanFitCalculator({ paidPlans }: { paidPlans: boolean })
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={`${kpi} col-span-2 lg:col-span-1`}>
           <p className={kpiLabel}><Sparkles className="h-3 w-3" aria-hidden="true" />Your plan</p>
-          <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{plan ? plan.name : "Custom"}</p>
+          <p className="mt-0.5 text-xl font-bold text-[var(--poskoo-ink)]">{plan ? plan.name : "Custom"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">
             {plan ? "Smallest plan that fits all three inputs." : "Above the Agency limits."}
           </p>
@@ -84,7 +84,7 @@ export default function PlanFitCalculator({ paidPlans }: { paidPlans: boolean })
         {FIELDS.map(({ key, label }) => (
           <div key={key} className={kpi}>
             <p className={kpiLabel}>{label}</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{input[key].toLocaleString("en-US")}</p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{input[key].toLocaleString("en-US")}</p>
             <p className="mt-1 truncate text-xs text-[#3d3450]">
               {!plan
                 ? "Above Agency limits"
@@ -210,7 +210,7 @@ export default function PlanFitCalculator({ paidPlans }: { paidPlans: boolean })
 
           <Link
             href={cta.href}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)]"
           >
             {cta.label}
             <ArrowRight className="h-5 w-5" aria-hidden="true" />

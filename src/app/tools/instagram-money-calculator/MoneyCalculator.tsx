@@ -29,7 +29,7 @@ function multiplierFor(rate: number | null): { value: number; label: string } {
 const fieldClass =
   "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-base tabular-nums outline-none focus:border-[var(--poskoo-violet)]";
 const labelClass = "text-sm font-semibold";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 
 export type MoneyCalculatorProps = {
   platform?: Platform;

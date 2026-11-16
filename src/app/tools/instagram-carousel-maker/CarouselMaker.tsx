@@ -122,7 +122,7 @@ const labelClass = "block text-sm font-semibold text-[var(--poskoo-ink)]";
 const inputClass = "mt-1.5 block w-full min-h-[44px] rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-base text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--poskoo-violet)]/30";
 const iconBtn = "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] text-[#3d3450] hover:border-[var(--poskoo-ink)] disabled:opacity-40 disabled:hover:border-[var(--poskoo-line)]";
 const ghostBtn = "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 const wordCount = (s: string) => s.split(/\s+/).filter(Boolean).length;
@@ -206,22 +206,22 @@ export default function CarouselMaker() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}><Layers className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Slides</p>
-          <p aria-live="polite" className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{slides.length}</p>
+          <p aria-live="polite" className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{slides.length}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Exported in this order.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Ruler className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Export size</p>
-          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{W}×{H}</p>
+          <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{W}×{H}</p>
           <p className="mt-1 text-xs text-[#3d3450]">4:5 portrait PNG per slide.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Type className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Words</p>
-          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{totalWords}</p>
+          <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{totalWords}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Across all headlines and body text.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Palette className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Colours</p>
-          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{coloursUsed}<span className="text-base font-medium text-[#5f5873]"> / {PALETTE.length}</span></p>
+          <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{coloursUsed}<span className="text-base font-medium text-[#5f5873]"> / {PALETTE.length}</span></p>
           <div className="mt-2 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
             {slides.map((s) => <i key={s.id} className="flex-1" style={{ background: s.bg, boxShadow: "inset 0 0 0 1px rgba(30,22,49,.08)" }} />)}
           </div>
@@ -306,7 +306,7 @@ export default function CarouselMaker() {
         {/* Primary action + live phone preview */}
         <aside aria-label="Download and preview" className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 lg:sticky lg:top-24">
           <button type="button" onClick={downloadAll} disabled={dlState === "busy"}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-70">
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-70">
             {dlState === "done" ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Download className="h-5 w-5" aria-hidden="true" />}
             {dlState === "busy" ? `Saving ${slides.length} PNGs…` : dlState === "done" ? "Downloaded" : "Download all slides"}
           </button>

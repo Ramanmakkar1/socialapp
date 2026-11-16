@@ -114,7 +114,7 @@ export default function FormatterTool() {
         {/* Preview + primary action */}
         <aside aria-label="LinkedIn preview" className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 max-lg:order-first lg:sticky lg:top-24">
           <button type="button" disabled={!text} onClick={() => copy(`main:${current.id}`, current.value)}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40">
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40">
             {copied === `main:${current.id}` ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied === `main:${current.id}` ? "Copied" : `Copy ${current.label.toLowerCase()}`}
           </button>

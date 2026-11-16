@@ -50,7 +50,7 @@ const FORMAT_HEX: Record<string, string> = { reel: "#6b4eff", carousel: "#ff8a5b
 
 const field = "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base outline-none focus:border-[var(--poskoo-violet)]";
 const ghostBtn = "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 export default function PostIdeasGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "youtube" }) {
@@ -144,17 +144,17 @@ export default function PostIdeasGenerator({ platform = "instagram" }: { platfor
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}>Ideas</p>
-          <p aria-live="polite" className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{ideas.length}</p>
+          <p aria-live="polite" className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{ideas.length}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Ready to film or design.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Niche</p>
-          <p className="mt-1 truncate text-2xl font-bold text-[var(--poskoo-ink)]">{nicheLabel}</p>
+          <p className="mt-0.5 truncate text-xl font-bold text-[var(--poskoo-ink)]">{nicheLabel}</p>
           <p className="mt-1 text-xs text-[#3d3450]">{format === "all" ? "All formats" : `${formatLabels[format]}s only`}</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Batch</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">#{seed}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">#{seed}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Shuffle for a fresh set.</p>
         </div>
         <div className={`${kpi} flex items-center gap-2.5 max-sm:p-3`}>
@@ -235,7 +235,7 @@ export default function PostIdeasGenerator({ platform = "instagram" }: { platfor
           <button
             type="button"
             onClick={() => setSeed((s) => s + 1)}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40"
           >
             <RefreshCw className="h-5 w-5" aria-hidden="true" />
             New ideas

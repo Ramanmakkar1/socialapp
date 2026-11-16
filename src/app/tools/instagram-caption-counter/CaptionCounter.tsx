@@ -22,7 +22,7 @@ function level(value: number, max: number | null): Level {
 const TEXT: Record<Level, string> = { ok: "text-[var(--poskoo-green)]", warn: "text-[#c4410f]", over: "text-[#c4410f]" };
 const BAR: Record<Level, string> = { ok: "bg-[var(--poskoo-green)]", warn: "bg-[var(--poskoo-coral)]", over: "bg-[var(--poskoo-coral)]" };
 
-const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn = "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40";
 
@@ -32,7 +32,7 @@ function Meter({ label, value, max, icon: Icon }: { label: string; value: number
   return (
     <div className={kpi}>
       <p className={kpiLabel}><Icon className="h-3.5 w-3.5" aria-hidden="true" />{label}</p>
-      <p className={`mt-1 text-2xl font-bold tabular-nums ${max === null ? "text-[var(--poskoo-ink)]" : TEXT[lv]}`}>
+      <p className={`mt-0.5 text-xl font-bold tabular-nums ${max === null ? "text-[var(--poskoo-ink)]" : TEXT[lv]}`}>
         {value.toLocaleString("en-US")}
         {max !== null && <span className="text-base font-medium text-[#5f5873]"> / {max.toLocaleString("en-US")}</span>}
       </p>
@@ -164,7 +164,7 @@ export default function CaptionCounter() {
           <Meter label="Mentions" value={a.mentions.length} max={limit.mentions} icon={AtSign} />
           <div className={kpi}>
             <p className={kpiLabel}><Scissors className="h-3.5 w-3.5" aria-hidden="true" />Feed fold</p>
-            <p className={`mt-1 text-2xl font-bold ${a.folded ? "text-[#c4410f]" : "text-[var(--poskoo-ink)]"}`}>
+            <p className={`mt-0.5 text-xl font-bold ${a.folded ? "text-[#c4410f]" : "text-[var(--poskoo-ink)]"}`}>
               {limit.foldAt === null ? "—" : a.folded ? "Cut" : "Fits"}
             </p>
             <p className="mt-1 text-xs text-[#3d3450]">
@@ -225,7 +225,7 @@ export default function CaptionCounter() {
           <button
             type="button"
             onClick={copy}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)]"
           >
             {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied ? "Copied" : "Copy"}

@@ -13,7 +13,7 @@ const IG_MAX_HASHTAGS = 30;
 // Instagram's feed shows roughly the first 125 characters before "… more".
 const FOLD_AT = 125;
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn =
   "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40";
@@ -39,7 +39,7 @@ function Meter({
   return (
     <div className={kpi}>
       <p className={kpiLabel}><Icon className="h-3 w-3" aria-hidden="true" />{label}</p>
-      <p className={`mt-1 text-2xl font-bold tabular-nums ${textColor}`}>
+      <p className={`mt-0.5 text-xl font-bold tabular-nums ${textColor}`}>
         {value.toLocaleString("en-US")}
         {max !== null && <span className="text-base font-medium text-[#5f5873]"> / {max.toLocaleString("en-US")}</span>}
       </p>
@@ -127,12 +127,12 @@ export default function CaptionFormatter() {
               <Meter label="Hashtags" value={hashtags.length} max={IG_MAX_HASHTAGS} icon={Hash} />
               <div className={kpi}>
                 <p className={kpiLabel}><AlignLeft className="h-3 w-3" aria-hidden="true" />Paragraphs</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{paragraphs}</p>
+                <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{paragraphs}</p>
                 <p className="mt-1 text-xs text-[#3d3450]">{blankLines} blank {blankLines === 1 ? "line" : "lines"} kept.</p>
               </div>
               <div className={kpi}>
                 <p className={kpiLabel}>Before “more”</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{countChars(fold.preview)}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
+                <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{countChars(fold.preview)}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
                 <p className="mt-1 text-xs text-[#3d3450]">{text ? (fold.folded ? "The rest sits behind “… more”." : "Whole caption shows in feed.") : "Type a caption to check."}</p>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function CaptionFormatter() {
             type="button"
             onClick={copy}
             disabled={!text}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copied ? (
               <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" />

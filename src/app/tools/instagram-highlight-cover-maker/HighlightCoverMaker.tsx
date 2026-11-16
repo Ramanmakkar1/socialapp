@@ -186,7 +186,7 @@ export default function HighlightCoverMaker() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}>Export size</p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {layout.width}×{layout.height}
           </p>
           <p className="mt-1 text-xs text-[#3d3450]">{format === "square" ? "Square" : "Story"} PNG, in px.</p>
@@ -196,7 +196,7 @@ export default function HighlightCoverMaker() {
             <Circle className="h-3 w-3" aria-hidden="true" />
             Icon
           </p>
-          <p className="mt-1 flex items-center gap-2 whitespace-nowrap text-xl font-bold sm:text-2xl text-[var(--poskoo-ink)]">
+          <p className="mt-1 flex items-center gap-2 whitespace-nowrap text-lg font-bold sm:text-xl text-[var(--poskoo-ink)]">
             <svg viewBox="0 0 24 24" className="h-6 w-6 flex-none" fill="var(--poskoo-violet)" aria-hidden="true">
               <path d={icon.path} />
             </svg>
@@ -211,7 +211,7 @@ export default function HighlightCoverMaker() {
             <Type className="h-3 w-3" aria-hidden="true" />
             Label
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {clampedLabel.length}
             <span className="text-base font-medium text-[#5f5873]"> / 12</span>
           </p>
@@ -457,8 +457,8 @@ const field =
 const ghostBtn =
   "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
 const primaryBtn =
-  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const segWrap = "mt-2 grid rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-1";
 const segItem =

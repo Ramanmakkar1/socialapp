@@ -27,10 +27,10 @@ function coveredPercent(zones: { x: number; y: number; w: number; h: number }[])
   return covered / 100;
 }
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const primaryBtn =
-  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40";
+  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40";
 const toggleRow =
   "flex min-h-11 items-center gap-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium";
 
@@ -224,7 +224,7 @@ export default function SafeZoneChecker({ modes = SAFE_ZONE_MODES }: { modes?: {
             <Frame className="h-3 w-3" aria-hidden="true" />
             Frame
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {FRAME_W}×{FRAME_H}
           </p>
           <p className="mt-1 text-xs text-[#3d3450]">9:16 {MODE_META[mode].noun}, in px.</p>
@@ -234,7 +234,7 @@ export default function SafeZoneChecker({ modes = SAFE_ZONE_MODES }: { modes?: {
             <ShieldCheck className="h-3 w-3" aria-hidden="true" />
             Clear area
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{clear}%</p>
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{clear}%</p>
           <div className="mt-2 flex h-1.5 overflow-hidden rounded-full" aria-hidden="true">
             <i className="block h-full bg-[var(--poskoo-green)] transition-[width]" style={{ width: `${clear}%` }} />
             <i className="block h-full flex-1" style={{ background: `rgba(${ZONE_RGB}, 0.6)` }} />
@@ -245,7 +245,7 @@ export default function SafeZoneChecker({ modes = SAFE_ZONE_MODES }: { modes?: {
             <ScanLine className="h-3 w-3" aria-hidden="true" />
             Covered by UI
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{covered}%</p>
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{covered}%</p>
           <p className="mt-1 text-xs text-[#3d3450]">Approximate; varies by device.</p>
         </div>
         <div className={kpi}>
@@ -253,7 +253,7 @@ export default function SafeZoneChecker({ modes = SAFE_ZONE_MODES }: { modes?: {
             <Layers className="h-3 w-3" aria-hidden="true" />
             Overlay zones
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{zones.length}</p>
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{zones.length}</p>
           <p className="mt-1 truncate text-xs text-[#3d3450]">{zones.map((z) => z.id).join(" · ")}</p>
         </div>
       </div>

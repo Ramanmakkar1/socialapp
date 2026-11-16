@@ -12,7 +12,7 @@ const INPUT =
 const LABEL = "block text-sm font-medium text-[#3d3450]";
 const HINT = "!mt-1.5 text-xs leading-relaxed text-[#3d3450]";
 const STEP_LABEL = "text-[11px] font-semibold uppercase tracking-wide text-[var(--poskoo-muted)]";
-const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 const MATCH_EXAMPLES: {
@@ -140,24 +140,24 @@ export default function FlowPreview() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={`${kpi} ${match ? "border-[var(--poskoo-green)]/40 bg-[var(--poskoo-mint)]/35" : ""}`}>
           <p className={kpiLabel}><Zap className="h-3.5 w-3.5" aria-hidden="true" />Keyword check</p>
-          <p className={`mt-1 text-2xl font-bold ${match ? "text-[#146b43]" : "text-[var(--poskoo-ink)]"}`}>{match ? "Matched" : "No match"}</p>
+          <p className={`mt-0.5 text-xl font-bold ${match ? "text-[#146b43]" : "text-[var(--poskoo-ink)]"}`}>{match ? "Matched" : "No match"}</p>
           <p className="mt-1 truncate text-xs text-[#3d3450]">{match ? `On “${matchedKeyword}”` : hasKeyword && hasComment ? "No DM would be sent." : "Add a keyword and comment."}</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />Match type</p>
-          <p className="mt-1 text-2xl font-bold capitalize text-[var(--poskoo-ink)]">{matchType}</p>
+          <p className="mt-0.5 text-xl font-bold capitalize text-[var(--poskoo-ink)]">{matchType}</p>
           <p className="mt-1 text-xs text-[#3d3450]">{matchType === "contains" ? "Keyword anywhere." : "Whole comment only."}</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />DM length</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{dmText.length}<span className="text-base font-medium text-[#5f5873]"> / 1,000</span></p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{dmText.length}<span className="text-base font-medium text-[#5f5873]"> / 1,000</span></p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-band)]" aria-hidden="true">
             <div className="h-full rounded-full bg-[var(--poskoo-violet)] transition-all" style={{ width: `${(dmText.length / 1000) * 100}%` }} />
           </div>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><ListOrdered className="h-3.5 w-3.5" aria-hidden="true" />Flow steps</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{captureEmail ? 5 : 3}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{captureEmail ? 5 : 3}</p>
           <p className="mt-1 text-xs text-[#3d3450]">{captureEmail ? "With email capture." : "Comment, check, DM."}</p>
         </div>
       </div>
@@ -463,7 +463,7 @@ export default function FlowPreview() {
             type="button"
             onClick={copyDm}
             disabled={!hasDm}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied ? "Copied" : "Copy DM text"}

@@ -43,7 +43,7 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn = "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
 
@@ -65,7 +65,7 @@ function CopyChip({ text, label, primary }: { text: string; label: string; prima
         type="button"
         onClick={copy}
         disabled={!text}
-        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40 disabled:hover:translate-y-0"
+        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40 disabled:hover:translate-y-0"
       >
         {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
         <span aria-live="polite">{copied ? "Copied" : label}</span>
@@ -151,12 +151,12 @@ export default function DmLinkGenerator() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}>Status</p>
-          <p className={`mt-1 text-2xl font-bold ${valid ? "text-[var(--poskoo-green)]" : error ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{status}</p>
+          <p className={`mt-0.5 text-xl font-bold ${valid ? "text-[var(--poskoo-green)]" : error ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{status}</p>
           <p className="mt-1 text-xs text-[#3d3450]">{cleaned && valid ? "Cleaned from your paste." : "Format check only."}</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Username length</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">
             {username.length}
             <span className="text-base font-medium text-[#5f5873]"> / 30</span>
           </p>
@@ -169,12 +169,12 @@ export default function DmLinkGenerator() {
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Link length</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{valid ? dmUrl.length : "—"}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{valid ? dmUrl.length : "—"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Characters in the ig.me link.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Snippets ready</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">
             {snippetsReady}
             <span className="text-base font-medium text-[#5f5873]"> / 3</span>
           </p>

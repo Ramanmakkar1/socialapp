@@ -76,6 +76,10 @@
   background: var(--lime); border-radius: var(--poskoo-radius-pill); padding: .3rem .75rem;
 }
 .toolBody { padding: 24px; min-width: 0; }
+/* Tool widgets space their text with Tailwind margin utilities (mt-2, space-y-*), but the landing
+   reset `.landing p, h3 { margin: 0 }` is unlayered and beat every utility, so helper text sat flush
+   under chips and bars. revert-layer hands margins back to the utilities (or preflight's 0). */
+.toolBody.toolBody :global(:is(p, h3, h4)) { margin: revert-layer; }
 @media (max-width: 560px) {
   .toolHead { padding: 12px 16px; }
   .toolHead h2 { font-size: 1.05rem; }

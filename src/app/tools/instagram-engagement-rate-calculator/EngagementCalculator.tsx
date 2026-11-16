@@ -39,7 +39,7 @@ export type EngagementCalculatorProps = {
   platform?: "instagram" | "tiktok";
 };
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn = "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
 const number = new Intl.NumberFormat("en");
@@ -203,7 +203,7 @@ export default function EngagementCalculator({
             type="button"
             onClick={copyResult}
             disabled={rate === null}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40 disabled:hover:translate-y-0"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40 disabled:hover:translate-y-0"
           >
             {copied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied ? "Copied" : "Copy result"}
@@ -226,17 +226,17 @@ export default function EngagementCalculator({
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div className={kpi}>
             <p className={kpiLabel}>Total interactions</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{number.format(total)}</p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{number.format(total)}</p>
             <p className="mt-1 text-xs text-[#3d3450]">{parts.map((p) => p.word).join(" + ")}.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>{baseLabel}</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{number.format(Number(values.base))}</p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{number.format(Number(values.base))}</p>
             <p className="mt-1 text-xs text-[#3d3450]">The base you divided by.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Biggest driver</p>
-            <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{top ? top.label : "—"}</p>
+            <p className="mt-0.5 text-xl font-bold text-[var(--poskoo-ink)]">{top ? top.label : "—"}</p>
             <p className="mt-1 text-xs tabular-nums text-[#3d3450]">{top ? `${Math.round((top.n / total) * 100)}% of interactions` : "No interactions yet."}</p>
           </div>
           <div className={kpi}>

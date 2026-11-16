@@ -57,7 +57,7 @@ const inputClass =
   "w-full min-w-0 min-h-11 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base sm:text-sm text-[var(--poskoo-ink)] outline-none focus:border-[var(--poskoo-violet)]";
 const ghostBtn = "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 text-sm font-medium hover:border-[var(--poskoo-ink)]";
 const primaryBtn = "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-sm font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const PLATFORM_HEX: Record<string, string> = {
   Instagram: "#e1306c", Facebook: "#1877f2", Threads: "#1e1631", TikTok: "#00a3a3",
@@ -133,11 +133,11 @@ export default function CalendarTemplate() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}><CalendarDays className="h-3 w-3" aria-hidden="true" />Planned</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums">{rows.length} <span className="text-sm font-medium text-[#5f5873]">{rows.length === 1 ? "post" : "posts"}</span></p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums">{rows.length} <span className="text-sm font-medium text-[#5f5873]">{rows.length === 1 ? "post" : "posts"}</span></p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Share2 className="h-3 w-3" aria-hidden="true" />Platforms</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums">{platformCounts.length}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums">{platformCounts.length}</p>
           {rows.length > 0 && (
             <div className="mt-2 flex h-1.5 overflow-hidden rounded-full" aria-hidden="true">
               {platformCounts.map((x) => <i key={x.p} style={{ width: `${(x.n / rows.length) * 100}%`, background: PLATFORM_HEX[x.p] }} />)}
@@ -146,11 +146,11 @@ export default function CalendarTemplate() {
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Layers className="h-3 w-3" aria-hidden="true" />Formats</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums">{formatsUsed}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums">{formatsUsed}</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Lightbulb className="h-3 w-3" aria-hidden="true" />Missing ideas</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${missingIdeas ? "text-[#b2401a]" : "text-[var(--poskoo-green)]"}`}>{missingIdeas}</p>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${missingIdeas ? "text-[#b2401a]" : "text-[var(--poskoo-green)]"}`}>{missingIdeas}</p>
         </div>
       </div>
 

@@ -9,7 +9,7 @@ const SAMPLE =
   "Posting at the right time is easier when you plan ahead. A content calendar turns a pile of ideas into a steady schedule you can actually keep up with.\n\nStart by choosing the days and times your audience is most active. Then write each post in advance, add the image or link, and let the queue publish it for you.\n\nScheduling also gives you room to review your wording before it goes live. You can check the character count, fix a typo, and make sure every link works.\n\nKeep a few slots open for timely posts. When news breaks or a conversation takes off, you can still join in without breaking your routine.\n\nReview your results each week. Keep the formats that get replies and saves, and drop the ones that do not. Small adjustments add up over time.";
 
 const ghostBtn = "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 type Style = "end" | "start";
@@ -109,7 +109,7 @@ function CountCard({ label, value, icon: Icon }: { label: string; value: number;
   return (
     <div className={kpi}>
       <p className={kpiLabel}><Icon className="h-3 w-3" aria-hidden="true" />{label}</p>
-      <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{value.toLocaleString("en-US")}</p>
+      <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{value.toLocaleString("en-US")}</p>
     </div>
   );
 }
@@ -199,7 +199,7 @@ export default function ThreadMaker({ platform = "x" }: { platform?: "x" | "thre
             type="button"
             onClick={() => copy(posts.join("\n\n---\n\n"), "all")}
             disabled={!posts.length}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copied === "all" ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied === "all" ? "Copied all" : "Copy all"}

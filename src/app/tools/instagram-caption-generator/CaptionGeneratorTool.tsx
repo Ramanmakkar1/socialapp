@@ -1692,7 +1692,7 @@ const field =
   "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base outline-none focus:border-[var(--poskoo-violet)] focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]/30";
 const ghostBtn =
   "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const toggle =
   "flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm font-medium has-[:checked]:border-[var(--poskoo-violet)] has-[:checked]:bg-[var(--poskoo-band)] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-[var(--poskoo-violet)]";
@@ -1954,17 +1954,17 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
         <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div className={kpi}>
             <p className={kpiLabel}>Drafts</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{captions.length}</p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{captions.length}</p>
             <p className="mt-1 text-xs text-[#3d3450]">Regenerate to reshuffle the order.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Avg. length</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{avgLength}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{avgLength}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
             <p className="mt-1 text-xs tabular-nums text-[#3d3450]">Range {shortest}–{longest} of {captionLimit.toLocaleString("en-US")}.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Hook before “more”</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{hookFits}<span className="text-base font-medium text-[#5f5873]"> / {captions.length}</span></p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{hookFits}<span className="text-base font-medium text-[#5f5873]"> / {captions.length}</span></p>
             <div className="mt-2 flex gap-0.5" aria-hidden="true">
               {captions.map((_, i) => (
                 <i key={i} className="h-1.5 flex-1 rounded-full" style={{ background: i < hookFits ? "var(--poskoo-green)" : "var(--poskoo-line)" }} />
@@ -1973,7 +1973,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Call to action</p>
-            <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{useCommentCta ? "Keyword" : "Standard"}</p>
+            <p className="mt-0.5 text-xl font-bold text-[var(--poskoo-ink)]">{useCommentCta ? "Keyword" : "Standard"}</p>
             <p className="mt-1 text-xs text-[#3d3450]">{useCommentCta ? "Comment a word, get a DM." : isPinterest ? "Save, click or visit the link." : isLinkedIn ? "Comment, tag or link in the comments." : isX ? "Reply, repost or follow the link." : isThreads ? "Reply, repost or follow the link." : "Comment, tag or link in bio."}</p>
           </div>
         </div>
@@ -2059,7 +2059,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
             type="button"
             onClick={() => handleCopy(current, selectedText)}
             disabled={!selectedText}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copiedId === current ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copiedId === current ? "Copied" : `Copy ${noun} ${current + 1}`}

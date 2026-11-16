@@ -12,7 +12,7 @@ import {
   type TitleStyleFilter,
 } from "@/lib/youtubeTitleIdeas";
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn = "inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:opacity-40";
 
@@ -105,12 +105,12 @@ export default function YouTubeTitleGenerator() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}>Titles</p>
-          <p aria-live="polite" className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{all.length}</p>
+          <p aria-live="polite" className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{all.length}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Ready to copy.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Styles</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">
             {groups.length}
             <span className="text-base font-medium text-[#5f5873]"> / {TITLE_STYLES.length}</span>
           </p>
@@ -118,12 +118,12 @@ export default function YouTubeTitleGenerator() {
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Over 70</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{overSearch}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{overSearch}</p>
           <p className="mt-1 text-xs text-[#3d3450]">May be cut off in search.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Over 100</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{overMax}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{overMax}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Too long for YouTube.</p>
         </div>
       </div>
@@ -192,7 +192,7 @@ export default function YouTubeTitleGenerator() {
             onClick={() => copy("all", all.join("\n"))}
             disabled={all.length === 0}
             aria-label="Copy all titles"
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copied === "all" ? (
               <Check className="h-5 w-5 text-[var(--poskoo-lime)]" />

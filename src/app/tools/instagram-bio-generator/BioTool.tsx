@@ -33,7 +33,7 @@ const PLATFORM_CTA: Record<BioPlatform, string> = {
 
 const field =
   "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base outline-none focus:border-[var(--poskoo-violet)] focus-visible:ring-2 focus-visible:ring-[var(--poskoo-violet)]/30";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const icon = "pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--poskoo-violet)]";
 
@@ -194,12 +194,12 @@ export default function BioTool({ platform = "instagram" }: { platform?: BioPlat
         <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div className={kpi}>
             <p className={kpiLabel}>Options</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{bios.length}</p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{bios.length}</p>
             <p className="mt-1 text-xs text-[#3d3450]">Templates for this niche.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Fit in {limit}</p>
-            <p aria-live="polite" className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{fitCount}<span className="text-base font-medium text-[#5f5873]"> / {bios.length}</span></p>
+            <p aria-live="polite" className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{fitCount}<span className="text-base font-medium text-[#5f5873]"> / {bios.length}</span></p>
             <div className="mt-2 flex gap-0.5" aria-hidden="true">
               {bios.map((b, i) => (
                 <i key={i} className="h-1.5 flex-1 rounded-full" style={{ background: !b.filled ? "var(--poskoo-line)" : b.len > limit ? "var(--poskoo-coral)" : "var(--poskoo-green)" }} />
@@ -208,12 +208,12 @@ export default function BioTool({ platform = "instagram" }: { platform?: BioPlat
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Shortest</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{shortest}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
+            <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{shortest}<span className="text-base font-medium text-[#5f5873]"> chars</span></p>
             <p className="mt-1 text-xs tabular-nums text-[#3d3450]">{Math.max(0, limit - shortest)} left of {limit}.</p>
           </div>
           <div className={kpi}>
             <p className={kpiLabel}>Name style</p>
-            <p className="mt-1 truncate text-2xl font-bold text-[var(--poskoo-ink)]">{nameStyle && name ? displayName : styleLabel}</p>
+            <p className="mt-0.5 truncate text-xl font-bold text-[var(--poskoo-ink)]">{nameStyle && name ? displayName : styleLabel}</p>
             <p className="mt-1 truncate text-xs text-[#3d3450]">{nameStyle ? styleLabel : "Optional fancy font."}</p>
           </div>
         </div>
@@ -293,7 +293,7 @@ export default function BioTool({ platform = "instagram" }: { platform?: BioPlat
             type="button"
             onClick={() => currentBio && copy(currentId, currentBio.filled)}
             disabled={!currentBio?.filled}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copied === currentId ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copied === currentId ? "Copied" : `Copy bio ${current + 1}`}

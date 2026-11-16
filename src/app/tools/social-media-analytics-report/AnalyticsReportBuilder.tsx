@@ -226,7 +226,7 @@ export default function AnalyticsReportBuilder() {
         {highlights.map((r) => (
           <div key={r.label} className="min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]">{r.label} · B</p>
-            <p className="mt-1 truncate text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{r.b}</p>
+            <p className="mt-0.5 truncate text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{r.b}</p>
             <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#5f5873]">
               <ChangeChip value={r.changeN} /><span className="truncate">vs {r.a}</span>
             </div>

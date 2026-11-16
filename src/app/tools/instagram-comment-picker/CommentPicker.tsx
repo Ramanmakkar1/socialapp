@@ -14,7 +14,7 @@ const SAMPLE = `@anna.k: I want to win this! @mia @leo
 
 const field =
   "mt-2 min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5 text-base outline-none focus:border-[var(--poskoo-violet)] focus:ring-2 focus:ring-[var(--poskoo-violet)]/25";
-const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "grid min-w-0 content-start gap-1 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 text-sm font-medium hover:border-[var(--poskoo-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:opacity-40";
@@ -189,12 +189,12 @@ export default function CommentPicker() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}><Inbox className="h-3.5 w-3.5" aria-hidden="true" />Pasted</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{parsed.length}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{parsed.length}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Comments read from your list.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><ListChecks className="h-3.5 w-3.5" aria-hidden="true" />Valid</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{valid.length}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{valid.length}</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-band)]" aria-hidden="true">
             <div className="h-full rounded-full bg-[var(--poskoo-green)] transition-all" style={{ width: `${validPct}%` }} />
           </div>
@@ -202,12 +202,12 @@ export default function CommentPicker() {
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Filter className="h-3.5 w-3.5" aria-hidden="true" />Filtered out</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">{filteredOut}</p>
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">{filteredOut}</p>
           <p className="mt-1 text-xs text-[#3d3450]">By keyword, tags or duplicates.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Percent className="h-3.5 w-3.5" aria-hidden="true" />Win chance</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-0.5 text-xl font-bold tabular-nums text-[var(--poskoo-ink)]">
             {valid.length ? `${odds >= 1 ? 100 : (odds * 100).toFixed(odds < 0.1 ? 1 : 0)}%` : "—"}
           </p>
           <p className="mt-1 text-xs text-[#3d3450]">
@@ -279,7 +279,7 @@ export default function CommentPicker() {
             type="button"
             onClick={pick}
             disabled={valid.length === 0 || shuffling !== null}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--poskoo-violet)] disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Shuffle className="h-5 w-5" aria-hidden="true" /> Pick winner{winnerCount > 1 ? "s" : ""}
           </button>

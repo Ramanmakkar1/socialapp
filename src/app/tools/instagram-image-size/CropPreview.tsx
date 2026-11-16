@@ -22,12 +22,12 @@ function ratioLabel(w: number, h: number): string {
   return w >= h ? `${(w / h).toFixed(2)}:1` : `1:${(h / w).toFixed(2)}`;
 }
 
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 const ghostBtn =
   "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-sm font-medium hover:border-[var(--poskoo-ink)] disabled:cursor-not-allowed disabled:opacity-40";
 const primaryBtn =
-  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:cursor-not-allowed disabled:opacity-40";
 
 function drawPreview(
   canvas: HTMLCanvasElement,
@@ -175,7 +175,7 @@ export default function CropPreview() {
             <Maximize2 className="h-3 w-3" aria-hidden="true" />
             Output size
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {format.width}×{format.height}
           </p>
           <p className="mt-1 truncate text-xs text-[#3d3450]">{format.label}</p>
@@ -192,7 +192,7 @@ export default function CropPreview() {
               <Ratio className="h-3 w-3" aria-hidden="true" />
               Aspect
             </p>
-            <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{ratioLabel(format.width, format.height)}</p>
+            <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{ratioLabel(format.width, format.height)}</p>
           </div>
         </div>
         <div className={kpi}>
@@ -200,7 +200,7 @@ export default function CropPreview() {
             <ImageIcon className="h-3 w-3" aria-hidden="true" />
             Your photo
           </p>
-          <p className="mt-1 truncate whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">
+          <p className="mt-1 truncate whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">
             {srcSize ? `${srcSize.w}×${srcSize.h}` : "—"}
           </p>
           <p className={`mt-1 text-xs ${upscaled ? "font-semibold text-[#a8410f]" : "text-[#3d3450]"}`}>
@@ -212,7 +212,7 @@ export default function CropPreview() {
             <Crop className="h-3 w-3" aria-hidden="true" />
             Photo kept
           </p>
-          <p className="mt-1 whitespace-nowrap text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{keptPct === null ? "—" : `${keptPct}%`}</p>
+          <p className="mt-1 whitespace-nowrap text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{keptPct === null ? "—" : `${keptPct}%`}</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
             <i className="block h-full rounded-full bg-[var(--poskoo-violet)] transition-[width]" style={{ width: `${keptPct ?? 0}%` }} />
           </div>

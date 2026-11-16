@@ -25,7 +25,7 @@ export default function PostPreviewTool() {
   const displayHandle = handle.trim().replace(/^@+/, "") || "your.studio";
   const limits = PLATFORM_LIMITS.instagram;
   const charPct = limits.max ? Math.min(100, (analysis.chars / limits.max) * 100) : 0;
-  const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+  const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
   const kpiLabel = "flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
   const field = "mt-2 block min-h-11 w-full min-w-0 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3 text-[var(--poskoo-ink)] focus-visible:outline-2 focus-visible:outline-[var(--poskoo-violet)]";
 
@@ -76,24 +76,24 @@ export default function PostPreviewTool() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}><Type className="h-3 w-3" aria-hidden="true" />Characters</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${analysis.overBy > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{analysis.chars.toLocaleString("en-US")}<span className="text-base font-medium text-[#5f5873]"> / {limits.max?.toLocaleString("en-US")}</span></p>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${analysis.overBy > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{analysis.chars.toLocaleString("en-US")}<span className="text-base font-medium text-[#5f5873]"> / {limits.max?.toLocaleString("en-US")}</span></p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--poskoo-line)]" aria-hidden="true">
             <i className="block h-full rounded-full" style={{ width: `${charPct}%`, background: analysis.overBy > 0 ? "var(--poskoo-coral)" : "var(--poskoo-green)" }} />
           </div>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Hash className="h-3 w-3" aria-hidden="true" />Hashtags</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${analysis.overHashtags > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{analysis.hashtags.length}<span className="text-base font-medium text-[#5f5873]"> / {limits.hashtags}</span></p>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${analysis.overHashtags > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{analysis.hashtags.length}<span className="text-base font-medium text-[#5f5873]"> / {limits.hashtags}</span></p>
           <p className="mt-1 text-xs text-[#3d3450]">Instagram allows up to {limits.hashtags}.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><AtSign className="h-3 w-3" aria-hidden="true" />Mentions</p>
-          <p className={`mt-1 text-2xl font-bold tabular-nums ${analysis.overMentions > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{analysis.mentions.length}<span className="text-base font-medium text-[#5f5873]"> / {limits.mentions}</span></p>
+          <p className={`mt-0.5 text-xl font-bold tabular-nums ${analysis.overMentions > 0 ? "text-[var(--poskoo-coral)]" : "text-[var(--poskoo-ink)]"}`}>{analysis.mentions.length}<span className="text-base font-medium text-[#5f5873]"> / {limits.mentions}</span></p>
           <p className="mt-1 text-xs text-[#3d3450]">@ tags in the caption.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}>Feed fold</p>
-          <p className="mt-1 text-2xl font-bold text-[var(--poskoo-ink)]">{analysis.folded ? "“… more”" : "Fits"}</p>
+          <p className="mt-0.5 text-xl font-bold text-[var(--poskoo-ink)]">{analysis.folded ? "“… more”" : "Fits"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Est. ~{limits.foldAt} characters show before the cut.</p>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function PostPreviewTool() {
         )}
       </div>
       <aside aria-labelledby={`${id}-feed`} className="min-w-0 space-y-3 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-paper)] p-4 lg:sticky lg:top-24">
-        <button type="button" onClick={copyCaption} disabled={!caption} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40">
+        <button type="button" onClick={copyCaption} disabled={!caption} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40">
           {justCopied ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
           {justCopied ? "Copied" : "Copy caption"}
         </button>

@@ -91,7 +91,7 @@ const AUDIENCES: { id: Audience; label: string }[] = [
 const AUDIENCE_ICON: Record<Audience, LucideIcon> = { b2b: Briefcase, recruiting: Users, local: Store, creators: Sparkles };
 
 const field = "min-h-11 w-full rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 text-base text-[var(--poskoo-ink)] focus:border-[var(--poskoo-violet)]";
-const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3.5";
+const kpi = "min-w-0 rounded-2xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2.5";
 const kpiLabel = "flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#5f5873]";
 
 /**
@@ -281,24 +281,24 @@ export default function BestTimeFinder({ platform = "Instagram", insightsName = 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className={kpi}>
           <p className={kpiLabel}><CalendarDays className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Posting days</p>
-          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{selectedDays.length}<span className="text-base font-medium text-[#5f5873]"> / 7</span></p>
+          <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{selectedDays.length}<span className="text-base font-medium text-[#5f5873]"> / 7</span></p>
           <div className="mt-2 flex gap-0.5" aria-hidden="true">
             {DAYS.map((d, i) => <i key={d.label} className="h-2 flex-1 rounded-full" style={{ background: days[i] ? "var(--poskoo-violet)" : "var(--poskoo-line)" }} />)}
           </div>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><ListChecks className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Slots per week</p>
-          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{weekSlots.length}</p>
+          <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{weekSlots.length}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Pick one or two a day to test.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Sunrise className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Earliest slot</p>
-          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{earliest ? formatTime(earliest) : "—"}</p>
+          <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{earliest ? formatTime(earliest) : "—"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Audience local time.</p>
         </div>
         <div className={kpi}>
           <p className={kpiLabel}><Moon className="h-3.5 w-3.5 text-[var(--poskoo-violet)]" aria-hidden="true" />Latest slot</p>
-          <p className="mt-1 text-xl font-bold sm:text-2xl tabular-nums text-[var(--poskoo-ink)]">{latest ? formatTime(latest) : "—"}</p>
+          <p className="mt-1 text-lg font-bold sm:text-xl tabular-nums text-[var(--poskoo-ink)]">{latest ? formatTime(latest) : "—"}</p>
           <p className="mt-1 text-xs text-[#3d3450]">Audience local time.</p>
         </div>
       </div>
@@ -392,7 +392,7 @@ export default function BestTimeFinder({ platform = "Instagram", insightsName = 
           <button
             type="button"
             onClick={copyPlan}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--poskoo-ink)] px-4 text-base font-semibold text-white shadow-[0_3px_0_var(--poskoo-violet)] transition hover:-translate-y-px disabled:opacity-40"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--poskoo-ink)] px-5 text-base font-semibold text-white transition hover:-translate-y-px hover:bg-[var(--poskoo-violet)] disabled:opacity-40"
           >
             {copyState === "ok" ? <Check className="h-5 w-5 text-[var(--poskoo-lime)]" aria-hidden="true" /> : <Copy className="h-5 w-5" aria-hidden="true" />}
             {copyState === "ok" ? "Copied" : "Copy plan"}
