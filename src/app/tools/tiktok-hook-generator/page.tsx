@@ -11,7 +11,7 @@ const config: ToolPageConfig = {
     "Type a TikTok topic and get ready-to-say hooks in eight styles, from curiosity to result. Copy a first line that stops the scroll in the first second.",
   pill: "Free · no signup · no AI",
   h1: { mark: "TikTok hook generator" },
-  lede: "A hook is the first 1-3 seconds or first line that stops the scroll. Type a topic to get ready-to-say hooks you can use in your next TikTok video.",
+  lede: "A TikTok hook generator turns your video topic into ready-to-say opening lines that stop the scroll in the first second. It helps creators beat the swipe decision: type a topic, pick a style, copy a hook and film it as the video opens.",
   art: "writing",
   artLabel: "A creator writes a bold opening line on a phone-shaped card with a giant pencil",
   heroPoints: ["8 hook styles", "48 hooks per topic", "One-click copy"],
@@ -54,10 +54,89 @@ const config: ToolPageConfig = {
     },
   ],
   guide: {
-    title: "What is a hook on TikTok?",
+    title: "What is a TikTok hook generator and how does it help creators?",
     intro:
-      "A hook is the first 1-3 seconds or the first line of a TikTok video. It is the part that decides whether someone keeps watching or keeps scrolling. This generator gives you a list of openers to start from; here is how to choose and use one.",
+      (
+        <>
+          <p>
+            A TikTok hook generator is a free tool that turns your video topic into a list of opening lines designed to
+            stop the scroll in the first second. You type what the video is about, pick a hook style and copy a finished
+            line to say or show as the video opens.
+          </p>
+          <p>
+            It helps creators because the hook decides the video&rsquo;s reach: TikTok&rsquo;s algorithm watches early
+            retention, and a weak opener means viewers swipe away before the rest of the video matters. A generator gives
+            you a batch of strong openers in seconds, so you can test lines without staring at a blank screen.
+          </p>
+        </>
+      ),
     sections: [
+      {
+        title: "Hook formulas that work on TikTok",
+        body: (
+          <>
+            <p>
+              Every hook in this tool is built from one of eight formulas. Each formula creates a reason to keep
+              watching: a gap to close, a promise to keep or a claim to check.
+            </p>
+            <ul>
+              <li><b>Curiosity:</b> &ldquo;Nobody tells you this about &hellip;&rdquo; &mdash; opens a gap the viewer wants closed.</li>
+              <li><b>Mistake:</b> &ldquo;Stop doing this if you want better &hellip;&rdquo; &mdash; warns the viewer they are losing out.</li>
+              <li><b>How-to:</b> &ldquo;How to fix &hellip; in one minute&rdquo; &mdash; promises a fast, concrete result.</li>
+              <li><b>Myth:</b> &ldquo;Everyone is wrong about &hellip;&rdquo; &mdash; challenges a belief the viewer already holds.</li>
+              <li><b>Story:</b> &ldquo;The &hellip; lesson that cost me a year&rdquo; &mdash; stakes make the viewer lean in.</li>
+              <li><b>List:</b> &ldquo;3 &hellip; tips I wish I knew sooner&rdquo; &mdash; a number promises structure and value.</li>
+              <li><b>Contrarian:</b> &ldquo;Unpopular opinion: &hellip; is not that hard&rdquo; &mdash; a claim worth arguing with.</li>
+              <li><b>Result:</b> &ldquo;This is what better &hellip; looks like&rdquo; &mdash; shows the payoff up front.</li>
+            </ul>
+            <p>
+              Match the formula to the video: how-to and list for tutorials, mistake and myth for corrections, story for
+              personal lessons, result for before-and-after. The hook is a promise, so the rest of the video has to keep
+              it.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "What the generator takes as input",
+        body: (
+          <>
+            <p>
+              The tool takes two inputs: your topic and a hook style.
+            </p>
+            <ul>
+              <li><b>Topic:</b> two or three words, such as &ldquo;meal prep&rdquo; or &ldquo;budget travel&rdquo;. It is trimmed, capped at 60 characters and dropped into every template, so each hook is a finished line, not a blank template.</li>
+              <li><b>Style:</b> keep All to see all eight formulas, or pick one to see its six hooks.</li>
+            </ul>
+            <p>
+              With no topic, the hooks say &ldquo;your niche&rdquo; so you can still see the shapes. Everything runs in
+              your browser: no AI call, nothing uploaded, and the same topic always gives the same list.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Practical examples",
+        body: (
+          <>
+            <p>
+              Type &ldquo;meal prep&rdquo; and the tool returns lines like:
+            </p>
+            <ul>
+              <li>&ldquo;Nobody tells you this about meal prep&rdquo; (curiosity)</li>
+              <li>&ldquo;Stop doing this if you want better meal prep&rdquo; (mistake)</li>
+              <li>&ldquo;How to fix meal prep in one minute&rdquo; (how-to)</li>
+              <li>&ldquo;3 meal prep tips I wish I knew sooner&rdquo; (list)</li>
+            </ul>
+            <p>
+              Say one of these in the first second, put it on screen as text, and keep the same line as the first line of
+              the caption. For a fitness account the same topic gives &ldquo;The gym mistake that costs you progress&rdquo;;
+              for a finance account, &ldquo;The budgeting myth that has to go&rdquo;. One topic, many angles &mdash; film
+              the strongest one.
+            </p>
+          </>
+        ),
+      },
       {
         title: "How long should a TikTok hook be?",
         body: (
@@ -120,7 +199,9 @@ const config: ToolPageConfig = {
             set of tags with the <Link href="/tools/tiktok-hashtag-generator">TikTok hashtag generator</Link>, and pick
             a starting time with the{" "}
             <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder. Then queue it on
-            a calendar with the <Link href="/tiktok-scheduler">TikTok scheduler</Link>.
+            a calendar with the <Link href="/tiktok-scheduler">TikTok scheduler</Link>, which publishes through TikTok&rsquo;s
+            official API at the time you choose. The <Link href="/tools">free social media tools hub</Link> has the rest
+            of the caption, hashtag and timing tools for the same video.
           </p>
         ),
       },
@@ -143,6 +224,14 @@ const config: ToolPageConfig = {
     {
       q: "Can I schedule the video once I have a hook?",
       a: "Yes. Poskoo schedules TikTok videos and photo posts from a calendar, so you can write the hook, film the video and queue it for the time you choose.",
+    },
+    {
+      q: "Does the TikTok hook generator use AI?",
+      a: "No. The hooks come from eight fixed formulas filled with your topic, all in your browser. Nothing is uploaded, no account is needed and the same topic always gives the same list.",
+    },
+    {
+      q: "Will a generated hook guarantee my video goes viral?",
+      a: "No. A hook decides whether viewers stay for the first seconds, which helps the algorithm test your video, but the rest of the video has to keep the promise the hook makes. Treat the list as starting points and edit each line to sound like you.",
     },
   ],
   related: [
