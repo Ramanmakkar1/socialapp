@@ -17,6 +17,9 @@ import { GUIDE_BODIES } from "@/content/guides/bodies";
 
 // Only the slugs in the registry exist; anything else is a 404.
 export const dynamicParams = false;
+// Poskoo plan and network lines in the articles follow the RUNTIME env (src/content/guides/poskooFacts.ts):
+// regenerate in the background at most every 10 minutes.
+export const revalidate = 600;
 
 export function generateStaticParams() {
   return GUIDES.map((guide) => ({ slug: guide.slug }));

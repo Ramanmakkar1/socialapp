@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Callout, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { POSKOO } from "./poskooFacts";
 
 // Competitor facts come from each vendor's own pricing or help page, opened November 12, 2026.
 const SRC = {
@@ -52,7 +53,7 @@ export const body: GuideBody = {
             caption="Cheap social media schedulers compared (prices checked November 2026)"
             head={["Tool", "Free plan", "Cheapest paid plan", "Pricing unit", "Best for"]}
             rows={[
-              ["Poskoo", "2 accounts, 10 scheduled posts/mo", "Pro $17/mo ($14/mo yearly), 5 accounts", "Flat per plan", "Scheduling plus Instagram auto-DM"],
+              ["Poskoo", "2 accounts, 10 scheduled posts/mo", `${POSKOO.proPrice}, 5 accounts${POSKOO.soon}`, "Flat per plan", "Scheduling plus Instagram auto-DM"],
               ["Meta Business Suite", "Free", "None", "Free", "Facebook and Instagram only"],
               ["Buffer", "3 channels, 10 queued posts each", "Essentials $5/mo per channel (yearly)", "Per channel", "One or two channels"],
               ["Publer", "3 accounts, 10 queued posts each", "Professional from $5/mo", "Per account and member", "Cheap multi-network posting"],
@@ -97,15 +98,14 @@ export const body: GuideBody = {
         <>
           <h3>1. Poskoo: flat price, scheduling and auto-DM together</h3>
           <p>
-            Poskoo schedules posts to Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon from
-            one calendar. On Instagram that includes feed posts, Reels, carousels and Stories. It also sends{" "}
+            Poskoo schedules posts to {POSKOO.socialNetworks} from one calendar. On Instagram that includes feed posts, Reels, carousels and Stories. It also sends{" "}
             <Link href="/instagram-auto-dm">automatic DMs to people who comment a keyword</Link>, which most cheap
             schedulers do not do.
           </p>
           <ul>
-            <li><strong>Price:</strong> Free plan with 2 social accounts, 10 scheduled posts a month and 500 auto-DMs. Pro is $17/mo ($14/mo billed yearly) for 5 accounts and unlimited scheduling. Agency is $35/mo ($29/mo yearly) for 25 accounts. See <Link href="/pricing">pricing</Link>.</li>
+            <li><strong>Price:</strong> Free plan with 2 social accounts, 10 scheduled posts a month and 500 auto-DMs. {POSKOO.paidLead}{POSKOO.proPrice} for 5 accounts and unlimited scheduling. {POSKOO.agencyPrice} for 25 accounts. See <Link href="/pricing">pricing</Link>.</li>
             <li><strong>Why it is cheap:</strong> one flat price, not per channel. Five accounts on Pro cost the same as two.</li>
-            <li><strong>Cons:</strong> the free plan has fewer posts than Buffer&apos;s or Publer&apos;s. TikTok and Pinterest are coming once platform approval lands, and X is not supported yet. Auto-DM is Instagram only.</li>
+            <li><strong>Cons:</strong> the free plan has fewer posts than Buffer&apos;s or Publer&apos;s. {POSKOO.pendingSentence} Auto-DM is Instagram only.</li>
           </ul>
           <p><strong>Best for:</strong> creators and small businesses on 3 to 5 accounts who also want comment-to-DM.</p>
 
@@ -226,7 +226,7 @@ export const body: GuideBody = {
             caption="Five accounts, one user, yearly billing (November 2026)"
             head={["Tool", "Plan", "About per month", "Notes"]}
             rows={[
-              ["Poskoo", "Pro", "$14", "Unlimited scheduled posts, plus 2,500 auto-DMs"],
+              ["Poskoo", `Pro${POSKOO.soon}`, POSKOO.proYearly, "Unlimited scheduled posts, plus 2,500 auto-DMs"],
               ["Buffer", "Essentials x 5 channels", "$25", "$5 per channel"],
               ["Later", "Starter", "$18.75", "1 social set, up to 30 posts per profile"],
               ["Metricool", "Starter", "$20", "Up to 5 brands, LinkedIn included"],

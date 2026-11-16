@@ -128,3 +128,8 @@ export const SOFTWARE_APPLICATION_OFFERS = PLANS.map((p) => ({
 const paidPrices = PLANS.filter((p) => p !== freePlan).map((p) => Number(p.price.replace("$", "")));
 /** One-line price summary for comparison tables: "Free plan; paid plans from $17/mo". */
 export const PRICE_SUMMARY = `${freePlan.name} plan; paid plans from $${Math.min(...paidPrices)}/mo`;
+
+/** PRICE_SUMMARY that doesn't present Pro/Agency as buyable before billing is live. */
+export function priceSummary(r: Pick<PlanReadiness, "paidPlans">): string {
+  return r.paidPlans ? PRICE_SUMMARY : `${freePlan.name} plan; paid plans from $${Math.min(...paidPrices)}/mo launching soon`;
+}

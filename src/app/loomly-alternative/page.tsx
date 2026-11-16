@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
-import { PRICE_SUMMARY } from "@/lib/plans";
+import { priceSummary } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -36,7 +37,7 @@ const compare: [string, string, string, string][] = [
   ["AI caption ideas", "Yes", "Check their site", "Check their site"],
   ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
   ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
-  ["Price", PRICE_SUMMARY, "Check their site", "Check their site"],
+  ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
 
 const faqs: { q: string; a: ReactNode; text: string }[] = [

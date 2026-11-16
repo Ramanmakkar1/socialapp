@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { ChannelStatusNote, networkAvailability } from "@/components/ChannelStatusNote";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
@@ -16,14 +17,19 @@ export const revalidate = 600;
 const PATH = "/x-scheduler";
 const title = `X Scheduler: Schedule Tweets and Posts on X | ${BRAND.name}`;
 const description = "Poskoo schedules posts to X through X's official API: connect your account, write the post, add up to 4 images or one video, and pick a time.";
+const SOON_DESCRIPTION = "Plan posts for X in Poskoo. X publishing through the official API is coming soon; Instagram, Threads and Facebook work today on the Free plan.";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: title },
-  description,
-  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
-  twitter: { card: "summary_large_image", title, description },
-});
+// The description only says publishing works once X is live (src/lib/platform-support.ts).
+export async function generateMetadata(): Promise<Metadata> {
+  const desc = networkAvailability("x") === "live" ? description : SOON_DESCRIPTION;
+  return withSocial({
+    title: { absolute: title },
+    description: desc,
+    alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+    openGraph: { title, description: desc, url: new URL(PATH, BRAND.canonicalUrl).toString() },
+    twitter: { card: "summary_large_image", title, description: desc },
+  });
+}
 
 const features = [
   {
@@ -108,6 +114,8 @@ const appJsonLd = {
 };
 
 export default function XSchedulerPage() {
+  const availability = networkAvailability("x");
+  const isLive = availability === "live";
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "X scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -120,21 +128,28 @@ export default function XSchedulerPage() {
 
       <header className="hero">
         <div className={s.heroText}>
-        <span className="pill">Official X API · No password needed</span>
+        <span className="pill">{isLive ? "Official X API · No password needed" : "Official X API · Not live yet"}</span>
         <p className="eyebrow">X scheduler</p>
         <h1>
           Schedule Tweets <em className="s mark">and posts on X</em>
         </h1>
+        {isLive ? (
         <p className="lede">
           Yes, you can schedule tweets for free: connect your X account with X&apos;s official sign-in, write the post,
           add up to 4 images or one video, pick a date and time, and Poskoo publishes it for you. The Free plan is $0
           with no credit card.
         </p>
+        ) : (
+        <p className="lede">
+          X scheduling in Poskoo isn&apos;t switched on yet. When it is, you&apos;ll connect your X account with X&apos;s official sign-in, write the post, add up to 4 images or one video and pick a time, and Poskoo will publish it for you. The Free plan is $0 with no credit card.
+        </p>
+        )}
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling posts <span aria-hidden="true">→</span></Link>
           <Link className="btn btn-line" href="/signup">Create your free account</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
+        <ChannelStatusNote state={availability} network="X" />
         </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends a scheduled post to X alongside posts for other social channels" /></div>
       </header>

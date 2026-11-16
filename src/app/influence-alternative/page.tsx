@@ -19,7 +19,7 @@ import { AnimArt } from "@/components/AnimArt";
 const PATH = "/influence-alternative";
 const title = `Influence.so Alternative with a Free Plan | ${BRAND.name}`;
 const description =
-  "Compare Poskoo and influence.so: a free-forever plan, unlimited posts from $17/mo, Instagram comment-to-DM and lead capture, and where influence.so leads.";
+  "Compare Poskoo and influence.so: a free-forever plan, Instagram comment-to-DM and lead capture, unlimited posts on Pro, and where influence.so leads.";
 
 // The "AI writing help" row follows the runtime AI key (env or stored in Admin → Settings):
 // regenerate in the background at most every 10 minutes.
@@ -47,7 +47,13 @@ const platforms = getPlatformCopy();
 
 const whyLook = [
   { no: "01 / Free plan", title: "Start without a trial clock", text: `influence.so starts with a 7-day trial. ${BRAND.name} has a Free plan with ${free.items[0].text.toLowerCase()}, ${free.items[1].text.replace(" / month", " a month")} and ${free.items[2].text.replace(" / month", " a month")}, with no end date.` },
-  { no: "02 / Unlimited posts", title: "Unlimited posts at a lower price", text: `On influence.so, unlimited posts come with its Pro plan. ${BRAND.name} Pro is ${pro.price} a month (${pro.yearly}) with unlimited scheduling for ${pro.items[0].text.toLowerCase()}.` },
+  {
+    no: "02 / Unlimited posts",
+    title: "Unlimited posts at a lower price",
+    text: paidPlans
+      ? `On influence.so, unlimited posts come with its Pro plan. ${BRAND.name} Pro is ${pro.price} a month (${pro.yearly}) with unlimited scheduling for ${pro.items[0].text.toLowerCase()}.`
+      : `On influence.so, unlimited posts come with its Pro plan. ${BRAND.name} Pro, launching soon, is priced at ${pro.price} a month (${pro.yearly}) with unlimited scheduling for ${pro.items[0].text.toLowerCase()}. Until then the Free plan covers ${free.items[1].text.replace(" / month", " a month")}.`,
+  },
   { no: "03 / Conversations", title: "Turn comments into DMs and leads", text: `${BRAND.name} sends an Instagram DM to everyone who comments a keyword, can ask for an email first, and exports the leads. We did not find these features on influence.so.` },
 ];
 
@@ -85,7 +91,7 @@ const switchSteps = [
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a good influence.so alternative?`, a: `It is if you want a free plan, unlimited posts at ${pro.price} a month, or Instagram comment-to-DM with lead capture. If you need many more networks, campaigns with a version per channel, or a non-English interface, influence.so is the stronger fit today.` },
+  { q: `Is ${BRAND.name} a good influence.so alternative?`, a: `It is if you want a free plan, unlimited posts at ${pro.price} a month${paidPlans ? "" : " once Pro launches"}, or Instagram comment-to-DM with lead capture. If you need many more networks, campaigns with a version per channel, or a non-English interface, influence.so is the stronger fit today.` },
   { q: "Does influence.so have a free plan?", a: `Not when we checked on ${CHECKED_ON}. It offered a 7-day trial. Its Starter plan was US$19 a month with 50 publications and 1,500 AI credits. Check its pricing page for current prices.` },
   { q: "Which tool supports more social networks?", a: `influence.so says it publishes to 32 destinations. ${platforms.answer}` },
   { q: "Can both tools be used from ChatGPT or Claude?", a: `Yes. Both offer a hosted MCP server. ${BRAND.name}'s has ${ASSISTANT_TOOLS.length} tools, from listing channels and creating or editing posts to Auto-DM rules and an analytics summary, and works with an API key on every plan, including Free.` },

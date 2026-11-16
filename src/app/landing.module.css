@@ -254,6 +254,11 @@
 /* "Soon" on a feature line that isn't switched on yet: same badge everywhere. */
 .landing :global(.soonBadge){
   display:inline-block;vertical-align:.1em;margin-left:2px;font-size:.68rem;font-weight:700;line-height:1;letter-spacing:.02em;padding:.22rem .45rem;border-radius:999px;background:var(--poskoo-band);color:var(--violet);white-space:nowrap}
+/* Network not live yet (TikTok / X / Pinterest scheduler pages): src/components/ChannelStatusNote.tsx. */
+.landing :global(.channelNote){
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:16px;max-width:560px;padding:14px 16px;border:1.5px solid var(--line);border-radius:16px;background:var(--card);font-size:.9rem;line-height:1.5;color:#3d3450;text-align:left}
+.landing :global(.channelNote a){
+  color:var(--violet);text-decoration:underline;text-underline-offset:3px}
 /* Compact plan comparison under the pricing cards. */
 .landing :global(.cmpWrap){
   max-width:880px;margin:40px auto 0;border:1.5px solid var(--line);border-radius:var(--poskoo-radius-panel);background:var(--card);overflow:hidden}

@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
-import { PRICE_SUMMARY } from "@/lib/plans";
+import { priceSummary } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -36,7 +37,7 @@ const compare: [string, string, string, string][] = [
   ["Comment-to-DM automation", "Yes", "Check their site", "Yes"],
   ["Email capture in DMs", "Yes", "Check their site", "Yes"],
   ["AI DM message ideas", "Yes", "Check their site", "Yes"],
-  ["Price", PRICE_SUMMARY, "Check their site", "Check their site"],
+  ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
 
 const faqs = [

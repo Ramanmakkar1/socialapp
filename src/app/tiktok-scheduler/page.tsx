@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { ChannelStatusNote, networkAvailability } from "@/components/ChannelStatusNote";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
@@ -16,14 +17,19 @@ export const revalidate = 600;
 const PATH = "/tiktok-scheduler";
 const title = `TikTok Scheduler: Plan and Auto-Post TikTok Videos | ${BRAND.name}`;
 const description = `Schedule TikTok videos and photo posts on one calendar and publish them automatically through TikTok's official API. Plan ahead and post on time.`;
+const SOON_DESCRIPTION = "Plan TikTok videos and photo posts on one calendar. TikTok publishing in Poskoo is built and waiting on TikTok platform approval; Instagram, Threads and Facebook work today.";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: title },
-  description,
-  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
-  openGraph: { title, description, url: PATH },
-  twitter: { card: "summary_large_image", title, description },
-});
+// The description only says publishing works once TikTok is live (src/lib/platform-support.ts).
+export async function generateMetadata(): Promise<Metadata> {
+  const desc = networkAvailability("tiktok") === "live" ? description : SOON_DESCRIPTION;
+  return withSocial({
+    title: { absolute: title },
+    description: desc,
+    alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+    openGraph: { title, description: desc, url: PATH },
+    twitter: { card: "summary_large_image", title, description: desc },
+  });
+}
 
 const features = [
   {
@@ -117,6 +123,8 @@ const appJsonLd = {
 };
 
 export default function TikTokSchedulerPage() {
+  const availability = networkAvailability("tiktok");
+  const isLive = availability === "live";
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "TikTok scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -129,16 +137,22 @@ export default function TikTokSchedulerPage() {
 
       <header className="hero">
         <div className={s.heroText}>
-        <span className="pill">Official TikTok API · No password needed</span>
+        <span className="pill">{isLive ? "Official TikTok API · No password needed" : "Official TikTok API · Not live yet"}</span>
         <p className="eyebrow">TikTok scheduler</p>
         <h1>
           Schedule TikTok videos and <em className="s mark">post them automatically</em>
         </h1>
+        {isLive ? (
         <p className="lede">
           Yes, you can schedule TikTok posts: connect your account with TikTok&apos;s official login, upload a video,
           write the caption, pick a date and time, and Poskoo posts it for you through TikTok&apos;s API. The Free plan
           is $0 with no credit card, and TikTok sits on the same calendar as Instagram, Threads and Facebook.
         </p>
+        ) : (
+        <p className="lede">
+          TikTok scheduling in Poskoo is built and waiting on TikTok&apos;s platform approval. Once it&apos;s approved you&apos;ll connect your account with TikTok&apos;s official login, upload a video, write the caption, pick a date and time, and Poskoo will post it through TikTok&apos;s API. The Free plan is $0 with no credit card.
+        </p>
+        )}
         <p className="lede">
           Upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it
           while you are busy.
@@ -148,6 +162,7 @@ export default function TikTokSchedulerPage() {
           <Link className="btn btn-line" href="/app/calendar">Open the calendar</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
+        <ChannelStatusNote state={availability} network="TikTok" />
         </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
       </header>

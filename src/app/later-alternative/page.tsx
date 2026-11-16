@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -28,7 +28,7 @@ const whyLook = [
 ];
 
 const compare: [string, string, string][] = [
-  ["Scheduling for Instagram, Facebook and Threads", "Instagram, Facebook Pages and Threads", "Yes"],
+  ["Networks you can schedule to", LIVE_PLATFORMS_TEXT, "Yes"],
   ["Visual calendar", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
@@ -44,7 +44,7 @@ const switchSteps = [
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Later alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar with Instagram, Facebook Pages and Threads scheduling and publishing today, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
+  { q: `Is ${BRAND.name} a Later alternative?`, a: `Yes. ${BRAND.name} gives you a visual calendar that schedules and publishes to ${LIVE_PLATFORMS_TEXT} today, plus Instagram comment-to-DM automation, email capture and link tracking in the same subscription.` },
   { q: "Does Later send automatic DMs when someone comments?", a: "Later is built for planning and publishing social content. Check Later's site for what its current plans include; many teams add a separate tool like ManyChat for comment-to-DM." },
   { q: "Can I import my Later media library or schedule?", a: `There is no Later import yet. Download assets from Later if needed, then upload them when you create posts in ${BRAND.name}. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
   { q: "Which platforms does each tool support?", a: `${PLATFORMS_ANSWER} Later supports additional networks such as Pinterest and TikTok; see their site for the current list.` },
@@ -76,7 +76,7 @@ export default function LaterAlternative() {
             Later alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            {BRAND.name} is a Later alternative with a visual calendar for Instagram, Facebook Pages and Threads that also auto-DMs everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads, starting on a $0 Free plan.
+            {BRAND.name} is a Later alternative with a visual calendar for {LIVE_PLATFORMS_TEXT} that also auto-DMs everyone who comments a keyword on your posts. Capture emails, track link clicks and export leads, starting on a $0 Free plan.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>

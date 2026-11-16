@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PRICE_SUMMARY, softwareOffers } from "@/lib/plans";
+import { priceSummary, softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { publisherRef } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
@@ -41,7 +41,7 @@ const compare: [string, string, string][] = [
   ["Facebook Messenger", "On the roadmap, no date", "Yes"],
   ["TikTok", "On the roadmap, no date", "Yes"],
   ["Official Meta API, no password", "Yes", "Yes"],
-  ["Price", PRICE_SUMMARY, "Check their site"],
+  ["Price", priceSummary(planReadiness()), "Check their site"],
 ];
 
 const faqs = [

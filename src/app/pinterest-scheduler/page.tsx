@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { ChannelStatusNote, networkAvailability } from "@/components/ChannelStatusNote";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
@@ -16,14 +17,19 @@ export const revalidate = 600;
 const PATH = "/pinterest-scheduler";
 const title = `Pinterest Scheduler: Schedule Pins to Your Boards | ${BRAND.name}`;
 const description = "Schedule Pinterest Pins to any board with the official API. Add a title and destination link, upload a JPG or PNG image, and choose the publishing time.";
+const SOON_DESCRIPTION = "Plan Pinterest Pins on one calendar. Pinterest publishing in Poskoo is built and waiting on Pinterest platform approval; Instagram, Threads and Facebook work today.";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: title },
-  description,
-  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
-  twitter: { card: "summary_large_image", title, description },
-});
+// The description only says publishing works once Pinterest is live (src/lib/platform-support.ts).
+export async function generateMetadata(): Promise<Metadata> {
+  const desc = networkAvailability("pinterest") === "live" ? description : SOON_DESCRIPTION;
+  return withSocial({
+    title: { absolute: title },
+    description: desc,
+    alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+    openGraph: { title, description: desc, url: new URL(PATH, BRAND.canonicalUrl).toString() },
+    twitter: { card: "summary_large_image", title, description: desc },
+  });
+}
 
 const features = [
   {
@@ -108,6 +114,8 @@ const appJsonLd = {
 };
 
 export default function PinterestSchedulerPage() {
+  const availability = networkAvailability("pinterest");
+  const isLive = availability === "live";
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Pinterest scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -120,22 +128,29 @@ export default function PinterestSchedulerPage() {
 
       <header className="hero">
         <div className={s.heroText}>
-        <span className="pill">Official Pinterest API · No password needed</span>
+        <span className="pill">{isLive ? "Official Pinterest API · No password needed" : "Official Pinterest API · Not live yet"}</span>
         <p className="eyebrow">Pinterest scheduler</p>
         <h1>
           Schedule Pinterest Pins <em className="s mark">to any board</em>
         </h1>
+        {isLive ? (
         <p className="lede">
           Poskoo schedules Pinterest Pins through the official Pinterest API: connect your account, pick a board, add a
           destination link and image, and choose the publishing time. Your Pin joins the same calendar and publishing
           queue as your other social posts. The Free plan is $0 with no credit card and includes 2 social accounts and 10
           scheduled posts a month.
         </p>
+        ) : (
+        <p className="lede">
+          Pinterest scheduling in Poskoo is built and waiting on Pinterest&apos;s platform approval. Once it&apos;s approved you&apos;ll connect your account, pick a board, add a destination link and image, and choose the publishing time, all on the same calendar as your other posts. The Free plan is $0 with no credit card.
+        </p>
+        )}
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling Pins <span aria-hidden="true">→</span></Link>
           <Link className="btn btn-line" href="/signup">Create your free account</Link>
         </div>
         <p className="small">Free plan included. No credit card needed.</p>
+        <ChannelStatusNote state={availability} network="Pinterest" />
         </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends a scheduled Pin to a board alongside posts for other social channels" /></div>
       </header>

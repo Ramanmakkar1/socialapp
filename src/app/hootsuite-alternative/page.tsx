@@ -3,8 +3,9 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
-import { PRICE_SUMMARY } from "@/lib/plans";
+import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { priceSummary } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -17,13 +18,13 @@ export const revalidate = 600;
 export const metadata: Metadata = withSocial({
   title: { absolute: "Hootsuite Alternative for Instagram Auto-DM | Poskoo" },
   description:
-    "An Instagram scheduler plus comment-to-DM automation, email capture and AI captions, with a free plan. A simpler Hootsuite alternative for Instagram.",
+    "An Instagram scheduler plus comment-to-DM automation, email capture and a link-in-bio page, with a free plan. A simpler Hootsuite alternative for Instagram.",
   alternates: { canonical: "/hootsuite-alternative" },
 });
 
 const whySwitch = [
   { no: "01 / Instagram", title: "Built for Instagram growth", text: "Schedule your posts and reply to every keyword comment with a DM from the same place, instead of a big suite plus a separate chatbot tool." },
-  { no: "02 / Pricing", title: "Simple, clear pricing", text: `Scheduling, comment-to-DM, AI captions and lead capture live in one ${BRAND.name} account. Start on the Free plan and upgrade when you need more.` },
+  { no: "02 / Pricing", title: "Simple, clear pricing", text: `Scheduling, comment-to-DM, a link-in-bio page and lead capture live in one ${BRAND.name} account. Start on the Free plan and upgrade when you need more.` },
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
@@ -36,11 +37,11 @@ const compare: [string, string, string, string][] = [
   ["Comment-to-DM automation", "Yes", "Check their site", "Yes"],
   ["Email capture in DMs", "Yes", "Check their site", "Yes"],
   ["AI DM message ideas", "Yes", "Check their site", "Yes"],
-  ["Price", PRICE_SUMMARY, "Check their site", "Check their site"],
+  ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
 
 const faqs = [
-  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, for Instagram, Facebook Pages and Threads. ${BRAND.name} schedules and publishes your Instagram, Facebook Page and Threads posts on a calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in. Hootsuite covers more networks and team features today.` },
+  { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, especially for Instagram. ${BRAND.name} schedules and publishes to ${LIVE_PLATFORMS_TEXT} on one calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture built in. Hootsuite covers more networks and team features today.` },
   { q: "Can I import my Hootsuite schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your schedule there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
   { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
@@ -71,7 +72,7 @@ export default function HootsuiteAlternative() {
             The Hootsuite alternative for Instagram that <em className="s">turns comments into leads</em>
           </h1>
           <p className="lede">
-            {BRAND.name} is a Hootsuite alternative that schedules your Instagram, Facebook Page and Threads posts and also DMs everyone who comments a keyword, so you can capture their email and track every lead. It starts on a $0 Free plan with no credit card.
+            {BRAND.name} is a Hootsuite alternative that schedules your posts to {LIVE_PLATFORMS_TEXT} and also DMs everyone who comments a keyword, so you can capture their email and track every lead. It starts on a $0 Free plan with no credit card.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>

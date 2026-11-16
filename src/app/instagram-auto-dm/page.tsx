@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PRICE_SUMMARY, softwareOffers } from "@/lib/plans";
+import { priceSummary, softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { publisherRef } from "@/lib/tool-schema";
 import { CompareNote } from "@/components/CompareNote";
@@ -39,7 +39,7 @@ const automations = [
 ];
 
 const compare: [string, string, string][] = [
-  ["Price", PRICE_SUMMARY, "Varies with contacts"],
+  ["Price", priceSummary(planReadiness()), "Varies with contacts"],
   ["Post scheduling included", "Yes", "No"],
   ["Comment-to-DM automation", "Yes", "Yes"],
   ["AI-written DM message ideas", "Yes", "Check their site"],

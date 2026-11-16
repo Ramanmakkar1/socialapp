@@ -3,7 +3,8 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PRICE_SUMMARY } from "@/lib/plans";
+import { priceSummary } from "@/lib/plans";
+import { planReadiness } from "@/lib/featureReadiness";
 import { PLAN_LIMITS } from "@/lib/planLimits";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
@@ -44,7 +45,7 @@ const compare: [string, string, string][] = [
   ["Post scheduling", "Yes", "Check their site"],
   ["Instagram comment-to-DM", "Yes", "Check their site"],
   ["Email capture in DMs", "Yes", "Check their site"],
-  ["Price", PRICE_SUMMARY, "Check their site"],
+  ["Price", priceSummary(planReadiness()), "Check their site"],
   [
     "Links on Free plan",
     `${PLAN_LIMITS.Free.bioLinks} links (${PLAN_LIMITS.Pro.bioLinks} on paid)`,

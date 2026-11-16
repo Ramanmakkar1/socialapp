@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Callout, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { POSKOO } from "./poskooFacts";
 
 // Competitor facts come from each vendor's own pricing page, opened November 12, 2026.
 const SRC = {
@@ -53,7 +54,7 @@ export const body: GuideBody = {
             caption="Instagram auto-DM tools compared (prices checked November 2026)"
             head={["Tool", "Free plan", "Cheapest paid plan", "How usage is counted", "Best for"]}
             rows={[
-              ["Poskoo", "500 auto-DMs/mo, 2 social accounts", "Pro $17/mo ($14/mo yearly), 2,500 DMs", "DMs sent", "Auto-DM plus a post scheduler in one"],
+              ["Poskoo", "500 auto-DMs/mo, 2 social accounts", `${POSKOO.proPrice}, 2,500 DMs${POSKOO.soon}`, "DMs sent", "Auto-DM plus a post scheduler in one"],
               ["ManyChat", "25 active contacts/mo, ManyChat branding", "Essential $14/mo billed yearly, 250 contacts", "Active contacts", "Multi-channel chat flows"],
               ["CreatorFlow", "500 DMs/mo, 1 account", "Pro $15/mo ($12/mo yearly), 5,000 DMs per account", "DMs sent", "Low-cost Instagram-only DMs"],
               ["LinkDM", "1,000 DMs/mo, 1 account", "Pro $19/mo ($182/yr), 25,000 DMs", "DMs sent", "High DM volume on a budget"],
@@ -116,9 +117,9 @@ export const body: GuideBody = {
             feed posts and Reels, and you can also auto-reply to Story replies and to DMs that contain a keyword.
           </p>
           <ul>
-            <li><strong>Price:</strong> Free plan with 500 auto-DMs a month. Pro is $17/mo ($14/mo billed yearly) with 2,500 DMs. Agency is $35/mo ($29/mo yearly) with 10,000 DMs and 25 social accounts. See <Link href="/pricing">pricing</Link>.</li>
+            <li><strong>Price:</strong> Free plan with 500 auto-DMs a month. {POSKOO.paidLead}{POSKOO.proPrice} with 2,500 DMs. {POSKOO.agencyPrice} with 10,000 DMs and 25 social accounts. See <Link href="/pricing">pricing</Link>.</li>
             <li><strong>Lead capture:</strong> email capture in the DM and click and lead analytics on Pro and Agency. You can also send the link only after someone follows you.</li>
-            <li><strong>Also includes:</strong> a scheduler for Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon, plus a link-in-bio page.</li>
+            <li><strong>Also includes:</strong> a scheduler for {POSKOO.socialNetworks}, plus a link-in-bio page.</li>
             <li><strong>Cons:</strong> auto-DM is Instagram only. DM limits are lower than LinkDM or CreatorFlow at a similar price. No visual flow builder for long multi-step chats.</li>
           </ul>
           <p>
@@ -220,7 +221,7 @@ export const body: GuideBody = {
             caption="Cheapest plan that covers each monthly volume (monthly billing unless noted)"
             head={["Tool", "About 500 DMs", "About 2,500 DMs", "About 10,000 DMs"]}
             rows={[
-              ["Poskoo", "Free", "Pro $17", "Agency $35"],
+              ["Poskoo", "Free", `${POSKOO.proShort}${POSKOO.soon}`, `${POSKOO.agencyShort}${POSKOO.soon}`],
               ["ManyChat", "Essential, plus extra contacts", "Pro $29 billed yearly", "Business or higher"],
               ["CreatorFlow", "Free", "Pro $15", "Growth $30"],
               ["LinkDM", "Free", "Free (1,000) or Pro $19", "Pro $19"],
