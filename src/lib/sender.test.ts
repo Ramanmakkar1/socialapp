@@ -234,6 +234,7 @@ function installSendDueDmsHarness(
   inboundByThread: Map<string, InboundMock> = new Map()
 ) {
   const advisoryByAccount = new Map<string, string>();
+  const leaseLog: { ids: string[]; leased: boolean }[] = [];
   const locksByClient = new Map<string, Set<string>>();
   let clientSeq = 0;
 
@@ -273,16 +274,16 @@ function installSendDueDmsHarness(
   const clientQuery = (clientId: string) => async (sql: string, params?: unknown[]) => {
     const accountId = typeof params?.[0] === "string" ? (params[0] as string) : null;
     if (sql === "begin" || sql === "commit" || sql.startsWith("rollback")) {
-      if (sql === "commit" || sql.startsWith("rollback")) {
-        const held = locksByClient.get(clientId);
-        if (held) {
-          for (const id of held) advisoryByAccount.delete(id);
-          locksByClient.delete(clientId);
-        }
-      }
+      // Session advisory locks survive commit/rollback (only pg_advisory_unlock releases them).
       return { rows: [] };
     }
-    if (sql.includes("pg_try_advisory_xact_lock")) {
+    if (sql.includes("pg_advisory_unlock")) {
+      const acct = params?.[1] as string;
+      if (advisoryByAccount.get(acct) === clientId) advisoryByAccount.delete(acct);
+      locksByClient.get(clientId)?.delete(acct);
+      return { rows: [{ pg_advisory_unlock: true }] };
+    }
+    if (sql.includes("pg_try_advisory_lock")) {
       const acct = params?.[1] as string;
       if (advisoryByAccount.has(acct)) {
         return { rows: [{ locked: false }] };
@@ -376,6 +377,14 @@ function installSendDueDmsHarness(
       if (acct) acct.dm_cooldown_until = new Date(Date.now() + (params?.[1] as number));
       return { rows: [] };
     }
+    if (sql.startsWith("update socialapp.dm_queue set next_attempt_at=now()") && sql.includes("any($1::uuid[])")) {
+      // Claim lease (with a duration) or release (without one).
+      const ids = new Set(params?.[0] as string[]);
+      const until = Date.now() + (typeof params?.[1] === "number" ? (params[1] as number) : 0);
+      for (const q of queue) if (ids.has(q.id) && q.status === "pending") q.next_attempt_at = until;
+      leaseLog.push({ ids: [...ids], leased: typeof params?.[1] === "number" });
+      return { rows: [] };
+    }
     if (sql.startsWith("update socialapp.dm_queue")) {
       return { rows: [] };
     }
@@ -393,7 +402,7 @@ function installSendDueDmsHarness(
     },
   } as unknown as pg.Pool;
 
-  return { pool, queue, accounts };
+  return { pool, queue, accounts, advisoryByAccount, leaseLog };
 }
 
 async function withSendDueDmsEnv<T>(
@@ -879,7 +888,7 @@ test("sendDueDms: comment reply still uses queue age, not inbound messaging wind
   );
 });
 
-test("sendDueDms: inbound lookup failure keeps the DM pending via rollback", async () => {
+test("sendDueDms: inbound lookup failure keeps the DM pending for a retry", async () => {
   const accountId = "acc-1";
   const externalId = "ig-1";
   const rules: RuleRow[] = [
@@ -967,7 +976,7 @@ test("sendDueDms: follow_check retries with backoff while Instagram does not ans
   const { result, updates, sentBodies } = await runFollowCheck(1, null);
   assert.equal(result.retried, 1);
   assert.equal(sentBodies.length, 0);
-  const retry = updates.find((u) => /next_attempt_at=now\(\) \+/.test(u.sql));
+  const retry = updates.find((u) => /next_attempt_at=now\(\) \+/.test(u.sql) && !u.sql.includes("any($1::uuid[])"));
   assert.ok(retry, "retry scheduled");
   assert.equal(retry.params[1], 2);
   assert.ok(Number(retry.params[3]) > 0);
@@ -1176,6 +1185,127 @@ test("sendDueDms: a message with an unresolved {{link}} is never sent; the item 
       assert.equal(result.failed, 1);
       assert.equal(ctx.queue[0]?.status, "failed");
       assert.match(ctx.queue[0]?.last_error ?? "", /still contained \{\{link\}\}/);
+    }
+  );
+});
+
+// ---- Claim / send / record: no Instagram call inside a transaction, results never rolled back ----
+
+/** Wraps every client so tests can see open transactions and inject a failing statement. */
+function instrumentClients(
+  ctx: ReturnType<typeof installSendDueDmsHarness>,
+  failWhen?: (sql: string, params: unknown[]) => boolean
+) {
+  const state = { openTx: 0 };
+  const connect = ctx.pool.connect.bind(ctx.pool);
+  (ctx.pool as unknown as { connect: () => Promise<unknown> }).connect = async () => {
+    const client = (await connect()) as unknown as { query: (sql: string, params?: unknown[]) => Promise<unknown> };
+    const original = client.query;
+    client.query = async (sql: string, params: unknown[] = []) => {
+      if (sql === "begin") state.openTx += 1;
+      if (sql === "commit" || sql.startsWith("rollback")) state.openTx -= 1;
+      if (failWhen?.(sql, params)) throw new Error("db write failed");
+      return original(sql, params);
+    };
+    return client;
+  };
+  return state;
+}
+
+function oneAccount(): MockSocialAccount[] {
+  return [{ id: "acc-1", external_id: "ig-1", status: "active", dm_cooldown_until: null, access_token_enc: "", created_at: 1 }];
+}
+const oneRule: RuleRow[] = [{ id: "rule-active", user_id: "user-1", social_account_id: "acc-1", status: "active" }];
+
+test("sendDueDms: Instagram is called outside any transaction and each result is recorded right away", async () => {
+  let state = { openTx: 0 };
+  const txOpenAtSend: number[] = [];
+  globalThis.fetch = async () => {
+    txOpenAtSend.push(state.openTx);
+    return { ok: true, text: async () => "" } as Response;
+  };
+  await withSendDueDmsEnv(
+    oneAccount(),
+    [baseQueueRow({ id: "q1", social_account_id: "acc-1", comment_id: "c1" }), baseQueueRow({ id: "q2", social_account_id: "acc-1", comment_id: "c2" })],
+    oneRule,
+    async (ctx) => {
+      state = instrumentClients(ctx);
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.sent, 2);
+      assert.deepEqual(txOpenAtSend, [0, 0], "no transaction is open while Instagram is called");
+      assert.equal(ctx.leaseLog[0]?.leased, true, "due rows are leased in the claim transaction");
+      assert.deepEqual(ctx.leaseLog[0]?.ids, ["q1", "q2"]);
+      assert.equal(ctx.advisoryByAccount.size, 0, "the per-account lock is released after the run");
+    }
+  );
+});
+
+test("sendDueDms: a DB error after a delivered DM never rolls back the DMs already sent", async () => {
+  let sends: string[] = [];
+  globalThis.fetch = async (_url, init) => {
+    sends.push(JSON.parse(String(init?.body)).recipient.comment_id);
+    return { ok: true, text: async () => "" } as Response;
+  };
+  const previousError = console.error;
+  console.error = () => {};
+  try {
+    await withSendDueDmsEnv(
+      oneAccount(),
+      [
+        baseQueueRow({ id: "q1", social_account_id: "acc-1", comment_id: "c1", created_at: Date.now() - 10_000 + 1 }),
+        baseQueueRow({ id: "q2", social_account_id: "acc-1", comment_id: "c2", created_at: Date.now() - 10_000 + 2 }),
+        baseQueueRow({ id: "q3", social_account_id: "acc-1", comment_id: "c3", created_at: Date.now() - 10_000 + 3 }),
+      ],
+      oneRule,
+      async (ctx) => {
+        // Recording q2's result fails (DB down for a moment / crash right after Instagram accepted it).
+        instrumentClients(ctx, (sql, params) => sql.startsWith("update socialapp.dm_queue set status='sent'") && params[0] === "q2");
+        const { sendDueDms, DM_LEASE_MS } = await import("./sender.ts");
+        const first = await sendDueDms(50);
+        assert.equal(first.sent, 1);
+        assert.deepEqual(sends, ["c1", "c2"]);
+        const q = (id: string) => ctx.queue.find((r) => r.id === id)!;
+        assert.equal(q("q1").status, "sent", "q1 stays sent (old code rolled it back and sent it again)");
+        assert.equal(q("q2").status, "pending");
+        assert.ok((q("q2").next_attempt_at ?? 0) > Date.now() + DM_LEASE_MS - 60_000, "q2 keeps its lease: not retried straight away");
+        assert.ok((q("q3").next_attempt_at ?? 0) <= Date.now(), "q3 was never attempted: its lease is released");
+        assert.equal(ctx.advisoryByAccount.size, 0);
+
+        // Next run: q1 is never sent again and q2 waits for its lease; q3 goes out.
+        sends = [];
+        (ctx.pool as unknown as { connect: unknown }).connect = installSendDueDmsHarness(ctx.accounts, ctx.queue, oneRule).pool.connect;
+        const second = await sendDueDms(50);
+        assert.deepEqual(sends, ["c3"]);
+        assert.equal(second.sent, 1);
+
+        // Stale lease (older than DM_LEASE_MS): the unsent row becomes due again; sent rows never do.
+        q("q2").next_attempt_at = Date.now() - 1;
+        sends = [];
+        await sendDueDms(50);
+        assert.deepEqual(sends, ["c2"]);
+        assert.equal(q("q2").status, "sent");
+      }
+    );
+  } finally {
+    console.error = previousError;
+  }
+});
+
+test("sendDueDms: a rate-limit stop releases the claimed rows it did not attempt", async () => {
+  globalThis.fetch = async () =>
+    ({ ok: false, status: 429, text: async () => JSON.stringify({ error: { message: "rate", code: 4 } }) }) as Response;
+  await withSendDueDmsEnv(
+    oneAccount(),
+    [baseQueueRow({ id: "q1", social_account_id: "acc-1", comment_id: "c1", created_at: Date.now() - 10_000 + 1 }), baseQueueRow({ id: "q2", social_account_id: "acc-1", comment_id: "c2", created_at: Date.now() - 10_000 + 2 })],
+    oneRule,
+    async (ctx) => {
+      const { sendDueDms } = await import("./sender.ts");
+      const result = await sendDueDms(50);
+      assert.equal(result.retried, 1);
+      assert.deepEqual(ctx.leaseLog.at(-1), { ids: ["q2"], leased: false });
+      assert.ok((ctx.queue[1].next_attempt_at ?? 0) <= Date.now());
+      assert.ok(ctx.accounts[0].dm_cooldown_until && ctx.accounts[0].dm_cooldown_until.getTime() > Date.now(), "cooldown kept");
     }
   );
 });
