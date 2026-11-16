@@ -6,6 +6,7 @@ import { BRAND } from "@/lib/brand";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -53,6 +54,23 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Hootsuite alternative`,
+    description:
+      "An Instagram scheduler plus comment-to-DM automation, email capture and a link-in-bio page, with a free plan. A simpler Hootsuite alternative for Instagram.",
+    url: `${BRAND.canonicalUrl}/hootsuite-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/hootsuite-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    "Publishing to Instagram, Facebook and Threads",
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+    "AI DM message ideas",
+  ],
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -62,7 +80,8 @@ function Cell({ v }: { v: string }) {
 export default function HootsuiteAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Hootsuite alternative", path: "/hootsuite-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
