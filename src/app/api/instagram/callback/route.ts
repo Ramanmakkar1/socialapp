@@ -2,10 +2,16 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
-import { encryptToken } from "@/lib/crypto";
-import { query } from "@/lib/db";
 import { IG_SCOPES, exchangeCode, fetchProfile, longLivedToken } from "@/lib/instagram";
-import { PICK_COOKIE, PICK_MAX_AGE_S, encodePick, saveFacebookLoginAccount } from "@/lib/metaAccounts";
+import {
+  INSTAGRAM_TAKEN_PATH,
+  PICK_COOKIE,
+  PICK_MAX_AGE_S,
+  encodePick,
+  isInstagramTakenByOther,
+  saveFacebookLoginAccount,
+  saveInstagramLoginAccount,
+} from "@/lib/metaAccounts";
 import { MetaApiError, discoverMetaAccounts, isMetaLoginConfigured, verifyState } from "@/lib/metaLogin";
 import { accountLimitError } from "@/lib/planLimits";
 
@@ -19,11 +25,14 @@ type BackResult =
   | "missing_permissions"
   | "no_pages"
   | "no_ig_business"
-  | "limit";
+  | "limit"
+  | "taken";
 
 function back(result: BackResult) {
   // Success opens the Connect dialog's "connected" step (ConnectChannelDialog); problems keep the Settings banners.
   if (result === "connected") return NextResponse.redirect(new URL("/app/calendar?connected=instagram", BRAND.url));
+  // Owned by another Poskoo user: the Connect dialog's "already connected to another Poskoo account" message.
+  if (result === "taken") return NextResponse.redirect(new URL(INSTAGRAM_TAKEN_PATH, BRAND.url));
   return NextResponse.redirect(new URL(`/app/settings?ig=${result}`, BRAND.url));
 }
 
@@ -51,10 +60,13 @@ export async function GET(request: Request) {
       const found = await discoverMetaAccounts(code);
       if (!found.ok) return back(found.reason);
       if (found.pages.length === 1) {
+        // Another Poskoo user's account is never taken over (its rules, contacts and posts stay theirs).
+        if (await isInstagramTakenByOther(user.id, found.pages[0].igUserId)) return back("taken");
         // Plan limit: a NEW account over the limit is refused; reconnecting an existing one works.
         if (await accountLimitError(user.id, { kind: "social", platform: "instagram", externalId: found.pages[0].igUserId })) return back("limit");
-        const { subscribed } = await saveFacebookLoginAccount(user.id, found.pages[0], found.scopes, found.metaUserId);
-        return back(subscribed ? "connected" : "connected_no_webhooks");
+        const saved = await saveFacebookLoginAccount(user.id, found.pages[0], found.scopes, found.metaUserId);
+        if (saved.taken) return back("taken");
+        return back(saved.subscribed ? "connected" : "connected_no_webhooks");
       }
       // More than one Instagram account: let the user choose. Only the encrypted user token is kept
       // (15 min, httpOnly); the chooser reads the Page list again with it.
@@ -91,20 +103,18 @@ export async function GET(request: Request) {
     const profile = await fetchProfile(long.access_token);
     const externalId = profile.user_id || short.user_id;
     if (!externalId) return back("error");
+    // Another Poskoo user's account is never taken over (its rules, contacts and posts stay theirs).
+    if (await isInstagramTakenByOther(user.id, externalId)) return back("taken");
     if (await accountLimitError(user.id, { kind: "social", platform: "instagram", externalId })) return back("limit");
-    await query(
-      `insert into socialapp.social_accounts (user_id, platform, external_id, username, access_token_enc, token_expires_at, scopes, status)
-       values ($1,'instagram',$2,$3,$4, now() + ($5 || ' seconds')::interval, $6, 'active')
-       on conflict (platform, external_id) do update set user_id=excluded.user_id, username=excluded.username, access_token_enc=excluded.access_token_enc, token_expires_at=excluded.token_expires_at, scopes=excluded.scopes, status='active', auth_type='instagram_login', page_id=null, page_name=null, updated_at=now()`,
-      [user.id, externalId, profile.username || null, encryptToken(long.access_token), String(long.expires_in), IG_SCOPES]
-    );
-    // App-scoped id = the user_id Meta sends in deauthorize/data-deletion signed_requests (migration 012).
-    if (short.user_id) {
-      await query(
-        "update socialapp.social_accounts set app_user_id=$2 where platform='instagram' and external_id=$1",
-        [externalId, short.user_id]
-      ).catch(() => undefined);
-    }
+    const saved = await saveInstagramLoginAccount(user.id, {
+      igUserId: externalId,
+      username: profile.username || null,
+      accessToken: long.access_token,
+      expiresIn: long.expires_in,
+      scopes: IG_SCOPES,
+      appUserId: short.user_id || null,
+    });
+    if (saved === "taken") return back("taken");
     return back("connected");
   } catch {
     return back("error");
