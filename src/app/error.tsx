@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import PublicShell from "@/components/PublicShell";
 import { PageArt } from "@/components/PageArt";
 
-export default function SiteError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function SiteError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  useEffect(() => {
+    // Only the framework digest is reported — never page data or secrets.
+    console.error("Page render error", error.digest ?? "no digest");
+  }, [error.digest]);
+
   return (
     <PublicShell>
       <header className="hero" role="alert">
@@ -22,6 +28,11 @@ export default function SiteError({ reset }: { error: Error & { digest?: string 
           <Link className="btn btn-line" href="/help">Visit help</Link>
           <Link className="btn btn-line" href="/contact">Contact us</Link>
         </div>
+        {error.digest ? (
+          <p className="small" style={{ marginTop: 16 }}>
+            Reference: <code>{error.digest}</code>
+          </p>
+        ) : null}
         <PageArt />
       </header>
     </PublicShell>
