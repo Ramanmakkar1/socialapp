@@ -7,7 +7,7 @@ import { publisherRef } from "@/lib/tool-schema";
 import { PLANS, cancelAnswer, plansFor, plansNote, softwareOffers, type PlanReadiness } from "@/lib/plans";
 import { planReadinessNow } from "@/lib/featureReadinessNow";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
-import { PlanCta, PlanTag } from "@/components/PlanCta";
+import { PlanCards } from "@/components/PlanCta";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
@@ -74,16 +74,6 @@ const appJsonLd = (r: PlanReadiness) => ({
 });
 const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
-// The landing's green check (its #ok symbol only exists on the home page, so inline it here).
-function Check() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" style={{ flex: "none", marginTop: 4 }}>
-      <circle cx="9" cy="9" r="9" fill="var(--green)" />
-      <path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default async function PricingPage() {
   const r = await planReadinessNow();
   const plans = plansFor(r);
@@ -112,25 +102,7 @@ export default async function PricingPage() {
           <p className="lede" style={{ textAlign: "center", maxWidth: "760px", margin: "0 auto 28px" }}>
             The Free plan costs $0 forever and includes 2 social accounts, 10 scheduled posts a month, 500 auto-DMs a month and a 5-link bio page. You can schedule to {LIVE_PLATFORMS_TEXT}, and no credit card is required.
           </p>
-          <div className="plans">
-            {plans.map((p) => (
-              <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
-                <PlanTag plan={p} />
-                <h3>{p.name}</h3>
-                <div className="price">{p.price} <small>{p.per}</small></div>
-        {p.yearly && <p className="priceYearly">or {p.yearlyHref ? <a href={p.yearlyHref}>{p.yearly}</a> : p.yearly}</p>}
-                <ul>
-                  {p.items.map((item) => (
-                    <li key={item.text}>
-                      <Check />
-                      <span>{item.text}{item.soon ? <small className="soon"> · launching soon</small> : null}</span>
-                    </li>
-                  ))}
-                </ul>
-                <PlanCta plan={p} />
-              </div>
-            ))}
-          </div>
+          <PlanCards plans={plans} />
           <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{plansNote(r)}</p>
           <p className="small" style={{ textAlign: "center", marginTop: "10px" }}>
             Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}

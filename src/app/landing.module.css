@@ -219,27 +219,41 @@
 .landing :global(.new small){
   opacity:.75}
 .landing :global(.plans){
-  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start}
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:stretch;padding-top:14px}
 .landing :global(.plan){
-  background:var(--card);border:1.5px solid var(--line);border-radius:var(--poskoo-radius-panel);padding:28px;display:flex;flex-direction:column;gap:16px;position:relative}
+  background:var(--card);border:1.5px solid var(--line);border-radius:var(--poskoo-radius-panel);padding:28px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:visible;min-width:0}
+/* Cards with a pill on the top edge get extra room so the pill never crowds the plan name. */
+.landing :global(.plan.tagged){
+  padding-top:34px}
 .landing :global(.plan.pop){
-  border:2px solid var(--ink);box-shadow:8px 8px 0 var(--peach)}
+  border:2px solid var(--ink);box-shadow:6px 6px 0 var(--peach)}
 .landing :global(.plan .tag){
-  position:absolute;top:-13px;left:24px;background:var(--lime);font-size:.75rem;font-weight:700;padding:.35rem .7rem;border-radius:999px;border:1.5px solid var(--ink)}
+  position:absolute;top:-13px;left:24px;z-index:1;white-space:nowrap;background:var(--lime);font-size:.75rem;font-weight:700;line-height:1.2;padding:.35rem .7rem;border-radius:999px;border:1.5px solid var(--ink)}
 .landing :global(.plan h3){
   font-size:1.2rem;letter-spacing:-.02em}
 .landing :global(.price){
   font-size:3rem;font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
 .landing :global(.price small){
   font-size:1rem;font-weight:500;color:var(--muted);letter-spacing:0}
+/* The list grows; the CTA block below it is pinned to the card's bottom edge. */
 .landing :global(.plan ul){
-  list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;font-size:.96rem}
+  list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;font-size:.96rem;line-height:1.45;flex:1 1 auto}
 .landing :global(.plan li){
   display:flex;gap:.6rem;align-items:flex-start}
+/* Check icon centred on the first text line (line box = 1.45em). */
 .landing :global(.plan li svg){
-  flex:none;margin-top:4px}
+  flex:none;margin-top:calc((1.45em - 16px) / 2)}
+.landing :global(.planCta){
+  display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-top:auto;padding-top:4px}
 .landing :global(.plan .btn){
-  justify-content:center}
+  justify-content:center;text-align:center}
+.landing :global(.planNote){
+  min-height:24px;display:flex;justify-content:center;align-items:center}
+.landing :global(.soonPill){
+  display:inline-flex;align-items:center;font-size:.75rem;font-weight:700;line-height:1;padding:.35rem .65rem;border-radius:999px;background:var(--poskoo-band);color:var(--violet)}
+/* "Soon" on a feature line that isn't switched on yet: same badge everywhere. */
+.landing :global(.soonBadge){
+  display:inline-block;vertical-align:.1em;margin-left:2px;font-size:.68rem;font-weight:700;line-height:1;letter-spacing:.02em;padding:.22rem .45rem;border-radius:999px;background:var(--poskoo-band);color:var(--violet);white-space:nowrap}
 .landing :global(.faq){
   max-width:760px;margin-inline:auto;display:flex;flex-direction:column;gap:10px}
 .landing :global(details){
@@ -329,7 +343,10 @@
 .landing :global(.ctaArt){
   max-width:280px}
 .landing :global(.plans){
-  grid-template-columns:1fr}
+  grid-template-columns:1fr;gap:28px}
+/* Keep the offset shadow inside the column so it never touches the page edge. */
+.landing :global(.plan.pop){
+  margin-right:6px}
 
 }
 

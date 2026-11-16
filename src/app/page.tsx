@@ -9,7 +9,7 @@ import { PLATFORMS_ANSWER, getPlatformCopy, listText } from "@/lib/platform-supp
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
 import { cancelAnswer, plansFor, plansNote } from "@/lib/plans";
 import { planReadinessNow } from "@/lib/featureReadinessNow";
-import { PlanCta, PlanTag } from "@/components/PlanCta";
+import { PlanCards } from "@/components/PlanCta";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import styles from "./landing.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -236,25 +236,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 
 <section id="pricing"><div className="wrap">
   <div className="head"><p className="eyebrow">Pricing</p><h2>Simple plans. <em className="s">Start free</em></h2></div>
-  <div className="plans">
-    {plans.map((p) => (
-      <div key={p.name} className={p.popular ? "plan pop" : "plan"}>
-        <PlanTag plan={p} />
-        <h3>{p.name}</h3>
-        <div className="price">{p.price} <small>{p.per}</small></div>
-        {p.yearly && <p className="priceYearly">or {p.yearlyHref ? <a href={p.yearlyHref}>{p.yearly}</a> : p.yearly}</p>}
-        <ul>
-          {p.items.map((item) => (
-            <li key={item.text}>
-              <svg width="16" height="16"><use href="#ok"/></svg>
-              <span>{item.text}{item.soon ? <small className="soon"> · launching soon</small> : null}</span>
-            </li>
-          ))}
-        </ul>
-        <PlanCta plan={p} />
-      </div>
-    ))}
-  </div>
+  <PlanCards plans={plans} />
   <p className="small" style={{ textAlign: "center", marginTop: "20px" }}>{plansNote(r)}</p>
 </div></section>
 

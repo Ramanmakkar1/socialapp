@@ -71,13 +71,7 @@
   }
 }
 
-/* Plan cards share one height; the button sits on the bottom edge. */
-.shell :global(.wrap .plans) {
-  align-items: stretch;
-}
-.shell :global(.wrap .plan .btn) {
-  margin-top: auto;
-}
+/* Plan cards share one height; the CTA block sits on the bottom edge (landing.module.css). */
 
 /* Accent links that must stay violet inside the landing wrapper
    (.landing a sets color:inherit — this has higher specificity). */
