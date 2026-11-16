@@ -206,7 +206,7 @@ export default async function InstagramScheduler() {
           <div className="howGrid">
             {steps.map((st) => (
               <article key={st.n} className="howStep">
-                <div className="howArt"><Image src={st.art} width={640} height={600} sizes="(max-width: 960px) 80vw, 320px" loading="lazy" alt={st.alt} /></div>
+                <div className="howArt"><Image src={st.art} width={640} height={600} sizes="(max-width: 600px) 80vw, (max-width: 960px) 460px, 340px" loading="lazy" alt={st.alt} /></div>
                 <span className="howNo">Step {st.n}</span>
                 <h3>{st.title}</h3>
                 <p>{st.text}</p>
