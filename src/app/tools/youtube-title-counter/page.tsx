@@ -16,7 +16,7 @@ const config: ToolPageConfig = {
   name: "YouTube title and description character counter",
   crumb: "YouTube title counter",
   title: "YouTube Title Counter: Check Limits Before Upload | Poskoo",
-  description: "Paste your YouTube title, description or tags for live character counts, search previews and over-limit warnings before you upload, free in your browser.",
+  description: "Check YouTube titles, descriptions and tags against real limits live. See search previews and fix over-limit text before you upload. Free, no sign-up.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "YouTube title & description counter", after: "with real limits" },
   lede: "A YouTube title counter is a free tool that checks your video title, description and tags against YouTube's character limits as you type. It shows the 100-character title cap, the 5,000-character description limit and the 500-character tag total, with a preview of what viewers see in search and on the watch page.",
