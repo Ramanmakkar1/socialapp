@@ -36,12 +36,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Re-check indexability at the output boundary: a path that is noindex for
   // any reason must never reach the XML, even if the candidate list changes.
   const hostIsIndexable = isApprovedProductionOrigin(BRAND.url);
-  return getSitemapPaths().filter((path) => hostIsIndexable && isPathIndexable(path)).map((path) => {
-    return {
-      url: `${BRAND.url}${path}`,
-      lastModified: SITEMAP_LAST_MODIFIED,
-      changeFrequency: META[path]?.changeFrequency ?? ("yearly" as const),
-      priority: META[path]?.priority ?? 0.3,
-    };
-  });
+  return getSitemapPaths()
+    .filter((path) => hostIsIndexable && isPathIndexable(path))
+    .map((path) => {
+      return {
+        url: `${BRAND.url}${path}`,
+        lastModified: SITEMAP_LAST_MODIFIED,
+        changeFrequency: META[path]?.changeFrequency ?? ("yearly" as const),
+        priority: META[path]?.priority ?? 0.3,
+      };
+    })
+    // Final host guard: every emitted URL must be on the approved production
+    // origin. A staging/legacy host is always noindex, so it can never leak in
+    // even if BRAND.url or the candidate path list changes.
+    .filter((entry) => isApprovedProductionOrigin(entry.url));
 }
