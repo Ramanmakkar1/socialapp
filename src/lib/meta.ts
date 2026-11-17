@@ -9,10 +9,13 @@ export function metaConfig(): {
 } {
   const appSecret = process.env.META_APP_SECRET ?? "";
   const igSecret = process.env.INSTAGRAM_APP_SECRET ?? "";
+  // The Threads API lives in its own Meta app; its uninstall / data-deletion callbacks are
+  // signed with that app's secret, so accept it too.
+  const threadsSecret = process.env.THREADS_APP_SECRET ?? "";
   return {
     verifyToken: process.env.META_WEBHOOK_VERIFY_TOKEN ?? "",
     appSecret,
-    appSecrets: [appSecret, igSecret].filter((s, i, all) => s !== "" && all.indexOf(s) === i),
+    appSecrets: [appSecret, igSecret, threadsSecret].filter((s, i, all) => s !== "" && all.indexOf(s) === i),
   };
 }
 
