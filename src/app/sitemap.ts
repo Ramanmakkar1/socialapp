@@ -32,10 +32,13 @@ function getSitemapPaths(host?: string | null): PublicPath[] {
   // a redirect is bypassed.
   if (host && !isApprovedProductionOrigin(`https://${host}`)) return [];
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
-  // isPathIndexable is the single source of truth: a noindex page (including
-  // the homepage while staging is noindex) is never listed, and it is listed
-  // again automatically once indexing is enabled.
-  return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
+  // isPathIndexable is the single source of truth for non-home paths: a noindex
+  // page is never listed, and it is listed again automatically once indexing is
+  // enabled. The homepage is excluded here explicitly: its page metadata is
+  // noindex while staging, so it must not be listed even when isSiteIndexable()
+  // is forced true; it re-enters the sitemap only via the production origin
+  // guard once indexing is enabled.
+  return PUBLIC_PATHS.filter((path) => (path === "/" ? !isSiteIndexable() : isPathIndexable(path)));
 }
 
 export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
