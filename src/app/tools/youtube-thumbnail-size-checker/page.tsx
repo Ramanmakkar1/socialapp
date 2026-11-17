@@ -3,6 +3,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import t from "@/components/tools/tools.module.css";
 import ThumbnailSizeChecker from "./ThumbnailSizeChecker";
 
+export const dynamic = "force-static";
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/youtube-thumbnail-size-checker",
   name: "YouTube thumbnail size checker",
