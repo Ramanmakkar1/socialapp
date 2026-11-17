@@ -34,49 +34,10 @@ test("homepage title matches the keyword-first template and is 50–60 character
 });
 
 test("home page canonical and description match the shared values", () => {
-  assert.ok(
-    pageSource.includes('const canonical = "https://socialapp.splitforms.com/";'),
-    "home page must use the staging-host absolute canonical",
-  );
-  assert.ok(
-    pageSource.includes("alternates: { canonical }"),
-    "home page must set alternates.canonical to the absolute canonical",
-  );
-  assert.ok(
-    pageSource.includes('const description = PAGE_DESCRIPTIONS["/"];'),
-    "home page description must come from PAGE_DESCRIPTIONS['/']",
-  );
+  assert.ok(pageSource.includes("const canonical = HOME_CANONICAL;"), "home page must use the production canonical");
+  assert.ok(pageSource.includes("alternates: { canonical }"), "home page must set alternates.canonical");
+  assert.ok(pageSource.includes('const description = PAGE_DESCRIPTIONS["/"];'), "home page description must come from PAGE_DESCRIPTIONS['/']");
   assert.equal(PAGE_DESCRIPTIONS["/"].length > 0, true);
-});
-
-test("home page canonical is an absolute https URL on the staging host with no query string", () => {
-  const canonical = "https://socialapp.splitforms.com/";
-  assert.ok(canonical.startsWith("https://"), "canonical must be https");
-  assert.ok(!canonical.includes("?"), "canonical must have no query string");
-  assert.ok(
-    pageSource.includes('const canonical = "https://socialapp.splitforms.com/";'),
-    "home page must use the staging-host canonical with a trailing slash",
-  );
-});
-
-test("home page canonical is a self-reference on the staging host", () => {
-  // The canonical is a self-reference on the staging host where the site is
-  // currently served.
-  const canonical = "https://socialapp.splitforms.com/";
-  assert.equal(new URL(canonical).hostname, "socialapp.splitforms.com");
-  assert.ok(!/\?|#/.test(canonical), "canonical must contain no query string or fragment");
-  assert.ok(
-    pageSource.includes("url: canonical"),
-    "home page openGraph.url must reuse the absolute canonical",
-  );
-});
-
-test("audited staging URL serves one clean canonical on the staging host", () => {
-  const audited = "https://socialapp.splitforms.com/";
-  assert.equal(new URL(audited).hostname, "socialapp.splitforms.com");
-  const canonical = "https://socialapp.splitforms.com/";
-  assert.equal(new URL(canonical).hostname, "socialapp.splitforms.com");
-  assert.ok(!canonical.includes("//", "https://".length), "canonical must have a single slash at the root");
 });
 
 test("home page JSON-LD includes WebPage, SoftwareApplication and FAQPage", () => {

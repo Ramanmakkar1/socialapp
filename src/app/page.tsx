@@ -3,6 +3,7 @@ import { preload } from "react-dom";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
+import { HOME_CANONICAL } from "@/lib/canonical";
 import { isPathIndexable } from "@/lib/indexability";
 import { PLATFORMS_ANSWER, getPlatformCopy, listText } from "@/lib/platform-support";
 import { HOME_DESCRIPTION_WITH_AI, PAGE_DESCRIPTIONS } from "@/lib/public-pages";
@@ -22,10 +23,11 @@ import { homePageJsonLd } from "./homeJsonLd";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 const BASE_DESCRIPTION = description;
-// The homepage canonical is a self-reference on the staging host. This stays
-// a fixed absolute URL (no query string or fragment) so staging metadata
-// cannot drift between requests.
-const canonical = "https://socialapp.splitforms.com/";
+// OWNER-APPROVED 2026-11-17: the canonical is ALWAYS the production URL https://poskoo.com/.
+// Never point it at the old staging host — that tells Google to drop
+// poskoo.com from the index. If an audit of the staging host complains, redirect that host
+// to poskoo.com instead of changing this line.
+const canonical = HOME_CANONICAL;
 // The shared description doesn't claim AI; once AI is switched on (isFeatureReadyNow("ai")) the
 // meta description mentions AI captions. Evaluated at request/revalidate time like the page.
 export async function generateMetadata(): Promise<Metadata> {
