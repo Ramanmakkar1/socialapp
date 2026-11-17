@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import CaptionGeneratorTool from "../instagram-caption-generator/CaptionGeneratorTool";
 
+export const dynamic = "force-static";
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/linkedin-post-generator",
   name: "LinkedIn post generator",
