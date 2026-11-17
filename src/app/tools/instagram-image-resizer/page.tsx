@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import ImageResizer from "./ImageResizer";
 
+export const dynamic = "force-static";
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/instagram-image-resizer",
   name: "Instagram image resizer",
