@@ -24,6 +24,13 @@ const LINKS: { href: string; label: string; key: ComparePage }[] = [
   { href: "/influence-alternative", label: "Influence.so alternative", key: "influence" },
 ];
 
+const WORKFLOW_LINKS: { href: string; label: string }[] = [
+  { href: "/social-media-scheduler-comparison", label: "Compare social media schedulers" },
+  { href: "/instagram-auto-dm", label: "Instagram auto-DM automation" },
+  { href: "/instagram-scheduler", label: "Schedule Instagram posts" },
+  { href: "/pricing", label: "See pricing" },
+];
+
 export function CompareAlternativesNav({ current }: { current?: ComparePage }) {
   return (
     <nav aria-label="Compare alternatives" className={s.chipRow}>
@@ -40,6 +47,14 @@ export function CompareAlternativesNav({ current }: { current?: ComparePage }) {
             </Link>
           ),
         )}
+      </div>
+      <p>Choose by workflow</p>
+      <div>
+        {WORKFLOW_LINKS.map((l) => (
+          <Link key={l.href} href={l.href} className={s.chip}>
+            {l.label}
+          </Link>
+        ))}
       </div>
     </nav>
   );
