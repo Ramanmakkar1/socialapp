@@ -55,40 +55,37 @@ test("home page JSON-LD includes WebPage, SoftwareApplication and FAQPage", () =
   );
 });
 
-test("home page WebPage node uses BRAND.url as its stable @id and url", () => {
-  // The audit requires the home WebPage to be identified by the bare home URL,
-  // not a fragment-suffixed @id, so the entity resolves to https://poskoo.com.
+test("home page WebPage node uses BRAND.canonicalUrl as its stable @id and url", () => {
+  // The audit requires the home WebPage to be identified by the bare canonical
+  // URL, not a fragment-suffixed @id or the staging host, so the entity resolves
+  // to https://poskoo.com and shares its @id with the root layout's graph.
   assert.ok(
-    homeJsonLdSource.includes('"@id": BRAND.url,'),
-    "WebPage @id must be exactly BRAND.url",
+    homeJsonLdSource.includes('"@id": BRAND.canonicalUrl,'),
+    "WebPage @id must be exactly BRAND.canonicalUrl",
   );
   assert.ok(
-    homeJsonLdSource.includes("url: BRAND.url,"),
-    "WebPage url must be BRAND.url",
+    homeJsonLdSource.includes("url: BRAND.canonicalUrl,"),
+    "WebPage url must be BRAND.canonicalUrl",
   );
   assert.ok(
-    homeJsonLdSource.includes("publisher: { \"@id\": BRAND.url + \"#org\" },"),
-    "WebPage publisher must reference the Organization node via BRAND.url",
+    homeJsonLdSource.includes("publisher: { \"@id\": BRAND.canonicalUrl + \"#org\" },"),
+    "WebPage publisher must reference the Organization node via BRAND.canonicalUrl",
   );
   assert.ok(
     homeJsonLdSource.includes('"@type": "WebPage"'),
     "home page JSON-LD must include a WebPage node",
   );
   assert.ok(
-    homeJsonLdSource.includes("url: BRAND.url,"),
-    "WebPage must use the production root URL expression",
-  );
-  assert.ok(
     homeJsonLdSource.includes('inLanguage: "en",'),
     "WebPage must declare inLanguage en",
   );
   assert.ok(
-    homeJsonLdSource.includes('isPartOf: { "@id": BRAND.url + "#website" },'),
-    "WebPage isPartOf must point at the WebSite node via BRAND.url",
+    homeJsonLdSource.includes('isPartOf: { "@id": BRAND.canonicalUrl + "#website" },'),
+    "WebPage isPartOf must point at the WebSite node via BRAND.canonicalUrl",
   );
   assert.ok(
-    !homeJsonLdSource.includes("BRAND.canonicalUrl"),
-    "homepage JSON-LD must not reference the nonexistent BRAND.canonicalUrl",
+    !homeJsonLdSource.includes("BRAND.url"),
+    "homepage JSON-LD must not point at the env/staging URL override",
   );
 });
 
@@ -102,7 +99,7 @@ test("homepage JSON-LD includes a BreadcrumbList with the canonical root URL", (
     "BreadcrumbList must include a Home item",
   );
   assert.ok(
-    homeJsonLdSource.includes("item: BRAND.url,"),
+    homeJsonLdSource.includes("item: BRAND.canonicalUrl,"),
     "BreadcrumbList Home item must point at the canonical root URL",
   );
 });
