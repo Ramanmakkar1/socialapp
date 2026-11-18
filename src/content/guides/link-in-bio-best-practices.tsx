@@ -24,6 +24,11 @@ export const body: GuideBody = {
         It works whether you use Instagram&apos;s own bio links or a separate link-in-bio page. You&apos;ll find ready
         examples for a creator, a local business and a coach further down.
       </p>
+      <p>
+        <strong>Quick answer:</strong> Create or log into{" "}
+        <Link href="/instagram-link-in-bio">Poskoo</Link>, add your links and pick a theme, then paste the generated
+        URL into Instagram&apos;s website field.
+      </p>
     </>
   ),
   sections: [
