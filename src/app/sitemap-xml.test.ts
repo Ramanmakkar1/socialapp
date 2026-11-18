@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { GET } from "./sitemap-xml/route.ts";
 import { BRAND } from "@/lib/brand";
 
-test("sitemap.xml serves XML with the browser stylesheet, not an HTML document", async () => {
+test("sitemap.xml serves plain XML to crawlers, with no XSLT stylesheet", async () => {
   const was = BRAND.indexable;
   BRAND.indexable = true;
   try {
@@ -12,28 +12,57 @@ test("sitemap.xml serves XML with the browser stylesheet, not an HTML document",
     assert.equal(res.status, 200);
     assert.match(res.headers.get("content-type") ?? "", /application\/xml/);
     const body = await res.text();
-    assert.match(
+    assert.doesNotMatch(
       body,
-      /<\?xml-stylesheet type="text\/xsl" href="\/sitemap\.xsl"\?>/,
-      "sitemap.xml must reference the XSL stylesheet so browsers can render it",
+      /xml-stylesheet/,
+      "sitemap.xml must not reference an XSL stylesheet (Chrome shows a deprecation banner)",
     );
-    assert.doesNotMatch(body, /<html[\s>]/i, "sitemap.xml must stay XML, not an HTML response body");
+    assert.doesNotMatch(body, /<html[\s>]/i, "crawler response must stay XML, not an HTML document");
     assert.match(body, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
+    assert.match(body, /<url>/, "the indexable host must list its pages");
   } finally {
     BRAND.indexable = was;
   }
 });
 
-test("sitemap.xsl renders a titled, lang-tagged, mobile viewport page with one H1", () => {
-  const xsl = readFileSync("public/sitemap.xsl", "utf8");
-  assert.match(xsl, /<html lang="en">/, "rendered sitemap page must declare its language");
-  assert.match(
-    xsl,
-    /<meta name="viewport" content="width=device-width, initial-scale=1"\/>/,
-    "rendered sitemap page must include the mobile viewport meta",
-  );
-  assert.match(xsl, /<title>XML Sitemap — Poskoo<\/title>/, "rendered sitemap page must have a title");
-  assert.equal((xsl.match(/<h1[\s>]/g) ?? []).length, 1, "rendered sitemap page must have exactly one H1");
+test("sitemap.xml serves the styled HTML page to browsers, with no XSLT", async () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const res = await GET(new Request("https://poskoo.com/sitemap.xml", { headers: { accept: "text/html" } }));
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get("content-type") ?? "", /text\/html/);
+    const body = await res.text();
+    assert.doesNotMatch(body, /xml-stylesheet/, "the browser page must not use XSLT");
+    assert.match(body, /<html lang="en">/, "rendered sitemap page must declare its language");
+    assert.match(
+      body,
+      /<meta name="viewport" content="width=device-width, initial-scale=1"\/>/,
+      "rendered sitemap page must include the mobile viewport meta",
+    );
+    assert.match(body, /<title>XML Sitemap — Poskoo<\/title>/, "rendered sitemap page must have a title");
+    assert.equal((body.match(/<h1[\s>]/g) ?? []).length, 1, "rendered sitemap page must have exactly one H1");
+    assert.match(body, /<h1>XML Sitemap<\/h1>/, "the H1 must be the sitemap title");
+    assert.match(body, /<td class="url"><a href="https:\/\/poskoo\.com\/">/, "the browser page must list the same URLs as the XML");
+    assert.match(body, /233 URLs|URLs<\/div>/, "the pill must show the URL count");
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
+test("sitemap.xml browser page shows the staging noindex notice while empty", async () => {
+  const was = BRAND.indexable;
+  BRAND.indexable = false;
+  try {
+    const res = await GET(new Request("https://poskoo.com/sitemap.xml", { headers: { accept: "text/html" } }));
+    const body = await res.text();
+    assert.match(res.headers.get("content-type") ?? "", /text\/html/);
+    assert.doesNotMatch(body, /<url>/, "noindex staging must show no URLs in the browser page");
+    assert.match(body, /Nothing to list right now/, "the empty browser page must explain the staging noindex");
+    assert.match(body, /0 URLs/, "the pill must show zero URLs while staging");
+  } finally {
+    BRAND.indexable = was;
+  }
 });
 
 test("sitemap.xml route has no <url> entries while BRAND.indexable is false", async () => {

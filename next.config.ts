@@ -90,9 +90,9 @@ const nextConfig: NextConfig = {
     return {
       // beforeFiles so this wins over the native sitemap.ts metadata route.
       beforeFiles: [
-        // Serve the sitemap from a custom route that adds an XSL stylesheet so
-        // browsers render it as a readable page instead of a near-empty XML tree.
-        // The route still uses the same sitemap() source as src/app/sitemap.ts.
+        // Serve the sitemap from a custom route: crawlers get plain XML,
+        // browsers get a clean HTML page (no XSLT, so no Chrome deprecation
+        // banner). The route uses the same sitemap() source as src/app/sitemap.ts.
         { source: "/sitemap.xml", destination: "/sitemap-xml" },
       ],
     };
