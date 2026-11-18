@@ -272,7 +272,7 @@ export default function SocialMediaSchedulerPage() {
             Poskoo sends them a private DM with your link and can collect their email first, all from the same
             workspace as your calendar. See{" "}
             <Link className={s.vlink} href="/instagram-auto-dm">Instagram auto-DM</Link>{" "}
-            or <Link className={s.vlink} href="/social-media-scheduler-comparison">compare social media schedulers</Link>.{" "}Running a shop or local business? See the <Link className={s.vlink} href="/social-media-scheduler-for-small-business">social media scheduler for small business</Link>. Managing clients? Try the <Link className={s.vlink} href="/social-media-scheduler-for-agencies">social media scheduler for agencies</Link>.
+            or <Link className={s.vlink} href="/social-media-scheduler-comparison">compare social media schedulers</Link>.{" "}Running a shop or local business? See the <Link className={s.vlink} href="/social-media-scheduler-for-small-business">social media scheduler for small business</Link>. Managing clients? Try the <Link className={s.vlink} href="/social-media-scheduler-for-agencies">social media scheduler for agencies</Link>.{" "}Switching tools? See the <Link className={s.vlink} href="/hootsuite-alternative">Hootsuite alternative</Link> and the <Link className={s.vlink} href="/buffer-alternative">Buffer alternative</Link>.
           </p>
         </div>
       </section>
