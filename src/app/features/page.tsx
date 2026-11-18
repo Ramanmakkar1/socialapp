@@ -177,10 +177,10 @@ export default async function FeaturesPage() {
           <span className="pill"><span>ALL-IN-ONE</span>{aiReady ? <>Schedule &middot; Auto-DM &middot; AI captions &middot; Free tools</> : <>Schedule &middot; Auto-DM &middot; Link in bio &middot; Free tools</>}</span>
           <p className="eyebrow">Features</p>
           <h1>
-            Everything Poskoo does, <em className="s mark">in one place</em>
+            Social media scheduler features, auto-DM and <em className="s mark">lead capture</em>
           </h1>
           <p className="lede">
-            Poskoo combines social scheduling, Instagram comment-to-DM automation, lead capture and analytics in
+            Poskoo schedules your social posts, auto-DMs Instagram commenters and captures leads from those DMs in
             one app.
           </p>
           <p>
