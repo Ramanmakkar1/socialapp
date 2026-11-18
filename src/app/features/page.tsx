@@ -78,8 +78,16 @@ const featuresFaqs = (aiReady: boolean) => [
     a: PLATFORMS_ANSWER,
   },
   {
+    q: "How does scheduling and auto-publishing work?",
+    a: "You add a post to the week or month calendar, pick a time, and Poskoo publishes it to your connected accounts automatically. You can edit, reschedule or delete it before it goes out, and every post shows whether it published or failed.",
+  },
+  {
     q: "How does Instagram comment-to-DM work?",
     a: "Set a keyword such as GUIDE or LINK, and Poskoo sends your message in a DM to everyone who comments it, usually within a minute. You can capture an email first, add a follow gate and track clicks.",
+  },
+  {
+    q: "How does Poskoo capture leads?",
+    a: "Poskoo can ask for an email in the DM before it sends your link, then saves that contact with the keyword and post they came from. You can filter your contacts and export them to CSV.",
   },
   {
     q: "Does Poskoo include AI captions?",
@@ -242,10 +250,10 @@ export default async function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Scheduler</p>
-              <h2>Plan once, <em className="s">publish everywhere</em></h2>
+              <h2>Scheduling and <em className="s">auto-publishing</em></h2>
               <p>
-                Build your week on a drag-and-drop calendar, then let Poskoo publish each post at the time you
-                choose.
+                Poskoo schedules your posts on a week or month calendar and auto-publishes each one at the time
+                you choose, so you can plan a whole week in one sitting.
               </p>
               <ul>
                 {schedulerBullets.map((item) => (
@@ -284,10 +292,10 @@ export default async function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Auto-DM</p>
-              <h2>Every comment can become <em className="s mark">a lead</em></h2>
+              <h2>Instagram <em className="s">auto-DMs</em></h2>
               <p>
-                Set a keyword such as GUIDE or LINK. When someone comments it, Poskoo sends them your message in
-                a DM, usually within a minute.
+                Set a keyword such as GUIDE or LINK, and Poskoo sends your message in a DM to everyone who
+                comments it, usually within a minute, so you never reply by hand.
               </p>
               <ul>
                 {autoDmBullets.map((item) => (
@@ -343,10 +351,12 @@ export default async function FeaturesPage() {
           <div className="split rev">
             <div className="copy">
               <p className="eyebrow">Sell and grow</p>
-              <h2>Turn DMs into <em className="s mark">sales and sign-ups</em></h2>
+              <h2>Lead <em className="s mark">capture</em></h2>
               <p>
-                Attach a lead magnet or a digital product to an auto-DM rule, and share your referral link to earn
-                more DMs. All three are in the app today.
+                Poskoo captures a lead by asking for an email in the DM before it sends your link, then saves
+                the contact with the keyword and post they came from. Attach a lead magnet or a digital product
+                to the same rule, and export your contacts to CSV whenever you need them. All three are in the
+                app today.
               </p>
               <ul>
                 {growBullets(cardPaymentsReady).map((item) => (
