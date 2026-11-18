@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
+import t from "@/components/tools/tools.module.css";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -76,6 +77,53 @@ const config: ToolPageConfig = {
               before it and test them. If your channel is new and the report is thin, start with the finder above and
               gather your own data as you publish.
             </p>
+          </>
+        ),
+      },
+      {
+        title: "Starting YouTube upload times by channel type",
+        body: (
+          <>
+            <p>
+              Starting points in your audience&apos;s local time, not measured data; test them in YouTube Studio
+              analytics.
+            </p>
+            <div className={t.tableWrap}>
+              <table className={t.table}>
+                <caption className="sr-only">
+                  Starting YouTube upload times by channel type, in your audience&apos;s local time
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Channel type</th>
+                    <th scope="col">Weekdays</th>
+                    <th scope="col">Weekends</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Gaming &amp; entertainment</th>
+                    <td>2 pm, 4 pm, 6 pm</td>
+                    <td>10 am, 2 pm</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Education &amp; how-to</th>
+                    <td>12 pm, 3 pm, 5 pm</td>
+                    <td>10 am</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Vlogs &amp; lifestyle</th>
+                    <td>2 pm, 5 pm, 7 pm</td>
+                    <td>9 am, 11 am</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">B2B &amp; product demos</th>
+                    <td>9 am, 11 am, 2 pm</td>
+                    <td>10 am</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </>
         ),
       },
