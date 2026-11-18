@@ -159,8 +159,8 @@ export default function LinkedInTextFormatterPage() {
       <div className={t.page}>
         <ToolHero config={config} />
         <p className="small" style={{ maxWidth: 720, margin: "0 auto 20px", textAlign: "center" }}>
-          The formatter changes LinkedIn text by swapping plain letters for Unicode bold, italic and monospace characters,
-          so the styling survives copy and paste. No LinkedIn font setting is needed and nothing is uploaded.
+          LinkedIn has no native bold or italic control, so this formatter converts text to Unicode styles for copy/paste.
+          Use it for posts, headlines, About text, and bullets.
         </p>
         <ToolCard title={config.toolTitle} note={config.toolNote}><FormatterTool /></ToolCard>
         <p className="small" style={{ marginTop: 14, textAlign: "center" }}>
