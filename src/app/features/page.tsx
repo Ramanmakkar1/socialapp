@@ -189,7 +189,8 @@ export default async function FeaturesPage() {
           </h1>
           <p className="lede">
             Poskoo schedules your social posts, auto-DMs Instagram commenters and captures leads from those DMs in
-            one app.
+            one app. Plan posts on a week or month calendar, auto-publish them from one queue, send a DM when
+            someone comments a keyword, capture an email before the link goes out and hand out a lead magnet{aiReady ? " - with AI caption and DM message ideas in your brand voice" : ""}.
           </p>
           <p>
             Poskoo is one app for planning posts, publishing to {LIVE_PLATFORMS_TEXT}, and
