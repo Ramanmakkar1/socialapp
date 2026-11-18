@@ -3,9 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PublicShell from "@/components/PublicShell";
+import RelatedLinks from "@/components/RelatedLinks";
 import site from "@/components/site.module.css";
 import PoskooMark from "@/components/PoskooMark";
 import { RelatedTools, ToolCta } from "@/components/tools/ToolPageTemplate";
+import { toolByHref } from "@/components/tools/registry";
 import { Takeaways } from "@/components/guides/GuideBlocks";
 import { ShareLinks } from "@/components/guides/ShareLinks";
 import g from "@/components/guides/guides.module.css";
@@ -84,6 +86,7 @@ export default async function GuidePage({ params }: Props) {
     .filter((x) => x !== undefined)
     .map((r) => ({ href: guidePath(r.slug), label: categoryLabel(r.category), title: r.crumb, text: r.excerpt }));
   const keepReading = [...relatedGuides, ...FURTHER_READING].slice(0, 3);
+  const relevantTool = toolByHref(guide.tools[0]);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -221,6 +224,13 @@ export default async function GuidePage({ params }: Props) {
                 ))}
               </ul>
             </section>
+            <RelatedLinks
+              links={[
+                { href: "/pricing", title: "Poskoo pricing", description: "Compare Free, Pro and Agency plans." },
+                { href: "/features", title: "Poskoo features", description: "Scheduling, auto-DMs, lead capture and free tools." },
+                ...(relevantTool ? [{ href: relevantTool.href, title: relevantTool.name, description: relevantTool.summary }] : []),
+              ]}
+            />
             <div className={g.shareEnd}>
               <p>Found this useful? Send it to someone picking a niche.</p>
               <ShareLinks url={url} title={guide.title} />
