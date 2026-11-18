@@ -926,6 +926,17 @@
   margin-top:16px;padding:10px 12px 10px 22px;border-radius:var(--poskoo-radius-pill)}
 .landing :global(.hero.heroCenter){
   display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding-block:3vh 12vh;max-width:860px;margin-inline:auto}
+/* 2026-11-18: keep the hero video art out from under the form — on wide desktops the
+   illustration is pinned to the right third, and the form/trust-line container sits above
+   it with right padding so "Free plan, no card" and "Log in" stay readable. */
+@media (min-width: 1101px) {
+  .landing :global(.heroVideoFrame){
+    left:auto;width:44%;max-width:640px}
+  .landing :global(.hero.heroCenter){
+    padding-right:clamp(48px, 12vw, 200px)}
+  .landing :global(.heroSignup){
+    position:relative;z-index:2}
+}
 .landing :global(.hero.heroCenter h1){
   font-size:clamp(2.2rem, 4.6vw, 4rem);max-width:none;line-height:1.02;letter-spacing:-.035em;margin-top:6px}
 .landing :global(.hero.heroCenter h1 .h1Line),.landing :global(.hero.heroCenter h1 em){
