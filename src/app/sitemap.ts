@@ -21,9 +21,18 @@ function resolveSitemapLastModified(): Date {
 
 export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 
+// The staging homepage URL that must never appear in the sitemap while the
+// site remains noindex. Named explicitly so the exclusion is visible at a
+// glance and survives any future change to the generic origin checks.
+const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com/";
+
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
 // intended; the file stays raw XML with no XSLT styling.
 function getSitemapPaths(host?: string | null): PublicPath[] {
+  // The staging homepage is excluded from the sitemap while the site remains
+  // noindex. This is a hard exclusion: the URL is never listed, regardless of
+  // the indexability flag or any future change to the origin checks below.
+  if (host && `https://${host}` === STAGING_HOMEPAGE_URL) return [];
   // Staging is noindex: list nothing, on any host, until indexing is enabled.
   // isPathIndexable returns false for every path (including "/") while the site
   // is noindex, so the filter below yields an empty list for staging.
@@ -60,5 +69,9 @@ export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
     // Final host guard: every emitted URL must be on the approved production
     // origin. A staging/legacy host is always noindex, so it can never leak in
     // even if BRAND.url or the candidate path list changes.
-    .filter((entry) => isApprovedProductionOrigin(entry.url));
+    .filter((entry) => isApprovedProductionOrigin(entry.url))
+    // Hard exclusion: the staging homepage is never listed while the site is
+    // noindex, even if a future change to BRAND.url or the path list would
+    // otherwise allow it.
+    .filter((entry) => entry.url !== STAGING_HOMEPAGE_URL);
 }
