@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
 
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-youtube",
   name: "Best time to post on YouTube finder",
