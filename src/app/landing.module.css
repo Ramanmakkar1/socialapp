@@ -38,7 +38,7 @@
 .landing :global(.eyebrow){
   font:600 .78rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .landing :global(.btn){
-  display:inline-flex;align-items:center;gap:.5rem;font:600 1rem/1 var(--sans);padding:.95rem 1.4rem;border-radius:var(--poskoo-radius-pill);text-decoration:none;border:1.5px solid transparent;transition:transform .2s, background .2s}
+  display:inline-flex;align-items:center;gap:.5rem;font:600 1rem/1 var(--sans);padding:.95rem 1.4rem;min-height:48px;border-radius:var(--poskoo-radius-pill);text-decoration:none;border:1.5px solid transparent;transition:transform .2s, background .2s}
 .landing :global(.btn-dark){
   background:var(--ink);color:#fff}
 .landing :global(.btn-dark:hover){

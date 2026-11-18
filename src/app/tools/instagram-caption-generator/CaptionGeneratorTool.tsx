@@ -2037,7 +2037,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
                       type="button"
                       onClick={() => handleCopy(index, captionText)}
                       aria-label={isCopied ? "Copied" : `Copy ${noun} ${index + 1}`}
-                      className={`inline-flex min-h-11 flex-none items-center gap-1.5 rounded-xl border px-3.5 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--poskoo-violet)] ${isCopied ? "border-[var(--poskoo-green)] bg-[var(--poskoo-green)]/10" : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] hover:border-[var(--poskoo-ink)]"}`}
+                      className={`inline-flex min-h-12 flex-none items-center gap-1.5 rounded-xl border px-3.5 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--poskoo-violet)] ${isCopied ? "border-[var(--poskoo-green)] bg-[var(--poskoo-green)]/10" : "border-[var(--poskoo-line)] bg-[var(--poskoo-card)] hover:border-[var(--poskoo-ink)]"}`}
                     >
                       {isCopied ? (
                         <Check className="h-3.5 w-3.5 text-[var(--poskoo-green)]" aria-hidden="true" />
@@ -2092,7 +2092,7 @@ export default function CaptionGeneratorTool({ platform = "instagram" }: { platf
                 {fold.folded && !expanded && (
                   <>
                     {"… "}
-                    <button type="button" onClick={() => setExpanded(true)} className="min-h-6 font-medium text-[#5f5873] underline-offset-2 hover:underline">more</button>
+                    <button type="button" onClick={() => setExpanded(true)} className="min-h-12 font-medium text-[#5f5873] underline-offset-2 hover:underline">more</button>
                   </>
                 )}
               </p>

@@ -30,18 +30,18 @@
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
-  min-height: 44px;
+  min-height: 48px;
   display: inline-flex;
   align-items: center;
-  padding-inline: 4px;
+  padding-inline: 6px;
 }
 .more:hover {
   text-decoration: none;
 }
 .ok {
   flex: none;
-  min-height: 40px;
-  min-width: 56px;
+  min-height: 48px;
+  min-width: 64px;
   padding: 0 18px;
   border: 0;
   border-radius: var(--poskoo-radius-pill);
