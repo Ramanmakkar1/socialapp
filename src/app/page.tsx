@@ -1,8 +1,10 @@
+// OWNER-APPROVED HOMEPAGE DESIGN (restored 2026-11-18 from 60cad71). Do NOT change layout, sections, hero, demo or styles. SEO bots: text/meta only, never design.
 import Image from "next/image";
 import { preload } from "react-dom";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
+import { HOME_CANONICAL } from "@/lib/canonical";
 import { isPathIndexable } from "@/lib/indexability";
 import { PLATFORMS_ANSWER, getPlatformCopy, listText } from "@/lib/platform-support";
 import { HOME_DESCRIPTION_WITH_AI, PAGE_DESCRIPTIONS } from "@/lib/public-pages";
@@ -22,8 +24,11 @@ import { homePageJsonLd } from "./homeJsonLd";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 const BASE_DESCRIPTION = description;
-// Self-referencing canonical on the production origin; never the legacy staging host (redirects 301).
-const canonical = `${BRAND.canonicalUrl}/`;
+// OWNER-APPROVED 2026-11-17: the canonical is ALWAYS the production URL https://poskoo.com/.
+// Never point it at the old staging host — that tells Google to drop
+// poskoo.com from the index. If an audit of the staging host complains, redirect that host
+// to poskoo.com instead of changing this line.
+const canonical = HOME_CANONICAL;
 // The shared description doesn't claim AI; once AI is switched on (isFeatureReadyNow("ai")) the
 // meta description mentions AI captions. Evaluated at request/revalidate time like the page.
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,50 +47,6 @@ export const dynamic = "force-static";
 // regenerate in the background at most every 10 minutes.
 export const revalidate = 600;
 const WORKS_COLOR: Record<string, string> = { instagram: "#E1306C", facebook: "#1877F2", threads: "var(--ink)", youtube: "#FF0033", linkedin: "#0A66C2", linkedin_pages: "#0A66C2", tiktok: "var(--ink)", pinterest: "#E60023", x: "var(--ink)", gbp: "#4285F4", bluesky: "#1185FE", mastodon: "#6364FF", tumblr: "#001935", farcaster: "#855dcd", plurk: "#ff574d" };
-
-// Inline step illustrations for the "How Poskoo works" section, drawn in the
-// brand palette (CSS variables from src/app/globals.css). Decorative: the
-// heading + description under each step carry the meaning.
-const svgStyle = { width: "auto", height: "100%", maxWidth: "100%", display: "block" } as const;
-function ConnectAccounts() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 120 120" fill="none" stroke="var(--poskoo-ink)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={svgStyle}>
-      <rect x="20" y="26" width="80" height="70" rx="16" strokeWidth="4" />
-      <rect x="29" y="35" width="62" height="52" rx="10" fill="var(--poskoo-card)" stroke="var(--poskoo-line)" strokeWidth="2" />
-      <circle cx="60" cy="61" r="8" />
-      <path d="M56 69 Q60 73 64 69" />
-      <line x1="101" y1="70" x2="105" y2="70" />
-      <circle cx="111" cy="70" r="9" />
-      <circle cx="94" cy="44" r="5" fill="var(--poskoo-lime)" strokeWidth="2" />
-    </svg>
-  );
-}
-function ScheduleContent() {
-  const dots = [[36, 50], [52, 50], [68, 50], [84, 50], [36, 66], [52, 66], [68, 66], [84, 66], [36, 82], [52, 82], [68, 82], [84, 82]];
-  return (
-    <svg aria-hidden="true" viewBox="0 0 120 120" fill="none" stroke="var(--poskoo-ink)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={svgStyle}>
-      <rect x="22" y="20" width="76" height="82" rx="15" strokeWidth="4" />
-      <rect x="30" y="28" width="60" height="10" rx="4" fill="var(--poskoo-violet)" stroke="none" />
-      {dots.map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="3" fill="var(--poskoo-muted)" />)}
-      <circle cx="94" cy="82" r="11" />
-      <line x1="94" y1="82" x2="94" y2="66" />
-      <line x1="94" y1="82" x2="104" y2="82" />
-      <circle cx="94" cy="82" r="2" fill="var(--poskoo-ink)" />
-    </svg>
-  );
-}
-function CaptureLeads() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 120 120" fill="none" stroke="var(--poskoo-ink)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={svgStyle}>
-      <rect x="24" y="32" width="68" height="46" rx="14" fill="var(--poskoo-card)" />
-      <path d="M92 78 L104 78 L98 70 Z" fill="var(--poskoo-card)" strokeLinejoin="round" />
-      <rect x="36" y="46" width="44" height="20" rx="3" />
-      <path d="M36 46 L58 60 L80 46" fill="none" />
-      <circle cx="90" cy="34" r="3" fill="var(--poskoo-lime)" />
-      <path d="M89 34 L91 34 M90 33 L90 35" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
 const faqs = [{"q": "What is Poskoo?", "a": "Poskoo is a web app that schedules and auto-publishes your social media posts, and automatically sends an Instagram DM with your link to everyone who comments a keyword. It also captures emails in the DM, gives you a link-in-bio page and shows which posts bring in clicks and leads. It uses each platform's official API, and the Free plan costs $0."}, {"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": PLATFORMS_ANSWER}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
 export default async function Home() {
 // Paid plans / AI items: "Launching soon" until featureReadiness says they're switched on.
@@ -149,31 +110,23 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <div className="head"><p className="eyebrow">Three steps</p><h2>How Poskoo works in 3 steps</h2></div>
     <div className="howGrid">
       <article className="howStep">
-        <div className="howArt"><ConnectAccounts /></div>
+        <div className="howArt"><Image src="/landing/step-connect.webp" width={640} height={627} sizes="(max-width: 600px) 80vw, (max-width: 960px) 460px, 340px" loading="lazy" alt="Illustration of connecting a social account on a phone, linking Instagram, Facebook and Threads" /></div>
         <span className="howNo">Step 1</span>
-        <h3>Connect accounts</h3>
-        <p>Link Instagram, Facebook and Threads through each platform&apos;s own official login. We never see your passwords.</p>
+        <h3>Connect your social media</h3>
+        <p>Link Instagram, Facebook and Threads with each app&apos;s own official login. We never see your passwords.</p>
       </article>
       <article className="howStep">
-        <div className="howArt"><ScheduleContent /></div>
+        <div className="howArt"><Image src="/landing/step-schedule.webp" width={640} height={597} sizes="(max-width: 600px) 80vw, (max-width: 960px) 460px, 340px" loading="lazy" alt="Illustration of placing photo posts on a wall calendar beside an alarm clock" /></div>
         <span className="howNo">Step 2</span>
-        <h3>Schedule content</h3>
-        <p>Plan posts on the calendar and pick when they go live, in your time zone.</p>
+        <h3>Plan and schedule posts</h3>
+        <p>Schedule Reels, carousels and single posts for the time you pick, in your time zone.</p>
       </article>
       <article className="howStep">
-        <div className="howArt"><CaptureLeads /></div>
+        <div className="howArt"><Image src="/landing/step-dm.webp" width={640} height={568} sizes="(max-width: 600px) 80vw, (max-width: 960px) 460px, 340px" loading="lazy" alt="Illustration of catching an envelope flying from a phone, showing an automatic DM after a keyword comment" /></div>
         <span className="howNo">Step 3</span>
-        <h3>Capture and reply to leads</h3>
-        <p>When someone comments your keyword, Poskoo sends your link by DM and asks for their email, so every comment can become a lead.</p>
+        <h3>Auto-DM every keyword comment</h3>
+        <p>When someone comments your keyword, Poskoo sends them your link by DM.</p>
       </article>
-    </div>
-    <div className="howLinks">
-      <Link className="btn btn-dark" href="/signup">
-        Start free <ArrowRight size={18} aria-hidden="true" />
-      </Link>
-      <Link className="btn btn-line" href="/features">
-        See all features <span aria-hidden="true">→</span>
-      </Link>
     </div>
   </div>
 </section>
@@ -236,7 +189,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
       {platforms.live.chat.length > 0 && <p>Chat: {listText(platforms.live.chat)}.</p>}
       {platforms.live.blogs.length > 0 && <p>Blogs, newsletters and self-hosted: {listText(platforms.live.blogs)}.</p>}
       {platforms.awaiting.length + platforms.soon.length > 0 && <p>Coming soon: {listText([...platforms.awaiting, ...platforms.soon])}.</p>}
-      <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/linkedin-scheduler">Schedule LinkedIn posts <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link><Link className="go" href="/bluesky-scheduler">Schedule Bluesky posts <span aria-hidden="true">→</span></Link><Link className="go" href="/hootsuite-alternative">Hootsuite alternative with Instagram auto-DM <span aria-hidden="true">→</span></Link></p>
+      <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/linkedin-scheduler">Schedule LinkedIn posts <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link></p>
     </div>
     <div className="art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
   </div>

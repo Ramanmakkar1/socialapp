@@ -35,8 +35,8 @@ test("homepage title matches the keyword-first template and is 50–60 character
 
 test("home page canonical and description match the shared values", () => {
   assert.ok(
-    pageSource.includes("const canonical = `${BRAND.canonicalUrl}/`;"),
-    "home page canonical must be built from BRAND.canonicalUrl",
+    pageSource.includes("const canonical = HOME_CANONICAL;"),
+    "home page canonical must be HOME_CANONICAL",
   );
   assert.ok(
     !pageSource.includes("socialapp.splitforms.com"),
@@ -175,17 +175,3 @@ test("homepage robots directive is conditional, not a hardcoded noindex", () => 
   assert.equal(isPathIndexable("/"), false, "staging must currently resolve the home page to noindex,nofollow");
 });
 
-test("homepage step illustrations are inline SVGs with descriptive headings", () => {
-  // Regression guard for the empty-alt audit: the three "How Poskoo works"
-  // steps are inline SVGs (decorative, so no alt attribute is needed) each
-  // paired with a heading and a description that carry the meaning.
-  for (const step of ["Connect accounts", "Schedule content", "Capture and reply to leads"]) {
-    assert.ok(pageSource.includes(`<h3>${step}</h3>`), `homepage must render the ${step} step`);
-  }
-  assert.equal(
-    (pageSource.match(/<svg[^>]*aria-hidden="true"[^>]*viewBox="0 0 120 120"/g) ?? []).length,
-    3,
-    "homepage must render three inline step illustrations",
-  );
-  assert.ok(!pageSource.includes('<Image src="/landing/step-'), "step illustrations must be inline SVGs, not images");
-});
