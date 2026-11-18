@@ -213,7 +213,8 @@ export default async function AppHome() {
     isFeatureReadyNow("ai_replies"),
   ]);
   const channelConnected = stats.hasAccount || anyChannel;
-  const checklistDone = channelConnected && postCreated && stats.hasPost;
+  const automationCreated = automations.length > 0;
+  const checklistDone = channelConnected && postCreated && stats.hasPost && automationCreated;
 
   return (
     <div className={`${instrumentSans.variable} ${home.page}`}>
@@ -257,7 +258,7 @@ export default async function AppHome() {
       )}
 
       {!checklistDone && (
-        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasPost} />
+        <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasPost} automationCreated={automationCreated} />
       )}
 
       <section className={home.section} aria-labelledby="todays-actions">

@@ -11,6 +11,8 @@ export type FirstSessionChecklistProps = {
   postCreated: boolean;
   /** A post is scheduled, publishing or already published. */
   postScheduled: boolean;
+  /** At least one Auto-DM rule exists for this user (any status). */
+  automationCreated: boolean;
 };
 
 type Step = { label: string; detail: string; href: string; done: boolean };
@@ -18,11 +20,12 @@ type Step = { label: string; detail: string; href: string; done: boolean };
 // First-session checklist for the dashboard. Completed steps are derived on the
 // server from existing account and post data; the whole card hides once every
 // step is done.
-export default function FirstSessionChecklist({ connected, postCreated, postScheduled }: FirstSessionChecklistProps) {
+export default function FirstSessionChecklist({ connected, postCreated, postScheduled, automationCreated }: FirstSessionChecklistProps) {
   const steps: Step[] = [
     { label: "Connect a channel", detail: "Pick a network in the Connect window: one click, then approve on the network's own screen.", href: "/app#connect", done: connected },
     { label: "Create a post", detail: "Compose a caption and add media.", href: "/app/calendar#new", done: postCreated },
     { label: "Schedule it", detail: "Pick a date and time on the calendar.", href: "/app/calendar", done: postScheduled },
+    { label: "Create an auto-DM rule", detail: "Turn a comment or keyword into an automatic DM.", href: "/app/auto-dm", done: automationCreated },
   ];
   const doneCount = steps.filter((s) => s.done).length;
   if (doneCount === steps.length) return null;
