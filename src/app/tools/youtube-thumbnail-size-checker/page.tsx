@@ -4,7 +4,7 @@ import t from "@/components/tools/tools.module.css";
 import ThumbnailSizeChecker from "./ThumbnailSizeChecker";
 
 export const dynamic = "force-static";
-export const revalidate = 600;
+export const revalidate = 3600;
 
 const config: ToolPageConfig = {
   path: "/tools/youtube-thumbnail-size-checker",
