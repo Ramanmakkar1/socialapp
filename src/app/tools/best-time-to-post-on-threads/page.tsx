@@ -65,7 +65,8 @@ const config: ToolPageConfig = {
             <p>
               Open the Threads app and go to your <b>profile &gt; Insights</b>. Threads Insights shows views and
               interactions, so you can review how individual posts performed at different times. It does not show an
-              active hours chart for your followers.
+              active hours chart for your followers. Once you have your slots, queue posts for them with the{" "}
+              <Link href="/threads-scheduler">Threads scheduler</Link>.
             </p>
             <p>
               Group your posts by the slots you tested, then compare views and replies per slot. If your account is new
