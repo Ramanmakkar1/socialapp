@@ -681,6 +681,44 @@
   font-size: 0.98rem;
   line-height: 1.55;
 }
+.shell.sched :global(.pcard .pstat) {
+  margin-top: auto;
+  align-self: flex-start;
+  display: inline-block;
+  border-radius: var(--poskoo-radius-pill);
+  padding: 0.35rem 0.8rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.7);
+  color: #1f7a3d;
+}
+.shell.sched :global(.pcard .pstatAwaiting) {
+  color: #8a6d1f;
+}
+.shell.sched :global(.pstatLegend) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin-top: 18px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.shell.sched :global(.pstatLegendItem) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.shell.sched :global(.pstatLegendDot) {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1f7a3d;
+  flex: none;
+}
+.shell.sched :global(.pstatLegendDotAwaiting) {
+  background: #8a6d1f;
+}
 @media (min-width: 641px) and (max-width: 960px) {
   .shell.sched :global(.wrap .cards) {
     grid-template-columns: repeat(2, minmax(0, 1fr));

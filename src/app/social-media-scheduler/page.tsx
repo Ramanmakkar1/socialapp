@@ -9,7 +9,7 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { getPlatformCopy, PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -26,53 +26,63 @@ export const metadata: Metadata = withSocial({
   twitter: { card: "summary_large_image", title, description },
 });
 
-const platforms = [
+const platformLinks = [
   {
+    id: "instagram",
     name: "Instagram",
     href: "/instagram-scheduler",
     text: "Schedule Instagram posts with a drag-and-drop calendar, feed, Reels and carousel support.",
   },
   {
+    id: "facebook",
     name: "Facebook",
     href: "/facebook-scheduler",
     text: "Schedule Facebook Page posts with text, photos or video through Meta's official login.",
   },
   {
+    id: "threads",
     name: "Threads",
     href: "/threads-scheduler",
     text: "Schedule Threads text, image or video posts on one calendar through Meta's official API.",
   },
   {
+    id: "tiktok",
     name: "TikTok",
     href: "/tiktok-scheduler",
     text: "Schedule TikTok videos and photo posts through TikTok's official API, alongside your other channels.",
   },
   {
+    id: "linkedin",
     name: "LinkedIn",
     href: "/linkedin-scheduler",
     text: "Schedule LinkedIn text and image posts through LinkedIn's official API, then track results.",
   },
   {
+    id: "pinterest",
     name: "Pinterest",
     href: "/pinterest-scheduler",
     text: "Schedule Pins to any board with a title, destination link and a JPG or PNG image.",
   },
   {
+    id: "youtube",
     name: "YouTube",
     href: "/youtube-scheduler",
     text: "Schedule YouTube videos and Shorts with titles, descriptions, tags and privacy settings.",
   },
   {
+    id: "x",
     name: "X (Twitter)",
     href: "/x-scheduler",
     text: "Schedule X posts with text and up to 4 images or one video through X's official API.",
   },
   {
+    id: "bluesky",
     name: "Bluesky",
     href: "/bluesky-scheduler",
     text: "Schedule Bluesky posts with your handle and an app password, with text and up to 4 images.",
   },
   {
+    id: "mastodon",
     name: "Mastodon",
     href: "/mastodon-scheduler",
     text: "Schedule Mastodon posts on any server with OAuth, images or video, and automatic publishing.",
@@ -144,6 +154,22 @@ const appJsonLd = {
   offers: softwareOffers(planReadiness()),
 };
 
+const howToJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "How to schedule social media posts in Poskoo",
+  description,
+  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
+  totalTime: "PT5M",
+  step: steps.map((st, i) => ({
+    "@type": "HowToStep",
+    position: i + 1,
+    name: st.title,
+    text: st.text,
+    url: `${BRAND.canonicalUrl}${PATH}#how-it-works`,
+  })),
+};
+
 const webPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
@@ -156,9 +182,18 @@ const webPageJsonLd = {
 };
 
 export default function SocialMediaSchedulerPage() {
+  const copy = getPlatformCopy();
+  const statusById = new Map(copy.catalog.map((entry) => [entry.id, entry]));
+  const platforms = platformLinks.map((link) => ({
+    ...link,
+    status: statusById.get(link.id) ?? { live: false, awaiting: false },
+  }));
+  const liveNames = platforms.filter((p) => p.status.live).map((p) => p.name);
+  const awaitingNames = platforms.filter((p) => p.status.awaiting).map((p) => p.name);
+
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Social media scheduler", path: PATH }]}>
-      {[appJsonLd, webPageJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd, webPageJsonLd, howToJsonLd, faqJsonLd(faqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -196,8 +231,13 @@ export default function SocialMediaSchedulerPage() {
               <article key={platform.name} className="pcard">
                 <h3><Link className={s.vlink} href={platform.href}>{platform.name} scheduler</Link></h3>
                 <p>{platform.text}</p>
+                <span className={`pstat${platform.status.live ? "" : " pstatAwaiting"}`}>{platform.status.live ? "Publishing today" : platform.status.awaiting ? "Coming after API approval" : "Coming soon"}</span>
               </article>
             ))}
+          </div>
+          <div className="pstatLegend" aria-label="Platform status legend">
+            <span className="pstatLegendItem"><span className="pstatLegendDot" aria-hidden="true" /> Publishing today: {liveNames.length ? liveNames.join(", ") : "none yet"}</span>
+            <span className="pstatLegendItem"><span className="pstatLegendDot pstatLegendDotAwaiting" aria-hidden="true" /> Coming after API approval: {awaitingNames.length ? awaitingNames.join(", ") : "none"}</span>
           </div>
         </div>
       </section>
