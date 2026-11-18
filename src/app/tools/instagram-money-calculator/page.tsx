@@ -159,6 +159,7 @@ const config: ToolPageConfig = {
     "/tools/instagram-comment-to-dm-calculator",
     "/tools/instagram-bio-generator",
     "/tools/best-time-to-post-on-instagram",
+    "/tools/tiktok-money-calculator",
   ],
   schema: {
     features: [
