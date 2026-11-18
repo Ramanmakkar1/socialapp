@@ -126,6 +126,56 @@ const config: ToolPageConfig = {
           </>
         ),
       },
+      {
+        title: "Example TikTok earnings by follower count",
+        body: (
+          <>
+            <p>
+              These are estimates that use the calculator&apos;s default $10-$25 per 1,000 followers per sponsored
+              video at x1 engagement (1-3%), not data from TikTok.
+            </p>
+            <div className={t.tableWrap}>
+              <table className={t.table}>
+                <caption className="sr-only">
+                  Example TikTok earnings by follower count, estimated price per sponsored video
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Followers</th>
+                    <th scope="col">Estimated price per sponsored video</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">10,000</th>
+                    <td>$100-$250</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">50,000</th>
+                    <td>$500-$1,250</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">100,000</th>
+                    <td>$1,000-$2,500</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">500,000</th>
+                    <td>$5,000-$12,500</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1,000,000</th>
+                    <td>$10,000-$25,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Creator Rewards at $0.40-$1.00 RPM pays about $40-$100 per 100,000 qualifying views and $400-$1,000 per
+              1 million.
+            </p>
+          </>
+        ),
+      },
     ],
   },
   faqTitle: "TikTok money calculator questions",
