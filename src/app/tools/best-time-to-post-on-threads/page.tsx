@@ -153,10 +153,6 @@ const config: ToolPageConfig = {
       q: "How often should I post on Threads?",
       a: "Start with one or two posts a day on the days you can sustain, then check your Threads insights after two weeks. Replies drive reach on Threads, so a smaller number of posts that start conversations usually beats posting many times with no follow-up.",
     },
-    {
-      q: "Can I schedule Threads posts?",
-      a: "Yes. Poskoo schedules Threads posts through Meta's official API, so you can plan a week in the calendar and let it publish at the time you pick. Read how to schedule Threads posts in the help guide, or open the Threads scheduler to start.",
-    },
   ],
   related: [
     "/tools/best-time-to-post-on-social-media",
