@@ -22,11 +22,8 @@ import { homePageJsonLd } from "./homeJsonLd";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 const BASE_DESCRIPTION = description;
-// BOSS FEEDBACK 2026-11-18: the homepage self-referencing canonical is exactly
-// https://socialapp.splitforms.com/ (the current host this staging site is served
-// on). Keep it here, not in the shared canonical helper, so the root layout's
-// default (poskoo.com) is left untouched for the other routes.
-const canonical = "https://socialapp.splitforms.com/";
+// Self-referencing canonical on the production origin; never the legacy staging host (redirects 301).
+const canonical = `${BRAND.canonicalUrl}/`;
 // The shared description doesn't claim AI; once AI is switched on (isFeatureReadyNow("ai")) the
 // meta description mentions AI captions. Evaluated at request/revalidate time like the page.
 export async function generateMetadata(): Promise<Metadata> {

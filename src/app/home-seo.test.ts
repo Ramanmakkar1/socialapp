@@ -34,7 +34,14 @@ test("homepage title matches the keyword-first template and is 50–60 character
 });
 
 test("home page canonical and description match the shared values", () => {
-  assert.ok(pageSource.includes('const canonical = "https://socialapp.splitforms.com/";'), "home page canonical must be exactly the staging host");
+  assert.ok(
+    pageSource.includes("const canonical = `${BRAND.canonicalUrl}/`;"),
+    "home page canonical must be built from BRAND.canonicalUrl",
+  );
+  assert.ok(
+    !pageSource.includes("socialapp.splitforms.com"),
+    "home page must never point at the legacy staging host",
+  );
   assert.ok(pageSource.includes("alternates: { canonical }"), "home page must set alternates.canonical");
   assert.ok(pageSource.includes('const description = PAGE_DESCRIPTIONS["/"];'), "home page description must come from PAGE_DESCRIPTIONS['/']");
   assert.equal(PAGE_DESCRIPTIONS["/"].length > 0, true);
