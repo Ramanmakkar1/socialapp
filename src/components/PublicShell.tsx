@@ -1,12 +1,10 @@
 import type { CSSProperties, ReactNode } from "react";
-import Link from "next/link";
 import { instrumentSans, instrumentSerif } from "@/lib/fonts";
 import landing from "@/app/landing.module.css";
 import s from "./site.module.css";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
-import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
+import Breadcrumbs from "./Breadcrumbs";
 
 // Existing components style themselves with the generic token names
 // (--surface, --brand, …). Inside the landing wrapper we bridge those names to
@@ -51,20 +49,7 @@ export default function PublicShell({
       </div>
       <main className={`wrap ${s.main}`}>
         {crumbs && (
-          <nav aria-label="Breadcrumb" className={s.crumbs}>
-            <ol>
-              {crumbs.map((c, i) => (
-                <li key={c.path + c.name}>
-                  {i > 0 && <span aria-hidden="true"> / </span>}
-                  {i === crumbs.length - 1 ? (
-                    <span aria-current="page">{c.name}</span>
-                  ) : (
-                    <Link href={c.path}>{c.name}</Link>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </nav>
+          <Breadcrumbs items={crumbs.map((c) => ({ name: c.name, href: c.path }))} />
         )}
         <ul className={s.trustStrip} aria-label="Poskoo trust highlights">
           {[
@@ -93,18 +78,6 @@ export default function PublicShell({
       <div className="wrap">
         <SiteFooter />
       </div>
-      {crumbs && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: ldJson(
-              breadcrumbJsonLd(
-                crumbs.map((c) => ({ name: c.name, url: BRAND.canonicalUrl + (c.path === "/" ? "/" : c.path) }))
-              )
-            ),
-          }}
-        />
-      )}
     </div>
   );
 }
