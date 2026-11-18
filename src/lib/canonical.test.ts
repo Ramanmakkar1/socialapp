@@ -43,13 +43,12 @@ test("metadata canonical origin stays on poskoo.com and never the staging host",
 test("home page metadata uses the shared canonical for canonical and OG url", () => {
   const pageSource = readFileSync("src/app/page.tsx", "utf8");
   const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
-  assert.ok(pageSource.includes('import { HOME_CANONICAL } from "@/lib/canonical";'));
-  assert.ok(pageSource.includes("const canonical = HOME_CANONICAL;"));
+  assert.ok(pageSource.includes('const canonical = "https://socialapp.splitforms.com/";'));
   assert.ok(pageSource.includes("alternates: { canonical }"));
   assert.ok(pageSource.includes("openGraph: { title, description, url: canonical,"));
-  // Both the home page metadata and the root-layout default point at the same
-  // constant, so the rendered canonical cannot drift between the two.
-  assert.ok(layoutSource.includes("alternates: { canonical: HOME_CANONICAL }"));
+  // The root layout default uses the shared production canonical (the homepage
+  // itself pins the staging host per boss feedback 2026-11-18).
+  assert.ok(layoutSource.includes('alternates: { canonical: canonicalUrl("/") }'));
 });
 
 test("canonical is present even while the home page is noindex", () => {
