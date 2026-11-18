@@ -255,7 +255,7 @@ export default function LinkedInTextFormatterPage() {
                   <span className={`${t.cardIcon} ${t.cat_plan}`}>
                     <ToolIcon name="sparkles" />
                   </span>
-                  <b>Try Postflow free</b>
+                  <b>Try {BRAND.name} free</b>
                 </span>
                 <p>Schedule this post on a calendar and publish it through LinkedIn&apos;s official API with Poskoo.</p>
                 <span className={t.go}>Create a free account <span aria-hidden="true">→</span></span>
