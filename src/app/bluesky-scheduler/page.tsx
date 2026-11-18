@@ -68,28 +68,16 @@ const steps = [
 
 const faqs = [
   {
-    q: "Can I schedule Bluesky posts with Poskoo?",
-    a: "Yes. Connect your Bluesky handle with an app password, write the post, add up to 4 images and pick a time. Poskoo publishes it for you and shows a published or failed status.",
+    q: "Is Bluesky scheduling free?",
+    a: "Yes. Poskoo's Free plan costs $0, includes Bluesky scheduling and does not require a credit card.",
   },
   {
-    q: "Do I need a Bluesky developer app?",
-    a: "No. You connect with your Bluesky handle and a Bluesky app password, which is Bluesky's official method for third-party apps. No developer app or extra setup is needed.",
+    q: "Can I schedule Bluesky threads and images?",
+    a: "You can schedule a single Bluesky post with up to 4 images. Bluesky threads are not supported yet.",
   },
   {
-    q: "How do I create a Bluesky app password?",
-    a: "In Bluesky, go to Settings → Privacy and security → App passwords and create a new app password. Use that app password in Poskoo instead of your main password, and revoke it at any time.",
-  },
-  {
-    q: "How many images can I add to a Bluesky post?",
-    a: "You can add up to 4 images per post. Images over Bluesky's 1 MB limit are shrunk automatically when possible, so they fit within the limit.",
-  },
-  {
-    q: "Does Poskoo support Bluesky video?",
-    a: "Not yet. Bluesky video is not supported in Poskoo right now, so schedule text and image posts. Video support will be added when it is available.",
-  },
-  {
-    q: "What happens if a Bluesky post fails?",
-    a: "Each post shows a published or failed status. If publishing fails, the queue shows the failure so you can check the post and try again.",
+    q: "Can I schedule Bluesky videos?",
+    a: "Not yet. Poskoo supports Bluesky text and image posts, but not video.",
   },
 ];
 
@@ -281,7 +269,7 @@ export default function BlueskySchedulerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">Bluesky scheduler FAQs</p>
-            <h2>App passwords, images and publishing</h2>
+            <h2>Bluesky scheduling FAQ</h2>
           </div>
           <div className="faq">
             {faqs.map((faq, index) => (
