@@ -11,7 +11,7 @@ const config: ToolPageConfig = {
     "Find the best time to post on Threads with a free finder. Choose your audience and time zone to get morning, lunch and evening slots to test. No signup.",
   pill: "Free · runs in your browser · nothing is saved",
   h1: { before: "Best time to post on", mark: "Threads" },
-  lede: "A good starting point for Threads is weekdays around 7–9 am, at lunch and 6–8 pm in your audience's local time, because many people check Threads alongside Instagram. Test these slots for two weeks and keep what your Threads insights show working.",
+  lede: "The best time to post on Threads is weekdays 7–9 am, at lunch, and 6–8 pm in your audience's time zone. Test these slots for two weeks and keep what your Threads Insights show working.",
   art: "card-schedule",
   artLabel: "A creator pins post cards onto a weekly calendar next to a smiling alarm clock",
   heroPoints: ["Your audience's time zone", "3 slots per day", "No signup"],
@@ -75,22 +75,20 @@ const config: ToolPageConfig = {
         ),
       },
       {
-        title: "A simple 2-week posting test",
+        title: "How to test and refine",
         body: (
           <>
             <p>
-              Pick two or three slots from the finder and keep everything else about your posting the same for two weeks.
-              That way the time is the only thing that changes.
+              Pick two or three slots from the finder and keep everything else about your posting the same for two weeks — time is the only variable.
             </p>
             <ol>
-              <li>Choose the days you can post and copy the plan.</li>
-              <li>Post at the same slots for 14 days, without changing your content style.</li>
-              <li>After two weeks, compare views and replies for each slot in Threads Insights.</li>
-              <li>Keep the best slot, drop the weakest, and test one new time next.</li>
+              <li>Choose your days and copy the plan.</li>
+              <li>Post at those exact slots for 14 days without changing content style.</li>
+              <li>In Threads Insights, compare views and replies per slot.</li>
+              <li>Keep the strongest slot, drop the weakest, and test one new time next.</li>
             </ol>
             <p>
-              Two weeks is long enough to see a pattern without waiting a whole month. Change one thing at a time so you
-              know what made the difference.
+              Two weeks is enough to see a pattern. Change one thing at a time so you know what made the difference.
             </p>
           </>
         ),
