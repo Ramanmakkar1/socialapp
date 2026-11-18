@@ -88,6 +88,7 @@ const workflows = [
     links: [
       { label: "Buffer alternative", href: "/buffer-alternative" },
       { label: "Metricool alternative", href: "/metricool-alternative" },
+      { label: "Hootsuite alternative", href: "/hootsuite-alternative" },
     ],
   },
   {
