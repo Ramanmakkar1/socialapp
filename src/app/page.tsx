@@ -236,7 +236,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
       {platforms.live.chat.length > 0 && <p>Chat: {listText(platforms.live.chat)}.</p>}
       {platforms.live.blogs.length > 0 && <p>Blogs, newsletters and self-hosted: {listText(platforms.live.blogs)}.</p>}
       {platforms.awaiting.length + platforms.soon.length > 0 && <p>Coming soon: {listText([...platforms.awaiting, ...platforms.soon])}.</p>}
-      <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/linkedin-scheduler">Schedule LinkedIn posts <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link></p>
+      <p className="chLinks"><Link className="go" href="/threads-scheduler">See the Threads scheduler <span aria-hidden="true">→</span></Link><Link className="go" href="/linkedin-scheduler">Schedule LinkedIn posts <span aria-hidden="true">→</span></Link><Link className="go" href="/social-media-scheduler-comparison">Compare social media schedulers <span aria-hidden="true">→</span></Link><Link className="go" href="/bluesky-scheduler">Schedule Bluesky posts <span aria-hidden="true">→</span></Link><Link className="go" href="/hootsuite-alternative">Hootsuite alternative with Instagram auto-DM <span aria-hidden="true">→</span></Link></p>
     </div>
     <div className="art"><AnimArt name="multichannel" label="A creator at a laptop sends one post that splits to several phones and screens" /></div>
   </div>
