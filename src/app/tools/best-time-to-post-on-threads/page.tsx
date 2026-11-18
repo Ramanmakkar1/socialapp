@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
+import t from "@/components/tools/tools.module.css";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-threads",
@@ -72,6 +73,52 @@ const config: ToolPageConfig = {
               Group your posts by the slots you tested, then compare views and replies per slot. If your account is new
               and the data is thin, start with the finder above and gather your own results as you post.
             </p>
+          </>
+        ),
+      },
+      {
+        title: "Starting Threads post times by audience",
+        body: (
+          <>
+            <p>
+              Starting points in your audience&apos;s local time, not measured data; test them in Threads Insights.
+            </p>
+            <div className={t.tableWrap}>
+              <table className={t.table}>
+                <caption className="sr-only">
+                  Starting Threads post times by audience, in your audience&apos;s local time
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Audience</th>
+                    <th scope="col">Weekdays</th>
+                    <th scope="col">Weekends</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Creators</th>
+                    <td>8 am, 12:30 pm, 7 pm, 9 pm</td>
+                    <td>10 am</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">B2B &amp; SaaS</th>
+                    <td>8 am, 12:30 pm, 7 pm (+10 am Tue-Thu)</td>
+                    <td>No weekend posts</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Local business</th>
+                    <td>8 am, 12:30 pm, 7 pm</td>
+                    <td>Sat 10 am, 11 am; Sun 10 am</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Ecommerce</th>
+                    <td>8 am, 12:30 pm, 7 pm</td>
+                    <td>10 am</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </>
         ),
       },
