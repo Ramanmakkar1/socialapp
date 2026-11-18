@@ -15,7 +15,7 @@ const config: ToolPageConfig = {
     "Free YouTube thumbnail size checker: upload an image to test the 1280x720 size, 16:9 ratio, 640 px minimum width and 2 MB limit before you upload.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "YouTube thumbnail size checker", after: "(1280 × 720)" },
-  lede: "The best YouTube thumbnail size is 1280 x 720 pixels (16:9), at least 640 px wide, under 2 MB, as JPG, PNG or GIF.",
+  lede: "The recommended YouTube thumbnail size is 1280 × 720 pixels with a 16:9 aspect ratio. Keep the file under 2 MB and use JPG, PNG or GIF; images should be at least 640 px wide.",
   art: "visual",
   artLabel: "A creator measures a video thumbnail frame with a ruler next to a YouTube player showing a 16:9 screen",
   heroPoints: ["Exact pixels and ratio", "16:9 frame preview", "Nothing is uploaded"],
@@ -168,8 +168,8 @@ const config: ToolPageConfig = {
       a: "The recommended YouTube thumbnail size is 1280 × 720 pixels, a 16:9 aspect ratio. That fills the thumbnail frame without cropping or bars. YouTube accepts other 16:9 sizes down to 640 px wide, but smaller images can look soft.",
     },
     {
-      q: "Does my thumbnail have to be exactly 1280 × 720?",
-      a: "No, but it is the safest choice. Any 16:9 image at least 640 px wide works. Images smaller than 1280 × 720 can look soft, and images with a different shape get cropped or padded.",
+      q: "What aspect ratio should a YouTube thumbnail use?",
+      a: "Use a 16:9 aspect ratio. An image at least 640 px wide works, but 1280 × 720 pixels is recommended for a sharp thumbnail that fills the frame without cropping or padding.",
     },
     {
       q: "Why does my thumbnail look cropped?",
@@ -180,8 +180,8 @@ const config: ToolPageConfig = {
       a: "No. The file is opened with a local object URL in your browser, measured, and released when you clear it or close the tab. Nothing is sent to a server and no YouTube login is needed.",
     },
     {
-      q: "What files can I check?",
-      a: "JPG, PNG and GIF files up to 2 MB. For YouTube itself, a JPG or PNG at 1280 × 720 is a safe choice.",
+      q: "What is the YouTube thumbnail file size limit?",
+      a: "YouTube thumbnail files must be under 2 MB. Use JPG, PNG or GIF; a JPG or PNG at 1280 × 720 pixels is a safe choice.",
     },
   ],
   related: [
