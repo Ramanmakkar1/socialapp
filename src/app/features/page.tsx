@@ -395,8 +395,10 @@ export default async function FeaturesPage() {
               <p className="small">
                 Popular tools:{" "}
                 <Link className={s.vlink} href="/tools/instagram-caption-generator">caption generator</Link>,{" "}
-                <Link className={s.vlink} href="/tools/instagram-hashtag-generator">hashtag generator</Link> and{" "}
-                <Link className={s.vlink} href="/tools/instagram-comment-keyword-tester">comment keyword tester</Link>.
+                <Link className={s.vlink} href="/tools/instagram-hashtag-generator">hashtag generator</Link>,{" "}
+                <Link className={s.vlink} href="/tools/instagram-comment-keyword-tester">comment keyword tester</Link>,{" "}
+                <Link className={s.vlink} href="/tools/linkedin-text-formatter">LinkedIn text formatter</Link> and{" "}
+                <Link className={s.vlink} href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link>.
               </p>
             </div>
             <div className="art">
