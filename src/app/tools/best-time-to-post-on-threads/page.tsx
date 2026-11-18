@@ -3,6 +3,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import BestTimeFinder from "./BestTimeFinder";
 import t from "@/components/tools/tools.module.css";
 
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-threads",
   name: "Best time to post on Threads finder",
