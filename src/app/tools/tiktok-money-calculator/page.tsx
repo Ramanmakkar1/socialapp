@@ -4,6 +4,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import t from "@/components/tools/tools.module.css";
 import MoneyCalculator from "../instagram-money-calculator/MoneyCalculator";
 
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
 const config: ToolPageConfig = {
   path: "/tools/tiktok-money-calculator",
   name: "TikTok money calculator",
