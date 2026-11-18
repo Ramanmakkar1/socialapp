@@ -189,6 +189,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/youtube-thumbnail-size-checker",
     "/tools/youtube-title-counter",
     "/tools/social-media-content-calendar",
     "/tools/best-time-to-post-on-tiktok",
