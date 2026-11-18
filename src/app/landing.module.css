@@ -288,7 +288,7 @@
 .landing :global(details){
   background:var(--card);border:1.5px solid var(--line);border-radius:var(--poskoo-radius-sm);padding:18px 22px}
 .landing :global(summary){
-  cursor:pointer;font-weight:600;font-size:1.08rem;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+  cursor:pointer;font-weight:600;font-size:1.08rem;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;min-height:44px}
 .landing :global(summary::-webkit-details-marker){
   display:none}
 .landing :global(summary::after){
