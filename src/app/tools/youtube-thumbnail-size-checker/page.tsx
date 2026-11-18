@@ -60,7 +60,7 @@ const config: ToolPageConfig = {
   guide: {
     title: "A practical guide to YouTube thumbnail sizes in 2026",
     intro:
-      "A thumbnail is a 16:9 frame, so the shape is what matters most; resolution decides how sharp it looks. Here is how the checker judges an image and how to fix one that does not fit.",
+      "YouTube thumbnails should be 1280 × 720 pixels with a 16:9 aspect ratio — that size fills the thumbnail frame without cropping or bars. Smaller images can look soft, anything under 640 px wide is rejected, and the wrong shape is cropped or padded. Here is how the checker judges an image and how to fix one that does not fit.",
     sections: [
       {
         title: "What this thumbnail size checker does",
