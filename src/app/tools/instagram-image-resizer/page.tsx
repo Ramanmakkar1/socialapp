@@ -3,7 +3,7 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import ImageResizer from "./ImageResizer";
 
 export const dynamic = "force-static";
-export const revalidate = 86400;
+export const revalidate = 3600;
 
 const config: ToolPageConfig = {
   path: "/tools/instagram-image-resizer",
