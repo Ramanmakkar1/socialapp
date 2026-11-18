@@ -303,6 +303,43 @@ export default function InstagramLinkInBioPage() {
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <p className="eyebrow">Free tools</p>
+            <h2>Build your page with free tools</h2>
+          </div>
+          <p>
+            Shape your bio, track your links and see how your page looks before you publish it. Use the{" "}
+            <Link className={s.vlink} href="/tools/instagram-bio-generator">
+              Instagram bio generator
+            </Link>
+            , the{" "}
+            <Link className={s.vlink} href="/tools/instagram-dm-link-generator">
+              DM link generator
+            </Link>
+            , the{" "}
+            <Link className={s.vlink} href="/tools/instagram-utm-builder">
+              UTM link builder
+            </Link>{" "}
+            and the{" "}
+            <Link className={s.vlink} href="/tools/instagram-post-preview">
+              post preview tool
+            </Link>
+            , then follow the{" "}
+            <Link className={s.vlink} href="/guides/link-in-bio-best-practices">
+              link-in-bio best practices guide
+            </Link>{" "}
+            to put it all together.
+          </p>
+          <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
+            <Link href="/tools/instagram-tools" className={s.vlink}>
+              all free Instagram tools
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
             <p className="eyebrow">Questions</p>
             <h2><span className={s.nowrap}>Link-in-bio</span> questions</h2>
           </div>
