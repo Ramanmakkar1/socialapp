@@ -189,6 +189,7 @@ const config: ToolPageConfig = {
     "/tools/social-media-image-sizes",
     "/tools/youtube-description-generator",
     "/tools/youtube-hashtag-generator",
+    "/tools/best-time-to-post-on-youtube",
   ],
   schema: {
     category: "MultimediaApplication",
