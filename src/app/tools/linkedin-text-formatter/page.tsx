@@ -11,6 +11,8 @@ import {
   toolMetadata,
   type ToolPageConfig,
 } from "@/components/tools/ToolPageTemplate";
+import { toolByHref } from "@/components/tools/registry";
+import { ToolIcon } from "@/components/tools/ToolIcon";
 import t from "@/components/tools/tools.module.css";
 import { BRAND } from "@/lib/brand";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
@@ -141,6 +143,16 @@ const config: ToolPageConfig = {
 
 export const metadata = toolMetadata(config);
 
+const moreTools = [
+  "/tools/youtube-thumbnail-size-checker",
+  "/tools/best-time-to-post-on-threads",
+  "/tools/tiktok-money-calculator",
+  "/tools/best-time-to-post-on-youtube",
+].flatMap((href) => {
+  const tool = toolByHref(href);
+  return tool ? [tool] : [];
+});
+
 const appJsonLd = {
   ...toolSoftwareJsonLd({ name: config.name, description, url: `${BRAND.url}${PATH}` }),
   featureList: config.schema?.features,
@@ -167,6 +179,31 @@ export default function LinkedInTextFormatterPage() {
         <ToolFeatures title={config.featuresTitle} features={config.features} />
         <ToolGuide guide={config.guide} />
         <ToolFaqSection title={config.faqTitle ?? `${config.name} FAQ`} faqs={config.faqs} />
+        <section className={t.section} aria-labelledby="more-tools-title">
+          <div className={t.relHead}>
+            <div>
+              <p className="eyebrow">Keep going</p>
+              <h2 id="more-tools-title">More free tools</h2>
+            </div>
+            <Link href="/tools" className={t.textLink}>See all tools <span aria-hidden="true">→</span></Link>
+          </div>
+          <ul className={t.grid}>
+            {moreTools.map((tool) => (
+              <li key={tool.href}>
+                <Link href={tool.href} className={`${t.card} ${t[`acc_${tool.category}`]}`}>
+                  <span className={t.cardTop}>
+                    <span className={`${t.cardIcon} ${t[`cat_${tool.category}`]}`}>
+                      <ToolIcon name={tool.icon} />
+                    </span>
+                    <b>{tool.name}</b>
+                  </span>
+                  <p>{tool.summary}</p>
+                  <span className={t.go}>Open tool <span aria-hidden="true">→</span></span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
         <section className={t.section}>
           <div className="cta">
             <div className="ctaCopy">
