@@ -24,7 +24,7 @@ const articleJsonLd = {
   headline: "How to set up an Instagram link-in-bio page",
   description: metadata.description,
   image: `${BRAND.canonicalUrl}/landing/hero.webp`,
-  dateModified: "2026-11-11",
+  dateModified: "2026-11-18",
   author: { "@type": "Organization", name: BRAND.company },
   publisher: publisherRef(),
   mainEntityOfPage: `${BRAND.canonicalUrl}/help/instagram-link-in-bio-setup`,
@@ -145,6 +145,18 @@ const faqs = [
     q: "Does my page show my latest Instagram posts?",
     a: "Yes. When you have published posts in Poskoo, the page shows your latest published posts under your links, so visitors can see recent work without leaving the page.",
   },
+  {
+    q: "Which link should I put in my Instagram bio?",
+    a: "Put your Poskoo page URL in the bio instead of a single destination. The page holds every link you want to share, and each one gets its own tracked short link so you can see which link people tap.",
+  },
+  {
+    q: "Why does my link-in-bio page show a not-found page?",
+    a: "The page only loads while Publish my page is ticked and saved. If you untick it, or the handle was never saved, visitors get a not-found page. Open Link in bio in the app, tick Publish my page and save again.",
+  },
+  {
+    q: "Can I change my links after I paste the URL in my bio?",
+    a: "Yes. Edit, reorder or remove links in the app at any time and the page URL stays the same, so you never need to update your Instagram bio again. Editing a link keeps its click history.",
+  },
 ];
 
 const faqJsonLd = {
@@ -188,8 +200,9 @@ export default function InstagramLinkInBioSetupHelpPage() {
               How to set up your Instagram <em className="s">link-in-bio page</em>
             </h1>
           <p className="lede">
-            Your Instagram link-in-bio page is one {BRAND.name} page that holds all your links, ready to paste into your
-            bio. Create it free in the app, add your links, then copy the page URL into your Instagram profile.
+            To set up an Instagram link in bio, create a free {BRAND.name} bio page, add your links and publish it, then
+            paste your page URL (<strong>poskoo.com/@yourname</strong>) into the Website field of your Instagram profile.
+            Every link on the page gets a tracked short link, so you can see which one people actually tap.
           </p>
         </div>
         <HelpGuideIllustration variant="start" className="hero-art" />
@@ -220,6 +233,71 @@ export default function InstagramLinkInBioSetupHelpPage() {
                 <p>{st.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className={s.prose}>
+            <h2>Which link should you put in your Instagram bio?</h2>
+            <p>
+              Put your {BRAND.name} page URL in the bio, not a single destination. The page holds every link you want to
+              share, so you can change what you promote without editing your Instagram profile again.
+            </p>
+            <ul>
+              <li>
+                <strong>Lead with your money link.</strong> Links appear in the order you set them, so put the shop,
+                booking or sign-up link first.
+              </li>
+              <li>
+                <strong>Use a short, specific label.</strong> <em>Shop the collection</em> or <em>Book a call</em> tells
+                people where the link goes; <em>Click here</em> does not. Labels can be up to 60 characters.
+              </li>
+              <li>
+                <strong>Paste the full address.</strong> Every link needs a complete <code>https://</code> URL, and the
+                editor rejects anything else.
+              </li>
+              <li>
+                <strong>Keep the page on-brand.</strong> Add an avatar and a one-line bio (up to 280 characters) so
+                visitors know they are in the right place.
+              </li>
+            </ul>
+            <p>
+              If you only have one destination today, the page still helps: the link stays editable and tracked, and your
+              latest published posts appear under it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className={s.prose}>
+            <h2>Common mistakes to avoid</h2>
+            <ul>
+              <li>
+                <strong>Forgetting to publish.</strong> The page only loads while <strong>Publish my page</strong> is
+                ticked and saved. Untick it and visitors get a not-found page.
+              </li>
+              <li>
+                <strong>Picking a handle that does not match your name.</strong> Handles are 3–30 characters, lowercase
+                letters, numbers, dots, dashes or underscores, and a few words such as <code>app</code> or{" "}
+                <code>help</code> are reserved.
+              </li>
+              <li>
+                <strong>Pasting a link without https://.</strong> The editor needs the full address, so copy it from the
+                browser bar rather than typing it.
+              </li>
+              <li>
+                <strong>Hitting your plan limit.</strong> On the Free plan you get {freeLinks} links. If you are over the
+                limit your existing links stay live, but you cannot add another until you remove one.
+              </li>
+              <li>
+                <strong>Pointing the bio at a link shortener instead.</strong> A shortener hides where the link goes and
+                gives you no page to update; your {BRAND.name} page does both.
+              </li>
+            </ul>
           </div>
         </div>
       </section>
