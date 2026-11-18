@@ -518,6 +518,15 @@
   }
 }
 
+.landing :global(.howLinks){
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:12px}
+.landing :global(.howLinks .btn){
+  min-height:48px}
+@media (max-width: 560px){
+  .landing :global(.howLinks){flex-direction:column}
+  .landing :global(.howLinks .btn){width:100%;justify-content:center}
+}
+
 .landing :global(.bento) {
   display:grid;
   grid-template-columns:repeat(2,1fr);

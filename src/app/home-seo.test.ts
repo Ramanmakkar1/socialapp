@@ -168,18 +168,17 @@ test("homepage robots directive is conditional, not a hardcoded noindex", () => 
   assert.equal(isPathIndexable("/"), false, "staging must currently resolve the home page to noindex,nofollow");
 });
 
-test("homepage step illustrations keep descriptive alt text", () => {
-  // Regression guard for the empty-alt audit: each of the three "How Poskoo
-  // works" images must carry descriptive alt text, not alt="".
-  const steps = [
-    { src: "/landing/step-connect.webp", alt: "connecting a social account on a phone, linking Instagram, Facebook and Threads" },
-    { src: "/landing/step-schedule.webp", alt: "placing photo posts on a wall calendar beside an alarm clock" },
-    { src: "/landing/step-dm.webp", alt: "catching an envelope flying from a phone, showing an automatic DM after a keyword comment" },
-  ];
-  for (const { src, alt } of steps) {
-    const tag = pageSource.match(new RegExp(`<Image[^>]*src="${src}"[^>]*>`))?.[0];
-    assert.ok(tag, `homepage must render the ${src} step illustration`);
-    assert.ok(!tag.includes('alt=""'), `${src} must not use an empty alt attribute`);
-    assert.ok(tag.includes(alt), `${src} alt text must describe ${alt}`);
+test("homepage step illustrations are inline SVGs with descriptive headings", () => {
+  // Regression guard for the empty-alt audit: the three "How Poskoo works"
+  // steps are inline SVGs (decorative, so no alt attribute is needed) each
+  // paired with a heading and a description that carry the meaning.
+  for (const step of ["Connect accounts", "Schedule content", "Capture and reply to leads"]) {
+    assert.ok(pageSource.includes(`<h3>${step}</h3>`), `homepage must render the ${step} step`);
   }
+  assert.equal(
+    (pageSource.match(/<svg[^>]*aria-hidden="true"[^>]*viewBox="0 0 120 120"/g) ?? []).length,
+    3,
+    "homepage must render three inline step illustrations",
+  );
+  assert.ok(!pageSource.includes('<Image src="/landing/step-'), "step illustrations must be inline SVGs, not images");
 });
