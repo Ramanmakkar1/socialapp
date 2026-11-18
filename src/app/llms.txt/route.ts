@@ -19,6 +19,20 @@ const isNoindex = (path: string) => isSiteIndexable() && !isPathIndexable(path);
 // a staging host, so models never pick up a staging URL.
 const SITE_URL = APPROVED_PRODUCTION_URL;
 
+// Keep this concise: the main product pages, popular free tools and direct comparisons.
+const LINK_PATHS = new Set([
+  "/pricing",
+  "/features",
+  "/tools",
+  "/tools/instagram-caption-generator",
+  "/tools/instagram-hashtag-generator",
+  "/tools/instagram-comment-to-dm-preview",
+  "/tools/linkedin-text-formatter",
+  "/social-media-scheduler-comparison",
+  "/buffer-alternative",
+  "/manychat-alternative",
+]);
+
 /** Page groups, matched in order. New pages (help, tools, guides) fall into a group by their path. */
 const GROUPS: { heading: string; match: (path: string) => boolean }[] = [
   { heading: "Product", match: (p) => ["/", "/features", "/pricing", "/developers", "/contact", "/social-media-scheduler-for-small-business"].includes(p) || p.startsWith("/instagram-auto-dm") || ["/instagram-dm-automation", "/instagram-link-in-bio", "/instagram-content-planner"].includes(p) },
@@ -36,7 +50,7 @@ export async function GET() {
 
   const grouped = new Map<string, string[]>(GROUPS.map((g) => [g.heading, []]));
   for (const path of PUBLIC_PATHS) {
-    if (isNoindex(path) || !META[path]) continue;
+    if (!LINK_PATHS.has(path) || isNoindex(path) || !META[path]) continue;
     const title = PAGE_TITLES[path] || path;
     const description = PAGE_DESCRIPTIONS[path];
     if (!description) continue;
@@ -73,7 +87,7 @@ export async function GET() {
     "",
     "## About",
     "",
-    `- ${BRAND.name} is a social media scheduler and Instagram comment-to-DM automation tool made by ${BRAND.company}.`,
+    `- ${BRAND.name} is a social media scheduler with Instagram comment-to-DM automation, AI replies and lead capture for creators and small businesses, made by ${BRAND.company}.`,
     `- Official website: ${SITE_URL}`,
     `- Tagline: ${BRAND.tagline}`,
     `- Support: ${BRAND.supportEmail} or ${SITE_URL}/contact`,
