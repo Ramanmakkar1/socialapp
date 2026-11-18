@@ -76,7 +76,9 @@ const config: ToolPageConfig = {
           <p>
             Say who you are, who you help, the result or proof you deliver and the skills you use. Add a short personal
             line if it fits, then finish with a call to action. Keep paragraphs short so the section is easy to scan on
-            mobile.
+            mobile.{" "}
+            To add bold headings or bullet points to your About section, use the{" "}
+            <Link href="/tools/linkedin-text-formatter">LinkedIn text formatter</Link>.
           </p>
         ),
       },
@@ -130,6 +132,7 @@ const config: ToolPageConfig = {
     "/tools/linkedin-headline-generator",
     "/tools/linkedin-post-generator",
     "/tools/linkedin-character-counter",
+    "/tools/linkedin-text-formatter",
     "/tools/linkedin-post-preview",
     "/linkedin-scheduler",
   ],
