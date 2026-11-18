@@ -19,17 +19,17 @@ import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import FormatterTool from "./FormatterTool";
 
 const PATH = "/tools/linkedin-text-formatter";
-const description = "Paste your text, turn it into bold, italic or bulleted LinkedIn styles, then copy clean text in one click. Free, no sign-up, nothing uploaded.";
+const description = "A LinkedIn text formatter turns plain text into bold, italic and bulleted Unicode styles you can paste into posts and profile fields. Free, no uploads.";
 
 const config: ToolPageConfig = {
   path: "/tools/linkedin-text-formatter",
   name: "LinkedIn Text Formatter",
   crumb: "LinkedIn Text Formatter",
-  title: "LinkedIn Text Formatter: Bold, Italic & Bullets",
+  title: "Free LinkedIn Text Formatter: Bold, Italic & Bullets",
   description,
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { mark: "LinkedIn Text Formatter" },
-  lede: "LinkedIn has no bold or italic button, so you bold text by converting it to Unicode bold characters and pasting them into your post, headline or About section. Type below, copy a style, add bullets and check the 3,000-character limit.",
+  lede: "A LinkedIn text formatter is a free tool that turns plain text into bold, italic and bulleted Unicode characters you can paste into LinkedIn posts, headlines and About sections, because LinkedIn's composer has no bold or italic button. Type below, copy a style, add bullets and check the 3,000-character limit.",
   art: "writing",
   artLabel: "A creator writes a LinkedIn post with a giant pencil and styled letters on a phone-shaped card",
   heroPoints: ["5 useful text styles", "One-click bullets", "3,000-character counter"],
@@ -72,9 +72,39 @@ const config: ToolPageConfig = {
     },
   ],
   guide: {
-    title: "LinkedIn bold text: how Unicode formatting works",
+    title: "What is a LinkedIn text formatter?",
     intro: "LinkedIn does not offer bold or italic buttons in its standard post composer. A LinkedIn text formatter works by replacing ordinary letters with lookalike Unicode characters, which you can copy and paste as text.",
     sections: [
+      {
+        title: "Which formatting does the tool support?",
+        body: (
+          <p>
+            The formatter produces five styles: bold, italic, bold italic, sans bold and monospace, plus a Bullet list
+            option that adds a &ldquo;•&rdquo; to every non-empty line while keeping blank lines intact. All output is
+            plain Unicode text, so it pastes cleanly into LinkedIn&apos;s post composer, headlines and About sections.
+          </p>
+        ),
+      },
+      {
+        title: "What is it used for?",
+        body: (
+          <p>
+            Use it to emphasize a key takeaway in a post, set a short heading, format a code or data snippet, or turn a
+            list of ideas into scannable bullets. The same copy-safe output works in profile fields, and you can paste
+            the finished text into a scheduled Poskoo post.
+          </p>
+        ),
+      },
+      {
+        title: "How do I use it without losing my formatting?",
+        body: (
+          <p>
+            Pick a style, press Copy, then paste directly into LinkedIn or a Poskoo draft. Because the result is real
+            Unicode text, it survives saving a draft, switching devices and publishing from the LinkedIn app. Keep the
+            rest of your post in plain text and style only a few key words so screen readers can still read it.
+          </p>
+        ),
+      },
       {
         title: "How do I add bold or italics to a LinkedIn post?",
         body: (
