@@ -16,6 +16,7 @@ import { ToolIcon } from "@/components/tools/ToolIcon";
 import t from "@/components/tools/tools.module.css";
 import { BRAND } from "@/lib/brand";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { convert } from "@/lib/igFonts";
 import FormatterTool from "./FormatterTool";
 
 const PATH = "/tools/linkedin-text-formatter";
@@ -205,6 +206,46 @@ export default function LinkedInTextFormatterPage() {
         <p className="small" style={{ marginTop: 14, textAlign: "center" }}>
           Screen readers may read Unicode styled letters poorly, so use them only for a few key words.
         </p>
+        <section className={t.section} aria-labelledby="style-examples-title">
+          <h2 id="style-examples-title">LinkedIn text style examples</h2>
+          <p>Each style below is plain Unicode text, so it pastes into LinkedIn posts, headlines and About sections.</p>
+          <table className={t.table} style={{ width: "100%", borderCollapse: "collapse", marginTop: 16 }}>
+            <thead>
+              <tr>
+                <th scope="col" style={{ textAlign: "left", padding: "8px 12px", borderBottom: "2px solid var(--poskoo-line)" }}>Style</th>
+                <th scope="col" style={{ textAlign: "left", padding: "8px 12px", borderBottom: "2px solid var(--poskoo-line)" }}>Example</th>
+                <th scope="col" style={{ textAlign: "left", padding: "8px 12px", borderBottom: "2px solid var(--poskoo-line)" }}>Best for</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row" style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontWeight: 600 }}>Bold</th>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontFamily: "monospace" }}>{convert("Grow on LinkedIn", "bold")}</td>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)" }}>Key takeaway</td>
+              </tr>
+              <tr>
+                <th scope="row" style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontWeight: 600 }}>Italic</th>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontFamily: "monospace" }}>{convert("Grow on LinkedIn", "italic")}</td>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)" }}>Short aside or title</td>
+              </tr>
+              <tr>
+                <th scope="row" style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontWeight: 600 }}>Bold italic</th>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontFamily: "monospace" }}>{convert("Grow on LinkedIn", "bold-italic")}</td>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)" }}>Section heading</td>
+              </tr>
+              <tr>
+                <th scope="row" style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontWeight: 600 }}>Sans bold</th>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontFamily: "monospace" }}>{convert("Grow on LinkedIn", "sans-bold")}</td>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)" }}>Headline highlight</td>
+              </tr>
+              <tr>
+                <th scope="row" style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontWeight: 600 }}>Monospace</th>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)", fontFamily: "monospace" }}>{convert("Grow on LinkedIn", "monospace")}</td>
+                <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--poskoo-line)" }}>Code or data</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
         <section className={t.section} aria-labelledby="related-tools-title" style={{ paddingTop: 24 }}>
           <div className={t.relHead}>
             <div>
