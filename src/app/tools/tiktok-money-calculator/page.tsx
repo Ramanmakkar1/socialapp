@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "Estimate TikTok brand deal pay from followers and engagement, plus an optional Creator Rewards estimate from qualifying views. Free, no login.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "TikTok money calculator:", mark: "estimate", after: "what a video can earn" },
-  lede: "A rough TikTok sponsored-video price is $10-$25 per 1,000 followers, adjusted up or down by your engagement rate. Enter your followers, engagement rate and video rate to estimate pay per sponsored video and per month, plus an optional Creator Rewards estimate.",
+  lede: "The calculator estimates TikTok earnings as views × RPM ÷ 1,000 for Creator Rewards, and as followers × your rate per 1,000 for brand deals. Real payouts vary by country, niche and video length, so treat the result as a range rather than a promise.",
   art: "analytics",
   artLabel: "A creator watches an upward chart with coins and dollar signs floating up",
   heroPoints: ["Sponsored video and monthly estimates", "Optional Creator Rewards estimate", "No login"],
@@ -143,6 +143,14 @@ const config: ToolPageConfig = {
       a: "Creator Rewards pays on views of videos longer than 1 minute. Views on shorter videos do not count. This calculator lets you enter an RPM of $0.40 to $1.00 to estimate rewards, but it is not official TikTok data.",
     },
     {
+      q: "What RPM should I use for TikTok Creator Rewards?",
+      a: "Start with $0.40 to $1.00 per 1,000 qualifying views, which is the range this calculator pre-fills. Use the lower end for general entertainment and a broad international audience, and the higher end for finance, tech or business content with mostly US, UK, Canadian or Australian viewers.",
+    },
+    {
+      q: "When are TikTok Creator Rewards payouts made?",
+      a: "TikTok pays Creator Rewards monthly, usually in the second half of the following month, once your balance passes the minimum payout threshold. The exact date and threshold are set by TikTok in your account, so check the Rewards dashboard for your own payout schedule.",
+    },
+    {
       q: "Does the calculator connect to my TikTok account?",
       a: "No. You type the numbers yourself and the calculation runs in your browser. Nothing is uploaded or connected to TikTok, and no login is needed.",
     },
@@ -173,9 +181,39 @@ const config: ToolPageConfig = {
 
 export const metadata = toolMetadata(config);
 
+const payoutFactors = (
+  <section className={t.section} aria-labelledby="payout-factors">
+    <div className="head">
+      <p className="eyebrow">Creator Rewards</p>
+      <h2 id="payout-factors">What affects TikTok Creator Rewards payouts</h2>
+    </div>
+    <div className={t.prose}>
+      <ul>
+        <li>
+          <b>Eligible views over 1 minute.</b> Creator Rewards only pays on views of videos longer than 1 minute, so
+          views on short clips earn nothing from the program.
+        </li>
+        <li>
+          <b>Audience country.</b> Payouts are higher where advertiser demand is strong, such as the US, UK, Canada and
+          Australia, and lower in most other markets.
+        </li>
+        <li>
+          <b>Niche RPM.</b> Finance, tech and business content usually earn a higher RPM than general entertainment, so
+          the same number of views can pay very differently.
+        </li>
+      </ul>
+      <p>
+        Poskoo&apos;s <Link href="/features">scheduling and comment-to-DM features</Link> help you publish longer videos
+        consistently, and the <Link href="/pricing">free plan on the pricing page</Link> shows what you get before you
+        pay.
+      </p>
+    </div>
+  </section>
+);
+
 export default function TikTokMoneyCalculatorPage() {
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={config} afterTool={payoutFactors}>
       <MoneyCalculator platform="tiktok" />
     </ToolPageTemplate>
   );
