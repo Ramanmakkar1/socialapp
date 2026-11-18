@@ -19,7 +19,7 @@ export const revalidate = 600;
 export const metadata: Metadata = withSocial({
   title: { absolute: "Hootsuite Alternative for Instagram Auto-DM | Poskoo" },
   description:
-    "An Instagram scheduler plus comment-to-DM automation, email capture and a link-in-bio page, with a free plan. A simpler Hootsuite alternative for Instagram.",
+    "An Instagram scheduler with comment-to-DM automation, email capture and a link-in-bio page on a free plan. A simpler Hootsuite alternative for Instagram.",
   alternates: { canonical: "/hootsuite-alternative" },
 });
 
@@ -58,7 +58,7 @@ const appJsonLd = {
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} Hootsuite alternative`,
     description:
-      "An Instagram scheduler plus comment-to-DM automation, email capture and a link-in-bio page, with a free plan. A simpler Hootsuite alternative for Instagram.",
+      "An Instagram scheduler with comment-to-DM automation, email capture and a link-in-bio page on a free plan. A simpler Hootsuite alternative for Instagram.",
     url: `${BRAND.canonicalUrl}/hootsuite-alternative`,
   }),
   "@id": `${BRAND.canonicalUrl}/hootsuite-alternative#software`,
