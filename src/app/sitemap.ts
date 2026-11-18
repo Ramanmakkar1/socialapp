@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
-import { isPathIndexable, isSiteIndexable } from "@/lib/indexability";
+import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
 
 // Evaluate indexability per request so a build never freezes the staging noindex.
@@ -25,20 +25,19 @@ export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 // intended; the file stays raw XML with no XSLT styling.
 function getSitemapPaths(host?: string | null): PublicPath[] {
   // Staging is noindex: list nothing, on any host, until indexing is enabled.
-  if (!isSiteIndexable()) return [];
+  // isPathIndexable returns false for every path (including "/") while the site
+  // is noindex, so the filter below yields an empty list for staging.
   // A non-canonical (staging/legacy) origin is always noindex, so never list it
   // even when the indexability flag is forced on. When the caller knows the
   // request host, use it: the legacy host must serve an empty sitemap even if
   // a redirect is bypassed.
   if (host && !isApprovedProductionOrigin(`https://${host}`)) return [];
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
-  // isPathIndexable is the single source of truth for non-home paths: a noindex
-  // page is never listed, and it is listed again automatically once indexing is
-  // enabled. The homepage is excluded here explicitly: its page metadata is
-  // noindex while staging, so it must not be listed even when isSiteIndexable()
-  // is forced true; it re-enters the sitemap only via the production origin
-  // guard once indexing is enabled.
-  return PUBLIC_PATHS.filter((path) => (path === "/" ? !isSiteIndexable() : isPathIndexable(path)));
+  // isPathIndexable is the single source of truth: a noindex page is never
+  // listed, and it is listed again automatically once indexing is enabled.
+  // The homepage is included while the site is indexable (production) and
+  // excluded while staging (noindex), matching the layout robots meta.
+  return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
 }
 
 export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
