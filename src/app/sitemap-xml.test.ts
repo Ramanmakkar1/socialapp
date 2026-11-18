@@ -115,6 +115,32 @@ test("sitemap.xml route matches the legacy host exactly, not by substring", asyn
   }
 });
 
+test("sitemap.xml route re-checks runtime noindex for the header and body", async () => {
+  // Regression: the X-Robots-Tag used to read the module-load BRAND.indexable
+  // snapshot, so a runtime noindex could still serve an indexable header.
+  const wasUrl = BRAND.url;
+  const prevFlag = process.env.NEXT_PUBLIC_SITE_INDEXABLE;
+  const prevUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  try {
+    BRAND.url = "https://poskoo.com";
+    process.env.NEXT_PUBLIC_SITE_INDEXABLE = "false";
+    process.env.NEXT_PUBLIC_SITE_URL = "https://poskoo.com";
+    const res = await GET(new Request("https://poskoo.com/sitemap.xml"));
+    assert.equal(res.headers.get("x-robots-tag"), "noindex, nofollow", "runtime noindex must set the header");
+    assert.doesNotMatch(await res.text(), /<url>/, "runtime noindex must serve an empty sitemap");
+    assert.ok(
+      readFileSync("src/app/sitemap-xml/route.ts", "utf8").includes("isSiteIndexable"),
+      "the route must use the runtime isSiteIndexable helper",
+    );
+  } finally {
+    BRAND.url = wasUrl;
+    if (prevFlag === undefined) delete process.env.NEXT_PUBLIC_SITE_INDEXABLE;
+    else process.env.NEXT_PUBLIC_SITE_INDEXABLE = prevFlag;
+    if (prevUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = prevUrl;
+  }
+});
+
 test("sitemap.xml route uses the visitor's host, not the server's internal bind address", async () => {
   // Regression 2026-11-15: in the standalone server request.url is http://0.0.0.0:3000/…,
   // which emptied the production sitemap. The proxy passes the real host in headers.

@@ -5,7 +5,7 @@
 // browsers render the styled page in public/sitemap.xsl (title, lang, viewport,
 // one <h1>) instead of a bare XML tree. next.config rewrites /sitemap.xml here.
 import sitemap from "@/app/sitemap";
-import { BRAND } from "@/lib/brand";
+import { isSiteIndexable } from "@/lib/indexability";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +75,9 @@ ${urls}${urls ? "\n" : ""}</urlset>
     "cache-control": "no-store",
   };
   // While staging is noindex, tell crawlers not to index the XML itself.
-  if (!BRAND.indexable) {
+  // Re-resolve at request time so a stale module-load snapshot can never mask
+  // a runtime noindex (e.g. a staging host or a flag turned off after build).
+  if (!isSiteIndexable()) {
     headers["x-robots-tag"] = "noindex, nofollow";
   }
 
