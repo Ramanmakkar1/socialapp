@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AnimArt } from "@/components/AnimArt";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import MoneyCalculator from "../instagram-money-calculator/MoneyCalculator";
@@ -211,9 +212,36 @@ const payoutFactors = (
   </section>
 );
 
+const signupCta = (
+  <section className={t.section} aria-labelledby="signup-cta-title">
+    <div className="cta">
+      <div className="ctaCopy">
+        <p className="ctaEyebrow">Free plan · no credit card</p>
+        <h2 id="signup-cta-title">
+          Know your worth, <em className="s">then grow it with Poskoo</em>
+        </h2>
+        <p>
+          Turn this estimate into a posting plan: schedule your sponsored videos, auto-DM
+          everyone who comments your keyword on Instagram, and let AI draft replies in your
+          voice.
+        </p>
+        <Link className="btn btn-dark" href="/signup">
+          Start free on Poskoo <span aria-hidden="true">→</span>
+        </Link>
+        <ul className="ctaChecks">
+          <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Schedule posts on your calendar</li>
+          <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Instagram comment-to-DM automation</li>
+          <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>AI replies in your voice</li>
+        </ul>
+      </div>
+      <AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" />
+    </div>
+  </section>
+);
+
 export default function TikTokMoneyCalculatorPage() {
   return (
-    <ToolPageTemplate config={config} afterTool={payoutFactors}>
+    <ToolPageTemplate config={config} afterTool={payoutFactors} signupCta={signupCta}>
       <MoneyCalculator platform="tiktok" />
     </ToolPageTemplate>
   );

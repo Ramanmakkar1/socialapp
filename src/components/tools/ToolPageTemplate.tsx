@@ -376,6 +376,7 @@ export function ToolPageTemplate({
   config,
   children,
   afterTool,
+  signupCta,
   afterGuide,
 }: {
   config: ToolPageConfig;
@@ -383,6 +384,8 @@ export function ToolPageTemplate({
   children: ReactNode;
   /** Optional block right after the tool card (e.g. a reference table). */
   afterTool?: ReactNode;
+  /** Optional branded sign-up CTA, rendered immediately after the tool result content. */
+  signupCta?: ReactNode;
   /** Optional block after the guide. */
   afterGuide?: ReactNode;
 }) {
@@ -426,6 +429,7 @@ export function ToolPageTemplate({
           {children}
         </ToolCard>
         {afterTool}
+        {signupCta}
         <HowItWorks title={config.stepsTitle} steps={config.steps} />
         <ToolFeatures title={config.featuresTitle} features={config.features} />
         <ToolGuide guide={config.guide} />
