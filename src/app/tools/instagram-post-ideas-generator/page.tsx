@@ -129,6 +129,10 @@ const config: ToolPageConfig = {
         title: "Common content planning mistakes",
         body: (
           <ul>
+            <li>
+              Picking a niche you cannot post about every week. Compare options in our guide to the{" "}
+              <Link href="/guides/best-instagram-niches-2026">best Instagram niches for 2026</Link>.
+            </li>
             <li>Copying a caption starter word for word, so it sounds like every other account.</li>
             <li>Posting only one format for weeks.</li>
             <li>Planning ideas but never putting them on a calendar.</li>
