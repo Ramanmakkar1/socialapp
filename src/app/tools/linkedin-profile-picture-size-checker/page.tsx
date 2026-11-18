@@ -4,7 +4,7 @@ import t from "@/components/tools/tools.module.css";
 import ProfilePhotoChecker from "@/components/tools/ProfilePhotoChecker";
 
 export const dynamic = "force-static";
-export const revalidate = 86400;
+export const revalidate = 3600;
 
 const config: ToolPageConfig = {
   path: "/tools/linkedin-profile-picture-size-checker",
