@@ -187,7 +187,6 @@ const config: ToolPageConfig = {
   related: [
     "/tools/youtube-title-generator",
     "/tools/social-media-image-sizes",
-    "/tools/youtube-tag-generator",
     "/tools/youtube-description-generator",
     "/tools/youtube-hashtag-generator",
   ],

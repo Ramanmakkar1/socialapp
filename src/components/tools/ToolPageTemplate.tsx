@@ -4,7 +4,7 @@ import { ArrowDown, ArrowRight, BookOpen } from "lucide-react";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { BRAND } from "@/lib/brand";
-import { TOOLS, toolByHref, toolPlatform, type ToolIconName, type ToolPlatform } from "./registry";
+import { TOOLS, toolByHref, toolPlatform, type ToolEntry, type ToolIconName, type ToolPlatform } from "./registry";
 import { ToolIcon } from "./ToolIcon";
 import { RelatedToolsCarousel } from "./RelatedToolsCarousel";
 import { faqJsonLd, howToJsonLd, ldJson, webAppJsonLd, webPageJsonLd, type AppCategory, type ToolFaq } from "./seo";
@@ -297,10 +297,20 @@ export function ToolFaqSection({ title, faqs }: { title: string; faqs: ToolFaq[]
 }
 
 export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string }) {
-  const picked = hrefs.filter((h) => h !== self).map(toolByHref).filter((x) => x !== undefined);
+  // Dedupe by href so a repeated entry in a page's related list can never render
+  // the same tool twice in the carousel.
+  const seen = new Set<string>([self]);
+  const picked: ToolEntry[] = [];
+  for (const href of hrefs) {
+    if (seen.has(href)) continue;
+    const tool = toolByHref(href);
+    if (!tool) continue;
+    seen.add(href);
+    picked.push(tool);
+  }
   // Top up with tools from the same category so the carousel always has a full row.
   const own = toolByHref(self);
-  const fill = TOOLS.filter((x) => x.href !== self && x.category === own?.category && !picked.includes(x));
+  const fill = TOOLS.filter((x) => !seen.has(x.href) && x.category === own?.category);
   const tools = [...picked, ...fill].slice(0, Math.max(picked.length, 8));
   // One intent-matched product CTA, derived from the tool's own route path.
   const nextAction = nextActionFor(self);
