@@ -112,23 +112,19 @@ const config: ToolPageConfig = {
       },
     ],
   },
-  faqTitle: "LinkedIn text formatting questions",
+  faqTitle: "Frequently asked questions",
   faqs: [
     {
-      q: "How do I bold text on LinkedIn?",
-      a: "Type your text in this formatter, press Copy next to Bold, and paste the Unicode result into your LinkedIn post. LinkedIn's standard post composer does not have a native bold button.",
+      q: "Does the formatting survive when I paste it into LinkedIn?",
+      a: "Yes. The formatter copies real Unicode characters rather than styling, so bold, italic and bulleted text stays formatted when you paste it into LinkedIn's post composer, headline or About section. It also survives saving a draft and publishing from the LinkedIn app or desktop.",
     },
     {
-      q: "Does bold text hurt LinkedIn reach?",
-      a: "There is no confirmed evidence that Unicode bold text directly reduces LinkedIn reach. However, long styled passages can be hard to read and may reduce engagement, so use bold only for a few key words.",
+      q: "Does LinkedIn support bold and italic text?",
+      a: "LinkedIn's composer has no native bold or italic button. This tool creates the effect by replacing letters with lookalike Unicode characters, which LinkedIn treats as ordinary text, so bold and italic display on both desktop and mobile.",
     },
     {
       q: "What is the LinkedIn post character limit?",
       a: "LinkedIn posts can be up to 3,000 characters. The live counter above tracks your draft against that limit and turns red above 3,000; check LinkedIn's composer before publishing because Unicode characters may be counted differently.",
-    },
-    {
-      q: "Will it work in my LinkedIn headline?",
-      a: "Yes, these Unicode styles generally work when pasted into a LinkedIn headline or About section. Keep important keywords in plain text and use styling sparingly because search matching and screen-reader pronunciation can be unreliable.",
     },
   ],
   related: [],
@@ -159,8 +155,9 @@ export default function LinkedInTextFormatterPage() {
       <div className={t.page}>
         <ToolHero config={config} />
         <p className="small" style={{ maxWidth: 720, margin: "0 auto 20px", textAlign: "center" }}>
-          LinkedIn has no native bold or italic control, so this formatter converts text to Unicode styles for copy/paste.
-          Use it for posts, headlines, About text, and bullets.
+          This free LinkedIn text formatter turns plain text into bold, italic, bulleted and other Unicode styles you can
+          copy and paste into LinkedIn posts, headlines and About sections. It runs in your browser with no sign-up, and
+          nothing you type is uploaded.
         </p>
         <ToolCard title={config.toolTitle} note={config.toolNote}><FormatterTool /></ToolCard>
         <p className="small" style={{ marginTop: 14, textAlign: "center" }}>
