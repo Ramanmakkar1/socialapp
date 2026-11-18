@@ -175,6 +175,64 @@ export default function LinkedInTextFormatterPage() {
         <p className="small" style={{ marginTop: 14, textAlign: "center" }}>
           Screen readers may read Unicode styled letters poorly, so use them only for a few key words.
         </p>
+        <section className={t.section} aria-labelledby="related-tools-title" style={{ paddingTop: 24 }}>
+          <div className={t.relHead}>
+            <div>
+              <p className="eyebrow">Related tools</p>
+              <h2 id="related-tools-title" style={{ fontSize: "1.4rem" }}>Take your post further</h2>
+            </div>
+          </div>
+          <ul className={t.grid}>
+            <li>
+              <Link href="/tools/linkedin-post-generator" className={`${t.card} ${t.acc_create}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_create}`}>
+                    <ToolIcon name="sparkles" />
+                  </span>
+                  <b>LinkedIn post generator</b>
+                </span>
+                <p>Write a full LinkedIn post with a scroll-stopping hook and call to action, then format it here.</p>
+                <span className={t.go}>Generate a post <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/tools/instagram-image-resizer" className={`${t.card} ${t.acc_media}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_media}`}>
+                    <ToolIcon name="image" />
+                  </span>
+                  <b>Instagram image resizer</b>
+                </span>
+                <p>Resize a photo to 1080×1080, 1080×1350 or 1080×1920 and download it for your post.</p>
+                <span className={t.go}>Resize an image <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/tools/youtube-thumbnail-size-checker" className={`${t.card} ${t.acc_media}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_media}`}>
+                    <ToolIcon name="smartphone" />
+                  </span>
+                  <b>YouTube thumbnail checker</b>
+                </span>
+                <p>Test a thumbnail against YouTube&apos;s 1280×720, 16:9 and 2 MB rules before you upload.</p>
+                <span className={t.go}>Check a thumbnail <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/signup" className={`${t.card} ${t.acc_plan}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_plan}`}>
+                    <ToolIcon name="sparkles" />
+                  </span>
+                  <b>Try Postflow free</b>
+                </span>
+                <p>Schedule this post on a calendar and publish it through LinkedIn&apos;s official API with Poskoo.</p>
+                <span className={t.go}>Create a free account <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+          </ul>
+        </section>
         <HowItWorks title={config.stepsTitle} steps={config.steps} />
         <ToolFeatures title={config.featuresTitle} features={config.features} />
         <ToolGuide guide={config.guide} />
