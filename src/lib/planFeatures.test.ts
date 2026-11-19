@@ -66,7 +66,7 @@ test("with gating on: Free is refused with an upgrade hint, Pro and Agency are a
 });
 
 test("feature map matches the plan cards (Free has none of them, Pro and Agency list all)", () => {
-  const copy: Record<PlanFeature, RegExp> = { ai: /^AI captions/, email_capture: /^Email capture in DMs$/, click_lead_analytics: /^Click \+ lead analytics$/ };
+  const copy: Record<PlanFeature, RegExp> = { ai: /^AI captions/, email_capture: /^Email capture in DMs$/, click_lead_analytics: /^Click \+ lead analytics$/, x_posting: /^Post to X \(Twitter\)$/ };
   for (const plan of PLANS) {
     for (const [feature, re] of Object.entries(copy) as [PlanFeature, RegExp][]) {
       const onCard = plan.items.some((i) => re.test(i.text));

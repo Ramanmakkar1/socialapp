@@ -6,6 +6,7 @@ import { NETWORKS } from "@/lib/networks/registry";
 import { holdTargetMedia } from "@/lib/mediaLifecycle";
 import { expiresWithin, loadActiveAccount, markAccountExpired, refreshUnderLock } from "@/lib/networks/store";
 import { markReminded } from "@/lib/networks/reminderSend";
+import { requirePlanFeature } from "@/lib/planFeatures";
 
 export type ClaimedNetworkRow = {
   id: string;
@@ -29,6 +30,7 @@ export type NetworkPublishDeps = {
   markExpired?: (accountId: string) => Promise<void>;
   holdMedia?: (targetId: string) => Promise<void>;
   markReminded?: (targetId: string, accountId: string) => Promise<void>;
+  planGate?: typeof requirePlanFeature;
 };
 
 function reconnect(label: string): string {
@@ -79,6 +81,14 @@ export async function publishNetworkTargets(limit: number, deps: NetworkPublishD
       for (const row of rows) {
         let token = "";
         try {
+          if (platform === "x") {
+            const gate = await (deps.planGate ?? requirePlanFeature)(row.user_id, "x_posting");
+            if (!gate.ok) {
+              await deps.markFailed(row.id, row.post_id, gate.error, token);
+              result.failed += 1;
+              continue;
+            }
+          }
           let account = await loadAccount(row.user_id, platform);
           if (!account) {
             await deps.markFailed(row.id, row.post_id, `No ${label} account connected. Connect ${label} in Settings, then retry.`, token);

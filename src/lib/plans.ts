@@ -47,6 +47,7 @@ export const PLANS: Plan[] = [
       { text: "Link in bio page (20 links)" },
       { text: "Email capture in DMs" },
       { text: "Click + lead analytics" },
+      { text: "Post to X (Twitter)" },
       { text: "Priority support" },
     ],
     cta: "Upgrade to Agency",

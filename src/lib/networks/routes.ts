@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { query } from "@/lib/db";
 import { accountLimitError } from "@/lib/planLimits";
+import { requirePlanFeature } from "@/lib/planFeatures";
 import {
   NetworkAuthError,
   newPkceVerifier,
@@ -44,8 +45,9 @@ export async function startOAuth(
   authorizeUrl: (flow: OAuthFlow) => string | Promise<string>,
   opts: { pkce?: boolean; extra?: Record<string, string> } = {},
 ): Promise<NextResponse> {
-  await requireUser();
+  const user = await requireUser();
   if (!NETWORKS[network].configured()) return NextResponse.redirect(settingsResultUrl(network, "not_configured"));
+  if (network === "x" && !(await requirePlanFeature(user.id, "x_posting")).ok) return NextResponse.redirect(settingsResultUrl(network, "plan_required"));
   const flow: OAuthFlow = { state: randomState(), ...(opts.pkce ? { verifier: newPkceVerifier() } : {}), ...(opts.extra ? { extra: opts.extra } : {}) };
   const target = await authorizeUrl(flow);
   const store = await cookies();

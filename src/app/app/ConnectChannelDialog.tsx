@@ -136,6 +136,8 @@ export function connectErrorText(code: string, net: string): string {
       return `This ${name} account is already connected to another Poskoo account.`;
     case "not_configured":
       return `Connecting ${name} isn't switched on on this server yet.`;
+    case "plan_required":
+      return `Posting to ${name} is part of the Agency plan. Upgrade in Settings > Plan & billing to connect ${name}.`;
     case "bad_instance":
       return "That doesn't look like a Mastodon server address. Type just the server, e.g. mastodon.social.";
     case "gbp_pending":
@@ -606,7 +608,7 @@ export default function ConnectChannelDialog({
             <div className={styles.connectStep}>
               <p role="alert" className={styles.connectError}>{connectErrorText(view.code, view.net)}</p>
               <div className={styles.connectBtnCol}>
-                {view.code !== "limit" && view.code !== "taken" && view.code !== "not_configured" && (
+                {view.code !== "limit" && view.code !== "taken" && view.code !== "not_configured" && view.code !== "plan_required" && (
                   retryHref(view.net) ? (
                     <a href={retryHref(view.net)!} className={styles.connectPrimary}><RotateCcw width={16} height={16} aria-hidden="true" /> Retry</a>
                   ) : (
@@ -615,6 +617,7 @@ export default function ConnectChannelDialog({
                     </button>
                   )
                 )}
+                {view.code === "plan_required" && <Link href="/app/settings/billing" className={styles.connectPrimary} onClick={() => ref.current?.close()}>See plans</Link>}
                 {view.code === "limit" && <Link href="/app/settings#accounts-heading" className={styles.connectPrimary} onClick={() => ref.current?.close()}>Manage channels</Link>}
                 <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "grid" })}>All channels</button>
               </div>

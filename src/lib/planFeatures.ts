@@ -1,5 +1,6 @@
 // Server-side gating of the paid plan features sold on the pricing cards (src/lib/plans.ts):
-// AI ideas, email capture in DMs and click + lead analytics are Pro / Agency features.
+// AI ideas, email capture in DMs and click + lead analytics are Pro / Agency features; posting to X
+// is Agency only (X bills Poskoo per post).
 //
 // ROLLOUT (read before changing): gating is only ENFORCED while paid plans are on sale, i.e. when
 // featureReadiness("billing") is ready (live Stripe key, billing webhook secret and
@@ -11,19 +12,21 @@
 import { featureReadiness, type Env } from "@/lib/featureReadiness";
 import { planForUser, upgradeHint, type PlanName } from "@/lib/planLimits";
 
-export type PlanFeature = "ai" | "email_capture" | "click_lead_analytics";
+export type PlanFeature = "ai" | "email_capture" | "click_lead_analytics" | "x_posting";
 
 /** Plans that include each feature (mirrors the plan card items; planFeatures.test.ts checks the copy). */
 export const PLAN_FEATURES: Record<PlanFeature, readonly PlanName[]> = {
   ai: ["Pro", "Agency"],
   email_capture: ["Pro", "Agency"],
   click_lead_analytics: ["Pro", "Agency"],
+  x_posting: ["Agency"],
 };
 
 const FEATURE_LABEL: Record<PlanFeature, string> = {
   ai: "AI captions, campaign drafts and DM message ideas are",
   email_capture: "Email capture in DMs is",
   click_lead_analytics: "Click and lead analytics are",
+  x_posting: "Posting to X (Twitter) is",
 };
 
 /** Whether plan features are enforced right now (see ROLLOUT above). */
@@ -39,7 +42,11 @@ export function planHasFeature(plan: PlanName, feature: PlanFeature): boolean {
 }
 
 export function planFeatureMessage(feature: PlanFeature, plan: PlanName): string {
-  return `${FEATURE_LABEL[feature]} part of the Pro and Agency plans.${upgradeHint(plan)}`;
+  const plans = PLAN_FEATURES[feature];
+  const where = plans.length === 1 ? `the ${plans[0]} plan` : `the ${plans.join(" and ")} plans`;
+  // Free users get pointed at the cheapest plan that actually has the feature (Agency for X).
+  const hint = plan === "Free" && !plans.includes("Pro") ? upgradeHint("Pro") : upgradeHint(plan);
+  return `${FEATURE_LABEL[feature]} part of ${where}.${hint}`;
 }
 
 export type PlanFeatureResult = { ok: true } | { ok: false; plan: PlanName; error: string };
