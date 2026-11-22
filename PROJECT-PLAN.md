@@ -1,7 +1,7 @@
 # Postflow (working name) — build plan
 
 One tool: **social media scheduler (like Buffer) + Instagram comment→DM automation (like ManyChat) + AI replies + lead capture.**
-Live: https://poskoo.com (Raman 2026-11-05; noindex until Raman says go). Old staging socialapp.splitforms.com points to the same app.
+Live: https://poskoo.com (Raman 2026-11-05; launched to search 2026-11-12 — public pages are index, follow). Old staging socialapp.splitforms.com points to the same app.
 
 ## Stack
 Next.js 16 (App Router, TypeScript, Tailwind v4) · Postgres on the shared Supabase (own schema `socialapp`) · pg-boss job queue (inside Postgres) · Node workers · official platform APIs only.
@@ -18,5 +18,5 @@ Next.js 16 (App Router, TypeScript, Tailwind v4) · Postgres on the shared Supab
 - Official APIs only. Never scraping, never asking users for passwords.
 - Secrets only in env vars (never commit `.env`). Tokens encrypted at rest.
 - Small, focused changes; keep the design system in `src/app/globals.css` (tokens) and the look of the landing page.
-- No payment code until Phase 4 — EXCEPTION approved by Raman 2026-11-11: creator Products/Orders via Stripe Connect (Managed Risk, direct charges, 3% platform fee), lead magnets and refer-and-earn are built. Subscription billing for Pro/Agency is built (2026-11-11: Stripe Checkout + Customer Portal on the platform account, /app/settings/billing, migration 043). Keep the site noindex until launch.
+- No payment code until Phase 4 — EXCEPTION approved by Raman 2026-11-11: creator Products/Orders via Stripe Connect (Managed Risk, direct charges, 3% platform fee), lead magnets and refer-and-earn are built. Subscription billing for Pro/Agency is built (2026-11-11: Stripe Checkout + Customer Portal on the platform account, /app/settings/billing, migration 043). Search launch done 2026-11-12: never put public pages back to noindex.
 - Every new page: mobile-friendly, dark-mode friendly, accessible (labels, contrast).

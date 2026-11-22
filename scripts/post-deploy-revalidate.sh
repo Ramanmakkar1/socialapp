@@ -13,3 +13,14 @@ curl -sf -X POST -H "x-cron-secret: $CRON_SECRET" "$BASE/api/jobs/revalidate" >/
 # so the page is served from the fresh render.
 curl -sf -o /dev/null "$BASE/" && sleep 2 && curl -sf -o /dev/null "$BASE/"
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Revalidated public pages"
+# Indexing fails closed (NEXT_PUBLIC_SITE_INDEXABLE + NEXT_PUBLIC_SITE_URL). On 2026-11-14 a build lost it and
+# Google dropped 42 pages as noindex. Fail the deploy log loudly if a public page is not "index, follow".
+PUBLIC_URL=${POSKOO_PUBLIC_URL:-https://poskoo.com}
+for page in / /social-media-scheduler /tools/instagram-comment-picker; do
+  robots=$(curl -sf "$PUBLIC_URL$page" | grep -oiE '<meta name="robots" content="[^"]*"' | head -1)
+  case "$robots" in
+    *"index, follow"*) ;;
+    *) echo "NOINDEX REGRESSION on $PUBLIC_URL$page: '${robots:-no robots meta}' - check NEXT_PUBLIC_SITE_INDEXABLE/NEXT_PUBLIC_SITE_URL"; exit 1 ;;
+  esac
+done
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) Public pages are index, follow"
