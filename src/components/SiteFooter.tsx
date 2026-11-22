@@ -99,6 +99,7 @@ export function SiteFooter() {
           { href: "/developers", label: "API and MCP" },
           { href: "/guides", label: "Guides" },
           { href: "/help", label: "Help center" },
+          { href: "/about", label: "About" },
           { href: "/contact", label: "Contact" },
         ]}
       />
