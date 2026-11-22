@@ -14,7 +14,8 @@ import s from "@/components/site.module.css";
 
 const PATH = "/pricing";
 // Plan buttons follow the RUNTIME env (src/lib/featureReadiness.ts; the Docker build has no env):
-// the page stays static and regenerates in the background at most every 10 minutes.
+// the page is statically rendered and regenerates in the background at most every 10 minutes.
+export const dynamic = "force-static";
 export const revalidate = 600;
 const title = `${BRAND.name} Pricing: Free Instagram Scheduler & Auto-DM Plans`;
 const description = `Compare ${BRAND.name} Free, Pro and Agency plans. Start free with Instagram scheduling and 500 auto-DMs a month, then upgrade any time. No credit card needed.`;
