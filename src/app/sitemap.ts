@@ -24,7 +24,7 @@ export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 // The staging homepage URL that must never appear in the sitemap while the
 // site remains noindex. Named explicitly so the exclusion is visible at a
 // glance and survives any future change to the generic origin checks.
-const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com/";
+const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com";
 
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
 // intended; the file stays raw XML with no XSLT styling.
@@ -67,5 +67,5 @@ export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
     // Hard exclusion: the staging homepage is never listed while the site is
     // noindex, even if a future change to BRAND.url or the path list would
     // otherwise allow it.
-    .filter((entry) => entry.url !== STAGING_HOMEPAGE_URL);
+    .filter((entry) => entry.url.replace(/\/$/, "") !== STAGING_HOMEPAGE_URL);
 }

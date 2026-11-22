@@ -239,15 +239,20 @@ export async function GET(request?: Request) {
   // The host is matched exactly (hostname only, optional port stripped) by
   // isApprovedProductionOrigin in sitemap.ts: a substring match would noindex
   // unrelated hosts such as evil-socialapp.splitforms.com.
-  const requestHost = request
-    ? (
-        request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
-        request.headers.get("host") ||
-        new URL(request.url).host
-      )
-        .toLowerCase()
-        .replace(/:\d+$/, "")
-    : null;
+  const LEGACY_STAGING_HOST = "socialapp.splitforms.com";
+  const normalizeHost = (value: string | null | undefined) =>
+    (value ?? "").split(",")[0]?.trim().toLowerCase().replace(/:\d+$/, "") ?? "";
+  const forwardedHost = request ? normalizeHost(request.headers.get("x-forwarded-host")) : "";
+  const directHost = request
+    ? normalizeHost(request.headers.get("host")) || normalizeHost(new URL(request.url).host)
+    : "";
+  // The legacy staging host must stay out of the sitemap even when a proxy
+  // rewrites x-forwarded-host to the canonical domain, so check both headers
+  // separately and pass the legacy host through when either one is it.
+  const requestHost =
+    forwardedHost === LEGACY_STAGING_HOST || directHost === LEGACY_STAGING_HOST
+      ? LEGACY_STAGING_HOST
+      : forwardedHost || directHost || null;
   const entries = (await sitemap(requestHost)).map((entry) => ({
     url: entry.url,
     lastmod: formatLastMod(entry.lastModified),

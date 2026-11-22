@@ -188,3 +188,24 @@ test("sitemap.xml route uses the visitor's host, not the server's internal bind 
     BRAND.indexable = was;
   }
 });
+
+test("sitemap.xml route keeps the legacy host out when x-forwarded-host is canonical", async () => {
+  // Regression: a proxy that rewrites x-forwarded-host to poskoo.com must not
+  // hide the legacy staging host in the host header and leak its URLs.
+  const was = BRAND.indexable;
+  BRAND.indexable = true;
+  try {
+    const res = await GET(
+      new Request("http://0.0.0.0:3000/sitemap.xml", {
+        headers: { host: "socialapp.splitforms.com", "x-forwarded-host": "poskoo.com" },
+      }),
+    );
+    assert.doesNotMatch(
+      await res.text(),
+      /<url>/,
+      "the legacy host must serve an empty sitemap even when x-forwarded-host is canonical",
+    );
+  } finally {
+    BRAND.indexable = was;
+  }
+});
