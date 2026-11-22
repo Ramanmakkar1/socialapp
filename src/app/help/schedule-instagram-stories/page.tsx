@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
+import { ldJson } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -13,12 +13,6 @@ export const metadata: Metadata = withSocial({
     `Schedule Instagram Stories: pick the Story format, paste one public image or video link, choose a time and ${BRAND.name} publishes it for you.`,
   alternates: { canonical: "/help/schedule-instagram-stories" },
 });
-
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: `${BRAND.url}/` },
-  { name: "Help", url: `${BRAND.url}/help` },
-  { name: "Schedule Instagram Stories", url: `${BRAND.url}/help/schedule-instagram-stories` },
-]);
 
 const steps = [
   {
@@ -156,10 +150,6 @@ export default function ScheduleInstagramStoriesHelpPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(howToJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <script
         type="application/ld+json"
