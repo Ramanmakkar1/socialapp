@@ -167,7 +167,7 @@ export const body: GuideBody = {
             If you are stuck on a version, the{" "}
             <Link href="/tools/social-media-post-generator">social media post generator</Link> gives you a starting
             draft per network, and the{" "}
-            <Link href="/tools/instagram-caption-formatter">Instagram caption formatter</Link> keeps your line breaks
+            <Link href="/tools/instagram-line-break-generator">Instagram line break generator</Link> keeps your line breaks
             when you paste.
           </p>
         </>

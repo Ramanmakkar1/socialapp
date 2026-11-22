@@ -1176,7 +1176,7 @@ export const GUIDES: GuideEntry[] = [
     tools: [
       "/tools/social-media-image-sizes",
       "/tools/social-media-post-generator",
-      "/tools/instagram-caption-formatter",
+      "/tools/instagram-line-break-generator",
       "/tools/threads-character-counter",
       "/tools/bluesky-character-counter",
       "/tools/instagram-safe-zone-checker",
