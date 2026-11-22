@@ -17,7 +17,7 @@ export const revalidate = 600;
 const PATH = "/x-scheduler";
 const title = `X Scheduler: Schedule Tweets and Posts on X | ${BRAND.name}`;
 const description = "Poskoo schedules posts to X through X's official API: connect your account, write the post, add up to 4 images or one video, and pick a time.";
-const SOON_DESCRIPTION = "Plan posts for X in Poskoo. X publishing through the official API is coming soon; Instagram, Threads and Facebook work today on the Free plan.";
+const SOON_DESCRIPTION = "Plan X posts in Poskoo. Publishing to X is coming soon and is included in the Agency plan (X bills per post); Free covers Instagram, Facebook and Threads.";
 
 // The description only says publishing works once X is live (src/lib/platform-support.ts).
 export async function generateMetadata(): Promise<Metadata> {
@@ -135,20 +135,20 @@ export default function XSchedulerPage() {
         </h1>
         {isLive ? (
         <p className="lede">
-          Yes, you can schedule tweets for free: connect your X account with X&apos;s official sign-in, write the post,
-          add up to 4 images or one video, pick a date and time, and Poskoo publishes it for you. The Free plan is $0
-          with no credit card.
+          Yes, you can schedule tweets: connect your X account with X&apos;s official sign-in, write the post,
+          add up to 4 images or one video, pick a date and time, and Poskoo publishes it for you. Publishing to X is
+          included in the Agency plan (X bills per post); the Free plan covers Instagram, Facebook and Threads.
         </p>
         ) : (
         <p className="lede">
-          X scheduling in Poskoo isn&apos;t switched on yet. When it is, you&apos;ll connect your X account with X&apos;s official sign-in, write the post, add up to 4 images or one video and pick a time, and Poskoo will publish it for you. The Free plan is $0 with no credit card.
+          X scheduling in Poskoo isn&apos;t switched on yet. When it is, you&apos;ll connect your X account with X&apos;s official sign-in, write the post, add up to 4 images or one video and pick a time, and Poskoo will publish it for you. Publishing to X is included in the Agency plan (X bills per post); the Free plan covers Instagram, Facebook and Threads.
         </p>
         )}
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling posts <span aria-hidden="true">→</span></Link>
           <Link className="btn btn-line" href="/signup">Create your free account</Link>
         </div>
-        <p className="small">Free plan included. No credit card needed.</p>
+        <p className="small">Free plan for Instagram, Facebook and Threads. No credit card needed.</p>
         <ChannelStatusNote state={availability} network="X" />
         </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends a scheduled post to X alongside posts for other social channels" /></div>
@@ -302,8 +302,8 @@ export default function XSchedulerPage() {
           <div className="cta">
             <div>
               <h2>Put your next X post <em className="s">on the calendar.</em></h2>
-              <p>Start free, connect through X&apos;s official sign-in, and schedule posts beside your Instagram content.</p>
-              <Link className="btn" href="/signup">Start scheduling posts free <span aria-hidden="true">→</span></Link>
+              <p>Start free with Instagram, Facebook and Threads, then add X on the Agency plan.</p>
+              <Link className="btn" href="/signup">Start scheduling posts <span aria-hidden="true">→</span></Link>
             </div>
             <Image
               sizes="(max-width: 960px) 100vw, 50vw"
