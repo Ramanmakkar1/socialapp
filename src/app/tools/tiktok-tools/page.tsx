@@ -192,6 +192,7 @@ export default function TikTokToolsPage() {
             <span>Keep exploring</span>
             <Link href="/tiktok-scheduler">TikTok scheduler</Link>
             <Link href="/help/schedule-tiktok-posts">How to schedule TikTok videos</Link>
+            <Link href="/guides/how-to-schedule-tiktok-videos">TikTok scheduling guide (2026)</Link>
             <Link href="/tools">All free tools</Link>
             <Link href="/signup">Free plan</Link>
             <Link href="/tools/best-time-to-post-on-tiktok">Best time to post on TikTok</Link>
