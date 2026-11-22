@@ -293,6 +293,22 @@ export default function SocialMediaSchedulerPage() {
         </div>
       </section>
 
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">By team</p>
+            <h2>Pick the scheduler for your kind of work</h2>
+          </div>
+          <nav className="relChips" aria-label="Social media schedulers by team">
+            <Link href="/social-media-scheduler-for-creators">Creators</Link>
+            <Link href="/social-media-scheduler-for-coaches">Coaches</Link>
+            <Link href="/social-media-scheduler-for-real-estate">Real estate</Link>
+            <Link href="/social-media-scheduler-for-ecommerce">E-commerce</Link>
+            <Link href="/social-media-scheduler-for-restaurants">Restaurants</Link>
+          </nav>
+        </div>
+      </section>
+
       <section id="demo" style={{ paddingTop: 20 }}>
         <div className="wrap">
           <LandingDemo hideLink={PATH} />
