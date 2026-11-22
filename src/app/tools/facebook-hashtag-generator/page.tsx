@@ -189,7 +189,14 @@ const config: ToolPageConfig = {
     },
     {
       q: "How do I find the best time to post on Facebook?",
-      a: "Use the <Link href=\"/tools/best-time-to-post-on-facebook\">best time to post on Facebook</Link> finder to get three starting slots for your audience and time zone, then test them for two weeks and keep what works.",
+      a: "Use the best time to post on Facebook finder to get three starting slots for your audience and time zone, then test them for two weeks and keep what works.",
+      aNode: (
+        <>
+          Use the{" "}
+          <Link href="/tools/best-time-to-post-on-facebook">best time to post on Facebook</Link> finder to get three
+          starting slots for your audience and time zone, then test them for two weeks and keep what works.
+        </>
+      ),
     },
   ],
   related: [
@@ -212,7 +219,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your hashtags are ready.",
     mark: "Schedule the post.",
-    text: "Connect Facebook with its official login, plan your posts on one calendar and publish them automatically with Poskoo's <Link href=\"/facebook-scheduler\">Facebook scheduler</Link>.",
+    text: "Connect Facebook with its official login, plan your posts on one calendar and publish them automatically with Poskoo's Facebook scheduler.",
   },
 };
 
