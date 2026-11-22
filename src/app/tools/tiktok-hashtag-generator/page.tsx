@@ -192,6 +192,7 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
+    "/tools/tiktok-caption-generator",
     "/tools/tiktok-caption-counter",
     "/tools/best-time-to-post-on-tiktok",
     "/tools/instagram-hashtag-generator",
