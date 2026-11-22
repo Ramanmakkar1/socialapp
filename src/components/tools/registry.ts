@@ -47,7 +47,6 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/instagram-caption-generator", name: "Caption generator", summary: "Caption drafts with a hook, clean line breaks and a comment CTA for any niche.", category: "create", icon: "sparkles" },
   { href: "/tools/instagram-caption-counter", name: "Caption counter", summary: "Count characters and hashtags as you type against Instagram's caption limits.", category: "create", icon: "type" },
   { href: "/tools/x-character-counter", name: "X character counter", summary: "Count characters the way X does: links as 23, emoji as 2, against the 280 limit.", category: "create", icon: "type" },
-  { href: "/tools/instagram-caption-formatter", name: "Caption formatter", summary: "Keep blank lines and spacing in a caption, with live counts and copy.", category: "create", icon: "align" },
   { href: "/tools/instagram-line-break-generator", name: "Line break generator", summary: "Stop paragraphs collapsing into one block of text in your captions.", category: "create", icon: "pilcrow" },
   { href: "/tools/instagram-font-generator", name: "Font generator", summary: "Copy Unicode font styles for your Instagram bio and captions.", category: "create", icon: "type" },
   { href: "/tools/tiktok-font-generator", name: "TikTok font generator", summary: "Copy-and-paste Unicode fonts for your TikTok bio, name and captions, checked against the 80-character bio limit.", category: "create", icon: "type" },
@@ -101,8 +100,6 @@ export const TOOLS: ToolEntry[] = [
   { href: "/tools/pinterest-character-counter", name: "Pinterest character counter", summary: "Check Pin title (100), description (500) and alt text limits, with a feed preview.", category: "create", icon: "type" },
   { href: "/tools/pinterest-description-generator", name: "Pinterest description generator", summary: "Six Pin description drafts under 500 characters with your keyword early and a call to action.", category: "create", icon: "sparkles" },
   { href: "/tools/threads-post-generator", name: "Threads post generator", summary: "Six ready-to-post Threads captions for any topic, kept under the 500-character limit.", category: "create", icon: "sparkles" },
-  { href: "/tools/tweet-generator", name: "Tweet generator", summary: "Six ready-to-post tweets for any topic, trimmed to X's 280-character limit.", category: "create", icon: "sparkles" },
-  { href: "/tools/threads-caption-generator", name: "Threads caption generator", summary: "Six Threads post drafts with a hook and call to action that fit the 500-character limit.", category: "create", icon: "sparkles" },
   // Images & video
   { href: "/tools/instagram-post-preview", name: "Post preview", summary: "Preview a photo and caption in a feed mockup with square and portrait crops.", category: "media", icon: "eye" },
   { href: "/tools/threads-post-preview", name: "Threads post preview", summary: "Write a Threads post, count against 500 characters and preview it on mobile.", category: "media", icon: "message" },
