@@ -70,6 +70,7 @@ export default function AboutPage() {
               comment with a direct message that can capture a lead.
             </p>
 
+            {/* OWNER DECISION: add the founder/team names, Town Media Labs location and founding year here (and to the Organization JSON-LD: founder, address, foundingDate) once Raman confirms them. Do not invent them. */}
             <h2>Who runs Poskoo</h2>
             <p>
               Poskoo is built and run by {BRAND.company}. The same team designs the product, supports customers and
