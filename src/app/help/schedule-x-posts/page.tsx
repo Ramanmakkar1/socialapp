@@ -94,10 +94,26 @@ const steps = [
   },
 ];
 
+function plainText(node: unknown): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(plainText).join("");
+  if (node && typeof node === "object" && "props" in node) {
+    return plainText((node as { props: { children: unknown } }).props.children);
+  }
+  return "";
+}
+
 const faqs = [
   {
     q: "Can you schedule X posts for free?",
-    a: "Yes. Poskoo includes a free plan, and you can create a free account without a credit card. Compare the available plans on the pricing page.",
+    a: (
+      <>
+        No. Scheduling posts to X is part of the <strong>Agency plan</strong>, because X charges per post.
+        Scheduling for Instagram, Facebook and Threads is included in the <strong>Free plan</strong>. Compare all{" "}
+        <Link className={s.vlink} href="/pricing">plans and pricing</Link>.
+      </>
+    ),
   },
   {
     q: "What is the character limit for an X post?",
@@ -119,7 +135,7 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({
     "@type": "Question",
     name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
+    acceptedAnswer: { "@type": "Answer", text: plainText(f.a) },
   })),
 };
 
