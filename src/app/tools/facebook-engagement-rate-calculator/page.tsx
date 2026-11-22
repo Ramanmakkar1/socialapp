@@ -12,7 +12,7 @@ const config: ToolPageConfig = {
     "Free Facebook engagement rate calculator: add reactions, comments and shares, then divide by reach or followers to get one post's engagement rate fast.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Facebook engagement rate calculator:", mark: "free", after: "by reach or followers" },
-  lede: "Facebook engagement rate = (reactions + comments + shares) / reach x 100. Enter one post's numbers, choose reach or followers as the base and get the rate as a percentage.",
+  lede: "Facebook engagement rate = (reactions + comments + shares) ÷ reach or followers × 100. This free tool needs no sign-up: enter one post's numbers and it returns the rate as a percentage.",
   art: "analytics",
   artLabel: "A marketer reads a rising engagement chart next to a Facebook-style post card",
   heroPoints: ["By reach or followers", "Reactions, comments and shares", "No login"],
@@ -218,7 +218,15 @@ export const metadata = toolMetadata(config);
 
 export default function FacebookEngagementRateCalculatorPage() {
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate
+      config={config}
+      afterTool={
+        <p className={t.prose}>
+          Also post on Instagram? Run the same numbers through the{" "}
+          <Link href="/tools/instagram-engagement-rate-calculator">Instagram engagement rate calculator</Link>.
+        </p>
+      }
+    >
       <EngagementCalculator
         labels={{ likes: "Reactions", comments: "Comments", shares: "Shares" }}
         reachLabel="Reach"
