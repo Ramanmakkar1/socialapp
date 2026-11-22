@@ -19,10 +19,8 @@ const isNoindex = (path: string) => isSiteIndexable() && !isPathIndexable(path);
 // a staging host, so models never pick up a staging URL.
 const SITE_URL = APPROVED_PRODUCTION_URL;
 
-// List every public page (except the legal pages) so AI answers can cite the right one.
-const LINK_PATHS = new Set(
-  PUBLIC_PATHS.filter((p) => !["/privacy", "/terms", "/data-deletion"].includes(p)),
-);
+// List every public page, including the legal pages, so AI answers can cite the right one.
+const LINK_PATHS = new Set(PUBLIC_PATHS);
 
 /** Page groups, matched in order. New pages (help, tools, guides) fall into a group by their path. */
 const GROUPS: { heading: string; match: (path: string) => boolean }[] = [
