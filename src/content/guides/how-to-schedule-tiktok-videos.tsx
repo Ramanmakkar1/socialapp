@@ -88,7 +88,8 @@ export const body: GuideBody = {
         <>
           <p>
             The <Link href="/tiktok-scheduler">Poskoo TikTok scheduler</Link> connects through TikTok&apos;s official
-            login and publishes with the Content Posting API. Here is the full flow.
+            login and publishes with the Content Posting API. Here is the full flow, or follow the short{" "}
+            <Link href="/help/schedule-tiktok-posts">TikTok scheduling help article</Link> inside the app.
           </p>
 
           <h3>1. Connect TikTok through the official login</h3>
