@@ -352,6 +352,16 @@ export default function InstagramLinkInBioSetupHelpPage() {
                 </Link>
               </li>
               <li>
+                <Link className={s.vlink} href="/guides/link-in-bio-best-practices">
+                  Link-in-bio best practices for Instagram
+                </Link>
+              </li>
+              <li>
+                <Link className={s.vlink} href="/linktree-alternative">
+                  Linktree alternative with tracked links
+                </Link>
+              </li>
+              <li>
                 <Link className={s.vlink} href="/tools/instagram-utm-builder">
                   UTM builder for bio links
                 </Link>
