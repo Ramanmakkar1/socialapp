@@ -36,11 +36,6 @@ const groups: { id: string; title: string; intro: string; tools: Tool[] }[] = [
         text: "Count characters and hashtags against the 2,200-character limit as you type.",
       },
       {
-        href: "/tools/instagram-caption-formatter",
-        name: "Instagram caption formatter",
-        text: "Keep blank lines and spacing, check counts, then copy clean caption text.",
-      },
-      {
         href: "/tools/instagram-hook-generator",
         name: "Instagram hook generator",
         text: "Get ready-to-copy Reel hooks in eight styles, from curiosity to result.",
