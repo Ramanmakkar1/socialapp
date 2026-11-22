@@ -6,6 +6,7 @@ import { test } from "node:test";
 // hubs. Pricing and Help must only pass their crumb, so neither page grows a
 // second hand-written trail or a duplicate BreadcrumbList.
 const shellSource = readFileSync("src/components/PublicShell.tsx", "utf8");
+const breadcrumbsSource = readFileSync("src/components/Breadcrumbs.tsx", "utf8");
 const pricingSource = readFileSync("src/app/pricing/page.tsx", "utf8");
 const helpSource = readFileSync("src/app/help/page.tsx", "utf8");
 
@@ -25,7 +26,8 @@ for (const [name, source, crumb] of [
   });
 }
 
-test("PublicShell is the single breadcrumb renderer", () => {
-  assert.ok(shellSource.includes('aria-label="Breadcrumb"'), "PublicShell must render the visible trail");
-  assert.ok(shellSource.includes("breadcrumbJsonLd("), "PublicShell must render the BreadcrumbList schema");
+test("PublicShell renders the shared Breadcrumbs component", () => {
+  assert.ok(shellSource.includes("<Breadcrumbs"), "PublicShell must use the shared Breadcrumbs component");
+  assert.ok(breadcrumbsSource.includes('aria-label="Breadcrumb"'), "Breadcrumbs must render the visible trail");
+  assert.ok(breadcrumbsSource.includes("breadcrumbJsonLd("), "Breadcrumbs must render the BreadcrumbList schema");
 });

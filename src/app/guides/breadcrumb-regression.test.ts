@@ -10,6 +10,7 @@ import { GUIDES, guidePath } from "@/content/guides/registry";
 // These guards make sure that link stays in place and every item stays an
 // absolute URL on BRAND.canonicalUrl (regression for "Missing breadcrumb schema").
 const shellSource = readFileSync("src/components/PublicShell.tsx", "utf8");
+const breadcrumbsSource = readFileSync("src/components/Breadcrumbs.tsx", "utf8");
 const guideSource = readFileSync("src/app/guides/[slug]/page.tsx", "utf8");
 const directorySource = readFileSync("src/app/guides/page.tsx", "utf8");
 
@@ -34,13 +35,14 @@ test("guides directory passes Home > Guides to PublicShell", () => {
 });
 
 test("PublicShell renders BreadcrumbList JSON-LD from absolute BRAND.canonicalUrl crumbs", () => {
-  assert.ok(shellSource.includes("breadcrumbJsonLd("), "PublicShell must render BreadcrumbList JSON-LD");
+  assert.ok(shellSource.includes("<Breadcrumbs"), "PublicShell must use the shared Breadcrumbs component");
   assert.ok(
     shellSource.includes('{ name: "Home", path: "/" }'),
     "PublicShell must prepend the Home breadcrumb",
   );
+  assert.ok(breadcrumbsSource.includes("breadcrumbJsonLd("), "Breadcrumbs must render BreadcrumbList JSON-LD");
   assert.ok(
-    shellSource.includes("BRAND.canonicalUrl + (c.path === \"/\" ? \"/\" : c.path)"),
+    breadcrumbsSource.includes('BRAND.canonicalUrl + (c.href === "/" ? "/" : c.href)'),
     "BreadcrumbList item URLs must be absolute on BRAND.canonicalUrl",
   );
 });
