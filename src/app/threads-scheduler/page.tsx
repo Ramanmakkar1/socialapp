@@ -183,7 +183,6 @@ export default function ThreadsSchedulerPage() {
             {" "}Want a better profile? Use the free <Link className={s.vlink} href="/tools/threads-bio-generator">Threads bio generator</Link>.
             {" "}Need a first draft? Try the <Link className={s.vlink} href="/tools/threads-post-generator">free Threads post generator</Link>.
             {" "}Need a topic tag? Use the free <Link className={s.vlink} href="/tools/threads-hashtag-generator">Threads hashtag generator</Link>.
-            {" "}Need a first draft? Use the free <Link className={s.vlink} href="/tools/threads-caption-generator">Threads caption generator</Link>.
             {" "}Have a long draft? Split it into numbered posts with the <Link className={s.vlink} href="/tools/threads-thread-maker">Threads thread maker</Link>.
             {" "}Or <Link className={s.vlink} href="/tools/threads-tools">browse all free Threads tools</Link> in one place.
             {" "}See which posts earn replies with the free <Link className={s.vlink} href="/tools/threads-engagement-rate-calculator">Threads engagement rate calculator</Link>.
