@@ -152,7 +152,9 @@ export const body: GuideBody = {
           <p>
             After a post is in the queue you can still edit, reschedule or delete it. If publishing fails, the post
             shows a clear failure status instead of disappearing, so you can fix the media or caption and try again.
-            That feedback loop is the main reason to use a scheduler rather than a reminder on your phone.
+            That feedback loop is the main reason to use a scheduler rather than a reminder on your phone. For
+            screenshots-free click-by-click steps and fixes for failed posts, see the{" "}
+            <Link href="/help/schedule-instagram-posts">Instagram post scheduling help article</Link>.
           </p>
           <InlineCta
             title="Schedule your first Instagram post free"
