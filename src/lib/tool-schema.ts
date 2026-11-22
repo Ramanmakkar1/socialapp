@@ -49,7 +49,8 @@ export function breadcrumbJsonLd(crumbs: Crumb[]) {
       "@type": "ListItem",
       position: i + 1,
       name: c.name,
-      item: c.url,
+      // A crumb with no href (e.g. the current page) has no item URL.
+      ...(c.url ? { item: c.url } : {}),
     })),
   };
 }

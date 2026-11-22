@@ -35,7 +35,7 @@ export default function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
             breadcrumbJsonLd(
               items.map((c) => ({
                 name: c.name,
-                url: BRAND.canonicalUrl + (c.href === "/" ? "/" : c.href),
+                url: c.href ? BRAND.canonicalUrl + (c.href === "/" ? "/" : c.href) : "",
               }))
             )
           ),
