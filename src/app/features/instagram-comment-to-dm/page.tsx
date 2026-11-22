@@ -467,10 +467,6 @@ export default function InstagramCommentToDmFeaturePage() {
             <Link className={s.vlink} href="/tools/instagram-comment-keyword-tester">
               free Instagram comment keyword tester
             </Link>
-            , or read the{" "}
-            <Link className={s.vlink} href="/instagram-comment-to-dm">
-              full Instagram comment-to-DM guide
-            </Link>
             .
           </p>
         </div>

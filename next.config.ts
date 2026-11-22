@@ -81,6 +81,8 @@ const nextConfig: NextConfig = {
       },
       // Google crawled /Home and got a 404. Send every capitalisation of the
       // old home path to the real home page with a permanent 301.
+      // Duplicate intent: the old /instagram-comment-to-dm page is merged into the features page.
+      { source: "/instagram-comment-to-dm", destination: "/features/instagram-comment-to-dm", permanent: true },
       { source: "/Home", destination: "/", permanent: true },
       { source: "/home", destination: "/", permanent: true },
       { source: "/:path([Hh][Oo][Mm][Ee])", destination: "/", permanent: true },

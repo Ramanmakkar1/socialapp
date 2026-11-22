@@ -424,7 +424,7 @@ export default function InstagramToolsPage() {
               </Link>
             </li>
             <li>
-              <Link className={t.card} href="/instagram-comment-to-dm">
+              <Link className={t.card} href="/features/instagram-comment-to-dm">
                 <span className={t.cardTop}>
                   <b>Turn comments into leads</b>
                 </span>

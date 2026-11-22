@@ -360,7 +360,7 @@ export default function LaterAlternativeComparison() {
             />
           </div>
           <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
-            <Link className={s.vlink} href="/instagram-comment-to-dm">
+            <Link className={s.vlink} href="/features/instagram-comment-to-dm">
               How Instagram comment-to-DM works
             </Link>{" "}
             ·{" "}

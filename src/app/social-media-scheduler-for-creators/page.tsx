@@ -70,7 +70,7 @@ const content: AudiencePageContent = {
     { q: "Can I make people follow me before they get the link?", a: "Yes. A rule can ask the person to follow your account first, and Poskoo checks the follow before it sends the link." },
   ],
   related: [
-    { href: "/instagram-comment-to-dm", label: "Instagram comment-to-DM" },
+    { href: "/features/instagram-comment-to-dm", label: "Instagram comment-to-DM" },
     { href: "/instagram-link-in-bio", label: "Instagram link in bio" },
     { href: "/youtube-scheduler", label: "YouTube scheduler" },
     { href: "/tools/instagram-hook-generator", label: "Instagram hook generator" },
