@@ -160,7 +160,7 @@ const config: ToolPageConfig = {
       a: "LinkedIn posts can be up to 3,000 characters. The live counter above tracks your draft against that limit and turns red above 3,000; check LinkedIn's composer before publishing because Unicode characters may be counted differently.",
     },
   ],
-  related: [],
+  related: ["/tools/linkedin-character-counter", "/tools/linkedin-headline-generator", "/tools/linkedin-summary-generator", "/tools/linkedin-post-generator"],
   schema: {
     features: [
       "Bold, italic, bold italic, sans bold and monospace text",
