@@ -64,7 +64,7 @@ const appJsonLd = {
   "@id": `${BRAND.canonicalUrl}/hootsuite-alternative#software`,
   featureList: [
     "Post scheduling with a calendar view",
-    "Publishing to Instagram, Facebook and Threads",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
     "Comment-to-DM automation",
     "Email capture in DMs",
     "AI DM message ideas",
