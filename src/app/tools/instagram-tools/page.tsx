@@ -461,6 +461,7 @@ export default function InstagramToolsPage() {
             <Link href="/tools/threads-tools">Threads tools</Link>
             <Link href="/tools/facebook-tools">Facebook tools</Link>
             <Link href="/tools/tiktok-tools">TikTok tools</Link>
+            <Link href="/guides/best-instagram-niches-2026">Best Instagram niches for 2026</Link>
             <Link href="/tools">All free social media tools</Link>
           </nav>
         </section>
