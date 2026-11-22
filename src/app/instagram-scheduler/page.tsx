@@ -274,6 +274,7 @@ export default async function InstagramScheduler() {
             <Link href="/buffer-alternative">Poskoo vs Buffer</Link>
             <Link href="/later-alternative">Poskoo vs Later</Link>
             <Link href="/tools">Free Instagram tools</Link>
+            <p className="small" style={{ marginTop: 12 }}>Step-by-step walkthrough: <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts</Link>.</p>
           </nav>
         </div>
       </section>
