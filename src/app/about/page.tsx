@@ -18,7 +18,7 @@ const aboutJsonLd = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
   name: `About ${BRAND.name}`,
-  url: `${BRAND.url}/about`,
+  url: `${BRAND.canonicalUrl}/about`,
   mainEntity: {
     "@type": "Organization",
     name: BRAND.company,
@@ -26,7 +26,7 @@ const aboutJsonLd = {
       "@type": "Brand",
       name: BRAND.name,
     },
-    url: BRAND.url,
+    url: BRAND.canonicalUrl,
     email: BRAND.supportEmail,
     sameAs: BRAND.social,
   },
