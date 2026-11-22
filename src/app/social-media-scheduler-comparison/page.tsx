@@ -362,6 +362,8 @@ export default function SocialMediaSchedulerComparisonPage() {
             <Link className={s.vlink} href="/later-alternative">Poskoo vs Later</Link>
             {" · "}
             <Link className={s.vlink} href="/hootsuite-alternative">Poskoo vs Hootsuite</Link>
+            {" · "}
+            <Link className={s.vlink} href="/guides/cheapest-social-media-scheduling-tools-2026">Cheapest scheduling tools in 2026</Link>
           </p>
           <CompareNote />
         </div>
