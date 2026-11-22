@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
+import { publisherRef } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -25,12 +25,6 @@ const articleJsonLd = {
   publisher: publisherRef(),
   mainEntityOfPage: `${BRAND.canonicalUrl}/help/schedule-instagram-carousel`,
 };
-
-const crumbsJsonLd = breadcrumbJsonLd([
-  { name: "Home", url: `${BRAND.url}/` },
-  { name: "Help", url: `${BRAND.url}/help` },
-  { name: "Schedule Instagram Carousels", url: `${BRAND.url}/help/schedule-instagram-carousel` },
-]);
 
 const steps = [
   {
@@ -146,10 +140,6 @@ export default function ScheduleInstagramCarouselHelpPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <script
         type="application/ld+json"
