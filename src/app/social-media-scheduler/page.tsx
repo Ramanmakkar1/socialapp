@@ -258,6 +258,7 @@ export default function SocialMediaSchedulerPage() {
               </article>
             ))}
           </div>
+          <p className="lede">See every scheduled post on a week or month view in the <Link className={s.vlink} href="/features/social-media-content-calendar">social media content calendar</Link>.</p>
         </div>
       </section>
 
