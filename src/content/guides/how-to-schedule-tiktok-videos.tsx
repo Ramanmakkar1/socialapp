@@ -101,8 +101,10 @@ export const body: GuideBody = {
 
           <h3>2. Upload the video and write the caption</h3>
           <p>
-            Open the composer and add one video, or up to 35 photos for a photo post. Write the caption, then choose the
-            visibility plus the comment, Duet and Stitch settings your account supports. You can select Instagram,
+            Open the composer and add one video, or up to 35 photos for a photo post. Write the caption (the free{" "}
+            <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> gives you six drafts with a
+            hook to start from), then choose the visibility plus the comment, Duet and Stitch settings your account
+            supports. You can select Instagram,
             Threads and Facebook Pages in the same composer and adjust the caption for each channel.
           </p>
 
