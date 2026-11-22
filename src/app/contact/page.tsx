@@ -18,11 +18,11 @@ const contactJsonLd = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
   name: `Contact ${BRAND.name} support`,
-  url: `${BRAND.url}/contact`,
+  url: `${BRAND.canonicalUrl}/contact`,
   mainEntity: {
     "@type": "Organization",
     name: BRAND.company,
-    url: BRAND.url,
+    url: BRAND.canonicalUrl,
     email: BRAND.supportEmail,
   },
 };
@@ -97,13 +97,17 @@ export default function ContactPage() {
                 <div className="pain" id="password-reset">
                   <b>Forgot your password?</b>
                   <span>
-                    Email us from the address you signed up with and we will help you get back into your account.{" "}
+                    <Link className={s.vlink} href="/forgot-password">
+                      Reset your password
+                    </Link>{" "}
+                    or{" "}
                     <a
                       className={s.vlink}
                       href={`mailto:${BRAND.supportEmail}?subject=${encodeURIComponent("Password reset")}`}
                     >
-                      Email support
-                    </a>
+                      email support
+                    </a>{" "}
+                    if you need a hand.
                   </span>
                 </div>
               </div>
