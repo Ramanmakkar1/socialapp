@@ -145,7 +145,7 @@ export default function ThreadsToolsPage() {
           <nav className="relChips" aria-label="Keep exploring">
             <span>Keep exploring</span>
             <Link href="/threads-scheduler">Threads scheduler</Link>
-            <Link href="/tools/threads-caption-generator">Threads caption generator</Link>
+            <Link href="/tools/threads-post-generator">Threads post generator</Link>
             <Link href="/help/schedule-threads-posts">How to schedule Threads posts</Link>
             <Link href="/tools">All free social media tools</Link>
             <Link href="/tools/instagram-tools">Instagram tools</Link>
