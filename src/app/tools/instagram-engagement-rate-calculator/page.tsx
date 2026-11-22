@@ -198,6 +198,7 @@ const config: ToolPageConfig = {
     "/tools/instagram-comment-to-dm-calculator",
     "/tools/instagram-caption-counter",
     "/tools/instagram-hook-generator",
+    "/tools/instagram-highlight-cover-maker",
   ],
   schema: {
     features: [

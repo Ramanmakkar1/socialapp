@@ -173,6 +173,7 @@ const config: ToolPageConfig = {
     "/tools/instagram-line-break-generator",
     "/tools/instagram-dm-link-generator",
     "/tools/instagram-caption-generator",
+    "/tools/instagram-highlight-cover-maker",
     "/tools/tiktok-bio-generator",
   ],
   schema: {
