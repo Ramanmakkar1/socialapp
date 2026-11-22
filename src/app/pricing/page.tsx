@@ -152,6 +152,13 @@ export default async function PricingPage() {
                 <p>{f.a}</p>
               </details>
             ))}
+            <p className="small">
+              See how AI caption and DM message ideas fit in:{" "}
+              <Link className={s.vlink} href="/ai-social-media-manager">
+                AI social media manager
+              </Link>{" "}
+              page.
+            </p>
           </div>
         </div>
       </section>
