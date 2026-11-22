@@ -151,16 +151,6 @@ const faqJsonLd = {
   })),
 };
 
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: BRAND.canonicalUrl },
-    { "@type": "ListItem", position: 2, name: "Features", item: `${BRAND.canonicalUrl}/features` },
-    { "@type": "ListItem", position: 3, name: "Social media content calendar", item: `${BRAND.canonicalUrl}${PATH}` },
-  ],
-};
-
 const ld = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
 
 const mockCard: CSSProperties = {
@@ -230,7 +220,6 @@ export default function SocialMediaContentCalendarFeaturePage() {
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(appJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld(breadcrumbJsonLd) }} />
 
       <header className="hero">
         <div className={s.heroText}>
