@@ -174,6 +174,17 @@ export default function HootsuiteAlternative() {
         </div>
       </section>
 
+      {/* Which should you choose */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className={s.prose}>
+            <h2>Hootsuite or {BRAND.name}: which should you choose?</h2>
+            <p>Choose Hootsuite if you need more networks and team features today.</p>
+            <p>Choose {BRAND.name} for Instagram scheduling, comment-to-DM automation and email capture in one app, starting on a $0 Free plan with no credit card.</p>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
@@ -207,6 +218,10 @@ export default function HootsuiteAlternative() {
             <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>
             {" · "}
             <Link className={s.vlink} href="/instagram-auto-dm">Instagram auto DM</Link>
+            {" · "}
+            <Link className={s.vlink} href="/social-media-scheduler-comparison">Compare social media schedulers</Link>
+            {" · "}
+            <Link className={s.vlink} href="/pricing">See pricing</Link>
             {" · "}
             <Link className={s.vlink} href="/">See the full product</Link>
           </p>
