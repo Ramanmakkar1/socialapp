@@ -146,6 +146,51 @@ export default function BlueskySchedulerPage() {
               <Link className={s.vlink} href="/tools/bluesky-character-counter">Bluesky character counter</Link> and follow
               the <Link className={s.vlink} href="/help/schedule-bluesky-posts">step-by-step guide to scheduling Bluesky posts</Link>.
             </p>
+            <h3>Bluesky scheduling limits at a glance</h3>
+            <div className={s.tableWrap}>
+              <table className={s.table}>
+                <thead>
+                  <tr className={s.tr}>
+                    <th className={s.th}>What</th>
+                    <th className={s.th}>In Poskoo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Connection</td>
+                    <td className={s.td}>handle + app password</td>
+                  </tr>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Post length</td>
+                    <td className={s.td}>300 characters</td>
+                  </tr>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Images</td>
+                    <td className={s.td}>up to 4 per post</td>
+                  </tr>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Image size</td>
+                    <td className={s.td}>over 1 MB shrunk automatically when possible</td>
+                  </tr>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Links</td>
+                    <td className={s.td}>preview card + clickable facets</td>
+                  </tr>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Video</td>
+                    <td className={s.td}>not supported yet</td>
+                  </tr>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Threads</td>
+                    <td className={s.td}>not supported yet</td>
+                  </tr>
+                  <tr className={s.tr}>
+                    <td className={s.td}>Price</td>
+                    <td className={s.td}>Free plan $0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
