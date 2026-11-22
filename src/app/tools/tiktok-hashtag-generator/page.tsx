@@ -181,7 +181,14 @@ const config: ToolPageConfig = {
     },
     {
       q: "How do I find the best time to post my TikTok?",
-      a: "Use the <Link href=\"/tools/best-time-to-post-on-tiktok\">best time to post on TikTok</Link> finder to get three starting slots for your audience and time zone, then test them for two weeks and keep what works.",
+      a: "Use the best time to post on TikTok finder to get three starting slots for your audience and time zone, then test them for two weeks and keep what works.",
+      aNode: (
+        <>
+          Use the{" "}
+          <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder to get three starting
+          slots for your audience and time zone, then test them for two weeks and keep what works.
+        </>
+      ),
     },
   ],
   related: [
@@ -204,7 +211,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your hashtags are ready.",
     mark: "Schedule the video.",
-    text: "Connect TikTok with its official login, plan your videos on one calendar and publish them automatically with Poskoo's <Link href=\"/tiktok-scheduler\">TikTok scheduler</Link>.",
+    text: "Connect TikTok with its official login, plan your videos on one calendar and publish them automatically with Poskoo's TikTok scheduler.",
   },
 };
 
