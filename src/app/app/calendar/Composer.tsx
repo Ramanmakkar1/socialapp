@@ -16,6 +16,7 @@ import AiOffNote from "@/components/AiOffNote";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";
 import { insertHashtags, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
 import { parseTags } from "@/lib/tagFilter";
+import { readSignupDraft } from "@/lib/captionHandoff";
 import type { PostTemplate } from "@/lib/templates";
 import { PLATFORMS, checkCaption, type PlatformId } from "@/lib/platforms";
 import {
@@ -132,6 +133,16 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     return saved;
   });
   const [mainCaption, setMainCaption] = useState(init.mainCaption);
+  // A caption saved by a free tool before signup fills an otherwise empty composer once.
+  const signupDraftAppliedRef = useRef(false);
+  useEffect(() => {
+    if (signupDraftAppliedRef.current) return;
+    signupDraftAppliedRef.current = true;
+    if (init.mainCaption.trim()) return;
+    const draft = readSignupDraft();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a browser-only draft
+    if (draft.ok && draft.caption.trim()) setMainCaption(draft.caption);
+  }, [init.mainCaption]);
   const [firstComment, setFirstComment] = useState(init.firstComment);
   const [postTags, setPostTags] = useState(init.tags.join(", "));
   const [templates, setTemplates] = useState<PostTemplate[]>([]);

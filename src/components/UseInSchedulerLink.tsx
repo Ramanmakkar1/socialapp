@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Copy } from "lucide-react";
+import { writeSignupDraft } from "@/lib/captionHandoff";
 
 /**
  * Copy-first handoff from a free tool to signup.
@@ -53,6 +54,7 @@ export default function UseInSchedulerLink({
         </button>
         <Link
           href={draftHref}
+          onClick={() => writeSignupDraft(text)}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--poskoo-violet)] px-5 py-3 text-sm font-semibold text-white"
         >
           Continue to sign up <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -61,9 +63,7 @@ export default function UseInSchedulerLink({
       <p role="status" aria-live="polite" className="mt-2 text-sm text-[var(--poskoo-muted)]">
         {error
           ? "Could not copy automatically. Select your caption, copy it manually, then continue to sign up."
-          : copied
-            ? "Caption copied. Paste it into your first post after signup."
-            : "Copy your caption first, then sign up and paste it into your first post."}
+          : "Caption saved — it will be waiting in your first post after signup."}
       </p>
     </div>
   );

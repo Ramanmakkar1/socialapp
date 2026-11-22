@@ -95,3 +95,57 @@ export function clearCaptionHandoff(): void {
     // Storage unavailable; nothing to clear.
   }
 }
+
+/** Draft carried from a free tool through signup into the composer. */
+export const SIGNUP_KEY = "poskoo:signup-draft";
+/** Signup drafts expire 30 minutes after they are written, to cover signup. */
+const SIGNUP_TTL_MS = 30 * 60 * 1000;
+
+/** Write a caption for the first post after signup. Never throws. */
+export function writeSignupDraft(caption: string): { ok: true } | { ok: false; error: HandoffError } {
+  const payload: CaptionHandoff = {
+    v: VERSION,
+    caption,
+    writtenAt: new Date().toISOString(),
+    from: SOURCE,
+  };
+  let serialized: string;
+  try {
+    serialized = JSON.stringify(payload);
+  } catch {
+    return { ok: false, error: "malformed" };
+  }
+  try {
+    if (new TextEncoder().encode(serialized).byteLength > MAX_BYTES) return { ok: false, error: "oversized" };
+    sessionStorage.setItem(SIGNUP_KEY, serialized);
+  } catch {
+    return { ok: false, error: "blocked" };
+  }
+  return { ok: true };
+}
+
+/** Read and remove a valid signup draft exactly once. Never throws. */
+export function readSignupDraft(): HandoffResult {
+  let raw: string | null;
+  try {
+    raw = sessionStorage.getItem(SIGNUP_KEY);
+  } catch {
+    return { ok: false, error: "blocked" };
+  }
+  if (raw === null) return { ok: false, error: "absent" };
+  let payload: unknown;
+  try {
+    payload = JSON.parse(raw);
+  } catch {
+    return { ok: false, error: "malformed" };
+  }
+  if (!isHandoff(payload)) return { ok: false, error: "malformed" };
+  const written = new Date(payload.writtenAt).getTime();
+  if (!Number.isFinite(written) || Date.now() - written > SIGNUP_TTL_MS) return { ok: false, error: "expired" };
+  try {
+    sessionStorage.removeItem(SIGNUP_KEY);
+  } catch {
+    // Best-effort removal; a stale item is still overwritten or expired on next write.
+  }
+  return { ok: true, caption: payload.caption };
+}
