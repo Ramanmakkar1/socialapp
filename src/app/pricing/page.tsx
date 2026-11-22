@@ -108,7 +108,7 @@ export default async function PricingPage() {
             Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}
             by accounts, scheduled posts and auto-DMs, or use the free{" "}
             <Link className={s.vlink} href="/tools/social-media-scheduler-plan-calculator">plan-fit calculator</Link>{" "}
-            to find the smallest plan for your numbers.
+            to find the smallest plan for your numbers.{" "}Comparing prices across tools? Read our <Link className={s.vlink} href="/guides/cheapest-social-media-scheduling-tools-2026">cheapest social media scheduling tools guide</Link>.
           </p>
         </div>
       </section>
