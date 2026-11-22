@@ -122,7 +122,8 @@ const related = [
   { href: "/guides/how-to-schedule-tiktok-videos", label: "How to schedule TikTok videos in 2026 (full guide)" },
   { href: "/tiktok-scheduler", label: "TikTok scheduler" },
   { href: "/tools/tiktok-caption-counter", label: "TikTok caption counter" },
-  { href: "/tools/instagram-safe-zone-checker", label: "9:16 safe zone checker" },
+  { href: "/tools/tiktok-caption-generator", label: "TikTok caption generator" },
+  { href: "/tools/tiktok-safe-zone-checker", label: "TikTok safe zone checker" },
   { href: "/tools/best-time-to-post-on-tiktok", label: "Best time to post on TikTok" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];
