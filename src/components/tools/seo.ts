@@ -56,7 +56,7 @@ export function webAppJsonLd({ name, description, path, category = "BusinessAppl
     "@type": "SoftwareApplication",
     name,
     description,
-    url: `${BRAND.url}${path}`,
+    url: `${BRAND.canonicalUrl}${path}`,
     applicationCategory: category,
     operatingSystem: "Web",
     browserRequirements: "Requires JavaScript and a modern web browser.",
@@ -78,7 +78,7 @@ export function howToJsonLd({ name, path, steps }: { name: string; path: string;
       position: i + 1,
       name: s.title,
       text: s.text,
-      url: `${BRAND.url}${path}#how-to`,
+      url: `${BRAND.canonicalUrl}${path}#how-to`,
     })),
   };
 }
