@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
-import { isPathIndexable, isSiteIndexable } from "@/lib/indexability";
+import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
 
 // Evaluate indexability per request so a build never freezes the staging noindex.
@@ -42,14 +42,8 @@ function getSitemapPaths(host?: string | null): PublicPath[] {
   // a redirect is bypassed.
   if (host && !isApprovedProductionOrigin(`https://${host}`)) return [];
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
-  // isPathIndexable is the single source of truth for every page: a noindex
-  // page is never listed, and it is listed again automatically once indexing
-  // is enabled. The homepage is gated by the same site-wide flag robots.txt
-  // uses, so it is omitted while staging is noindex and listed again once
-  // indexing is enabled.
-  return PUBLIC_PATHS.filter((path) =>
-    path === "/" ? isSiteIndexable() : isPathIndexable(path),
-  );
+  // home is listed only when indexable (production).
+  return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
 }
 
 export default function sitemap(host?: string | null): MetadataRoute.Sitemap {

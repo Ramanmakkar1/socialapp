@@ -142,6 +142,21 @@ test("approved production host is populated only when BRAND.indexable is true", 
   }
 });
 
+test("production sitemap lists the poskoo.com home page and never the staging home URL", () => {
+  const wasUrl = BRAND.url;
+  const was = BRAND.indexable;
+  try {
+    BRAND.indexable = true;
+    BRAND.url = "https://poskoo.com";
+    const urls = sitemap().map((entry) => entry.url);
+    assert.ok(urls.includes("https://poskoo.com/"), "the production sitemap must list the home page");
+    assert.ok(!urls.includes("https://socialapp.splitforms.com/"), "the staging home URL must never be listed");
+  } finally {
+    BRAND.url = wasUrl;
+    BRAND.indexable = was;
+  }
+});
+
 test("staging: sitemap omits the home page and robots omits the sitemap", () => {
   assert.equal(BRAND.indexable, false);
   assert.deepEqual(sitemap(), [], "noindex staging must list no URLs at all");
