@@ -31,6 +31,8 @@ export type ToolPageConfig = {
   pill: string;
   /** H1 split so one phrase gets the lime highlight. Only one H1 per page. */
   h1: { before?: string; mark: string; after?: string };
+  /** Optional answer-first paragraph shown directly under the H1, before the lede. */
+  answer?: ReactNode;
   lede: string;
   /** Hero animation and its alt text (describe what the drawing shows). */
   art: AnimName;
@@ -158,6 +160,7 @@ export function ToolHero({ config }: { config: ToolPageConfig }) {
         <em className="s mark">{h1.mark}</em>
         {h1.after ? ` ${h1.after}` : null}
       </h1>
+      {config.answer && <p className={t.prose}>{config.answer}</p>}
       <p className="lede">{config.lede}</p>
       {config.heroPoints && config.heroPoints.length > 0 && (
         <ul className={t.points}>
