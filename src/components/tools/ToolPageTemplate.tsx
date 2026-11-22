@@ -4,7 +4,7 @@ import { ArrowDown, ArrowRight, BookOpen } from "lucide-react";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { BRAND } from "@/lib/brand";
-import { TOOLS, toolByHref, toolPlatform, type ToolEntry, type ToolIconName, type ToolPlatform } from "./registry";
+import { TOOLS, toolByHref, toolPlatform, type ToolEntry, type ToolCategory, type ToolIconName, type ToolPlatform } from "./registry";
 import { ToolIcon } from "./ToolIcon";
 import { RelatedToolsCarousel } from "./RelatedToolsCarousel";
 import { faqJsonLd, howToJsonLd, ldJson, webAppJsonLd, webPageJsonLd, type AppCategory, type ToolFaq } from "./seo";
@@ -120,6 +120,22 @@ export function nextActionFor(path: string): { href: string; label: string; blur
     blurb: "Browse the rest of the free tools for your next post.",
   };
 }
+
+/** Matching guide for a tool category, shown as an extra "keep exploring" chip. */
+export const GUIDE_FOR_CATEGORY: Record<ToolCategory, string> = {
+  dm: "/guides/instagram-comment-to-dm-automation-guide",
+  plan: "/guides/social-media-content-calendar-guide",
+  create: "/guides/how-to-schedule-instagram-posts",
+  media: "/guides/instagram-reels-strategy-for-small-business",
+};
+
+/** Link label for each category's matching guide. */
+export const GUIDE_LABEL_FOR_CATEGORY: Record<ToolCategory, string> = {
+  dm: "Instagram comment-to-DM guide",
+  plan: "social media content calendar guide",
+  create: "How to schedule Instagram posts",
+  media: "Instagram Reels strategy guide",
+};
 
 const slug = (s: string) =>
   s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
@@ -314,6 +330,11 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
   const tools = [...picked, ...fill].slice(0, Math.max(picked.length, 8));
   // One intent-matched product CTA, derived from the tool's own route path.
   const nextAction = nextActionFor(self);
+  // Matching guide for this tool's category (skipped on guide pages or unknown categories).
+  const category = toolByHref(self)?.category;
+  const guideHref = category ? GUIDE_FOR_CATEGORY[category] : undefined;
+  const guideLabel = category ? GUIDE_LABEL_FOR_CATEGORY[category] : undefined;
+  const showGuide = Boolean(guideHref && guideLabel && !self.startsWith("/guides"));
   return (
     <section className={`${t.section} ${t.related}`} aria-labelledby="related-title">
       <div className={t.relHead}>
@@ -328,6 +349,9 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
         <span>Ready to post?</span>
         <span>{nextAction.blurb}</span>
         <Link href={nextAction.href}>{nextAction.label}</Link>
+        {showGuide && guideHref && guideLabel && (
+          <Link href={guideHref}>{guideLabel}</Link>
+        )}
       </nav>
     </section>
   );
