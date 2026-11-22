@@ -131,6 +131,7 @@ const faqJsonLd = {
 };
 
 const related = [
+  { href: "/guides/how-to-schedule-instagram-posts", label: "How to schedule Instagram posts: 3 methods compared" },
   { href: "/help/schedule-instagram-carousel", label: "Schedule Instagram carousels" },
   { href: "/help/schedule-instagram-reels", label: "Schedule Instagram Reels" },
   { href: "/help/schedule-instagram-stories", label: "Schedule Instagram Stories" },
@@ -241,6 +242,7 @@ export default function ScheduleInstagramPostsHelpPage() {
               <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">
                 best time to post on Instagram
               </Link>
+              {" "}
               tool.
             </p>
           </div>
