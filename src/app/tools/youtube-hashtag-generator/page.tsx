@@ -217,7 +217,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your hashtags are ready.",
     mark: "Schedule the video.",
-    text: "Connect YouTube with its official login, plan your uploads on one calendar and publish them automatically with Poskoo's <Link href=\"/youtube-scheduler\">YouTube scheduler</Link>.",
+    text: "Connect YouTube with its official login, plan your uploads on one calendar and publish them automatically with Poskoo's YouTube scheduler.",
   },
 };
 
