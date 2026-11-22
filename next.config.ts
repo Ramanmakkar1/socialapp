@@ -81,6 +81,10 @@ const nextConfig: NextConfig = {
       },
       // Google crawled /Home and got a 404. Send every capitalisation of the
       // old home path to the real home page with a permanent 301.
+      // Duplicate tools: 301 the duplicate tool to the version we keep (the older, more-linked URL).
+      { source: "/tools/tweet-generator", destination: "/tools/x-post-generator", permanent: true },
+      { source: "/tools/threads-caption-generator", destination: "/tools/threads-post-generator", permanent: true },
+      { source: "/tools/instagram-caption-formatter", destination: "/tools/instagram-line-break-generator", permanent: true },
       // Duplicate intent: the old /instagram-comment-to-dm page is merged into the features page.
       { source: "/instagram-comment-to-dm", destination: "/features/instagram-comment-to-dm", permanent: true },
       { source: "/Home", destination: "/", permanent: true },
