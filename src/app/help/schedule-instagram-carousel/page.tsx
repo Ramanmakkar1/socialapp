@@ -249,7 +249,7 @@ export default function ScheduleInstagramCarouselHelpPage() {
             </ul>
             <p>
               For more checks, read{" "}
-              <Link className={s.vlink} href="/help/schedule-instagram-reels">
+              <Link className={s.vlink} href="/help/schedule-instagram-posts">
                 what to do when a scheduled post did not publish
               </Link>
               . Still stuck?{" "}
