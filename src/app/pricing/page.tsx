@@ -31,7 +31,7 @@ export const metadata: Metadata = withSocial({
 const free = PLANS[0];
 const freeLimits = free.items.filter((i) => !i.soon).map((i) => i.text).join(", ");
 
-const pricingFaqs = (r: PlanReadiness) => [
+const pricingFaqs = (r: PlanReadiness): { q: string; a: string }[] => [
   {
     q: "Is there a free plan?",
     a: `Yes. The ${free.name} plan is ${free.price} ${free.per} and includes ${freeLimits}. Every account starts on it.`,
