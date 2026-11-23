@@ -22,6 +22,11 @@ export const body: GuideBody = {
         Below is how each option works, what you can and cannot schedule, when to post, the size and caption limits,
         and the reasons a scheduled TikTok sometimes fails.
       </p>
+      <p>
+        Ready to plan a week of TikToks? Open the <Link href="/tiktok-scheduler">TikTok scheduler</Link> to queue
+        videos on a calendar, and use the <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link>{" "}
+        to write captions and hashtags before you schedule.
+      </p>
     </>
   ),
   sections: [
