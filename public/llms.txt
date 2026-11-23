@@ -4,15 +4,10 @@ Poskoo is a social media scheduler with Instagram comment-to-DM automation and A
 
 ## Key pages
 
-- https://poskoo.com/ — Poskoo homepage: social media scheduling, Instagram comment-to-DM automation and AI replies.
-- https://poskoo.com/features — Full feature overview for scheduling, automation and AI replies.
-- https://poskoo.com/pricing — Plan comparison, including the Free plan at $0.
-- https://poskoo.com/social-media-scheduler — Plan, queue and publish social media posts on a calendar.
-- https://poskoo.com/google-business-profile-scheduler — Schedule Google Business Profile posts on the $0 Free plan.
-- https://poskoo.com/buffer-alternative — How Poskoo compares to Buffer.
-- https://poskoo.com/instagram-scheduler — Schedule Instagram posts with Instagram account support.
-- https://poskoo.com/ai-social-media-manager — AI replies and AI-assisted social media management.
-- https://poskoo.com/tools — Free social media tools.
-- https://poskoo.com/help — Help centre and product guides.
-- https://poskoo.com/help/schedule-instagram-posts — Step-by-step Instagram scheduling help.
-- https://poskoo.com/guides — Guides for social media scheduling and automation.
+- https://poskoo.com/ - Poskoo is an Instagram scheduler and auto-DM tool with lead capture, a link-in-bio page and free tools. Plan, publish and grow your content in one place.
+- https://poskoo.com/features - Every Poskoo feature in one place: scheduling, Instagram auto-DM, AI captions, lead capture, free tools and comparisons, all in one workspace.
+- https://poskoo.com/pricing - Compare Poskoo Free, Pro and Agency plans. Start free with Instagram scheduling and 500 auto-DMs a month, then upgrade any time. No credit card needed.
+- https://poskoo.com/social-media-scheduler - Free social media scheduler for Instagram, Facebook, Threads, TikTok, LinkedIn, Pinterest, YouTube, X, Bluesky and Mastodon. One calendar, official APIs.
+- https://poskoo.com/instagram-scheduler - Schedule Instagram posts with a drag-and-drop calendar, feed, Reels and carousel support, all from one Poskoo workspace for your Instagram content.
+- https://poskoo.com/ai-social-media-manager - An AI social media manager that drafts caption ideas, adapts them per platform, suggests DM replies, captures leads and shows analytics in Poskoo.
+- https://poskoo.com/buffer-alternative - A Buffer alternative with built-in Instagram auto-DM and comment-to-lead conversion, so Poskoo turns your Instagram comments into real contacts.
