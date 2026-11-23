@@ -291,6 +291,18 @@ export default function LinkedInTextFormatterPage() {
               </Link>
             </li>
             <li>
+              <Link href="/tools/tiktok-caption-generator" className={`${t.card} ${t.acc_create}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_create}`}>
+                    <ToolIcon name="clapperboard" />
+                  </span>
+                  <b>TikTok caption generator</b>
+                </span>
+                <p>Turn a short idea into a TikTok caption with hashtags and a hook, ready to post.</p>
+                <span className={t.go}>Generate a TikTok caption <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+            <li>
               <Link href="/social-media-scheduler" className={`${t.card} ${t.acc_plan}`}>
                 <span className={t.cardTop}>
                   <span className={`${t.cardIcon} ${t.cat_plan}`}>
@@ -300,6 +312,18 @@ export default function LinkedInTextFormatterPage() {
                 </span>
                 <p>Plan, queue and publish posts across Instagram, Facebook, LinkedIn and more from one calendar.</p>
                 <span className={t.go}>Explore the social media scheduler <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/ai-social-media-manager" className={`${t.card} ${t.acc_dm}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_dm}`}>
+                    <ToolIcon name="message" />
+                  </span>
+                  <b>AI social media manager</b>
+                </span>
+                <p>Let AI draft replies, answer comments and capture leads from your social inbox.</p>
+                <span className={t.go}>Meet the AI social media manager <span aria-hidden="true">→</span></span>
               </Link>
             </li>
             <li>
