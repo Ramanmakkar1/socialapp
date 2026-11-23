@@ -9,7 +9,7 @@ import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
-import { getPlatformCopy, PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -26,105 +26,77 @@ export const metadata: Metadata = withSocial({
   twitter: { card: "summary_large_image", title, description },
 });
 
-const platformLinks = [
+const platforms = [
   {
-    id: "instagram",
     name: "Instagram",
     href: "/instagram-scheduler",
     text: "Schedule Instagram posts with a drag-and-drop calendar, feed, Reels and carousel support.",
   },
   {
-    id: "facebook",
     name: "Facebook",
     href: "/facebook-scheduler",
     text: "Schedule Facebook Page posts with text, photos or video through Meta's official login.",
   },
   {
-    id: "threads",
     name: "Threads",
     href: "/threads-scheduler",
     text: "Schedule Threads text, image or video posts on one calendar through Meta's official API.",
   },
   {
-    id: "tiktok",
     name: "TikTok",
     href: "/tiktok-scheduler",
     text: "Schedule TikTok videos and photo posts through TikTok's official API, alongside your other channels.",
   },
   {
-    id: "linkedin",
     name: "LinkedIn",
     href: "/linkedin-scheduler",
     text: "Schedule LinkedIn text and image posts through LinkedIn's official API, then track results.",
   },
   {
-    id: "pinterest",
     name: "Pinterest",
     href: "/pinterest-scheduler",
     text: "Schedule Pins to any board with a title, destination link and a JPG or PNG image.",
   },
   {
-    id: "youtube",
     name: "YouTube",
     href: "/youtube-scheduler",
     text: "Schedule YouTube videos and Shorts with titles, descriptions, tags and privacy settings.",
   },
   {
-    id: "x",
     name: "X (Twitter)",
     href: "/x-scheduler",
     text: "Schedule X posts with text and up to 4 images or one video through X's official API.",
   },
   {
-    id: "gbp",
-    name: "Google Business Profile",
-    href: "/google-business-profile-scheduler",
-    text: "Schedule Google Business Profile updates, offers and events to your locations with a photo and a Book or Call button.",
-  },
-  {
-    id: "bluesky",
     name: "Bluesky",
     href: "/bluesky-scheduler",
     text: "Schedule Bluesky posts with your handle and an app password, with text and up to 4 images.",
   },
   {
-    id: "mastodon",
     name: "Mastodon",
     href: "/mastodon-scheduler",
     text: "Schedule Mastodon posts on any server with OAuth, images or video, and automatic publishing.",
   },
 ];
 
-const networkLinks = [
-  { href: "/instagram-scheduler", label: "Instagram" },
-  { href: "/tiktok-scheduler", label: "TikTok" },
-  { href: "/linkedin-scheduler", label: "LinkedIn" },
-  { href: "/x-scheduler", label: "X (Twitter)" },
-  { href: "/pinterest-scheduler", label: "Pinterest" },
-  { href: "/youtube-scheduler", label: "YouTube" },
-  { href: "/bluesky-scheduler", label: "Bluesky" },
-  { href: "/mastodon-scheduler", label: "Mastodon" },
-  { href: "/google-business-profile-scheduler", label: "Google Business Profile scheduler" },
-];
-
 const steps = [
   {
     n: "1",
     art: "feat-linkbio" as const,
-    title: "Connect Instagram, Facebook or Threads via Meta",
-    text: "Connect the Instagram, Facebook or Threads account you want to post from with Meta's official login. Poskoo never asks for your password.",
+    title: "Connect accounts with official login",
+    text: "Sign in on each platform's own login screen and approve publishing. Poskoo never asks for your password.",
   },
   {
     n: "2",
     art: "writing" as const,
-    title: "Compose the post and pick a time on the calendar",
-    text: "Add your image or video in the composer, then choose the date and time on the week or month calendar in your own time zone.",
+    title: "Write once and customise per channel",
+    text: "Write your post in one composer, select the channels, and adjust the caption for each platform where you want a different version.",
   },
   {
     n: "3",
     art: "feat-calendar" as const,
-    title: "Poskoo publishes on time and reports the result",
-    text: "At the scheduled time Poskoo publishes through the official API and shows a success or failure status for every post, retrying automatically if a publish fails.",
+    title: "Pick a time and track the queue",
+    text: "Choose a date and time, see it in the queue and calendar, then follow the published or failed status of every post.",
   },
 ];
 
@@ -200,15 +172,6 @@ const webPageJsonLd = {
 };
 
 export default function SocialMediaSchedulerPage() {
-  const copy = getPlatformCopy();
-  const statusById = new Map(copy.catalog.map((entry) => [entry.id, entry]));
-  const platforms = platformLinks.map((link) => ({
-    ...link,
-    status: statusById.get(link.id) ?? { live: false, awaiting: false },
-  }));
-  const liveNames = platforms.filter((p) => p.status.live).map((p) => p.name);
-  const awaitingNames = platforms.filter((p) => p.status.awaiting).map((p) => p.name);
-
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Social media scheduler", path: PATH }]}>
       {[appJsonLd, webPageJsonLd, howToJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -241,23 +204,6 @@ export default function SocialMediaSchedulerPage() {
       <section>
         <div className="wrap">
           <div className="head">
-            <h2>Which networks can you schedule?</h2>
-          </div>
-          <p className="lede">
-            Poskoo&apos;s Free plan is $0 and includes 2 social accounts and 10 scheduled posts a month, so you can
-            schedule to any of these networks without a credit card.
-          </p>
-          <nav className="relChips" aria-label="Scheduler pages by network">
-            {networkLinks.map((link) => (
-              <Link key={link.href} href={link.href}>{link.label}</Link>
-            ))}
-          </nav>
-        </div>
-      </section>
-
-      <section>
-        <div className="wrap">
-          <div className="head">
             <p className="eyebrow">Supported platforms</p>
             <h2>Which platforms can you schedule?</h2>
           </div>
@@ -266,13 +212,8 @@ export default function SocialMediaSchedulerPage() {
               <article key={platform.name} className="pcard">
                 <h3><Link className={s.vlink} href={platform.href}>{platform.name} scheduler</Link></h3>
                 <p>{platform.text}</p>
-                <span className={`pstat${platform.status.live ? "" : " pstatAwaiting"}`}>{platform.status.live ? "Publishing today" : platform.status.awaiting ? "Coming after API approval" : "Coming soon"}</span>
               </article>
             ))}
-          </div>
-          <div className="pstatLegend" aria-label="Platform status legend">
-            <span className="pstatLegendItem"><span className="pstatLegendDot" aria-hidden="true" /> Publishing today: {liveNames.length ? liveNames.join(", ") : "none yet"}</span>
-            <span className="pstatLegendItem"><span className="pstatLegendDot pstatLegendDotAwaiting" aria-hidden="true" /> Coming after API approval: {awaitingNames.length ? awaitingNames.join(", ") : "none"}</span>
           </div>
         </div>
       </section>
@@ -281,7 +222,7 @@ export default function SocialMediaSchedulerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">How it works</p>
-            <h2>How scheduling works</h2>
+            <h2>How does scheduling work in Poskoo?</h2>
           </div>
           <div className="howGrid">
             {steps.map((step) => (
@@ -293,8 +234,6 @@ export default function SocialMediaSchedulerPage() {
               </article>
             ))}
           </div>
-          <p className="lede">See every scheduled post on a week or month view in the <Link className={s.vlink} href="/features/social-media-content-calendar">social media content calendar</Link>.</p>
-          <p className="lede">The Free plan is $0 with no card needed. If a post will not publish, read the <Link className={s.vlink} href="/help">scheduling help</Link>. Comparing schedulers? See <Link className={s.vlink} href="/buffer-alternative">Poskoo vs Buffer</Link>.</p>
         </div>
       </section>
 
@@ -309,7 +248,7 @@ export default function SocialMediaSchedulerPage() {
             Poskoo sends them a private DM with your link and can collect their email first, all from the same
             workspace as your calendar. See{" "}
             <Link className={s.vlink} href="/instagram-auto-dm">Instagram auto-DM</Link>{" "}
-            or <Link className={s.vlink} href="/social-media-scheduler-comparison">compare social media schedulers</Link>.{" "}Running a shop or local business? See the <Link className={s.vlink} href="/social-media-scheduler-for-small-business">social media scheduler for small business</Link>. Running a local business? See the <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>. Managing clients? Try the <Link className={s.vlink} href="/social-media-scheduler-for-agencies">social media scheduler for agencies</Link>.{" "}Switching tools? See the <Link className={s.vlink} href="/hootsuite-alternative">Hootsuite alternative</Link> and the <Link className={s.vlink} href="/buffer-alternative">Buffer alternative</Link>.
+            or <Link className={s.vlink} href="/social-media-scheduler-comparison">compare social media schedulers</Link>.{" "}Running a shop or local business? See the <Link className={s.vlink} href="/social-media-scheduler-for-small-business">social media scheduler for small business</Link>. Managing clients? Try the <Link className={s.vlink} href="/social-media-scheduler-for-agencies">social media scheduler for agencies</Link>.
           </p>
         </div>
       </section>
@@ -329,40 +268,9 @@ export default function SocialMediaSchedulerPage() {
         </div>
       </section>
 
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">By team</p>
-            <h2>Pick the scheduler for your kind of work</h2>
-          </div>
-          <nav className="relChips" aria-label="Social media schedulers by team">
-            <Link href="/social-media-scheduler-for-creators">Creators</Link>
-            <Link href="/social-media-scheduler-for-coaches">Coaches</Link>
-            <Link href="/social-media-scheduler-for-real-estate">Real estate</Link>
-            <Link href="/social-media-scheduler-for-ecommerce">E-commerce</Link>
-            <Link href="/social-media-scheduler-for-restaurants">Restaurants</Link>
-          </nav>
-        </div>
-      </section>
-
       <section id="demo" style={{ paddingTop: 20 }}>
         <div className="wrap">
           <LandingDemo hideLink={PATH} />
-        </div>
-      </section>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <h2>Explore each scheduler</h2>
-          </div>
-          <nav className="relChips" aria-label="Individual scheduler pages">
-            <Link href="/instagram-scheduler">Instagram scheduler</Link>
-            <Link href="/tiktok-scheduler">TikTok scheduler</Link>
-            <Link href="/bluesky-scheduler">Bluesky scheduler</Link>
-            <Link href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>
-            <Link href="/buffer-alternative">Buffer alternative</Link>
-          </nav>
         </div>
       </section>
 

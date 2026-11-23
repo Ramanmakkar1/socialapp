@@ -64,7 +64,7 @@ const steps = [
     art: "/landing/step-dm.webp",
     alt: "Illustration of publishing a post with comment-to-DM automation sending a message",
     title: "Publish and DM commenters",
-    text: `${BRAND.name} publishes it automatically at the scheduled time and shows a success or failure status. If you added an auto-DM rule, commenters get your message in their DMs.`,
+    text: `${BRAND.name} publishes at the scheduled time. If you added an auto-DM rule, commenters get your message in their DMs.`,
   },
 ];
 
@@ -163,7 +163,7 @@ export default async function InstagramScheduler() {
         <span className="pill"><span>NEW</span>Schedule posts · auto-DM on publish</span>
         <h1>Instagram scheduler that <em className="s mark">auto-DMs every comment</em></h1>
         <p className="lede">
-          Yes, you can schedule Instagram posts for free: connect your account through Meta&apos;s official login, plan posts, reels, carousels and stories on a calendar, pick a time, and {BRAND.name} publishes them for you. The Free plan is $0 with no credit card, and a comment-to-DM rule sends your link to everyone who comments. Learn <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts step by step</Link>.
+          Yes, you can schedule Instagram posts for free: connect your account through Meta&apos;s official login, plan posts, reels, carousels and stories on a calendar, pick a time, and {BRAND.name} publishes them for you. The Free plan is $0 with no credit card, and a comment-to-DM rule sends your link to everyone who comments.
         </p>
         <form className="glassBar glass schedBar" action="/signup" method="get">
           <label className="sr-only" htmlFor="sched-email">Email</label>
@@ -202,7 +202,7 @@ export default async function InstagramScheduler() {
 
       <section id="how" className="howSection">
         <div className="wrap">
-          <div className="head"><p className="eyebrow">How it works</p><h2>How Instagram scheduling <em className="s mark">works in Poskoo</em></h2></div>
+          <div className="head"><p className="eyebrow">How it works</p><h2>Three steps to your <em className="s mark">first scheduled post</em></h2></div>
           <div className="howGrid">
             {steps.map((st) => (
               <article key={st.n} className="howStep">
@@ -213,9 +213,6 @@ export default async function InstagramScheduler() {
               </article>
             ))}
           </div>
-          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            Want the full walkthrough? Read <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts in Poskoo</Link>.
-          </p>
         </div>
       </section>
 
@@ -245,10 +242,10 @@ export default async function InstagramScheduler() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            Check your files before you schedule: the free <Link className={s.vlink} href="/tools/instagram-reels-size-checker">Instagram Reels size checker</Link>, <Link className={s.vlink} href="/tools/instagram-story-size-checker">Instagram Story size checker</Link> the <Link className={s.vlink} href="/tools/instagram-image-size">Instagram image size guide</Link> and the free <Link className={s.vlink} href="/tools/instagram-image-resizer">Instagram image resizer</Link> for 1080x1350 and 1080x1080 crops. Write the post with the <Link className={s.vlink} href="/tools/instagram-caption-generator">free Instagram caption generator</Link> and <Link className={s.vlink} href="/tools/instagram-hashtag-generator">Instagram hashtag generator</Link>, split a wide image with the <Link className={s.vlink} href="/tools/instagram-carousel-splitter">carousel splitter</Link>, and pick a slot with the <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">best time to post on Instagram</Link> finder.
+            Check your files before you schedule: the free <Link className={s.vlink} href="/tools/instagram-reels-size-checker">Instagram Reels size checker</Link>, <Link className={s.vlink} href="/tools/instagram-story-size-checker">Instagram Story size checker</Link> and <Link className={s.vlink} href="/tools/instagram-image-size">Instagram image size guide</Link>. Write the post with the <Link className={s.vlink} href="/tools/instagram-caption-generator">free Instagram caption generator</Link> and <Link className={s.vlink} href="/tools/instagram-hashtag-generator">Instagram hashtag generator</Link>, split a wide image with the <Link className={s.vlink} href="/tools/instagram-carousel-splitter">carousel splitter</Link>, and pick a slot with the <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">best time to post on Instagram</Link> finder.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
-            Polish your profile and grid with the free <Link className={s.vlink} href="/tools/instagram-font-generator">Instagram font generator</Link>, <Link className={s.vlink} href="/tools/instagram-bio-generator">Instagram bio generator</Link>, <Link className={s.vlink} href="/tools/instagram-grid-maker">Instagram grid maker</Link>, the <Link className={s.vlink} href="/tools/instagram-highlight-cover-maker">free Instagram highlight cover maker</Link>, <Link className={s.vlink} href="/tools/instagram-carousel-maker">Instagram carousel maker</Link>, <Link className={s.vlink} href="/tools/instagram-post-preview">Instagram post preview</Link> and <Link className={s.vlink} href="/tools/instagram-line-break-generator">Instagram line break generator</Link>, browse <Link className={s.vlink} href="/tools/instagram-tools">all free Instagram tools</Link>, or see <Link className={s.vlink} href="/tools">all free social media tools</Link>.
+            Polish your profile and grid with the free <Link className={s.vlink} href="/tools/instagram-font-generator">Instagram font generator</Link>, <Link className={s.vlink} href="/tools/instagram-bio-generator">Instagram bio generator</Link>, <Link className={s.vlink} href="/tools/instagram-grid-maker">Instagram grid maker</Link>, <Link className={s.vlink} href="/tools/instagram-carousel-maker">Instagram carousel maker</Link>, <Link className={s.vlink} href="/tools/instagram-post-preview">Instagram post preview</Link> and <Link className={s.vlink} href="/tools/instagram-line-break-generator">Instagram line break generator</Link>, browse <Link className={s.vlink} href="/tools/instagram-tools">all free Instagram tools</Link>, or see <Link className={s.vlink} href="/tools">all free social media tools</Link>.
           </p>
         </div>
       </section>
@@ -263,7 +260,7 @@ export default async function InstagramScheduler() {
         <div className="wrap" style={{ maxWidth: 760 }}>
           <h2>Schedule Instagram posts and auto-DM commenters <em className="s">from one place</em></h2>
           <p className="small">
-            {BRAND.name} is a scheduler and an <Link className={s.vlink} href="/instagram-auto-dm">Instagram comment-to-DM automation</Link> tool in one. Set up <Link className={s.vlink} href="/help/auto-dm-instagram-comments">auto-DM on Instagram comments</Link>, follow the guides on <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts</Link> and <Link className={s.vlink} href="/help/schedule-instagram-reels">schedule Instagram Reels</Link>, add a <Link className={s.vlink} href="/instagram-link-in-bio">free Instagram link-in-bio page</Link> (see <Link className={s.vlink} href="/help/instagram-link-in-bio-setup">how to set up your link-in-bio page</Link>), then compare <Link className={s.vlink} href="/pricing">plans and limits</Link> and see <Link className={s.vlink} href="/features">everything in {BRAND.name}</Link>. The <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> drafts captions and DM replies in your brand voice.
+            {BRAND.name} is a scheduler and an <Link className={s.vlink} href="/instagram-auto-dm">Instagram comment-to-DM automation</Link> tool in one. Set up <Link className={s.vlink} href="/help/auto-dm-instagram-comments">auto-DM on Instagram comments</Link>, follow the guides to <Link className={s.vlink} href="/help/schedule-instagram-posts">schedule Instagram posts</Link> and <Link className={s.vlink} href="/help/schedule-instagram-reels">schedule Instagram Reels</Link>, then compare <Link className={s.vlink} href="/pricing">plans and limits</Link> and see <Link className={s.vlink} href="/features">everything in {BRAND.name}</Link>.
           </p>
         </div>
       </section>
@@ -277,7 +274,6 @@ export default async function InstagramScheduler() {
             <Link href="/buffer-alternative">Poskoo vs Buffer</Link>
             <Link href="/later-alternative">Poskoo vs Later</Link>
             <Link href="/tools">Free Instagram tools</Link>
-            <p className="small" style={{ marginTop: 12 }}>Step-by-step walkthrough: <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts</Link>.</p>
           </nav>
         </div>
       </section>
@@ -296,9 +292,6 @@ export default async function InstagramScheduler() {
               </details>
             ))}
           </div>
-          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            Need the step-by-step version? Read <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts in Poskoo</Link>. Scheduling more than Instagram? See the <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link> for every network.
-          </p>
         </div>
       </section>
 

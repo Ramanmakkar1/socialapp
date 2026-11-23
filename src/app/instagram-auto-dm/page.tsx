@@ -216,14 +216,6 @@ export default async function InstagramAutoDm() {
                 <span className="font-medium">Instagram DM automation explained</span>
                 <p className="text-sm text-ink-2">See what comment keywords, Story replies, DM keywords and email capture can automate.</p>
               </Link>
-              <Link href="/instagram-auto-reply" className="group min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40">
-                <span className="font-medium">Instagram auto-reply FAQ</span>
-                <p className="text-sm text-ink-2">How keyword, Story reply and DM auto-replies work, with limits and pauses.</p>
-              </Link>
-              <Link href="/help/auto-dm-instagram-comments" className="group min-w-0 rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40">
-                <span className="font-medium">How to auto-DM Instagram comments</span>
-                <p className="text-sm text-ink-2">Step-by-step setup for your first comment-to-DM rule.</p>
-              </Link>
             </div>
           </div>
         </div>

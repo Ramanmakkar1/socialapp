@@ -267,12 +267,10 @@ export default function TikTokSchedulerPage() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            New to it? Read the{" "}
-            <Link className={s.vlink} href="/help/schedule-tiktok-posts">TikTok scheduling help page</Link>.
-            {" "}Step-by-step:{" "}
-            <Link className={s.vlink} href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link>.
-            {" "}Need a caption? Try the free{" "}
-            <Link className={s.vlink} href="/tools/tiktok-caption-generator">TikTok caption generator</Link>.
+            New to it? Follow our step-by-step guide:{" "}
+            <Link className={s.vlink} href="/help/schedule-tiktok-posts">how to schedule TikTok videos</Link>.
+            {" "}For the full walkthrough, read the{" "}
+            <Link className={s.vlink} href="/guides/how-to-schedule-tiktok-videos">step-by-step guide to scheduling TikTok videos</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Writing a caption first? Check the 4,000-character limit and feed preview with our{" "}
@@ -291,10 +289,10 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/tools/tiktok-profile-picture-size-checker">TikTok profile picture size checker</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
-            Need words for your video? Draft six hooks and captions with our{" "}
-            <Link className={s.vlink} href="/tools/tiktok-caption-generator">free TikTok caption generator</Link>{" "}
-            or get opening lines with our{" "}
-            <Link className={s.vlink} href="/tools/tiktok-hook-generator">free TikTok hook generator</Link>.
+            Need words for your video? Get opening lines with our{" "}
+            <Link className={s.vlink} href="/tools/tiktok-hook-generator">free TikTok hook generator</Link>{" "}
+            or draft six hooks and captions with our{" "}
+            <Link className={s.vlink} href="/tools/tiktok-caption-generator">free TikTok caption generator</Link>.
             Need a topic? Get six ideas with our{" "}
             <Link className={s.vlink} href="/tools/tiktok-video-ideas-generator">TikTok video ideas generator</Link>.
           </p>
@@ -309,8 +307,7 @@ export default function TikTokSchedulerPage() {
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Measure how each video did with the <Link className={s.vlink} href="/tools/tiktok-engagement-rate-calculator">free TikTok engagement rate calculator</Link>.
-            Keep text clear of the interface with the <Link className={s.vlink} href="/tools/tiktok-safe-zone-checker">TikTok safe zone checker</Link>.{" "}
-            Curious what your views could earn? Estimate it with the <Link className={s.vlink} href="/tools/tiktok-money-calculator">TikTok money calculator</Link>.
+            Keep text clear of the interface with the <Link className={s.vlink} href="/tools/tiktok-safe-zone-checker">TikTok safe zone checker</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Not sure when to post? Get three starting times for your audience with the{" "}

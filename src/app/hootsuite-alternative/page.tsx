@@ -152,12 +152,6 @@ export default function HootsuiteAlternative() {
           </div>
           <CompareNote />
           <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Competitor features and prices change. Check their websites for current plans.</p>
-          <p className="small" style={{ textAlign: "center" }}>
-            More alternatives:{'\u00a0'}
-            <Link className={s.vlink} href="/buffer-alternative">Buffer alternative</Link>{'\u00a0'}
-            ·{'\u00a0'}
-            <Link className={s.vlink} href="/metricool-alternative">Metricool alternative</Link>
-          </p>
         </div>
       </section>
 
@@ -176,17 +170,6 @@ export default function HootsuiteAlternative() {
               <div className="pain"><b>1. Schedule the post</b><span>Pick the time and write a caption that asks people to comment a keyword such as GUIDE.</span></div>
               <div className="pain"><b>2. Attach the DM rule</b><span>Set the keyword and the message with your link. It switches on when the post is published.</span></div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Which should you choose */}
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className={s.prose}>
-            <h2>Hootsuite or {BRAND.name}: which should you choose?</h2>
-            <p>Choose Hootsuite if you need more networks and team features today.</p>
-            <p>Choose {BRAND.name} for Instagram scheduling, comment-to-DM automation and email capture in one app, starting on a $0 Free plan with no credit card.</p>
           </div>
         </div>
       </section>
@@ -224,10 +207,6 @@ export default function HootsuiteAlternative() {
             <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>
             {" · "}
             <Link className={s.vlink} href="/instagram-auto-dm">Instagram auto DM</Link>
-            {" · "}
-            <Link className={s.vlink} href="/social-media-scheduler-comparison">Compare social media schedulers</Link>
-            {" · "}
-            <Link className={s.vlink} href="/pricing">See pricing</Link>
             {" · "}
             <Link className={s.vlink} href="/">See the full product</Link>
           </p>

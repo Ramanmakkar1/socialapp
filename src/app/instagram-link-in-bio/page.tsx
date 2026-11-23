@@ -246,11 +246,7 @@ export default function InstagramLinkInBioPage() {
               </p>
               <p>
                 You control the handle, display name, bio, avatar and theme. Each link gets a tracked short link, so the
-                Link in bio screen shows clicks per link and the total for the page. When you{" "}
-                <Link className={s.vlink} href="/instagram-scheduler">
-                  schedule Instagram posts
-                </Link>{" "}
-                in Poskoo, your latest published posts appear under your links automatically.
+                Link in bio screen shows clicks per link and the total for the page.
               </p>
             </div>
             <div className="art">
@@ -299,43 +295,6 @@ export default function InstagramLinkInBioPage() {
           <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
             <Link href="/pricing" className={s.vlink}>
               Compare every plan and limit
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">Free tools</p>
-            <h2>Build your page with free tools</h2>
-          </div>
-          <p>
-            Shape your bio, track your links and see how your page looks before you publish it. Use the{" "}
-            <Link className={s.vlink} href="/tools/instagram-bio-generator">
-              Instagram bio generator
-            </Link>
-            , the{" "}
-            <Link className={s.vlink} href="/tools/instagram-dm-link-generator">
-              DM link generator
-            </Link>
-            , the{" "}
-            <Link className={s.vlink} href="/tools/instagram-utm-builder">
-              UTM link builder
-            </Link>{" "}
-            and the{" "}
-            <Link className={s.vlink} href="/tools/instagram-post-preview">
-              post preview tool
-            </Link>
-            , then follow the{" "}
-            <Link className={s.vlink} href="/guides/link-in-bio-best-practices">
-              link-in-bio best practices guide
-            </Link>{" "}
-            to put it all together.
-          </p>
-          <p className="small" style={{ textAlign: "center", marginTop: 20 }}>
-            <Link href="/tools/instagram-tools" className={s.vlink}>
-              all free Instagram tools
             </Link>
           </p>
         </div>

@@ -111,25 +111,8 @@ export default async function PricingPage() {
             Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}
             by accounts, scheduled posts and auto-DMs, or use the free{" "}
             <Link className={s.vlink} href="/tools/social-media-scheduler-plan-calculator">plan-fit calculator</Link>{" "}
-            to find the smallest plan for your numbers.{" "}Comparing prices across tools? Read our <Link className={s.vlink} href="/guides/cheapest-social-media-scheduling-tools-2026">cheapest social media scheduling tools guide</Link>.{" "}
-            Comparing options? See how Poskoo compares with <Link className={s.vlink} href="/buffer-alternative">Buffer</Link> and with <Link className={s.vlink} href="/manychat-alternative">ManyChat</Link>.
+            to find the smallest plan for your numbers.
           </p>
-          <p className="small" style={{ textAlign: "center", marginTop: "10px" }}>
-            Explore the <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>, the{" "}
-            <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link> or the{" "}
-            <Link className={s.vlink} href="/tiktok-scheduler">TikTok scheduler</Link>.
-          </p>
-        </div>
-      </section>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <h2>Compare Poskoo with other schedulers</h2>
-          <ul className="small" style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center", listStyle: "none", padding: 0, marginTop: "12px" }}>
-            <li><Link className={s.vlink} href="/social-media-scheduler">Social media scheduler for every network</Link></li>
-            <li><Link className={s.vlink} href="/buffer-alternative">Poskoo vs Buffer</Link></li>
-            <li><Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link></li>
-          </ul>
         </div>
       </section>
 
@@ -172,20 +155,6 @@ export default async function PricingPage() {
                 <p>{f.a}</p>
               </details>
             ))}
-            <p className="small">
-              See how AI caption and DM message ideas fit in:{" "}
-              <Link className={s.vlink} href="/ai-social-media-manager">
-                AI social media manager
-              </Link>{" "}
-              page.
-            </p>
-            <p className="small">
-              See everything you can schedule on the{" "}
-              <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>.
-            </p>
-            <p className="small">
-              Weighing up tools? See <Link className={s.vlink} href="/buffer-alternative">Poskoo vs Buffer</Link> side by side.
-            </p>
           </div>
         </div>
       </section>

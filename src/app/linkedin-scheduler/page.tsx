@@ -154,9 +154,9 @@ export default function LinkedInSchedulerPage() {
           Schedule LinkedIn posts and <em className="s mark">publish them on time</em>
         </h1>
         <p className="lede">
-          A LinkedIn scheduler is a tool that saves your LinkedIn posts and publishes them automatically at the date and
-          time you choose. Poskoo publishes to your profile or a company page through LinkedIn&apos;s official API, so your
-          posts go live even when you are busy or offline.
+          Yes, you can schedule LinkedIn posts on the $0 Free plan (no credit card): connect your profile with LinkedIn&apos;s official sign-in,
+          write a post of up to 3,000 characters with up to 20 images, pick a date and time, and Poskoo publishes it
+          automatically. LinkedIn sits on the same calendar as Instagram, Facebook and Threads.
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -171,7 +171,7 @@ export default function LinkedInSchedulerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">LinkedIn scheduling features</p>
-            <h2>Supported LinkedIn <em className="s">scheduling workflows.</em></h2>
+            <h2>What you can <em className="s">schedule on LinkedIn.</em></h2>
             <p className="lede">
               A LinkedIn scheduler is a tool that saves your posts and publishes them to LinkedIn at the date and time
               you choose, so you do not have to be online. Poskoo does this through LinkedIn&apos;s official API, on the
@@ -265,36 +265,6 @@ export default function LinkedInSchedulerPage() {
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
-            <p className="eyebrow">Who it is for</p>
-            <h2>Who a LinkedIn scheduler is for</h2>
-            <p className="lede">
-              A LinkedIn scheduler suits anyone who posts to LinkedIn regularly but cannot be online at the best time
-              every day. That includes:
-            </p>
-          </div>
-          <div className="cards">
-            <article className="pcard">
-              <span className="no">01 / Founders</span>
-              <h3>Founders and solo marketers</h3>
-              <p>Plan a week of thought-leadership posts in one sitting, then stay visible without interrupting your workday.</p>
-            </article>
-            <article className="pcard">
-              <span className="no">02 / B2B teams</span>
-              <h3>B2B marketing teams</h3>
-              <p>Keep your company page and team members posting on a steady cadence, with every planned post visible in one calendar.</p>
-            </article>
-            <article className="pcard">
-              <span className="no">03 / Agencies</span>
-              <h3>Agencies and consultants</h3>
-              <p>Manage several client profiles from one queue, schedule posts in advance and check what published or failed.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
             <p className="eyebrow">LinkedIn scheduler FAQs</p>
             <h2>Accounts, formats and publishing</h2>
           </div>
@@ -308,7 +278,7 @@ export default function LinkedInSchedulerPage() {
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             New to it? Follow our step-by-step guide:{" "}
-            <Link className={s.vlink} href="/help/schedule-linkedin-posts">how to schedule LinkedIn posts</Link>. For the bigger picture, read the <Link className={s.vlink} href="/guides/linkedin-posting-strategy-for-founders">LinkedIn posting strategy for founders</Link>.
+            <Link className={s.vlink} href="/help/schedule-linkedin-posts">how to schedule LinkedIn posts</Link>.
             Draft it with the <Link className={s.vlink} href="/tools/linkedin-post-generator">free LinkedIn post generator</Link> or the <Link className={s.vlink} href="/tools/linkedin-caption-generator">free LinkedIn caption generator</Link>, win the first line with the <Link className={s.vlink} href="/tools/linkedin-hook-generator">free LinkedIn hook generator</Link>, check the length with the <Link className={s.vlink} href="/tools/linkedin-character-counter">LinkedIn character counter</Link>, then see how it looks with the <Link className={s.vlink} href="/tools/linkedin-post-preview">LinkedIn post preview</Link>.
             Pick a starting slot with our <Link className={s.vlink} href="/tools/best-time-to-post-on-linkedin">best time to post on LinkedIn</Link> finder.
             Build a short, relevant tag set with the <Link className={s.vlink} href="/tools/linkedin-hashtag-generator">LinkedIn hashtag generator</Link>.

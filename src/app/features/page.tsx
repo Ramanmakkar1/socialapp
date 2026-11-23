@@ -78,16 +78,8 @@ const featuresFaqs = (aiReady: boolean) => [
     a: PLATFORMS_ANSWER,
   },
   {
-    q: "How does scheduling and auto-publishing work?",
-    a: "You add a post to the week or month calendar, pick a time, and Poskoo publishes it to your connected accounts automatically. You can edit, reschedule or delete it before it goes out, and every post shows whether it published or failed.",
-  },
-  {
     q: "How does Instagram comment-to-DM work?",
     a: "Set a keyword such as GUIDE or LINK, and Poskoo sends your message in a DM to everyone who comments it, usually within a minute. You can capture an email first, add a follow gate and track clicks.",
-  },
-  {
-    q: "How does Poskoo capture leads?",
-    a: "Poskoo can ask for an email in the DM before it sends your link, then saves that contact with the keyword and post they came from. You can filter your contacts and export them to CSV.",
   },
   {
     q: "Does Poskoo include AI captions?",
@@ -185,12 +177,11 @@ export default async function FeaturesPage() {
           <span className="pill"><span>ALL-IN-ONE</span>{aiReady ? <>Schedule &middot; Auto-DM &middot; AI captions &middot; Free tools</> : <>Schedule &middot; Auto-DM &middot; Link in bio &middot; Free tools</>}</span>
           <p className="eyebrow">Features</p>
           <h1>
-            Social media scheduler features, auto-DM and <em className="s mark">lead capture</em>
+            Everything Poskoo does, <em className="s mark">in one place</em>
           </h1>
           <p className="lede">
-            Poskoo schedules your social posts, auto-DMs Instagram commenters and captures leads from those DMs in
-            one app. Plan posts on a week or month calendar, auto-publish them from one queue, send a DM when
-            someone comments a keyword, capture an email before the link goes out and hand out a lead magnet{aiReady ? " - with AI caption and DM message ideas in your brand voice" : ""}.
+            Poskoo combines social scheduling, Instagram comment-to-DM automation, lead capture and analytics in
+            one app.
           </p>
           <p>
             Poskoo is one app for planning posts, publishing to {LIVE_PLATFORMS_TEXT}, and
@@ -233,21 +224,6 @@ export default async function FeaturesPage() {
               <Link className="go" href="/instagram-link-in-bio">Build your Instagram link in bio <span aria-hidden="true">&rarr;</span></Link>
             </article>
             <article className="pcard">
-              <h3>Social media scheduler</h3>
-              <p>Plan, queue and auto-publish posts across your connected channels from one calendar.</p>
-              <Link className="go" href="/social-media-scheduler">See the social media scheduler <span aria-hidden="true">&rarr;</span></Link>
-            </article>
-            <article className="pcard">
-              <h3>Buffer alternative</h3>
-              <p>Compare Poskoo with Buffer for scheduling and comment-to-DM automation in one plan.</p>
-              <Link className="go" href="/buffer-alternative">See the Buffer alternative <span aria-hidden="true">&rarr;</span></Link>
-            </article>
-            <article className="pcard">
-              <h3>AI social media manager</h3>
-              <p>Draft captions and replies with AI, then approve and schedule them in a few clicks.</p>
-              <Link className="go" href="/ai-social-media-manager">Explore the AI social media manager <span aria-hidden="true">&rarr;</span></Link>
-            </article>
-            <article className="pcard">
               <h3>Pricing</h3>
               <p>Compare the Free, Pro and Agency plans and what each one includes.</p>
               <Link className="go" href="/pricing">See Poskoo pricing and plans <span aria-hidden="true">&rarr;</span></Link>
@@ -266,16 +242,10 @@ export default async function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Scheduler</p>
-              <h2>Scheduling and <em className="s">auto-publishing</em></h2>
+              <h2>Plan once, <em className="s">publish everywhere</em></h2>
               <p>
-                As a <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>, Poskoo
-                schedules your posts on a week or month calendar and auto-publishes each one at the time you choose,
-                so you can plan a whole week in one sitting.
-              </p>
-              <p>
-                Google Business Profile scheduling is built in too, so you can plan and publish updates from the same
-                calendar with the{" "}
-                <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>.
+                Build your week on a drag-and-drop calendar, then let Poskoo publish each post at the time you
+                choose.
               </p>
               <ul>
                 {schedulerBullets.map((item) => (
@@ -292,11 +262,8 @@ export default async function FeaturesPage() {
                 the <Link className={s.vlink} href="/linkedin-scheduler">LinkedIn scheduler</Link>,{" "}
                 the <Link className={s.vlink} href="/bluesky-scheduler">Bluesky scheduler</Link>,{" "}
                 the <Link className={s.vlink} href="/mastodon-scheduler">Mastodon scheduler</Link>,{" "}
-                the <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>,{" "}
-                the <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>,{" "}
-                the <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>,{" "}
-                the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>,{" "}
-                and the <Link className={s.vlink} href="/features/social-media-content-calendar">social media content calendar</Link>.
+                the <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>{" "}
+                and the <Link className={s.vlink} href="/instagram-content-planner">Instagram content planner</Link>.
                 Running a small business? See the{" "}
                 <Link className={s.vlink} href="/social-media-scheduler">
                   social media scheduler for small business
@@ -316,10 +283,10 @@ export default async function FeaturesPage() {
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Auto-DM</p>
-              <h2>Instagram <em className="s">auto-DMs</em></h2>
+              <h2>Every comment can become <em className="s mark">a lead</em></h2>
               <p>
-                Set a keyword such as GUIDE or LINK, and Poskoo sends your message in a DM to everyone who
-                comments it, usually within a minute, so you never reply by hand.
+                Set a keyword such as GUIDE or LINK. When someone comments it, Poskoo sends them your message in
+                a DM, usually within a minute.
               </p>
               <ul>
                 {autoDmBullets.map((item) => (
@@ -331,7 +298,6 @@ export default async function FeaturesPage() {
               </Link>
               <p className="small">
                 Ready-made messages: <Link className={s.vlink} href="/instagram-auto-dm/templates">browse auto-DM templates</Link>.
-                {" "}Or read the <Link className={s.vlink} href="/features/instagram-comment-to-dm">Instagram comment-to-DM feature guide</Link>.
               </p>
             </div>
             <div className="art">
@@ -361,7 +327,7 @@ export default async function FeaturesPage() {
                 {aiReady ? "Try AI captions free" : "Start free, write captions yourself"} <span aria-hidden="true">&rarr;</span>
               </Link>
               {aiReady ? <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p> : null}
-              <p className="small">See how our <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> works, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link>, and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>. You can also plan posts with the <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link> or the <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>.</p>
+              <p className="small">See how it fits together on the <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> page, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link> and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>.</p>
             </div>
             <div className="art">
               <AnimArt name="feat-ai" label="An AI helper drafts a caption idea" />
@@ -375,12 +341,10 @@ export default async function FeaturesPage() {
           <div className="split rev">
             <div className="copy">
               <p className="eyebrow">Sell and grow</p>
-              <h2>Lead <em className="s mark">capture</em></h2>
+              <h2>Turn DMs into <em className="s mark">sales and sign-ups</em></h2>
               <p>
-                Poskoo captures a lead by asking for an email in the DM before it sends your link, then saves
-                the contact with the keyword and post they came from. Attach a lead magnet or a digital product
-                to the same rule, and export your contacts to CSV whenever you need them. All three are in the
-                app today.
+                Attach a lead magnet or a digital product to an auto-DM rule, and share your referral link to earn
+                more DMs. All three are in the app today.
               </p>
               <ul>
                 {growBullets(cardPaymentsReady).map((item) => (
@@ -419,10 +383,8 @@ export default async function FeaturesPage() {
               <p className="small">
                 Popular tools:{" "}
                 <Link className={s.vlink} href="/tools/instagram-caption-generator">caption generator</Link>,{" "}
-                <Link className={s.vlink} href="/tools/instagram-hashtag-generator">hashtag generator</Link>,{" "}
-                <Link className={s.vlink} href="/tools/instagram-comment-keyword-tester">comment keyword tester</Link>,{" "}
-                <Link className={s.vlink} href="/tools/linkedin-text-formatter">LinkedIn text formatter</Link> and{" "}
-                <Link className={s.vlink} href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link>.
+                <Link className={s.vlink} href="/tools/instagram-hashtag-generator">hashtag generator</Link> and{" "}
+                <Link className={s.vlink} href="/tools/instagram-comment-keyword-tester">comment keyword tester</Link>.
               </p>
             </div>
             <div className="art">
@@ -447,12 +409,6 @@ export default async function FeaturesPage() {
                 <li>Official Meta API with no password sharing.</li>
                 <li>Free plan to test the whole workflow, then Pro or Agency when you grow.</li>
               </ul>
-              <p className="small">
-                Coming from Hootsuite? Read the{" "}
-                <Link className={s.vlink} href="/hootsuite-alternative">Hootsuite alternative with Instagram auto-DM</Link>.
-                Comparing tools? See how Poskoo works as a{" "}
-                <Link className={s.vlink} href="/buffer-alternative">Buffer alternative</Link>.
-              </p>
             </div>
             <div className="art">
               <AnimArt name="compare" label="Someone tips a pile of messy app windows into a recycling bin and holds up one phone that does it all" />

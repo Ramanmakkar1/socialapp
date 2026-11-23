@@ -259,7 +259,7 @@ export default function XSchedulerPage() {
             <article className="pcard">
               <span className="no">03 / Compare</span>
               <h3>Choose the right scheduling setup</h3>
-              <p>Read the <Link className={s.vlink} href="/social-media-scheduler-comparison">social media scheduler comparison</Link> to review supported channels, publishing and planning features. Cross-posting from X? Plan the same update with the <Link className={s.vlink} href="/bluesky-scheduler">Bluesky post scheduler</Link>.</p>
+              <p>Read the <Link className={s.vlink} href="/social-media-scheduler-comparison">social media scheduler comparison</Link> to review supported channels, publishing and planning features.</p>
             </article>
           </div>
         </div>
