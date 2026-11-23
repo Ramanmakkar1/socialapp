@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
-import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb-schema";
+import { ldJson } from "@/lib/tool-schema";
 import s from "./site.module.css";
 
 export type BreadcrumbItem = { name: string; href: string };
@@ -32,12 +32,7 @@ export default function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: ldJson(
-            breadcrumbJsonLd(
-              items.map((c) => ({
-                name: c.name,
-                url: c.href ? BRAND.canonicalUrl + (c.href === "/" ? "/" : c.href) : "",
-              }))
-            )
+            breadcrumbJsonLd(items.map((c) => ({ name: c.name, path: c.href })))
           ),
         }}
       />
