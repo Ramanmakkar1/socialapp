@@ -21,6 +21,7 @@ import { GoogleButton } from "@/components/GoogleButton";
 import { AnimArt, ANIM_LABELS } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
 import { homePageJsonLd } from "./homeJsonLd";
+import { HomeSchema } from "@/components/HomeSchema";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
 const description = PAGE_DESCRIPTIONS["/"];
 const BASE_DESCRIPTION = description;
@@ -70,7 +71,7 @@ const jsonLd = homePageJsonLd(faqList, r, title);
 // fetch it early and at high priority so it, not the lazy art below, is the LCP candidate.
 preload("/landing/hero-poster.webp?v=2", { as: "image", fetchPriority: "high" });
 return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
-<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+<HomeSchema data={jsonLd} />
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
   <symbol id="ok" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--green)"/><path d="M5 9.3l2.6 2.5L13 6.4" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></symbol>
   <symbol id="no" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--red)"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/></symbol>
