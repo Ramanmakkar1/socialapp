@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
  const description = (await isFeatureReadyNow("ai")) ? HOME_DESCRIPTION_WITH_AI : BASE_DESCRIPTION;
  return {
  metadataBase: new URL(BRAND.canonicalUrl),
- title: { absolute: title }, description, alternates: { canonical: HOME_CANONICAL },
+ title: { absolute: title }, description, alternates: { canonical: "/" },
  robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },
  openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
