@@ -483,7 +483,7 @@ export const GUIDES: GuideEntry[] = [
       "/tools/instagram-caption-generator",
       "/tools/instagram-image-size",
     ],
-    related: ["cheapest-social-media-scheduling-tools-2026", "best-instagram-auto-dm-tools-2026"],
+    related: ["cheapest-social-media-scheduling-tools-2026", "best-instagram-auto-dm-tools-2026", "how-to-schedule-tiktok-videos"],
   },
   {
     slug: "how-to-schedule-tiktok-videos",
