@@ -108,7 +108,8 @@ export default async function PricingPage() {
             Want the detail? <Link className={s.vlink} href="/instagram-scheduler/pricing">Compare Instagram scheduler plan limits</Link>{" "}
             by accounts, scheduled posts and auto-DMs, or use the free{" "}
             <Link className={s.vlink} href="/tools/social-media-scheduler-plan-calculator">plan-fit calculator</Link>{" "}
-            to find the smallest plan for your numbers.{" "}Comparing prices across tools? Read our <Link className={s.vlink} href="/guides/cheapest-social-media-scheduling-tools-2026">cheapest social media scheduling tools guide</Link>.
+            to find the smallest plan for your numbers.{" "}Comparing prices across tools? Read our <Link className={s.vlink} href="/guides/cheapest-social-media-scheduling-tools-2026">cheapest social media scheduling tools guide</Link>.{" "}
+            Comparing options? See how Poskoo compares with <Link className={s.vlink} href="/buffer-alternative">Buffer</Link> and with <Link className={s.vlink} href="/manychat-alternative">ManyChat</Link>.
           </p>
         </div>
       </section>
