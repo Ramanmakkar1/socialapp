@@ -14,6 +14,7 @@ import g from "@/components/guides/guides.module.css";
 import t from "@/components/tools/tools.module.css";
 import { BRAND } from "@/lib/brand";
 import { faqJsonLd, ldJson } from "@/lib/tool-schema";
+import { guideArticleJsonLd } from "@/lib/guide-schema";
 import { GUIDES, categoryLabel, guideBySlug, guidePath, readingMinutes } from "@/content/guides/registry";
 import { GUIDE_BODIES } from "@/content/guides/bodies";
 
@@ -88,39 +89,7 @@ export default async function GuidePage({ params }: Props) {
   const keepReading = [...relatedGuides, ...FURTHER_READING].slice(0, 3);
   const relevantTool = toolByHref(guide.tools[0]);
 
-  const articleJsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebPage",
-        "@id": `${url}#webpage`,
-        url,
-        name: guide.title,
-        description: guide.description,
-        inLanguage: "en",
-        isPartOf: { "@id": `${BRAND.url}#website` },
-        about: { "@id": `${BRAND.url}#org` },
-        mainEntity: { "@id": `${url}#article` },
-      },
-      {
-        "@type": "BlogPosting",
-        "@id": `${url}#article`,
-        headline: guide.h1,
-        description: guide.description,
-        image: [`${BRAND.url}${guide.cover.src}`],
-        datePublished: guide.published,
-        dateModified: guide.updated,
-        author: { "@type": "Organization", name: guide.author, url: BRAND.url },
-        publisher: { "@id": `${BRAND.url}#org` },
-        isPartOf: { "@id": `${BRAND.url}#website` },
-        mainEntityOfPage: { "@id": `${url}#webpage` },
-        url,
-        articleSection: categoryLabel(guide.category),
-        wordCount: guide.wordCount,
-        inLanguage: "en",
-      },
-    ],
-  };
+  const articleJsonLd = guideArticleJsonLd(guide);
 
   const tocList = (
     <ol>
