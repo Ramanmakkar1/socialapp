@@ -346,7 +346,7 @@ export default async function FeaturesPage() {
                 {aiReady ? "Try AI captions free" : "Start free, write captions yourself"} <span aria-hidden="true">&rarr;</span>
               </Link>
               {aiReady ? <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p> : null}
-              <p className="small">See how our <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> works, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link>, and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>.</p>
+              <p className="small">See how our <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> works, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link>, and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>. You can also plan posts with the <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link> or the <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link>.</p>
             </div>
             <div className="art">
               <AnimArt name="feat-ai" label="An AI helper drafts a caption idea" />
