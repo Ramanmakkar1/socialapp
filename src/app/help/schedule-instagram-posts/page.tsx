@@ -160,6 +160,10 @@ export default function ScheduleInstagramPostsHelpPage() {
               How to schedule Instagram <em className="s">posts</em>
             </h1>
           <p className="lede">
+            You can schedule Instagram posts in Poskoo on the $0 Free plan. Connect your Instagram account, add your
+            media and caption, pick a date and time in your own time zone, and Poskoo publishes the post for you.
+          </p>
+          <p className="lede">
             Connect an Instagram professional (Business or Creator) account through Meta&apos;s official login, open the
             Calendar, paste one public https JPEG image link, write a caption, pick a date and time, press Schedule, and
             Poskoo publishes it automatically.
@@ -190,6 +194,12 @@ export default function ScheduleInstagramPostsHelpPage() {
         <div className="wrap">
           <div className={s.prose}>
             <h2>Step by step</h2>
+            <ol>
+              <li>Connect the Instagram account you want to post from.</li>
+              <li>Add the media and the caption for your post.</li>
+              <li>Pick the date and time in your time zone.</li>
+              <li>Check the scheduled post on the calendar.</li>
+            </ol>
             {steps.map((st, i) => (
               <div key={st.name}>
                 <h3>
