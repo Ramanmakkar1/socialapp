@@ -427,6 +427,8 @@ export default async function FeaturesPage() {
               <p className="small">
                 Coming from Hootsuite? Read the{" "}
                 <Link className={s.vlink} href="/hootsuite-alternative">Hootsuite alternative with Instagram auto-DM</Link>.
+                Comparing tools? See how Poskoo works as a{" "}
+                <Link className={s.vlink} href="/buffer-alternative">Buffer alternative</Link>.
               </p>
             </div>
             <div className="art">
