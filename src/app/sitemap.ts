@@ -26,6 +26,17 @@ export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 // glance and survives any future change to the generic origin checks.
 const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com";
 
+// The homepage is the one URL the audit tracks separately. It is listed only
+// while the site-wide noindex flag is off; the same isPathIndexable("/") call
+// drives the robots meta in src/app/layout.tsx and src/app/page.tsx, so the
+// sitemap can never advertise a noindex homepage.
+const HOMEPAGE_PATH: PublicPath = "/";
+
+function isListablePath(path: PublicPath): boolean {
+  if (path === HOMEPAGE_PATH && !isPathIndexable(HOMEPAGE_PATH)) return false;
+  return isPathIndexable(path);
+}
+
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
 // intended; the file stays raw XML with no XSLT styling.
 // The tools URL list is PUBLIC_PATHS in src/lib/public-pages.ts; it already
@@ -44,8 +55,9 @@ function getSitemapPaths(host?: string | null): PublicPath[] {
   // a redirect is bypassed.
   if (host && !isApprovedProductionOrigin(`https://${host}`)) return [];
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
-  // home is listed only when indexable (production).
-  return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
+  // home is listed only when indexable (production); every other noindex path
+  // is dropped by the same helper, so a fully noindex site returns an empty list.
+  return PUBLIC_PATHS.filter(isListablePath);
 }
 
 export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
@@ -53,7 +65,7 @@ export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
   // any reason must never reach the XML, even if the candidate list changes.
   const hostIsIndexable = isApprovedProductionOrigin(BRAND.url);
   return getSitemapPaths(host)
-    .filter((path) => hostIsIndexable && isPathIndexable(path))
+    .filter((path) => hostIsIndexable && isListablePath(path))
     .map((path) => {
       return {
         url: `${BRAND.url}${path}`,
