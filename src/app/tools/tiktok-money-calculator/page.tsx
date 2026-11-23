@@ -116,7 +116,8 @@ const config: ToolPageConfig = {
               hold attention, then post consistently with the{" "}
               <Link href="/tiktok-scheduler">TikTok scheduler</Link> so your best formats keep shipping, and use the{" "}
               <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to turn each video into a
-              ready-to-post caption.
+              ready-to-post caption. See how to plan and schedule those videos in our guide to{" "}
+              <Link href="/guides/how-to-schedule-tiktok-videos">scheduling TikTok videos</Link>.
             </p>
             <p>
               For more ways creators earn beyond one-off videos, read the{" "}
