@@ -73,6 +73,10 @@ const config: ToolPageConfig = {
               (for example a chef emoji built from several symbols) may count as more, and Instagram&apos;s own counter can
               differ slightly. Nothing is sent anywhere and nothing is saved.
             </p>
+            <p>
+              Ready to post it? Plan and schedule it with the{" "}
+              <Link href="/instagram-scheduler">Instagram scheduler</Link>.
+            </p>
           </>
         ),
       },
