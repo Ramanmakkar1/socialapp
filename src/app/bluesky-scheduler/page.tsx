@@ -309,6 +309,9 @@ export default function BlueskySchedulerPage() {
               <p>Read the <Link className={s.vlink} href="/social-media-scheduler-comparison">social media scheduler comparison</Link> to review supported channels, publishing and planning features.</p>
             </article>
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Reuse the same text for cross-posting: write it once with the free <Link className={s.vlink} href="/tools/social-media-post-generator">social media post generator</Link>, then turn it into a thread with the <Link className={s.vlink} href="/tools/x-thread-maker">X thread maker</Link>.
+          </p>
         </div>
       </section>
 
