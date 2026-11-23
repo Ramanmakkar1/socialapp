@@ -91,6 +91,22 @@ export const body: GuideBody = {
             login and publishes with the Content Posting API. Here is the full flow, or follow the short{" "}
             <Link href="/help/schedule-tiktok-posts">TikTok scheduling help article</Link> inside the app.
           </p>
+          <p><strong>Four steps to schedule a TikTok in Poskoo:</strong></p>
+          <ol>
+            <li>
+              <strong>Connect TikTok</strong> through TikTok&apos;s official login and allow publishing access.
+            </li>
+            <li>
+              <strong>Upload the video and caption</strong> in the composer, then pick the visibility and post options.
+            </li>
+            <li>
+              <strong>Choose the date and time in your time zone</strong> so the post goes out when you expect it to.
+            </li>
+            <li>
+              <strong>Confirm on the calendar</strong> and check the queue, where you can edit, reschedule or delete the
+              post before it is due.
+            </li>
+          </ol>
 
           <h3>1. Connect TikTok through the official login</h3>
           <p>
