@@ -233,6 +233,21 @@ export default async function FeaturesPage() {
               <Link className="go" href="/instagram-link-in-bio">Build your Instagram link in bio <span aria-hidden="true">&rarr;</span></Link>
             </article>
             <article className="pcard">
+              <h3>Social media scheduler</h3>
+              <p>Plan, queue and auto-publish posts across your connected channels from one calendar.</p>
+              <Link className="go" href="/social-media-scheduler">See the social media scheduler <span aria-hidden="true">&rarr;</span></Link>
+            </article>
+            <article className="pcard">
+              <h3>Buffer alternative</h3>
+              <p>Compare Poskoo with Buffer for scheduling and comment-to-DM automation in one plan.</p>
+              <Link className="go" href="/buffer-alternative">See the Buffer alternative <span aria-hidden="true">&rarr;</span></Link>
+            </article>
+            <article className="pcard">
+              <h3>AI social media manager</h3>
+              <p>Draft captions and replies with AI, then approve and schedule them in a few clicks.</p>
+              <Link className="go" href="/ai-social-media-manager">Explore the AI social media manager <span aria-hidden="true">&rarr;</span></Link>
+            </article>
+            <article className="pcard">
               <h3>Pricing</h3>
               <p>Compare the Free, Pro and Agency plans and what each one includes.</p>
               <Link className="go" href="/pricing">See Poskoo pricing and plans <span aria-hidden="true">&rarr;</span></Link>
