@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { readSignupDraft, SIGNUP_KEY, writeSignupDraft } from "./captionHandoff.ts";
+import { peekSignupDraft, readSignupDraft, SIGNUP_KEY, writeSignupDraft } from "./captionHandoff.ts";
 
 class MemoryStorage {
   private items = new Map<string, string>();
@@ -41,6 +41,15 @@ test("signup draft older than 30 minutes is rejected", () => {
   payload.writtenAt = new Date(Date.now() - 31 * 60 * 1000).toISOString();
   storage.setItem(SIGNUP_KEY, JSON.stringify(payload));
   assert.deepEqual(readSignupDraft(), { ok: false, error: "expired" });
+});
+
+test("peek validates a signup draft without removing it", () => {
+  const storage = useMemoryStorage();
+  writeSignupDraft("Launch day caption ✨");
+  assert.deepEqual(peekSignupDraft(), { ok: true, caption: "Launch day caption ✨" });
+  assert.ok(storage.getItem(SIGNUP_KEY), "peek must not remove the draft");
+  assert.deepEqual(readSignupDraft(), { ok: true, caption: "Launch day caption ✨" });
+  assert.deepEqual(peekSignupDraft(), { ok: false, error: "absent" });
 });
 
 test("signup draft that is not valid JSON is rejected", () => {

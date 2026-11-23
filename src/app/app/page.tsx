@@ -17,6 +17,7 @@ import RefreshInstagramButton from "./RefreshInstagramButton";
 import { CardRowSkeleton } from "./Skeleton";
 import ActiveAutomations from "./ActiveAutomations";
 import FirstSessionChecklist from "./FirstSessionChecklist";
+import SignupDraftBanner from "./SignupDraftBanner";
 import home from "./home.module.css";
 import { BtnLink } from "@/components/ui/kit";
 import EmptyState from "./EmptyState";
@@ -256,6 +257,8 @@ export default async function AppHome() {
           <Link href="/app/calendar?view=list&status=failed">Review and retry</Link>
         </div>
       )}
+
+      <SignupDraftBanner />
 
       {!checklistDone && (
         <FirstSessionChecklist connected={channelConnected} postCreated={postCreated} postScheduled={stats.hasPost} automationCreated={automationCreated} />

@@ -87,6 +87,27 @@ export function readCaptionHandoff(): HandoffResult {
   return { ok: true, caption: payload.caption };
 }
 
+/** Validate a stored signup draft without removing it. Never throws. */
+export function peekSignupDraft(): HandoffResult {
+  let raw: string | null;
+  try {
+    raw = sessionStorage.getItem(SIGNUP_KEY);
+  } catch {
+    return { ok: false, error: "blocked" };
+  }
+  if (raw === null) return { ok: false, error: "absent" };
+  let payload: unknown;
+  try {
+    payload = JSON.parse(raw);
+  } catch {
+    return { ok: false, error: "malformed" };
+  }
+  if (!isHandoff(payload)) return { ok: false, error: "malformed" };
+  const written = new Date(payload.writtenAt).getTime();
+  if (!Number.isFinite(written) || Date.now() - written > SIGNUP_TTL_MS) return { ok: false, error: "expired" };
+  return { ok: true, caption: payload.caption };
+}
+
 /** Remove any stored handoff without reading it. Never throws. */
 export function clearCaptionHandoff(): void {
   try {
