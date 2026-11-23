@@ -21,6 +21,13 @@ const jsonLd = {
       description: pageDescription,
       isPartOf: { "@id": `${BRAND.url}#website` },
     },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${BRAND.url}/` },
+        { "@type": "ListItem", position: 2, name: "Data deletion", item: `${BRAND.url}/data-deletion` },
+      ],
+    },
   ],
 };
 
@@ -31,8 +38,11 @@ export const metadata: Metadata = withSocial({
 });
 export default function Page() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Data deletion", path: "/data-deletion" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }} />
+      <nav aria-label="Breadcrumb" className={s.crumbs}>
+        <Link href="/">Home</Link> / Data deletion
+      </nav>
       <header className="hero">
         <div className={s.heroText}>
           <p className="eyebrow">Legal</p>

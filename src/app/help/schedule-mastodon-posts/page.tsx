@@ -135,7 +135,6 @@ const howToJsonLd = {
 
 const related = [
   { href: "/mastodon-scheduler", label: "Mastodon scheduler" },
-  { href: "/tools/mastodon-character-counter", label: "Mastodon character counter (500 limit)" },
   { href: "/help/schedule-threads-posts", label: "Schedule Threads posts" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];

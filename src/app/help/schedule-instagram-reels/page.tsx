@@ -123,13 +123,11 @@ const faqJsonLd = {
 };
 
 const related = [
-  { href: "/help/schedule-instagram-posts", label: "Schedule Instagram posts" },
   { href: "/help/schedule-instagram-stories", label: "Schedule Instagram Stories" },
   { href: "/instagram-scheduler", label: "Instagram scheduler" },
   { href: "/instagram-auto-dm", label: "Instagram auto DM" },
   { href: "/tools/instagram-safe-zone-checker", label: "Reel and Story safe zone checker" },
   { href: "/help/getting-started", label: "Getting started" },
-  { href: "/guides/how-to-schedule-instagram-posts", label: "How to schedule Instagram posts in 2026 (full guide)" },
 ];
 
 export default function ScheduleInstagramReelsHelpPage() {
@@ -155,8 +153,8 @@ export default function ScheduleInstagramReelsHelpPage() {
               How to schedule Instagram <em className="s">Reels</em>
             </h1>
           <p className="lede">
-            Yes — you can schedule an Instagram Reel by pasting a public .mp4 link, writing a caption, and picking a date
-            and time. Connect your Instagram account first, then open the Calendar and create the post.
+            Paste one public .mp4 link, write a caption, choose a time and {BRAND.name} publishes your Reel for you. Here
+            is exactly what a scheduled Reel needs, step by step.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />

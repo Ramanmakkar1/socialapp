@@ -483,7 +483,7 @@ export const GUIDES: GuideEntry[] = [
       "/tools/instagram-caption-generator",
       "/tools/instagram-image-size",
     ],
-    related: ["cheapest-social-media-scheduling-tools-2026", "best-instagram-auto-dm-tools-2026", "how-to-schedule-tiktok-videos"],
+    related: ["cheapest-social-media-scheduling-tools-2026", "best-instagram-auto-dm-tools-2026"],
   },
   {
     slug: "how-to-schedule-tiktok-videos",
@@ -492,7 +492,7 @@ export const GUIDES: GuideEntry[] = [
       "Schedule TikTok videos free in TikTok Studio or Poskoo's official TikTok API scheduler, with steps, timing tips, size limits and fixes for failed posts.",
     h1: "How to schedule TikTok videos",
     subtitle:
-      "Schedule TikTok videos free in TikTok Studio on a desktop, or in Poskoo through TikTok's official Content Posting API. Both routes are official, so neither one asks for your TikTok password.",
+      "The exact steps for TikTok Studio and Poskoo, the size and caption limits, and how to fix a video that failed.",
     crumb: "How to schedule TikTok videos",
     excerpt: "Schedule TikTok videos free in TikTok Studio or Poskoo, with steps and fixes.",
     category: "scheduling",

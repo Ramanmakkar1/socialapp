@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { guideBySlug, guidePath } from "@/content/guides/registry";
 import { publisherRef } from "@/lib/tool-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
@@ -115,12 +114,7 @@ const faqJsonLd = {
 };
 
 const related = [
-  ...(guideBySlug("how-to-schedule-threads-posts")
-    ? [{ href: guidePath("how-to-schedule-threads-posts"), label: "How to schedule Threads posts in 2026 (full guide)" }]
-    : []),
   { href: "/threads-scheduler", label: "Threads scheduler" },
-  { href: "/tools/threads-character-counter", label: "Threads character counter" },
-  { href: "/tools/best-time-to-post-on-threads", label: "Best time to post on Threads" },
   { href: "/tools/threads-post-preview", label: "Threads post preview tool" },
   { href: "/help", label: "All help guides" },
 ];

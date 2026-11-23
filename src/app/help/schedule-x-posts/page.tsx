@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { guideBySlug, guidePath } from "@/content/guides/registry";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -156,12 +155,7 @@ const howToJsonLd = {
 };
 
 const related = [
-  ...(guideBySlug("how-to-schedule-tweets")
-    ? [{ href: guidePath("how-to-schedule-tweets"), label: "How to schedule tweets on X in 2026 (full guide)" }]
-    : []),
   { href: "/x-scheduler", label: "X scheduler features and media limits" },
-  { href: "/tools/x-character-counter", label: "X character counter (280-character check)" },
-  { href: "/tools/best-time-to-post-on-x", label: "Best time to post on X" },
   { href: "/help/getting-started", label: "Getting started with Poskoo" },
   { href: "/pricing", label: "Poskoo pricing and free plan" },
 ];

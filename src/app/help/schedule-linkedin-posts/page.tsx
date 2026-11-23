@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { guideBySlug, guidePath } from "@/content/guides/registry";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -118,11 +117,7 @@ const howToJsonLd = {
 };
 
 const related = [
-  ...(guideBySlug("how-to-schedule-linkedin-posts")
-    ? [{ href: guidePath("how-to-schedule-linkedin-posts"), label: "How to schedule LinkedIn posts in 2026 (full guide)" }]
-    : []),
   { href: "/linkedin-scheduler", label: "LinkedIn post scheduler" },
-  { href: "/tools/linkedin-character-counter", label: "LinkedIn character counter" },
   { href: "/help/schedule-facebook-posts", label: "Schedule Facebook Page posts" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];

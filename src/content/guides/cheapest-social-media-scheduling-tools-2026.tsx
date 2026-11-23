@@ -19,17 +19,19 @@ export const body: GuideBody = {
   intro: (
     <>
       <p>
-        <strong>
-          Meta Business Suite is the cheapest scheduler if you only post to Facebook and Instagram, because it is free.
-          Buffer and Publer are the cheapest for one or two channels, and a flat plan like Poskoo Pro or Metricool
-          Starter wins once you manage five or more accounts.
-        </strong>
+        A scheduler should save you time, not eat a big chunk of what a small account earns. The good news: in 2026
+        you can schedule posts across several networks for free, or for less than the price of a lunch each month.
+        The catch is that every tool counts differently. Some charge per channel, some per &quot;social set&quot;,
+        some per brand, and free plans are capped in different ways.
       </p>
       <p>
-        A scheduler should save you time, not eat a big chunk of what a small account earns. The catch is that every
-        tool counts differently: some charge per channel, some per &quot;social set&quot;, some per brand, and free
-        plans are capped in different ways. We compared eight cheap and free schedulers on what you actually pay for a
-        typical setup. Prices were checked in November 2026 and may change.
+        We compared eight cheap and free schedulers on what you actually pay for a typical setup.{" "}
+        <strong>
+          Short answer: Meta Business Suite is free if you only post to Facebook and Instagram, Buffer and Publer are
+          the cheapest for one or two channels, and a flat plan like Poskoo Pro or Metricool Starter wins once you
+          manage five or more accounts.
+        </strong>{" "}
+        Prices were checked in November 2026 and may change.
       </p>
       <Callout kind="warning" title="Disclosure: we make Poskoo">
         <p>

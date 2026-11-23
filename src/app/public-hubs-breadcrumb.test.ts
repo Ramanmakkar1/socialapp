@@ -3,16 +3,23 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 // PublicShell owns the visible trail and the BreadcrumbList JSON-LD for public
-// hubs. Pricing and Help must only pass their crumb, so neither page grows a
-// second hand-written trail or a duplicate BreadcrumbList.
+// hubs. Pricing must only pass its crumb, so it never grows a second
+// hand-written trail or a duplicate BreadcrumbList.
 const shellSource = readFileSync("src/components/PublicShell.tsx", "utf8");
 const breadcrumbsSource = readFileSync("src/components/Breadcrumbs.tsx", "utf8");
 const pricingSource = readFileSync("src/app/pricing/page.tsx", "utf8");
 const helpSource = readFileSync("src/app/help/page.tsx", "utf8");
 
+// The Help hub keeps the owner's design: no visible trail, one BreadcrumbList
+// of its own (it does not pass crumbs to PublicShell, so there is no duplicate).
+test("help hub has no visible trail and exactly one BreadcrumbList", () => {
+  assert.ok(!helpSource.includes("breadcrumbs={"), "help must not pass a visible trail to PublicShell");
+  assert.ok(!helpSource.includes('aria-label="Breadcrumb"'), "help must not render its own breadcrumb nav");
+  assert.equal(helpSource.split("breadcrumbJsonLd(").length - 1, 1, "help must render one BreadcrumbList");
+});
+
 for (const [name, source, crumb] of [
   ["pricing", pricingSource, '{ name: "Pricing", path: PATH }'],
-  ["help", helpSource, '{ name: "Help", path: "/help" }'],
 ] as const) {
   test(`${name} hub passes its breadcrumb to PublicShell`, () => {
     assert.ok(source.includes("breadcrumbs={"), `${name} must pass breadcrumbs to PublicShell`);

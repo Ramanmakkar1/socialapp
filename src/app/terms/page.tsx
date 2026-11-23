@@ -23,13 +23,23 @@ const jsonLd = {
       inLanguage: "en",
       isPartOf: { "@id": BRAND.url + "#website" },
     },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: BRAND.url + "/" },
+        { "@type": "ListItem", position: 2, name: "Terms", item: BRAND.url + "/terms" },
+      ],
+    },
   ],
 };
 
 export default function Page() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Terms", path: "/terms" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <nav aria-label="Breadcrumb" className={s.crumbs}>
+        <Link href="/">Home</Link> / Terms
+      </nav>
       <header className="hero">
         <div className={s.heroText}>
           <p className="eyebrow">Legal</p>

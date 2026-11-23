@@ -120,13 +120,11 @@ const faqJsonLd = {
 };
 
 const related = [
-  { href: "/help/schedule-instagram-posts", label: "Schedule Instagram posts" },
   { href: "/help/schedule-instagram-reels", label: "Schedule Instagram Reels" },
   { href: "/help/schedule-instagram-stories", label: "Schedule Instagram Stories" },
   { href: "/instagram-scheduler", label: "Instagram scheduler" },
   { href: "/tools/instagram-image-size", label: "Instagram image size guide" },
   { href: "/help/getting-started", label: "Getting started" },
-  { href: "/guides/how-to-schedule-instagram-posts", label: "How to schedule Instagram posts in 2026 (full guide)" },
 ];
 
 export default function ScheduleInstagramCarouselHelpPage() {
@@ -152,8 +150,8 @@ export default function ScheduleInstagramCarouselHelpPage() {
               How to schedule an Instagram <em className="s">carousel post</em>
             </h1>
           <p className="lede">
-            Yes — you can schedule an Instagram carousel by pasting 2 to 10 public image links, writing one caption, and
-            picking a time. Connect your Instagram account, then open the Calendar to paste the links and schedule it.
+            Paste 2 to 10 public image links, write one caption, choose a time and {BRAND.name} publishes your carousel
+            for you. Here is exactly what a scheduled carousel needs, step by step.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />

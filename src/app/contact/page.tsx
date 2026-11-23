@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { ldJson } from "@/lib/tool-schema";
+import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import s from "@/components/site.module.css";
@@ -27,12 +27,21 @@ const contactJsonLd = {
   },
 };
 
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: BRAND.canonicalUrl },
+  { name: "Contact", url: `${BRAND.canonicalUrl}/contact` },
+]);
+
 export default function ContactPage() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Contact", path: "/contact" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(contactJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <header className="hero">
         <div className={s.heroText}>
@@ -97,17 +106,13 @@ export default function ContactPage() {
                 <div className="pain" id="password-reset">
                   <b>Forgot your password?</b>
                   <span>
-                    <Link className={s.vlink} href="/forgot-password">
-                      Reset your password
-                    </Link>{" "}
-                    or{" "}
+                    Email us from the address you signed up with and we will help you get back into your account.{" "}
                     <a
                       className={s.vlink}
                       href={`mailto:${BRAND.supportEmail}?subject=${encodeURIComponent("Password reset")}`}
                     >
-                      email support
-                    </a>{" "}
-                    if you need a hand.
+                      Email support
+                    </a>
                   </span>
                 </div>
               </div>

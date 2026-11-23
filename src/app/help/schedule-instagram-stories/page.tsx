@@ -136,7 +136,6 @@ const related = [
   { href: "/instagram-scheduler", label: "Instagram scheduler" },
   { href: "/tools/instagram-image-size", label: "Instagram image size guide" },
   { href: "/help/getting-started", label: "Getting started" },
-  { href: "/guides/how-to-schedule-instagram-posts", label: "How to schedule Instagram posts in 2026 (full guide)" },
 ];
 
 export default function ScheduleInstagramStoriesHelpPage() {
@@ -162,8 +161,8 @@ export default function ScheduleInstagramStoriesHelpPage() {
               How to schedule Instagram <em className="s">Stories</em>
             </h1>
           <p className="lede">
-            Yes — you can schedule an Instagram Story by pasting one public image or video link, choosing the Story
-            format, and picking a time. Connect your account, then open the Calendar to create your first Story.
+            Paste one public image or video link, pick the Story format, choose a time and {BRAND.name} publishes it for
+            you. Here is exactly what a scheduled Story can and can&apos;t include.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />

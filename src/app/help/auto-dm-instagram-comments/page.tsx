@@ -193,8 +193,8 @@ export default function AutoDmInstagramCommentsHelpPage() {
               How to auto-DM people who comment on your <em className="s">Instagram posts</em>
             </h1>
           <p className="lede">
-            Yes — you can automatically DM everyone who comments a chosen keyword on your Instagram posts. To start,
-            connect your Instagram account in Settings, then create your first keyword rule in Auto-DM.
+            Send an automatic DM to everyone who comments a keyword. {BRAND.name} uses Meta&apos;s official Instagram
+            API, so you set one rule and every matching comment gets your message and link.
           </p>
         </div>
         <HelpGuideIllustration variant="autodm" className="hero-art" />

@@ -138,7 +138,6 @@ const howToJsonLd = {
 
 const related = [
   { href: "/bluesky-scheduler", label: "Bluesky scheduler" },
-  { href: "/tools/bluesky-character-counter", label: "Bluesky character counter (300 limit)" },
   { href: "/help/schedule-threads-posts", label: "Schedule Threads posts" },
   { href: "/help/getting-started", label: "Getting started guide" },
 ];

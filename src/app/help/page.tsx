@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { ldJson } from "@/lib/tool-schema";
+import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
@@ -39,113 +39,106 @@ const guides = [
     go: "Read guide",
   },
   {
-    href: "/help/schedule-instagram-posts",
-    no: "04 / Scheduling",
-    title: "How to schedule Instagram posts",
-    text: "Paste one JPEG image link, write a caption, pick a date and time and the feed post publishes automatically.",
-    go: "How to schedule Instagram posts",
-  },
-  {
     href: "/help/schedule-instagram-stories",
-    no: "05 / Scheduling",
+    no: "04 / Scheduling",
     title: "Schedule Instagram Stories",
     text: "Pick the Story format, paste one image or video link, choose a time and see what Stories can and cannot include.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-instagram-reels",
-    no: "06 / Scheduling",
+    no: "05 / Scheduling",
     title: "Schedule Instagram Reels",
     text: "Paste one public .mp4 link, write a caption, pick a time and see what a scheduled Reel needs, step by step.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-instagram-carousel",
-    no: "07 / Scheduling",
+    no: "06 / Scheduling",
     title: "Schedule Instagram carousels",
     text: "Paste 2 to 10 public image links in slide order, write one caption and schedule the carousel from the Calendar.",
     go: "Read guide",
   },
   {
     href: "/help/instagram-story-reply-auto-dm",
-    no: "08 / Auto-DM",
+    no: "07 / Auto-DM",
     title: "Auto-DM Instagram Story replies",
     text: "Send a DM with your link to everyone who replies to your Story with a keyword like FREE.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-threads-posts",
-    no: "09 / Scheduling",
+    no: "08 / Scheduling",
     title: "Schedule Threads posts",
     text: "Write up to 500 characters, add one image or video, pick a time and Poskoo publishes it to Threads.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-facebook-posts",
-    no: "10 / Scheduling",
+    no: "09 / Scheduling",
     title: "Schedule Facebook Page posts",
     text: "Connect your Page with Meta's official login, write the post, add photos or a video link and pick a time.",
     go: "Read guide",
   },
   {
     href: "/help/instagram-link-in-bio-setup",
-    no: "11 / Link in bio",
+    no: "10 / Link in bio",
     title: "Set up your link-in-bio page",
     text: "Build a mobile link page, publish it and paste its page URL into your Instagram bio.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-linkedin-posts",
-    no: "12 / Scheduling",
+    no: "11 / Scheduling",
     title: "Schedule LinkedIn posts",
     text: "Connect your profile with LinkedIn's official sign-in, write the post, add images, pick a time and it publishes.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-tiktok-posts",
-    no: "13 / Scheduling",
+    no: "12 / Scheduling",
     title: "Schedule TikTok videos",
     text: "Connect TikTok with its official login, upload a vertical video, choose who can see it, pick a time and it posts.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-pinterest-posts",
-    no: "14 / Scheduling",
+    no: "13 / Scheduling",
     title: "Schedule Pinterest Pins",
     text: "Connect Pinterest with its official login, pick a board, add an image and link, choose a time and it pins.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-x-posts",
-    no: "15 / Scheduling",
+    no: "14 / Scheduling",
     title: "Schedule X posts",
     text: "Connect X with OAuth, write up to 280 characters, add images or one video, pick a time and track its status.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-youtube-videos",
-    no: "16 / Scheduling",
+    no: "15 / Scheduling",
     title: "Schedule YouTube videos and Shorts",
     text: "Connect with Google, add a video, title, description and tags, choose privacy and a time, then track its status.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-bluesky-posts",
-    no: "17 / Scheduling",
+    no: "16 / Scheduling",
     title: "Schedule Bluesky posts",
     text: "Create an app password, connect your handle, write up to 300 characters, add up to 4 images and pick a time.",
     go: "Read guide",
   },
   {
     href: "/help/schedule-mastodon-posts",
-    no: "18 / Scheduling",
+    no: "17 / Scheduling",
     title: "Schedule Mastodon posts",
     text: "Connect your server with OAuth, write to its character limit, add images or video and pick a time.",
     go: "Read guide",
   },
   {
     href: "/contact",
-    no: "19 / Contact",
+    no: "18 / Contact",
     title: "Contact support",
     text: "Email the team about scheduling, auto-DMs or your account — we reply within one business day.",
     go: "Contact us",
@@ -170,39 +163,6 @@ const resources = [
   },
 ];
 
-const faqs = [
-  {
-    q: "How do I get started with Poskoo?",
-    a: "Sign in, connect Instagram in Settings, create your first auto-DM rule from a template, then schedule a post in the calendar. The getting started guide walks through all three steps in about three minutes.",
-  },
-  {
-    q: "Which Instagram account type do I need for auto-DM?",
-    a: "You need a free Instagram Business or Creator account. Connect it through Meta's official login in Settings — Poskoo never asks for your Instagram password.",
-  },
-  {
-    q: "Where can I find troubleshooting help?",
-    a: "Start with the Instagram auto DM not working guide for a step-by-step checklist covering the connection, message access, active rules, keywords, gates and the send queue. If you are still stuck, contact support and we reply within one business day.",
-  },
-  {
-    q: "Do I need to give Poskoo my social media passwords?",
-    a: "No. Every account connects through the platform's official login or app password, so Poskoo never sees or stores your passwords.",
-  },
-  {
-    q: "Can I schedule posts for platforms other than Instagram?",
-    a: "Yes. Poskoo also schedules Facebook Pages, Threads, LinkedIn, TikTok, Pinterest, X, YouTube, Bluesky and Mastodon from the same calendar.",
-  },
-];
-
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
-    "@type": "Question",
-    name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
-  })),
-};
-
 const collectionJsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
@@ -223,16 +183,21 @@ const collectionJsonLd = {
   },
 };
 
+const crumbsJsonLd = breadcrumbJsonLd([
+  { name: "Home", url: BRAND.canonicalUrl },
+  { name: "Help", url: `${BRAND.canonicalUrl}/help` },
+]);
+
 export default function HelpHubPage() {
   return (
-    <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Help", path: "/help" }]}>
+    <PublicShell className={`${s.sched} ${s.pub}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(collectionJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: ldJson(crumbsJsonLd) }}
       />
       <header className="hero">
         <div className={s.heroText}>
@@ -241,34 +206,11 @@ export default function HelpHubPage() {
             Help <em className="s">center</em>
           </h1>
           <p className="lede">
-            {BRAND.name} Help answers how to connect your social accounts, schedule posts, and set up Instagram comment-to-DM automation, with step-by-step guides for every feature.
+            Guides for scheduling posts and Instagram comment-to-DM automation in {BRAND.name}.
           </p>
         </div>
         <div className="hero-art"><AnimArt name="help" label="A creator reads on a giant open book under a lightbulb and a signpost" /></div>
       </header>
-
-      <div className="wrap">
-        <nav aria-label="Popular help topics" className={s.chipRow}>
-          <p>Popular topics</p>
-          <div>
-            <Link className={s.chip} href="/instagram-scheduler">
-              Instagram post scheduler
-            </Link>
-            <Link className={s.chip} href="/instagram-auto-dm">
-              Instagram auto-DM setup
-            </Link>
-            <Link className={s.chip} href="/help/schedule-instagram-posts">
-              How to schedule Instagram posts
-            </Link>
-            <Link className={s.chip} href="/pricing">
-              Plans and pricing
-            </Link>
-            <Link className={s.chip} href="/contact">
-              Contact support
-            </Link>
-          </div>
-        </nav>
-      </div>
 
       <section style={{ paddingTop: 40 }}>
         <div className="wrap">
@@ -286,23 +228,6 @@ export default function HelpHubPage() {
                   {g.go} <span aria-hidden="true">→</span>
                 </Link>
               </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{ paddingTop: 20 }}>
-        <div className="wrap">
-          <div className="head">
-            <p className="eyebrow">Questions</p>
-            <h2>FAQ</h2>
-          </div>
-          <div className="faq">
-            {faqs.map((f) => (
-              <details key={f.q}>
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-              </details>
             ))}
           </div>
         </div>
