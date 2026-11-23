@@ -294,7 +294,7 @@ export default async function InstagramScheduler() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            Need the step-by-step version? Read <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts in Poskoo</Link>.
+            Need the step-by-step version? Read <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts in Poskoo</Link>. Scheduling more than Instagram? See the <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link> for every network.
           </p>
         </div>
       </section>
