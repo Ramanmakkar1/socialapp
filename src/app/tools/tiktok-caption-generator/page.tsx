@@ -178,7 +178,9 @@ const config: ToolPageConfig = {
       aNode: (
         <>
           Use the <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder to get three
-          starting slots for your audience and time zone, then test them and keep what works.
+          starting slots for your audience and time zone, then test them and keep what works. Once you have a slot,{" "}
+          <Link href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link> shows how to queue it
+          in advance.
         </>
       ),
     },
