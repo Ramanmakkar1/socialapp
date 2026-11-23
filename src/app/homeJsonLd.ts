@@ -17,7 +17,7 @@ export const homePageJsonLd = (
       "@id": BRAND.canonicalUrl + "#org",
       name: BRAND.name,
       legalName: BRAND.company,
-      url: BRAND.canonicalUrl,
+      url: BRAND.canonicalUrl + "/",
       email: BRAND.supportEmail,
       description: BRAND.description,
       slogan: BRAND.tagline,
@@ -37,7 +37,7 @@ export const homePageJsonLd = (
     {
       "@type": "WebSite",
       "@id": BRAND.canonicalUrl + "#website",
-      url: BRAND.canonicalUrl,
+      url: BRAND.canonicalUrl + "/",
       name: BRAND.name,
       publisher: { "@id": BRAND.canonicalUrl + "#org" },
       inLanguage: "en",
