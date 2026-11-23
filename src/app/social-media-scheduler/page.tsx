@@ -111,20 +111,20 @@ const steps = [
   {
     n: "1",
     art: "feat-linkbio" as const,
-    title: "Connect accounts with official login",
-    text: "Sign in on each platform's own login screen and approve publishing. Poskoo never asks for your password.",
+    title: "Connect Instagram, Facebook or Threads via Meta",
+    text: "Connect the Instagram, Facebook or Threads account you want to post from with Meta's official login. Poskoo never asks for your password.",
   },
   {
     n: "2",
     art: "writing" as const,
-    title: "Write once and customise per channel",
-    text: "Write your post in one composer, select the channels, and adjust the caption for each platform where you want a different version.",
+    title: "Compose the post and pick a time on the calendar",
+    text: "Add your image or video in the composer, then choose the date and time on the week or month calendar in your own time zone.",
   },
   {
     n: "3",
     art: "feat-calendar" as const,
-    title: "Pick a time and track the queue",
-    text: "Choose a date and time, see it in the queue and calendar, then follow the published or failed status of every post.",
+    title: "Poskoo publishes on time and reports the result",
+    text: "At the scheduled time Poskoo publishes through the official API and shows a success or failure status for every post, retrying automatically if a publish fails.",
   },
 ];
 
@@ -281,7 +281,7 @@ export default function SocialMediaSchedulerPage() {
         <div className="wrap">
           <div className="head">
             <p className="eyebrow">How it works</p>
-            <h2>How does scheduling work in Poskoo?</h2>
+            <h2>How scheduling works</h2>
           </div>
           <div className="howGrid">
             {steps.map((step) => (
@@ -294,6 +294,7 @@ export default function SocialMediaSchedulerPage() {
             ))}
           </div>
           <p className="lede">See every scheduled post on a week or month view in the <Link className={s.vlink} href="/features/social-media-content-calendar">social media content calendar</Link>.</p>
+          <p className="lede">The Free plan is $0 with no card needed. If a post will not publish, read the <Link className={s.vlink} href="/help">scheduling help</Link>.</p>
         </div>
       </section>
 
