@@ -305,8 +305,12 @@ export default function SocialMediaSchedulerForRestaurantsPage() {
             </table>
           </div>
           <p className="small" style={{ marginTop: 16 }}>
-            TikTok, Pinterest, X and Google Business Profile are built and waiting for each platform&apos;s API
-            approval. They are not listed as available until they are switched on.
+            TikTok, Pinterest, X and{" "}
+            <Link className={s.vlink} href="/google-business-profile-scheduler">
+              Google Business Profile
+            </Link>{" "}
+            are built and waiting for each platform&apos;s API approval. They are not listed as available until they
+            are switched on.
           </p>
         </div>
       </section>
