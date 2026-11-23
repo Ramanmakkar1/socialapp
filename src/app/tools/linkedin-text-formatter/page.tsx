@@ -291,6 +291,18 @@ export default function LinkedInTextFormatterPage() {
               </Link>
             </li>
             <li>
+              <Link href="/social-media-scheduler" className={`${t.card} ${t.acc_plan}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_plan}`}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>Social media scheduler</b>
+                </span>
+                <p>Plan, queue and publish posts across Instagram, Facebook, LinkedIn and more from one calendar.</p>
+                <span className={t.go}>Explore the social media scheduler <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+            <li>
               <Link href="/signup" className={`${t.card} ${t.acc_plan}`}>
                 <span className={t.cardTop}>
                   <span className={`${t.cardIcon} ${t.cat_plan}`}>
