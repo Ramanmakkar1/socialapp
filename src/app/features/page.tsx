@@ -256,6 +256,11 @@ export default async function FeaturesPage() {
                 Poskoo schedules your posts on a week or month calendar and auto-publishes each one at the time
                 you choose, so you can plan a whole week in one sitting.
               </p>
+              <p>
+                Google Business Profile scheduling is built in too, so you can plan and publish updates from the same
+                calendar with the{" "}
+                <Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>.
+              </p>
               <ul>
                 {schedulerBullets.map((item) => (
                   <li key={item}>{item}</li>
