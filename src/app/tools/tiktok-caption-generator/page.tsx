@@ -12,6 +12,8 @@ const config: ToolPageConfig = {
     "Free TikTok caption generator: enter your topic, pick a goal and tone, copy six captions with a short hook and call to action. Under TikTok's 4,000 limit.",
   pill: "Free · no signup · no AI or scraping",
   h1: { before: "TikTok caption generator:", mark: "free captions", after: "with hooks" },
+  answer:
+    "To write a good TikTok caption, hook viewers in the first line, name the video's topic in plain words, then add a clear call to action and a small set of relevant hashtags. Keep it short enough to read over the video, and check the length before you post.",
   lede: "Generate six TikTok caption drafts from your topic, goal and tone. Each one has a short hook and a call to action, runs in your browser and is ready to copy.",
   art: "writing",
   artLabel: "A creator writes TikTok captions with a hook, call to action and phone preview",
@@ -59,6 +61,29 @@ const config: ToolPageConfig = {
     intro:
       "A strong TikTok caption names the video's topic, gives viewers a clear opening and ends with a relevant next step. Use these drafts as a starting point, then add the details only your video can supply.",
     sections: [
+      {
+        title: "TikTok caption tips",
+        body: (
+          <ul>
+            <li>
+              <b>Hook in the first line.</b> Only the opening line usually shows over the video, so lead with the most
+              interesting detail or question.
+            </li>
+            <li>
+              <b>Use 3-5 relevant hashtags.</b> Choose tags that describe the video rather than broad tags that have
+              nothing to do with it.
+            </li>
+            <li>
+              <b>Add one clear call to action.</b> Ask for a single next step, such as saving the video, commenting or
+              visiting a link.
+            </li>
+            <li>
+              <b>Keep it under 150 characters.</b> Short captions stay readable over the video. The limit is 4,000
+              characters, but a tight caption is easier to scan.
+            </li>
+          </ul>
+        ),
+      },
       {
         title: "What this TikTok caption generator does",
         body: (
