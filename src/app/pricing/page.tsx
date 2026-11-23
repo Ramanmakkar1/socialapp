@@ -170,6 +170,10 @@ export default async function PricingPage() {
               </Link>{" "}
               page.
             </p>
+            <p className="small">
+              See everything you can schedule on the{" "}
+              <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>.
+            </p>
           </div>
         </div>
       </section>
