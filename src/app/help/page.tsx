@@ -257,6 +257,9 @@ export default function HelpHubPage() {
             <Link className={s.chip} href="/instagram-auto-dm">
               Instagram auto-DM setup
             </Link>
+            <Link className={s.chip} href="/help/schedule-instagram-posts">
+              How to schedule Instagram posts
+            </Link>
             <Link className={s.chip} href="/pricing">
               Plans and pricing
             </Link>
