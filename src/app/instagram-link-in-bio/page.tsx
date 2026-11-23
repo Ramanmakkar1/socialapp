@@ -246,7 +246,11 @@ export default function InstagramLinkInBioPage() {
               </p>
               <p>
                 You control the handle, display name, bio, avatar and theme. Each link gets a tracked short link, so the
-                Link in bio screen shows clicks per link and the total for the page.
+                Link in bio screen shows clicks per link and the total for the page. When you{" "}
+                <Link className={s.vlink} href="/instagram-scheduler">
+                  schedule Instagram posts
+                </Link>{" "}
+                in Poskoo, your latest published posts appear under your links automatically.
               </p>
             </div>
             <div className="art">
