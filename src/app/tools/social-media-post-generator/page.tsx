@@ -124,6 +124,11 @@ const config: ToolPageConfig = {
               <Link href="/social-media-scheduler">social media scheduler</Link> to plan it on a calendar, and see the{" "}
               <Link href="/features">scheduler features</Link> for queues, auto-DM rules and post approvals.
             </p>
+            <p>
+              Writing for other networks? Plan the same post with the{" "}
+              <Link href="/bluesky-scheduler">Bluesky scheduler</Link> or style bold, italic and bulleted lines with the{" "}
+              <Link href="/tools/linkedin-text-formatter">LinkedIn text formatter</Link>.
+            </p>
           </>
         ),
       },
