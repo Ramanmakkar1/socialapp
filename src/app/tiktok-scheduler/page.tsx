@@ -271,6 +271,8 @@ export default function TikTokSchedulerPage() {
             <Link className={s.vlink} href="/help/schedule-tiktok-posts">TikTok scheduling help page</Link>.
             {" "}Step-by-step:{" "}
             <Link className={s.vlink} href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link>.
+            {" "}Need a caption? Try the free{" "}
+            <Link className={s.vlink} href="/tools/tiktok-caption-generator">TikTok caption generator</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Writing a caption first? Check the 4,000-character limit and feed preview with our{" "}
