@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
 import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
@@ -32,6 +33,12 @@ const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com";
 // sitemap can never advertise a noindex homepage.
 const HOMEPAGE_PATH: PublicPath = "/";
 
+// Tool routes whose page metadata sets `robots: { index: false }`. Grep
+// src/app/tools for `index: false` and add each route here so a noindex tool
+// can never be listed. As of 2026-11-23 no tool page is noindex (the grep finds
+// nothing), so the list is empty; isPathIndexable still drops app/auth routes.
+const NOINDEX_PATHS: readonly string[] = [];
+
 function isListablePath(path: PublicPath): boolean {
   if (path === HOMEPAGE_PATH && !isPathIndexable(HOMEPAGE_PATH)) return false;
   return isPathIndexable(path);
@@ -57,10 +64,12 @@ function getSitemapPaths(host?: string | null): PublicPath[] {
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
   // home is listed only when indexable (production); every other noindex path
   // is dropped by the same helper, so a fully noindex site returns an empty list.
-  return PUBLIC_PATHS.filter(isListablePath);
+  return PUBLIC_PATHS.filter(isListablePath).filter((path) => !NOINDEX_PATHS.includes(path));
 }
 
-export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
+// Synchronous entry builder for callers that already know the request host
+// (and for tests, which run outside a Next.js request).
+export function sitemapEntries(host?: string | null): MetadataRoute.Sitemap {
   // Re-check indexability at the output boundary: a path that is noindex for
   // any reason must never reach the XML, even if the candidate list changes.
   // isPathIndexable("/") is the same site-level noindex condition the root
@@ -85,4 +94,27 @@ export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
     // noindex, even if a future change to BRAND.url or the path list would
     // otherwise allow it.
     .filter((entry) => entry.url.replace(/\/$/, "") !== STAGING_HOMEPAGE_URL);
+}
+
+function normalizeHost(value: string | null | undefined): string {
+  return (value ?? "").split(",")[0]?.trim().toLowerCase().replace(/:\d+$/, "") ?? "";
+}
+
+// Read the request host when the caller did not pass one. headers() throws
+// outside a request (build, tests); then fall back to the BRAND.url checks.
+async function readRequestHost(): Promise<string | null> {
+  try {
+    const h = await headers();
+    return normalizeHost(h.get("x-forwarded-host")) || normalizeHost(h.get("host")) || null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function sitemap(host?: string | null): Promise<MetadataRoute.Sitemap> {
+  const requestHost = typeof host === "string" && host ? normalizeHost(host) : await readRequestHost();
+  // Any host other than poskoo.com (the old staging host, previews, localhost)
+  // gets an empty sitemap.
+  if (requestHost && !isApprovedProductionOrigin(`https://${requestHost}`)) return [];
+  return sitemapEntries(requestHost);
 }

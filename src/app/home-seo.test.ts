@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import sitemap from "./sitemap.ts";
+import { sitemapEntries as sitemap } from "./sitemap.ts";
 import { BRAND } from "@/lib/brand";
 import { isPathIndexable } from "@/lib/indexability";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";

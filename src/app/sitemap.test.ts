@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import robots from "./robots.ts";
 import { GET as llmsTxt } from "./llms.txt/route.ts";
-import sitemap, { SITEMAP_LAST_MODIFIED } from "./sitemap.ts";
+import requestSitemap, { sitemapEntries as sitemap, SITEMAP_LAST_MODIFIED } from "./sitemap.ts";
 import nextConfig from "../../next.config.ts";
 import { BRAND } from "@/lib/brand";
 import { isPathIndexable } from "@/lib/indexability";
@@ -108,6 +108,21 @@ test("sitemap generator returns nothing for the noindex legacy request host", ()
     BRAND.indexable = true;
     assert.deepEqual(sitemap("socialapp.splitforms.com"), [], "the legacy noindex host must not list any URL");
     assert.ok(sitemap("poskoo.com").length > 0, "the approved production host must still list its pages");
+  } finally {
+    BRAND.indexable = was;
+  }
+});
+
+test("async sitemap export lists nothing on any host but poskoo.com", async () => {
+  const was = BRAND.indexable;
+  try {
+    BRAND.indexable = true;
+    for (const host of ["socialapp.splitforms.com", "preview.vercel.app", "localhost:3000"]) {
+      assert.deepEqual(await requestSitemap(host), [], `${host} must get an empty sitemap`);
+    }
+    assert.deepEqual(await requestSitemap("poskoo.com"), sitemap("poskoo.com"));
+    // Outside a request headers() throws; the export must fall back, not crash.
+    assert.deepEqual(await requestSitemap(), sitemap());
   } finally {
     BRAND.indexable = was;
   }
