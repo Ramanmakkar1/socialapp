@@ -156,6 +156,129 @@ export default function ToolsPage() {
           </ul>
         </section>
 
+        <section className={t.picks} aria-labelledby="schedulers-by-network">
+          <div className={t.groupHead}>
+            <h2 id="schedulers-by-network">Schedulers by network</h2>
+            <p>
+              Schedule posts on Instagram, TikTok, LinkedIn, Threads, Bluesky, Pinterest, Facebook and Google Business Profile.
+            </p>
+          </div>
+          <ul className={t.grid}>
+            <li>
+              <Link href="/instagram-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>Instagram scheduler</b>
+                </span>
+                <p>Schedule posts on Instagram.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/tiktok-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>TikTok scheduler</b>
+                </span>
+                <p>Schedule posts on TikTok.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/linkedin-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>LinkedIn scheduler</b>
+                </span>
+                <p>Schedule posts on LinkedIn.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/threads-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>Threads scheduler</b>
+                </span>
+                <p>Schedule posts on Threads.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/bluesky-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>Bluesky scheduler</b>
+                </span>
+                <p>Schedule posts on Bluesky.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/pinterest-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>Pinterest scheduler</b>
+                </span>
+                <p>Schedule posts on Pinterest.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/google-business-profile-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>Google Business Profile scheduler</b>
+                </span>
+                <p>Schedule posts on Google Business Profile.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/facebook-scheduler" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={t.cardIcon}>
+                    <ToolIcon name="calendar" />
+                  </span>
+                  <b>Facebook scheduler</b>
+                </span>
+                <p>Schedule posts on Facebook.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+          </ul>
+        </section>
+
         <section id="all-tools" className={t.toolSection} aria-label="All free tools">
           <ToolsDirectory />
         </section>
