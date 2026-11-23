@@ -10,6 +10,7 @@ import { CompareNote } from "@/components/CompareNote";
 import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -51,6 +52,12 @@ const faqs = [
   { q: "Is there a free plan?", a: `Yes. The Free plan is $0 forever and includes 2 social accounts, 10 scheduled posts per month and 500 auto-DMs per month. Every account starts on it.` },
 ];
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({ name: `${BRAND.name} Planoly alternative`, description: "A Planoly alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export.", url: `${BRAND.canonicalUrl}/planoly-alternative` }),
+  "@id": `${BRAND.canonicalUrl}/planoly-alternative#software`,
+  featureList: ["Post scheduling with a calendar view", "Instagram, Facebook Page and Threads publishing", "Comment-to-DM automation", "Email capture in DMs"],
+};
+
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -67,6 +74,7 @@ export default function PlanolyAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Planoly alternative", path: "/planoly-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
