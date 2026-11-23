@@ -75,7 +75,8 @@ const config: ToolPageConfig = {
             </p>
             <p>
               Ready to post it? Plan and schedule it with the{" "}
-              <Link href="/instagram-scheduler">Instagram scheduler</Link>.
+              <Link href="/instagram-scheduler">Instagram scheduler</Link>, and see{" "}
+              <Link href="/help/schedule-instagram-posts">how to schedule Instagram posts</Link> step by step.
             </p>
           </>
         ),
