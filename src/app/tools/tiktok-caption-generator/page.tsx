@@ -242,7 +242,19 @@ export const metadata = {
 
 export default function TikTokCaptionGeneratorPage() {
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate
+      config={config}
+      afterTool={
+        <section className={`${t.section} ${t.related}`}>
+          <nav className="relChips" aria-label="Related TikTok tools and guides">
+            <span>Keep going</span>
+            <Link href="/guides/how-to-schedule-tiktok-videos">TikTok scheduling guide</Link>
+            <Link href="/tools/social-media-post-generator">Social media post generator</Link>
+            <Link href="/tools/tiktok-money-calculator">TikTok money calculator</Link>
+          </nav>
+        </section>
+      }
+    >
       <CaptionGeneratorTool platform="tiktok" />
     </ToolPageTemplate>
   );
