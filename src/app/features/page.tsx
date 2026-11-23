@@ -253,8 +253,9 @@ export default async function FeaturesPage() {
               <p className="eyebrow">Scheduler</p>
               <h2>Scheduling and <em className="s">auto-publishing</em></h2>
               <p>
-                Poskoo schedules your posts on a week or month calendar and auto-publishes each one at the time
-                you choose, so you can plan a whole week in one sitting.
+                As a <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>, Poskoo
+                schedules your posts on a week or month calendar and auto-publishes each one at the time you choose,
+                so you can plan a whole week in one sitting.
               </p>
               <p>
                 Google Business Profile scheduling is built in too, so you can plan and publish updates from the same
