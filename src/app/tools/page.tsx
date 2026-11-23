@@ -5,7 +5,7 @@ import PublicShell from "@/components/PublicShell";
 import { AnimArt } from "@/components/AnimArt";
 import { TOOLS, TOOL_CATEGORIES } from "@/components/tools/registry";
 import { ToolsDirectory } from "@/components/tools/ToolsDirectory";
-import { CategoryIcon } from "@/components/tools/ToolIcon";
+import { CategoryIcon, ToolIcon } from "@/components/tools/ToolIcon";
 import { ToolCta, ToolFaqSection, toolMetadata } from "@/components/tools/ToolPageTemplate";
 import { faqJsonLd, ldJson } from "@/components/tools/seo";
 import t from "@/components/tools/tools.module.css";
@@ -104,6 +104,57 @@ export default function ToolsPage() {
             <AnimArt name="features" label="A creator points at an open toolbox of calendar, chat, mail, chart and link tools" />
           </div>
         </header>
+
+        <section className={t.picks} aria-labelledby="most-used-tools">
+          <div className={t.groupHead}>
+            <h2 id="most-used-tools">Most-used free tools</h2>
+            <p>The three tools people open most, one per job.</p>
+          </div>
+          <ul className={t.grid}>
+            <li>
+              <Link href="/tools/linkedin-text-formatter" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_create}`}>
+                    <ToolIcon name="type" />
+                  </span>
+                  <b>LinkedIn text formatter</b>
+                </span>
+                <p>Copy bold, italic and bulleted Unicode text for LinkedIn posts and profiles.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/tools/instagram-highlight-cover-maker" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_media}`}>
+                    <ToolIcon name="circle" />
+                  </span>
+                  <b>Instagram highlight cover maker</b>
+                </span>
+                <p>Matching highlight covers with icons and brand colours, downloaded as PNGs.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/tools/facebook-engagement-rate-calculator" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_plan}`}>
+                    <ToolIcon name="percent" />
+                  </span>
+                  <b>Facebook engagement rate calculator</b>
+                </span>
+                <p>Engagement rate by reach or followers from reactions, comments and shares.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+          </ul>
+        </section>
 
         <section id="all-tools" className={t.toolSection} aria-label="All free tools">
           <ToolsDirectory />
