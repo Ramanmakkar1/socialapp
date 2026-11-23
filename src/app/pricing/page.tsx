@@ -111,6 +111,11 @@ export default async function PricingPage() {
             to find the smallest plan for your numbers.{" "}Comparing prices across tools? Read our <Link className={s.vlink} href="/guides/cheapest-social-media-scheduling-tools-2026">cheapest social media scheduling tools guide</Link>.{" "}
             Comparing options? See how Poskoo compares with <Link className={s.vlink} href="/buffer-alternative">Buffer</Link> and with <Link className={s.vlink} href="/manychat-alternative">ManyChat</Link>.
           </p>
+          <p className="small" style={{ textAlign: "center", marginTop: "10px" }}>
+            Explore the <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>, the{" "}
+            <Link className={s.vlink} href="/instagram-scheduler">Instagram scheduler</Link> or the{" "}
+            <Link className={s.vlink} href="/tiktok-scheduler">TikTok scheduler</Link>.
+          </p>
         </div>
       </section>
 
