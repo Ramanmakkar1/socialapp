@@ -315,6 +315,18 @@ export default function LinkedInTextFormatterPage() {
               </Link>
             </li>
             <li>
+              <Link href="/buffer-alternative" className={`${t.card} ${t.acc_plan}`}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_plan}`}>
+                    <ToolIcon name="layers" />
+                  </span>
+                  <b>Buffer alternative for scheduling</b>
+                </span>
+                <p>Compare Poskoo, a Buffer alternative that schedules posts and automates comments and replies.</p>
+                <span className={t.go}>See the Buffer alternative <span aria-hidden="true">→</span></span>
+              </Link>
+            </li>
+            <li>
               <Link href="/ai-social-media-manager" className={`${t.card} ${t.acc_dm}`}>
                 <span className={t.cardTop}>
                   <span className={`${t.cardIcon} ${t.cat_dm}`}>
