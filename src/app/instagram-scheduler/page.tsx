@@ -64,7 +64,7 @@ const steps = [
     art: "/landing/step-dm.webp",
     alt: "Illustration of publishing a post with comment-to-DM automation sending a message",
     title: "Publish and DM commenters",
-    text: `${BRAND.name} publishes at the scheduled time. If you added an auto-DM rule, commenters get your message in their DMs.`,
+    text: `${BRAND.name} publishes it automatically at the scheduled time and shows a success or failure status. If you added an auto-DM rule, commenters get your message in their DMs.`,
   },
 ];
 
