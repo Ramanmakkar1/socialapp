@@ -219,6 +219,13 @@ export default function ScheduleInstagramPostsHelpPage() {
                 <p>{st.body}</p>
               </div>
             ))}
+            <p>
+              Ready to start?{" "}
+              <Link className={s.vlink} href="/instagram-scheduler">
+                Schedule Instagram posts with Poskoo
+              </Link>{" "}
+              from the Instagram scheduler page — the Free plan includes a monthly post allowance.
+            </p>
           </div>
         </div>
       </section>
