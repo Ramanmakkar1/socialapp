@@ -95,6 +95,18 @@ const platformLinks = [
   },
 ];
 
+const networkLinks = [
+  { href: "/instagram-scheduler", label: "Instagram" },
+  { href: "/tiktok-scheduler", label: "TikTok" },
+  { href: "/linkedin-scheduler", label: "LinkedIn" },
+  { href: "/x-scheduler", label: "X (Twitter)" },
+  { href: "/pinterest-scheduler", label: "Pinterest" },
+  { href: "/youtube-scheduler", label: "YouTube" },
+  { href: "/bluesky-scheduler", label: "Bluesky" },
+  { href: "/mastodon-scheduler", label: "Mastodon" },
+  { href: "/google-business-profile-scheduler", label: "Google Business Profile" },
+];
+
 const steps = [
   {
     n: "1",
@@ -225,6 +237,23 @@ export default function SocialMediaSchedulerPage() {
         </div>
         <div className="hero-art"><AnimArt name="multichannel" label="A creator at a laptop sends one scheduled post to several phones and social platforms" /></div>
       </header>
+
+      <section>
+        <div className="wrap">
+          <div className="head">
+            <h2>Which networks can you schedule?</h2>
+          </div>
+          <p className="lede">
+            Poskoo&apos;s Free plan is $0 and includes 2 social accounts and 10 scheduled posts a month, so you can
+            schedule to any of these networks without a credit card.
+          </p>
+          <nav className="relChips" aria-label="Scheduler pages by network">
+            {networkLinks.map((link) => (
+              <Link key={link.href} href={link.href}>{link.label}</Link>
+            ))}
+          </nav>
+        </div>
+      </section>
 
       <section>
         <div className="wrap">
