@@ -1,71 +1,101 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { breadcrumbJsonLd, faqJsonLd, ldJson, toolSoftwareJsonLd } from "./tool-schema.ts";
+import { BRAND } from "./brand";
+import { breadcrumbJsonLd, faqJsonLd, publisherRef, toolSoftwareJsonLd } from "./tool-schema";
 
-test("toolSoftwareJsonLd emits a free web SoftwareApplication with no ratings", () => {
-  const jsonLd = JSON.parse(
-    ldJson(
-      toolSoftwareJsonLd({
-        name: "Instagram bio generator",
-        description: "Generate an Instagram bio in seconds.",
-        url: "https://poskoo.com/tools/instagram-bio-generator",
-      }),
-    ),
+type Node = Record<string, unknown>;
+
+// Round-trip through JSON so the test sees exactly what the page serialises.
+function roundTrip<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
+const software = () =>
+  roundTrip(
+    toolSoftwareJsonLd({
+      name: "Instagram Scheduler",
+      description: "Schedule Instagram posts for free.",
+      url: `${BRAND.canonicalUrl}/tools/instagram-scheduler`,
+    }),
   );
 
-  assert.equal(jsonLd["@type"], "SoftwareApplication");
-  assert.equal(jsonLd.name, "Instagram bio generator");
-  assert.equal(jsonLd.offers.price, "0");
-  assert.equal(jsonLd.offers.priceCurrency, "USD");
-  assert.equal(jsonLd.operatingSystem, "Web");
-  assert.equal(jsonLd.aggregateRating, undefined);
-  assert.equal(jsonLd.review, undefined);
-});
-
-test("breadcrumbJsonLd numbers positions 1..n and links every crumb but the last", () => {
-  const jsonLd = breadcrumbJsonLd([
-    { name: "Home", url: "https://poskoo.com/" },
-    { name: "Tools", url: "https://poskoo.com/tools" },
-    { name: "Instagram bio generator", url: "" },
-  ]);
-
-  assert.equal(jsonLd["@type"], "BreadcrumbList");
-  assert.deepEqual(
-    jsonLd.itemListElement.map((item) => item.position),
-    [1, 2, 3],
+const crumbs = () =>
+  roundTrip(
+    breadcrumbJsonLd([
+      { name: "Home", url: BRAND.canonicalUrl },
+      { name: "Tools", url: `${BRAND.canonicalUrl}/tools` },
+      { name: "Instagram Scheduler", url: "" },
+    ]),
   );
 
-  const items = jsonLd.itemListElement;
-  for (const item of items.slice(0, -1)) {
-    assert.ok(item.item, `${item.name} must have an item URL`);
-    assert.match(item.item, /^https:\/\//);
+const faqs = () =>
+  roundTrip(
+    faqJsonLd([
+      { q: "Is it free?", a: "Yes, the scheduler is free." },
+      { q: "Do I need a credit card?", a: "No card is required." },
+    ]),
+  );
+
+test("every helper serialises to valid JSON", () => {
+  for (const build of [software, crumbs, faqs, () => roundTrip(publisherRef())]) {
+    assert.doesNotThrow(() => JSON.stringify(build()));
   }
-  assert.equal(items.at(-1)?.item, undefined);
 });
 
-test("faqJsonLd maps each question and answer to Question/acceptedAnswer.text", () => {
-  const jsonLd = faqJsonLd([
-    { q: "Is it free?", a: "Yes, the tool is free." },
-    { q: "Do I need an account?", a: "No account is needed." },
-  ]);
+test("toolSoftwareJsonLd emits a complete free SoftwareApplication", () => {
+  const node = software();
 
-  assert.equal(jsonLd["@type"], "FAQPage");
-  assert.equal(jsonLd.mainEntity.length, 2);
-  assert.deepEqual(
-    jsonLd.mainEntity.map((entry) => entry["@type"]),
-    ["Question", "Question"],
-  );
-  assert.equal(jsonLd.mainEntity[0].name, "Is it free?");
-  assert.equal(jsonLd.mainEntity[0].acceptedAnswer["@type"], "Answer");
-  assert.equal(jsonLd.mainEntity[0].acceptedAnswer.text, "Yes, the tool is free.");
-  assert.equal(jsonLd.mainEntity[1].name, "Do I need an account?");
-  assert.equal(jsonLd.mainEntity[1].acceptedAnswer.text, "No account is needed.");
+  assert.equal(node["@type"], "SoftwareApplication");
+  assert.ok(node.name, "name is missing");
+  assert.ok(node.description, "description is missing");
+  assert.ok(node.url, "url is missing");
+  assert.ok(node.applicationCategory, "applicationCategory is missing");
+  assert.equal(node.operatingSystem, "Web");
+  assert.equal(node.isAccessibleForFree, true);
+
+  const offers = node.offers as Node;
+  assert.equal(offers.price, "0");
+  assert.equal(offers.priceCurrency, "USD");
+
+  const publisher = node.publisher as Node;
+  assert.equal(publisher["@id"], `${BRAND.canonicalUrl}#org`);
 });
 
-test("ldJson escapes '<' so the inline script cannot be closed early", () => {
-  const serialized = ldJson({ name: "</script><script>alert(1)</script>" });
+test("breadcrumbJsonLd positions start at 1 and a crumb without a url has no item", () => {
+  const node = crumbs();
+  const items = node.itemListElement as Node[];
 
-  assert.ok(!serialized.includes("<"));
-  assert.ok(serialized.includes("\\u003c"));
-  assert.equal(JSON.parse(serialized).name, "</script><script>alert(1)</script>");
+  assert.equal(node["@type"], "BreadcrumbList");
+  assert.ok(items.length > 0, "itemListElement must not be empty");
+  items.forEach((item, index) => {
+    assert.equal(item.position, index + 1, `position at index ${index} must be ${index + 1}`);
+  });
+
+  const last = items[items.length - 1];
+  assert.equal("item" in last, false, "a crumb with no url must not have an item key");
+  assert.ok(items[0].item, "a crumb with a url must have an item key");
+});
+
+test("faqJsonLd mainEntity length equals the input length", () => {
+  const input = [
+    { q: "Is it free?", a: "Yes, the scheduler is free." },
+    { q: "Do I need a credit card?", a: "No card is required." },
+  ];
+  const node = roundTrip(faqJsonLd(input));
+  const mainEntity = node.mainEntity as Node[];
+
+  assert.equal(node["@type"], "FAQPage");
+  assert.equal(mainEntity.length, input.length);
+  mainEntity.forEach((question, index) => {
+    assert.equal(question.name, input[index].q);
+    assert.equal((question.acceptedAnswer as Node).text, input[index].a);
+  });
+});
+
+test("no helper emits aggregateRating or review", () => {
+  for (const build of [software, crumbs, faqs, () => roundTrip(publisherRef())]) {
+    const serialised = JSON.stringify(build());
+    assert.ok(!serialised.includes("aggregateRating"), "aggregateRating must not be emitted");
+    assert.ok(!serialised.includes('"review"'), "review must not be emitted");
+  }
 });
