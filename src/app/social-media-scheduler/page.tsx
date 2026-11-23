@@ -354,6 +354,21 @@ export default function SocialMediaSchedulerPage() {
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
           <div className="head">
+            <h2>Explore each scheduler</h2>
+          </div>
+          <nav className="relChips" aria-label="Individual scheduler pages">
+            <Link href="/instagram-scheduler">Instagram scheduler</Link>
+            <Link href="/tiktok-scheduler">TikTok scheduler</Link>
+            <Link href="/bluesky-scheduler">Bluesky scheduler</Link>
+            <Link href="/google-business-profile-scheduler">Google Business Profile scheduler</Link>
+            <Link href="/buffer-alternative">Buffer alternative</Link>
+          </nav>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
             <p className="eyebrow">Social media scheduler FAQs</p>
             <h2>Accounts, platforms and publishing</h2>
           </div>
