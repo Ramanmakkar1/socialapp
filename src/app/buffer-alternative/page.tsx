@@ -206,6 +206,10 @@ export default function BufferAlternative() {
             <Link className={s.vlink} href="/tools/instagram-caption-counter">Instagram caption counter</Link>
             {" · "}
             <Link className={s.vlink} href="/">See the full product</Link>
+            {" · "}
+            <Link className={s.vlink} href="/pricing">Poskoo pricing and $0 Free plan</Link>
+            {" · "}
+            <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>
           </p>
           <CompareAlternativesNav current="buffer" />
         </div>
