@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { helpArticleJsonLd } from "@/lib/help-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
+const description = `Send an automatic Instagram DM to everyone who comments a keyword. Set up a comment-to-DM rule in ${BRAND.name} with the official Meta API, step by step.`;
+
 export const metadata: Metadata = withSocial({
   title: "How to Auto DM Instagram Comments (Step by Step)",
-  description:
-    `Send an automatic Instagram DM to everyone who comments a keyword. Set up a comment-to-DM rule in ${BRAND.name} with the official Meta API, step by step.`,
+  description,
   alternates: { canonical: "/help/auto-dm-instagram-comments" },
 });
 
@@ -117,6 +119,14 @@ const tips = [
   "Use 'Comment contains keyword' unless the keyword is also a common word that would trigger by mistake.",
 ];
 
+const articleJsonLd = helpArticleJsonLd({
+  headline: "How to auto-DM people who comment on your Instagram posts",
+  description,
+  path: "/help/auto-dm-instagram-comments",
+  datePublished: "2026-11-07",
+  dateModified: "2026-11-15",
+});
+
 const howToJsonLd = {
   "@context": "https://schema.org",
   "@type": "HowTo",
@@ -164,6 +174,10 @@ export default function AutoDmInstagramCommentsHelpPage() {
         { name: "Auto-DM Instagram comments", path: "/help/auto-dm-instagram-comments" },
       ]}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd).replace(/</g, "\\u003c") }}
