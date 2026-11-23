@@ -138,6 +138,11 @@ const config: ToolPageConfig = {
               <b>Read the parts.</b> A post with many saves but few likes is still doing a job; the total rate hides that.
             </li>
             <li>
+              <b>Plan the next post.</b> Write the caption with the{" "}
+              <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> and read{" "}
+              <Link href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link> in advance.
+            </li>
+            <li>
               <b>Turn your rate into a price.</b> Use the{" "}
               <Link href="/tools/instagram-money-calculator">
                 estimate sponsored post pay with the Instagram money calculator
@@ -197,6 +202,7 @@ const config: ToolPageConfig = {
     "/tools/instagram-posting-frequency-calculator",
     "/tools/instagram-comment-to-dm-calculator",
     "/tools/instagram-caption-counter",
+    "/tools/tiktok-caption-generator",
     "/tools/instagram-hook-generator",
     "/tools/instagram-highlight-cover-maker",
   ],
