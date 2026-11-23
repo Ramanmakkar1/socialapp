@@ -6,7 +6,31 @@ import { REF_COOKIE, normalizeCode, parseRefCookie, refCookieOptions, refCookieV
 import { apiTier } from "@/lib/apiRateLimit";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
+// The old staging host must never be indexable. next.config's host matcher
+// misses the port (e.g. "socialapp.splitforms.com:443"), so normalise the host
+// here and 301 every page to the same path on poskoo.com.
+const LEGACY_HOST = "socialapp.splitforms.com";
+
+function normalizeHost(value: string | null): string {
+  return (value ?? "").split(",")[0].trim().toLowerCase().replace(/:\d+$/, "");
+}
+
 export function proxy(request: NextRequest) {
+  const host = normalizeHost(request.headers.get("x-forwarded-host")) || normalizeHost(request.headers.get("host"));
+  if (host === LEGACY_HOST) {
+    const { pathname, search } = request.nextUrl;
+    // Webhooks/OAuth callbacks on /api and the (empty) legacy sitemap keep working.
+    if (!pathname.startsWith("/api") && pathname !== "/sitemap.xml") {
+      return NextResponse.redirect(new URL(pathname + search, "https://poskoo.com"), {
+        status: 301,
+        headers: {
+          "X-Robots-Tag": "noindex, nofollow",
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+  }
+
   // Per-IP limits for /api/* (tiers and exemptions in src/lib/apiRateLimit.ts).
   const tier = apiTier(request.nextUrl.pathname);
   if (tier) {
@@ -25,9 +49,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/api/:path*",
-    { source: "/", has: [{ type: "query", key: "ref" }] },
-    { source: "/signup", has: [{ type: "query", key: "ref" }] },
-  ],
+  // Run on every page so the legacy host is caught on any path (the old
+  // next.config host matcher missed hosts with a port). Static assets are skipped.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

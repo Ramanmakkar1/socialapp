@@ -27,3 +27,34 @@ test("?ref=CODE sets a 60-day first-touch cookie; an existing valid cookie is ne
 
   assert.equal(setCookie(proxy(new NextRequest("https://poskoo.com/?ref=bad!"))), null);
 });
+
+test("legacy staging host 301s to poskoo.com with noindex", () => {
+  const res = proxy(
+    new NextRequest("https://socialapp.splitforms.com/pricing?utm=1", {
+      headers: { host: "socialapp.splitforms.com" },
+    }),
+  );
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), "https://poskoo.com/pricing?utm=1");
+  assert.equal(res.headers.get("x-robots-tag"), "noindex, nofollow");
+  assert.equal(res.headers.get("cache-control"), "no-store");
+});
+
+test("legacy host with a port in x-forwarded-host is still redirected", () => {
+  const res = proxy(
+    new NextRequest("https://socialapp.splitforms.com/", {
+      headers: { "x-forwarded-host": "socialapp.splitforms.com:443" },
+    }),
+  );
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), "https://poskoo.com/");
+  assert.equal(res.headers.get("x-robots-tag"), "noindex, nofollow");
+});
+
+test("poskoo.com passes through", () => {
+  const res = proxy(
+    new NextRequest("https://poskoo.com/pricing", { headers: { host: "poskoo.com" } }),
+  );
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get("x-robots-tag"), null);
+});
