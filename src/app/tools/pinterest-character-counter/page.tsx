@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
-import { BRAND } from "@/lib/brand";
 import { PINTEREST_LIMITS } from "@/lib/pinterestCharCount";
 import PinterestCharCounter from "./PinterestCharCounter";
 
@@ -164,7 +163,7 @@ const config: ToolPageConfig = {
 export const metadata: Metadata = {
   ...toolMetadata(config),
   title: { absolute: "Pinterest Character Counter: Pin Title & Description" },
-  alternates: { canonical: new URL("/tools/pinterest-character-counter", BRAND.url) },
+  alternates: { canonical: config.path },
 };
 
 export default function PinterestCharacterCounterPage() {

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
-import { BRAND } from "@/lib/brand";
 import MastodonCharCounter from "./MastodonCharCounter";
 
 const limitRows: [string, string][] = [
@@ -168,7 +167,7 @@ const config: ToolPageConfig = {
 export const metadata: Metadata = {
   ...toolMetadata(config),
   title: { absolute: "Mastodon Character Counter: 500 Limit, Links as 23" },
-  alternates: { canonical: new URL("/tools/mastodon-character-counter", BRAND.url) },
+  alternates: { canonical: config.path },
 };
 
 export default function MastodonCharacterCounterPage() {
