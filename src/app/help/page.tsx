@@ -43,7 +43,7 @@ const guides = [
     no: "04 / Scheduling",
     title: "How to schedule Instagram posts",
     text: "Paste one JPEG image link, write a caption, pick a date and time and the feed post publishes automatically.",
-    go: "Read guide",
+    go: "How to schedule Instagram posts",
   },
   {
     href: "/help/schedule-instagram-stories",
