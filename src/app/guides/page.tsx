@@ -67,6 +67,7 @@ export default function GuidesPage() {
         <nav className={g.hubLinks} aria-label="Poskoo product pages">
           <Link href="/instagram-scheduler">Instagram scheduler</Link>
           <Link href="/instagram-auto-dm">Instagram auto-DM</Link>
+          <Link href="/guides/how-to-schedule-tiktok-videos">How to schedule TikTok videos</Link>
           <Link href="/pricing">Pricing and free plan</Link>
         </nav>
 
