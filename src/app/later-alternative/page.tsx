@@ -10,6 +10,7 @@ import { CompareNote } from "@/components/CompareNote";
 import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -51,6 +52,21 @@ const faqs = [
   { q: "Is comment-to-DM allowed on Instagram?", a: `Yes, through the official Instagram API. ${BRAND.name} only messages people who commented first, uses Meta login, and never asks for your password.` },
 ];
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Later alternative`,
+    description: "A Later alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export.",
+    url: `${BRAND.canonicalUrl}/later-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/later-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    "Instagram, Facebook Page and Threads publishing",
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
+};
+
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -67,6 +83,7 @@ export default function LaterAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Later alternative", path: "/later-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
