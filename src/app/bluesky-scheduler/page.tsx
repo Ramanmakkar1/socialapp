@@ -139,7 +139,9 @@ export default function BlueskySchedulerPage() {
               A Bluesky scheduler is a tool that lets you write Bluesky posts ahead of time and place them on a calendar
               so they publish automatically at the date and time you choose. Poskoo connects to Bluesky with your handle
               and an app password (never your main password), lets you add text and up to 4 images, and publishes each
-              scheduled post for you with a published or failed status.
+              scheduled post for you with a published or failed status. It is part of our{" "}
+              <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>, and you can see{" "}
+              <Link className={s.vlink} href="/features">all features</Link> across every supported channel.
             </p>
             <p>
               Before you schedule, check your copy with the{" "}
