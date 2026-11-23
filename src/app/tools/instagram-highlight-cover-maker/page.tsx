@@ -12,8 +12,6 @@ const config: ToolPageConfig = {
     "Free Instagram highlight cover maker: pick a colour, icon and short label, preview the circle crop and download a 1080×1080 or 1080×1920 PNG. No upload.",
   pill: "Free · runs in your browser · no watermark",
   h1: { mark: "Instagram highlight cover maker", after: "with free icons" },
-  answer:
-    "This free Instagram highlight cover maker lets you design highlight covers right in your browser: pick a colour, icon and label, preview the circle crop and download a PNG, with no sign-up. Every download is free, with no watermark and no limit.",
   lede: "Pick a colour and an icon, add an optional label, preview the circle crop and download a ready-to-use highlight cover PNG. No upload, no account, no watermark.",
   art: "visual",
   artLabel: "A creator measures a photo frame with a ruler next to phone screens of different shapes",
@@ -180,7 +178,6 @@ const config: ToolPageConfig = {
     "/tools/instagram-bio-generator",
     "/tools/instagram-story-size-checker",
     "/tools/instagram-reel-cover-maker",
-    "/tools/tiktok-caption-generator",
     "/tools/instagram-safe-zone-checker",
   ],
   schema: {
@@ -204,17 +201,7 @@ export const metadata = toolMetadata(config);
 
 export default function InstagramHighlightCoverMakerPage() {
   return (
-    <ToolPageTemplate
-      config={config}
-      afterTool={
-        <p className={t.prose}>
-          Once your covers are ready, schedule the Stories they belong to with the{" "}
-          <Link href="/instagram-scheduler">Poskoo Instagram scheduler</Link>. Need a
-          full post to go with them? Try our{" "}
-          <Link href="/tools/social-media-post-generator">social media post generator</Link>.
-        </p>
-      }
-    >
+    <ToolPageTemplate config={config}>
       <HighlightCoverMaker />
     </ToolPageTemplate>
   );

@@ -120,6 +120,11 @@ const groups: { id: string; title: string; intro: string; tools: Tool[] }[] = [
         text: "Make sure your profile photo is square and sharp at every size.",
       },
       {
+        href: "/tools/instagram-reels-size-checker",
+        name: "Instagram Reels size checker",
+        text: "Check vertical video size and ratio for Reels in your browser.",
+      },
+      {
         href: "/tools/instagram-safe-zone-checker",
         name: "Instagram safe zone checker",
         text: "Keep text and buttons clear of the Reels and Stories interface.",
@@ -401,48 +406,6 @@ export default function InstagramToolsPage() {
           ))}
         </section>
 
-        <section className={t.section} aria-labelledby="instagram-workflow">
-          <div className="head">
-            <p className="eyebrow">Your next step</p>
-            <h2 id="instagram-workflow">Turn your Instagram workflow into growth</h2>
-          </div>
-          <ul className={t.grid}>
-            <li>
-              <Link className={t.card} href="/instagram-scheduler">
-                <span className={t.cardTop}>
-                  <b>Create content</b>
-                </span>
-                <p>Plan and schedule Instagram posts, Reels and Stories from one calendar.</p>
-                <span className={t.go}>
-                  Open the Instagram scheduler <span aria-hidden="true">→</span>
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link className={t.card} href="/features/instagram-comment-to-dm">
-                <span className={t.cardTop}>
-                  <b>Turn comments into leads</b>
-                </span>
-                <p>Send automatic DMs, share links and capture leads from comment keywords.</p>
-                <span className={t.go}>
-                  Set up Instagram comment-to-DM <span aria-hidden="true">→</span>
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link className={t.card} href="/social-media-analytics">
-                <span className={t.cardTop}>
-                  <b>Track results</b>
-                </span>
-                <p>Measure reach, engagement and audience growth across your social accounts.</p>
-                <span className={t.go}>
-                  Explore social media analytics <span aria-hidden="true">→</span>
-                </span>
-              </Link>
-            </li>
-          </ul>
-        </section>
-
         <ToolFaqSection title="Instagram tools questions" faqs={faqs} />
 
         <section className={`${t.section} ${t.related}`}>
@@ -456,7 +419,6 @@ export default function InstagramToolsPage() {
             <Link href="/tools/threads-tools">Threads tools</Link>
             <Link href="/tools/facebook-tools">Facebook tools</Link>
             <Link href="/tools/tiktok-tools">TikTok tools</Link>
-            <Link href="/guides/best-instagram-niches-2026">Best Instagram niches for 2026</Link>
             <Link href="/tools">All free social media tools</Link>
           </nav>
         </section>

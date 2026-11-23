@@ -63,17 +63,6 @@ const platformTables = platforms.map((platform) => (
       <h2 id={`${platform.name.toLowerCase()}-sizes`}>{platform.name} image sizes</h2>
       <p>{platform.note}</p>
       <p><Link href={platform.scheduler}>Schedule {platform.name} posts</Link></p>
-      {platform.checkers && platform.checkers.length > 0 && (
-        <p>
-          Check your image:{" "}
-          {platform.checkers.map((checker, index) => (
-            <span key={checker.href}>
-              {index > 0 && " · "}
-              <Link href={checker.href}>{checker.label}</Link>
-            </span>
-          ))}
-        </p>
-      )}
     </div>
     <SizeTable rows={platform.rows} label={`${platform.name} image sizes in pixels and aspect ratios`} />
   </section>
@@ -116,7 +105,7 @@ const config: ToolPageConfig = {
       },
       {
         title: "Keep important details away from the edges",
-        body: <p>Profile pictures are usually shown as circles, vertical videos have interface elements over the top and bottom, and channel banners appear at different widths across devices. Centre faces and logos, keep text inside the visible area and check <Link href="/tools/youtube-banner-size-checker">YouTube channel art</Link> against its 1546×423 safe area. Test a finished 1280×720 cover with the <Link href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link>.</p>,
+        body: <p>Profile pictures are usually shown as circles, vertical videos have interface elements over the top and bottom, and channel banners appear at different widths across devices. Centre faces and logos, keep text inside the visible area and check YouTube channel art against its 1546×423 safe area.</p>,
       },
       {
         title: "Link previews are not all identical",
@@ -147,7 +136,6 @@ const config: ToolPageConfig = {
     "/tools/instagram-image-size",
     "/tools/instagram-carousel-size-checker",
     "/tools/instagram-safe-zone-checker",
-    "/tools/pinterest-pin-size-checker",
   ],
   schema: {
     category: "MultimediaApplication",

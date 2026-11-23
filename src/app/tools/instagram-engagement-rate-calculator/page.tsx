@@ -12,14 +12,7 @@ const config: ToolPageConfig = {
     "Free Instagram engagement rate calculator. Enter likes, comments, saves and shares plus followers or reach to get your rate and the formula used, fast.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram engagement rate", mark: "calculator" },
-  lede: (
-    <>
-      Instagram engagement rate is the share of your audience that interacted with a post, shown as a percentage. Enter
-      one post&apos;s likes, comments, saves, shares and either followers or reach and the calculator returns that
-      post&apos;s engagement rate, plus the exact formula it used. To keep engagement up, see{" "}
-      <Link href="/help/schedule-instagram-posts">how to schedule Instagram posts</Link>.
-    </>
-  ),
+  lede: "Enter the likes, comments, saves and shares from one post, choose followers or reach as the base, and get its engagement rate as a percentage.",
   art: "analytics",
   artLabel: "A creator waters a growing bar chart while hearts float up",
   heroPoints: ["By followers or reach", "Saves and shares count", "No login"],
@@ -144,18 +137,6 @@ const config: ToolPageConfig = {
             <li>
               <b>Read the parts.</b> A post with many saves but few likes is still doing a job; the total rate hides that.
             </li>
-            <li>
-              <b>Plan the next post.</b> Write the caption with the{" "}
-              <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> and read{" "}
-              <Link href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link> in advance.
-            </li>
-            <li>
-              <b>Turn your rate into a price.</b> Use the{" "}
-              <Link href="/tools/instagram-money-calculator">
-                estimate sponsored post pay with the Instagram money calculator
-              </Link>{" "}
-              to see a sponsored-post range.
-            </li>
           </ul>
         ),
       },
@@ -187,14 +168,6 @@ const config: ToolPageConfig = {
       a: "In this calculator, yes. They are optional fields: fill them in from the post's insights for a fuller picture, or leave them blank and they count as zero.",
     },
     {
-      q: "Which numbers do I enter in the calculator?",
-      a: "Enter the post's likes and comments, then choose either followers or reach as the base. Saves and shares are optional: type them in from the post's insights for a fuller rate, or leave them blank and they count as zero.",
-    },
-    {
-      q: "What is a good engagement rate on Instagram?",
-      a: "There is no single pass mark. A rough common range is about 1-5% by followers, and reach-based rates usually look higher because reach is smaller than followers. Judge a post against your own recent posts in the same format rather than against a stranger's account.",
-    },
-    {
       q: "Does the calculator connect to my Instagram account?",
       a: "No. You type the numbers yourself and the calculation runs in your browser. Nothing is uploaded or saved.",
     },
@@ -205,13 +178,10 @@ const config: ToolPageConfig = {
   ],
   related: [
     "/tools/social-media-analytics-report",
-    "/tools/instagram-money-calculator",
     "/tools/instagram-posting-frequency-calculator",
     "/tools/instagram-comment-to-dm-calculator",
     "/tools/instagram-caption-counter",
-    "/tools/tiktok-caption-generator",
     "/tools/instagram-hook-generator",
-    "/tools/instagram-highlight-cover-maker",
   ],
   schema: {
     features: [

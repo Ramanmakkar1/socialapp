@@ -165,7 +165,6 @@ const config: ToolPageConfig = {
     "/tools/instagram-dm-link-generator",
     "/tools/instagram-post-ideas-generator",
     "/tools/instagram-hashtag-generator",
-    "/tools/tiktok-username-generator",
   ],
   schema: {
     features: [

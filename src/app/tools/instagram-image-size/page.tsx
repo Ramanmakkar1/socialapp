@@ -51,9 +51,6 @@ const sizesTable = (
         </tbody>
       </table>
     </div>
-    <p className="mt-3 text-sm text-[#3d3450]">
-      Need to fix a photo? Use the free <Link href="/tools/instagram-image-resizer" className="font-medium text-[var(--poskoo-violet)] underline underline-offset-2">Instagram image resizer</Link>.
-    </p>
   </section>
 );
 
@@ -204,24 +201,16 @@ const config: ToolPageConfig = {
       {
         title: "Common image size mistakes",
         body: (
-          <>
-            <ul>
-              <li>Uploading a landscape photo as a Story and letting Instagram decide the crop.</li>
-              <li>Mixing square and portrait slides in one carousel.</li>
-              <li>Exporting below 1080 px wide, which can look soft on modern phones.</li>
-              <li>Placing text or logos at the very top or bottom of a 9:16 frame, where the interface covers them.</li>
-              <li>
-                Putting a face near the edge of a profile photo, where the circle cuts it off. When the image is ready,
-                plan the post with the <Link href="/instagram-scheduler">Instagram scheduler</Link>.
-              </li>
-            </ul>
-            <p>
-              Posting to other networks too? See the <Link href="/tools/social-media-image-sizes">image sizes for every social platform</Link>.
-            </p>
-            <p>
-              Before you upload, test the photo with the <Link href="/tools/instagram-profile-picture-size-checker">Instagram profile picture size checker</Link> to see the square frame and circle crop.
-            </p>
-          </>
+          <ul>
+            <li>Uploading a landscape photo as a Story and letting Instagram decide the crop.</li>
+            <li>Mixing square and portrait slides in one carousel.</li>
+            <li>Exporting below 1080 px wide, which can look soft on modern phones.</li>
+            <li>Placing text or logos at the very top or bottom of a 9:16 frame, where the interface covers them.</li>
+            <li>
+              Putting a face near the edge of a profile photo, where the circle cuts it off. When the image is ready,
+              plan the post with the <Link href="/instagram-scheduler">Instagram scheduler</Link>.
+            </li>
+          </ul>
         ),
       },
     ],

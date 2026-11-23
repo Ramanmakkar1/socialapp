@@ -172,7 +172,6 @@ const config: ToolPageConfig = {
     },
   ],
   related: [
-    "/tools/social-media-post-generator",
     "/tools/instagram-caption-counter",
     "/tools/instagram-hook-generator",
     "/tools/instagram-hashtag-generator",

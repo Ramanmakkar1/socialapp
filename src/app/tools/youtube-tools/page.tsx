@@ -36,11 +36,6 @@ const groups: { id: string; title: string; intro: string; tools: Tool[] }[] = [
         text: "Count title, description and tag characters against YouTube's limits as you type.",
       },
       {
-        href: "/tools/youtube-video-ideas-generator",
-        name: "YouTube video ideas generator",
-        text: "Get niche-specific video ideas, each with a format, hook and a description starter.",
-      },
-      {
         href: "/tools/youtube-description-generator",
         name: "YouTube description generator",
         text: "Draft a description with a hook, summary, links and timestamps in one pass.",

@@ -118,7 +118,7 @@ const config: ToolPageConfig = {
         title: "Best practices to improve each step",
         body: (
           <ul>
-            <li><b>More comments:</b> state the keyword and the reward clearly in the caption and on screen in a Reel. See <Link href="/guides/how-to-get-more-comments-on-instagram">how to get more comments on Instagram</Link> for 12 tactics.</li>
+            <li><b>More comments:</b> state the keyword and the reward clearly in the caption and on screen in a Reel.</li>
             <li>
               <b>Better delivery:</b> pick a distinctive keyword and test it in the{" "}
               <Link href="/tools/instagram-comment-keyword-tester">comment keyword tester</Link> so real requests match.
