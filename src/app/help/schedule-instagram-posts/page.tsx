@@ -168,6 +168,17 @@ export default function ScheduleInstagramPostsHelpPage() {
             Calendar, paste one public https JPEG image link, write a caption, pick a date and time, press Schedule, and
             Poskoo publishes it automatically.
           </p>
+          <p className="lede">
+            Want the full tool instead of a single post? Try the{" "}
+            <Link className={s.vlink} href="/instagram-scheduler">
+              Instagram scheduler
+            </Link>
+            . Before you post, make a set of matching covers with the{" "}
+            <Link className={s.vlink} href="/tools/instagram-highlight-cover-maker">
+              Instagram highlight cover maker
+            </Link>
+            .
+          </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
       </header>
