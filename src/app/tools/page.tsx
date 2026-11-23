@@ -304,6 +304,7 @@ export default function ToolsPage() {
             <Link href="/tools/youtube-video-ideas-generator">YouTube video ideas generator</Link>
             <Link href="/tools/x-tools">X (Twitter) tools</Link>
             <Link href="/tools/tiktok-tools">TikTok tools</Link>
+            <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link>
             <Link href="/tools/tiktok-hook-generator">TikTok hook generator</Link>
             <Link href="/tools/tiktok-money-calculator">TikTok money calculator</Link>
             <Link href="/tools/facebook-tools">Facebook tools</Link>
