@@ -104,7 +104,7 @@ const networkLinks = [
   { href: "/youtube-scheduler", label: "YouTube" },
   { href: "/bluesky-scheduler", label: "Bluesky" },
   { href: "/mastodon-scheduler", label: "Mastodon" },
-  { href: "/google-business-profile-scheduler", label: "Google Business Profile" },
+  { href: "/google-business-profile-scheduler", label: "Google Business Profile scheduler" },
 ];
 
 const steps = [
