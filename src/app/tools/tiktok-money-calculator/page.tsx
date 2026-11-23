@@ -114,7 +114,9 @@ const config: ToolPageConfig = {
               Brand deals and rewards both follow reach and engagement. Track your{" "}
               <Link href="/tools/tiktok-engagement-rate-calculator">TikTok engagement rate</Link> to see which videos
               hold attention, then post consistently with the{" "}
-              <Link href="/tiktok-scheduler">TikTok scheduler</Link> so your best formats keep shipping.
+              <Link href="/tiktok-scheduler">TikTok scheduler</Link> so your best formats keep shipping, and use the{" "}
+              <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to turn each video into a
+              ready-to-post caption.
             </p>
             <p>
               For more ways creators earn beyond one-off videos, read the{" "}
