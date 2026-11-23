@@ -24,8 +24,8 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${BRAND.url}/` },
-        { "@type": "ListItem", position: 2, name: "Data deletion", item: `${BRAND.url}/data-deletion` },
+        { "@type": "ListItem", position: 1, name: "Home", item: `${BRAND.canonicalUrl}/` },
+        { "@type": "ListItem", position: 2, name: "Data deletion", item: `${BRAND.canonicalUrl}/data-deletion` },
       ],
     },
   ],
