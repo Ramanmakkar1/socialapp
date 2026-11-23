@@ -67,6 +67,21 @@ const jsonLd = {
       inLanguage: "en",
       description: BRAND.description,
     },
+    {
+      "@type": "SoftwareApplication",
+      "@id": BRAND.canonicalUrl + "#software",
+      name: BRAND.name,
+      url: BRAND.canonicalUrl,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      description: BRAND.description,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      publisher: { "@id": BRAND.canonicalUrl + "#org" },
+    },
   ],
 };
 
