@@ -223,7 +223,8 @@ export default function FacebookEngagementRateCalculatorPage() {
       afterTool={
         <p className={t.prose}>
           Also post on Instagram? Run the same numbers through the{" "}
-          <Link href="/tools/instagram-engagement-rate-calculator">Instagram engagement rate calculator</Link>.
+          <Link href="/tools/instagram-engagement-rate-calculator">Instagram engagement rate calculator</Link>{" "}
+          or plan your posts with the <Link href="/instagram-scheduler">Instagram scheduler</Link>.
         </p>
       }
     >
