@@ -1,5 +1,4 @@
 import { BRAND } from "@/lib/brand";
-import { HOME_CANONICAL } from "@/lib/canonical";
 import { softwareOffers, type PlanReadiness } from "@/lib/plans";
 
 // Home page JSON-LD graph. The root layout also emits Organization and WebSite
@@ -46,8 +45,8 @@ export const homePageJsonLd = (
     },
     {
       "@type": "WebPage",
-      "@id": HOME_CANONICAL,
-      url: HOME_CANONICAL,
+      "@id": BRAND.canonicalUrl,
+      url: BRAND.canonicalUrl,
       name: title,
       description: BRAND.description,
       inLanguage: "en",
@@ -73,11 +72,11 @@ export const homePageJsonLd = (
         "Instagram link-in-bio page",
         "Analytics for reach, comments, DMs, link clicks and leads",
       ],
-      url: HOME_CANONICAL,
+      url: BRAND.canonicalUrl,
       image: BRAND.canonicalUrl + "/landing/hero.webp",
       sameAs: BRAND.social,
       isAccessibleForFree: true,
-      mainEntityOfPage: { "@id": HOME_CANONICAL },
+      mainEntityOfPage: { "@id": BRAND.canonicalUrl },
       publisher: { "@id": BRAND.canonicalUrl + "#org" },
       creator: { "@id": BRAND.canonicalUrl + "#org" },
       offers: softwareOffers(r),
@@ -90,14 +89,14 @@ export const homePageJsonLd = (
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: HOME_CANONICAL,
+          item: BRAND.canonicalUrl,
         },
       ],
     },
     {
       "@type": "FAQPage",
       "@id": BRAND.canonicalUrl + "/#faq",
-      isPartOf: { "@id": HOME_CANONICAL },
+      isPartOf: { "@id": BRAND.canonicalUrl },
       mainEntity: faqs.map((f) => ({
         "@type": "Question",
         name: f.q,
