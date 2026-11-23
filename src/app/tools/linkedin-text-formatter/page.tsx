@@ -204,7 +204,9 @@ export default function LinkedInTextFormatterPage() {
         </p>
         <ToolCard title={config.toolTitle} note={config.toolNote}><FormatterTool /></ToolCard>
         <p className="small" style={{ marginTop: 14, textAlign: "center" }}>
-          Screen readers may read Unicode styled letters poorly, so use them only for a few key words.
+          Screen readers may read Unicode styled letters poorly, so use them only for a few key words. When your post is
+          ready, plan and queue it with the{" "}
+          <Link href="/social-media-scheduler" className={t.textLink}>social media scheduler</Link>.
         </p>
         <section className={t.section} aria-labelledby="style-examples-title">
           <h2 id="style-examples-title">LinkedIn text style examples</h2>
