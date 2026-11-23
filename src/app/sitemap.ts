@@ -26,16 +26,6 @@ export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
 // glance and survives any future change to the generic origin checks.
 const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com";
 
-// /tools pages that carry noindex per Search Console ("Excluded by noindex").
-// They must never be listed in the sitemap; the pages themselves are untouched.
-const NOINDEX_TOOLS_PATHS = new Set([
-  "/tools/x-thread-maker",
-  "/tools/pinterest-hashtag-generator",
-  "/tools/x-hashtag-generator",
-  "/tools/social-media-post-generator",
-  "/tools/pinterest-description-generator",
-]);
-
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
 // intended; the file stays raw XML with no XSLT styling.
 function getSitemapPaths(host?: string | null): PublicPath[] {
@@ -53,9 +43,7 @@ function getSitemapPaths(host?: string | null): PublicPath[] {
   if (host && !isApprovedProductionOrigin(`https://${host}`)) return [];
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
   // home is listed only when indexable (production).
-  return PUBLIC_PATHS.filter(
-    (path) => !NOINDEX_TOOLS_PATHS.has(path) && isPathIndexable(path),
-  );
+  return PUBLIC_PATHS.filter((path) => isPathIndexable(path));
 }
 
 export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
