@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
@@ -47,6 +48,21 @@ const faqs = [
   { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Buffer alternative`,
+    description: "A Buffer alternative that schedules Instagram, Facebook Page and Threads posts and auto-DMs keyword commenters, with email capture.",
+    url: `${BRAND.canonicalUrl}/buffer-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/buffer-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    "Instagram, Facebook Page and Threads publishing",
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
+};
+
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -63,6 +79,7 @@ export default function BufferAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Buffer alternative", path: "/buffer-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
