@@ -119,6 +119,11 @@ const config: ToolPageConfig = {
               You do not need a different idea for every network. Write the core post once, then adjust the hook, the
               amount of detail and the call to action for each platform&apos;s limit and culture.
             </p>
+            <p>
+              Ready to publish? Copy your favourite draft into the{" "}
+              <Link href="/social-media-scheduler">social media scheduler</Link> to plan it on a calendar, and see the{" "}
+              <Link href="/features">scheduler features</Link> for queues, auto-DM rules and post approvals.
+            </p>
           </>
         ),
       },
