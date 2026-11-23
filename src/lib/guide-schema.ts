@@ -23,7 +23,7 @@ export function guidesHubJsonLd({
       "@type": "ListItem",
       position: i + 1,
       name: x.h1,
-      url: `${BRAND.url}${guidePath(x.slug)}`,
+      url: `${BRAND.canonicalUrl}${guidePath(x.slug)}`,
     })),
   };
 
@@ -37,7 +37,7 @@ export function guidesHubJsonLd({
         description,
         url,
         inLanguage: "en",
-        isPartOf: { "@id": `${BRAND.url}#website` },
+        isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
         mainEntity: { "@id": `${url}#itemlist` },
       },
       itemList,

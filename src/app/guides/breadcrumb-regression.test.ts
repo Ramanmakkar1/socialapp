@@ -51,9 +51,9 @@ test("every guide's breadcrumb items are absolute and match its route", () => {
   for (const guide of GUIDES) {
     const path = guidePath(guide.slug);
     const schema = breadcrumbJsonLd([
-      { name: "Home", url: `${BRAND.url}/` },
-      { name: "Guides", url: `${BRAND.url}/guides` },
-      { name: guide.crumb, url: `${BRAND.url}${path}` },
+      { name: "Home", url: `${BRAND.canonicalUrl}/` },
+      { name: "Guides", url: `${BRAND.canonicalUrl}/guides` },
+      { name: guide.crumb, url: `${BRAND.canonicalUrl}${path}` },
     ]);
     assert.equal(schema["@type"], "BreadcrumbList");
     assert.deepEqual(
@@ -63,9 +63,9 @@ test("every guide's breadcrumb items are absolute and match its route", () => {
     );
     for (const item of schema.itemListElement) {
       assert.ok(item.item, `${guide.slug} breadcrumb items must have an absolute URL`);
-      assert.ok(item.item.startsWith(`${BRAND.url}/`), `${guide.slug} breadcrumb URL must be absolute: ${item.item}`);
+      assert.ok(item.item.startsWith(`${BRAND.canonicalUrl}/`), `${guide.slug} breadcrumb URL must be absolute: ${item.item}`);
     }
-    assert.equal(schema.itemListElement[2].item, `${BRAND.url}${path}`);
+    assert.equal(schema.itemListElement[2].item, `${BRAND.canonicalUrl}${path}`);
   }
 });
 

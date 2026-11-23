@@ -8,6 +8,7 @@ import { ToolCta } from "@/components/tools/ToolPageTemplate";
 import g from "@/components/guides/guides.module.css";
 import t from "@/components/tools/tools.module.css";
 import { BRAND } from "@/lib/brand";
+import { canonicalUrl } from "@/lib/canonical";
 import { ldJson } from "@/lib/tool-schema";
 import { guidesHubJsonLd } from "@/lib/guide-schema";
 import { PAGE_DESCRIPTIONS } from "@/lib/public-pages";
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
 const guidesJsonLd = guidesHubJsonLd({
   name: `${BRAND.name} guides`,
   description,
-  url: `${BRAND.url}${PATH}`,
+  url: canonicalUrl(PATH),
 });
 
 export default function GuidesPage() {
