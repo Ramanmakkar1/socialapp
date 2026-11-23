@@ -141,6 +141,17 @@ const config: ToolPageConfig = {
           </ul>
         ),
       },
+      {
+        title: "Turn your caption into a scheduled TikTok post",
+        body: (
+          <p>
+            When a caption is ready, <Link href="/tiktok-scheduler">schedule your TikTok posts</Link> in Poskoo so they
+            publish through TikTok&apos;s official login at the time you pick. New to scheduling? Read{" "}
+            <Link href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link> for the step-by-step
+            walkthrough.
+          </p>
+        ),
+      },
     ],
   },
   faqTitle: "TikTok caption generator questions",
