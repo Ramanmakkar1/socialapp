@@ -338,8 +338,13 @@ export default function SocialMediaSchedulerForSmallBusinessPage() {
             , see the{" "}
             <Link className={s.vlink} href="/free-social-media-scheduler">
               free social media scheduler
-            </Link>{" "}
-            or read the{" "}
+            </Link>
+            {", "}
+            plan posts for your listing with the{" "}
+            <Link className={s.vlink} href="/google-business-profile-scheduler">
+              Google Business Profile scheduler
+            </Link>
+            , or read the{" "}
             <Link className={s.vlink} href="/social-media-scheduler-comparison">
               social media scheduler comparison
             </Link>{" "}
