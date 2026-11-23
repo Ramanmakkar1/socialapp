@@ -209,7 +209,9 @@ export default function InstagramHighlightCoverMakerPage() {
       afterTool={
         <p className={t.prose}>
           Once your covers are ready, schedule the Stories they belong to with the{" "}
-          <Link href="/instagram-scheduler">Poskoo Instagram scheduler</Link>.
+          <Link href="/instagram-scheduler">Poskoo Instagram scheduler</Link>. Need a
+          full post to go with them? Try our{" "}
+          <Link href="/tools/social-media-post-generator">social media post generator</Link>.
         </p>
       }
     >
