@@ -1114,7 +1114,7 @@ export const GUIDES: GuideEntry[] = [
       "/tools/bluesky-character-counter",
       "/tools/threads-post-generator",
       "/tools/threads-bio-generator",
-      "/tools/threads-tools",
+      "/tools/threads-hashtag-generator",
       "/tools/instagram-utm-builder",
     ],
     related: ["how-to-cross-post-on-social-media", "social-media-seo-2026"],
