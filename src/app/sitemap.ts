@@ -63,7 +63,10 @@ function getSitemapPaths(host?: string | null): PublicPath[] {
 export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
   // Re-check indexability at the output boundary: a path that is noindex for
   // any reason must never reach the XML, even if the candidate list changes.
-  const hostIsIndexable = isApprovedProductionOrigin(BRAND.url);
+  // isPathIndexable("/") is the same site-level noindex condition the root
+  // layout uses for its robots meta (src/app/layout.tsx), so the sitemap
+  // returns an empty array exactly while the site is noindex, on every host.
+  const hostIsIndexable = isApprovedProductionOrigin(BRAND.url) && isPathIndexable("/");
   return getSitemapPaths(host)
     .filter((path) => hostIsIndexable && isListablePath(path))
     .map((path) => {
