@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
-import { BRAND } from "@/lib/brand";
+import { canonicalUrl } from "@/lib/canonical";
 import BlueskyCharCounter from "./BlueskyCharCounter";
 
 const limitRows: [string, string][] = [
@@ -160,7 +160,7 @@ const config: ToolPageConfig = {
 export const metadata: Metadata = {
   ...toolMetadata(config),
   title: { absolute: "Bluesky Character Counter: Check the 300 Limit Free" },
-  alternates: { canonical: new URL("/tools/bluesky-character-counter", BRAND.url) },
+  alternates: { canonical: canonicalUrl("/tools/bluesky-character-counter") },
 };
 
 export default function BlueskyCharacterCounterPage() {
