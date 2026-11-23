@@ -32,6 +32,20 @@ const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com";
 // sitemap can never advertise a noindex homepage.
 const HOMEPAGE_PATH: PublicPath = "/";
 
+// Tool pages that render noindex, so they must never be advertised in the
+// sitemap even though they stay in the PUBLIC_PATHS list for titles/meta.
+const NOINDEX_TOOL_PATHS: readonly PublicPath[] = [
+  "/tools/x-thread-maker",
+  "/tools/pinterest-hashtag-generator",
+  "/tools/x-hashtag-generator",
+  "/tools/social-media-post-generator",
+  "/tools/pinterest-description-generator",
+];
+
+function isListableToolPath(path: PublicPath): boolean {
+  return !NOINDEX_TOOL_PATHS.includes(path);
+}
+
 function isListablePath(path: PublicPath): boolean {
   if (path === HOMEPAGE_PATH && !isPathIndexable(HOMEPAGE_PATH)) return false;
   return isPathIndexable(path);
@@ -57,7 +71,7 @@ function getSitemapPaths(host?: string | null): PublicPath[] {
   if (!isApprovedProductionOrigin(BRAND.url)) return [];
   // home is listed only when indexable (production); every other noindex path
   // is dropped by the same helper, so a fully noindex site returns an empty list.
-  return PUBLIC_PATHS.filter(isListablePath);
+  return PUBLIC_PATHS.filter(isListableToolPath).filter(isListablePath);
 }
 
 export default function sitemap(host?: string | null): MetadataRoute.Sitemap {
