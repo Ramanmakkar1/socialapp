@@ -76,6 +76,12 @@ const platformLinks = [
     text: "Schedule X posts with text and up to 4 images or one video through X's official API.",
   },
   {
+    id: "gbp",
+    name: "Google Business Profile",
+    href: "/google-business-profile-scheduler",
+    text: "Schedule Google Business Profile updates, offers and events to your locations with a photo and a Book or Call button.",
+  },
+  {
     id: "bluesky",
     name: "Bluesky",
     href: "/bluesky-scheduler",
