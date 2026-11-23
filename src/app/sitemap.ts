@@ -28,6 +28,8 @@ const STAGING_HOMEPAGE_URL = "https://socialapp.splitforms.com";
 
 // Only indexable paths are listed. An empty sitemap while staging is noindex is
 // intended; the file stays raw XML with no XSLT styling.
+// The tools URL list is PUBLIC_PATHS in src/lib/public-pages.ts; it already
+// includes "/tools/tiktok-caption-generator" next to the other /tools entries.
 function getSitemapPaths(host?: string | null): PublicPath[] {
   // The staging homepage is excluded from the sitemap while the site remains
   // noindex. This is a hard exclusion: the URL is never listed, regardless of
