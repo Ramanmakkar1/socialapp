@@ -246,6 +246,10 @@ export default function TikTokCaptionGeneratorPage() {
       config={config}
       afterTool={
         <section className={`${t.section} ${t.related}`}>
+          <p className={t.prose}>
+            Schedule the captions you generate with the{" "}
+            <Link href="/social-media-scheduler">Poskoo social media scheduler</Link>.
+          </p>
           <nav className="relChips" aria-label="Related TikTok tools and guides">
             <span>Keep going</span>
             <Link href="/guides/how-to-schedule-tiktok-videos">TikTok scheduling guide</Link>
