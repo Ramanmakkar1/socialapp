@@ -202,7 +202,7 @@ export default async function InstagramScheduler() {
 
       <section id="how" className="howSection">
         <div className="wrap">
-          <div className="head"><p className="eyebrow">How it works</p><h2>Three steps to your <em className="s mark">first scheduled post</em></h2></div>
+          <div className="head"><p className="eyebrow">How it works</p><h2>How Instagram scheduling <em className="s mark">works in Poskoo</em></h2></div>
           <div className="howGrid">
             {steps.map((st) => (
               <article key={st.n} className="howStep">
@@ -213,6 +213,9 @@ export default async function InstagramScheduler() {
               </article>
             ))}
           </div>
+          <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
+            Want the full walkthrough? Read <Link className={s.vlink} href="/help/schedule-instagram-posts">how to schedule Instagram posts in Poskoo</Link>.
+          </p>
         </div>
       </section>
 
