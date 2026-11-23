@@ -164,13 +164,13 @@
   .guide { grid-template-columns: 1fr; gap: 20px; padding: 28px 20px; border-radius: var(--poskoo-radius-card); }
   .toc { position: static; }
   .toc ol { display: flex; flex-wrap: wrap; gap: 6px; }
-  .toc a { border: 1.5px solid var(--line); border-radius: var(--poskoo-radius-pill); padding: .35rem .75rem; font-size: .84rem; min-height: 40px; align-items: center; }
+  .toc a { border: 1.5px solid var(--line); border-radius: var(--poskoo-radius-pill); padding: .35rem .75rem; font-size: .84rem; }
 }
 
 /* ---------- Related tools carousel ---------- */
 .relHead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 20px; margin-bottom: 18px; }
 .relHead h2 { font-size: clamp(1.6rem, 3vw, 2.3rem); margin-top: 8px; }
-.page.page .relHead .textLink { display: inline-flex; align-items: center; min-height: 40px; }
+.page.page .relHead .textLink { display: inline; }
 .carousel { margin-bottom: 26px; }
 .carViewport { position: relative; }
 .carViewport::before, .carViewport::after {
@@ -206,13 +206,9 @@
 .carCard small { color: var(--muted); font-size: .88rem; line-height: 1.4; padding-inline: 4px; }
 .carGo { margin-top: auto; padding: 4px 4px 0; font-size: .88rem; font-weight: 600; color: var(--violet); }
 .carControls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
-.carDots { display: flex; gap: 2px; flex-wrap: wrap; }
-.dot, .dotOn { position: relative; width: 20px; height: 40px; padding: 0; border: 0; background: transparent; cursor: pointer; }
-.dot::before, .dotOn::before {
-  content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: 8px; height: 8px; border-radius: 999px; background: var(--line); transition: width .2s, background .2s;
-}
-.dotOn::before { width: 22px; background: var(--ink); }
+.carDots { display: flex; gap: 6px; flex-wrap: wrap; }
+.dot, .dotOn { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: var(--line); cursor: pointer; transition: width .2s, background .2s; }
+.dotOn { width: 22px; background: var(--ink); }
 .carArrows { display: flex; gap: 8px; }
 .carBtn {
   display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
@@ -354,11 +350,6 @@
 .hubPage { min-width: 0; }
 :global(body):has(.hubPage):has([aria-label="Cookie notice"]) { padding-top: 64px; }
 :global(body):has(.hubPage) [aria-label="Cookie notice"] { top: 8px; bottom: auto; }
-/* Tool pages put the form at the top, so a bottom-docked cookie bar covers the
-   first controls (Tone, Add emojis, keyword CTA). Dock it to the top and reserve
-   its height, same as the hub, so no form control is obscured on phones. */
-:global(body):has(.toolFirst):has([aria-label="Cookie notice"]) { padding-top: 64px; }
-:global(body):has(.toolFirst) [aria-label="Cookie notice"] { top: 8px; bottom: auto; }
 .picks { padding-top: 30px; }
 .pickGrid {
   list-style: none; margin: 0; padding: 0;

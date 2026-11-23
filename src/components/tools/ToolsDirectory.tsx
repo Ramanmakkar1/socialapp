@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, SearchX } from "lucide-react";
-import { TOOLS, TOOL_CATEGORIES, TOOL_PLATFORMS, toolArt, toolByHref, toolPlatform, type ToolCategory, type ToolPlatform } from "./registry";
+import { TOOLS, TOOL_CATEGORIES, toolArt, toolByHref, type ToolCategory } from "./registry";
 import { CategoryIcon, ToolIcon } from "./ToolIcon";
 import t from "./tools.module.css";
 
@@ -20,7 +20,6 @@ const PICKS = [
 export function ToolsDirectory() {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<ToolCategory | "all">("all");
-  const [platform, setPlatform] = useState<ToolPlatform | "all">("all");
 
   const q = query.trim().toLowerCase();
   const visible = useMemo(
@@ -28,12 +27,11 @@ export function ToolsDirectory() {
       TOOLS.filter(
         (tool) =>
           (cat === "all" || tool.category === cat) &&
-          (platform === "all" || toolPlatform(tool) === platform) &&
           (!q || `${tool.name} ${tool.summary}`.toLowerCase().includes(q))
       ),
-    [q, cat, platform]
+    [q, cat]
   );
-  const filtered = cat !== "all" || platform !== "all" || q !== "";
+  const filtered = cat !== "all" || q !== "";
   const picks = PICKS.map((p) => ({ ...p, tool: toolByHref(p.href) })).filter((p) => p.tool !== undefined);
 
   return (
@@ -62,21 +60,6 @@ export function ToolsDirectory() {
             </button>
           ))}
         </div>
-        <div className={`${t.filters} ${t.platformFilters}`} aria-label="Filter by platform">
-          <button type="button" className={t.filter} aria-pressed={platform === "all"} onClick={() => setPlatform("all")}>
-            All platforms<span>{TOOLS.length}</span>
-          </button>
-          {TOOL_PLATFORMS.map((p) => {
-            const count = TOOLS.filter((tool) => toolPlatform(tool) === p.id).length;
-            if (count === 0) return null;
-            return (
-              <button key={p.id} type="button" className={t.filter} aria-pressed={platform === p.id} onClick={() => setPlatform(p.id)}>
-                {p.label}
-                <span>{count}</span>
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       <p className="sr-only" aria-live="polite">{visible.length} tools shown</p>
@@ -84,7 +67,7 @@ export function ToolsDirectory() {
         <p className={t.resultLine}>
           Showing <b>{visible.length}</b> of {TOOLS.length} tools
           {q ? <> matching &ldquo;{query.trim()}&rdquo;</> : null}.{" "}
-          <button type="button" className={t.textLink} onClick={() => { setQuery(""); setCat("all"); setPlatform("all"); }}>
+          <button type="button" className={t.textLink} onClick={() => { setQuery(""); setCat("all"); }}>
             Show all
           </button>
         </p>
@@ -150,7 +133,7 @@ export function ToolsDirectory() {
         <div className={t.empty}>
           <span className={t.emptyIcon} aria-hidden="true"><SearchX size={22} /></span>
           <p>No tool matches &ldquo;{query}&rdquo;.</p>
-          <button type="button" className={t.filter} onClick={() => { setQuery(""); setCat("all"); setPlatform("all"); }}>Clear search</button>
+          <button type="button" className={t.filter} onClick={() => { setQuery(""); setCat("all"); }}>Clear search</button>
         </div>
       )}
     </div>

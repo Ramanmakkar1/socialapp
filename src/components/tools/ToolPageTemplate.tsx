@@ -4,7 +4,7 @@ import { ArrowDown, ArrowRight, BookOpen } from "lucide-react";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { BRAND } from "@/lib/brand";
-import { TOOLS, toolByHref, toolPlatform, type ToolEntry, type ToolCategory, type ToolIconName, type ToolPlatform } from "./registry";
+import { TOOLS, toolByHref, toolPlatform, type ToolEntry, type ToolIconName, type ToolPlatform } from "./registry";
 import { ToolIcon } from "./ToolIcon";
 import { RelatedToolsCarousel } from "./RelatedToolsCarousel";
 import { faqJsonLd, howToJsonLd, ldJson, webAppJsonLd, webPageJsonLd, type AppCategory, type ToolFaq } from "./seo";
@@ -80,64 +80,6 @@ export function toolBreadcrumbs(path: string, crumb: string): { name: string; pa
   const hub = tool ? PLATFORM_HUBS[toolPlatform(tool)] : undefined;
   return [{ name: "Free social media tools", path: "/tools" }, ...(hub && hub.path !== path ? [hub] : []), { name: crumb, path }];
 }
-
-/**
- * Next product CTA for one tool page, derived from its registry category (`config.path`).
- * Create, media and planning tools hand off to the scheduler, comment/DM tools to auto DM.
- * Labels and blurbs match what the visitor just made, so the next step feels obvious.
- */
-export function nextActionFor(path: string): { href: string; label: string; blurb: string } {
-  const category = toolByHref(path)?.category;
-  if (category === "dm") {
-    return {
-      href: "/instagram-auto-dm",
-      label: "Automate this DM",
-      blurb: "Set up this comment-to-DM flow in Instagram auto DM and reply to every commenter automatically.",
-    };
-  }
-  if (category === "media") {
-    return {
-      href: "/instagram-scheduler",
-      label: "Schedule this visual",
-      blurb: "Schedule the post with the media you just prepared — Poskoo publishes it at the right time.",
-    };
-  }
-  if (category === "plan") {
-    return {
-      href: "/instagram-scheduler",
-      label: "Put this plan on autopilot",
-      blurb: "Add these posting times to your Instagram scheduler calendar and let the queue publish them.",
-    };
-  }
-  if (category === "create") {
-    return {
-      href: "/instagram-scheduler",
-      label: "Schedule the post you just prepared",
-      blurb: "Schedule the post you just prepared — pick a time and Poskoo publishes it for you.",
-    };
-  }
-  return {
-    href: "/tools",
-    label: "All free social media tools",
-    blurb: "Browse the rest of the free tools for your next post.",
-  };
-}
-
-/** Matching guide for a tool category, shown as an extra "keep exploring" chip. */
-export const GUIDE_FOR_CATEGORY: Record<ToolCategory, string> = {
-  dm: "/guides/instagram-comment-to-dm-automation-guide",
-  plan: "/guides/social-media-content-calendar-guide",
-  create: "/guides/how-to-schedule-instagram-posts",
-  media: "/guides/instagram-reels-strategy-for-small-business",
-};
-
-/** Link label for each category's matching guide. */
-export const GUIDE_LABEL_FOR_CATEGORY: Record<ToolCategory, string> = {
-  dm: "Instagram comment-to-DM guide",
-  plan: "social media content calendar guide",
-  create: "How to schedule Instagram posts",
-  media: "Instagram Reels strategy guide",
-};
 
 const slug = (s: string) =>
   s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
@@ -331,13 +273,6 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
   const own = toolByHref(self);
   const fill = TOOLS.filter((x) => !seen.has(x.href) && x.category === own?.category);
   const tools = [...picked, ...fill].slice(0, Math.max(picked.length, 8));
-  // One intent-matched product CTA, derived from the tool's own route path.
-  const nextAction = nextActionFor(self);
-  // Matching guide for this tool's category (skipped on guide pages or unknown categories).
-  const category = toolByHref(self)?.category;
-  const guideHref = category ? GUIDE_FOR_CATEGORY[category] : undefined;
-  const guideLabel = category ? GUIDE_LABEL_FOR_CATEGORY[category] : undefined;
-  const showGuide = Boolean(guideHref && guideLabel && !self.startsWith("/guides"));
   return (
     <section className={`${t.section} ${t.related}`} aria-labelledby="related-title">
       <div className={t.relHead}>
@@ -350,11 +285,9 @@ export function RelatedTools({ hrefs, self }: { hrefs: string[]; self: string })
       <RelatedToolsCarousel tools={tools} />
       <nav className="relChips" aria-label="Keep exploring">
         <span>Ready to post?</span>
-        <span>{nextAction.blurb}</span>
-        <Link href={nextAction.href}>{nextAction.label}</Link>
-        {showGuide && guideHref && guideLabel && (
-          <Link href={guideHref}>{guideLabel}</Link>
-        )}
+        <Link href="/instagram-scheduler">Instagram scheduler</Link>
+        <Link href="/instagram-auto-dm">Instagram auto DM</Link>
+        <Link href="/tools">All free social media tools</Link>
       </nav>
     </section>
   );

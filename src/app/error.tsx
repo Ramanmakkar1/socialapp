@@ -24,15 +24,13 @@ export default function SiteError({ error, reset }: { error: Error & { digest?: 
             Try again
           </button>
           <Link className="btn btn-line" href="/">Back to homepage</Link>
-          <Link className="btn btn-line" href="/pricing">See pricing</Link>
-          <Link className="btn btn-line" href="/help">Visit help</Link>
-          <Link className="btn btn-line" href="/contact">Contact us</Link>
         </div>
-        {error.digest ? (
-          <p className="small" style={{ marginTop: 16 }}>
-            Reference: <code>{error.digest}</code>
-          </p>
-        ) : null}
+        <p className="small">
+          Need a hand?{" "}
+          <Link href="/help" style={{ color: "var(--violet)", textDecoration: "underline", textUnderlineOffset: 3 }}>
+            Visit help
+          </Link>
+        </p>
         <PageArt />
       </header>
     </PublicShell>

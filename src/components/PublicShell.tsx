@@ -51,28 +51,6 @@ export default function PublicShell({
         {crumbs && (
           <Breadcrumbs items={crumbs.map((c) => ({ name: c.name, href: c.path }))} />
         )}
-        <ul className={s.trustStrip} aria-label="Poskoo trust highlights">
-          {[
-            "Official platform APIs",
-            "No passwords",
-            "$0 Free plan",
-            "No credit card",
-          ].map((item) => (
-            <li key={item}>
-              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                <path
-                  d="M5 10.4l3.1 3L15 6.6"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
         {children}
       </main>
       <div className="wrap">
