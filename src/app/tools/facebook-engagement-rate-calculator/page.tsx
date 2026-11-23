@@ -197,6 +197,7 @@ const config: ToolPageConfig = {
     "/tools/facebook-character-counter",
     "/tools/facebook-hashtag-generator",
     "/tools/best-time-to-post-on-facebook",
+    "/tools/instagram-engagement-rate-calculator",
   ],
   schema: {
     features: [
