@@ -62,6 +62,7 @@ test("every guide's breadcrumb items are absolute and match its route", () => {
       `${guide.slug} breadcrumb names must match the visible trail`,
     );
     for (const item of schema.itemListElement) {
+      assert.ok(item.item, `${guide.slug} breadcrumb items must have an absolute URL`);
       assert.ok(item.item.startsWith(`${BRAND.url}/`), `${guide.slug} breadcrumb URL must be absolute: ${item.item}`);
     }
     assert.equal(schema.itemListElement[2].item, `${BRAND.url}${path}`);
