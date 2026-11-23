@@ -8,6 +8,7 @@ test("tool merge redirects (owner decision #280): 301s each duplicate tool to th
     { source: "/tools/tweet-generator", destination: "/tools/x-post-generator" },
     { source: "/tools/threads-caption-generator", destination: "/tools/threads-post-generator" },
     { source: "/tools/instagram-caption-formatter", destination: "/tools/instagram-line-break-generator" },
+    { source: "/alternatives/later", destination: "/later-alternative" },
   ];
   for (const { source, destination } of expected) {
     const rule = redirects?.find((r) => r.source === source);

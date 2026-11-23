@@ -85,6 +85,7 @@ const nextConfig: NextConfig = {
       { source: "/tools/tweet-generator", destination: "/tools/x-post-generator", permanent: true },
       { source: "/tools/threads-caption-generator", destination: "/tools/threads-post-generator", permanent: true },
       { source: "/tools/instagram-caption-formatter", destination: "/tools/instagram-line-break-generator", permanent: true },
+      { source: "/alternatives/later", destination: "/later-alternative", permanent: true },
       // Duplicate intent: the old /instagram-comment-to-dm page is merged into the features page.
       { source: "/instagram-comment-to-dm", destination: "/features/instagram-comment-to-dm", permanent: true },
       { source: "/Home", destination: "/", permanent: true },
