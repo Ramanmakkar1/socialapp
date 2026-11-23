@@ -33,7 +33,7 @@ export type ToolPageConfig = {
   h1: { before?: string; mark: string; after?: string };
   /** Optional answer-first paragraph shown directly under the H1, before the lede. */
   answer?: ReactNode;
-  lede: string;
+  lede: ReactNode;
   /** Hero animation and its alt text (describe what the drawing shows). */
   art: AnimName;
   artLabel: string;

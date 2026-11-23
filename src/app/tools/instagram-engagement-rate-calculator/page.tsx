@@ -12,7 +12,14 @@ const config: ToolPageConfig = {
     "Free Instagram engagement rate calculator. Enter likes, comments, saves and shares plus followers or reach to get your rate and the formula used, fast.",
   pill: "Free · runs in your browser · nothing is uploaded",
   h1: { before: "Instagram engagement rate", mark: "calculator" },
-  lede: "Instagram engagement rate is the share of your audience that interacted with a post, shown as a percentage. Enter one post's likes, comments, saves, shares and either followers or reach and the calculator returns that post's engagement rate, plus the exact formula it used.",
+  lede: (
+    <>
+      Instagram engagement rate is the share of your audience that interacted with a post, shown as a percentage. Enter
+      one post&apos;s likes, comments, saves, shares and either followers or reach and the calculator returns that
+      post&apos;s engagement rate, plus the exact formula it used. To keep engagement up, see{" "}
+      <Link href="/help/schedule-instagram-posts">how to schedule Instagram posts</Link>.
+    </>
+  ),
   art: "analytics",
   artLabel: "A creator waters a growing bar chart while hearts float up",
   heroPoints: ["By followers or reach", "Saves and shares count", "No login"],
