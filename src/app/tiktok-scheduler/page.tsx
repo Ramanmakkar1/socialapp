@@ -267,10 +267,10 @@ export default function TikTokSchedulerPage() {
             ))}
           </div>
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
-            New to it? Follow our step-by-step guide:{" "}
-            <Link className={s.vlink} href="/help/schedule-tiktok-posts">how to schedule TikTok videos</Link>.
-            {" "}For the full walkthrough, read the{" "}
-            <Link className={s.vlink} href="/guides/how-to-schedule-tiktok-videos">step-by-step guide to scheduling TikTok videos</Link>.
+            New to it? Read the{" "}
+            <Link className={s.vlink} href="/help/schedule-tiktok-posts">TikTok scheduling help page</Link>.
+            {" "}Step-by-step:{" "}
+            <Link className={s.vlink} href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link>.
           </p>
           <p className="small" style={{ marginTop: 12, textAlign: "center" }}>
             Writing a caption first? Check the 4,000-character limit and feed preview with our{" "}
