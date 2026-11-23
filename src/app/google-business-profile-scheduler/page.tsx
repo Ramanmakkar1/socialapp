@@ -274,7 +274,9 @@ export default function GoogleBusinessProfileSchedulerPage() {
           <p className="small" style={{ marginTop: 20, textAlign: "center" }}>
             Need a hand? Browse the <Link className={s.vlink} href="/tools">free social media tools</Link> or read the{" "}
             <Link className={s.vlink} href="/social-media-scheduler-comparison">social media scheduler comparison</Link> before you{" "}
-            <Link className={s.vlink} href="/signup">create your free account</Link>.
+            <Link className={s.vlink} href="/signup">create your free account</Link>. See{" "}
+            <Link className={s.vlink} href="/features">all Poskoo features</Link> and{" "}
+            <Link className={s.vlink} href="/pricing">pricing and $0 Free plan</Link>.
           </p>
         </div>
       </section>
