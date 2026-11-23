@@ -152,9 +152,11 @@ const config: ToolPageConfig = {
             <p>
               Hashtags are only one part of an X post. Before you publish, check the whole post with the{" "}
               <Link href="/tools/x-character-counter">X character counter</Link> and see how it looks in the feed with the{" "}
-              <Link href="/tools/x-post-preview">X post preview</Link>. If you are planning ahead, the{" "}
-              <Link href="/tools/best-time-to-post-on-x">best time to post on X</Link> finder gives you three starting
-              slots, and the <Link href="/x-scheduler">X scheduler</Link> publishes the post for you at the time you pick.
+              <Link href="/tools/x-post-preview">X post preview</Link>. If the post is part of a longer thread, the{" "}
+              <Link href="/tools/x-thread-maker">X thread maker</Link> splits it into numbered posts. If you are planning
+              ahead, the <Link href="/tools/best-time-to-post-on-x">best time to post on X</Link> finder gives you three
+              starting slots, and the <Link href="/x-scheduler">X scheduler</Link> publishes the post for you at the time
+              you pick.
             </p>
           </>
         ),
