@@ -117,7 +117,9 @@ const config: ToolPageConfig = {
               A live flow needs a professional Instagram account connected through Meta. In{" "}
               <Link href="/instagram-auto-dm">Poskoo&apos;s Instagram auto-DM</Link>, you pick the posts, add the keyword
               and match type, and write the message once. When a comment matches, Poskoo sends the DM through the official
-              Meta API, as long as the rule is active and delivery rules allow it.
+              Meta API, as long as the rule is active and delivery rules allow it. The{" "}
+              <Link href="/guides/instagram-comment-to-dm-automation-guide">comment-to-DM automation guide</Link> walks
+              through the full setup.
             </p>
           </>
         ),
