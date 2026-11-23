@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, AtSign, Bell, CalendarClock, ChevronDown, Facebook, Hash, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Bell, CalendarClock, ChevronDown, Clock, Facebook, Hash, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
 import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, nextAvailableSlots, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import PostPreview from "./PostPreview";
@@ -166,6 +166,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [igFormat, setIgFormat] = useState<"feed" | "story">(init.igFormat);
   const [selectedRuleId, setSelectedRuleId] = useState(init.selectedRuleId);
   const [scheduledAt, setScheduledAt] = useState("");
+  const [postNow, setPostNow] = useState(false);
   const [timeZone, setTimeZone] = useState("");
   const [nextSlotLabel, setNextSlotLabel] = useState("");
   const [ytTitle, setYtTitle] = useState("");
@@ -361,6 +362,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     scheduleOriginRef.current = null;
     setScheduledAt(value);
     setNextSlotLabel("");
+    setPostNow(false);
   }
 
   function buildSaveInput(mode: "draft" | "schedule" | "queue") {
@@ -1704,6 +1706,24 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                   })}
                 </div>
               )}
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() => {
+                    changeScheduledAt(toLocalInputValue(new Date(Date.now() + 2 * 60 * 1000)));
+                    setPostNow(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[var(--poskoo-line)] px-3 py-1 text-xs font-medium text-[var(--poskoo-violet)] hover:bg-[var(--poskoo-band)] disabled:opacity-60"
+                >
+                  <Clock className="h-3.5 w-3.5" aria-hidden /> Post now
+                </button>
+                {postNow && (
+                  <span className="text-xs text-[var(--poskoo-muted)]" aria-live="polite">
+                    Publishes within a few minutes
+                  </span>
+                )}
+              </div>
               {queueReady && (
                 <div className="relative mt-2 inline-flex" data-composer-pop>
                   <button
