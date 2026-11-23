@@ -235,7 +235,10 @@ const config: ToolPageConfig = {
   },
 };
 
-export const metadata = toolMetadata(config);
+export const metadata = {
+  ...toolMetadata(config),
+  alternates: { canonical: "https://poskoo.com/tools/tiktok-caption-generator" },
+};
 
 export default function TikTokCaptionGeneratorPage() {
   return (
