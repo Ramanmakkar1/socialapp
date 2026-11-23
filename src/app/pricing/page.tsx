@@ -115,6 +115,17 @@ export default async function PricingPage() {
 
       <section style={{ paddingTop: 20 }}>
         <div className="wrap">
+          <h2>Compare Poskoo with other schedulers</h2>
+          <ul className="small" style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center", listStyle: "none", padding: 0, marginTop: "12px" }}>
+            <li><Link className={s.vlink} href="/social-media-scheduler">Social media scheduler</Link></li>
+            <li><Link className={s.vlink} href="/buffer-alternative">Poskoo vs Buffer</Link></li>
+            <li><Link className={s.vlink} href="/google-business-profile-scheduler">Google Business Profile scheduler</Link></li>
+          </ul>
+        </div>
+      </section>
+
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
           <div className="split">
             <div className="copy">
               <p className="eyebrow">Every plan</p>
