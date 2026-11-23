@@ -108,7 +108,7 @@ export default function ToolsPage() {
         <section className={t.picks} aria-labelledby="most-used-tools">
           <div className={t.groupHead}>
             <h2 id="most-used-tools">Most-used free tools</h2>
-            <p>The three tools people open most, one per job.</p>
+            <p>The four tools people open most, one per job.</p>
           </div>
           <ul className={t.grid}>
             <li>
@@ -120,6 +120,20 @@ export default function ToolsPage() {
                   <b>LinkedIn text formatter</b>
                 </span>
                 <p>Copy bold, italic and bulleted Unicode text for LinkedIn posts and profiles.</p>
+                <span className={t.go}>
+                  Open tool <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/tools/tiktok-caption-generator" className={t.card}>
+                <span className={t.cardTop}>
+                  <span className={`${t.cardIcon} ${t.cat_create}`}>
+                    <ToolIcon name="sparkles" />
+                  </span>
+                  <b>TikTok caption generator</b>
+                </span>
+                <p>Six TikTok caption drafts with a short hook and call to action for any topic.</p>
                 <span className={t.go}>
                   Open tool <span aria-hidden="true">→</span>
                 </span>
