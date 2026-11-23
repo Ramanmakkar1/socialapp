@@ -41,6 +41,16 @@ const compare: [string, string, string, string][] = [
   ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
 
+// Short at-a-glance table. Buffer values only repeat what this page already states:
+// Buffer schedules posts; auto-DMing commenters or capturing their email needs another tool.
+const glance: [string, string, string][] = [
+  ["Instagram/Facebook/Threads scheduling", "Yes", "Yes"],
+  ["Comment-to-DM automation", "Yes", "Not offered"],
+  ["AI replies", "Yes", "Check their site"],
+  ["Lead capture", "Yes", "Not offered"],
+  ["Free plan", "Yes", "Check their site"],
+];
+
 const faqs = [
   { q: `Is ${BRAND.name} a Buffer alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts like Buffer does, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
   { q: "Can I import my existing Buffer schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
@@ -168,6 +178,39 @@ export default function BufferAlternative() {
               <div className="pain"><b>2. Attach the DM rule</b><span>Set the keyword and the message with your link. It switches on when the post is published.</span></div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* At a glance */}
+      <section style={{ paddingTop: 20 }}>
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">At a glance</p>
+            <h2>Poskoo vs Buffer at a glance</h2>
+          </div>
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead>
+                <tr className={s.tr}>
+                  <th scope="col" className={s.th}>Feature</th>
+                  <th scope="col" className={`${s.th} ${s.oursCol}`}>{BRAND.name}</th>
+                  <th scope="col" className={s.th}>Buffer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {glance.map(([label, ours, buffer]) => (
+                  <tr key={label} className={s.tr}>
+                    <td className={s.td}>{label}</td>
+                    <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
+                    <td className={s.td} style={{ textAlign: "center" }}><Cell v={buffer} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <Link className={s.vlink} href="/social-media-scheduler">See the social media scheduler</Link>
+          </p>
         </div>
       </section>
 
