@@ -45,7 +45,7 @@ test("home page metadata uses the shared canonical for canonical and OG url", ()
   const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
   assert.ok(pageSource.includes("const canonical = HOME_CANONICAL;"));
   assert.ok(!pageSource.includes("socialapp.splitforms.com"), "home canonical must not use the staging host");
-  assert.ok(pageSource.includes("alternates: { canonical }"));
+  assert.ok(pageSource.includes("alternates: { canonical: HOME_CANONICAL }"));
   assert.ok(pageSource.includes("openGraph: { title, description, url: canonical,"));
   // Both the layout default and the homepage use the poskoo.com production canonical.
   assert.ok(layoutSource.includes('alternates: { canonical: canonicalUrl("/") }'));

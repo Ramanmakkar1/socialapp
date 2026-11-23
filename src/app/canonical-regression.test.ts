@@ -12,7 +12,7 @@ const layoutSource = readFileSync("src/app/layout.tsx", "utf8");
 test("home canonical is https://poskoo.com/", () => {
   assert.equal(HOME_CANONICAL, "https://poskoo.com/");
   assert.ok(pageSource.includes("const canonical = HOME_CANONICAL;"), "home page must use HOME_CANONICAL");
-  assert.ok(pageSource.includes("alternates: { canonical }"));
+  assert.ok(pageSource.includes("alternates: { canonical: HOME_CANONICAL }"));
   assert.ok(pageSource.includes("url: canonical"), "og:url must reuse the canonical");
 });
 
