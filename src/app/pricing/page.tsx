@@ -175,6 +175,9 @@ export default async function PricingPage() {
               See everything you can schedule on the{" "}
               <Link className={s.vlink} href="/social-media-scheduler">social media scheduler</Link>.
             </p>
+            <p className="small">
+              Weighing up tools? See <Link className={s.vlink} href="/buffer-alternative">Poskoo vs Buffer</Link> side by side.
+            </p>
           </div>
         </div>
       </section>
