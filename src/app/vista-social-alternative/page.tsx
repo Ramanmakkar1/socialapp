@@ -28,17 +28,6 @@ const whySwitch = [
   { no: "03 / Leads", title: "Leads from every post", text: "Ask for an email in the DM before the link is sent, so every comment on a scheduled post can become a lead." },
 ];
 
-const compare: [string, string, string, string][] = [
-  ["Social media scheduling", "Yes", "Check their site", "Check their site"],
-  [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
-  ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
-  ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
-  ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
-  ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
-];
-
 const faqs = [
   { q: `Is ${BRAND.name} a Vista Social alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
   { q: "What is Vista Social?", a: "Vista Social is a social media management tool for scheduling, engagement and reporting. For its exact features and plans, see their site." },
@@ -60,6 +49,17 @@ function Cell({ v }: { v: string }) {
 }
 
 export default function VistaSocialAlternative() {
+  const compare: [string, string, string, string][] = [
+    ["Social media scheduling", "Yes", "Check their site", "Check their site"],
+    [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
+    ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
+    ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
+    ["AI caption ideas", "Yes", "Check their site", "Check their site"],
+    ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+    ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
+    ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
+  ];
+
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Vista Social alternative", path: "/vista-social-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
