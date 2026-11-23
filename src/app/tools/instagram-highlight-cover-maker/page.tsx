@@ -180,6 +180,7 @@ const config: ToolPageConfig = {
     "/tools/instagram-bio-generator",
     "/tools/instagram-story-size-checker",
     "/tools/instagram-reel-cover-maker",
+    "/tools/tiktok-caption-generator",
     "/tools/instagram-safe-zone-checker",
   ],
   schema: {
