@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { publisherRef } from "@/lib/tool-schema";
+import { helpArticleJsonLd } from "@/lib/help-schema";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
@@ -14,17 +14,15 @@ export const metadata: Metadata = withSocial({
   alternates: { canonical: "/help/schedule-instagram-posts" },
 });
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
+const datePublished = "2026-11-07";
+
+const articleJsonLd = helpArticleJsonLd({
   headline: "How to schedule Instagram posts",
-  description: metadata.description,
-  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
+  description: String(metadata.description),
+  path: "/help/schedule-instagram-posts",
+  datePublished,
   dateModified: "2026-11-14",
-  author: { "@type": "Organization", name: BRAND.company },
-  publisher: publisherRef(),
-  mainEntityOfPage: `${BRAND.canonicalUrl}/help/schedule-instagram-posts`,
-};
+});
 
 const steps = [
   {
