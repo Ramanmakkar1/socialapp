@@ -152,6 +152,12 @@ export default function HootsuiteAlternative() {
           </div>
           <CompareNote />
           <p className="small" style={{ textAlign: "center", marginTop: 16 }}>Competitor features and prices change. Check their websites for current plans.</p>
+          <p className="small" style={{ textAlign: "center" }}>
+            More alternatives:{'\u00a0'}
+            <Link className={s.vlink} href="/buffer-alternative">Buffer alternative</Link>{'\u00a0'}
+            ·{'\u00a0'}
+            <Link className={s.vlink} href="/metricool-alternative">Metricool alternative</Link>
+          </p>
         </div>
       </section>
 
