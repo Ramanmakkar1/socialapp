@@ -119,9 +119,8 @@ const config: ToolPageConfig = {
               naturally.
             </p>
             <p>
-              Need ideas? Try the free{" "}
-              <Link href="/tools/pinterest-hashtag-generator">Pinterest hashtag generator</Link> and choose tags that
-              match the Pin&apos;s topic rather than popular but unrelated words.
+              Need ideas? Try the free <Link href="/tools/pinterest-hashtag-generator">Pinterest hashtag generator</Link>{" "}
+              and choose tags that match the Pin&apos;s topic rather than popular but unrelated words.
             </p>
           </>
         ),
