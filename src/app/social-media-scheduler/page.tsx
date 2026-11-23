@@ -294,7 +294,7 @@ export default function SocialMediaSchedulerPage() {
             ))}
           </div>
           <p className="lede">See every scheduled post on a week or month view in the <Link className={s.vlink} href="/features/social-media-content-calendar">social media content calendar</Link>.</p>
-          <p className="lede">The Free plan is $0 with no card needed. If a post will not publish, read the <Link className={s.vlink} href="/help">scheduling help</Link>. Comparing schedulers? See <Link className={s.vlink} href="/buffer-alternative">how Poskoo compares to Buffer</Link>.</p>
+          <p className="lede">The Free plan is $0 with no card needed. If a post will not publish, read the <Link className={s.vlink} href="/help">scheduling help</Link>. Comparing schedulers? See <Link className={s.vlink} href="/buffer-alternative">Poskoo vs Buffer</Link>.</p>
         </div>
       </section>
 
