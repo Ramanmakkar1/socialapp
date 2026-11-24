@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: guide.title },
     description: guide.description,
     alternates: { canonical: path },
-    authors: [{ name: guide.author, url: BRAND.url }],
+    authors: [{ name: guide.author, url: BRAND.canonicalUrl }],
     openGraph: {
       type: "article",
       siteName: BRAND.name,
@@ -72,7 +72,7 @@ export default async function GuidePage({ params }: Props) {
   if (!guide || !body) notFound();
 
   const path = guidePath(guide.slug);
-  const url = `${BRAND.url}${path}`;
+  const url = `${BRAND.canonicalUrl}${path}`;
   const minutes = readingMinutes(guide);
   const toc = [
     ...body.sections.map((s) => ({ id: s.id, title: s.title })),
