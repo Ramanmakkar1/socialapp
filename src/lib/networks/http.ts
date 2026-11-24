@@ -72,6 +72,8 @@ export function failed(label: string, what: string, r: { status: number; error: 
     ok: false as const,
     error: redact(`${label} ${what} failed: ${r.error}`, ...secrets),
     tokenDead: r.status === 401 || r.status === 403,
+    /** HTTP status (0 = no response: timeout / dropped connection), for src/lib/publishErrors.ts. */
+    status: r.status,
   };
 }
 

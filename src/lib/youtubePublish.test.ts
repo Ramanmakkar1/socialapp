@@ -32,7 +32,7 @@ function ytDb(posts: Post[], targets: Target[], channels: Channel[] = []) {
     if (!p) return;
     const ts = targets.filter((t) => t.post_id === postId);
     if (ts.some((t) => t.status === "failed")) p.status = "failed";
-    else if (!ts.some((t) => t.status === "pending" || t.status === "publishing")) p.status = "published";
+    else if (!ts.some((t) => t.status === "pending" || t.status === "retrying" || t.status === "publishing")) p.status = "published";
     else if (!ts.some((t) => t.status === "publishing")) p.status = "scheduled";
     p.updated_at = Date.now();
   };
@@ -96,6 +96,14 @@ function ytDb(posts: Post[], targets: Target[], channels: Channel[] = []) {
     {
       match: /from socialapp\.youtube_channels/,
       reply: (params) => channels.filter((c) => c.user_id === String(params[0]) && c.status === "active"),
+    },
+    {
+      match: /update socialapp\.post_targets set status='retrying', error=\$2/,
+      reply: (params) => {
+        const t = targets.find((x) => x.id === params[0]);
+        if (t) { t.status = "retrying"; t.error = String(params[1]); t.external_post_id = null; }
+        return [];
+      },
     },
     {
       match: /update socialapp\.post_targets set status='failed', error=\$2/,
@@ -296,8 +304,9 @@ test("youtube: a temporary token-endpoint failure keeps the channel and its refr
     assert.equal(result.failed, 1);
     assert.equal(channels[0].status, "active");
     assert.equal(channels[0].refresh_token_enc, savedToken);
-    assert.equal(targets[0].status, "failed");
-    assert.match(targets[0].error ?? "", /Retry/);
+    // Temporary: Poskoo retries it automatically (src/lib/publishRetry.ts); the post stays scheduled.
+    assert.equal(targets[0].status, "retrying");
+    assert.equal(posts[0].status, "scheduled");
     assert.doesNotMatch(targets[0].error ?? "", /Reconnect/);
   } finally {
     globalThis.fetch = realFetch;
@@ -326,8 +335,9 @@ test("youtube: a 403 quotaExceeded keeps the channel connected (post stays queue
     const result = await publishDuePosts();
     assert.equal(result.failed, 1);
     assert.equal(channels[0].status, "active");
-    assert.equal(targets[0].status, "failed");
-    assert.match(targets[0].error ?? "", /Quota exceeded/);
+    // A quota error keeps the post queued: retried automatically after a backoff.
+    assert.equal(targets[0].status, "retrying");
+    assert.match(targets[0].error ?? "", /quota/i);
     assert.doesNotMatch(targets[0].error ?? "", /Reconnect YouTube/);
   } finally {
     globalThis.fetch = realFetch;

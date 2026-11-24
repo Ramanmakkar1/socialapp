@@ -98,6 +98,7 @@ export default function PostCard({ post, tz, compact = false, row = false, onOpe
       </div>
       {!compact && <p className={styles.cardCaption}>{post.caption.trim() || "(no caption)"}</p>}
       {row && post.status === "failed" && post.error && <p className={styles.cardError}>Couldn’t publish: {post.error.slice(0, 160)}</p>}
+      {row && post.status !== "failed" && post.retry_at && <p className={styles.cardError}>Retrying automatically: {(post.error ?? "temporary problem").slice(0, 140)}</p>}
     </div>
   );
 }

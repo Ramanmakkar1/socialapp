@@ -103,6 +103,16 @@ export async function loadActiveAccount(userId: string, platform: NetworkId): Pr
   return rows[0] ? rowToAccount(rows[0]) : null;
 }
 
+/** One of the user's accounts on this network, picked in the composer; null when it is not active. */
+export async function loadUserAccount(userId: string, platform: NetworkId, accountId: string): Promise<NetAccount | null> {
+  const rows = await query<AccountRow>(
+    `select ${ACCOUNT_COLUMNS} from socialapp.social_accounts
+     where id=$1 and user_id=$2 and platform=$3 and status='active'`,
+    [accountId, userId, platform],
+  );
+  return rows[0] ? rowToAccount(rows[0]) : null;
+}
+
 export async function loadAccountById(id: string): Promise<NetAccount | null> {
   const rows = await query<AccountRow>(`select ${ACCOUNT_COLUMNS} from socialapp.social_accounts where id=$1 and status='active'`, [id]);
   return rows[0] ? rowToAccount(rows[0]) : null;

@@ -15,6 +15,8 @@ import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { isAdmin } from "@/lib/admin";
 import { ALLOWED_PLATFORMS } from "@/lib/savePost";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
+import type { AccountChoices } from "@/lib/accountChoices";
+import { loadAccountChoices } from "@/lib/accountChoicesServer";
 import IdeasBoard from "./IdeasBoard";
 import type { Idea } from "./IdeaCard";
 import LoadFailed from "./LoadFailed";
@@ -47,6 +49,11 @@ type WeekPost = {
   insights: CalendarPost["insights"];
   fb_post_id: string | null;
   error: string | null;
+  error_kind?: string | null;
+  error_raw?: string | null;
+  error_platform?: string | null;
+  retry_at?: Date | string | null;
+  warning?: string | null;
 };
 
 const CHANNEL_ORDER = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group", ...EXTRA_NETWORK_IDS];
@@ -78,6 +85,11 @@ function toCalendarPost(row: WeekPost): CalendarPost {
     insights: row.insights ?? null,
     permalink: row.fb_post_id && /^[0-9_]+$/.test(row.fb_post_id) ? `https://www.facebook.com/${row.fb_post_id}` : null,
     error: row.error,
+    error_kind: row.error_kind ?? null,
+    error_raw: row.error_raw ?? null,
+    error_platform: row.error_platform ?? null,
+    retry_at: row.retry_at ?? null,
+    warning: row.warning ?? null,
     kind: postKind({ igFormat: row.ig_format, mediaCount, isVideo: thumbIsVideo, platforms: row.platforms }),
   };
 }
@@ -207,6 +219,8 @@ export default async function CalendarPage({
   let schedulePlatforms: string[] = [];
   let scheduleRowCount = -1; // -1 = unknown (table missing / not read)
   let youtubeReady = false;
+  // Networks with 2+ connected accounts: the composer lets the user pick which ones get the post.
+  let accountChoices: AccountChoices = {};
   // TikTok, Bluesky, Mastodon, LinkedIn, Pinterest, X: connected + per-account composer data.
   const networkReady: Partial<Record<string, boolean>> = {};
   const captionMaxOverrides: Partial<Record<string, number>> = {};
@@ -243,8 +257,12 @@ export default async function CalendarPage({
       try {
         const [row] = await query<DraftRow>(
           `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags" : "'{}'::text[] as tags"}, p.scheduled_at, p.status, p.media, p.dm_rule_id, p.ig_format,
-           coalesce(array_agg(t.platform) filter (where t.platform is not null), '{}') as platforms,
-           coalesce(jsonb_object_agg(t.platform, t.caption_override) filter (where t.caption_override is not null), '{}'::jsonb) as overrides
+           coalesce(array_agg(distinct t.platform) filter (where t.platform is not null), '{}') as platforms,
+           coalesce(jsonb_object_agg(t.platform, t.caption_override) filter (where t.caption_override is not null), '{}'::jsonb) as overrides,
+           (select coalesce(jsonb_object_agg(x.platform, x.ids), '{}'::jsonb) from (
+              select platform, jsonb_agg(coalesce(social_account_id, youtube_channel_id)) as ids from post_targets
+              where post_id = p.id and account_locked and coalesce(social_account_id, youtube_channel_id) is not null group by platform
+            ) x) as accounts
            from scheduled_posts p left join post_targets t on t.post_id = p.id
            where p.id = $1 and p.user_id = $2 and p.status in ('draft','scheduled') group by p.id`,
           [draft, user.id],
@@ -264,6 +282,7 @@ export default async function CalendarPage({
               scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
               dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
               status: row.status,
+              accounts: row.accounts ?? {},
             };
             draftFailed = false;
           }
@@ -315,6 +334,11 @@ export default async function CalendarPage({
       threadsReady = rows.length > 0;
     } catch {
       threadsReady = false;
+    }
+    try {
+      accountChoices = await loadAccountChoices(user.id);
+    } catch {
+      accountChoices = {};
     }
     try {
       const ytRows = await query<{ 1: unknown }>(
@@ -382,7 +406,7 @@ export default async function CalendarPage({
         [user.id],
       ),
       query<Post & { media?: unknown }>(
-        `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.media, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50`,
+        `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.media, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (array_agg(t.error) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error, (array_agg(t.error_kind) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_kind, (array_agg(t.error_raw) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_raw, (array_agg(t.platform) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_platform, min(t.next_retry_at) filter (where t.status = 'retrying') as retry_at, (array_agg(t.warning) filter (where t.warning is not null))[1] as warning from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50`,
         [user.id],
       ),
       query<WeekPost>(
@@ -390,7 +414,12 @@ export default async function CalendarPage({
            coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms,
            (array_agg(t.insights) filter (where t.platform = 'instagram' and t.insights is not null))[1] as insights,
            (array_agg(t.external_post_id) filter (where t.platform = 'facebook' and t.status = 'published'))[1] as fb_post_id,
-           (array_agg(t.error) filter (where t.status = 'failed' and t.error is not null))[1] as error
+          (array_agg(t.error) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error,
+           (array_agg(t.error_kind) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_kind,
+           (array_agg(t.error_raw) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_raw,
+           (array_agg(t.platform) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_platform,
+           min(t.next_retry_at) filter (where t.status = 'retrying') as retry_at,
+           (array_agg(t.warning) filter (where t.warning is not null))[1] as warning
          from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.scheduled_at >= $2 and p.scheduled_at < $3 group by p.id order by p.scheduled_at limit 300`,
         [user.id, rangeStart, rangeEnd],
       ),
@@ -549,7 +578,7 @@ export default async function CalendarPage({
         </section>
       ) : (
         <ComposerDialog title={initialIdea ? "Create post from idea" : initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
-          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} networkReady={networkReady} captionMaxOverrides={captionMaxOverrides} networkData={networkData} mediaPlan={mediaPlan} />
+          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} networkReady={networkReady} captionMaxOverrides={captionMaxOverrides} networkData={networkData} mediaPlan={mediaPlan} accountChoices={accountChoices} />
         </ComposerDialog>
       )}
       {view === "month" ? (

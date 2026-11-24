@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { getPool, isDbConfigured } from "@/lib/db";
 
-export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: string }> {
+export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: string; id?: string }> {
   if (typeof id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     return { ok: false, error: "Invalid post." };
   }
@@ -13,6 +13,7 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
   }
 
   const user = await requireUser();
+  let newId: string | undefined;
   try {
     const client = await getPool().connect();
     try {
@@ -28,10 +29,11 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
         return { ok: false, error: "Post not found." };
       }
       await client.query(
-        "insert into socialapp.post_targets (post_id, platform, social_account_id, caption_override, status, external_post_id, error, published_at, insights, insights_at) select $2, platform, social_account_id, caption_override, 'pending', null, null, null, null, null from socialapp.post_targets where post_id=$1",
+        "insert into socialapp.post_targets (post_id, platform, social_account_id, youtube_channel_id, account_locked, caption_override, net_options, yt_metadata, status) select $2, platform, social_account_id, youtube_channel_id, account_locked, caption_override, net_options, yt_metadata, 'pending' from socialapp.post_targets where post_id=$1",
         [id, result.rows[0].id],
       );
       await client.query("commit");
+      newId = result.rows[0].id;
     } catch (error) {
       await client.query("rollback").catch(() => {});
       throw error;
@@ -42,5 +44,5 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
     return { ok: false, error: "Could not duplicate post." };
   }
   revalidatePath("/app/calendar");
-  return { ok: true };
+  return { ok: true, id: newId };
 }

@@ -37,6 +37,7 @@ import ui from "@/components/ui/ui.module.css";
 import { NEW_NETWORK_COLOR, NEW_NETWORK_ICON } from "@/components/brandIcons";
 import NetworkOptionsPanel, { type NetworkPanelData } from "./NetworkOptionsPanel";
 import { EXTRA_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
+import { initialPicks, type AccountChoices } from "@/lib/accountChoices";
 
 const PLATFORM_ORDER: PlatformId[] = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group", ...EXTRA_NETWORK_IDS];
 const NEW_NETWORKS = ["tiktok", "bluesky", "mastodon", "linkedin", "pinterest", "x", "gbp", "ig_personal", "fb_group", ...EXTRA_NETWORK_IDS] as const;
@@ -75,7 +76,7 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false, scheduledUsage = null, accountNames = {}, networkReady = {}, captionMaxOverrides = {}, networkData = {}, mediaPlan = "Free" }: { mediaPlan?: PlanName; networkReady?: Partial<Record<string, boolean>>; captionMaxOverrides?: Partial<Record<string, number>>; networkData?: NetworkPanelData; rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean; scheduledUsage?: { used: number; limit: number | null } | null; accountNames?: Record<string, string> }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false, scheduledUsage = null, accountNames = {}, networkReady = {}, captionMaxOverrides = {}, networkData = {}, mediaPlan = "Free", accountChoices = {} }: { accountChoices?: AccountChoices; mediaPlan?: PlanName; networkReady?: Partial<Record<string, boolean>>; captionMaxOverrides?: Partial<Record<string, number>>; networkData?: NetworkPanelData; rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean; scheduledUsage?: { used: number; limit: number | null } | null; accountNames?: Record<string, string> }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const livePlatforms: PlatformId[] = ["instagram"];
@@ -125,6 +126,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     preselect ? (Object.fromEntries(PLATFORM_ORDER.map((p) => [p, p === preselect])) as Record<PlatformId, boolean>) : init.enabled,
   );
   const [activeTab, setActiveTab] = useState<PlatformId>(preselect ?? "instagram");
+  // Multi-account: which connected accounts of each network get the post (networks with 2+ accounts).
+  const [picked, setPicked] = useState<Record<string, string[]>>(() => initialPicks(accountChoices, initialDraft?.accounts));
   const [netOptions, setNetOptions] = useState<Record<string, Record<string, unknown>>>(() => {
     const saved: Record<string, Record<string, unknown>> = {};
     for (const [k, v] of Object.entries(initialDraft?.netOptions ?? {})) {
@@ -224,6 +227,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     setSelectedRuleId(blank.selectedRuleId);
     setCustomize(blank.customize);
     setEnabled(blank.enabled);
+    setPicked(initialPicks(accountChoices, undefined));
     setActiveTab("instagram");
     setScheduledAt("");
     setNextSlotLabel("");
@@ -239,7 +243,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     setAiIdeas([]);
     setAiError("");
     scheduleOriginRef.current = null;
-  }, []);
+  }, [accountChoices]);
 
   const draftScheduledAt = initialDraft?.scheduledAt ?? null;
   useEffect(() => {
@@ -395,7 +399,17 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       ytPrivacy: enabled.youtube ? ytPrivacy : undefined,
       ytShorts: enabled.youtube ? ytShorts : undefined,
       netOptions: Object.fromEntries(NEW_NETWORKS.filter((n) => enabled[n]).map((n) => [n, netOptions[n] ?? {}])),
+      accounts: Object.fromEntries(platforms.filter((p) => (accountChoices[p]?.length ?? 0) > 1 && picked[p]?.length).map((p) => [p, picked[p]])),
     };
+  }
+
+  function togglePickedAccount(platform: PlatformId, id: string) {
+    setPicked((prev) => {
+      const current = prev[platform] ?? [];
+      const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
+      // Keep at least one: to skip the network entirely, untick it above.
+      return next.length === 0 ? prev : { ...prev, [platform]: next };
+    });
   }
 
   const firstNet = selected[0] ?? "instagram";
@@ -856,6 +870,34 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 </span>
               </p>
             )}
+            {PLATFORM_ORDER.filter((p) => enabled[p] && livePlatforms.includes(p) && (accountChoices[p]?.length ?? 0) > 1).map((platform) => (
+              <fieldset key={platform} className="mt-3 min-w-0">
+                <legend className="text-xs font-medium text-[var(--poskoo-muted)]">{PLATFORMS[platform].label} accounts</legend>
+                <div className="mt-1.5 flex flex-wrap gap-2">
+                  {(accountChoices[platform] ?? []).map((choice) => {
+                    const on = picked[platform]?.includes(choice.id) ?? false;
+                    const last = on && (picked[platform]?.length ?? 0) === 1;
+                    return (
+                      <button
+                        key={choice.id}
+                        type="button"
+                        aria-pressed={on}
+                        title={last ? `At least one ${PLATFORMS[platform].label} account stays picked. Untick ${PLATFORMS[platform].label} above to skip it.` : undefined}
+                        onClick={() => togglePickedAccount(platform, choice.id)}
+                        className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
+                          on
+                            ? "border-[var(--poskoo-violet)] bg-[var(--poskoo-band)] text-[var(--poskoo-ink)]"
+                            : "border-[var(--poskoo-line)] text-[var(--poskoo-muted)] hover:border-[var(--poskoo-violet)]"
+                        }`}
+                      >
+                        <span className="h-2 w-2 flex-none rounded-full" style={{ background: on ? NET_COLOR[platform] : "var(--poskoo-line)" }} aria-hidden />
+                        <span className="truncate">{choice.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            ))}
           </div>
 
           <details className="group rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 py-3">

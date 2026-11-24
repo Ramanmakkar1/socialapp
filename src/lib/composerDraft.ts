@@ -19,6 +19,8 @@ export type ComposerDraftInitial = {
   status?: "draft" | "scheduled";
   /** Saved per-network options (post_targets.net_options) keyed by platform. */
   netOptions?: Partial<Record<string, unknown>>;
+  /** Accounts picked per network (multi-account targeting); networks left out use the default account. */
+  accounts?: Partial<Record<string, string[]>>;
 };
 
 export type ComposerState = {

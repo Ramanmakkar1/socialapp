@@ -22,6 +22,11 @@ export type Post = {
   platforms: string[];
   tags?: string[];
   error?: string | null;
+  error_kind?: string | null;
+  error_raw?: string | null;
+  error_platform?: string | null;
+  retry_at?: Date | string | null;
+  warning?: string | null;
   thumb?: string | null;
   thumbIsVideo?: boolean;
 };

@@ -37,7 +37,8 @@ export async function retryFailedPost(postId: string, userId: string): Promise<R
     }
 
     const targetRes = await client.query<{ id: string }>(
-      "update post_targets set status='pending', error=null where post_id=$1 and status='failed' returning id",
+      // A manual retry starts the automatic-retry budget again (src/lib/publishRetry.ts).
+      "update post_targets set status='pending', error=null, error_kind=null, error_raw=null, attempt_count=0, next_retry_at=null where post_id=$1 and status='failed' returning id",
       [postId],
     );
     if (targetRes.rowCount === 0) {
@@ -53,4 +54,19 @@ export async function retryFailedPost(postId: string, userId: string): Promise<R
     client.release();
   }
   return { ok: true };
+}
+
+/**
+ * "Retry now" on a post whose targets are waiting for an automatic retry ('retrying'): bring the
+ * next attempt forward to the worker's next run. Returns false when nothing was waiting.
+ */
+export async function retryWaitingNow(postId: string, userId: string): Promise<boolean> {
+  const res = await getPool().query<{ id: string }>(
+    `update socialapp.post_targets t set next_retry_at=now()
+     from socialapp.scheduled_posts p
+     where t.post_id=p.id and p.id=$1 and p.user_id=$2 and p.status='scheduled' and t.status='retrying'
+     returning t.id`,
+    [postId, userId],
+  );
+  return (res.rowCount ?? 0) > 0;
 }

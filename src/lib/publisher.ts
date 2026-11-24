@@ -10,6 +10,8 @@ import { isNetworkId } from "@/lib/networks/common";
 import { publishNetworkTargets, type ClaimedNetworkRow } from "@/lib/networks/publish";
 import { expireReminders } from "@/lib/networks/reminderSend";
 import { releasePostMedia, releasePublishedMediaSweep } from "@/lib/mediaLifecycle";
+import { classifyPublishError, type PublishErrorKind } from "@/lib/publishErrors";
+import { gaveUpNote, nextRetryDelayMs } from "@/lib/publishRetry";
 
 const PUBLISH_TIMEOUT_MS = 20_000;
 const YT_VIDEO_FETCH_TIMEOUT_MS = 5 * 60_000;
@@ -26,6 +28,12 @@ type ClaimedRow = {
   first_comment: string | null;
   yt_metadata: unknown;
   net_options?: unknown;
+  /** The exact account picked in the composer (null on rows saved before multi-account). */
+  social_account_id?: string | null;
+  youtube_channel_id?: string | null;
+  /** true = the user picked an account; a null id then means that account was removed. */
+  account_locked?: boolean | null;
+  attempt_count?: number | null;
 };
 
 type AccountRow = {
@@ -242,22 +250,70 @@ async function waitForVideoContainerReady(
   return { ok: false, error: cleanError("Instagram video processing failed", token) };
 }
 
-async function markTargetFailed(
+export type FailInfo = {
+  /** Category when the caller already knows it (e.g. "no account connected" = reconnect). */
+  kind?: PublishErrorKind;
+  /** The network's own message, shown as "Message from the network". */
+  raw?: string;
+  /** Automatic retries already made (post_targets.attempt_count); enables retry for retry / rate_limit. */
+  attempts?: number;
+};
+
+/**
+ * Fail a target, or put it in 'retrying' when the category allows another automatic attempt
+ * (src/lib/publishRetry.ts). Only a final failure e-mails the owner.
+ */
+export async function markTargetFailed(
   targetId: string,
   postId: string,
   error: string,
   token: string,
-): Promise<void> {
+  info: FailInfo = {},
+): Promise<"failed" | "retrying"> {
   const pool = getPool();
   const cleaned = cleanError(error, token);
+  const kind: PublishErrorKind = info.kind ?? "unknown";
+  const raw = info.raw !== undefined ? cleanError(info.raw, token) : null;
+  const attempts = info.attempts ?? 0;
+  const delay = info.attempts === undefined ? null : nextRetryDelayMs(kind, attempts);
+  if (delay !== null) {
+    await pool.query(
+      `update socialapp.post_targets set status='retrying', error=$2, error_kind=$3, error_raw=$4,
+       attempt_count=attempt_count+1, next_retry_at=now() + ($5::bigint * interval '1 millisecond'),
+       published_at=null, external_post_id=null where id=$1`,
+      [targetId, cleaned, kind, raw, delay],
+    );
+    await refreshPostStatus(postId);
+    return "retrying";
+  }
   await pool.query(
-    "update socialapp.post_targets set status='failed', error=$2, published_at=null, external_post_id=null where id=$1",
-    [targetId, cleaned],
+    `update socialapp.post_targets set status='failed', error=$2, error_kind=$3, error_raw=$4, next_retry_at=null,
+     published_at=null, external_post_id=null where id=$1`,
+    [targetId, cleanError(cleaned + gaveUpNote(kind, attempts), token), kind, raw],
   );
   await refreshPostStatus(postId);
   // Owner alert e-mail, at most one per post (src/lib/emailNotify.ts). Never blocks publishing.
   void import("@/lib/emailNotify").then((m) => m.inBackground("post_failed", () => m.notifyPostFailed(postId))).catch(() => undefined);
+  return "failed";
 }
+
+/** Classify a network's raw error and fail / schedule a retry for the target. */
+export async function failPublish(
+  row: { id: string; post_id: string; attempt_count?: number | null },
+  platform: string,
+  rawError: string,
+  token: string,
+  hints: { tokenDead?: boolean; status?: number } = {},
+): Promise<{ kind: PublishErrorKind; outcome: "failed" | "retrying" }> {
+  const raw = cleanError(rawError, token);
+  const c = classifyPublishError(platform, raw, hints);
+  const outcome = await markTargetFailed(row.id, row.post_id, c.message, token, { kind: c.kind, raw: c.raw, attempts: row.attempt_count ?? 0 });
+  return { kind: c.kind, outcome };
+}
+
+/** A failed target whose picked account is gone: never post to a different account instead. */
+export const PICKED_ACCOUNT_GONE =
+  "The account picked for this post was disconnected or removed. Reconnect it in Settings, or edit the post and pick another account.";
 
 export async function refreshPostStatus(postId: string): Promise<void> {
   const pool = getPool();
@@ -268,7 +324,7 @@ export async function refreshPostStatus(postId: string): Promise<void> {
   const updated = await pool.query<{ status: string }>(
     `update socialapp.scheduled_posts p set status = case
       when exists(select 1 from socialapp.post_targets where post_id=p.id and status='publishing') then p.status
-      when exists(select 1 from socialapp.post_targets where post_id=p.id and status='pending') then 'scheduled'
+      when exists(select 1 from socialapp.post_targets where post_id=p.id and status in ('pending','retrying')) then 'scheduled'
       when exists(select 1 from socialapp.post_targets where post_id=p.id and status='failed') then 'failed'
       when exists(select 1 from socialapp.post_targets where post_id=p.id and status='reminded') then 'publishing'
       else 'published'
@@ -651,6 +707,20 @@ export async function recoverStuckPublishing(staleMs = STUCK_PUBLISHING_MS): Pro
   return res.rows.length;
 }
 
+/** The user picked an exact account for this target, and that account no longer exists. */
+function pickedAccountGone(row: ClaimedRow): boolean {
+  return row.account_locked === true && !row.social_account_id && !row.youtube_channel_id;
+}
+
+async function markSocialAccountExpired(accountId: string): Promise<void> {
+  await getPool()
+    .query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [accountId])
+    .catch(() => undefined);
+}
+
+/** A target the worker may publish now: new, or an automatic retry whose time has come. */
+export const CLAIMABLE_TARGET = "(t.status='pending' or (t.status='retrying' and t.next_retry_at <= now()))";
+
 /**
  * Claims due posts in one transaction: the post row becomes 'publishing' together with its
  * Instagram targets, so delete / reschedule (which only touch draft/scheduled/failed rows)
@@ -667,7 +737,7 @@ async function claimDueTargets(
       `select p.id from socialapp.scheduled_posts p
        where p.status='scheduled' and p.scheduled_at <= now()
          and exists (select 1 from socialapp.post_targets t
-           where t.post_id=p.id and t.platform=$2 and t.status='pending')
+           where t.post_id=p.id and t.platform=$2 and ${CLAIMABLE_TARGET})
        order by p.scheduled_at
        limit $1
        for update of p skip locked`,
@@ -685,8 +755,9 @@ async function claimDueTargets(
     const claimed = await client.query<ClaimedRow>(
       `update socialapp.post_targets t set status='publishing'
        from socialapp.scheduled_posts p
-       where t.post_id=p.id and p.id = any($1::uuid[]) and t.platform=$2 and t.status='pending'
-       returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment, t.yt_metadata${isNetworkId(platform) ? ", t.net_options" : ""}`,
+       where t.post_id=p.id and p.id = any($1::uuid[]) and t.platform=$2 and ${CLAIMABLE_TARGET}
+       returning t.id, t.post_id, t.caption_override, p.caption, p.media, p.user_id, p.ig_format, p.first_comment, t.yt_metadata,
+         t.social_account_id, t.youtube_channel_id, t.account_locked, t.attempt_count${isNetworkId(platform) ? ", t.net_options" : ""}`,
       [ids, platform],
     );
     await client.query("commit");
@@ -723,22 +794,27 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   }
   for await (const row of claimEach(limit, "instagram")) {
     let token = "";
+    if (pickedAccountGone(row)) {
+      await markTargetFailed(row.id, row.post_id, PICKED_ACCOUNT_GONE, token, { kind: "reconnect" });
+      result.failed += 1;
+      continue;
+    }
     const accounts = await pool.query<AccountRow>(
       `select id, external_id, access_token_enc, auth_type from socialapp.social_accounts
-       where user_id=$1 and platform='instagram' and status='active'
+       where user_id=$1 and platform='instagram' and status='active' and ($2::uuid is null or id=$2)
        order by created_at limit 1`,
-      [row.user_id],
+      [row.user_id, row.social_account_id ?? null],
     );
     const account = accounts.rows[0];
     if (!account?.access_token_enc) {
-      await markTargetFailed(row.id, row.post_id, "No connected Instagram account", token);
+      await markTargetFailed(row.id, row.post_id, row.social_account_id ? "The Instagram account picked for this post needs reconnecting. Reconnect it in Settings, then retry." : "No connected Instagram account. Connect Instagram in Settings, then retry.", token, { kind: "reconnect" });
       result.failed += 1;
       continue;
     }
 
     const postMedia = firstMedia(row.media);
     if (!postMedia && allImages(row.media).length < 2) {
-      await markTargetFailed(row.id, row.post_id, "Instagram needs an image or video", token);
+      await markTargetFailed(row.id, row.post_id, "Instagram needs an image or video", token, { kind: "bad_body" });
       result.failed += 1;
       continue;
     }
@@ -746,7 +822,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     try {
       token = decryptToken(account.access_token_enc);
     } catch {
-      await markTargetFailed(row.id, row.post_id, "No connected Instagram account", token);
+      await markTargetFailed(row.id, row.post_id, "Instagram access could not be read. Reconnect Instagram in Settings, then retry.", token, { kind: "reconnect" });
       result.failed += 1;
       continue;
     }
@@ -766,7 +842,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     if (outcome.ok) {
       await pool.query(
         `update socialapp.post_targets set status='published', external_post_id=$2,
-         published_at=now(), error=null, social_account_id=$3 where id=$1`,
+         published_at=now(), error=null, error_kind=null, error_raw=null, next_retry_at=null, social_account_id=$3 where id=$1`,
         [row.id, outcome.externalPostId, account.id],
       );
       if (shouldPostFirstComment(igFormat, row.first_comment)) {
@@ -780,6 +856,13 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           console.error("First comment failed:", cleanError(message, token));
+          // The post is live; tell the owner the first comment didn't go out (shown on the post).
+          await pool
+            .query("update socialapp.post_targets set warning=$2 where id=$1", [
+              row.id,
+              cleanError(`The post is live, but Instagram didn't add the first comment: ${message}. Add it by hand on Instagram.`, token),
+            ])
+            .catch(() => undefined);
         }
       }
       // This loop only claims Instagram targets; switch on the post's attached auto-DM rule.
@@ -797,23 +880,20 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
       await refreshPostStatus(row.post_id);
       result.published += 1;
     } else {
+      const failed = await failPublish(row, "instagram", outcome.error, token);
       // Expired or revoked token: flag the account so Settings shows a clear Reconnect prompt.
-      const tokenDead = /HTTP 401\b|OAuthException|access token|session has expired/i.test(outcome.error);
-      if (tokenDead) {
-        await pool
-          .query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [account.id])
-          .catch(() => undefined);
-      }
-      const error = tokenDead
-        ? `Instagram access expired or was removed. Reconnect Instagram in Settings, then retry. (${outcome.error})`
-        : outcome.error;
-      await markTargetFailed(row.id, row.post_id, error, token);
+      if (failed.kind === "refresh_token" || failed.kind === "reconnect") await markSocialAccountExpired(account.id);
       result.failed += 1;
     }
   }
 
   for await (const row of claimEach(limit, "facebook")) {
     let token = "";
+    if (pickedAccountGone(row)) {
+      await markTargetFailed(row.id, row.post_id, PICKED_ACCOUNT_GONE, token, { kind: "reconnect" });
+      result.failed += 1;
+      continue;
+    }
     const accounts = await pool.query<{
       id: string;
       page_id: string;
@@ -823,16 +903,20 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     }>(
       `select id, page_id, scopes, access_token_enc, auth_type from socialapp.social_accounts
        where user_id=$1 and platform='instagram' and auth_type='facebook_login' and status='active' and page_id is not null
+         and ($2::uuid is null or id=$2)
        order by created_at limit 1`,
-      [row.user_id],
+      [row.user_id, row.social_account_id ?? null],
     );
     const account = accounts.rows[0];
     if (!account?.access_token_enc) {
       await markTargetFailed(
         row.id,
         row.post_id,
-        "No Facebook Page connected. Connect Instagram with Facebook login in Settings, then retry.",
+        row.social_account_id
+          ? "The Facebook Page picked for this post needs reconnecting. Reconnect it in Settings, then retry."
+          : "No Facebook Page connected. Connect Instagram with Facebook login in Settings, then retry.",
         token,
+        { kind: "reconnect" },
       );
       result.failed += 1;
       continue;
@@ -844,6 +928,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
         row.post_id,
         'Posting to your Facebook Page needs the "Manage Page posts" permission. Reconnect in Settings and allow it, then retry.',
         token,
+        { kind: "reconnect" },
       );
       result.failed += 1;
       continue;
@@ -855,8 +940,9 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
       await markTargetFailed(
         row.id,
         row.post_id,
-        "No Facebook Page connected. Connect Instagram with Facebook login in Settings, then retry.",
+        "Facebook Page access could not be read. Reconnect in Settings, then retry.",
         token,
+        { kind: "reconnect" },
       );
       result.failed += 1;
       continue;
@@ -872,22 +958,15 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     if (outcome.ok) {
       await pool.query(
         `update socialapp.post_targets set status='published', external_post_id=$2,
-         published_at=now(), error=null, social_account_id=$3 where id=$1`,
+         published_at=now(), error=null, error_kind=null, error_raw=null, next_retry_at=null, social_account_id=$3 where id=$1`,
         [row.id, outcome.postId, account.id],
       );
       await refreshPostStatus(row.post_id);
       result.published += 1;
     } else {
+      const failed = await failPublish(row, "facebook", outcome.error, token, { tokenDead: outcome.tokenDead });
       // Expired or revoked Page token: flag the account so Settings shows a clear Reconnect prompt.
-      if (outcome.tokenDead) {
-        await pool
-          .query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [account.id])
-          .catch(() => undefined);
-      }
-      const error = outcome.tokenDead
-        ? `Facebook access expired or was removed. Reconnect in Settings, then retry. (${outcome.error})`
-        : outcome.error;
-      await markTargetFailed(row.id, row.post_id, error, token);
+      if (failed.kind === "refresh_token" || failed.kind === "reconnect") await markSocialAccountExpired(account.id);
       result.failed += 1;
     }
   }
@@ -896,19 +975,28 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
     let token = "";
     let counted = false;
     try {
+      if (pickedAccountGone(row)) {
+        await markTargetFailed(row.id, row.post_id, PICKED_ACCOUNT_GONE, token, { kind: "reconnect" });
+        result.failed += 1;
+        counted = true;
+        continue;
+      }
       const accounts = await pool.query<AccountRow>(
         `select id, external_id, access_token_enc from socialapp.social_accounts
-         where user_id=$1 and platform='threads' and status='active'
+         where user_id=$1 and platform='threads' and status='active' and ($2::uuid is null or id=$2)
          order by created_at limit 1`,
-        [row.user_id],
+        [row.user_id, row.social_account_id ?? null],
       );
       const account = accounts.rows[0];
       if (!account?.access_token_enc) {
         await markTargetFailed(
           row.id,
           row.post_id,
-          "No Threads account connected. Connect Threads in Settings, then retry.",
+          row.social_account_id
+            ? "The Threads account picked for this post needs reconnecting. Reconnect it in Settings, then retry."
+            : "No Threads account connected. Connect Threads in Settings, then retry.",
           token,
+          { kind: "reconnect" },
         );
         result.failed += 1;
         counted = true;
@@ -921,8 +1009,9 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
         await markTargetFailed(
           row.id,
           row.post_id,
-          "No Threads account connected. Connect Threads in Settings, then retry.",
+          "Threads access could not be read. Reconnect Threads in Settings, then retry.",
           token,
+          { kind: "reconnect" },
         );
         result.failed += 1;
         counted = true;
@@ -941,25 +1030,20 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
       if (outcome.ok) {
         await pool.query(
           `update socialapp.post_targets set status='published', external_post_id=$2,
-           published_at=now(), error=null, social_account_id=$3 where id=$1`,
+           published_at=now(), error=null, error_kind=null, error_raw=null, next_retry_at=null, social_account_id=$3 where id=$1`,
           [row.id, outcome.id, account.id],
         );
         await refreshPostStatus(row.post_id);
         result.published += 1;
       } else {
-        // Expired or revoked Threads token: flag the account so Settings shows a clear Reconnect prompt.
         const tokenDead = outcome.error === RECONNECT_MESSAGE;
-        if (tokenDead) {
-          await pool
-            .query("update socialapp.social_accounts set status='expired', updated_at=now() where id=$1 and status='active'", [account.id])
-            .catch(() => undefined);
-        }
-        const error = tokenDead
-          ? `Threads access expired or was removed. Reconnect Threads in Settings, then retry. (${outcome.error})`
-          : outcome.error;
-        await markTargetFailed(row.id, row.post_id, error, token);
-        result.failed += 1;
+        // Threads flags HTTP 429 / 5xx as retryable; "Could not reach Threads" (no response) stays ambiguous.
+        const status = outcome.retryable && !outcome.error.startsWith("Could not reach") ? 503 : undefined;
+        const failed = await failPublish(row, "threads", outcome.error, token, { tokenDead, status });
         counted = true;
+        // Expired or revoked Threads token: flag the account so Settings shows a clear Reconnect prompt.
+        if (failed.kind === "refresh_token" || failed.kind === "reconnect") await markSocialAccountExpired(account.id);
+        result.failed += 1;
       }
     } catch (err) {
       if (!counted) {
@@ -975,22 +1059,30 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
   for await (const row of claimEach(limit, "youtube")) {
     let token = "";
     try {
+      if (pickedAccountGone(row)) {
+        await markTargetFailed(row.id, row.post_id, PICKED_ACCOUNT_GONE, token, { kind: "reconnect" });
+        result.failed += 1;
+        continue;
+      }
       const channels = await pool.query<{
         id: string;
         channel_id: string;
         refresh_token_enc: string;
       }>(
         `select id, channel_id, refresh_token_enc from socialapp.youtube_channels
-         where user_id=$1 and status='active' order by updated_at desc limit 1`,
-        [row.user_id],
+         where user_id=$1 and status='active' and ($2::uuid is null or id=$2) order by updated_at desc limit 1`,
+        [row.user_id, row.youtube_channel_id ?? null],
       );
       const channel = channels.rows[0];
       if (!channel?.refresh_token_enc) {
         await markTargetFailed(
           row.id,
           row.post_id,
-          "No YouTube channel connected. Connect YouTube in Settings, then retry.",
+          row.youtube_channel_id
+            ? "The YouTube channel picked for this post needs reconnecting. Reconnect it in Settings, then retry."
+            : "No YouTube channel connected. Connect YouTube in Settings, then retry.",
           token,
+          { kind: "reconnect" },
         );
         result.failed += 1;
         continue;
@@ -1003,8 +1095,9 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
         await markTargetFailed(
           row.id,
           row.post_id,
-          "No YouTube channel connected. Connect YouTube in Settings, then retry.",
+          "YouTube access could not be read. Reconnect YouTube in Settings, then retry.",
           token,
+          { kind: "reconnect" },
         );
         result.failed += 1;
         continue;
@@ -1013,7 +1106,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
 
       const media = firstMedia(row.media);
       if (!media || media.type !== "video") {
-        await markTargetFailed(row.id, row.post_id, "YouTube posts need a video link (.mp4)", token);
+        await markTargetFailed(row.id, row.post_id, "YouTube posts need a video link (.mp4)", token, { kind: "bad_body" });
         result.failed += 1;
         continue;
       }
@@ -1031,8 +1124,8 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
         // external_post_id holds the watch URL; social_account_id is a FK to social_accounts, so it stays null.
         await pool.query(
           `update socialapp.post_targets set status='published', external_post_id=$2,
-           published_at=now(), error=null where id=$1`,
-          [row.id, outcome.videoUrl],
+           published_at=now(), error=null, error_kind=null, error_raw=null, next_retry_at=null, youtube_channel_id=$3 where id=$1`,
+          [row.id, outcome.videoUrl, channel.id],
         );
         await refreshPostStatus(row.post_id);
         result.published += 1;
@@ -1047,10 +1140,7 @@ export async function publishDuePosts(limit = 20): Promise<PublishResult> {
             )
             .catch(() => undefined);
         }
-        const error = outcome.tokenDead
-          ? `YouTube access expired or was removed. Reconnect YouTube in Settings, then retry. (${outcome.error})`
-          : outcome.error;
-        await markTargetFailed(row.id, row.post_id, error, token);
+        await failPublish(row, "youtube", outcome.error, token, { tokenDead: outcome.tokenDead });
         result.failed += 1;
       }
     } catch (err) {
