@@ -9,7 +9,7 @@ import styles from "./shell.module.css";
 
 const TABS = [
   { href: "/app", icon: LayoutDashboard, label: "Home" },
-  { href: "/app/calendar", icon: CalendarDays, label: "Calendar" },
+  { href: "/app/calendar", icon: CalendarDays, label: "Publish" },
   { href: "/app/inbox", icon: Inbox, label: "Inbox" },
   { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Auto-DM" },
 ];

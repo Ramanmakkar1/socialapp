@@ -9,23 +9,31 @@ export type SidebarChannel = {
   status: string;
   /** Posts waiting to publish on this platform. */
   scheduled: number;
+  /** Row id (social_accounts.id, or "yt-" + youtube_channels.id): the /app/channels/[id] page. */
+  id?: string;
 };
 
-type AccountRow = { platform: string; username: string | null; page_name: string | null; status: string };
+type AccountRow = { id?: string; platform: string; username: string | null; page_name: string | null; status: string };
+type YoutubeRow = { id?: string; title: string; status: string };
+
+/** Sidebar / channel page link for one connected account. */
+export function channelHref(c: Pick<SidebarChannel, "id" | "platform">): string {
+  return c.id ? `/app/channels/${encodeURIComponent(c.id)}` : `/app/calendar?view=week&channel=${c.platform}`;
+}
 type CountRow = { platform: string; n: number };
 
 /** Builds the sidebar list: one row per connected account, with the platform's scheduled-post count. */
-export function buildChannels(accounts: AccountRow[], youtube: { title: string; status: string }[], counts: CountRow[]): SidebarChannel[] {
+export function buildChannels(accounts: AccountRow[], youtube: YoutubeRow[], counts: CountRow[]): SidebarChannel[] {
   const countOf = (p: string) => counts.find((c) => c.platform === p)?.n ?? 0;
   const out: SidebarChannel[] = [];
   for (const a of accounts) {
     // LinkedIn (member name) and Google Business Profile (location title) are names, not handles: no "@" in front of it.
     const name =
       (a.username && (a.platform === "linkedin" || a.platform === "gbp" || a.platform === "fb_group" || isExtraNetwork(a.platform) ? a.username : `@${a.username.replace(/^@/, "")}`)) || a.page_name || a.platform;
-    out.push({ platform: a.platform, name, status: a.status, scheduled: countOf(a.platform) });
+    out.push({ platform: a.platform, name, status: a.status, scheduled: countOf(a.platform), ...(a.id ? { id: a.id } : {}) });
   }
   for (const y of youtube) {
-    out.push({ platform: "youtube", name: y.title || "YouTube channel", status: y.status, scheduled: countOf("youtube") });
+    out.push({ platform: "youtube", name: y.title || "YouTube channel", status: y.status, scheduled: countOf("youtube"), ...(y.id ? { id: `yt-${y.id}` } : {}) });
   }
   return out;
 }
@@ -33,19 +41,19 @@ export function buildChannels(accounts: AccountRow[], youtube: { title: string; 
 export async function getSidebarChannels(userId: string): Promise<SidebarChannel[]> {
   if (!isDbConfigured()) return [];
   let accounts: AccountRow[] = [];
-  let youtube: { title: string; status: string }[] = [];
+  let youtube: YoutubeRow[] = [];
   let counts: CountRow[] = [];
   try {
     accounts = await query<AccountRow>(
-      "select platform, username, page_name, status from socialapp.social_accounts where user_id=$1 order by created_at limit 8",
+      "select id::text, platform, username, page_name, status from socialapp.social_accounts where user_id=$1 order by created_at limit 25",
       [userId],
     );
   } catch {
     accounts = [];
   }
   try {
-    youtube = await query<{ title: string; status: string }>(
-      "select title, status from socialapp.youtube_channels where user_id=$1 order by created_at limit 4",
+    youtube = await query<YoutubeRow>(
+      "select id::text, title, status from socialapp.youtube_channels where user_id=$1 order by created_at limit 10",
       [userId],
     );
   } catch {

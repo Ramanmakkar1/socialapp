@@ -16,7 +16,6 @@ import { pendingMediaUsage } from "@/lib/mediaLifecycle";
 import { GB, PLAN_MEDIA_LIMITS, pendingStorageLabel } from "@/lib/mediaLimits";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
-import { NEW_NETWORK_ICON } from "@/components/brandIcons";
 import { connectHref, networkAvailability } from "@/lib/networks/registry";
 import { neynarConfig } from "@/lib/networks/apps";
 import { linkedinConfig } from "@/lib/networks/linkedin";
@@ -27,8 +26,10 @@ import PoskooMark from "@/components/PoskooMark";
 import { VERIFY_DISMISS_COOKIE } from "@/lib/emailCodes";
 import AlertBar, { VerifyEmailActions, type ShellAlert } from "./AlertBar";
 import { BtnA } from "@/components/ui/kit";
-import { AtSign, Check, ChevronDown, ChevronsUpDown, Gauge, Facebook, Instagram, LogOut, Plus, Settings, Youtube } from "lucide-react";
-import { getSidebarChannels, type SidebarChannel } from "@/lib/sidebarChannels";
+import { Check, ChevronDown, ChevronsUpDown, Gauge, LogOut, Plus, Settings } from "lucide-react";
+import { getSidebarChannels } from "@/lib/sidebarChannels";
+import SidebarChannels from "./SidebarChannels";
+import SidebarCollapse from "./SidebarCollapse";
 import ConnectChannelDialog, { type ConnectAvailability } from "./ConnectChannelDialog";
 import SidebarNav from "./SidebarNav";
 import ShellFrame from "./ShellFrame";
@@ -61,19 +62,17 @@ function Logo() {
   );
 }
 
-const CHANNEL_ICON: Record<string, typeof Instagram> = { instagram: Instagram, facebook: Facebook, threads: AtSign, youtube: Youtube, ...NEW_NETWORK_ICON };
-
-// Account / workspace menu at the top of the sidebar (native disclosure, no JS needed).
+// User card at the bottom of the sidebar: opens the account / workspace menu upward (native disclosure, no JS needed).
 function AccountMenu({ name, email, plan }: { name: string; email: string; plan: string }) {
   return (
-    <details className={styles.acctMenu}>
+    <details className={styles.acctMenu} data-placement="up">
       <summary className={styles.acctBtn} aria-label={`Account menu for ${name}`}>
         <span className={styles.acctAvatar} aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>
-        <span className={styles.acctText}>
+        <span className={`${styles.acctText} ${styles.navLabel}`}>
           <b>{name}</b>
           <span>{plan} plan</span>
         </span>
-        <ChevronsUpDown width={16} height={16} aria-hidden="true" className={styles.acctChevron} />
+        <ChevronsUpDown width={16} height={16} aria-hidden="true" className={`${styles.acctChevron} ${styles.navLabel}`} />
       </summary>
       <div className={styles.acctPop}>
         <p className={styles.acctLabel}>Workspace</p>
@@ -93,64 +92,15 @@ function AccountMenu({ name, email, plan }: { name: string; email: string; plan:
   );
 }
 
-// Primary actions: new post (opens the composer) and new automation (trigger picker dialog).
+// Primary action: the big "New" button opens the composer; "+ Auto-DM" starts an automation.
 function NewButtons() {
   return (
     <div className={styles.newRow}>
-      <Link href="/app/calendar?compose=1" className={styles.newBtn}>
-        <Plus width={16} height={16} aria-hidden="true" /> Post
+      <Link href="/app/calendar?compose=1" className={styles.newBtn} aria-label="New post">
+        <Plus width={17} height={17} aria-hidden="true" /> <span className={styles.navLabel}>New</span>
       </Link>
       <NewAutomationDialog label="Auto-DM" className={styles.newAutoBtn} />
     </div>
-  );
-}
-
-function ChannelRow({ c, Icon, ok }: { c: SidebarChannel; Icon: typeof Instagram; ok: boolean }) {
-  return (
-    <>
-      <span className={styles.channelAvatar} aria-hidden="true">
-        {c.name.replace(/^@/, "").slice(0, 1).toUpperCase()}
-        <span className={`${styles.channelBadge} ${styles[`badge_${c.platform}`] ?? ""}`}><Icon width={9} height={9} /></span>
-      </span>
-      <span className={styles.channelName}>{c.name}</span>
-      {ok ? (
-        c.scheduled > 0 && <span className={styles.channelCount} aria-label={`${c.scheduled} scheduled`}>{c.scheduled}</span>
-      ) : (
-        <span className={styles.channelWarn}>Reconnect</span>
-      )}
-    </>
-  );
-}
-
-// Buffer-style channel list: avatar initial with network badge, handle, scheduled count.
-function Channels({ channels, availability, slots }: { channels: SidebarChannel[]; availability: ConnectAvailability; slots?: { used: number; limit: number } }) {
-  return (
-    <section className={styles.channels} aria-labelledby="sidebar-channels">
-      <p id="sidebar-channels" className={styles.navGroupTitle}>Channels</p>
-      <ul className={styles.channelList}>
-        {channels.map((c, i) => {
-          const Icon = CHANNEL_ICON[c.platform] ?? AtSign;
-          const ok = c.status === "active";
-          return (
-            <li key={`${c.platform}-${i}`}>
-              {ok ? (
-                <Link href={`/app/calendar?view=week&channel=${c.platform}`} className={styles.channel} title={`${c.name} · ${c.platform}`}>
-                  <ChannelRow c={c} Icon={Icon} ok />
-                </Link>
-              ) : (
-                // Reconnect = the same one-click connect as the Connect dialog (full navigation: OAuth start or the dialog form).
-                <a href={connectHref(c.platform)} className={styles.channel} title={`${c.name} needs to be reconnected`}>
-                  <ChannelRow c={c} Icon={Icon} ok={false} />
-                </a>
-              )}
-            </li>
-          );
-        })}
-        <li>
-          <ConnectChannelDialog availability={availability} slots={slots} label={channels.length ? "Connect more channels" : "Connect a channel"} />
-        </li>
-      </ul>
-    </section>
   );
 }
 
@@ -339,17 +289,20 @@ async function AppShell({ children }: { children: ReactNode }) {
             <div className={styles.sideTop}>
               <Logo />
             </div>
-            <AccountMenu name={displayName} email={user.email} plan={plan} />
             <NewButtons />
             <div className={styles.sideScroll}>
               <SidebarNav failedPosts={failedPosts} scheduledPosts={scheduledPosts} pendingOrders={pendingOrders} />
-              <Channels channels={channels} availability={availability} slots={{ used: connectedAccounts, limit: limits.socialAccounts }} />
+              <SidebarChannels
+                channels={channels}
+                reconnectHrefs={Object.fromEntries(channels.filter((c) => c.status !== "active").map((c) => [c.platform, connectHref(c.platform)]))}
+                connect={<ConnectChannelDialog availability={availability} slots={{ used: connectedAccounts, limit: limits.socialAccounts }} label={channels.length ? "Connect more channels" : "Connect a channel"} />}
+              />
               <details className={styles.usage}>
                 <summary className={styles.usageSummary}>
                   <Gauge width={16} height={16} aria-hidden="true" />
-                  <span>Usage</span>
-                  <span className={styles.usageHint}>{plan} plan</span>
-                  <ChevronDown width={14} height={14} aria-hidden="true" className={styles.usageChevron} />
+                  <span className={styles.navLabel}>Usage</span>
+                  <span className={`${styles.usageHint} ${styles.navLabel}`}>{plan} plan</span>
+                  <ChevronDown width={14} height={14} aria-hidden="true" className={`${styles.usageChevron} ${styles.navLabel}`} />
                 </summary>
                 <div className={styles.usageBody} aria-label="Plan usage">
                   {limits.scheduledPostsPerMonth !== null && (
@@ -365,8 +318,12 @@ async function AppShell({ children }: { children: ReactNode }) {
                   )}
                 </div>
               </details>
+              <SidebarNav variant="footer" failedPosts={failedPosts} showAdmin={isAdmin(user)} />
             </div>
-            <SidebarNav variant="footer" failedPosts={failedPosts} showAdmin={isAdmin(user)} />
+            <div className={styles.userCard}>
+              <AccountMenu name={displayName} email={user.email} plan={plan} />
+              <SidebarCollapse />
+            </div>
           </>
         }
       >

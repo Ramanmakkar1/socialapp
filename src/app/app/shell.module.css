@@ -1,63 +1,99 @@
 /* App shell — Buffer-style sidebar in the Poskoo palette. Only --poskoo-* tokens (+ network colours). */
 
 .shell {
-  /* Light, Buffer-like dashboard palette: white canvas, warm-grey chrome, hairline borders,
-     one accent (Poskoo violet). Every dashboard page inherits these tokens. */
-  --poskoo-paper: #fafaf8;
-  --poskoo-card: #ffffff;
-  --poskoo-ink: #1d1b22;
-  --poskoo-muted: #67646e;
-  --poskoo-line: #ebe9e4;
-  --poskoo-band: #f3f2ee;
-  --poskoo-pill-border: #e0ddd6;
-  --poskoo-violet: #5b3ff0;
-  /* Pastels become soft tints so pages that use them as panel fills stay calm. */
-  --poskoo-lilac: #ece7ff;
-  --poskoo-peach: #fff1de;
-  --poskoo-mint: #e3f6ec;
-  --poskoo-pink: #fdebf4;
-  --poskoo-shadow-card: 0 1px 2px rgba(20, 18, 26, .04);
-  --poskoo-shadow-float: 0 14px 34px -14px rgba(20, 18, 26, .22);
+  /* Dashboard palette (2026-11-24, Raman: TryPost-style warm greys + violet). App-only: the
+     public site keeps its own owner-approved look. --app-* are the source tokens; the older
+     --poskoo-* names every dashboard page already uses are mapped onto them. */
+  --app-bg: #ffffff;
+  --app-fg: #292928;
+  --app-card: #ffffff;
+  --app-sidebar: #f7f6f3;
+  --app-muted: #f7f6f3;
+  --app-muted-fg: #5a5a59;
+  --app-accent: #f3f2f0;
+  --app-secondary: #eae8e5;
+  --app-border: #eae8e5;
+  --app-border-strong: #dedcd9;
+  --app-primary: #ddd6fe;
+  --app-primary-hover: #c4b5fd;
+  --app-primary-subtle: #ede9fe;
+  --app-primary-selected: #8b5cf633;
+  --app-primary-strong: #6d28d9;
+  --app-primary-strong-fg: #ffffff;
+  --app-primary-text: #6d28d9;
+  --app-primary-text-hover: #5b21b6;
+  --app-ring: #7c3aed;
+  --app-sidebar-hover: rgb(51 34 0 / .06);
+  --app-radius: .5rem;
+
+  --poskoo-paper: var(--app-muted);
+  --poskoo-card: var(--app-card);
+  --poskoo-ink: var(--app-fg);
+  --poskoo-muted: var(--app-muted-fg);
+  --poskoo-line: var(--app-border);
+  --poskoo-band: var(--app-muted);
+  --poskoo-pill-border: var(--app-border-strong);
+  --poskoo-violet: var(--app-primary-text);
+  --poskoo-lilac: var(--app-primary-subtle);
+  /* The old lime accent (Auto-DM button, "New" pills) becomes the soft violet. */
+  --poskoo-lime: var(--app-primary);
+  --poskoo-peach: #fff4e5;
+  --poskoo-mint: #e8f6ee;
+  --poskoo-pink: #fdeef5;
+  --poskoo-shadow-card: 0 1px 2px rgb(41 41 40 / .04);
+  --poskoo-shadow-float: 0 12px 32px -14px rgb(41 41 40 / .22);
   --poskoo-shadow-accent: none;
-  --ink-2: #3a3842;
-  --accent-tint: color-mix(in srgb, var(--poskoo-violet) 11%, transparent);
-  --side-bg: #f7f6f3;
-  /* Solid buttons / ink pills in the shared UI kit use the accent instead of near-black. */
-  --fill-strong: var(--poskoo-violet);
+  --ink-2: #3d3d3c;
+  --accent-tint: var(--app-primary);
+  --side-bg: var(--app-sidebar);
+  /* Solid buttons / ink pills in the shared UI kit use the strong violet. */
+  --fill-strong: var(--app-primary-strong);
   display: flex;
   min-height: 100dvh;
   overflow-x: clip;
-  background: var(--poskoo-card);
+  background: var(--app-sidebar);
+  color: var(--app-fg);
   font-family: var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
 }
-.shell > main { background: var(--poskoo-card); }
-.shell :global(.btn-primary) { background: var(--fill-strong); color: #fff; }
+.shell :global(.btn-primary) { background: var(--fill-strong); color: var(--app-primary-strong-fg); }
+.shell :focus-visible { outline-color: var(--app-ring); }
 
 /* Light is the default. Dark mode for the dashboard only: the public site keeps its light look. */
 @media (prefers-color-scheme: dark) {
   .shell {
     color-scheme: dark;
-    --side-bg: #16141d;
-    --poskoo-paper: #121019;
-    --poskoo-card: #1b1824;
-    --poskoo-ink: #f2eff8;
-    --poskoo-muted: #a9a3b8;
-    --poskoo-line: #2e2a3a;
-    --poskoo-band: #262036;
-    --poskoo-pill-border: #3d3456;
-    --poskoo-lilac: #6c5aa8;
-    --poskoo-peach: #5a3d22;
-    --poskoo-pink: #5c2f48;
-    --poskoo-mint: #1f4a37;
-    --poskoo-violet: #a08cff;
+    --app-bg: #111111;
+    --app-fg: #f7f6f3;
+    --app-card: #191919;
+    --app-sidebar: #111111;
+    --app-muted: #202020;
+    --app-muted-fg: #bcbab6;
+    --app-accent: #2a2a2a;
+    --app-secondary: #2e2e2e;
+    --app-border: #2e2e2e;
+    --app-border-strong: #3a3a3a;
+    --app-primary: #c4b5fd;
+    --app-primary-hover: #a78bfa;
+    --app-primary-subtle: #2e1065;
+    --app-primary-selected: #a78bfa33;
+    --app-primary-strong: #a78bfa;
+    --app-primary-strong-fg: #1e1530;
+    --app-primary-text: #c4b5fd;
+    --app-primary-text-hover: #ddd6fe;
+    --app-ring: #a78bfa;
+    --app-sidebar-hover: rgb(255 255 255 / .06);
+    --poskoo-peach: #3a2a14;
+    --poskoo-pink: #3d1f2e;
+    --poskoo-mint: #16342a;
     --poskoo-coral: #ff7a52;
     --poskoo-red: #ff6b70;
     --poskoo-green: #3fcf8e;
-    --poskoo-shadow-card: 0 1px 0 rgba(0, 0, 0, .4), 0 18px 30px -22px rgba(0, 0, 0, .7);
+    --poskoo-shadow-card: 0 1px 0 rgba(0, 0, 0, .4);
     --poskoo-shadow-float: 0 22px 40px -18px rgba(0, 0, 0, .8);
-    --ink-2: #cfc9dc;
+    --ink-2: #dcdad6;
+    /* Selected nav on dark: a translucent violet, text stays light. */
+    --accent-tint: var(--app-primary-selected);
   }
-  .shell { --fill-strong: #6d55f5; }
 }
 
 .logo {
@@ -121,8 +157,10 @@
     bottom: auto;
     left: auto;
     width: 256px;
-    padding-bottom: 12px;
+    border-right: 0;
+    padding: 18px 12px 10px;
     box-shadow: none;
+    transition: width .18s ease;
     transform: none;
     visibility: visible;
     transition: none;
@@ -226,23 +264,24 @@
 }
 .acctItem:hover { background: var(--poskoo-band); }
 
-/* Primary actions: "+ Post" (accent) and "+ Automation" (lime). */
-.newRow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-.newRow .newBtn { min-height: 40px; border-radius: 11px; font-size: .88rem; text-decoration: none; }
+/* Primary actions: the big "New" (strong violet) and a compact "+ Auto-DM". */
+.newRow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; margin-top: 4px; }
+.newRow .newBtn { min-height: 42px; border-radius: 999px; font-size: .95rem; text-decoration: none; }
 .newAutoBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: .35rem;
-  min-height: 40px;
-  border: 0;
-  border-radius: 11px;
-  background: var(--poskoo-lime);
-  color: #1e1631;
-  font: 700 .88rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  gap: .3rem;
+  min-height: 42px;
+  border: 1px solid var(--app-border-strong);
+  border-radius: 999px;
+  background: var(--app-card);
+  padding: 0 .8rem;
+  color: var(--app-fg);
+  font: 600 .82rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
   cursor: pointer;
 }
-.newAutoBtn:hover { background: color-mix(in srgb, var(--poskoo-lime) 85%, black); }
+.newAutoBtn:hover { background: var(--app-accent); }
 /* "+ New" button. */
 .newBtn {
   display: flex;
@@ -251,34 +290,38 @@
   gap: .4rem;
   min-height: 42px;
   border-radius: 12px;
-  background: var(--fill-strong);
-  color: #fff;
-  font-weight: 700;
+  background: var(--app-primary-strong);
+  color: var(--app-primary-strong-fg);
+  font-weight: 600;
   font-size: .94rem;
   list-style: none;
   cursor: pointer;
 }
 .newBtn::-webkit-details-marker { display: none; }
-.newBtn:hover { background: color-mix(in srgb, var(--fill-strong) 88%, black); }
+.newBtn:hover { background: color-mix(in srgb, var(--app-primary-strong) 88%, black); }
 
 /* Nav items. */
 .navItem {
   display: flex;
   align-items: center;
   gap: .65rem;
-  min-height: 38px;
-  border-radius: 10px;
-  padding: .4rem .7rem;
-  color: var(--poskoo-muted);
+  min-height: 36px;
+  border-radius: var(--app-radius);
+  padding: .35rem .65rem;
+  color: var(--app-fg);
   font-size: .9rem;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
+  list-style: none;
+  cursor: pointer;
   transition: background .15s, color .15s;
 }
-.navItem:hover { background: color-mix(in srgb, var(--poskoo-ink) 5%, transparent); color: var(--poskoo-ink); }
+.navItem::-webkit-details-marker { display: none; }
+.navItem svg { flex: none; color: var(--app-muted-fg); }
+.navItem:hover { background: var(--app-sidebar-hover); }
 .navItemActive,
-.navItemActive:hover { background: var(--accent-tint); color: var(--poskoo-violet); }
-.navItemActive svg { color: var(--poskoo-violet); }
+.navItemActive:hover { background: var(--accent-tint); color: var(--app-fg); font-weight: 600; }
+.navItemActive svg { color: var(--app-primary-text); }
 .navBadge {
   margin-left: auto;
   min-width: 20px;
@@ -296,19 +339,19 @@
 .navCount {
   margin-left: auto;
   min-width: 22px;
-  border-radius: 999px;
-  background: var(--poskoo-card);
-  padding: 1px 7px;
-  color: var(--poskoo-muted);
-  font-size: .72rem;
-  font-weight: 700;
-  text-align: center;
-  box-shadow: inset 0 0 0 1px var(--poskoo-line);
+  padding: 1px 2px;
+  color: var(--app-muted-fg);
+  font-size: .78rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
-.newPill { margin-left: auto; border-radius: 999px; background: var(--poskoo-lime); padding: 1px 7px; color: #1e1631; font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.newPill { margin-left: auto; border-radius: 999px; background: var(--app-primary-subtle); padding: 1px 7px; color: var(--app-primary-text); font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 
-/* Channel list. */
-.channels { margin-top: 16px; }
+/* Channel list ("Channels · 8"). */
+.channels { margin-top: 18px; }
+.channelsTitle { display: flex; gap: 4px; margin: 0 0 4px; padding: 0 .65rem; color: var(--app-muted-fg); font-size: .8rem; font-weight: 500; }
+.channelsCount { font-variant-numeric: tabular-nums; }
 .channelList { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1px; margin: 0; padding: 0; list-style: none; }
 .channel {
   display: flex;
@@ -317,25 +360,37 @@
   gap: .6rem;
   min-height: 40px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--app-radius);
   background: transparent;
-  padding: .3rem .6rem;
-  color: var(--poskoo-ink);
-  font: 600 .86rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
+  padding: .3rem .65rem;
+  color: var(--app-fg);
+  font: 500 .88rem var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
   text-align: left;
   text-decoration: none;
+  list-style: none;
   cursor: pointer;
 }
-.channel:hover { background: color-mix(in srgb, var(--poskoo-ink) 5%, transparent); }
+.channel::-webkit-details-marker { display: none; }
+.channel:hover { background: var(--app-sidebar-hover); }
+.channelActive { background: var(--app-accent); }
+.channelChevron { flex: none; color: var(--app-muted-fg); transition: transform .15s; }
+.channelItem[open] > summary .channelChevron { transform: rotate(90deg); }
+.channelSub { display: grid; gap: 1px; margin: 2px 0 4px 22px; border-left: 1px solid var(--app-border-strong); padding-left: 8px; }
+.channelSubItem { display: flex; align-items: center; gap: .55rem; min-height: 34px; border-radius: var(--app-radius); padding: .3rem .6rem; color: var(--app-fg); font-size: .86rem; font-weight: 500; text-decoration: none; }
+.channelSubItem svg { color: var(--app-muted-fg); }
+.channelSubItem:hover { background: var(--app-sidebar-hover); }
+.channelSubItem[aria-current="page"] { background: var(--accent-tint); font-weight: 600; }
+.channelSubItem .channelCount { margin-left: auto; }
+.channelConnect { margin-top: 2px; }
 .channelAvatar {
   position: relative;
   display: grid;
   flex: none;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--poskoo-lilac);
+  background: var(--app-primary-subtle);
   color: var(--poskoo-ink);
   font-size: .78rem;
   font-weight: 700;
@@ -348,7 +403,7 @@
   place-items: center;
   width: 15px;
   height: 15px;
-  border: 2px solid var(--poskoo-card);
+  border: 2px solid var(--app-sidebar);
   border-radius: 50%;
   background: #1e1631;
   color: #fff;
@@ -358,7 +413,7 @@
 .badge_threads { background: #000; }
 .badge_youtube { background: #ff0000; }
 .channelName { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.channelCount { min-width: 22px; color: var(--poskoo-muted); font-size: .76rem; text-align: right; }
+.channelCount { min-width: 22px; color: var(--app-muted-fg); font-size: .78rem; font-variant-numeric: tabular-nums; text-align: right; }
 .channelWarn { color: var(--poskoo-red); font-size: .72rem; font-weight: 700; }
 .channelAdd { color: var(--poskoo-muted); }
 .channelAdd .channelAvatar { border: 1.5px dashed var(--poskoo-line); background: transparent; color: var(--poskoo-muted); }
@@ -746,3 +801,84 @@ a.connectCard:hover { border-color: var(--poskoo-pill-border); box-shadow: 0 6px
 .badge_twitch { background: #9146ff; }
 .netBg_farcaster { background: #855dcd; }
 .badge_farcaster { background: #855dcd; }
+
+/* ---- 2026-11-24 TryPost-style shell ---------------------------------------------------- */
+/* Desktop: warm-grey canvas, the page sits in a white rounded panel with a thin warm border. */
+@media (min-width: 900px) {
+  .shell > main {
+    min-height: calc(100dvh - 16px);
+    margin: 8px 8px 8px 0;
+    border: 1px solid var(--app-border);
+    border-radius: 14px;
+    background: var(--app-card);
+  }
+}
+@media (max-width: 899.98px) {
+  .shell > main { background: var(--app-card); }
+}
+.navLabel { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.navItem > .navLabel { flex: 0 1 auto; }
+
+/* "More" group. */
+.moreGroup > summary { width: 100%; }
+.moreChevron { margin-left: auto; transition: transform .15s; }
+.navBadge + .moreChevron { margin-left: 6px; }
+.moreGroup[open] .moreChevron { transform: rotate(180deg); }
+.moreBody { display: grid; gap: 1px; margin-top: 1px; padding-left: 10px; }
+.moreBody .navItem { min-height: 34px; font-size: .87rem; }
+
+/* User card at the bottom: account menu (opens upward) + collapse toggle. */
+.userCard { display: flex; align-items: center; gap: 4px; margin: 8px -12px -10px; border-top: 1px solid var(--app-border); padding: 10px 12px; }
+.userCard .acctMenu { min-width: 0; flex: 1; }
+.userCard .acctBtn { min-height: 44px; border: 0; background: transparent; padding: 4px 6px; }
+.userCard .acctBtn:hover, .userCard .acctMenu[open] .acctBtn { background: var(--app-sidebar-hover); }
+.userCard .acctAvatar { border-radius: 50%; background: var(--app-primary); color: var(--app-fg); }
+.acctMenu[data-placement="up"] .acctPop { top: auto; bottom: calc(100% + 6px); }
+.collapseBtn {
+  display: none;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: var(--app-radius);
+  background: transparent;
+  color: var(--app-muted-fg);
+  cursor: pointer;
+}
+.collapseBtn:hover { background: var(--app-sidebar-hover); color: var(--app-fg); }
+@media (min-width: 900px) {
+  .collapseBtn { display: grid; }
+}
+
+/* Footer links (Settings, Review guide, Help) sit at the end of the scrolling list. */
+.sideScroll .footNav { margin-top: 14px; }
+
+/* Collapsed rail (desktop). */
+@media (min-width: 900px) {
+  .sidebar[data-collapsed="true"] { width: 68px; padding-inline: 10px; }
+  .sidebar[data-collapsed="true"] .navLabel,
+  .sidebar[data-collapsed="true"] .channelName,
+  .sidebar[data-collapsed="true"] .channelCount,
+  .sidebar[data-collapsed="true"] .channelChevron,
+  .sidebar[data-collapsed="true"] .channelsTitle,
+  .sidebar[data-collapsed="true"] .channelSub,
+  .sidebar[data-collapsed="true"] .channelConnect,
+  .sidebar[data-collapsed="true"] .channelWarn,
+  .sidebar[data-collapsed="true"] .usageBody,
+  .sidebar[data-collapsed="true"] .footNav,
+  .sidebar[data-collapsed="true"] .moreBody,
+  .sidebar[data-collapsed="true"] .newAutoBtn,
+  .sidebar[data-collapsed="true"] .navCount,
+  .sidebar[data-collapsed="true"] .navBadge,
+  .sidebar[data-collapsed="true"] .logo { display: none; }
+  .sidebar[data-collapsed="true"] .newRow { grid-template-columns: 1fr; }
+  .sidebar[data-collapsed="true"] .navItem,
+  .sidebar[data-collapsed="true"] .channel,
+  .sidebar[data-collapsed="true"] .usageSummary { justify-content: center; padding-inline: 0; }
+  .sidebar[data-collapsed="true"] .userCard { flex-direction: column; margin-inline: -10px; padding-inline: 10px; }
+  .sidebar[data-collapsed="true"] .sideTop { min-height: 12px; padding: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .channelChevron, .moreChevron { transition: none; }
+}

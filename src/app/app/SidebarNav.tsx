@@ -1,37 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard, Flame } from "lucide-react";
+import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard, Flame, Lightbulb, MoreHorizontal, ChevronDown } from "lucide-react";
 import styles from "./shell.module.css";
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; badge?: string };
 
-// Grouped like a scheduling suite: publish, engage, create, analyze.
+// TryPost-style: a short list of the main jobs (Create, Publish, Insights, Inbox, Automations),
+// then everything else behind a compact "More" group so the channel list stays near the top.
+const primary: NavItem[] = [
+  { href: "/app", icon: LayoutDashboard, label: "Home" },
+  { href: "/app/calendar?view=ideas", icon: Lightbulb, label: "Create" },
+  { href: "/app/calendar", icon: CalendarDays, label: "Publish" },
+  { href: "/app/analytics", icon: BarChart3, label: "Insights" },
+  { href: "/app/inbox", icon: Inbox, label: "Inbox" },
+  { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Automations" },
+];
+
+const more: NavItem[] = [
+  { href: "/app/contacts", icon: Users, label: "Contacts" },
+  { href: "/app/rewind", icon: History, label: "Rewind" },
+  { href: "/app/content", icon: Clapperboard, label: "Posts & Reels" },
+  { href: "/app/templates", icon: LayoutTemplate, label: "Templates" },
+  { href: "/app/bio", icon: Link2, label: "Link in bio" },
+  { href: "/app/trends", icon: Flame, label: "Trends", badge: "New" },
+  { href: "/app/products", icon: Package, label: "Products" },
+  { href: "/app/orders", icon: Receipt, label: "Orders" },
+  { href: "/app/lead-magnets", icon: Magnet, label: "Lead magnet", badge: "New" },
+  { href: "/app/referrals", icon: Gift, label: "Refer and earn" },
+];
+
+/** Kept for callers that list every destination (mobile titles). */
 const groups: { title: string | null; items: NavItem[] }[] = [
-  { title: null, items: [{ href: "/app", icon: LayoutDashboard, label: "Home" }] },
-  { title: "Publish", items: [{ href: "/app/calendar", icon: CalendarDays, label: "Calendar" }] },
-  {
-    title: "Engage",
-    items: [
-      { href: "/app/inbox", icon: Inbox, label: "Inbox" },
-      { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Auto-DM" },
-      { href: "/app/contacts", icon: Users, label: "Contacts" },
-      { href: "/app/rewind", icon: History, label: "Rewind" },
-    ],
-  },
-  { title: "Create", items: [{ href: "/app/content", icon: Clapperboard, label: "Posts & Reels" }, { href: "/app/templates", icon: LayoutTemplate, label: "Templates" }, { href: "/app/bio", icon: Link2, label: "Link in bio" }] },
-  { title: "Analyze", items: [{ href: "/app/analytics", icon: BarChart3, label: "Analytics" }, { href: "/app/trends", icon: Flame, label: "Trends", badge: "New" }] },
-  {
-    title: "Grow",
-    items: [
-      { href: "/app/products", icon: Package, label: "Products" },
-      { href: "/app/orders", icon: Receipt, label: "Orders" },
-      { href: "/app/lead-magnets", icon: Magnet, label: "Lead magnet", badge: "New" },
-      { href: "/app/referrals", icon: Gift, label: "Refer and earn" },
-    ],
-  },
+  { title: null, items: primary },
+  { title: "More", items: more },
 ];
 
 const baseFooter: NavItem[] = [
@@ -41,7 +45,8 @@ const baseFooter: NavItem[] = [
 ];
 
 const TITLES: [string, string][] = [
-  ...groups.flatMap((g) => g.items.map((i): [string, string] => [i.href, i.label])),
+  ...groups.flatMap((g) => g.items.filter((i) => !i.href.includes("?")).map((i): [string, string] => [i.href, i.label])),
+  ["/app/channels", "Channel"],
   ...baseFooter.map((i): [string, string] => [i.href, i.label]),
   ["/app/auto-dm/activity", "Auto-DM activity"],
   ["/app/analytics/report", "Analytics report"],
@@ -68,9 +73,17 @@ export function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function Item({ item, pathname, failedPosts, scheduledPosts = 0, pendingOrders = 0 }: { item: NavItem; pathname: string; failedPosts: number; scheduledPosts?: number; pendingOrders?: number }) {
+/** Create = the ideas board (/app/calendar?view=ideas) and templates; Publish = the rest of the calendar + channel pages. */
+function isItemActive(pathname: string, view: string | null, href: string): boolean {
+  if (href === "/app/calendar?view=ideas") return (pathname === "/app/calendar" && view === "ideas") || isActive(pathname, "/app/templates");
+  if (href === "/app/calendar") return (isActive(pathname, "/app/calendar") && view !== "ideas") || isActive(pathname, "/app/channels");
+  if (href === "/app/templates") return false; // highlighted as "Create"
+  return isActive(pathname, href);
+}
+
+function Item({ item, pathname, view = null, failedPosts, scheduledPosts = 0, pendingOrders = 0 }: { item: NavItem; pathname: string; view?: string | null; failedPosts: number; scheduledPosts?: number; pendingOrders?: number }) {
   const { href, icon: Icon, label, badge } = item;
-  const active = isActive(pathname, href);
+  const active = isItemActive(pathname, view, href);
   const showBadge = href === "/app/calendar" && failedPosts > 0;
   const showCount = href === "/app/calendar" && !showBadge && scheduledPosts > 0;
   // UPI payments waiting for the seller to confirm (Direct UPI, sellers in India).
@@ -82,8 +95,8 @@ function Item({ item, pathname, failedPosts, scheduledPosts = 0, pendingOrders =
       className={`${styles.navItem} ${active ? styles.navItemActive : ""}`}
     >
       <Icon width={17} height={17} aria-hidden="true" />
-      {label}
-      {badge && <span className={styles.newPill}>{badge}</span>}
+      <span className={styles.navLabel}>{label}</span>
+      {badge && <span className={`${styles.newPill} ${styles.navLabel}`}>{badge}</span>}
       {showBadge && (
         <span className={styles.navBadge} aria-label={`${failedPosts} failed ${failedPosts === 1 ? "post" : "posts"}`}>
           {failedPosts > 99 ? "99+" : failedPosts}
@@ -119,6 +132,7 @@ export default function SidebarNav({
   showAdmin?: boolean;
 }) {
   const pathname = usePathname() ?? "";
+  const view = useSearchParams()?.get("view") ?? null;
   const footer = getFooter(showAdmin);
   const navRef = useRef<HTMLElement>(null);
 
@@ -142,16 +156,27 @@ export default function SidebarNav({
       </nav>
     );
   }
+  const moreOpen = more.some((i) => isActive(pathname, i.href));
   return (
     <nav ref={navRef} aria-label="Dashboard" className={styles.nav}>
-      {groups.map((g) => (
-        <div key={g.title ?? "top"} className={styles.navGroup}>
-          {g.title && <p className={styles.navGroupTitle}>{g.title}</p>}
-          {g.items.map((item) => (
-            <Item key={item.href} item={item} pathname={pathname} failedPosts={failedPosts} scheduledPosts={scheduledPosts} pendingOrders={pendingOrders} />
+      <div className={styles.navGroup}>
+        {primary.map((item) => (
+          <Item key={item.href} item={item} pathname={pathname} view={view} failedPosts={failedPosts} scheduledPosts={scheduledPosts} pendingOrders={pendingOrders} />
+        ))}
+      </div>
+      <details className={styles.moreGroup} open={moreOpen || undefined}>
+        <summary className={styles.navItem}>
+          <MoreHorizontal width={17} height={17} aria-hidden="true" />
+          <span className={styles.navLabel}>More</span>
+          {pendingOrders > 0 && <span className={styles.navBadge} aria-label={`${pendingOrders} ${pendingOrders === 1 ? "payment" : "payments"} to confirm`}>{pendingOrders > 99 ? "99+" : pendingOrders}</span>}
+          <ChevronDown width={14} height={14} aria-hidden="true" className={`${styles.moreChevron} ${styles.navLabel}`} />
+        </summary>
+        <div className={styles.moreBody}>
+          {more.map((item) => (
+            <Item key={item.href} item={item} pathname={pathname} view={view} failedPosts={failedPosts} pendingOrders={pendingOrders} />
           ))}
         </div>
-      ))}
+      </details>
     </nav>
   );
 }
