@@ -162,7 +162,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <div className="tpShotImg">
     {/* The post the AI just scheduled drops into Thursday's empty cell. */}
     <span className="tpDrop" aria-hidden="true"><Instagram width={11} height={11} />9:00 AM</span>
-    <Image src="/landing/hero-dashboard-orange.webp" width={2080} height={1300} sizes="(max-width: 1120px) 94vw, 1040px" priority alt="The Poskoo dashboard: a month calendar of scheduled Instagram, TikTok, LinkedIn, Facebook, Threads, Bluesky, Pinterest and X posts, with the channel list in the sidebar" />
+    <Image src="/landing/hero-dashboard-hq.webp" width={2080} height={1300} sizes="(max-width: 1120px) 94vw, 1040px" unoptimized priority alt="The Poskoo dashboard: a month calendar of scheduled Instagram, TikTok, LinkedIn, Facebook, Threads, Bluesky, Pinterest and X posts, with the channel list in the sidebar" />
     </div>
   </figure>
   </div>
