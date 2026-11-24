@@ -210,6 +210,13 @@ async function AppShell({ children }: { children: ReactNode }) {
       plurk: Boolean(availability.plurk),
       twitch: Boolean(availability.twitch),
       farcaster: Boolean(availability.farcaster),
+      reddit: Boolean(availability.reddit),
+      dribbble: Boolean(availability.dribbble),
+      vk: Boolean(availability.vk),
+      kick: Boolean(availability.kick),
+      whop: Boolean(availability.whop),
+      mewe: Boolean(availability.mewe),
+      tiktok_business: Boolean(availability.tiktok_business),
     },
     process.env,
   );

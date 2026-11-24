@@ -1,8 +1,8 @@
 // Real brand marks (Simple Icons, CC0) for the "Works with" strip and anywhere a network's actual logo
 // is wanted. Server-safe: only the path strings of the brands used are bundled.
 import {
-  siBluesky, siDiscord, siFacebook, siFarcaster, siInstagram, siMastodon, siPinterest, siTelegram,
-  siThreads, siTiktok, siTumblr, siX, siYoutube,
+  siBluesky, siDiscord, siDribbble, siFacebook, siFarcaster, siInstagram, siKick, siLemmy, siMastodon, siMedium,
+  siMewe, siPinterest, siReddit, siTelegram, siThreads, siTiktok, siTumblr, siVk, siX, siYoutube,
 } from "simple-icons";
 
 // LinkedIn's mark is not in Simple Icons (removed at LinkedIn's request); this is its standard "in" glyph.
@@ -26,6 +26,15 @@ const MARKS: Record<string, Mark> = {
   farcaster: { path: siFarcaster.path, color: `#${siFarcaster.hex}` },
   telegram: { path: siTelegram.path, color: `#${siTelegram.hex}` },
   discord: { path: siDiscord.path, color: `#${siDiscord.hex}` },
+  // 2026-11-24: networks ported from Postiz (Whop has no Simple Icons mark: line icon fallback).
+  reddit: { path: siReddit.path, color: `#${siReddit.hex}` },
+  medium: { path: siMedium.path, color: "#111111" },
+  dribbble: { path: siDribbble.path, color: `#${siDribbble.hex}` },
+  lemmy: { path: siLemmy.path, color: "#111111" },
+  vk: { path: siVk.path, color: `#${siVk.hex}` },
+  kick: { path: siKick.path, color: "#111111" },
+  mewe: { path: siMewe.path, color: `#${siMewe.hex}` },
+  tiktok_business: { path: siTiktok.path, color: "#111111" },
 };
 
 export function hasBrandLogo(id: string): boolean {

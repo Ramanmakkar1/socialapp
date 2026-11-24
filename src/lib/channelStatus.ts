@@ -5,8 +5,13 @@
 //     LINKEDIN_PAGES_ENABLED=1),
 //   - CHANNEL_STATUS_<ID>=ready|awaiting|soon overrides the wording (ready still needs the keys).
 
-export type ComingChannel = "tiktok" | "pinterest" | "x" | "gbp" | "linkedin_pages" | "tumblr" | "wpcom" | "plurk" | "twitch" | "farcaster";
-export const COMING_CHANNELS: ComingChannel[] = ["tiktok", "pinterest", "x", "gbp", "linkedin_pages", "tumblr", "wpcom", "plurk", "twitch", "farcaster"];
+export type ComingChannel =
+  | "tiktok" | "pinterest" | "x" | "gbp" | "linkedin_pages" | "tumblr" | "wpcom" | "plurk" | "twitch" | "farcaster"
+  | "reddit" | "dribbble" | "vk" | "kick" | "whop" | "mewe" | "tiktok_business";
+export const COMING_CHANNELS: ComingChannel[] = [
+  "tiktok", "pinterest", "x", "gbp", "linkedin_pages", "tumblr", "wpcom", "plurk", "twitch", "farcaster",
+  "reddit", "dribbble", "vk", "kick", "whop", "mewe", "tiktok_business",
+];
 
 export type ChannelState = "ready" | "awaiting" | "soon";
 
@@ -82,6 +87,49 @@ export const CHANNEL_STATUS_CONFIG: Record<ComingChannel, Config> = {
     reviewer: "Neynar",
     whenOff: "soon",
     why: "Casting to Farcaster goes through Neynar's signer service. It's built and switches on once Poskoo's Neynar plan is set up.",
+  },
+  // 2026-11-24 (ported from Postiz): built; switched on once Poskoo's app keys are on the server.
+  reddit: {
+    name: "Reddit",
+    reviewer: "Reddit",
+    whenOff: "soon",
+    why: "Posting to subreddits is built. We're registering Poskoo's Reddit app and switching it on soon.",
+  },
+  dribbble: {
+    name: "Dribbble",
+    reviewer: "Dribbble",
+    whenOff: "soon",
+    why: "Posting shots to Dribbble is built. We're registering Poskoo's Dribbble app and switching it on soon.",
+  },
+  vk: {
+    name: "VK",
+    reviewer: "VK",
+    whenOff: "soon",
+    why: "Posting to your VK wall is built. We're registering Poskoo's VK ID app and switching it on soon.",
+  },
+  kick: {
+    name: "Kick",
+    reviewer: "Kick",
+    whenOff: "soon",
+    why: "Kick has no API for posts, so Poskoo sends your message to your own channel's chat. It's built and switches on soon.",
+  },
+  whop: {
+    name: "Whop",
+    reviewer: "Whop",
+    whenOff: "soon",
+    why: "Posting to your Whop community forums is built. We're registering Poskoo's Whop app and switching it on soon.",
+  },
+  mewe: {
+    name: "MeWe",
+    reviewer: "MeWe",
+    whenOff: "awaiting",
+    why: "MeWe gives API access to approved partner apps. Posting to your MeWe timeline is built and waiting for MeWe's approval.",
+  },
+  tiktok_business: {
+    name: "TikTok Business",
+    reviewer: "TikTok",
+    whenOff: "awaiting",
+    why: "TikTok approves apps for its API for Business separately. Posting to TikTok business accounts is built and waiting for that approval.",
   },
 };
 

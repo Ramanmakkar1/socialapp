@@ -8,6 +8,7 @@ import { reminderChannelStatus } from "@/lib/featureReadiness";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isFarcasterConfigured, isPlurkConfigured, isTumblrConfigured, isTwitchConfigured, isWpcomConfigured } from "@/lib/networks/apps";
+import { isDribbbleConfigured, isKickConfigured, isMeweConfigured, isRedditConfigured, isTikTokBusinessConfigured, isVkConfigured, isWhopConfigured } from "@/lib/networks/moreApps";
 import { isGbpConfigured } from "@/lib/networks/gbp";
 import { isLinkedInConfigured, linkedinConfig } from "@/lib/networks/linkedin";
 import { isPinterestConfigured } from "@/lib/networks/pinterest";
@@ -40,6 +41,9 @@ const TOKEN_GROUP: Record<TokenNetworkId, PlatformGroup> = {
   discourse: "blogs",
   listmonk: "blogs",
   nostr: "blogs",
+  medium: "blogs",
+  lemmy: "social",
+  moltbook: "social",
 };
 
 /** Every publishing network, in the order the copy lists them. Reminder channels are not here. */
@@ -59,8 +63,16 @@ export const PLATFORM_CATALOG: CatalogItem[] = [
   { id: "tumblr", label: "Tumblr", group: "social", coming: "tumblr" },
   { id: "farcaster", label: "Farcaster", group: "social", coming: "farcaster" },
   { id: "plurk", label: "Plurk", group: "social", coming: "plurk" },
+  { id: "reddit", label: "Reddit", group: "social", coming: "reddit" },
+  { id: "dribbble", label: "Dribbble", group: "social", coming: "dribbble" },
+  { id: "vk", label: "VK", group: "social", coming: "vk" },
+  { id: "mewe", label: "MeWe", group: "social", coming: "mewe" },
+  { id: "tiktok_business", label: "TikTok Business", group: "social", coming: "tiktok_business" },
+  { id: "whop", label: "Whop", group: "social", coming: "whop" },
+  ...TOKEN_NETWORK_IDS.filter((id) => TOKEN_GROUP[id] === "social").map((id) => ({ id, label: TOKEN_NETWORKS[id].label, group: "social" as const })),
   ...TOKEN_NETWORK_IDS.filter((id) => TOKEN_GROUP[id] === "chat").map((id) => ({ id, label: TOKEN_NETWORKS[id].label, group: "chat" as const })),
   { id: "twitch", label: "Twitch chat", group: "chat", coming: "twitch" },
+  { id: "kick", label: "Kick chat", group: "chat", coming: "kick" },
   ...TOKEN_NETWORK_IDS.filter((id) => TOKEN_GROUP[id] === "blogs").map((id) => ({ id, label: TOKEN_NETWORKS[id].label, group: "blogs" as const })),
   { id: "wpcom", label: "WordPress.com", group: "blogs", coming: "wpcom" },
 ];
@@ -105,6 +117,13 @@ export function configuredNetworks(): Record<string, boolean> {
     plurk: isPlurkConfigured(),
     twitch: isTwitchConfigured(),
     wpcom: isWpcomConfigured(),
+    reddit: isRedditConfigured(),
+    dribbble: isDribbbleConfigured(),
+    vk: isVkConfigured(),
+    kick: isKickConfigured(),
+    whop: isWhopConfigured(),
+    mewe: isMeweConfigured(),
+    tiktok_business: isTikTokBusinessConfigured(),
   };
   for (const id of TOKEN_NETWORK_IDS) out[id] = true;
   return out;
