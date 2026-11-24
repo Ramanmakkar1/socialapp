@@ -171,3 +171,4 @@ export const LIVE_PLATFORMS_TEXT = COPY.liveText;
 export const LIVE_PLATFORM_COUNT = COPY.liveCount;
 export const LIVE_PLATFORM_COUNT_TEXT = COPY.liveCountText;
 export const PLATFORMS_ANSWER = COPY.answer;
+export const OFFICIAL_API_ANSWER = "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape.";
