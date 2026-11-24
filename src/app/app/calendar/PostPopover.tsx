@@ -7,6 +7,7 @@ import { deletePost } from "./actions";
 import { duplicatePost } from "./duplicateActions";
 import { retryPost } from "./retryActions";
 import RescheduleControl from "./RescheduleControl";
+import FailureDetails, { hasFailureDetails } from "./FailureDetails";
 import { PLATFORM_ICON, PLATFORM_LABEL, STATUS_LABEL, engagementRateOf, formatDateTime, isMovable, type AccountNames, type CalendarPost } from "./calendarUtils";
 import styles from "./calendar.module.css";
 
@@ -172,9 +173,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
         )}
       </div>
 
-      {post.status === "failed" && post.error && (
-        <p className={styles.popError} role="status">Couldn’t publish: {post.error.slice(0, 180)}</p>
-      )}
+      {hasFailureDetails(post) && <FailureDetails post={post} tz={tz} onDone={onClose} />}
 
       {published && (
         <div className={styles.popMetrics}>
@@ -209,7 +208,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
           <Link href={editHref} scroll={false} className={styles.popPrimary}>
             {post.status === "draft" ? "Edit draft" : "Edit post"}
           </Link>
-        ) : post.status === "failed" ? (
+        ) : post.status === "failed" && !post.error ? (
           <button type="button" className={styles.popPrimary} disabled={pending} onClick={() => run("retry", () => retryPost(post.id), true)}>
             {pending && busy === "retry" ? "Retrying…" : "Retry now"}
           </button>

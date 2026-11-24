@@ -48,6 +48,11 @@ type WeekPost = {
   insights: CalendarPost["insights"];
   fb_post_id: string | null;
   error: string | null;
+  error_kind?: string | null;
+  error_raw?: string | null;
+  error_platform?: string | null;
+  retry_at?: Date | string | null;
+  warning?: string | null;
 };
 
 const CHANNEL_ORDER = ["instagram", "facebook", "threads", "youtube", "tiktok", "linkedin", "x", "bluesky", "mastodon", "pinterest", "gbp", "ig_personal", "fb_group", ...EXTRA_NETWORK_IDS];
@@ -79,6 +84,11 @@ function toCalendarPost(row: WeekPost): CalendarPost {
     insights: row.insights ?? null,
     permalink: row.fb_post_id && /^[0-9_]+$/.test(row.fb_post_id) ? `https://www.facebook.com/${row.fb_post_id}` : null,
     error: row.error,
+    error_kind: row.error_kind ?? null,
+    error_raw: row.error_raw ?? null,
+    error_platform: row.error_platform ?? null,
+    retry_at: row.retry_at ?? null,
+    warning: row.warning ?? null,
     kind: postKind({ igFormat: row.ig_format, mediaCount, isVideo: thumbIsVideo, platforms: row.platforms }),
   };
 }
@@ -387,7 +397,7 @@ export default async function CalendarPage({
         [user.id],
       ),
       query<Post & { media?: unknown }>(
-        `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.media, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (select t2.error from post_targets t2 where t2.post_id = p.id and t2.status = 'failed' and t2.error is not null limit 1) as error from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50`,
+        `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags," : ""} p.scheduled_at, p.media, p.status, coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms, (array_agg(t.error) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error, (array_agg(t.error_kind) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_kind, (array_agg(t.error_raw) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_raw, (array_agg(t.platform) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_platform, min(t.next_retry_at) filter (where t.status = 'retrying') as retry_at, (array_agg(t.warning) filter (where t.warning is not null))[1] as warning from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.status <> 'published' group by p.id order by p.scheduled_at nulls last, p.created_at desc limit 50`,
         [user.id],
       ),
       query<WeekPost>(
@@ -395,7 +405,12 @@ export default async function CalendarPage({
            coalesce(array_agg(t.platform order by t.platform) filter (where t.platform is not null), '{}') as platforms,
            (array_agg(t.insights) filter (where t.platform = 'instagram' and t.insights is not null))[1] as insights,
            (array_agg(t.external_post_id) filter (where t.platform = 'facebook' and t.status = 'published'))[1] as fb_post_id,
-           (array_agg(t.error) filter (where t.status = 'failed' and t.error is not null))[1] as error
+          (array_agg(t.error) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error,
+           (array_agg(t.error_kind) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_kind,
+           (array_agg(t.error_raw) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_raw,
+           (array_agg(t.platform) filter (where t.status in ('failed','retrying') and t.error is not null))[1] as error_platform,
+           min(t.next_retry_at) filter (where t.status = 'retrying') as retry_at,
+           (array_agg(t.warning) filter (where t.warning is not null))[1] as warning
          from scheduled_posts p left join post_targets t on t.post_id = p.id where p.user_id = $1 and p.scheduled_at >= $2 and p.scheduled_at < $3 group by p.id order by p.scheduled_at limit 300`,
         [user.id, rangeStart, rangeEnd],
       ),

@@ -19,6 +19,14 @@ export type CalendarPost = {
   /** Public link to the live post when the app can derive one. */
   permalink?: string | null;
   error?: string | null;
+  /** Failure category (src/lib/publishErrors.ts), the network's own message and which network failed. */
+  error_kind?: string | null;
+  error_raw?: string | null;
+  error_platform?: string | null;
+  /** Next automatic retry (a target in 'retrying'); the post itself stays 'scheduled'. */
+  retry_at?: Date | string | null;
+  /** The post is live but a follow-up step failed (e.g. Instagram first comment). */
+  warning?: string | null;
   /** Post type badge (story / reel / carousel / ...), week grid. */
   kind?: PostKind;
 };

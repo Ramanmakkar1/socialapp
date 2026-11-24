@@ -5,17 +5,9 @@
 // the worker can act on plus a plain-English reason for the user. The raw text is kept and shown
 // as "Message from the network" next to the reason.
 import { NETWORK_LABEL, isNetworkId } from "@/lib/networks/common";
+import type { PublishErrorKind } from "@/lib/publishErrorKinds";
 
-/**
- * refresh_token — the access token was rejected; refresh it once, otherwise the user reconnects.
- * reconnect     — refreshing cannot help (account locked out, daily user cap…): reconnect.
- * bad_body      — the network refused this post's content/media: the user must edit it.
- * retry         — the network had a temporary problem: safe to try again automatically.
- * rate_limit    — too many requests / daily cap: try again later with a long backoff.
- * ambiguous     — the connection dropped mid-publish: the post may already be live, never auto-retry.
- * unknown       — nothing matched: shown as is, never auto-retried.
- */
-export type PublishErrorKind = "refresh_token" | "reconnect" | "bad_body" | "retry" | "rate_limit" | "ambiguous" | "unknown";
+export { failureAction, KIND_SUMMARY, type FailureAction, type PublishErrorKind } from "@/lib/publishErrorKinds";
 
 export type ClassifiedError = { kind: PublishErrorKind; message: string; raw: string };
 
@@ -152,7 +144,7 @@ const RULES: Partial<Record<string, Rule[]>> = {
     r(/invalidDescription/, "bad_body", "YouTube rejected the description (max 5,000 characters, no < or >)."),
     r(/invalidCategoryId/, "bad_body", "The YouTube category is invalid."),
     r(/uploadLimitExceeded|defaultVideoInsertPerDayPerProject/, "rate_limit", "YouTube's daily upload limit was reached."),
-    r(/quotaExceeded|rateLimitExceeded/, "rate_limit", "YouTube's API quota was reached."),
+    r(/quotaExceeded|rateLimitExceeded|Quota exceeded/i, "rate_limit", "YouTube's API quota was reached."),
     r(/youtubeSignupRequired/, "reconnect", "This Google account has no YouTube channel yet. Create one, then reconnect."),
     r(/UNAUTHENTICATED|invalid_grant/, "refresh_token", "Your YouTube access expired. Reconnect YouTube in Settings."),
     // Poskoo's own wrapper messages (publishToYouTube): no upload had started.
@@ -228,22 +220,3 @@ export function classifyPublishError(platform: string, raw: string, opts: { toke
   }
   return { kind: "unknown", message: text ? withLabel(platform, text) : `${label(platform)} publishing failed.`, raw: text };
 }
-
-/** What the user should do next, for the "Why it failed" popover. */
-export type FailureAction = "reconnect" | "edit" | "retry";
-
-export function failureAction(kind: string | null | undefined): FailureAction {
-  if (kind === "refresh_token" || kind === "reconnect") return "reconnect";
-  if (kind === "bad_body") return "edit";
-  return "retry";
-}
-
-export const KIND_SUMMARY: Record<PublishErrorKind, string> = {
-  refresh_token: "The account's access expired",
-  reconnect: "The account needs to be reconnected",
-  bad_body: "The network refused this post",
-  retry: "The network had a temporary problem",
-  rate_limit: "The network's posting limit was reached",
-  ambiguous: "The connection dropped while posting",
-  unknown: "Publishing failed",
-};

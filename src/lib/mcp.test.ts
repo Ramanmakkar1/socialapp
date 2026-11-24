@@ -247,7 +247,7 @@ test("update_post: edits a draft, keeps its channels and media, and drops an ove
     ...storedDraft("draft"),
     { match: /select exists \(select 1 from information_schema\.columns/, reply: () => [{ exists: false }] },
     { match: /^select status, scheduled_at from scheduled_posts where id = \$1 and user_id = \$2 for update/, reply: () => [{ status: "draft", scheduled_at: null }] },
-    { match: /^select 1 from post_targets where post_id = \$1 and status <> 'pending'/, reply: () => [] },
+    { match: /^select 1 from post_targets where post_id = \$1 and status not in \('pending','retrying'\)/, reply: () => [] },
     { match: /^update scheduled_posts set caption=/, reply: (p) => { update = p; return [{ id: POST_ID }]; } },
     { match: /^delete from post_targets/, reply: () => [] },
     { match: /^insert into post_targets/, reply: (p) => { targets.push(p); return []; } },

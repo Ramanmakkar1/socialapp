@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { getPool, isDbConfigured } from "@/lib/db";
 
-export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: string }> {
+export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: string; id?: string }> {
   if (typeof id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     return { ok: false, error: "Invalid post." };
   }
@@ -13,6 +13,7 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
   }
 
   const user = await requireUser();
+  let newId: string | undefined;
   try {
     const client = await getPool().connect();
     try {
@@ -32,6 +33,7 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
         [id, result.rows[0].id],
       );
       await client.query("commit");
+      newId = result.rows[0].id;
     } catch (error) {
       await client.query("rollback").catch(() => {});
       throw error;
@@ -42,5 +44,5 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
     return { ok: false, error: "Could not duplicate post." };
   }
   revalidatePath("/app/calendar");
-  return { ok: true };
+  return { ok: true, id: newId };
 }
