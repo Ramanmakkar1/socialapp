@@ -17,9 +17,9 @@ const jsonLd = {
     {
       "@type": "WebPage",
       name: pageTitle,
-      url: `${BRAND.url}/data-deletion`,
+      url: `${BRAND.canonicalUrl}/data-deletion`,
       description: pageDescription,
-      isPartOf: { "@id": `${BRAND.url}#website` },
+      isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
     },
     {
       "@type": "BreadcrumbList",
