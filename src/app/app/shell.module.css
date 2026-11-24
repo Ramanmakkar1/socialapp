@@ -798,6 +798,27 @@ a.connectCard:hover { border-color: var(--poskoo-pill-border); box-shadow: 0 6px
 .netBg_plurk { background: #ff574d; }
 .badge_plurk { background: #ff574d; }
 .netBg_twitch { background: #9146ff; }
+/* 2026-11-24 networks ported from Postiz */
+.netBg_reddit { background: #ff4500; }
+.netBg_medium { background: #000000; }
+.netBg_lemmy { background: #00bc8c; }
+.netBg_moltbook { background: #e8452c; }
+.netBg_dribbble { background: #ea4c89; }
+.netBg_vk { background: #0077ff; }
+.netBg_kick { background: #53fc18; color: #111; }
+.netBg_whop { background: #ff6243; }
+.netBg_mewe { background: #17377f; }
+.netBg_tiktok_business { background: #111111; }
+.badge_reddit { background: #ff4500; }
+.badge_medium { background: #000000; }
+.badge_lemmy { background: #00bc8c; }
+.badge_moltbook { background: #e8452c; }
+.badge_dribbble { background: #ea4c89; }
+.badge_vk { background: #0077ff; }
+.badge_kick { background: #53fc18; }
+.badge_whop { background: #ff6243; }
+.badge_mewe { background: #17377f; }
+.badge_tiktok_business { background: #111111; }
 .badge_twitch { background: #9146ff; }
 .netBg_farcaster { background: #855dcd; }
 .badge_farcaster { background: #855dcd; }
