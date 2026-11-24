@@ -88,8 +88,7 @@ const config: ToolPageConfig = {
           <p>
             Search results typically show about the first <b>70 characters</b> of a title, while a watch page shows about
             the first <b>157 characters</b> of a description above Show more. These are approximate display lengths, not
-            separate publishing limits. The exact cut-off can vary by device, layout and search result. Need a starting
-            point? Generate title ideas with the <Link href="/tools/youtube-title-generator">free YouTube title generator</Link>.
+            separate publishing limits. The exact cut-off can vary by device, layout and search result. Need a full description? Build one with the <Link href="/tools/youtube-description-generator">free YouTube description generator</Link>.
           </p>
         ),
       },
