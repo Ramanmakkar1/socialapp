@@ -186,3 +186,28 @@ export function gbpOptionsError(opts: GbpOptions, media: MediaItem[]): string | 
   if (opts.cta && opts.cta !== "CALL" && !isWebUrl(opts.ctaUrl)) return "Add the web address for the button (https://…).";
   return null;
 }
+
+// ---- Destination per post (2026-11-24): networks where each post names where it goes. ---------------
+// Reddit: the subreddit (required). Whop: the forum / experience id (optional when the channel has a
+// default forum from connect time). One generic text field in the composer (NetworkOptionsPanel).
+
+export type DestOptions = { dest: string };
+
+export const DEST_OPTION: Partial<Record<string, { label: string; placeholder: string; help: string; required: boolean }>> = {
+  reddit: { label: "Subreddit", placeholder: "r/yoursubreddit", help: "The first line of the caption is the post title (up to 300 characters). Check the subreddit's rules first.", required: true },
+  whop: { label: "Forum (experience ID)", placeholder: "exp_… (empty = your default forum)", help: "The first line of the caption is the post title.", required: false },
+};
+
+export function parseDestOptions(raw: unknown): DestOptions {
+  return { dest: str(obj(raw).dest).trim().slice(0, 200) };
+}
+
+export function destOptionsError(platform: string, opts: DestOptions): string | null {
+  const spec = DEST_OPTION[platform];
+  if (!spec) return null;
+  if (spec.required && !opts.dest) return `Add the ${spec.label.toLowerCase()} for ${platform === "reddit" ? "Reddit" : "this network"}.`;
+  if (platform === "reddit" && opts.dest && !/^(\/?r\/)?[A-Za-z0-9_]{2,21}\/?$/.test(opts.dest.replace(/^https?:\/\/(www\.|old\.)?reddit\.com/i, ""))) {
+    return "That doesn't look like a subreddit name (e.g. r/marketing).";
+  }
+  return null;
+}

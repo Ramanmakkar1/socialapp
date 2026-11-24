@@ -20,6 +20,10 @@ export const TOKEN_NETWORK_IDS = [
   "discourse",
   "listmonk",
   "nostr",
+  // 2026-11-24, ported from Postiz (AGPL-3.0): src/lib/networks/moreTokens.ts
+  "medium",
+  "lemmy",
+  "moltbook",
 ] as const;
 
 export type TokenNetworkId = (typeof TOKEN_NETWORK_IDS)[number];
@@ -265,12 +269,65 @@ export const TOKEN_NETWORKS: Record<TokenNetworkId, TokenNetworkSpec> = {
     media: "none",
     maxMedia: 0,
   },
+  // Medium's API takes Markdown posts; the first line is the title. Medium stopped issuing NEW
+  // integration tokens in 2023, so this works for people who already have one.
+  medium: {
+    label: "Medium",
+    sub: "Profile or publication",
+    color: "#000000",
+    captionMax: 100000,
+    fields: [
+      { name: "token", label: "Integration token", type: "password" },
+      { name: "publication", label: "Publication ID", placeholder: "Leave empty to post on your profile", optional: true },
+    ],
+    help: "Medium → Settings → Security and apps → Integration tokens. Medium no longer issues new tokens, so this only works if you already have one. Posts to a publication are saved as drafts for the editors.",
+    helpUrl: "https://github.com/Medium/medium-api-docs",
+    media: "none",
+    maxMedia: 0,
+    titled: true,
+  },
+  // Lemmy (fediverse link aggregator): one connected channel = one community. Poskoo logs in once
+  // and keeps only the session token (JWT); the password is never stored.
+  lemmy: {
+    label: "Lemmy",
+    sub: "Community",
+    color: "#00bc8c",
+    captionMax: 10000,
+    fields: [
+      SERVER("lemmy.world", "Instance"),
+      { name: "username", label: "Username or email" },
+      { name: "password", label: "Password", type: "password" },
+      { name: "community", label: "Community", placeholder: "technology or technology@lemmy.world" },
+    ],
+    help: "Poskoo signs in once to get a session token and does NOT keep your password. The first line of each post is its title. Connect each community you post to as its own channel.",
+    helpUrl: "https://join-lemmy.org/docs/users/01-getting-started.html",
+    warning: "Accounts with two-factor login can't connect this way yet.",
+    media: "none",
+    maxMedia: 0,
+    titled: true,
+  },
+  // Moltbook: the social network for AI agents. An agent's API key posts to a "submolt".
+  moltbook: {
+    label: "Moltbook",
+    sub: "Agent",
+    color: "#e8472b",
+    captionMax: 40000,
+    fields: [
+      { name: "token", label: "Agent API key", placeholder: "moltbook_…", type: "password" },
+      { name: "submolt", label: "Submolt", placeholder: "general", optional: true },
+    ],
+    help: "Register your agent on Moltbook and copy its API key. Posts go to the submolt you pick (general by default); the first line is the title.",
+    helpUrl: "https://www.moltbook.com",
+    media: "none",
+    maxMedia: 0,
+    titled: true,
+  },
 };
 
 // ---- Networks connected through an OAuth app (or Neynar's sign-in) that the Poskoo owner registers.
 // They need server env vars; until then the Connect card shows "Not available yet" (channelStatus.ts).
 
-export const APP_NETWORK_IDS = ["tumblr", "wpcom", "plurk", "twitch", "farcaster"] as const;
+export const APP_NETWORK_IDS = ["tumblr", "wpcom", "plurk", "twitch", "farcaster", "reddit", "dribbble", "vk", "kick", "whop", "mewe", "tiktok_business"] as const;
 export type AppNetworkId = (typeof APP_NETWORK_IDS)[number];
 export type AppNetworkSpec = Omit<TokenNetworkSpec, "fields" | "help" | "helpUrl" | "warning">;
 
@@ -284,6 +341,21 @@ export const APP_NETWORKS: Record<AppNetworkId, AppNetworkSpec> = {
   twitch: { label: "Twitch", sub: "Channel chat", color: "#9146ff", captionMax: 500, media: "none", maxMedia: 0 },
   // Casts: 320 bytes for regular accounts (longer casts need Farcaster Pro).
   farcaster: { label: "Farcaster", sub: "Profile", color: "#855dcd", captionMax: 320, media: "none", maxMedia: 0 },
+  // 2026-11-24, ported from Postiz (AGPL-3.0): src/lib/networks/moreApps.ts
+  // Reddit self posts: the first line is the title (300), the rest the body (40,000). Subreddit per post.
+  reddit: { label: "Reddit", sub: "Subreddits", color: "#ff4500", captionMax: 40000, media: "none", maxMedia: 0, titled: true },
+  // Dribbble shots: exactly one image; the first line is the shot title.
+  dribbble: { label: "Dribbble", sub: "Shots", color: "#ea4c89", captionMax: 2000, media: "images_required", maxMedia: 1, titled: true },
+  // VK wall posts (VK ID OAuth), text for now.
+  vk: { label: "VK", sub: "Wall", color: "#0077ff", captionMax: 15000, media: "none", maxMedia: 0 },
+  // Kick has no posts API: a chat message in your own channel (500 characters), like Twitch.
+  kick: { label: "Kick", sub: "Channel chat", color: "#53fc18", captionMax: 500, media: "none", maxMedia: 0 },
+  // Whop forum posts in one of your experiences (forum picked per post).
+  whop: { label: "Whop", sub: "Forum", color: "#ff6243", captionMax: 10000, media: "none", maxMedia: 0 },
+  // MeWe timeline posts (MeWe developer API), text and up to 10 photos.
+  mewe: { label: "MeWe", sub: "Timeline", color: "#17377f", captionMax: 63206, media: "images", maxMedia: 10 },
+  // TikTok API for Business (business accounts): one video by URL, or up to 35 photos.
+  tiktok_business: { label: "TikTok Business", sub: "Business account", color: "#000000", captionMax: 2200, media: "any", maxMedia: 35 },
 };
 
 export function isAppNetwork(value: unknown): value is AppNetworkId {

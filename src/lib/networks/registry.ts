@@ -28,6 +28,28 @@ import {
   refreshTumblrToken,
   refreshTwitchToken,
 } from "@/lib/networks/apps";
+import { publishToLemmy, publishToMedium, publishToMoltbook } from "@/lib/networks/moreTokens";
+import {
+  isDribbbleConfigured,
+  isKickConfigured,
+  isMeweConfigured,
+  isRedditConfigured,
+  isTikTokBusinessConfigured,
+  isVkConfigured,
+  isWhopConfigured,
+  publishToDribbble,
+  publishToKick,
+  publishToMewe,
+  publishToReddit,
+  publishToTikTokBusiness,
+  publishToVk,
+  publishToWhop,
+  refreshKickToken,
+  refreshRedditToken,
+  refreshTikTokBusinessToken,
+  refreshVkToken,
+  refreshWhopToken,
+} from "@/lib/networks/moreApps";
 
 export type NetworkAdapter = {
   configured: () => boolean;
@@ -59,6 +81,13 @@ function needsRefreshToken(fn: (rt: string, f?: Fetch) => Promise<TokenSet>, lab
     }
     return fn(account.refreshToken, fetchImpl);
   };
+}
+
+/** VK ID refreshes need the device_id it gave at connect time (account meta). */
+async function refreshVk(account: NetAccount, fetchImpl?: Fetch): Promise<TokenSet> {
+  const deviceId = str(account.meta.deviceId);
+  if (!account.refreshToken || !deviceId) throw new NetworkAuthError("refresh_failed", "VK access expired. Reconnect VK in Settings.", true);
+  return refreshVkToken(account.refreshToken, deviceId, fetchImpl);
 }
 
 export const NETWORKS: Record<NetworkId, NetworkAdapter> = {
@@ -95,6 +124,17 @@ export const NETWORKS: Record<NetworkId, NetworkAdapter> = {
   plurk: { configured: isPlurkConfigured, publish: publishToPlurk, refreshSkewSec: 0 },
   twitch: { configured: isTwitchConfigured, publish: publishToTwitch, refresh: needsRefreshToken(refreshTwitchToken, "Twitch"), refreshSkewSec: 10 * 60 },
   farcaster: { configured: isFarcasterConfigured, publish: publishToFarcaster, refreshSkewSec: 0 },
+  // 2026-11-24 (ported from Postiz): token networks need no keys; app networks wait for their env keys.
+  medium: { configured: () => true, publish: publishToMedium, refreshSkewSec: 0 },
+  lemmy: { configured: () => true, publish: publishToLemmy, refreshSkewSec: 0 },
+  moltbook: { configured: () => true, publish: publishToMoltbook, refreshSkewSec: 0 },
+  reddit: { configured: isRedditConfigured, publish: publishToReddit, refresh: needsRefreshToken(refreshRedditToken, "Reddit"), refreshSkewSec: 5 * 60 },
+  dribbble: { configured: isDribbbleConfigured, publish: publishToDribbble, refreshSkewSec: 0 },
+  vk: { configured: isVkConfigured, publish: publishToVk, refresh: refreshVk, refreshSkewSec: 10 * 60 },
+  kick: { configured: isKickConfigured, publish: publishToKick, refresh: needsRefreshToken(refreshKickToken, "Kick"), refreshSkewSec: 10 * 60 },
+  whop: { configured: isWhopConfigured, publish: publishToWhop, refresh: needsRefreshToken(refreshWhopToken, "Whop"), refreshSkewSec: 5 * 60 },
+  mewe: { configured: isMeweConfigured, publish: publishToMewe, refreshSkewSec: 0 },
+  tiktok_business: { configured: isTikTokBusinessConfigured, publish: publishToTikTokBusiness, refresh: needsRefreshToken(refreshTikTokBusinessToken, "TikTok Business"), refreshSkewSec: 15 * 60 },
 };
 
 /** Which new networks can be connected on this server (Bluesky / Mastodon need no keys). */
@@ -120,6 +160,13 @@ export function connectHref(platform: string): string {
     case "wpcom":
     case "plurk":
     case "twitch":
+    case "reddit":
+    case "dribbble":
+    case "vk":
+    case "kick":
+    case "whop":
+    case "mewe":
+    case "tiktok_business":
       return `/api/${platform}/connect`;
     case "farcaster":
       return "/app/settings?connect=farcaster#connect";

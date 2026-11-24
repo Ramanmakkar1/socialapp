@@ -173,6 +173,47 @@ const RULES: Partial<Record<string, Rule[]>> = {
   ],
   devto: [r("Canonical url has already been taken", "bad_body", "DEV already has a post with this canonical URL.")],
   wordpress: [r("rest_cannot_create", "bad_body", "The WordPress user can't create posts. Give it Author or Editor rights.")],
+  // 2026-11-24 networks (Postiz handleErrors + each API's documented error codes).
+  reddit: [
+    r("RATELIMIT", "rate_limit", "Reddit is limiting how often this account can post. It will be tried again later."),
+    r("SUBREDDIT_NOEXIST", "bad_body", "That subreddit doesn't exist. Check the name in the Reddit options."),
+    r("SUBREDDIT_NOTALLOWED", "bad_body", "This account isn't allowed to post in that subreddit."),
+    r("NO_SELFS", "bad_body", "That subreddit doesn't allow text posts."),
+    r("SUBMIT_VALIDATION_FLAIR_REQUIRED", "bad_body", "That subreddit requires post flair, which Poskoo can't set yet. Post there from Reddit."),
+    r("TOO_LONG", "bad_body", "The Reddit title is too long (300 characters max). Shorten the first line."),
+    r("NO_TEXT", "bad_body", "Reddit posts need a title. Write it on the first line."),
+    r("invalid_grant", "refresh_token", "Reddit access expired. Reconnect Reddit in Settings."),
+  ],
+  lemmy: [
+    r("rate_limit_error", "rate_limit", "Lemmy rate limit reached. It will be tried again later."),
+    r(/not_logged_in|incorrect_login/, "refresh_token", "Your Lemmy session is no longer valid. Reconnect the channel."),
+    r(/site_ban|"error":"banned"|banned_from_community/, "bad_body", "This account is banned on that Lemmy instance or community."),
+    r("couldnt_find_community", "bad_body", "That Lemmy community no longer exists. Reconnect with another one."),
+    r("blocked_url", "bad_body", "The Lemmy instance blocks a link in this post."),
+  ],
+  medium: [r(/publication.*not.*(found|allowed)|not a writer/i, "bad_body", "Your Medium account can't post to that publication.")],
+  vk: [r("(5)", "refresh_token", "VK access expired. Reconnect VK in Settings."), r(/\((6|9)\)/, "rate_limit", "VK is limiting posts right now. It will be tried again later.")],
+  whop: [
+    r("invalid_grant", "refresh_token", "Whop access expired. Reconnect Whop in Settings."),
+    r("insufficient_scope", "reconnect", "Whop permissions are missing. Reconnect Whop and allow every permission."),
+    r("not_found", "bad_body", "That Whop forum wasn't found. Check the forum in the Whop options."),
+  ],
+  tiktok_business: [
+    r(/access_token_invalid|Access token (is incorrect|has expired)|The access token is invalid|auth_removed/, "refresh_token", "TikTok access expired. Reconnect TikTok Business in Settings."),
+    r(/rate_limit_exceeded|Too many requests/, "rate_limit", "TikTok is limiting posts right now. It will be tried again later."),
+    r("file_format_check_failed", "bad_body", "TikTok can't read this file format. Use MP4/MOV video or JPG/PNG photos."),
+    r("duration_check_failed", "bad_body", "The video is too long or too short for TikTok."),
+    r("frame_rate_check_failed", "bad_body", "TikTok rejected the video's frame rate."),
+    r(/video_pull_failed|photo_pull_failed/, "retry", "TikTok couldn't download the media yet."),
+    r("url_ownership_unverified", "bad_body", "TikTok needs Poskoo's media domain verified before it can pull files."),
+    r("spam_risk_too_many_posts", "rate_limit", "TikTok's daily post limit for this account is reached."),
+    r(/spam_risk/, "bad_body", "TikTok flagged this post as spam risk. Change the text and try again."),
+    r("reached_active_user_cap", "reconnect", "Poskoo's TikTok Business app reached its user cap. Try again later."),
+  ],
+  dribbble: [r(/upload.*(not permitted|forbidden)|player/i, "bad_body", "Only Dribbble accounts that can upload shots (Pro / Player) can post from Poskoo.")],
+  kick: [r(/chat.*(disabled|closed)|followers only|subscribers only/i, "bad_body", "Your Kick chat isn't accepting this message right now (chat mode).")],
+  mewe: [r("Unauthorized", "refresh_token", "MeWe access expired. Reconnect MeWe in Settings."), r(/Enhance Your Calm|\b420\b/, "rate_limit", "MeWe is limiting posts. It will be tried again later.")],
+  moltbook: [r(/rate.?limit|too many/i, "rate_limit", "Moltbook is limiting posts. It will be tried again later.")],
 };
 
 // Checked after the per-network rules, for every network.
