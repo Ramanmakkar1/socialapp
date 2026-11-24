@@ -65,7 +65,7 @@ export type PublishOutcome =
       /** Reminder channels: the e-mail went out, the user still has to post it themselves. */
       reminded?: boolean;
     }
-  | { ok: false; error: string; tokenDead?: boolean };
+  | { ok: false; error: string; tokenDead?: boolean; /** HTTP status when known; 0 = no response. */ status?: number };
 
 export type PublishInput = {
   account: NetAccount;
