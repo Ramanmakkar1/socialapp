@@ -176,7 +176,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: tool.name,
-    url: `${BRAND.url}${tool.href}`,
+    url: `${BRAND.canonicalUrl}${tool.href}`,
   })),
 };
 
@@ -184,7 +184,7 @@ const softwareJsonLd = toolSoftwareJsonLd({
   name: "YouTube tools",
   description:
     "A free collection of YouTube tools for titles, descriptions, tags, hashtags, channel art, thumbnail and Shorts sizes, planning and engagement stats.",
-  url: `${BRAND.url}${PATH}`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
 });
 
 export default function YouTubeToolsPage() {
