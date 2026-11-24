@@ -127,10 +127,39 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   </div>
 </div>
 <div className="wrap tpShotWrap">
+  {/* Story cards that float over the dashboard (CSS only, staggered): AI plans the week, a comment
+      becomes a DM, the post goes out everywhere, reach goes up. */}
+  <div className="tpStage">
+  <div className="tpFloat tpFloatAi" aria-hidden="true">
+    <div className="tpFloatHead"><span className="tpDot tpDotAi"><AtSign width={12} height={12} /></span>Your AI assistant<em>MCP</em></div>
+    <p className="tpAsk">Plan next week for the studio: 3 reels and 2 carousels.</p>
+    <p className="tpOk"><b>✓</b> 12 posts scheduled on 5 channels</p>
+  </div>
+  <div className="tpFloat tpFloatDm" aria-hidden="true">
+    <div className="tpFloatHead"><span className="tpDot tpDotIg"><Instagram width={12} height={12} /></span>@maya.k commented <q>GUIDE</q></div>
+    <p className="tpDm"><span className="tpLive"></span>Auto-DM sent with your link · 4s</p>
+  </div>
+  <div className="tpFloat tpFloatPub" aria-hidden="true">
+    <div className="tpFloatHead"><span className="tpDot tpDotOk">✓</span>Published</div>
+    <div className="tpNets">
+      <span style={{ color: "#E1306C" }}><Instagram width={14} height={14} /></span>
+      <span><TikTokIcon width={14} height={14} /></span>
+      <span style={{ color: "#0A66C2" }}><LinkedInIcon width={14} height={14} /></span>
+      <span style={{ color: "#1877F2" }}><Facebook width={14} height={14} /></span>
+      <span style={{ color: "#FF0033" }}><Youtube width={14} height={14} /></span>
+    </div>
+  </div>
+  <div className="tpFloat tpFloatStat" aria-hidden="true">
+    <div className="tpFloatHead">Reach this week</div>
+    <div className="tpStatRow"><b>+38%</b>
+      <svg viewBox="0 0 90 30" width="90" height="30"><path d="M2 26 L18 22 L32 24 L46 15 L60 17 L74 8 L88 4" fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+    </div>
+  </div>
   <figure className="tpShot">
     <div className="tpBar" aria-hidden="true"><i></i><i></i><i></i><span>poskoo.com/app/calendar</span></div>
-    <Image src="/landing/hero-dashboard.webp" width={2080} height={1300} sizes="(max-width: 1120px) 94vw, 1040px" priority alt="The Poskoo dashboard: a month calendar of scheduled Instagram, TikTok, LinkedIn, Facebook, Threads, Bluesky, Pinterest and X posts, with the channel list in the sidebar" />
+    <Image src="/landing/hero-dashboard-orange.webp" width={2080} height={1300} sizes="(max-width: 1120px) 94vw, 1040px" priority alt="The Poskoo dashboard: a month calendar of scheduled Instagram, TikTok, LinkedIn, Facebook, Threads, Bluesky, Pinterest and X posts, with the channel list in the sidebar" />
   </figure>
+  </div>
 </div>
 <div className="wrap">
   <div className="works"><span>Works with</span>{worksWith.map((e) => <b key={e.id}><i style={{ background: WORKS_COLOR[e.id] ?? "var(--ink)" }}></i>{e.label}</b>)}{moreLive > 0 && <span>+ {moreLive} more</span>}<span>· Official APIs only</span></div>
@@ -287,11 +316,30 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
 </div></section>
 
 <section id="faq" style={{"paddingTop": "20px"}}><div className="wrap">
-  <div className="head"><p className="eyebrow">Questions</p><h2>Good to know</h2></div>
-  <div className="faq">
-    {faqList.map((f, i) => (
-      <details key={f.q} open={i === 0}><summary>{f.q}</summary><p>{f.a}</p></details>
-    ))}
+  {/* 2026-11-24 FAQ redesign (owner request): sticky intro + help card on the left, numbered
+      accordion on the right. Questions/answers and the FAQPage JSON-LD (faqList) are unchanged. */}
+  <div className="faqV2">
+    <div className="faqIntro">
+      <div className="head"><p className="eyebrow">Questions</p><h2>Good to know</h2></div>
+      <p className="faqLede">Scheduling, auto-DMs, plans and safety: the answers people ask for most.</p>
+      <div className="faqHelp">
+        <span className="faqHelpIcon" aria-hidden="true"><MessageCircle width={20} height={20} /></span>
+        <b>Still have a question?</b>
+        <span>A real person replies, usually within a day.</span>
+        <div className="faqHelpLinks">
+          <a href={`mailto:${BRAND.supportEmail}`}>Email us</a>
+          <Link href="/guides">Read the guides <ArrowRight width={14} height={14} /></Link>
+        </div>
+      </div>
+    </div>
+    <div className="faq">
+      {faqList.map((f, i) => (
+        <details key={f.q} open={i === 0}>
+          <summary><span className="faqNum">{String(i + 1).padStart(2, "0")}</span><span className="faqQ">{f.q}</span><span className="faqToggle" aria-hidden="true"></span></summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
   </div>
 </div></section>
 

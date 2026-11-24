@@ -1480,3 +1480,111 @@
   .landing :global(.tpBar span){font-size:.68rem;padding:3px 10px;transform:translateX(-14px)}
 }
 @media (prefers-reduced-motion: reduce){ .landing :global(.tpTile){animation:none} }
+
+/* 2026-11-24 hero story cards over the dashboard (owner: "something engaging here").
+   Each card pops in on a stagger, then floats gently. Reduced motion: shown still. */
+.landing :global(.tpStage){position:relative;max-width:1040px;margin:0 auto}
+.landing :global(.tpFloat){position:absolute;z-index:3;width:max-content;max-width:280px;padding:12px 14px;border-radius:16px;
+  background:rgba(255,255,255,.96);border:1px solid rgba(41,41,40,.08);color:#292928;font:500 .86rem/1.35 var(--sans);
+  box-shadow:0 24px 48px -20px rgba(150,60,20,.35),0 6px 16px -8px rgba(41,41,40,.18);
+  opacity:0;animation:tpPop .7s cubic-bezier(.2,.9,.3,1.2) forwards, tpBob 6s ease-in-out infinite}
+.landing :global(.tpFloatAi){left:-6%;top:14%;animation-delay:.5s,1.2s}
+.landing :global(.tpFloatDm){right:-5%;top:9%;animation-delay:1.6s,2.3s}
+.landing :global(.tpFloatPub){left:-3%;bottom:16%;animation-delay:2.7s,3.4s}
+.landing :global(.tpFloatStat){right:-4%;bottom:22%;animation-delay:3.8s,4.5s}
+.landing :global(.tpFloatHead){display:flex;align-items:center;gap:8px;font-weight:600;font-size:.82rem}
+.landing :global(.tpFloatHead em){margin-left:auto;padding:2px 7px;border-radius:999px;background:#fff1ea;color:#b93d12;font:600 .66rem/1.4 var(--sans);letter-spacing:.04em}
+.landing :global(.tpFloatHead q){quotes:none;padding:1px 6px;border-radius:6px;background:#fff1ea;color:#b93d12;font-weight:700}
+.landing :global(.tpDot){display:inline-grid;place-items:center;width:22px;height:22px;border-radius:7px;color:#fff;font-size:.72rem;flex:none}
+.landing :global(.tpDotAi){background:#1e1631}
+.landing :global(.tpDotIg){background:linear-gradient(135deg,#f58529,#dd2a7b 55%,#8134af)}
+.landing :global(.tpDotOk){background:#1fa971}
+.landing :global(.tpAsk){margin:9px 0 0;padding:8px 10px;border-radius:12px 12px 12px 4px;background:#f7f6f3;color:#3d3d3c;font-size:.82rem}
+.landing :global(.tpOk){margin:7px 0 0;color:#1e1631;font-weight:600;font-size:.82rem}
+.landing :global(.tpOk b){color:#1fa971}
+.landing :global(.tpDm){display:flex;align-items:center;gap:7px;margin:7px 0 0;color:#3d3d3c;font-size:.82rem}
+.landing :global(.tpLive){width:8px;height:8px;border-radius:50%;background:#1fa971;box-shadow:0 0 0 0 rgba(31,169,113,.5);animation:tpPulse 1.8s ease-out infinite}
+.landing :global(.tpNets){display:flex;gap:6px;margin-top:8px}
+.landing :global(.tpNets span){display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:#f7f6f3;color:#111}
+.landing :global(.tpStatRow){display:flex;align-items:center;gap:10px;margin-top:4px}
+.landing :global(.tpStatRow b){font:800 1.5rem/1 var(--sans);letter-spacing:-.03em;color:#1e1631}
+@keyframes tpPop{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes tpBob{0%,100%{translate:0 0}50%{translate:0 -6px}}
+@keyframes tpPulse{to{box-shadow:0 0 0 8px rgba(31,169,113,0)}}
+@media (max-width: 1180px){
+  .landing :global(.tpFloatAi){left:-1%}
+  .landing :global(.tpFloatDm){right:-1%}
+  .landing :global(.tpFloatPub){left:1%}
+  .landing :global(.tpFloatStat){right:1%}
+}
+@media (max-width: 860px){
+  .landing :global(.tpFloat){max-width:210px;padding:9px 11px;font-size:.76rem}
+  .landing :global(.tpFloatPub),.landing :global(.tpFloatStat){display:none}
+  .landing :global(.tpFloatAi){left:2%;top:auto;bottom:8%}
+  .landing :global(.tpFloatDm){right:2%;top:14%}
+}
+@media (max-width: 520px){
+  .landing :global(.tpFloatAi){display:none}
+  .landing :global(.tpFloatDm){right:3%;top:auto;bottom:6%}
+}
+@media (prefers-reduced-motion: reduce){
+  .landing :global(.tpFloat){animation:none;opacity:1}
+  .landing :global(.tpLive){animation:none}
+}
+
+/* 2026-11-24 FAQ redesign: sticky intro + help card left, numbered accordion right (logo orange). */
+.landing :global(.faqV2){display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:clamp(28px,5vw,72px);align-items:start;max-width:1100px;margin-inline:auto}
+.landing :global(.faqIntro){position:sticky;top:96px}
+.landing :global(.faqIntro .head){text-align:left;margin:0;align-items:flex-start;gap:8px}
+.landing :global(.faqIntro .head h2){margin-top:6px}
+.landing :global(.faqLede){margin-top:14px;color:var(--muted);font-size:1.05rem;line-height:1.55}
+.landing :global(.faqHelp){display:flex;flex-direction:column;gap:6px;margin-top:26px;padding:22px;border-radius:22px;background:#fff1ea;border:1px solid #ffe1d4}
+.landing :global(.faqHelp b){font-size:1.05rem;color:var(--ink)}
+.landing :global(.faqHelp > span:not(.faqHelpIcon)){color:#5a5a59;font-size:.95rem}
+.landing :global(.faqHelpIcon){display:grid;place-items:center;width:40px;height:40px;margin-bottom:6px;border-radius:12px;background:#ff6a3d;color:#1e1631}
+.landing :global(.faqHelpLinks){display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.landing :global(.faqHelpLinks a){display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;transition:background .2s,transform .2s}
+.landing :global(.faqHelpLinks a:first-child){background:#1e1631;color:#fff}
+.landing :global(.faqHelpLinks a:last-child){background:#fff;color:#1e1631;border:1px solid #ffd2bf}
+.landing :global(.faqHelpLinks a:hover){transform:translateY(-1px)}
+.landing :global(.faqV2 .faq){max-width:none;margin:0;gap:12px}
+.landing :global(.faqV2 details){padding:0;border:1px solid #efe9df;border-radius:20px;background:#fff;transition:background .25s,border-color .25s,box-shadow .25s;interpolate-size:allow-keywords}
+.landing :global(.faqV2 details:hover){border-color:#ffd2bf}
+.landing :global(.faqV2 details[open]){background:#fff8f4;border-color:#ffd2bf;box-shadow:0 18px 40px -28px rgba(150,60,20,.45)}
+.landing :global(.faqV2 details::details-content){block-size:0;overflow:hidden;transition:block-size .3s ease,content-visibility .3s allow-discrete}
+.landing :global(.faqV2 details[open]::details-content){block-size:auto}
+.landing :global(.faqV2 summary){display:flex;align-items:center;gap:16px;padding:20px 22px;border-radius:20px;font-size:1.08rem;font-weight:600;color:var(--ink)}
+.landing :global(.faqV2 summary::after){display:none}
+.landing :global(.faqV2 summary:focus){outline:none}
+.landing :global(.faqV2 summary:focus-visible){outline:none;box-shadow:0 0 0 3px rgba(255,106,61,.45)}
+.landing :global(.faqNum){flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#f7f4ef;color:#8a8478;font:700 .82rem/1 var(--sans);letter-spacing:.02em;transition:background .25s,color .25s}
+.landing :global(.faqV2 details[open] .faqNum){background:#ff6a3d;color:#1e1631}
+.landing :global(.faqQ){flex:1}
+.landing :global(.faqToggle){position:relative;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid #efe9df;background:#fff;transition:transform .3s,background .25s,border-color .25s}
+.landing :global(.faqToggle)::before,.landing :global(.faqToggle)::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:2px;border-radius:2px;background:#1e1631;translate:-50% -50%}
+.landing :global(.faqToggle)::after{rotate:90deg;transition:rotate .3s}
+.landing :global(.faqV2 details[open] .faqToggle){background:#1e1631;border-color:#1e1631;transform:rotate(180deg)}
+.landing :global(.faqV2 details[open] .faqToggle)::before,.landing :global(.faqV2 details[open] .faqToggle)::after{background:#fff}
+.landing :global(.faqV2 details[open] .faqToggle)::after{rotate:0deg}
+.landing :global(.faqV2 details p){margin:0;padding:0 22px 22px 76px;color:#4d4a45;font-size:1rem;line-height:1.65}
+@media (max-width: 900px){
+  .landing :global(.faqV2){grid-template-columns:1fr}
+  .landing :global(.faqV2){gap:18px}
+  .landing :global(.faqIntro){display:contents}
+  .landing :global(.faqIntro .head){text-align:center;align-items:center}
+  .landing :global(.faqLede){text-align:center;margin-top:0}
+  .landing :global(.faqV2 .faq){order:2}
+  .landing :global(.faqHelp){order:3;margin-top:8px}
+}
+@media (max-width: 560px){
+  .landing :global(.faqV2 summary){padding:16px;gap:12px;font-size:1rem}
+  .landing :global(.faqNum){width:32px;height:32px}
+  .landing :global(.faqV2 details p){padding:0 16px 18px 16px}
+}
+@media (prefers-reduced-motion: reduce){
+  .landing :global(.faqV2 details::details-content){transition:none}
+  .landing :global(.faqToggle),.landing :global(.faqToggle)::after{transition:none}
+}
+
+/* breathing room between the hero dashboard frame and the "Works with" strip */
+.landing :global(.tpShotWrap + .wrap .works){margin-top:34px}
