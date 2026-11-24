@@ -240,6 +240,20 @@ export default async function DevelopersPage() {
         </div>
       </section>
 
+      <section style={{ paddingTop: 24 }} id="source-code">
+        <div className="wrap">
+          <div className="head">
+            <p className="eyebrow">Open source</p>
+            <h2>Poskoo is open source</h2>
+          </div>
+          <p className="lede" style={{ maxWidth: 720 }}>
+            Poskoo&apos;s code is free software under the GNU Affero General Public License v3.0. Read it, run it
+            yourself or contribute:{" "}
+            <a className={s.vlink} href="https://github.com/Ramanmakkar1/socialapp" rel="noopener">source code on GitHub</a>.
+          </p>
+        </div>
+      </section>
+
       <p className="small" style={{ textAlign: "center", marginTop: 24 }}>
         Questions? Email {BRAND.supportEmail} and we will help you connect your assistant.
       </p>
