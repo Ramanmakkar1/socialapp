@@ -133,6 +133,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <div className="tpFloat tpFloatAi" aria-hidden="true">
     <div className="tpFloatHead"><span className="tpDot tpDotAi"><AtSign width={12} height={12} /></span>Your AI assistant<em>MCP</em></div>
     <p className="tpAsk">Plan next week for the studio: 3 reels and 2 carousels.</p>
+    <p className="tpTyping"><i></i><i></i><i></i></p>
     <p className="tpOk"><b>✓</b> 12 posts scheduled on 5 channels</p>
   </div>
   <div className="tpFloat tpFloatDm" aria-hidden="true">
@@ -140,7 +141,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <p className="tpDm"><span className="tpLive"></span>Auto-DM sent with your link · 4s</p>
   </div>
   <div className="tpFloat tpFloatPub" aria-hidden="true">
-    <div className="tpFloatHead"><span className="tpDot tpDotOk">✓</span>Published</div>
+    <div className="tpFloatHead"><span className="tpDot tpDotOk">✓</span>Published everywhere</div>
     <div className="tpNets">
       <span style={{ color: "#E1306C" }}><Instagram width={14} height={14} /></span>
       <span><TikTokIcon width={14} height={14} /></span>
@@ -152,12 +153,16 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <div className="tpFloat tpFloatStat" aria-hidden="true">
     <div className="tpFloatHead">Reach this week</div>
     <div className="tpStatRow"><b>+38%</b>
-      <svg viewBox="0 0 90 30" width="90" height="30"><path d="M2 26 L18 22 L32 24 L46 15 L60 17 L74 8 L88 4" fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <svg viewBox="0 0 90 30" width="90" height="30"><path className="tpSpark" d="M2 26 L18 22 L32 24 L46 15 L60 17 L74 8 L88 4" fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
     </div>
   </div>
   <figure className="tpShot">
-    <div className="tpBar" aria-hidden="true"><i></i><i></i><i></i><span>poskoo.com/app/calendar</span></div>
+    <div className="tpBar" aria-hidden="true"><i></i><i></i><i></i><span>poskoo.com/app/publish</span></div>
+    <div className="tpShotImg">
+    {/* The post the AI just scheduled drops into Thursday's empty cell. */}
+    <span className="tpDrop" aria-hidden="true"><Instagram width={11} height={11} />9:00 AM</span>
     <Image src="/landing/hero-dashboard-orange.webp" width={2080} height={1300} sizes="(max-width: 1120px) 94vw, 1040px" priority alt="The Poskoo dashboard: a month calendar of scheduled Instagram, TikTok, LinkedIn, Facebook, Threads, Bluesky, Pinterest and X posts, with the channel list in the sidebar" />
+    </div>
   </figure>
   </div>
 </div>

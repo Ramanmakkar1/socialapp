@@ -1488,10 +1488,6 @@
   background:rgba(255,255,255,.96);border:1px solid rgba(41,41,40,.08);color:#292928;font:500 .86rem/1.35 var(--sans);
   box-shadow:0 24px 48px -20px rgba(150,60,20,.35),0 6px 16px -8px rgba(41,41,40,.18);
   opacity:0;animation:tpPop .7s cubic-bezier(.2,.9,.3,1.2) forwards, tpBob 6s ease-in-out infinite}
-.landing :global(.tpFloatAi){left:-6%;top:14%;animation-delay:.5s,1.2s}
-.landing :global(.tpFloatDm){right:-5%;top:9%;animation-delay:1.6s,2.3s}
-.landing :global(.tpFloatPub){left:-3%;bottom:16%;animation-delay:2.7s,3.4s}
-.landing :global(.tpFloatStat){right:-4%;bottom:22%;animation-delay:3.8s,4.5s}
 .landing :global(.tpFloatHead){display:flex;align-items:center;gap:8px;font-weight:600;font-size:.82rem}
 .landing :global(.tpFloatHead em){margin-left:auto;padding:2px 7px;border-radius:999px;background:#fff1ea;color:#b93d12;font:600 .66rem/1.4 var(--sans);letter-spacing:.04em}
 .landing :global(.tpFloatHead q){quotes:none;padding:1px 6px;border-radius:6px;background:#fff1ea;color:#b93d12;font-weight:700}
@@ -1511,22 +1507,6 @@
 @keyframes tpPop{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
 @keyframes tpBob{0%,100%{translate:0 0}50%{translate:0 -6px}}
 @keyframes tpPulse{to{box-shadow:0 0 0 8px rgba(31,169,113,0)}}
-@media (max-width: 1180px){
-  .landing :global(.tpFloatAi){left:-1%}
-  .landing :global(.tpFloatDm){right:-1%}
-  .landing :global(.tpFloatPub){left:1%}
-  .landing :global(.tpFloatStat){right:1%}
-}
-@media (max-width: 860px){
-  .landing :global(.tpFloat){max-width:210px;padding:9px 11px;font-size:.76rem}
-  .landing :global(.tpFloatPub),.landing :global(.tpFloatStat){display:none}
-  .landing :global(.tpFloatAi){left:2%;top:auto;bottom:8%}
-  .landing :global(.tpFloatDm){right:2%;top:14%}
-}
-@media (max-width: 520px){
-  .landing :global(.tpFloatAi){display:none}
-  .landing :global(.tpFloatDm){right:3%;top:auto;bottom:6%}
-}
 @media (prefers-reduced-motion: reduce){
   .landing :global(.tpFloat){animation:none;opacity:1}
   .landing :global(.tpLive){animation:none}
@@ -1588,3 +1568,57 @@
 
 /* breathing room between the hero dashboard frame and the "Works with" strip */
 .landing :global(.tpShotWrap + .wrap .works){margin-top:34px}
+
+/* 2026-11-24 v2 hero stage: cards live in the side gutters (only nudge the frame edge), the AI card
+   "types" then a new post drops into Thursday, the frame un-tilts as it scrolls in, and the bottom of
+   the screenshot fades into the page. */
+.landing :global(.tpFloatAi){left:-190px;top:44%;width:250px;animation-delay:.4s,1.1s}
+.landing :global(.tpFloatDm){right:-180px;top:40%;animation-delay:3.3s,4s}
+.landing :global(.tpFloatPub){left:-150px;bottom:4%;animation-delay:4.1s,4.8s}
+.landing :global(.tpFloatStat){right:-140px;bottom:8%;animation-delay:4.9s,5.6s}
+.landing :global(.tpTyping){display:flex;gap:4px;margin:8px 0 0;height:18px;align-items:center;animation:tpTypeShow 1.6s steps(1) .9s both}
+.landing :global(.tpTyping i){width:6px;height:6px;border-radius:50%;background:#b8b2a7;animation:tpDots 1s ease-in-out infinite}
+.landing :global(.tpTyping i:nth-child(2)){animation-delay:.15s}
+.landing :global(.tpTyping i:nth-child(3)){animation-delay:.3s}
+.landing :global(.tpFloatAi .tpOk){opacity:0;animation:tpFadeUp .45s ease 2.5s forwards}
+.landing :global(.tpShotImg){position:relative}
+.landing :global(.tpDrop){position:absolute;z-index:2;left:57.8%;top:82.4%;width:8.3%;height:4.9%;display:flex;align-items:center;gap:4px;padding:0 6px;
+  border-radius:7px;background:#fff1ea;border:1.5px solid #ff6a3d;color:#1e1631;font:600 clamp(.42rem,.75vw,.66rem)/1 var(--sans);white-space:nowrap;overflow:hidden;
+  box-shadow:0 0 0 0 rgba(255,106,61,.45);opacity:0;animation:tpDropIn .6s cubic-bezier(.2,.9,.3,1.3) 2.7s forwards, tpRing 2.4s ease-out 3.3s infinite}
+.landing :global(.tpDrop svg){flex:none;color:#E1306C}
+.landing :global(.tpDrop b){margin-left:auto;padding:1px 4px;border-radius:4px;background:#ff6a3d;color:#1e1631;font-size:.9em}
+.landing :global(.tpSpark){stroke-dasharray:120;stroke-dashoffset:120;animation:tpDraw 1.2s ease 5.3s forwards}
+.landing :global(.tpShot){-webkit-mask-image:linear-gradient(#000 74%,transparent 100%);mask-image:linear-gradient(#000 74%,transparent 100%)}
+@supports (animation-timeline: view()){
+  .landing :global(.tpShot){transform-origin:50% 0;animation:tpTilt linear both;animation-timeline:view();animation-range:entry 0% cover 38%}
+}
+@keyframes tpTilt{from{transform:perspective(1800px) rotateX(14deg) scale(.94);opacity:.6}to{transform:none;opacity:1}}
+@keyframes tpTypeShow{0%{opacity:1}99%{opacity:1}100%{opacity:0;height:0;margin:0}}
+@keyframes tpDots{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+@keyframes tpFadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes tpDropIn{from{opacity:0;transform:translateY(-26px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes tpRing{0%{box-shadow:0 0 0 0 rgba(255,106,61,.5)}70%,100%{box-shadow:0 0 0 10px rgba(255,106,61,0)}}
+@keyframes tpDraw{to{stroke-dashoffset:0}}
+@media (max-width: 1400px){
+  .landing :global(.tpFloatAi){left:-120px}
+  .landing :global(.tpFloatDm){right:-110px}
+  .landing :global(.tpFloatPub){left:-100px}
+  .landing :global(.tpFloatStat){right:-90px}
+}
+@media (max-width: 1180px){
+  .landing :global(.tpFloat){max-width:220px;padding:10px 12px;font-size:.78rem}
+  .landing :global(.tpFloatAi){left:-12px;width:220px;top:auto;bottom:30%}
+  .landing :global(.tpFloatDm){right:-12px;top:12%}
+  .landing :global(.tpFloatPub){display:none}
+  .landing :global(.tpFloatStat){right:-12px;bottom:14%}
+}
+@media (max-width: 760px){
+  .landing :global(.tpFloatAi),.landing :global(.tpFloatStat){display:none}
+  .landing :global(.tpFloatDm){right:2%;top:auto;bottom:18%}
+}
+@media (prefers-reduced-motion: reduce){
+  .landing :global(.tpShot){animation:none}
+  .landing :global(.tpTyping){display:none}
+  .landing :global(.tpFloatAi .tpOk),.landing :global(.tpDrop){opacity:1;animation:none}
+  .landing :global(.tpSpark){stroke-dashoffset:0;animation:none}
+}
