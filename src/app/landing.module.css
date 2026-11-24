@@ -1622,3 +1622,7 @@
   .landing :global(.tpFloatAi .tpOk),.landing :global(.tpDrop){opacity:1;animation:none}
   .landing :global(.tpSpark){stroke-dashoffset:0;animation:none}
 }
+
+/* Works-with strip: real brand logos instead of colour dots */
+.landing :global(.works b){gap:8px}
+.landing :global(.works b svg){flex:none;display:block}

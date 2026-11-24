@@ -20,6 +20,7 @@ import { GoogleButton } from "@/components/GoogleButton";
 import { AnimArt, ANIM_LABELS } from "@/components/AnimArt";
 import { ArrowRight, AtSign, Facebook, Instagram, Youtube, Send, MessageCircle } from "lucide-react";
 import { BlueskyIcon, LinkedInIcon, MastodonIcon, PinterestIcon, TikTokIcon, XIcon } from "@/components/brandIcons";
+import { BrandLogo, hasBrandLogo } from "@/components/BrandLogo";
 import { homePageJsonLd } from "./homeJsonLd";
 import { HomeSchema } from "@/components/HomeSchema";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
@@ -97,7 +98,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <Image className="tpCloud tpCloudL" src="/landing/hero-cloud-left.webp" width={188} height={102} sizes="130px" alt="" />
     <Image className="tpCloud tpCloudR" src="/landing/hero-cloud-right.webp" width={182} height={94} sizes="124px" alt="" />
     {HERO_TILES.map(({ id, Icon, color }) => (
-      <span key={id} className={`tpTile tpTile-${id}`} style={{ color }}><Icon width={22} height={22} strokeWidth={2} /></span>
+      <span key={id} className={`tpTile tpTile-${id}`} style={{ color }}>{hasBrandLogo(id) ? <BrandLogo id={id} size={24} /> : <Icon width={22} height={22} strokeWidth={2} />}</span>
     ))}
   </div>
   <div className="wrap">
@@ -167,7 +168,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   </div>
 </div>
 <div className="wrap">
-  <div className="works"><span>Works with</span>{worksWith.map((e) => <b key={e.id}><i style={{ background: WORKS_COLOR[e.id] ?? "var(--ink)" }}></i>{e.label}</b>)}{moreLive > 0 && <span>+ {moreLive} more</span>}<span>· Official APIs only</span></div>
+  <div className="works"><span>Works with</span>{worksWith.map((e) => <b key={e.id}>{hasBrandLogo(e.id) ? <BrandLogo id={e.id} size={18} /> : <i style={{ background: WORKS_COLOR[e.id] ?? "var(--ink)" }}></i>}{e.label}</b>)}{moreLive > 0 && <span>+ {moreLive} more</span>}<span>· Official APIs only</span></div>
 </div>
 
 <section className="howSection">
