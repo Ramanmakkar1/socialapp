@@ -15,6 +15,8 @@ import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { isAdmin } from "@/lib/admin";
 import { ALLOWED_PLATFORMS } from "@/lib/savePost";
 import type { ComposerDraftInitial } from "@/lib/composerDraft";
+import type { AccountChoices } from "@/lib/accountChoices";
+import { loadAccountChoices } from "@/lib/accountChoicesServer";
 import IdeasBoard from "./IdeasBoard";
 import type { Idea } from "./IdeaCard";
 import LoadFailed from "./LoadFailed";
@@ -198,6 +200,8 @@ export default async function CalendarPage({
   let schedulePlatforms: string[] = [];
   let scheduleRowCount = -1; // -1 = unknown (table missing / not read)
   let youtubeReady = false;
+  // Networks with 2+ connected accounts: the composer lets the user pick which ones get the post.
+  let accountChoices: AccountChoices = {};
   // TikTok, Bluesky, Mastodon, LinkedIn, Pinterest, X: connected + per-account composer data.
   const networkReady: Partial<Record<string, boolean>> = {};
   const captionMaxOverrides: Partial<Record<string, number>> = {};
@@ -234,8 +238,12 @@ export default async function CalendarPage({
       try {
         const [row] = await query<DraftRow>(
           `select p.id, p.caption, p.first_comment, ${hasTags ? "p.tags" : "'{}'::text[] as tags"}, p.scheduled_at, p.status, p.media, p.dm_rule_id, p.ig_format,
-           coalesce(array_agg(t.platform) filter (where t.platform is not null), '{}') as platforms,
-           coalesce(jsonb_object_agg(t.platform, t.caption_override) filter (where t.caption_override is not null), '{}'::jsonb) as overrides
+           coalesce(array_agg(distinct t.platform) filter (where t.platform is not null), '{}') as platforms,
+           coalesce(jsonb_object_agg(t.platform, t.caption_override) filter (where t.caption_override is not null), '{}'::jsonb) as overrides,
+           (select coalesce(jsonb_object_agg(x.platform, x.ids), '{}'::jsonb) from (
+              select platform, jsonb_agg(coalesce(social_account_id, youtube_channel_id)) as ids from post_targets
+              where post_id = p.id and account_locked and coalesce(social_account_id, youtube_channel_id) is not null group by platform
+            ) x) as accounts
            from scheduled_posts p left join post_targets t on t.post_id = p.id
            where p.id = $1 and p.user_id = $2 and p.status in ('draft','scheduled') group by p.id`,
           [draft, user.id],
@@ -255,6 +263,7 @@ export default async function CalendarPage({
               scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
               dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
               status: row.status,
+              accounts: row.accounts ?? {},
             };
             draftFailed = false;
           }
@@ -306,6 +315,11 @@ export default async function CalendarPage({
       threadsReady = rows.length > 0;
     } catch {
       threadsReady = false;
+    }
+    try {
+      accountChoices = await loadAccountChoices(user.id);
+    } catch {
+      accountChoices = {};
     }
     try {
       const ytRows = await query<{ 1: unknown }>(
@@ -526,7 +540,7 @@ export default async function CalendarPage({
         </section>
       ) : (
         <ComposerDialog title={initialIdea ? "Create post from idea" : initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
-          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} networkReady={networkReady} captionMaxOverrides={captionMaxOverrides} networkData={networkData} mediaPlan={mediaPlan} />
+          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} networkReady={networkReady} captionMaxOverrides={captionMaxOverrides} networkData={networkData} mediaPlan={mediaPlan} accountChoices={accountChoices} />
         </ComposerDialog>
       )}
       {view === "month" ? (
