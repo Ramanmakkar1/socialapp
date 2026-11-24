@@ -79,7 +79,7 @@ const appJsonLd = {
     name: `${BRAND.name} Metricool alternative`,
     description:
       "Metricool alternative for Instagram scheduling with comment-to-DM automation, lead capture and an inbox — schedule posts and turn commenters into leads.",
-    url: `${BRAND.url}/metricool-alternative`,
+    url: `${BRAND.canonicalUrl}/metricool-alternative`,
   }),
   featureList: ["Instagram scheduling", "Comment-to-DM automation", "Email capture in DMs", "Lead CSV export"],
 };
