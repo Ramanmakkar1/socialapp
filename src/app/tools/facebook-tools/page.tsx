@@ -143,7 +143,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: tool.name,
-    url: `${BRAND.url}${tool.href}`,
+    url: `${BRAND.canonicalUrl}${tool.href}`,
   })),
 };
 
@@ -151,7 +151,7 @@ const softwareJsonLd = toolSoftwareJsonLd({
   name: "Facebook tools",
   description:
     "A free collection of Facebook tools for captions, hashtags, bios, fonts, post previews, cover and post sizes, best posting times and engagement stats.",
-  url: `${BRAND.url}${PATH}`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
 });
 
 export default function FacebookToolsPage() {
