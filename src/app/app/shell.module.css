@@ -1,53 +1,50 @@
 /* App shell — Buffer-style sidebar in the Poskoo palette. Only --poskoo-* tokens (+ network colours). */
 
 .shell {
-  /* Dashboard palette (2026-11-24, Raman: TryPost-style warm greys + violet). App-only: the
-     public site keeps its own owner-approved look. --app-* are the source tokens; the older
-     --poskoo-* names every dashboard page already uses are mapped onto them. */
-  --app-bg: #ffffff;
-  --app-fg: #292928;
-  --app-card: #ffffff;
-  --app-sidebar: #f7f6f3;
-  --app-muted: #f7f6f3;
-  --app-muted-fg: #5a5a59;
-  --app-accent: #f3f2f0;
-  --app-secondary: #eae8e5;
-  --app-border: #eae8e5;
-  --app-border-strong: #dedcd9;
-  --app-primary: #ffe1d4;
-  --app-primary-hover: #ffcdb8;
-  --app-primary-subtle: #fff1ea;
-  --app-primary-selected: #ff6a3d2e;
-  --app-primary-strong: #ff6a3d;
-  --app-primary-strong-fg: #1e1631;
-  --app-primary-text: #b93d12;
-  --app-primary-text-hover: #9a3210;
-  --app-ring: #ff6a3d;
-  --app-sidebar-hover: rgb(51 34 0 / .06);
-  --app-radius: .5rem;
-
-  --poskoo-paper: var(--app-muted);
-  --poskoo-card: var(--app-card);
-  --poskoo-ink: var(--app-fg);
-  --poskoo-muted: var(--app-muted-fg);
-  --poskoo-line: var(--app-border);
-  --poskoo-band: var(--app-muted);
-  --poskoo-pill-border: var(--app-border-strong);
-  --poskoo-violet: var(--app-primary-text);
-  --poskoo-lilac: var(--app-primary-subtle);
-  /* The old lime accent (Auto-DM button, "New" pills) becomes the soft violet. */
-  --poskoo-lime: var(--app-primary);
-  --poskoo-peach: #fff4e5;
-  --poskoo-mint: #e8f6ee;
-  --poskoo-pink: #fdeef5;
-  --poskoo-shadow-card: 0 1px 2px rgb(41 41 40 / .04);
-  --poskoo-shadow-float: 0 12px 32px -14px rgb(41 41 40 / .22);
+  /* Dashboard colours = the original Poskoo dashboard palette (owner 2026-11-24: "fix dashboard colour
+     like it was before"): white canvas, warm-grey chrome, hairline borders, Poskoo violet accent.
+     The new layout's --app-* tokens point at these same original values. */
+  --poskoo-paper: #fafaf8;
+  --poskoo-card: #ffffff;
+  --poskoo-ink: #1d1b22;
+  --poskoo-muted: #67646e;
+  --poskoo-line: #ebe9e4;
+  --poskoo-band: #f3f2ee;
+  --poskoo-pill-border: #e0ddd6;
+  --poskoo-violet: #5b3ff0;
+  --poskoo-lilac: #ece7ff;
+  --poskoo-peach: #fff1de;
+  --poskoo-mint: #e3f6ec;
+  --poskoo-pink: #fdebf4;
+  --poskoo-shadow-card: 0 1px 2px rgba(20, 18, 26, .04);
+  --poskoo-shadow-float: 0 14px 34px -14px rgba(20, 18, 26, .22);
   --poskoo-shadow-accent: none;
-  --ink-2: #3d3d3c;
-  --accent-tint: var(--app-primary);
-  --side-bg: var(--app-sidebar);
-  /* Solid buttons / ink pills in the shared UI kit use the strong violet. */
-  --fill-strong: var(--app-primary-strong);
+  --ink-2: #3a3842;
+  --accent-tint: color-mix(in srgb, var(--poskoo-violet) 11%, transparent);
+  --side-bg: #f7f6f3;
+  --fill-strong: var(--poskoo-violet);
+
+  --app-bg: var(--poskoo-card);
+  --app-fg: var(--poskoo-ink);
+  --app-card: var(--poskoo-card);
+  --app-sidebar: var(--side-bg);
+  --app-muted: var(--poskoo-band);
+  --app-muted-fg: var(--poskoo-muted);
+  --app-accent: var(--poskoo-band);
+  --app-secondary: var(--poskoo-line);
+  --app-border: var(--poskoo-line);
+  --app-border-strong: var(--poskoo-pill-border);
+  --app-primary: var(--accent-tint);
+  --app-primary-hover: color-mix(in srgb, var(--poskoo-violet) 18%, transparent);
+  --app-primary-subtle: var(--poskoo-lilac);
+  --app-primary-selected: var(--accent-tint);
+  --app-primary-strong: var(--poskoo-violet);
+  --app-primary-strong-fg: #ffffff;
+  --app-primary-text: var(--poskoo-violet);
+  --app-primary-text-hover: #4a30d6;
+  --app-ring: var(--poskoo-violet);
+  --app-sidebar-hover: rgb(20 18 26 / .05);
+  --app-radius: .5rem;
   display: flex;
   min-height: 100dvh;
   overflow-x: clip;
@@ -55,44 +52,34 @@
   color: var(--app-fg);
   font-family: var(--font-instrument-sans), "Segoe UI", system-ui, sans-serif;
 }
-.shell :global(.btn-primary) { background: var(--fill-strong); color: var(--app-primary-strong-fg); }
+.shell :global(.btn-primary) { background: var(--fill-strong); color: #fff; }
 .shell :focus-visible { outline-color: var(--app-ring); }
 
-/* Light is the default. Dark mode for the dashboard only: the public site keeps its light look. */
+/* Light is the default. Dark mode for the dashboard only (original dark palette). */
 @media (prefers-color-scheme: dark) {
   .shell {
     color-scheme: dark;
-    --app-bg: #111111;
-    --app-fg: #f7f6f3;
-    --app-card: #191919;
-    --app-sidebar: #111111;
-    --app-muted: #202020;
-    --app-muted-fg: #bcbab6;
-    --app-accent: #2a2a2a;
-    --app-secondary: #2e2e2e;
-    --app-border: #2e2e2e;
-    --app-border-strong: #3a3a3a;
-    --app-primary: #ff9a75;
-    --app-primary-hover: #ff8a63;
-    --app-primary-subtle: #3a1a10;
-    --app-primary-selected: #ff6a3d33;
-    --app-primary-strong: #ff6a3d;
-    --app-primary-strong-fg: #1e1631;
-    --app-primary-text: #ff9a75;
-    --app-primary-text-hover: #ffc2a8;
-    --app-ring: #ff8a63;
-    --app-sidebar-hover: rgb(255 255 255 / .06);
-    --poskoo-peach: #3a2a14;
-    --poskoo-pink: #3d1f2e;
-    --poskoo-mint: #16342a;
+    --side-bg: #16141d;
+    --poskoo-paper: #121019;
+    --poskoo-card: #1b1824;
+    --poskoo-ink: #f2eff8;
+    --poskoo-muted: #a9a3b8;
+    --poskoo-line: #2e2a3a;
+    --poskoo-band: #262036;
+    --poskoo-pill-border: #3d3456;
+    --poskoo-lilac: #6c5aa8;
+    --poskoo-peach: #5a3d22;
+    --poskoo-pink: #5c2f48;
+    --poskoo-mint: #1f4a37;
+    --poskoo-violet: #a08cff;
     --poskoo-coral: #ff7a52;
     --poskoo-red: #ff6b70;
     --poskoo-green: #3fcf8e;
-    --poskoo-shadow-card: 0 1px 0 rgba(0, 0, 0, .4);
+    --poskoo-shadow-card: 0 1px 0 rgba(0, 0, 0, .4), 0 18px 30px -22px rgba(0, 0, 0, .7);
     --poskoo-shadow-float: 0 22px 40px -18px rgba(0, 0, 0, .8);
-    --ink-2: #dcdad6;
-    /* Selected nav on dark: a translucent violet, text stays light. */
-    --accent-tint: var(--app-primary-selected);
+    --ink-2: #cfc9dc;
+    --fill-strong: #6d55f5;
+    --app-sidebar-hover: rgb(255 255 255 / .06);
   }
 }
 
