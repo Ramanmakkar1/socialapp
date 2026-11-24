@@ -38,8 +38,8 @@ export async function generateMetadata(): Promise<Metadata> {
  metadataBase: new URL(BRAND.canonicalUrl),
  title: { absolute: title }, description, alternates: { canonical: HOME_CANONICAL },
  robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },
- openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.url}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
- twitter: { card: "summary_large_image", title, description, images: [`${BRAND.url}/landing/hero.webp`] },
+openGraph: { title, description, url: canonical, siteName: BRAND.name, images: [{ url: `${BRAND.canonicalUrl}/landing/hero.webp`, width: 1400, height: 933, alt: "Poskoo Instagram scheduling and auto-DM" }] },
+  twitter: { card: "summary_large_image", title, description, images: [`${BRAND.canonicalUrl}/landing/hero.webp`] },
  };
 }
 export const dynamic = "force-static";
