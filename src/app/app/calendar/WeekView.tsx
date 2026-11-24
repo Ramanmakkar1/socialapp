@@ -22,6 +22,8 @@ type WeekViewProps = {
   composeBase?: string;
   accounts?: AccountNames;
   loadError?: LoadError;
+  /** Day view: show only this day (YYYY-MM-DD), full width, no phone day tabs. */
+  singleDay?: string;
 };
 
 const PHONE_QUERY = "(max-width: 767px)";
@@ -45,7 +47,7 @@ function dayLabels(key: string) {
 // (or the week's first post). Posts sit in their hour slot, stacked in time order. Click an empty
 // slot to start a post at that time; drag a draft / scheduled post to another slot to move it.
 // Phones get one day at a time with day tabs.
-export default function WeekView({ posts, weekStart, composeBase, accounts = {}, loadError }: WeekViewProps) {
+export default function WeekView({ posts, weekStart, composeBase, accounts = {}, loadError, singleDay }: WeekViewProps) {
   const { posts: visiblePosts, tz, error, dragOverKey, dropProps, open, openPost, closePost } = useCalendar(posts);
   const router = useRouter();
   const params = useSearchParams();
@@ -61,11 +63,11 @@ export default function WeekView({ posts, weekStart, composeBase, accounts = {},
   }, []);
 
   const startKey = weekStart.toISOString().slice(0, 10);
-  const week = Array.from({ length: 7 }, (_, i) => addDays(startKey, i));
+  const week = singleDay ? [singleDay] : Array.from({ length: 7 }, (_, i) => addDays(startKey, i));
   const nowSlot = slotOf(now, tz);
   const todayKey = nowSlot.key;
   const activeDay = pickedDay && week.includes(pickedDay) ? pickedDay : week.includes(todayKey) ? todayKey : week[0];
-  const days = isPhone ? [activeDay] : week;
+  const days = isPhone || singleDay ? [activeDay] : week;
   const bySlot = groupBySlot(visiblePosts, tz);
   const dayCount = new Map<string, number>();
   let firstHour: number | null = null;
@@ -122,7 +124,7 @@ export default function WeekView({ posts, weekStart, composeBase, accounts = {},
       {error && <p role="alert" className={styles.errorText}>{error}</p>}
       {loadError && <LoadFailed {...loadError} className={styles.mb} />}
 
-      {isPhone && (
+      {isPhone && !singleDay && (
         <div className={styles.dayTabs} role="tablist" aria-label="Day">
           {week.map((key) => {
             const { weekday, num, long } = dayLabels(key);
@@ -151,7 +153,7 @@ export default function WeekView({ posts, weekStart, composeBase, accounts = {},
         className={styles.tgScroll}
         style={{ ["--tg-days" as string]: days.length }}
         role="table"
-        aria-label={isPhone ? `Posts on ${dayLabels(activeDay).long} by hour` : "Posts this week by day and hour"}
+        aria-label={isPhone || singleDay ? `Posts on ${dayLabels(activeDay).long} by hour` : "Posts this week by day and hour"}
         aria-rowcount={HOURS.length + 1}
       >
         <div className={`${styles.tgRow} ${styles.tgHead}`} role="row" data-head>

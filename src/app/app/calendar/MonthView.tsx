@@ -100,7 +100,7 @@ export default function MonthView({ posts, monthStart, composeBase, accounts = {
                 ))}
                 {extra > 0 && (
                   <button type="button" className={styles.moreBtn} aria-expanded={isOpen} onClick={() => toggle(key)}>
-                    {isOpen ? "Show less" : `${extra} more`}
+                    {isOpen ? "Show less" : `+${extra} more`}
                   </button>
                 )}
               </div>

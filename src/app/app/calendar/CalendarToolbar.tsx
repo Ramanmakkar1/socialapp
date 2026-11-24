@@ -12,7 +12,7 @@ import styles from "./calendar.module.css";
 export type NoDatePost = { id: string; caption: string; platforms: string[] };
 
 type Props = {
-  view: "week" | "month";
+  view: "day" | "week" | "month";
   label: string;
   subLabel?: string;
   prevHref: string;
@@ -83,7 +83,7 @@ export default function CalendarToolbar({ view, label, subLabel, prevHref, nextH
     router.push(`${pathname}?${next.toString()}`, { scroll: false });
   }
 
-  const unit = view === "month" ? "month" : "week";
+  const unit = view;
 
   return (
     <div className={styles.toolbar} ref={barRef}>
@@ -98,8 +98,9 @@ export default function CalendarToolbar({ view, label, subLabel, prevHref, nextH
         <span className={styles.selectWrap}>
           <label htmlFor={`${id}-view`} className={styles.srOnly}>Calendar range</label>
           <select id={`${id}-view`} value={view} onChange={(e) => setView(e.target.value)} className={styles.toolSelect}>
-            <option value="week">Week</option>
             <option value="month">Month</option>
+            <option value="week">Week</option>
+            <option value="day">Day</option>
           </select>
           <ChevronDown width={14} height={14} aria-hidden="true" />
         </span>

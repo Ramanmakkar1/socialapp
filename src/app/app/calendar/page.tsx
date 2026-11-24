@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import ScheduleSeeder from "../settings/ScheduleSeeder";
-import { CalendarDays, Lightbulb, List, Plus } from "lucide-react";
+import { CalendarDays, LayoutGrid, LayoutTemplate, Lightbulb, List, Plus } from "lucide-react";
 import CalendarToolbar, { type NoDatePost } from "./CalendarToolbar";
 import { PLATFORM_LABEL, weekMonthLabel, type AccountNames, type CalendarPost } from "./calendarUtils";
 import CalendarEmptyState from "./CalendarEmptyState";
@@ -21,6 +21,7 @@ import LoadFailed from "./LoadFailed";
 import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
 import WeekView from "./WeekView";
+import GridView from "./GridView";
 import { getCurrentUser, requireUser } from "@/lib/auth";
 import { planForUser, scheduledPostsUsage } from "@/lib/planLimits";
 import { topHours } from "@/lib/bestTime";
@@ -32,7 +33,7 @@ import { filterPosts, parseChannels, parseStatus, postKind, sundayOnOrBefore } f
 import styles from "./calendar.module.css";
 import { isExtraNetwork, EXTRA_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
 
-export const metadata = { title: "Calendar" };
+export const metadata = { title: "Publish" };
 
 type WeekPost = {
   id: string;
@@ -144,11 +145,19 @@ function monthQueryParam(d: Date): string {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string; view?: string; month?: string; status?: string; draft?: string; idea?: string; tag?: string; channel?: string; campaign?: string; tz?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string; date?: string; status?: string; draft?: string; idea?: string; tag?: string; channel?: string; campaign?: string; tz?: string }>;
 }) {
-  const { week, view: viewParam, month, status, draft, idea, tag = "", channel = "", campaign, tz = "" } = await searchParams;
+  const { week, view: viewParam, month, date, status, draft, idea, tag = "", channel = "", campaign, tz = "" } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
-  const view: "week" | "month" | "list" | "ideas" = viewParam === "month" ? "month" : viewParam === "list" ? "list" : viewParam === "ideas" ? "ideas" : "week";
+  const view: "day" | "week" | "month" | "list" | "grid" | "ideas" =
+    viewParam === "month" ? "month" : viewParam === "day" ? "day" : viewParam === "list" ? "list" : viewParam === "grid" ? "grid" : viewParam === "ideas" ? "ideas" : "week";
+  // Day view: ?date=YYYY-MM-DD (not "day", which the composer uses for "new post on this day").
+  const dayStart = date && /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(new Date(`${date}T00:00:00.000Z`).getTime())
+    ? new Date(`${date}T00:00:00.000Z`)
+    : new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00.000Z`);
+  const dayKey = dayStart.toISOString().slice(0, 10);
+  const prevDayKey = new Date(dayStart.getTime() - 86_400_000).toISOString().slice(0, 10);
+  const nextDayKey = new Date(dayStart.getTime() + 86_400_000).toISOString().slice(0, 10);
   const weekStart = parseWeekParam(week);
   const monthStart = parseMonthParam(month);
   const prevMonth = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() - 1, 1));
@@ -172,8 +181,8 @@ export default async function CalendarPage({
 
   // One extra day on each side: the calendar groups posts by the viewer's local day, which can
   // differ from the UTC day near midnight.
-  const rangeStart = new Date((view === "month" ? monthGridStart : weekStart).getTime() - 86_400_000);
-  const rangeEnd = new Date((view === "month" ? monthRangeEnd : weekEndExclusive).getTime() + 86_400_000);
+  const rangeStart = new Date((view === "month" ? monthGridStart : view === "day" ? dayStart : weekStart).getTime() - 86_400_000);
+  const rangeEnd = new Date((view === "month" ? monthRangeEnd : view === "day" ? new Date(dayStart.getTime() + 86_400_000) : weekEndExclusive).getTime() + 86_400_000);
 
   let rows: (Post & { media?: unknown })[] = [];
   let weekRows: WeekPost[] = [];
@@ -209,10 +218,10 @@ export default async function CalendarPage({
   const reloadHref =
     view === "month"
       ? `/app/calendar?view=month&month=${monthQueryParam(monthStart)}`
-      : view === "list"
-        ? "/app/calendar?view=list"
-        : view === "ideas"
-          ? "/app/calendar?view=ideas"
+      : view === "day"
+        ? `/app/calendar?view=day&date=${dayKey}`
+        : view === "list" || view === "grid" || view === "ideas"
+          ? `/app/calendar?view=${view}`
           : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
 
   const queueReloadHref = initialFilter === "all" ? reloadHref : `${reloadHref}&status=${initialFilter}`;
@@ -466,6 +475,8 @@ export default async function CalendarPage({
   const now = new Date();
   const thisWeek = weekQueryParam(sundayUtcStart(now));
   const thisMonth = now.toISOString().slice(0, 7);
+  const isCreate = view === "ideas";
+  const calendarActive = view === "week" || view === "month" || view === "day";
   const emptyRange = !rowsFailed && !weekRowsFailed && rows.length === 0 && weekRows.length === 0;
 
   // "Campaign from brief": connected channels first; with none connected, every channel (drafts need no connection).
@@ -482,29 +493,41 @@ export default async function CalendarPage({
       <ScheduleSeeder needed={seedSchedule} />
       <header className={styles.pubHeader}>
         <div className={styles.pubTitleWrap}>
-          <span className={styles.pubIcon} aria-hidden="true"><CalendarDays width={20} height={20} /></span>
+          <span className={styles.pubIcon} aria-hidden="true">{isCreate ? <Lightbulb width={20} height={20} /> : <CalendarDays width={20} height={20} />}</span>
           <div>
-            <h1 className={styles.pubTitle}>Calendar</h1>
-            <p className={styles.pubSub}>{pubSub}</p>
+            <h1 className={styles.pubTitle}>{isCreate ? "Create" : "Publish"}</h1>
+            <p className={styles.pubSub}>{isCreate ? "Collect ideas, turn them into posts, and reuse your templates." : pubSub}</p>
           </div>
         </div>
         <div className={styles.pubActions}>
-          <nav className={styles.viewSwitch} aria-label="Calendar view">
-            <Link href="/app/calendar?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
-              <List width={16} height={16} aria-hidden="true" /> List
-            </Link>
-            <Link href="/app/calendar?view=week" aria-current={view === "week" || view === "month" ? "page" : undefined} className={`${styles.viewLink} ${view === "week" || view === "month" ? styles.viewLinkActive : ""}`}>
-              <CalendarDays width={16} height={16} aria-hidden="true" /> Calendar
-            </Link>
-            <Link href="/app/calendar?view=ideas" aria-current={view === "ideas" ? "page" : undefined} className={`${styles.viewLink} ${view === "ideas" ? styles.viewLinkActive : ""}`}>
-              <Lightbulb width={16} height={16} aria-hidden="true" /> Ideas
-            </Link>
-          </nav>
+          {!isCreate && (
+            <nav className={styles.viewSwitch} aria-label="Publish view">
+              <Link href="/app/calendar?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
+                <List width={16} height={16} aria-hidden="true" /> List
+              </Link>
+              <Link href="/app/calendar?view=month" aria-current={calendarActive ? "page" : undefined} className={`${styles.viewLink} ${calendarActive ? styles.viewLinkActive : ""}`}>
+                <CalendarDays width={16} height={16} aria-hidden="true" /> Calendar
+              </Link>
+              <Link href="/app/calendar?view=grid" aria-current={view === "grid" ? "page" : undefined} className={`${styles.viewLink} ${view === "grid" ? styles.viewLinkActive : ""}`}>
+                <LayoutGrid width={16} height={16} aria-hidden="true" /> Grid
+              </Link>
+            </nav>
+          )}
           <CampaignDialog aiReady={aiReady} aiAdmin={isAdmin(viewer)} autoOpen={campaign === "1"} channels={campaignChannels} mediaPlan={mediaPlan} />
           <Link href={`${reloadHref}&compose=1`} scroll={false} className={styles.newPostBtn}>
             <Plus width={18} height={18} aria-hidden="true" /> <span className={styles.newPostText}>New post</span>
           </Link>
         </div>
+        {isCreate && (
+          <nav className={styles.pageTabs} aria-label="Create">
+            <Link href="/app/calendar?view=ideas" aria-current="page" className={`${styles.pageTab} ${styles.pageTabActive}`}>
+              <Lightbulb width={15} height={15} aria-hidden="true" /> Ideas
+            </Link>
+            <Link href="/app/templates" className={styles.pageTab}>
+              <LayoutTemplate width={15} height={15} aria-hidden="true" /> Templates
+            </Link>
+          </nav>
+        )}
       </header>
       {draftFailed ? (
         <LoadFailed
@@ -550,6 +573,33 @@ export default async function CalendarPage({
             loadError={
               weekRowsFailed
                 ? { message: "We couldn’t load the posts scheduled for this month. They may still exist.", reloadHref }
+                : undefined
+            }
+          />
+          {emptyRange && <CalendarEmptyState composeHref={`${reloadHref}&compose=1`} />}
+        </section>
+      ) : view === "day" ? (
+        <section className={styles.viewSection} aria-label="Day calendar">
+          <CalendarToolbar
+            view="day"
+            label={dayStart.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" })}
+            prevHref={`/app/calendar?view=day&date=${prevDayKey}${filterQuery}`}
+            nextHref={`/app/calendar?view=day&date=${nextDayKey}${filterQuery}`}
+            todayHref={`/app/calendar?view=day${filterQuery}`}
+            isCurrent={dayKey === now.toISOString().slice(0, 10)}
+            channels={channelOptions}
+            tags={allTags}
+            scheduleTz={scheduleTz}
+          />
+          <WeekView
+            posts={calendarPosts}
+            weekStart={dayStart}
+            singleDay={dayKey}
+            composeBase={`/app/calendar?view=day&date=${dayKey}${filterQuery}&compose=1`}
+            accounts={accountNames}
+            loadError={
+              weekRowsFailed
+                ? { message: "We couldn’t load the posts scheduled for this day. They may still exist.", reloadHref }
                 : undefined
             }
           />
@@ -601,6 +651,14 @@ export default async function CalendarPage({
             }
           />
         </>
+      )}
+      {view === "grid" && (
+        <GridView
+          posts={[...listPosts, ...publishedPosts].filter((p) => channels.length === 0 || p.platforms.some((pl) => channels.includes(pl)))}
+          composeHref={`${reloadHref}&compose=1`}
+          accounts={accountNames}
+          loadError={rowsFailed ? { message: "We couldn’t load your posts. They may still exist.", reloadHref } : undefined}
+        />
       )}
       {view === "list" && (
         <>

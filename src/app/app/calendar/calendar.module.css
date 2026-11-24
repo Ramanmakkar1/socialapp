@@ -1120,3 +1120,59 @@
 .selectWrap > .selectIconLeft { right: auto; left: 10px; }
 .tzSelect { max-width: 220px; padding-left: 1.9rem; text-overflow: ellipsis; }
 .wcThumbVideo { display: grid; width: 100%; height: 100%; place-items: center; color: var(--poskoo-muted); }
+
+/* ---------- 2026-11-24 TryPost-style Publish page ---------- */
+/* View switch: soft lavender selected state; "New post" is an outlined button. */
+.viewLinkActive,
+.viewLinkActive:hover { background: var(--app-primary-subtle, var(--poskoo-lilac)); color: var(--app-primary-text, var(--poskoo-violet)); box-shadow: none; }
+.newPostBtn { border: 1px solid var(--app-border-strong, var(--poskoo-line)); background: var(--app-card, var(--poskoo-card)); color: var(--app-fg, var(--poskoo-ink)); font-weight: 600; }
+.newPostBtn:hover { background: var(--app-accent, var(--poskoo-band)); }
+.pubIcon { border: 1px solid var(--app-border, var(--poskoo-line)); background: var(--app-card, var(--poskoo-card)); color: var(--app-fg, var(--poskoo-ink)); }
+.pubTitle { font-size: 1.4rem; font-weight: 600; }
+
+/* Create page tabs (Ideas / Templates). */
+.pageTabs { display: flex; width: 100%; gap: 4px; border-bottom: 1px solid var(--app-border, var(--poskoo-line)); }
+.pageTab { display: inline-flex; align-items: center; gap: 6px; margin-bottom: -1px; border-bottom: 2px solid transparent; padding: 8px 10px; color: var(--app-muted-fg, var(--poskoo-muted)); font-size: .92rem; font-weight: 500; text-decoration: none; }
+.pageTab:hover { color: var(--app-fg, var(--poskoo-ink)); }
+.pageTabActive { border-bottom-color: var(--app-primary-text, var(--poskoo-violet)); color: var(--app-fg, var(--poskoo-ink)); font-weight: 600; }
+
+/* Month chips: icon + time + thumbnail on the right, no caption. */
+.cardCompact { flex-direction: row; align-items: center; min-height: 34px; border-radius: 8px; padding: 4px 4px 4px 8px; }
+.cardCompact .cardHead { width: 100%; padding-right: 0; }
+.cardCompact .cardTop { flex: 1; }
+.cardCompact .cardTime { font-weight: 500; font-size: .78rem; }
+.cardCompact .cardStatus { position: static; margin-left: auto; flex: none; }
+.chipThumb { flex: none; width: 24px; height: 24px; margin-left: auto; overflow: hidden; border-radius: 5px; background: var(--poskoo-band); }
+.chipThumb img { width: 100%; height: 100%; object-fit: cover; }
+.moreBtn { color: var(--app-muted-fg, var(--poskoo-muted)); font-weight: 500; }
+
+/* Grid (gallery) view. */
+.postGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.gridTile {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--app-border, var(--poskoo-line));
+  border-radius: 12px;
+  background: var(--app-card, var(--poskoo-card));
+  padding: 8px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.gridTile:hover { border-color: var(--app-border-strong, var(--poskoo-pill-border)); box-shadow: 0 6px 18px -12px rgb(41 41 40 / .35); }
+.gridMedia { position: relative; display: grid; aspect-ratio: 1; overflow: hidden; place-items: center; border-radius: 8px; background: var(--poskoo-band); }
+.gridMedia img { width: 100%; height: 100%; object-fit: cover; }
+.gridPlay { position: absolute; top: 8px; right: 8px; color: #fff; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .5)); }
+.gridStatus { position: absolute; bottom: 8px; left: 8px; border-radius: 999px; padding: 2px 8px; font-size: .72rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+.gridMeta { display: flex; align-items: center; gap: 6px; padding: 0 2px; }
+.gridWhen { color: var(--app-muted-fg, var(--poskoo-muted)); font-size: .78rem; }
+.gridCaption { display: -webkit-box; overflow: hidden; padding: 0 2px 2px; color: var(--app-fg, var(--poskoo-ink)); font-size: .86rem; line-height: 1.35; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.gridEmpty { display: grid; justify-items: center; gap: 12px; border: 1px dashed var(--app-border-strong, var(--poskoo-line)); border-radius: 12px; padding: 40px 16px; color: var(--app-muted-fg, var(--poskoo-muted)); text-align: center; }
+@media (prefers-reduced-motion: reduce) {
+  .gridTile { transition: none; }
+}

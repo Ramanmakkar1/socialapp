@@ -8,6 +8,7 @@ import styles from "./calendar.module.css";
 
 const STATUS_ICON: Record<string, typeof Clock3> = { scheduled: Clock3, draft: PencilLine, published: CheckCircle2, failed: AlertCircle, publishing: Loader2 };
 
+// Month chips (compact): network icon, time and a small thumbnail, like a calendar app.
 // One post: media tile (thumbnail, or a channel-coloured icon tile when the post has no media),
 // network icons + time, 2-line caption, status icon. Used by the week, month and list views.
 // Clicking (or Enter/Space) opens the post popover; scheduled posts and drafts can be dragged.
@@ -87,9 +88,15 @@ export default function PostCard({ post, tz, compact = false, row = false, onOpe
           <span className={styles.cardTime} suppressHydrationWarning>{time}</span>
           {row && <span className={`${styles.statusTag} ${styles[`status_${post.status}`] ?? ""}`}>{statusLabel}</span>}
         </p>
-        {!row && <StatusIcon className={`${styles.cardStatus} ${styles[`statusIco_${post.status}`] ?? ""}`} width={14} height={14} aria-hidden="true" />}
+        {compact && post.thumb && (
+          <span className={styles.chipThumb} aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element -- user media from arbitrary hosts */}
+            <img src={post.thumb} alt="" loading="lazy" />
+          </span>
+        )}
+        {!row && !(compact && post.thumb) && <StatusIcon className={`${styles.cardStatus} ${styles[`statusIco_${post.status}`] ?? ""}`} width={14} height={14} aria-hidden="true" />}
       </div>
-      <p className={styles.cardCaption}>{post.caption.trim() || "(no caption)"}</p>
+      {!compact && <p className={styles.cardCaption}>{post.caption.trim() || "(no caption)"}</p>}
       {row && post.status === "failed" && post.error && <p className={styles.cardError}>Couldn’t publish: {post.error.slice(0, 160)}</p>}
     </div>
   );
