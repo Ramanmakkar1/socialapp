@@ -57,7 +57,8 @@ export default function SidebarChannels({
             );
           }
           const href = channelHref(c);
-          const insightsHref = `/app/analytics?channel=${encodeURIComponent(c.platform)}`;
+          // Insights splits posts and growth per connected account (?account=<social_accounts id>).
+          const insightsHref = c.id && !c.id.startsWith("yt-") ? `/app/analytics?account=${encodeURIComponent(c.id)}` : "/app/analytics";
           const here = Boolean(c.id) && pathname.startsWith(`/app/channels/${c.id}`);
           return (
             <li key={key}>

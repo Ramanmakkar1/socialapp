@@ -222,3 +222,23 @@
 @media (prefers-reduced-motion: reduce) {
   .tip::after { transition: none; }
 }
+
+/* ---------- 2026-11-24 TryPost-style Insights ---------- */
+/* Range tabs: soft lavender selected state. */
+.rangePicker { border-color: var(--app-border, var(--poskoo-line)); background: var(--app-card, var(--poskoo-card)); }
+.rangeOption { color: var(--app-fg, var(--poskoo-ink)); font-weight: 500; }
+.rangeActive, .rangeActive:hover { background: var(--app-primary-subtle, var(--poskoo-lilac)); color: var(--app-primary-text, var(--poskoo-violet)); box-shadow: none; }
+/* KPI cards sit on a muted rounded section, each with its change vs the previous period. */
+.summaryBox { border-radius: 16px; background: var(--app-muted, var(--poskoo-band)); padding: 18px 16px 16px; }
+.summaryBox .blockTitle { margin: 0; }
+.compareLine { margin: 4px 0 0; color: var(--app-muted-fg, var(--poskoo-muted)); font-size: .85rem; }
+.summaryBox .summaryGrid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.summaryBox .kpi { border-color: var(--app-border, var(--poskoo-line)); border-radius: 12px; padding: 16px 18px; }
+.summaryBox .kpiLabel { color: var(--app-muted-fg, var(--poskoo-muted)); font-weight: 500; justify-content: space-between; }
+.summaryBox .kpiValue { display: inline-block; margin-top: 8px; font-size: 1.45rem; font-weight: 600; }
+.summaryBox .changePill { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; background: none; padding: 0; color: #15803d; font-size: .8rem; font-weight: 500; }
+.summaryBox .changeDown { color: #b91c1c; }
+@media (prefers-color-scheme: dark) {
+  .summaryBox .changePill { color: #4ade80; }
+  .summaryBox .changeDown { color: #f87171; }
+}

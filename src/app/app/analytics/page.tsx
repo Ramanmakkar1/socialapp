@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { postThumbUrl } from "@/lib/mediaUpload";
 import { Suspense } from "react";
-import { BarChart3, Download, Info, Instagram, MessageCircle, TrendingUp, Trophy } from "lucide-react";
+import { BarChart3, Download, Info, Instagram, MessageCircle, TrendingDown, TrendingUp, Trophy } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parsePeriod, PERIOD_OPTIONS } from "@/lib/analytics";
 import { isDbConfigured, query } from "@/lib/db";
@@ -18,7 +18,7 @@ import styles from "./analytics.module.css";
 import { CommentTimes, DailyBars, GrowthChart } from "./Charts";
 import { getCommentTimeCells } from "./commentTimes";
 
-export const metadata = { title: "Analytics" };
+export const metadata = { title: "Insights" };
 
 
 function shortCaption(caption: string): string {
@@ -74,7 +74,10 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     for (const [k, v] of Object.entries(merged)) if (v) q.set(k, v);
     return q.toString();
   };
-  const [stats, rules, recentPosts, commentCells, dailyActivity, postPerformance, growthSnapshots] = await Promise.all([
+  // The same-length window right before the period, for "vs previous period" changes on the KPI cards.
+  const spanMs = period.range.to.getTime() - period.range.from.getTime();
+  const prevRange = { from: new Date(period.range.from.getTime() - spanMs), to: period.range.from };
+  const [stats, rules, recentPosts, commentCells, dailyActivity, postPerformance, growthSnapshots, prevPerformance] = await Promise.all([
     getDashboardStats(user.id),
     getRuleStats(user.id),
     getRecentPosts(user.id),
@@ -82,6 +85,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     getDailyActivity(user.id),
     getPostPerformance(user.id, period.range, accountId),
     getGrowthSnapshots(user.id, period.range, accountId),
+    tab === "posts" ? getPostPerformance(user.id, prevRange, accountId).catch(() => []) : Promise.resolve([]),
   ]);
   let igHandle: string | null = null;
   let unanswered: number | null = null;
@@ -158,16 +162,32 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     : undefined;
   const growthChange = hasGrowth ? growthEnd - growthStart : null;
   const fmt = (n: number | null | undefined) => (n == null ? "—" : n.toLocaleString("en-US"));
+  // Previous period totals (same metrics, same channel filter).
+  const prevSum = (key: "reach" | "likes" | "comments" | "saved") =>
+    prevPerformance.some((p) => p[key] != null) ? prevPerformance.reduce((acc, p) => acc + (p[key] ?? 0), 0) : null;
+  const prevReach = prevSum("reach");
+  const prevLikes = prevSum("likes");
+  const prevComments = prevSum("comments");
+  const prevEng = prevReach && prevLikes != null && prevComments != null ? ((prevLikes + prevComments + (prevSum("saved") ?? 0)) / prevReach) * 100 : null;
+  const curEng = totalReach && totalLikes != null && totalComments != null ? ((totalLikes + totalComments + (totalSaved ?? 0)) / totalReach) * 100 : null;
+  const pct = (cur: number | null, prev: number | null): string | undefined => {
+    if (cur == null || prev == null || prev === 0) return undefined;
+    const d = ((cur - prev) / prev) * 100;
+    return `${d >= 0 ? "+" : ""}${d.toLocaleString("en-US", { maximumFractionDigits: 2 })}%`;
+  };
+  const prevClicks = prevPerformance.reduce((acc, p) => acc + p.linkClicks, 0);
+  const shortDate = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  const compareLine = `${shortDate(period.range.from)} – ${shortDate(period.range.to)} · Compared to ${shortDate(prevRange.from)} – ${shortDate(prevRange.to)}`;
   const summary: { label: string; value: string; tip: string; change?: string }[] = [
     { label: "Followers", value: hasGrowth ? fmt(growthEnd) : "—", change: growthChange == null ? undefined : `${growthChange >= 0 ? "+" : ""}${growthChange.toLocaleString("en-US")}`, tip: "Followers on your connected Instagram accounts from daily snapshots; change over the selected period." },
-    { label: "Posts", value: fmt(postPerformance.length), tip: "Posts published through Poskoo in the selected period." },
-    { label: "Likes", value: fmt(totalLikes), tip: "Likes on those posts (Instagram insights)." },
-    { label: "Comments", value: fmt(totalComments), tip: "Comments on those posts (Instagram insights)." },
-    { label: "Eng. rate", value: engRate ?? "—", tip: "(Likes + comments + saves) divided by reach, across those posts." },
-    { label: "Reach", value: fmt(totalReach), tip: "Accounts that saw those posts (Instagram insights)." },
+    { label: "Posts", value: fmt(postPerformance.length), change: pct(postPerformance.length, prevPerformance.length), tip: "Posts published through Poskoo in the selected period." },
+    { label: "Likes", value: fmt(totalLikes), change: pct(totalLikes, prevLikes), tip: "Likes on those posts (Instagram insights)." },
+    { label: "Comments", value: fmt(totalComments), change: pct(totalComments, prevComments), tip: "Comments on those posts (Instagram insights)." },
+    { label: "Eng. rate", value: engRate ?? "—", change: pct(curEng, prevEng), tip: "(Likes + comments + saves) divided by reach, across those posts." },
+    { label: "Reach", value: fmt(totalReach), change: pct(totalReach, prevReach), tip: "Accounts that saw those posts (Instagram insights)." },
     { label: "DMs sent", value: fmt(stats.dmsSent), tip: "Automated DMs sent in the last 7 days." },
     { label: "Leads", value: fmt(stats.leads), tip: "Contacts collected by your Auto-DMs (all time)." },
-    { label: "Link clicks", value: fmt(totalClicks), tip: "Clicks on tracked DM links from rules attached to those posts." },
+    { label: "Link clicks", value: fmt(totalClicks), change: pct(totalClicks, prevClicks), tip: "Clicks on tracked DM links from rules attached to those posts." },
   ];
 
   return (
@@ -280,8 +300,9 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             </div>
           </section>
 
-          <section className={styles.block} aria-labelledby="summary-heading">
-            <h2 id="summary-heading" className={styles.blockTitle}>All insights <span className={styles.blockSub}>Summary, {period.phrase}{channel ? ` · @${channel.username ?? channel.platform}` : ""}</span></h2>
+          <section className={`${styles.block} ${styles.summaryBox}`} aria-labelledby="summary-heading">
+            <h2 id="summary-heading" className={styles.blockTitle}>Summary{channel ? <span className={styles.blockSub}> · @{channel.username ?? channel.platform}</span> : null}</h2>
+            <p className={styles.compareLine}>{compareLine}</p>
             <div className={styles.summaryGrid}>
               {summary.map((t) => (
                 <div key={t.label} className={styles.kpi}>
@@ -292,7 +313,12 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
                     </span>
                   </p>
                   <p className={styles.kpiValue}>{t.value}</p>
-                  {t.change && <span className={styles.changePill}>{t.change}</span>}
+                  {t.change && (
+                    <span className={`${styles.changePill} ${t.change.startsWith("-") ? styles.changeDown : ""}`}>
+                      {t.change.startsWith("-") ? <TrendingDown width={12} height={12} aria-hidden="true" /> : <TrendingUp width={12} height={12} aria-hidden="true" />}
+                      {t.change}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
