@@ -2,24 +2,12 @@
 import { isDbConfigured, query } from "@/lib/db";
 import { isExtraNetwork } from "@/lib/networks/tokenNetworks";
 
-export type SidebarChannel = {
-  platform: "instagram" | "facebook" | "threads" | "youtube" | string;
-  name: string;
-  /** "active" or anything else (expired / disconnected) = needs attention. */
-  status: string;
-  /** Posts waiting to publish on this platform. */
-  scheduled: number;
-  /** Row id (social_accounts.id, or "yt-" + youtube_channels.id): the /app/channels/[id] page. */
-  id?: string;
-};
+import { channelHref, type SidebarChannel } from "@/lib/sidebarChannelsShared";
+export { channelHref, type SidebarChannel };
 
 type AccountRow = { id?: string; platform: string; username: string | null; page_name: string | null; status: string };
 type YoutubeRow = { id?: string; title: string; status: string };
 
-/** Sidebar / channel page link for one connected account. */
-export function channelHref(c: Pick<SidebarChannel, "id" | "platform">): string {
-  return c.id ? `/app/channels/${encodeURIComponent(c.id)}` : `/app/calendar?view=week&channel=${c.platform}`;
-}
 type CountRow = { platform: string; n: number };
 
 /** Builds the sidebar list: one row per connected account, with the platform's scheduled-post count. */

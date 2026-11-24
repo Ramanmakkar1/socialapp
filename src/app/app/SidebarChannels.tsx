@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { AtSign, BarChart3, CalendarDays, ChevronRight, Facebook, Instagram, Youtube } from "lucide-react";
 import { NEW_NETWORK_ICON } from "@/components/brandIcons";
-import { channelHref, type SidebarChannel } from "@/lib/sidebarChannels";
+import { channelHref, type SidebarChannel } from "@/lib/sidebarChannelsShared";
 import styles from "./shell.module.css";
 
 const CHANNEL_ICON: Record<string, typeof Instagram> = { instagram: Instagram, facebook: Facebook, threads: AtSign, youtube: Youtube, ...NEW_NETWORK_ICON };
