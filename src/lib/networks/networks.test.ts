@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { createFakePool, installFakePool } from "../../test-utils/fakePool.ts";
 import { json, mockFetch } from "../../test-utils/mockFetch.ts";
 import { NetworkAuthError, openOAuthFlow, redact, sealOAuthFlow, type NetAccount } from "./common.ts";
-import { publishNetworkTargets, type ClaimedNetworkRow } from "./publish.ts";
+import { publishNetworkTargets, type ClaimedNetworkRow, type MarkFailedInfo } from "./publish.ts";
 import { networkTargetError, normalizeNetOptions } from "./validate.ts";
 import { checkCaption, xWeightedLength } from "../platforms.ts";
 
@@ -34,7 +34,7 @@ const row = (over: Partial<ClaimedNetworkRow> = {}): ClaimedNetworkRow => ({
 });
 
 function harness(rows: ClaimedNetworkRow[]) {
-  const failed: { id: string; error: string }[] = [];
+  const failed: { id: string; error: string; info?: MarkFailedInfo }[] = [];
   const published: { id: string; ext: string }[] = [];
   const expired: string[] = [];
   const refreshed: string[] = [];
@@ -46,7 +46,7 @@ function harness(rows: ClaimedNetworkRow[]) {
     refreshed,
     deps: {
       claim: async (_n: number, platform: string) => (platform === "bluesky" && !claimed ? ((claimed = true), rows) : []),
-      markFailed: async (id: string, _p: string, error: string) => void failed.push({ id, error }),
+      markFailed: async (id: string, _p: string, error: string, _t: string, info?: MarkFailedInfo) => void failed.push({ id, error, info }),
       refreshPostStatus: async (p: string) => void refreshed.push(p),
       markPublished: async (id: string, ext: string) => void published.push({ id, ext }),
       markExpired: async (id: string) => void expired.push(id),
@@ -106,7 +106,47 @@ test("publish loop: a tokenDead publish error expires the account; other errors 
   }, ["bluesky"]);
   assert.deepEqual(h.expired, ["acc-1"]);
   assert.match(h.failed[0].error, /^Bluesky access expired/);
-  assert.equal(h.failed[1].error, "Rate limited");
+  assert.equal(h.failed[0].info?.kind, "refresh_token");
+  // A rate limit keeps the account and is handed over for an automatic retry (attempts given).
+  assert.match(h.failed[1].error, /rate limit/);
+  assert.equal(h.failed[1].info?.kind, "rate_limit");
+  assert.equal(h.failed[1].info?.raw, "Rate limited");
+  assert.equal(h.failed[1].info?.attempts, 0);
+});
+
+test("publish loop: a rejected token is refreshed once and the post retried with the new token", async () => {
+  const h = harness([row({ id: "t1" })]);
+  const tokens: string[] = [];
+  const r = await publishNetworkTargets(10, {
+    ...h.deps,
+    loadAccount: async () => ({ ...acct(), platform: "bluesky" as const }),
+    ensureFresh: async (a) => a,
+    forceRefresh: async (a) => ({ ...a, accessToken: "fresh" }),
+    publish: async (_p, input) => {
+      tokens.push(input.account.accessToken);
+      return tokens.length === 1 ? { ok: false, error: "Bluesky post failed: expired", tokenDead: true, status: 401 } : { ok: true, id: "x1" };
+    },
+  }, ["bluesky"]);
+  assert.equal(r.published, 1);
+  assert.equal(tokens[1], "fresh");
+  assert.deepEqual(h.expired, []);
+});
+
+test("publish loop: a picked account is loaded by id; a removed picked account fails without posting elsewhere", async () => {
+  const h = harness([row({ id: "t1", social_account_id: "acc-2", account_locked: true }), row({ id: "t2", social_account_id: null, account_locked: true })]);
+  const asked: (string | null | undefined)[] = [];
+  let published = 0;
+  await publishNetworkTargets(10, {
+    ...h.deps,
+    loadAccount: async (_u, _p, id) => (asked.push(id), { ...acct(), id: id ?? "oldest" }),
+    ensureFresh: async (a) => a,
+    publish: async () => (published++, { ok: true, id: "ok" }),
+  }, ["bluesky"]);
+  assert.deepEqual(asked, ["acc-2"]);
+  assert.equal(published, 1);
+  assert.equal(h.failed[0].id, "t2");
+  assert.equal(h.failed[0].info?.kind, "reconnect");
+  assert.match(h.failed[0].error, /account picked for this post/);
 });
 
 test("publish loop: a claim failure (e.g. migration not applied) skips that network only", async () => {

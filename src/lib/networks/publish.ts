@@ -4,7 +4,8 @@ import { getPool } from "@/lib/db";
 import { NETWORK_IDS, NETWORK_LABEL, NetworkAuthError, mediaItems, obj, type NetAccount, type NetworkId, type PublishOutcome } from "@/lib/networks/common";
 import { NETWORKS } from "@/lib/networks/registry";
 import { holdTargetMedia } from "@/lib/mediaLifecycle";
-import { expiresWithin, loadActiveAccount, markAccountExpired, refreshUnderLock } from "@/lib/networks/store";
+import { expiresWithin, loadActiveAccount, loadUserAccount, markAccountExpired, refreshUnderLock } from "@/lib/networks/store";
+import { classifyPublishError, type PublishErrorKind } from "@/lib/publishErrors";
 import { markReminded } from "@/lib/networks/reminderSend";
 import { requirePlanFeature } from "@/lib/planFeatures";
 
@@ -16,14 +17,24 @@ export type ClaimedNetworkRow = {
   media: unknown;
   user_id: string;
   net_options?: unknown;
+  /** The exact account picked in the composer (null on rows saved before multi-account). */
+  social_account_id?: string | null;
+  /** true = the user picked an account; a null id then means that account was removed. */
+  account_locked?: boolean | null;
+  attempt_count?: number | null;
 };
+
+export type MarkFailedInfo = { kind?: PublishErrorKind; raw?: string; attempts?: number };
 
 export type NetworkPublishDeps = {
   claim: (limit: number, platform: NetworkId) => Promise<ClaimedNetworkRow[]>;
-  markFailed: (targetId: string, postId: string, error: string, token: string) => Promise<void>;
+  /** Fails the target, or schedules an automatic retry when `info.attempts` is given and the kind allows it. */
+  markFailed: (targetId: string, postId: string, error: string, token: string, info?: MarkFailedInfo) => Promise<unknown>;
   refreshPostStatus: (postId: string) => Promise<void>;
   /** Test seams. */
-  loadAccount?: (userId: string, platform: NetworkId) => Promise<NetAccount | null>;
+  loadAccount?: (userId: string, platform: NetworkId, accountId?: string | null) => Promise<NetAccount | null>;
+  /** Force a token refresh after the network rejected the token (refresh-once-then-retry). */
+  forceRefresh?: (account: NetAccount) => Promise<NetAccount>;
   ensureFresh?: (account: NetAccount) => Promise<NetAccount>;
   publish?: (platform: NetworkId, input: Parameters<(typeof NETWORKS)[NetworkId]["publish"]>[0]) => Promise<PublishOutcome>;
   markPublished?: (targetId: string, externalId: string, accountId: string) => Promise<void>;
@@ -48,18 +59,34 @@ export async function ensureFreshAccount(account: NetAccount): Promise<NetAccoun
   );
 }
 
+/** Refresh now, whatever the stored expiry says (the network just rejected the token). */
+export async function forceRefreshAccount(account: NetAccount): Promise<NetAccount> {
+  const adapter = NETWORKS[account.platform];
+  if (!adapter.refresh) throw new NetworkAuthError("no_refresh", "this network has no token refresh", true);
+  return refreshUnderLock(account.id, () => true, (a) => adapter.refresh!(a));
+}
+
 async function defaultMarkPublished(targetId: string, externalId: string, accountId: string): Promise<void> {
   await getPool().query(
-    `update socialapp.post_targets set status='published', external_post_id=$2, published_at=now(), error=null, social_account_id=$3 where id=$1`,
+    `update socialapp.post_targets set status='published', external_post_id=$2, published_at=now(), error=null,
+     error_kind=null, error_raw=null, next_retry_at=null, social_account_id=$3 where id=$1`,
     [targetId, externalId, accountId],
   );
 }
+
+async function defaultLoadAccount(userId: string, platform: NetworkId, accountId?: string | null): Promise<NetAccount | null> {
+  return accountId ? loadUserAccount(userId, platform, accountId) : loadActiveAccount(userId, platform);
+}
+
+export const PICKED_ACCOUNT_GONE =
+  "The account picked for this post was disconnected or removed. Reconnect it in Settings, or edit the post and pick another account.";
 
 export type NetworkPublishResult = { published: number; failed: number; reminded?: number };
 
 export async function publishNetworkTargets(limit: number, deps: NetworkPublishDeps, platforms: NetworkId[] = NETWORK_IDS): Promise<NetworkPublishResult> {
   const result: NetworkPublishResult = { published: 0, failed: 0 };
-  const loadAccount = deps.loadAccount ?? loadActiveAccount;
+  const loadAccount = deps.loadAccount ?? defaultLoadAccount;
+  const forceRefresh = deps.forceRefresh ?? forceRefreshAccount;
   const ensureFresh = deps.ensureFresh ?? ensureFreshAccount;
   const publish = deps.publish ?? ((platform, input) => NETWORKS[platform].publish(input));
   const markPublished = deps.markPublished ?? defaultMarkPublished;
@@ -89,9 +116,17 @@ export async function publishNetworkTargets(limit: number, deps: NetworkPublishD
               continue;
             }
           }
-          let account = await loadAccount(row.user_id, platform);
+          if (row.account_locked === true && !row.social_account_id) {
+            await deps.markFailed(row.id, row.post_id, PICKED_ACCOUNT_GONE, token, { kind: "reconnect" });
+            result.failed += 1;
+            continue;
+          }
+          let account = await loadAccount(row.user_id, platform, row.social_account_id ?? null);
           if (!account) {
-            await deps.markFailed(row.id, row.post_id, `No ${label} account connected. Connect ${label} in Settings, then retry.`, token);
+            const message = row.social_account_id
+              ? `The ${label} account picked for this post needs reconnecting. Reconnect it in Settings, then retry.`
+              : `No ${label} account connected. Connect ${label} in Settings, then retry.`;
+            await deps.markFailed(row.id, row.post_id, message, token, { kind: "reconnect" });
             result.failed += 1;
             continue;
           }
@@ -101,19 +136,35 @@ export async function publishNetworkTargets(limit: number, deps: NetworkPublishD
             const dead = err instanceof NetworkAuthError ? err.tokenDead : false;
             if (dead) await markExpired(account.id).catch(() => undefined);
             const message = err instanceof Error ? err.message : String(err);
-            await deps.markFailed(row.id, row.post_id, dead ? reconnect(label) : `${label}: could not refresh access (${message}). It will be retried on Retry.`, account.accessToken);
+            await deps.markFailed(
+              row.id,
+              row.post_id,
+              dead ? reconnect(label) : `${label}: could not refresh access. Poskoo will try again.`,
+              account.accessToken,
+              dead ? { kind: "reconnect", raw: message } : { kind: "retry", raw: message, attempts: row.attempt_count ?? 0 },
+            );
             result.failed += 1;
             continue;
           }
           token = account.accessToken;
           const options = obj(row.net_options);
-          const outcome = await publish(platform, {
-            account,
+          const input = {
             text: row.caption_override ?? row.caption,
             media: mediaItems(row.media),
             options,
             idempotencyKey: row.id,
-          });
+          };
+          let outcome = await publish(platform, { account, ...input });
+          // The network rejected the token: refresh it once and try again (a 401 means nothing was posted).
+          if (!outcome.ok && NETWORKS[platform].refresh && classifyPublishError(platform, outcome.error, outcome).kind === "refresh_token") {
+            try {
+              account = await forceRefresh(account);
+              token = account.accessToken;
+              outcome = await publish(platform, { account, ...input });
+            } catch {
+              // Refresh failed: fall through with the original rejection (marks the account expired).
+            }
+          }
           if (outcome.ok && outcome.reminded) {
             // Reminder channels: the e-mail went out; the owner posts it and marks it as posted.
             await (deps.markReminded ?? markReminded)(row.id, account.id);
@@ -125,9 +176,10 @@ export async function publishNetworkTargets(limit: number, deps: NetworkPublishD
             await deps.refreshPostStatus(row.post_id);
             result.published += 1;
           } else {
-            if (outcome.tokenDead) await markExpired(account.id).catch(() => undefined);
-            const error = outcome.tokenDead ? `${reconnect(label)} (${outcome.error})` : outcome.error;
-            await deps.markFailed(row.id, row.post_id, error, token);
+            const c = classifyPublishError(platform, outcome.error, outcome);
+            if (c.kind === "refresh_token" || c.kind === "reconnect") await markExpired(account.id).catch(() => undefined);
+            const message = c.kind === "refresh_token" ? reconnect(label) : c.message;
+            await deps.markFailed(row.id, row.post_id, message, token, { kind: c.kind, raw: c.raw, attempts: row.attempt_count ?? 0 });
             result.failed += 1;
           }
         } catch (err) {

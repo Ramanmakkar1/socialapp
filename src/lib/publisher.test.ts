@@ -4,7 +4,7 @@ import { encryptToken } from "./crypto.ts";
 import { createFakePool, installFakePool, type FakeHandler } from "../test-utils/fakePool.ts";
 
 type Post = { id: string; user_id: string; status: string; scheduled_at: number; updated_at: number };
-type Target = { id: string; post_id: string; platform: string; status: string; error: string | null };
+type Target = { id: string; post_id: string; platform: string; status: string; error: string | null; next_retry_at?: number; error_kind?: string; attempt_count?: number };
 type Account = { id: string; external_id: string; access_token_enc: string; status: string };
 
 const MIN = 60_000;
@@ -12,12 +12,13 @@ const MIN = 60_000;
 // In-memory emulation of the publisher's SQL (claim, recovery, status refresh).
 function publisherDb(posts: Post[], targets: Target[], accounts: Account[] = []) {
   const postOf = (id: string) => posts.find((p) => p.id === id)!;
+  const claimable = (t: Target) => t.status === "pending" || (t.status === "retrying" && (t.next_retry_at ?? 0) <= Date.now());
   const refresh = (postId: string) => {
     const p = postOf(postId);
     if (!p) return;
     const ts = targets.filter((t) => t.post_id === postId);
     if (ts.some((t) => t.status === "publishing")) return void (p.updated_at = Date.now());
-    if (ts.some((t) => t.status === "pending")) p.status = "scheduled";
+    if (ts.some((t) => t.status === "pending" || t.status === "retrying")) p.status = "scheduled";
     else if (ts.some((t) => t.status === "failed")) p.status = "failed";
     else if (ts.some((t) => t.status === "reminded")) p.status = "publishing";
     else p.status = "published";
@@ -51,7 +52,7 @@ function publisherDb(posts: Post[], targets: Target[], accounts: Account[] = [])
       reply: (params) =>
         posts
           .filter((p) => p.status === "scheduled" && p.scheduled_at <= Date.now() &&
-            targets.some((t) => t.post_id === p.id && t.platform === String(params[1]) && t.status === "pending"))
+            targets.some((t) => t.post_id === p.id && t.platform === String(params[1]) && claimable(t)))
           .slice(0, Number(params[0]))
           .map((p) => ({ id: p.id })),
     },
@@ -71,7 +72,7 @@ function publisherDb(posts: Post[], targets: Target[], accounts: Account[] = [])
         const ids = params[0] as string[];
         const platform = String(params[1]);
         return targets
-          .filter((t) => ids.includes(t.post_id) && t.platform === platform && t.status === "pending")
+          .filter((t) => ids.includes(t.post_id) && t.platform === platform && claimable(t))
           .map((t) => {
             t.status = "publishing";
             const p = postOf(t.post_id);
@@ -92,10 +93,24 @@ function publisherDb(posts: Post[], targets: Target[], accounts: Account[] = [])
       reply: (_params, sql) => (sql.includes("platform='threads'") ? accounts : []),
     },
     {
+      match: /update socialapp\.post_targets set status='retrying'/,
+      reply: (params) => {
+        const t = targets.find((x) => x.id === params[0]);
+        if (t) {
+          t.status = "retrying";
+          t.error = String(params[1]);
+          t.error_kind = String(params[2]);
+          t.attempt_count = (t.attempt_count ?? 0) + 1;
+          t.next_retry_at = Date.now() + Number(params[4]);
+        }
+        return [];
+      },
+    },
+    {
       match: /update socialapp\.post_targets set status='failed', error=\$2/,
       reply: (params) => {
         const t = targets.find((x) => x.id === params[0]);
-        if (t) { t.status = "failed"; t.error = String(params[1]); }
+        if (t) { t.status = "failed"; t.error = String(params[1]); t.error_kind = params[2] === undefined ? undefined : String(params[2]); }
         return [];
       },
     },
@@ -290,7 +305,9 @@ test("publisher: a failed Instagram target does not strand the post's other netw
     assert.equal(posts[0].status, "failed");
     // The real status SQL (emulated above) must rank pending/publishing targets before failed ones.
     const statusSql = calls.find((c) => /update socialapp\.scheduled_posts p set status = case/.test(c.sql))?.sql ?? "";
-    assert.ok(statusSql.indexOf("status='pending'") >= 0 && statusSql.indexOf("status='pending'") < statusSql.indexOf("status='failed'"));
+    assert.ok(statusSql.indexOf("'pending'") >= 0 && statusSql.indexOf("'pending'") < statusSql.indexOf("status='failed'"));
+    // An automatic retry waiting for its time keeps the post scheduled, like a pending target.
+    assert.ok(statusSql.indexOf("'retrying'") >= 0 && statusSql.indexOf("'retrying'") < statusSql.indexOf("status='failed'"));
   } finally {
     globalThis.fetch = realFetch;
     restore();
@@ -323,6 +340,78 @@ test("publisher: due posts are claimed one at a time, so none waits claimed behi
     assert.equal(result.published, 2);
     assert.deepEqual([...new Set(claimedWhilePublishing)], [1], "only the post being published is claimed");
     assert.deepEqual(posts.map((p) => p.status), ["published", "published"]);
+  } finally {
+    globalThis.fetch = realFetch;
+    restore();
+  }
+});
+
+test("publisher: a temporary network error puts the target in 'retrying', keeps the post scheduled, and it publishes once due", async () => {
+  const posts: Post[] = [
+    { id: "r1", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [{ id: "t-r1", post_id: "r1", platform: "threads", status: "pending", error: null }];
+  const accounts: Account[] = [];
+  const { pool, calls } = createFakePool(publisherDb(posts, targets, accounts));
+  const restore = installFakePool(pool);
+  accounts.push({ id: "acc-th", external_id: "12345", access_token_enc: encryptToken("th-token"), status: "active" });
+  const realFetch = globalThis.fetch;
+  let down = true;
+  globalThis.fetch = (async () => {
+    if (down) return new Response(JSON.stringify({ error: { message: "Service temporarily unavailable", code: 2 } }), { status: 503 });
+    return new Response(JSON.stringify({ id: "thread-post-1" }));
+  }) as typeof fetch;
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    await publishDuePosts();
+    assert.equal(targets[0].status, "retrying");
+    assert.equal(targets[0].error_kind, "retry");
+    assert.equal(targets[0].attempt_count, 1);
+    assert.equal(posts[0].status, "scheduled", "a retrying target keeps the post scheduled, not failed");
+    assert.ok(!calls.some((c) => /select u\.email/.test(c.sql)), "no failure e-mail while retrying");
+    // Not due yet: the next run leaves it alone.
+    await publishDuePosts();
+    assert.equal(targets[0].status, "retrying");
+    // Due: claimed again and published.
+    targets[0].next_retry_at = Date.now() - 1;
+    down = false;
+    await publishDuePosts();
+    assert.equal(targets[0].status, "published");
+    assert.equal(posts[0].status, "published");
+  } finally {
+    globalThis.fetch = realFetch;
+    restore();
+  }
+});
+
+test("publisher: a content error fails at once with its category; a dropped connection is never auto-retried", async () => {
+  const posts: Post[] = [
+    { id: "b1", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+    { id: "b2", user_id: "u1", status: "scheduled", scheduled_at: Date.now() - MIN, updated_at: Date.now() - 10 * MIN },
+  ];
+  const targets: Target[] = [
+    { id: "t-b1", post_id: "b1", platform: "threads", status: "pending", error: null },
+    { id: "t-b2", post_id: "b2", platform: "threads", status: "pending", error: null },
+  ];
+  const accounts: Account[] = [];
+  const { pool } = createFakePool(publisherDb(posts, targets, accounts));
+  const restore = installFakePool(pool);
+  accounts.push({ id: "acc-th", external_id: "12345", access_token_enc: encryptToken("th-token"), status: "active" });
+  const realFetch = globalThis.fetch;
+  let n = 0;
+  globalThis.fetch = (async () => {
+    n += 1;
+    if (n === 1) return new Response(JSON.stringify({ error: { message: "text must be at most 500 characters" } }), { status: 400 });
+    throw new Error("fetch failed");
+  }) as typeof fetch;
+  try {
+    const { publishDuePosts } = await import("./publisher.ts");
+    await publishDuePosts();
+    assert.equal(targets[0].status, "failed");
+    assert.equal(targets[0].error_kind, "bad_body");
+    assert.match(targets[0].error ?? "", /500 characters/);
+    assert.equal(targets[1].status, "failed");
+    assert.equal(targets[1].error_kind, "ambiguous");
   } finally {
     globalThis.fetch = realFetch;
     restore();
