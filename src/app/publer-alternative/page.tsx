@@ -19,7 +19,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: `Publer Alternative with Instagram Auto-DM | ${BRAND.name}` },
   description:
     "Poskoo is a Publer alternative that schedules Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon posts and auto-DMs keyword commenters.",
-  alternates: { canonical: `${BRAND.url}/publer-alternative` },
+  alternates: { canonical: "/publer-alternative" },
 });
 
 const whySwitch = [

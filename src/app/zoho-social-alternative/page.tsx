@@ -22,7 +22,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: "Zoho Social Alternative: Instagram Auto-DM | Poskoo" },
   description:
     "Poskoo is a Zoho Social alternative: schedule Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky and Mastodon and auto-DM commenters. Free plan.",
-  alternates: { canonical: `${BRAND.url}${PATH}` },
+  alternates: { canonical: PATH },
 });
 
 const whySwitch = [

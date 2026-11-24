@@ -19,7 +19,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: `Vista Social Alternative with Instagram Auto-DM | ${BRAND.name}` },
   description:
     "Poskoo is a Vista Social alternative: schedule Instagram, Facebook, Threads, YouTube and LinkedIn posts and auto-DM every keyword commenter. Free plan.",
-  alternates: { canonical: `${BRAND.url}/vista-social-alternative` },
+  alternates: { canonical: "/vista-social-alternative" },
 });
 
 const whySwitch = [

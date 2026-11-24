@@ -19,7 +19,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: `Sendible Alternative with Instagram Auto-DM | ${BRAND.name}` },
   description:
     "Looking for a Sendible alternative? Poskoo schedules posts to 7 networks and auto-DMs Instagram commenters with your link, with a free plan to get started.",
-  alternates: { canonical: `${BRAND.url}/sendible-alternative` },
+  alternates: { canonical: "/sendible-alternative" },
 });
 
 const whySwitch = [

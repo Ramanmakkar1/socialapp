@@ -19,7 +19,7 @@ export const metadata: Metadata = withSocial({
   title: { absolute: `SocialBee Alternative with Instagram Auto-DM | ${BRAND.name}` },
   description:
     "Poskoo is a SocialBee alternative that schedules Instagram, Facebook and Threads posts and auto-DMs every keyword commenter to capture leads. Free plan.",
-  alternates: { canonical: `${BRAND.url}/socialbee-alternative` },
+  alternates: { canonical: "/socialbee-alternative" },
 });
 
 const whySwitch = [
