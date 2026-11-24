@@ -28,6 +28,8 @@ test("per-network tables: TikTok, X, Discord, YouTube, Threads", () => {
 
 test("HTTP status from the adapters decides when no rule matches", () => {
   assert.equal(classifyPublishError("bluesky", "Bluesky post failed: boom", { status: 503 }).kind, "retry");
+  assert.equal(classifyPublishError("bluesky", "Bluesky post failed: boom", { status: 500 }).kind, "ambiguous");
+  assert.equal(classifyPublishError("x", "Bad gateway", { status: 502 }).kind, "ambiguous");
   assert.equal(classifyPublishError("bluesky", "Bluesky post failed: slow down", { status: 429 }).kind, "rate_limit");
   assert.equal(classifyPublishError("bluesky", "Bluesky post failed: x", { status: 0 }).kind, "ambiguous");
   assert.equal(classifyPublishError("bluesky", "Bluesky post failed: nope", { tokenDead: true, status: 401 }).kind, "refresh_token");

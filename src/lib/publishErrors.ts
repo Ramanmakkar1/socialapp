@@ -214,7 +214,10 @@ export function classifyPublishError(platform: string, raw: string, opts: { toke
   // HTTP status from the network adapters (src/lib/networks/http.ts failed()).
   if (opts.status === 0) return { kind: "ambiguous", message: withLabel(platform, "The connection dropped before the network confirmed the post."), raw: text };
   if (opts.status === 429) return { kind: "rate_limit", message: withLabel(platform, "The network's rate limit was reached."), raw: text };
-  if (opts.status !== undefined && opts.status >= 500) return { kind: "retry", message: withLabel(platform, "The network is temporarily unavailable."), raw: text };
+  // 503 = the network refused the request (nothing posted): safe to retry. Other 5xx (500/502/504) can
+  // happen AFTER the network accepted the post, so never auto-retry them (a retry could double-post).
+  if (opts.status === 503) return { kind: "retry", message: withLabel(platform, "The network is temporarily unavailable."), raw: text };
+  if (opts.status !== undefined && opts.status >= 500) return { kind: "ambiguous", message: withLabel(platform, "The network had a server error and may or may not have published the post. Check your profile, then Retry if it isn't there."), raw: text };
   for (const rule of GENERIC) {
     if (hit(rule, text)) return { kind: rule.k, message: withLabel(platform, rule.msg), raw: text };
   }
