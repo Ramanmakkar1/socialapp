@@ -41,7 +41,72 @@ export type SavePostInput = {
   ytShorts?: boolean;
   /** Per-network options (TikTok privacy / disclosure, Pinterest board + title + link, LinkedIn author). */
   netOptions?: Partial<Record<string, unknown>>;
+  /**
+   * The exact connected accounts to post to, per network (social_accounts ids; youtube_channels ids
+   * for YouTube). A network left out goes to the user's oldest active account, as before.
+   */
+  accounts?: Partial<Record<string, string[]>>;
 };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** Most accounts one network can get in a single post (the Agency plan connects up to 25). */
+export const MAX_ACCOUNTS_PER_NETWORK = 25;
+
+/** One post_targets row: the account it goes to (both null = oldest active account, the old behaviour). */
+export type TargetAccount = { socialAccountId: string | null; youtubeChannelId: string | null };
+
+/**
+ * Check every picked account belongs to this user and to that network. Facebook Pages are stored as
+ * the Instagram (Facebook login) row that holds the Page; YouTube channels have their own table.
+ */
+export async function resolvePickedAccounts(
+  userId: string,
+  platforms: PlatformId[],
+  picked: Partial<Record<string, string[]>> | undefined,
+  /** Scheduling needs every picked account connected right now; a draft may keep one that needs reconnecting. */
+  requireActive = false,
+  run: typeof query = query,
+): Promise<{ ok: true; targets: Partial<Record<string, TargetAccount[]>> } | { ok: false; error: string }> {
+  const targets: Partial<Record<string, TargetAccount[]>> = {};
+  for (const platform of platforms) {
+    const raw = picked?.[platform];
+    if (raw === undefined) continue;
+    if (!Array.isArray(raw)) return { ok: false, error: "Invalid account." };
+    const ids = [...new Set(raw.filter((id): id is string => typeof id === "string"))];
+    if (ids.length === 0) return { ok: false, error: `Pick at least one ${platformLabel(platform)} account.` };
+    if (ids.length > MAX_ACCOUNTS_PER_NETWORK) return { ok: false, error: "Too many accounts picked." };
+    if (!ids.every((id) => UUID_RE.test(id))) return { ok: false, error: "Invalid account." };
+    const active = requireActive ? " and status='active'" : "";
+    let rows: { id: string }[];
+    if (platform === "youtube") {
+      rows = await run<{ id: string }>(`select id from socialapp.youtube_channels where user_id=$1 and id = any($2::uuid[])${active}`, [userId, ids]);
+    } else if (platform === "facebook") {
+      rows = await run<{ id: string }>(
+        `select id from socialapp.social_accounts where user_id=$1 and platform='instagram' and auth_type='facebook_login' and page_id is not null and id = any($2::uuid[])${active}`,
+        [userId, ids],
+      );
+    } else {
+      rows = await run<{ id: string }>(`select id from socialapp.social_accounts where user_id=$1 and platform=$2 and id = any($3::uuid[])${active}`, [userId, platform, ids]);
+    }
+    if (rows.length !== ids.length) {
+      return {
+        ok: false,
+        error: requireActive
+          ? `A ${platformLabel(platform)} account you picked needs reconnecting. Reconnect it in Settings, untick it, or save as a draft.`
+          : `That ${platformLabel(platform)} account isn't connected any more. Refresh and pick again.`,
+      };
+    }
+    targets[platform] = ids.map((id) =>
+      platform === "youtube" ? { socialAccountId: null, youtubeChannelId: id } : { socialAccountId: id, youtubeChannelId: null },
+    );
+  }
+  return { ok: true, targets };
+}
+
+function platformLabel(platform: string): string {
+  if (isNetworkId(platform)) return NETWORK_LABEL[platform];
+  return { instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube" }[platform] ?? platform;
+}
 
 type MediaItem = { type: "image" | "video"; url: string };
 
@@ -337,6 +402,16 @@ export async function savePostForUser(
 
   const status = input.mode === "draft" ? "draft" : "scheduled";
 
+  let pickedTargets: Partial<Record<string, TargetAccount[]>> = {};
+  try {
+    const resolved = await resolvePickedAccounts(userId, platforms, input.accounts, input.mode !== "draft");
+    if (!resolved.ok) return { ok: false, error: resolved.error };
+    pickedTargets = resolved.targets;
+  } catch (err) {
+    console.error("savePost: account check failed", userId, err instanceof Error ? err.message : err);
+    return { ok: false, error: "Could not save post. Please try again." };
+  }
+
   let dmRuleId: string | null = null;
   if (input.dmRuleId) {
     if (
@@ -414,7 +489,7 @@ export async function savePostForUser(
         }
       }
       const strayTargets = await client.query(
-        "select 1 from post_targets where post_id = $1 and status <> 'pending' limit 1",
+        "select 1 from post_targets where post_id = $1 and status not in ('pending','retrying') limit 1",
         [input.draftId],
       );
       if (strayTargets.rows.length > 0) {
@@ -481,19 +556,27 @@ export async function savePostForUser(
       const customized = Object.prototype.hasOwnProperty.call(input.overrides, platform);
       const raw = customized ? input.overrides[platform] : undefined;
       const captionOverride = customized ? raw ?? "" : null;
+      // One target per picked account; none picked = one target for the oldest active account.
+      const picked = pickedTargets[platform];
+      const accounts: (TargetAccount | null)[] = picked && picked.length > 0 ? picked : [null];
 
-      if (isNetworkId(platform)) {
-        const options = normalizeNetOptions(platform, input.netOptions?.[platform]);
+      for (const account of accounts) {
+        const accountCols = account
+          ? [account.socialAccountId, account.youtubeChannelId, true]
+          : [null, null, false];
+        if (isNetworkId(platform)) {
+          const options = normalizeNetOptions(platform, input.netOptions?.[platform]);
+          await client.query(
+            "insert into post_targets (post_id, platform, caption_override, net_options, social_account_id, youtube_channel_id, account_locked) values ($1, $2, $3, $4::jsonb, $5, $6, $7)",
+            [id, platform, captionOverride, options ? JSON.stringify(options) : null, ...accountCols],
+          );
+          continue;
+        }
         await client.query(
-          "insert into post_targets (post_id, platform, caption_override, net_options) values ($1, $2, $3, $4::jsonb)",
-          [id, platform, captionOverride, options ? JSON.stringify(options) : null],
+          "insert into post_targets (post_id, platform, caption_override, yt_metadata, social_account_id, youtube_channel_id, account_locked) values ($1, $2, $3, $4, $5, $6, $7)",
+          [id, platform, captionOverride, platform === "youtube" ? ytMetadata : null, ...accountCols],
         );
-        continue;
       }
-      await client.query(
-        "insert into post_targets (post_id, platform, caption_override, yt_metadata) values ($1, $2, $3, $4)",
-        [id, platform, captionOverride, platform === "youtube" ? ytMetadata : null],
-      );
     }
 
     await client.query("commit");
