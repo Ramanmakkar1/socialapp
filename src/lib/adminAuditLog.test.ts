@@ -8,8 +8,8 @@ test("listAudit binds action, admin and a target email pattern", async () => {
   const fake = createFakePool([{ match: /from socialapp.admin_audit/, reply: () => [] }]);
   const restore = installFakePool(fake.pool);
   try {
-    await listAudit({ action: "post.retry", admin: "raman@townmedialabs.ca", target: "shop_", page: 2 });
-    assert.deepEqual(fake.calls[0].params, ["post.retry", "raman@townmedialabs.ca", "%shop\\_%", 26, 25]);
+    await listAudit({ action: "post.retry", admin: "owner@example.com", target: "shop_", page: 2 });
+    assert.deepEqual(fake.calls[0].params, ["post.retry", "owner@example.com", "%shop\\_%", 26, 25]);
     await listAudit({ action: "", admin: "", target: "", page: 1 });
     assert.deepEqual(fake.calls[1].params, [null, null, null, 26, 0]);
   } finally {

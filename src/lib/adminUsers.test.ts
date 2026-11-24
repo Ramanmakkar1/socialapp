@@ -7,8 +7,12 @@ import { effectivePlan, listAdminUsers } from "./adminUsers.ts";
 const NOW = new Date("2026-11-15T12:00:00Z");
 
 test("effectivePlan: verified admins get Agency, an unverified admin address does not", () => {
-  assert.deepEqual(effectivePlan({ email: "townmedialabs@gmail.com", verified: true, plan: null, status: null, past_due_since: null }, NOW), { plan: "Agency", viaAdmin: true });
-  assert.deepEqual(effectivePlan({ email: "townmedialabs@gmail.com", verified: false, plan: null, status: null, past_due_since: null }, NOW), { plan: "Free", viaAdmin: false });
+  const saved = process.env.ADMIN_EMAILS;
+  process.env.ADMIN_EMAILS = "owner@example.com";
+  assert.deepEqual(effectivePlan({ email: "owner@example.com", verified: true, plan: null, status: null, past_due_since: null }, NOW), { plan: "Agency", viaAdmin: true });
+  assert.deepEqual(effectivePlan({ email: "owner@example.com", verified: false, plan: null, status: null, past_due_since: null }, NOW), { plan: "Free", viaAdmin: false });
+  if (saved === undefined) delete process.env.ADMIN_EMAILS;
+  else process.env.ADMIN_EMAILS = saved;
 });
 
 test("effectivePlan follows the billing row (active, grace, expired grace, abandoned checkout)", () => {

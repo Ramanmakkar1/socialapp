@@ -1,9 +1,9 @@
-// Admin allow-list + audit: built-ins, ADMIN_EMAILS parsing, the requireAdmin decision,
+// Admin allow-list + audit: ADMIN_EMAILS parsing (nothing built in), the requireAdmin decision,
 // and the best-effort audit insert.
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { createFakePool, installFakePool } from "../test-utils/fakePool.ts";
-import { adminAudit, adminDecision, adminEmails, BUILTIN_ADMINS, isAdminEmail } from "./admin.ts";
+import { adminAudit, adminDecision, adminEmails, isAdminEmail } from "./admin.ts";
 
 const savedEnv = process.env.ADMIN_EMAILS;
 afterEach(() => {
@@ -11,14 +11,10 @@ afterEach(() => {
   else process.env.ADMIN_EMAILS = savedEnv;
 });
 
-test("built-in admins are always allowed", () => {
+test("no ADMIN_EMAILS = no admins (nothing is hard-coded)", () => {
   delete process.env.ADMIN_EMAILS;
-  const list = adminEmails();
-  for (const email of BUILTIN_ADMINS) {
-    assert.ok(list.includes(email), `missing builtin ${email}`);
-  }
-  assert.equal(isAdminEmail("townmedialabs@gmail.com"), true);
-  assert.equal(isAdminEmail("raman@townmedialabs.ca"), true);
+  assert.deepEqual(adminEmails(), []);
+  assert.equal(isAdminEmail("owner@example.com"), false);
 });
 
 test("ADMIN_EMAILS adds admins, trimmed and case-insensitive", () => {
@@ -40,16 +36,16 @@ test("non-admins and empty emails are rejected", () => {
 });
 
 test("adminDecision: guest / non_admin / admin (allow-listed AND verified through Google)", () => {
-  delete process.env.ADMIN_EMAILS;
+  process.env.ADMIN_EMAILS = "owner@example.com";
   assert.equal(adminDecision(null), "guest");
   assert.equal(adminDecision({ id: "1", email: "random@user.com", name: null, emailVerified: true }), "non_admin");
-  assert.equal(adminDecision({ id: "2", email: "TownMediaLabs@gmail.com", name: null, emailVerified: true }), "admin");
+  assert.equal(adminDecision({ id: "2", email: "Owner@Example.com", name: null, emailVerified: true }), "admin");
 });
 
 test("an allow-listed email from a password sign-up (never verified) is NOT an admin", () => {
-  delete process.env.ADMIN_EMAILS;
-  assert.equal(adminDecision({ id: "3", email: "townmedialabs@gmail.com", name: null }), "non_admin");
-  assert.equal(adminDecision({ id: "3", email: "townmedialabs@gmail.com", name: null, emailVerified: false }), "non_admin");
+  process.env.ADMIN_EMAILS = "owner@example.com";
+  assert.equal(adminDecision({ id: "3", email: "owner@example.com", name: null }), "non_admin");
+  assert.equal(adminDecision({ id: "3", email: "owner@example.com", name: null, emailVerified: false }), "non_admin");
 });
 
 test("adminAudit inserts a row with the target and details", async () => {

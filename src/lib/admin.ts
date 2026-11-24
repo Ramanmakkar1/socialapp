@@ -4,16 +4,14 @@ import { notFound } from "next/navigation";
 import { getCurrentUser, type CurrentUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 
-// Built-in admins (Raman) — always allowed, no env needed.
-export const BUILTIN_ADMINS = ["townmedialabs@gmail.com", "raman@townmedialabs.ca"];
-
-// The full allow-list: built-ins plus the comma-separated ADMIN_EMAILS env.
+// The admin allow-list comes ONLY from the comma-separated ADMIN_EMAILS env (server .env), so the
+// open-source code names no real accounts. Empty or unset = nobody is an admin.
 export function adminEmails(): string[] {
   const fromEnv = (process.env.ADMIN_EMAILS ?? "")
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
-  return [...new Set([...BUILTIN_ADMINS, ...fromEnv])];
+  return [...new Set(fromEnv)];
 }
 
 export function isAdminEmail(email: string | null | undefined): boolean {
