@@ -1387,7 +1387,7 @@
   position:relative;overflow:hidden;margin-top:10px;border-radius:28px;
   margin-left:calc(-1 * max(16px, env(safe-area-inset-left, 0px)) + 10px);margin-right:calc(-1 * max(16px, env(safe-area-inset-right, 0px)) + 10px);
   padding-inline:max(6px, env(safe-area-inset-left, 0px));padding-bottom:clamp(190px, 21vw, 300px);
-  background:radial-gradient(120% 70% at 50% 0%, var(--tp-lav-2) 0%, var(--tp-lav) 38%, #fff7f2 72%, #fffcf8 100%);color:var(--tp-ink)}
+  background:radial-gradient(110% 60% at 50% 0%, #fff4ee 0%, #fffaf7 45%, #fffdfb 75%, #fffefd 100%);color:var(--tp-ink)}
 .landing :global(.tpHero > .wrap){position:relative;z-index:2}
 .landing :global(.tpHero nav.top){
   position:relative;margin-top:14px;padding:10px 12px 10px 22px;border-radius:var(--poskoo-radius-pill);
@@ -1626,3 +1626,8 @@
 /* Works-with strip: real brand logos instead of colour dots */
 .landing :global(.works b){gap:8px}
 .landing :global(.works b svg){flex:none;display:block}
+
+/* 2026-11-24 owner: "make it light" - near-white hero, softer highlight, white glass nav */
+.landing :global(.tpHero .mark){background:linear-gradient(transparent 14%, #ffeadf 14%, #ffeadf 88%, transparent 88%)}
+.landing :global(.tpHero nav.top){background:rgba(255,255,255,.88);border-color:#f3ece6;box-shadow:0 10px 30px -18px rgba(150,60,20,.18)}
+.landing :global(.tpHero){box-shadow:inset 0 0 0 1px #f6efe9}
