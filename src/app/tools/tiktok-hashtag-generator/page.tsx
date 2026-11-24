@@ -176,8 +176,8 @@ const config: ToolPageConfig = {
       a: "No. TikTok has no public API for hashtag post counts and this tool never scrapes TikTok, so popularity is an estimated range based on each tag's size tier (for example 1M+ for broad tags). The tool also does not check live trends; read the set before you post it.",
     },
     {
-      q: "Does this generator work offline in my browser?",
-      a: "Yes. The generator builds your set and copies it in your browser without uploading your keyword, using AI or scraping TikTok. Choose Copy all to copy the full set, or select the plain text if clipboard access is unavailable.",
+      q: "Does this generator upload my keyword or scrape TikTok?",
+      a: "No. The generator builds your set and copies it in your browser without uploading your keyword, using AI or scraping TikTok. Choose Copy all to copy the full set, or select the plain text if clipboard access is unavailable.",
     },
     {
       q: "How do I find the best time to post my TikTok?",
