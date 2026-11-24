@@ -1,17 +1,18 @@
 // "Upgrade" (billing page form, POST): Stripe Checkout (mode=subscription) on the PLATFORM account.
 // A user who already pays is sent to the Customer Portal instead (plan switches happen there).
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { BILLING_PATH, startCheckout } from "@/lib/billing";
 import { isFeatureReady } from "@/lib/featureReadiness";
 import { parsePlanChoice } from "@/lib/billingState";
 import { UPGRADE_INTENT_COOKIE } from "@/lib/upgradeIntent";
+import { getOwnWorkspaceUser } from "@/lib/workspace";
 
 const back = (status: string) => NextResponse.redirect(new URL(`${BILLING_PATH}?billing=${status}`, BRAND.url), 303);
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getOwnWorkspaceUser();
   if (!user) return NextResponse.redirect(new URL("/login", BRAND.url), 303);
   // Paid plans launch only with live Stripe keys etc. (src/lib/featureReadiness.ts): never a test checkout.
   if (!isFeatureReady("billing")) return back("not_configured");

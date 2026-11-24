@@ -1,12 +1,13 @@
 // Stripe sends the creator back here after onboarding: re-read the account and report.
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { isStripeConfigured } from "@/lib/payments";
 import { refreshConnectedAccount } from "@/lib/stripeConnect";
+import { getWorkspaceUserAtLeast } from "@/lib/workspace";
 
 export async function GET() {
-  const user = await getCurrentUser();
+  const user = await getWorkspaceUserAtLeast("owner");
   if (!user) return NextResponse.redirect(new URL("/login", BRAND.url));
   let status = "not_configured";
   if (isStripeConfigured()) {

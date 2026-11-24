@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { isAdmin } from "@/lib/admin";
 import type { AiAvailability } from "@/components/AiOffNote";
@@ -9,13 +9,14 @@ import { isKnownPlatform } from "@/lib/captionFit";
 import type { PlatformId } from "@/lib/platforms";
 import { consumeAiRequest } from "@/lib/aiQuota";
 import { isDbConfigured, query } from "@/lib/db";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export async function suggestCaptions(input: {
   topic: string;
   draft?: string;
   tone?: string;
 }): Promise<CaptionIdeasResult> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const topic = typeof input?.topic === "string" ? input.topic.trim() : "";
   if (!topic || topic.length > 300) {
     return { ok: false, error: "Describe the post in 1-300 characters." };
@@ -57,7 +58,7 @@ export async function suggestCaptions(input: {
 
 /** Whether AI is on (env or stored key), and whether this user may switch it on (admin). */
 export async function aiAvailable(): Promise<AiAvailability> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   return { ready: await isFeatureReadyNow("ai"), isAdmin: isAdmin(user) };
 }
 
@@ -76,7 +77,7 @@ async function brandVoiceFor(userId: string): Promise<string | undefined> {
  * The composer puts them in the per-network fields (post_targets.caption_override at save time).
  */
 export async function tailorCaptions(input: { caption: string; platforms: string[] }): Promise<VariantsResult> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const caption = typeof input?.caption === "string" ? input.caption.trim() : "";
   if (!caption) return { ok: false, error: "Write the main caption first, then tailor it per network." };
   if (caption.length > 5000) return { ok: false, error: "The caption is too long to tailor (5,000 characters max)." };

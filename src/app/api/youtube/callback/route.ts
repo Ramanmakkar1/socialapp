@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { accountLimitError } from "@/lib/planLimits";
 import { getYouTubeChannel, saveYouTubeChannel } from "@/lib/youtubeAccounts";
@@ -11,6 +11,7 @@ import {
   fetchYouTubeChannel,
   openFlow,
 } from "@/lib/youtubeAuth";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 type BackResult =
   | "connected"
@@ -39,7 +40,7 @@ const REASON_TO_BACK: Record<YouTubeAuthError["reason"], BackResult> = {
 
 export async function GET(request: Request) {
   // Outside the try so the /login redirect is not swallowed.
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   try {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Flame, Hash, Info } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { planForUser } from "@/lib/planLimits";
 import { accountWeek, isStale, scoreTrends, trendWatchLimit, type TrendMediaInput } from "@/lib/trends";
@@ -10,6 +10,7 @@ import RefreshControls from "./RefreshControls";
 import TrendsBoard from "./TrendsBoard";
 import WatchPanel, { type WatchView } from "./WatchPanel";
 import styles from "./trends.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = {
   title: "Trends",
@@ -90,7 +91,7 @@ function toWatchViews(watches: WatchRow[], media: TrendMediaInput[], now: number
 }
 
 export default async function TrendsPage() {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   let connection: TrendConnection = { state: "none" };
   let watches: WatchRow[] = [];
   let media: TrendMediaInput[] = [];

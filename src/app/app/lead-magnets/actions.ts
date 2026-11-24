@@ -2,14 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { readDeliveryFields, readRuleIds } from "@/lib/digitalDelivery";
 import { deleteLeadMagnet, saveLeadMagnet } from "@/lib/leadMagnets";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export type FormState = { errors?: string[] } | undefined;
 
 export async function saveLeadMagnetAction(_prev: FormState, form: FormData): Promise<FormState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const id = typeof form.get("id") === "string" && form.get("id") ? String(form.get("id")) : null;
   const { values, errors } = readDeliveryFields(form);
   if (errors.length > 0) return { errors };
@@ -26,7 +27,7 @@ export async function saveLeadMagnetAction(_prev: FormState, form: FormData): Pr
 }
 
 export async function deleteLeadMagnetAction(form: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const id = String(form.get("id") ?? "");
   try {
     await deleteLeadMagnet(user.id, id);

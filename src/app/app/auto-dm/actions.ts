@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { linkTokenError } from "@/lib/rules";
 import { createDmRuleForUser, emailCapturePlanError, resolveSocialAccountId, UUID_RE, validateFormInput, type RuleFormInput } from "@/lib/dmRuleCreate";
@@ -11,6 +11,7 @@ import { detachMagnetIfLinkChanged } from "@/lib/leadMagnets";
 import { fetchRecentMedia, type IgMediaItem } from "@/lib/igMedia";
 import type { GraphAccount } from "@/lib/igGraph";
 import { isMissingColumnError } from "@/lib/ruleMedia";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export type { RuleFormInput, RuleTrigger } from "@/lib/dmRuleCreate";
 
@@ -27,7 +28,7 @@ export type RecentMediaResult =
 export async function listRecentMedia(socialAccountId: string): Promise<RecentMediaResult> {
   if (!isDbConfigured()) return { ok: false, error: "Database not configured." };
   if (!UUID_RE.test(socialAccountId)) return { ok: false, error: "Choose a connected Instagram account." };
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const accounts = await query<GraphAccount>(
       `select id, external_id, access_token_enc, auth_type from socialapp.social_accounts
@@ -45,7 +46,7 @@ export async function createRule(input: RuleFormInput): Promise<RuleActionResult
   if (!isDbConfigured()) {
     return dbNotReady();
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const result = await createDmRuleForUser(user.id, input, "active");
   if (!result.ok) return result;
   revalidatePath("/app/auto-dm");
@@ -60,7 +61,7 @@ export async function updateRule(id: string, input: RuleFormInput): Promise<Rule
   if (!UUID_RE.test(id)) {
     return { ok: false, errors: ["Invalid Auto-DM."] };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const errors = validateFormInput(input);
   if (errors.length > 0) {
     return { ok: false, errors };
@@ -153,7 +154,7 @@ export async function toggleRule(id: string): Promise<RuleActionResult> {
   if (!UUID_RE.test(id)) {
     return { ok: false, errors: ["Invalid Auto-DM."] };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     // Going live is validated on the server too: a rule whose message uses {{link}} must have a link.
     const current = await query<{ status: string; dm_text: string; link_url: string | null }>(
@@ -192,7 +193,7 @@ export async function rewindRuleAction(
   if (!UUID_RE.test(id)) {
     return { ok: false, error: "Invalid Auto-DM." };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const result = await rewindRule(user.id, id);
     try {
@@ -222,7 +223,7 @@ export async function deleteRule(id: string): Promise<RuleActionResult> {
   if (!UUID_RE.test(id)) {
     return { ok: false, errors: ["Invalid Auto-DM."] };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const rows = await query<{ id: string }>(
       "delete from socialapp.dm_rules where id = $1 and user_id = $2 returning id",

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+
 import { getPool, isDbConfigured } from "@/lib/db";
 import type { PoolClient } from "pg";
 import {
@@ -12,6 +12,7 @@ import {
   normalizeTags,
   shouldReplaceTags,
 } from "@/lib/ideas";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -54,7 +55,7 @@ export async function saveIdea(input: SaveIdeaInput): Promise<SaveIdeaResult> {
     return { ok: false, error: "Invalid idea." };
   }
 
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const text = typeof input.text === "string" ? input.text.trim() : "";
   const mediaUrls = cleanMediaUrls(input.mediaUrls);
   if (!text && mediaUrls.length === 0) {
@@ -122,7 +123,7 @@ export async function deleteIdea(id: string): Promise<{ ok: boolean; error?: str
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const client = await getPool().connect();
     try {
@@ -145,7 +146,7 @@ export async function moveIdea(id: string, status: string): Promise<{ ok: boolea
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const client = await getPool().connect();
     try {

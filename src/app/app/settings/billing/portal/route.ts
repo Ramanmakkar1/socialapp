@@ -1,14 +1,15 @@
 // "Manage billing" (POST): Stripe Customer Portal for the user's platform customer
 // (switch Pro/Agency and monthly/yearly, cancel at period end, card, invoices).
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { BILLING_PATH, getBilling, isBillingConfigured, portalUrl } from "@/lib/billing";
+import { getOwnWorkspaceUser } from "@/lib/workspace";
 
 const back = (status: string) => NextResponse.redirect(new URL(`${BILLING_PATH}?billing=${status}`, BRAND.url), 303);
 
 export async function POST() {
-  const user = await getCurrentUser();
+  const user = await getOwnWorkspaceUser();
   if (!user) return NextResponse.redirect(new URL("/login", BRAND.url), 303);
   if (!isBillingConfigured()) return back("not_configured");
   try {

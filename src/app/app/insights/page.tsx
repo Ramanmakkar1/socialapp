@@ -2,7 +2,7 @@ import Link from "next/link";
 import { postThumbUrl } from "@/lib/mediaUpload";
 import { Suspense } from "react";
 import { BarChart3, Download, Info, Instagram, MessageCircle, TrendingDown, TrendingUp, Trophy } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parsePeriod, PERIOD_OPTIONS } from "@/lib/analytics";
 import { isDbConfigured, query } from "@/lib/db";
 import { getDailyActivity, getDashboardStats, getRecentPosts, getRuleStats } from "@/lib/stats";
@@ -17,6 +17,7 @@ import PostPerformanceTable from "./PostPerformanceTable";
 import styles from "./analytics.module.css";
 import { CommentTimes, DailyBars, GrowthChart } from "./Charts";
 import { getCommentTimeCells } from "./commentTimes";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Insights" };
 
@@ -48,7 +49,7 @@ function formatPlatforms(platforms: string[]): string {
 
 
 export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ range?: string; tab?: string; sort?: string; account?: string }> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const { range: rangeParam, tab: tabParam, sort: sortParam, account: accountParam } = await searchParams;
   const tab = TABS.some((t) => t.id === tabParam) ? (tabParam as (typeof TABS)[number]["id"]) : "posts";
   const period = parsePeriod(rangeParam);

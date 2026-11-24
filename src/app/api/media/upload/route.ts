@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth";
+
 import { pendingMediaUsage } from "@/lib/mediaLifecycle";
 import { PLAN_MEDIA_LIMITS, checkMediaForTargets, formatBytes, pendingQuotaMessage } from "@/lib/mediaLimits";
 import { probeVideoDurationSec } from "@/lib/mediaProbe";
@@ -20,6 +20,7 @@ import {
 } from "@/lib/mediaStorage";
 import { validateMediaFile } from "@/lib/mediaUpload";
 import { planForUser } from "@/lib/planLimits";
+import { getWorkspaceUser } from "@/lib/workspace";
 
 export const runtime = "nodejs";
 
@@ -34,7 +35,7 @@ export const runtime = "nodejs";
  * the upload itself is deleted on publish, so published posts still show a picture).
  */
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getWorkspaceUser();
   if (!user) {
     return Response.json({ error: "Please sign in again." }, { status: 401 });
   }

@@ -7,7 +7,7 @@ import styles from "@/components/commerce/commerce.module.css";
 import { readPaging } from "@/components/commerce/pager";
 import { BtnLink, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { ORDER_STATUS_LABEL, countOrders, listOrders, type OrderRow } from "@/lib/orders";
@@ -16,6 +16,7 @@ import { connectedAccountForPage, type ConnectedAccount } from "@/lib/stripeConn
 import PaymentsNotice from "../products/PaymentsNotice";
 import { getSellerPayout, listAwaitingUpi, type AwaitingUpiOrder, type SellerPayout } from "@/lib/upiOrders";
 import UpiPending from "./UpiPending";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 const UPI_MESSAGES: Record<string, { warn: boolean; text: string }> = {
   paid: { warn: false, text: "Payment confirmed. The buyer is getting their product by e-mail." },
@@ -33,7 +34,7 @@ export const metadata = {
 const GOOD = new Set(["paid"]);
 
 export default async function OrdersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const params = await searchParams;
   // Card checkout needs live Stripe (src/lib/featureReadiness.ts); UPI never does.
   const configured = isFeatureReady("card_payments");

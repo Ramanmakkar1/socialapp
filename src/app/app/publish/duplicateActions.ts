@@ -1,8 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+
 import { getPool, isDbConfigured } from "@/lib/db";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: string; id?: string }> {
   if (typeof id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -12,7 +13,7 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
     return { ok: false, error: "Database not configured" };
   }
 
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   let newId: string | undefined;
   try {
     const client = await getPool().connect();

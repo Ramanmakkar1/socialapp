@@ -2,15 +2,16 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { INSTAGRAM_TAKEN_PATH, PICK_COOKIE, decodePick, isInstagramTakenByOther, saveFacebookLoginAccount } from "@/lib/metaAccounts";
 import { MetaApiError, fetchPagesWithInstagram } from "@/lib/metaLogin";
 import { accountLimitError } from "@/lib/planLimits";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 // Connects the Instagram account the user picked (re-reads the Page list with the stored user token,
 // so the Page token never passes through the browser).
 export async function connectPickedAccountAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const raw = formData.get("ig_user_id");
   const igUserId = typeof raw === "string" ? raw.trim().slice(0, 64) : "";
   const store = await cookies();

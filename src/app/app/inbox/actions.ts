@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { GraphError, graphCall, likeComment, replyToCommentPublicly, sendDirectMessage, userAccount } from "@/lib/igGraph";
 import { guardedDmSend } from "@/lib/dmCooldown";
@@ -17,6 +17,7 @@ import {
   withinWindow,
 } from "@/lib/inbox";
 import { inboxReturnParams } from "./returnTo";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 function field(formData: FormData, key: string, max = 1000): string {
   const v = formData.get(key);
@@ -38,7 +39,7 @@ function failMessage(err: unknown): string {
 
 // Public reply under a comment (instagram_business_manage_comments).
 export async function replyToCommentAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
   const message = field(formData, "message", 2200);
@@ -66,7 +67,7 @@ export async function replyToCommentAction(formData: FormData): Promise<void> {
 
 // One private DM reply to a comment (allowed within 7 days of the comment).
 export async function privateReplyAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
   const message = field(formData, "message", 1000);
@@ -109,7 +110,7 @@ export async function privateReplyAction(formData: FormData): Promise<void> {
 
 // Reply inside a DM thread (instagram_business_manage_messages), only within 24 h of their last message.
 export async function replyInThreadAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const accountId = field(formData, "account_id", 64);
   const senderId = field(formData, "sender_id", 64);
   const message = field(formData, "message", 1000);
@@ -138,7 +139,7 @@ export async function replyInThreadAction(formData: FormData): Promise<void> {
 
 // Hide / unhide a comment in the inbox (local only; Instagram has no hide-comment endpoint).
 export async function hideCommentAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
   if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." }, formData);
@@ -152,7 +153,7 @@ export async function hideCommentAction(formData: FormData): Promise<void> {
 
 // Like the comment on Instagram (instagram_business_manage_comments, the same permission as replies).
 export async function likeCommentAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
   if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." }, formData);
@@ -170,7 +171,7 @@ export async function likeCommentAction(formData: FormData): Promise<void> {
 
 // Mark a comment done (answered) / reopen it.
 export async function toggleDoneAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const accountId = field(formData, "account_id", 64);
   const commentId = field(formData, "comment_id", 64);
   if (!isDbConfigured() || !accountId || !commentId) back({ error: "We couldn't find that comment." }, formData);

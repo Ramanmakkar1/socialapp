@@ -3,7 +3,7 @@ import { Check, CreditCard } from "lucide-react";
 import { Btn, BtnLink, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
-import { requireUser } from "@/lib/auth";
+
 import { getBilling, isBillingConfigured, refreshStoredSubscription, syncFromCheckoutSession, type StoredBilling } from "@/lib/billing";
 import {
   BILLING_INTERVALS,
@@ -25,6 +25,7 @@ import { PLAN_LIMITS, monthlyAutoDmLimit, scheduledPostsUsage, type PlanName } f
 import { PLANS } from "@/lib/plans";
 import styles from "../../app-page.module.css";
 import billing from "./billing.module.css";
+import { requireOwnWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Plan & billing" };
 
@@ -143,7 +144,7 @@ export default async function BillingPage({
 }: {
   searchParams: Promise<{ upgraded?: string | string[]; session_id?: string | string[]; canceled?: string | string[]; portal?: string | string[]; billing?: string | string[]; plan?: string | string[]; interval?: string | string[] }>;
 }) {
-  const user = await requireUser();
+  const user = await requireOwnWorkspaceUser();
   const sp = await searchParams;
   const configured = isBillingConfigured();
   // Selling Pro / Agency needs live Stripe (src/lib/featureReadiness.ts). Until then the cards show

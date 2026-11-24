@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { Download, Mail, Search, Users, Zap } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { buildContactQuery, parseContactFilters } from "@/lib/contactsQuery";
 import EmptyState from "../EmptyState";
@@ -12,6 +12,7 @@ import LocalTime from "@/components/LocalTime";
 import { BtnLink } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "./contacts.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = {
   title: "Contacts",
@@ -55,7 +56,7 @@ function initialsFor(contact: Contact): string {
 
 export default async function ContactsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const rawParams = await searchParams;
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const configured = isDbConfigured();
   const filters = parseContactFilters(rawParams);
   const requestedPage = typeof rawParams.page === "string" ? rawParams.page : Array.isArray(rawParams.page) ? rawParams.page[0] : "";

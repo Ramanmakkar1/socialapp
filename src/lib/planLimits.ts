@@ -30,6 +30,8 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
  */
 export async function planForUser(userId: string): Promise<PlanName> {
   if (!userId || !isDbConfigured()) return "Free";
+  // Client workspaces (migration 054) have no plan of their own: they use their creator's plan.
+  userId = await billingOwnerId(userId);
   try {
     // Admins (allow-listed AND email verified, same rule as the admin panel) get Agency limits.
     const admins = await query<{ email: string }>(
@@ -45,6 +47,16 @@ export async function planForUser(userId: string): Promise<PlanName> {
     return planFromBilling(rows[0]);
   } catch {
     return "Free";
+  }
+}
+
+/** Whose subscription pays for `userId`'s workspace: the creator of a client workspace, else itself. */
+export async function billingOwnerId(userId: string): Promise<string> {
+  try {
+    const rows = await query<{ created_by_user_id: string | null }>("select created_by_user_id from socialapp.users where id=$1", [userId]);
+    return rows[0]?.created_by_user_id ?? userId;
+  } catch {
+    return userId; // before migration 054
   }
 }
 

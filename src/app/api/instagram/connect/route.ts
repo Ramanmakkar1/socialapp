@@ -1,15 +1,16 @@
 import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { authorizeUrl, isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured, metaAuthorizeUrl, signState } from "@/lib/metaLogin";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 // ?via=instagram uses Instagram Login when it is configured; anything else (or ?via=facebook) uses
 // Facebook Login for Business when that is configured (the Connect dialog offers both).
 export async function GET(request: Request) {
-  await requireUser();
+  await requireWorkspaceUser("admin");
   const via = new URL(request.url).searchParams.get("via");
   const preferInstagram = via === "instagram" && isIgConfigured();
   if (isMetaLoginConfigured() && !preferInstagram) {

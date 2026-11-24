@@ -1,5 +1,5 @@
 import { MessageCircleHeart } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { BtnA, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import { query } from "@/lib/db";
@@ -10,6 +10,7 @@ import { DmDeliveryStatus, loadDmDeliveryRows, type DmDeliveryRow } from "./DmDe
 import { RewindPastCommentsButton } from "./RewindPastCommentsButton";
 import { isMissingColumnError } from "@/lib/ruleMedia";
 import { clickCountSql, uniqueClickCountSql } from "@/lib/links";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Auto-DM" };
 
@@ -20,7 +21,7 @@ export default async function AutoDmPage({
 }: {
   searchParams: Promise<{ template?: string | string[]; trigger?: string | string[] }>;
 }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const { template: templateParam, trigger: triggerParam } = await searchParams;
   const triggerRaw = typeof triggerParam === "string" ? triggerParam : triggerParam?.[0];
   const startTrigger = TRIGGERS.find((t) => t === triggerRaw);

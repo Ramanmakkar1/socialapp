@@ -6,7 +6,7 @@ import styles from "@/components/commerce/commerce.module.css";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { BtnA, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
-import { requireUser } from "@/lib/auth";
+
 import { listRuleOptions } from "@/lib/leadMagnets";
 import { centsToInput, formatMoney, platformFeeCents } from "@/lib/money";
 import { isFeatureReady } from "@/lib/featureReadiness";
@@ -18,11 +18,12 @@ import { rulePicks } from "../../lead-magnets/rulePicks";
 import { deleteProductAction } from "../actions";
 import PaymentsNotice from "../PaymentsNotice";
 import ProductForm from "../ProductForm";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Product" };
 
 export default async function ProductPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string; error?: string }> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const { id } = await params;
   const { saved, error } = await searchParams;
   const product = await getProduct(user.id, id);

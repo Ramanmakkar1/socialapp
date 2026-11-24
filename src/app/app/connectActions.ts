@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { cleanChannelRequest } from "@/lib/channelStatus";
 import { isReminderNetwork, parseReminderChannel } from "@/lib/networks/reminder";
@@ -14,6 +14,7 @@ import { connectPendingGbp, pendingGbpLocations } from "@/lib/networks/gbpConnec
 import { connectTokenNetwork, readTokenFields } from "@/lib/networks/tokenConnect";
 import { connectFarcasterSigner, isFarcasterConfigured } from "@/lib/networks/apps";
 import { isTokenNetwork, TOKEN_NETWORKS } from "@/lib/networks/tokenNetworks";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export type BlueskyConnectState = { error: string } | null;
 
@@ -22,7 +23,7 @@ export type BlueskyConnectState = { error: string } | null;
  * by logging in once, then stored encrypted so expired sessions can be renewed without the user.
  */
 export async function connectBlueskyAction(_prev: BlueskyConnectState, formData: FormData): Promise<BlueskyConnectState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
   const handle = normalizeHandle(String(formData.get("handle") ?? "")).slice(0, 253);
   const password = String(formData.get("app_password") ?? "").trim().slice(0, 100);
@@ -56,7 +57,7 @@ export type TokenConnectState = { error: string } | null;
  * The credentials are checked against the network once, then stored encrypted like OAuth tokens.
  */
 export async function connectTokenNetworkAction(_prev: TokenConnectState, formData: FormData): Promise<TokenConnectState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
   const network = String(formData.get("network") ?? "");
   if (!isTokenNetwork(network)) return { error: "Unknown channel." };
@@ -76,7 +77,7 @@ export async function connectTokenNetworkAction(_prev: TokenConnectState, formDa
 
 /** Farcaster: the browser's "Sign in with Neynar" result (checked with Neynar before it's stored). */
 export async function connectFarcasterAction(signerUuid: string, fid: string): Promise<TokenConnectState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
   if (!isFarcasterConfigured()) return { error: "Connecting Farcaster isn't switched on on this server yet." };
   let target: URL;
@@ -97,7 +98,7 @@ export type GbpPickResult =
 
 /** The Connect dialog's "Select the locations to connect" list (Google Business Profile, several locations). */
 export async function gbpPickListAction(): Promise<GbpPickResult> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   try {
     const list = await pendingGbpLocations(user.id);
     if (!list) return { ok: false, error: "The Google sign-in expired. Connect Google Business Profile again." };
@@ -108,7 +109,7 @@ export async function gbpPickListAction(): Promise<GbpPickResult> {
 }
 
 export async function connectGbpLocationsAction(_prev: { error: string } | null, formData: FormData): Promise<{ error: string } | null> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const chosen = formData.getAll("location").map(String).filter((l) => l.startsWith("locations/")).slice(0, 200);
   if (chosen.length === 0) return { error: "Tick at least one location." };
   let target = "";
@@ -137,7 +138,7 @@ export type ReminderConnectState = { error: string } | null;
  * connected channels like any other (completeConnect -> accountLimitError).
  */
 export async function connectReminderAction(_prev: ReminderConnectState, formData: FormData): Promise<ReminderConnectState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!isDbConfigured()) return { error: "The database is not set up on this server yet." };
   // Reminders are e-mails: without a mailer they would never arrive (src/lib/featureReadiness.ts).
   if (!isFeatureReady("email")) return { error: "Reminder channels are coming soon: e-mail sending isn't switched on yet." };
@@ -168,7 +169,7 @@ export async function connectReminderAction(_prev: ReminderConnectState, formDat
 export type ChannelInterestState = { ok: true; message: string } | { ok: false; error: string } | null;
 
 export async function channelInterestAction(_prev: ChannelInterestState, formData: FormData): Promise<ChannelInterestState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!isDbConfigured()) return { ok: false, error: "The database is not set up on this server yet." };
   const kind = formData.get("kind") === "notify" ? "notify" : "request";
   const clean = cleanChannelRequest(String(formData.get("channel") ?? ""), kind === "request" ? String(formData.get("note") ?? "") : "");
@@ -218,7 +219,7 @@ async function linkedinAccountMeta(userId: string): Promise<{ id: string; userna
 }
 
 export async function linkedinPagesListAction(): Promise<LinkedInPagesResult> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   try {
     const acc = await linkedinAccountMeta(user.id);
     if (!acc) return { ok: false, error: "Connect LinkedIn first." };
@@ -233,7 +234,7 @@ export async function linkedinPagesListAction(): Promise<LinkedInPagesResult> {
 }
 
 export async function saveLinkedInPagesAction(_prev: { error: string } | null, formData: FormData): Promise<{ error: string } | null> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   let target = "";
   try {
     const acc = await linkedinAccountMeta(user.id);

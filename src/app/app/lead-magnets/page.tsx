@@ -4,9 +4,10 @@ import EmptyState from "../EmptyState";
 import { BtnLink, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
 import styles from "@/components/commerce/commerce.module.css";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { listLeadMagnets, type LeadMagnetRow } from "@/lib/leadMagnets";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = {
   title: "Lead magnets",
@@ -14,7 +15,7 @@ export const metadata = {
 };
 
 export default async function LeadMagnetsPage({ searchParams }: { searchParams: Promise<{ deleted?: string }> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const { deleted } = await searchParams;
   let magnets: LeadMagnetRow[] = [];
   let failed = false;

@@ -2,18 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { readDeliveryFields, readRuleIds } from "@/lib/digitalDelivery";
 import { isProductCurrency, isSupportedCurrency, type ProductCurrency } from "@/lib/money";
 import { parsePriceToCents } from "@/lib/payments";
 import { payoutRoute } from "@/lib/upi";
 import { getSellerPayout } from "@/lib/upiOrders";
 import { deleteProduct, saveProduct } from "@/lib/products";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export type FormState = { errors?: string[] } | undefined;
 
 export async function saveProductAction(_prev: FormState, form: FormData): Promise<FormState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const id = typeof form.get("id") === "string" && form.get("id") ? String(form.get("id")) : null;
   const { values, errors } = readDeliveryFields(form);
   const priceCents = parsePriceToCents(String(form.get("price") ?? ""));
@@ -40,7 +41,7 @@ export async function saveProductAction(_prev: FormState, form: FormData): Promi
 }
 
 export async function deleteProductAction(form: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const id = String(form.get("id") ?? "");
   try {
     await deleteProduct(user.id, id);

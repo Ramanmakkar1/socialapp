@@ -103,6 +103,16 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   }
 }
 
+// Hashed id of the current session (the sessions.id primary key), or null. Never throws.
+export async function currentSessionId(): Promise<string | null> {
+  try {
+    const token = (await cookies()).get(COOKIE)?.value;
+    return token ? hashToken(token) : null;
+  } catch {
+    return null;
+  }
+}
+
 // Use in server components/actions that need a login; sends guests to /login.
 export async function requireUser(): Promise<CurrentUser> {
   const user = await getCurrentUser();

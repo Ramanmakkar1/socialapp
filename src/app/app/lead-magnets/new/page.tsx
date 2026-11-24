@@ -1,15 +1,16 @@
 import { Magnet } from "lucide-react";
 import { PageHero } from "@/components/ui/kit";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { listRuleOptions, type RuleOption } from "@/lib/leadMagnets";
 import LeadMagnetForm from "../LeadMagnetForm";
 import { rulePicks } from "../rulePicks";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Create lead magnet" };
 
 export default async function NewLeadMagnetPage() {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   let rules: RuleOption[] = [];
   try {
     rules = isDbConfigured() ? await listRuleOptions(user.id) : [];

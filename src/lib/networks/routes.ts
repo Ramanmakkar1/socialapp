@@ -3,7 +3,7 @@
 // new channel selected (and a "connected" toast). Errors go back to Settings with a clear banner.
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { query } from "@/lib/db";
 import { accountLimitError } from "@/lib/planLimits";
@@ -22,6 +22,7 @@ import {
 import { NETWORKS } from "@/lib/networks/registry";
 import { saveNetworkAccount, type SaveAccountInput } from "@/lib/networks/store";
 import { DEFAULT_SCHEDULE_DAYS, DEFAULT_SCHEDULE_TIMES } from "@/lib/postingSchedule";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 /**
  * A failed connect: back to the calendar with the Connect dialog open on a plain-words error and a
@@ -45,7 +46,7 @@ export async function startOAuth(
   authorizeUrl: (flow: OAuthFlow) => string | Promise<string>,
   opts: { pkce?: boolean; extra?: Record<string, string> } = {},
 ): Promise<NextResponse> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!NETWORKS[network].configured()) return NextResponse.redirect(settingsResultUrl(network, "not_configured"));
   if (network === "x" && !(await requirePlanFeature(user.id, "x_posting")).ok) return NextResponse.redirect(settingsResultUrl(network, "plan_required"));
   const flow: OAuthFlow = { state: randomState(), ...(opts.pkce ? { verifier: newPkceVerifier() } : {}), ...(opts.extra ? { extra: opts.extra } : {}) };
@@ -99,7 +100,7 @@ export async function finishOAuth(
   codeParam = "code",
 ): Promise<NextResponse> {
   // Outside the try so the /login redirect is not swallowed.
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   try {
     const url = new URL(request.url);
     const code = url.searchParams.get(codeParam);

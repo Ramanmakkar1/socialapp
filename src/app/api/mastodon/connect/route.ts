@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { NetworkAuthError } from "@/lib/networks/common";
 import { mastodonAuthorizeUrl, normalizeInstance } from "@/lib/networks/mastodon";
 import { getOrRegisterMastodonApp } from "@/lib/networks/mastodonApps";
 import { settingsResultUrl, startOAuth } from "@/lib/networks/routes";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 // GET /api/mastodon/connect?instance=mastodon.social (the Connect dialog's one-field form).
 export async function GET(request: Request) {
-  await requireUser();
+  await requireWorkspaceUser("admin");
   const instance = normalizeInstance(new URL(request.url).searchParams.get("instance") ?? "");
   if (!instance) return NextResponse.redirect(settingsResultUrl("mastodon", "bad_instance"));
   try {

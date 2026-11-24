@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { Film } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import type { IgProfile } from "@/lib/igGraph";
 import { relativeDay, type IgMediaItem } from "@/lib/igMedia";
@@ -13,6 +13,7 @@ import { CardRowSkeleton, TableSkeleton } from "../Skeleton";
 import EmptyState from "../EmptyState";
 import { BtnLink } from "@/components/ui/kit";
 import styles from "./content.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Posts & Reels" };
 
@@ -22,7 +23,7 @@ type Account = { id: string; external_id: string; access_token_enc: string | nul
 // call as Home's "Today's actions"), with whether an active comment automation covers each post.
 // Views, DM clicks and CTR per post are not stored, so they show a dash.
 export default async function ContentPage() {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   let account: Account | null = null;
   let scopes: { media_ids: string[] }[] = [];
   if (isDbConfigured()) {

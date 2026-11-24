@@ -1,11 +1,12 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { encryptToken } from "@/lib/crypto";
 import { query } from "@/lib/db";
 import { accountLimitError } from "@/lib/planLimits";
 import { THREADS_SCOPES, exchangeThreadsCode, fetchThreadsProfile, threadsLongLivedToken } from "@/lib/threadsAuth";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 type BackResult = "connected" | "error" | "state_error" | "declined" | "limit";
 
@@ -17,7 +18,7 @@ function back(result: BackResult) {
 
 export async function GET(request: Request) {
   // Outside the try so the /login redirect is not swallowed.
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   try {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");

@@ -2,13 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { ideaInsertStatement } from "@/lib/ideas";
 import { planForUser } from "@/lib/planLimits";
 import { rateLimit } from "@/lib/rateLimit";
 import { draftIdeaText, kindOf, parseUsernameList, trendWatchLimit } from "@/lib/trends";
 import { refreshWatches } from "@/lib/trendsData";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -16,7 +17,7 @@ export type AddWatchState = { ok: boolean; message: string } | null;
 
 /** "Add" in the Watched accounts panel: one or more usernames, within the plan's limit. */
 export async function addWatchesAction(_prev: AddWatchState, formData: FormData): Promise<AddWatchState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   if (!isDbConfigured()) return { ok: false, message: "The database isn't configured." };
   const raw = String(formData.get("usernames") ?? "").slice(0, 2000);
   const { valid, invalid } = parseUsernameList(raw);
@@ -54,7 +55,7 @@ export async function addWatchesAction(_prev: AddWatchState, formData: FormData)
 }
 
 export async function removeWatchAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const id = String(formData.get("id") ?? "");
   if (!UUID_RE.test(id) || !isDbConfigured()) return;
   await query("delete from socialapp.trend_watches where id=$1 and user_id=$2", [id, user.id]);
@@ -68,7 +69,7 @@ export type RefreshState = { ok: boolean; message: string };
  * without it only accounts older than 6 hours (automatic refresh when the page is opened).
  */
 export async function refreshTrendsAction(force: boolean): Promise<RefreshState> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   if (!isDbConfigured()) return { ok: false, message: "The database isn't configured." };
   if (force) {
     const limited = rateLimit(`trends-refresh:${user.id}`, 6, 60 * 60 * 1000);
@@ -96,7 +97,7 @@ export async function refreshTrendsAction(force: boolean): Promise<RefreshState>
 
 /** "Make a post like this": saves an idea that credits the source, then opens it in the composer. */
 export async function makePostLikeThisAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const mediaId = String(formData.get("mediaId") ?? "").slice(0, 64);
   const watchId = String(formData.get("watchUser") ?? "").slice(0, 40);
   if (!mediaId || !isDbConfigured()) redirect("/app/publish?compose=1");

@@ -1,17 +1,18 @@
 import { Package } from "lucide-react";
 import { PageHero } from "@/components/ui/kit";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { listRuleOptions, type RuleOption } from "@/lib/leadMagnets";
 import { payoutRoute } from "@/lib/upi";
 import { getSellerPayout } from "@/lib/upiOrders";
 import { rulePicks } from "../../lead-magnets/rulePicks";
 import ProductForm from "../ProductForm";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Create product" };
 
 export default async function NewProductPage() {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   let rules: RuleOption[] = [];
   let upi = false;
   try {

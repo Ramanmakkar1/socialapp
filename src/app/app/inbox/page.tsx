@@ -3,7 +3,7 @@ import { postThumbUrl } from "@/lib/mediaUpload";
 import Link from "next/link";
 import { Check, EyeOff, Heart, Image as ImageIcon, Inbox, Instagram, LayoutGrid, List, MessageCircle, MessagesSquare } from "lucide-react";
 import LocalTime from "@/components/LocalTime";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import {
   DM_WINDOW_MS,
@@ -26,6 +26,7 @@ import { postKeyFor } from "./returnTo";
 import ReplySubmitButton from "./ReplySubmitButton";
 import ThreadReplyComposer from "./ThreadReplyComposer";
 import styles from "./inbox.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Inbox" };
 
@@ -115,7 +116,7 @@ export default async function InboxPage({
 }: {
   searchParams: Promise<{ tab?: string | string[]; thread?: string | string[]; ok?: string | string[]; error?: string | string[]; filter?: string | string[]; view?: string | string[]; post?: string | string[] }>;
 }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const sp = await searchParams;
   const threadKey = one(sp.thread);
   const tab = threadKey ? "messages" : one(sp.tab) === "messages" ? "messages" : "comments";

@@ -6,7 +6,7 @@ import styles from "@/components/commerce/commerce.module.css";
 import { readPaging } from "@/components/commerce/pager";
 import { BtnLink, PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { isFeatureReady } from "@/lib/featureReadiness";
@@ -14,6 +14,7 @@ import { countProducts, listProducts, type ProductRow } from "@/lib/products";
 import { connectedAccountForPage, type ConnectedAccount } from "@/lib/stripeConnect";
 import { getSellerPayout, type SellerPayout } from "@/lib/upiOrders";
 import PaymentsNotice from "./PaymentsNotice";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = {
   title: "Products",
@@ -21,7 +22,7 @@ export const metadata = {
 };
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const params = await searchParams;
   // Card checkout needs live Stripe (src/lib/featureReadiness.ts); UPI never does.
   const configured = isFeatureReady("card_payments");

@@ -7,16 +7,17 @@ import styles from "@/components/commerce/commerce.module.css";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { PageHero } from "@/components/ui/kit";
 import ui from "@/components/ui/ui.module.css";
-import { requireUser } from "@/lib/auth";
+
 import { getLeadMagnet, listRuleOptions, recentDeliveries } from "@/lib/leadMagnets";
 import { deleteLeadMagnetAction } from "../actions";
 import LeadMagnetForm from "../LeadMagnetForm";
 import { rulePicks } from "../rulePicks";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Lead magnet" };
 
 export default async function LeadMagnetPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string; error?: string }> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const { id } = await params;
   const { saved, error } = await searchParams;
   const magnet = await getLeadMagnet(user.id, id);

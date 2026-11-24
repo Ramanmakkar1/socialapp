@@ -1,16 +1,17 @@
 // Starts or resumes Stripe Connect onboarding. POST (Settings form) creates the connected
 // account on first use; GET (Stripe's refresh_url, "Continue setup") makes a fresh Account Link.
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { isDbConfigured } from "@/lib/db";
 import { isFeatureReady } from "@/lib/featureReadiness";
 import { CONNECT_COUNTRIES, ensureConnectedAccount, getConnectedAccount, onboardingLink } from "@/lib/stripeConnect";
+import { getWorkspaceUserAtLeast } from "@/lib/workspace";
 
 const back = (status: string) => NextResponse.redirect(new URL(`/app/settings?payments=${status}#payments-heading`, BRAND.url), 303);
 
 async function start(country: string | null) {
-  const user = await getCurrentUser();
+  const user = await getWorkspaceUserAtLeast("owner");
   if (!user) return NextResponse.redirect(new URL("/login", BRAND.url), 303);
   // Stripe onboarding only once card payments are live (src/lib/featureReadiness.ts).
   if (!isFeatureReady("card_payments") || !isDbConfigured()) return back("not_configured");

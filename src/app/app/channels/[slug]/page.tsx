@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { CalendarDays, LayoutGrid, List, Plus, Settings } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { isExtraNetwork } from "@/lib/networks/tokenNetworks";
 import { channelSlugForId, findChannelBySlug } from "@/lib/sidebarChannels";
 import { PLATFORM_ICON, PLATFORM_LABEL } from "../../publish/calendarUtils";
 import ChannelPosts, { type ChannelPost } from "./ChannelPosts";
 import styles from "./channel.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Channel" };
 
@@ -59,7 +60,7 @@ export default async function ChannelPage({ params, searchParams }: { params: Pr
   const { slug: rawSlug } = await params;
   const { tab: tabParam } = await searchParams;
   const tab: Tab = tabParam === "drafts" || tabParam === "sent" ? tabParam : "queue";
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   if (!isDbConfigured()) notFound();
   const key = decodeURIComponent(rawSlug);
   // Old links used the row id (/app/channels/<uuid>, /app/channels/yt-<uuid>): send them to the readable slug.

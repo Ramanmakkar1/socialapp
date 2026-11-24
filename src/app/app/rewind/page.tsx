@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { History, RefreshCw } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import LoadFailed from "../publish/LoadFailed";
 import RewindFlow, { type RewindRule } from "./RewindFlow";
 import LocalTime from "@/components/LocalTime";
 import styles from "./rewind.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = {
   title: "Rewind",
@@ -44,7 +45,7 @@ function Header() {
 }
 
 export default async function RewindPage() {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const configured = isDbConfigured();
   const loadFailure = (
     <div className={styles.page}>

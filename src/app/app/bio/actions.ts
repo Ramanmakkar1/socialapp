@@ -2,12 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { saveBioPage, type BioLinkInput } from "@/lib/bioPage";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export async function saveBioPageAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   if (!isDbConfigured()) redirect("/app/bio?error=not_configured");
 
   const ids = formData.getAll("link_id").map(String);

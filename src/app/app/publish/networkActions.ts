@@ -2,18 +2,19 @@
 
 // Composer data for the newer networks, read live when the network is ticked: TikTok creator info
 // (TikTok requires it to be shown and used before every post) and the user's Pinterest boards.
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { NetworkAuthError } from "@/lib/networks/common";
 import { listPinterestBoards, type PinterestBoard } from "@/lib/networks/pinterest";
 import { ensureFreshAccount } from "@/lib/networks/publish";
 import { loadActiveAccount, markAccountExpired } from "@/lib/networks/store";
 import { queryCreatorInfo, type TikTokCreatorInfo } from "@/lib/networks/tiktok";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export type TikTokCreatorResult = { ok: true; info: TikTokCreatorInfo } | { ok: false; error: string };
 
 export async function tiktokCreatorInfoAction(): Promise<TikTokCreatorResult> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   if (!isDbConfigured()) return { ok: false, error: "Not available on this server." };
   try {
     const stored = await loadActiveAccount(user.id, "tiktok");
@@ -31,7 +32,7 @@ export async function tiktokCreatorInfoAction(): Promise<TikTokCreatorResult> {
 export type PinterestBoardsResult = { ok: true; boards: PinterestBoard[] } | { ok: false; error: string };
 
 export async function pinterestBoardsAction(): Promise<PinterestBoardsResult> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   if (!isDbConfigured()) return { ok: false, error: "Not available on this server." };
   try {
     const stored = await loadActiveAccount(user.id, "pinterest");

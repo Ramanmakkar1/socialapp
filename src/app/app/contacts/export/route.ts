@@ -1,10 +1,11 @@
-import { getCurrentUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { buildContactQuery, isValidRuleId, parseContactFilters } from "@/lib/contactsQuery";
 import { leadsCsv, type LeadRow } from "@/lib/leadsCsv";
+import { getWorkspaceUser } from "@/lib/workspace";
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getWorkspaceUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
   if (!isDbConfigured()) return new Response("Contacts are not available right now.", { status: 503 });
   try {

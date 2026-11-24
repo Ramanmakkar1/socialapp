@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { Activity, Inbox } from "lucide-react";
 import LocalTime from "@/components/LocalTime";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import EmptyState from "../../EmptyState";
 import ui from "@/components/ui/ui.module.css";
 import { PageHero } from "@/components/ui/kit";
 import { attemptsText } from "@/lib/deliveryLabels";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Auto-DM activity" };
 
@@ -50,7 +51,7 @@ function explainError(error: string | null): string | null {
 }
 
 export default async function AutoDmActivityPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const { page: requestedPage = "" } = await searchParams;
   const page = Math.min(Math.max(Number.parseInt(requestedPage, 10) || 1, 1), 1000);
 

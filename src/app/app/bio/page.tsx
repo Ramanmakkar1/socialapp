@@ -1,11 +1,12 @@
 import { ExternalLink, Link2 } from "lucide-react";
 import { BtnA, PageHero } from "@/components/ui/kit";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { getBioPage } from "@/lib/bioPage";
 import { isDbConfigured } from "@/lib/db";
 import BioEditor from "./BioEditor";
 import styles from "./bio.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Link in bio" };
 
@@ -14,7 +15,7 @@ export default async function BioPage({
 }: {
   searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const params = await searchParams;
   const page = isDbConfigured() ? await getBioPage(user.id) : null;
   const publicUrl = page ? `${BRAND.url}/@${page.handle}` : null;

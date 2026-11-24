@@ -3,17 +3,18 @@
 // 1-hour cookie, then sign up; after sign-up the billing page (and a dashboard banner) picks it up.
 // GET never creates a Stripe session: Checkout starts from a POST on the billing page.
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { parsePlanChoice } from "@/lib/billingState";
 import { isFeatureReady } from "@/lib/featureReadiness";
 import { UPGRADE_INTENT_COOKIE, UPGRADE_INTENT_MAX_AGE, billingChoiceHref, serializeUpgradeIntent } from "@/lib/upgradeIntent";
+import { getOwnWorkspaceUser } from "@/lib/workspace";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const choice = parsePlanChoice(url.searchParams.get("plan"), url.searchParams.get("interval") ?? "month");
   if (!choice) return NextResponse.redirect(new URL("/pricing", BRAND.url), 303);
-  const user = await getCurrentUser().catch(() => null);
+  const user = await getOwnWorkspaceUser().catch(() => null);
   // Paid plans not on sale yet (featureReadiness "billing"): the billing page explains, and a
   // visitor just signs up for Free (no plan remembered, so no "Continue to checkout" banner).
   const paidReady = isFeatureReady("billing");

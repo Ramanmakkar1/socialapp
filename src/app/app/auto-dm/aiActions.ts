@@ -1,12 +1,13 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { isAdmin } from "@/lib/admin";
 import type { AiAvailability } from "@/components/AiOffNote";
 import { generateDmIdeas, type DmIdeasResult } from "@/lib/ai";
 import { consumeAiRequest } from "@/lib/aiQuota";
 import { isDbConfigured, query } from "@/lib/db";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export async function suggestDmMessages(input: {
   goal: string;
@@ -15,7 +16,7 @@ export async function suggestDmMessages(input: {
   emailGate?: boolean;
   tone?: string;
 }): Promise<DmIdeasResult> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const goal = typeof input?.goal === "string" ? input.goal.trim() : "";
   if (!goal || goal.length > 300) {
     return { ok: false, error: "Describe what the DM is for in 1-300 characters." };
@@ -60,6 +61,6 @@ export async function suggestDmMessages(input: {
 
 /** Whether AI is on (env or stored key), and whether this user may switch it on (admin). */
 export async function dmAiAvailable(): Promise<AiAvailability> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   return { ready: await isFeatureReadyNow("ai"), isAdmin: isAdmin(user) };
 }

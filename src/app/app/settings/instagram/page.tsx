@@ -4,17 +4,18 @@ import { Instagram } from "lucide-react";
 import { BtnLink, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
-import { requireUser } from "@/lib/auth";
+
 import { PICK_COOKIE, decodePick } from "@/lib/metaAccounts";
 import { fetchPagesWithInstagram, type MetaPageWithInstagram } from "@/lib/metaLogin";
 import { connectPickedAccountAction } from "./actions";
 import styles from "../../app-page.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Choose an Instagram account" };
 
 // Shown after Facebook login when more than one Page has an Instagram professional account.
 export default async function ChooseInstagramPage() {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const store = await cookies();
   const pick = decodePick(store.get(PICK_COOKIE)?.value, user.id);
   if (!pick) redirect("/app/settings?ig=pick_expired");

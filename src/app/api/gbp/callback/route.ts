@@ -1,15 +1,16 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { NetworkAuthError, oauthCookieName, openOAuthFlow } from "@/lib/networks/common";
 import { exchangeGbpCode, listGbpLocations } from "@/lib/networks/gbp";
 import { saveGbpLocation, storePendingGbp } from "@/lib/networks/gbpConnect";
 import { connectedUrl, seedChannelSchedule, settingsResultUrl } from "@/lib/networks/routes";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 // One location: connected right away. Several: the Connect dialog shows the location picker.
 export async function GET(request: Request) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   try {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");

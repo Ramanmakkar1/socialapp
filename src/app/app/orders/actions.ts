@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+
 import { isUuid } from "@/lib/leadMagnets";
 import { normalizeRejectReason } from "@/lib/upi";
 import { decideUpiOrder } from "@/lib/upiOrders";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 /**
  * Seller confirms or rejects one of their Direct UPI orders. Only an order still awaiting
@@ -13,7 +14,7 @@ import { decideUpiOrder } from "@/lib/upiOrders";
  * Confirm -> paid -> the buyer gets the receipt with the access link; reject -> reason e-mail.
  */
 export async function decideUpiOrderAction(form: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const id = String(form.get("id") ?? "");
   const decision = form.get("decision") === "confirm" ? "confirm" : "reject";
   if (!isUuid(id)) redirect("/app/orders?upi=missing");

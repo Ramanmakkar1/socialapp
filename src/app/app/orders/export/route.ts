@@ -1,10 +1,11 @@
-import { getCurrentUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { listOrders, ordersCsv } from "@/lib/orders";
+import { getWorkspaceUserAtLeast } from "@/lib/workspace";
 
 // CSV of the newest 10,000 orders, same conventions as the contacts export.
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
+  const user = await getWorkspaceUserAtLeast("admin");
   if (!user) return new Response("Unauthorized", { status: 401 });
   if (!isDbConfigured()) return new Response("Orders are not available right now.", { status: 503 });
   try {

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import { IG_SCOPES, exchangeCode, fetchProfile, longLivedToken } from "@/lib/instagram";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/lib/metaAccounts";
 import { MetaApiError, discoverMetaAccounts, isMetaLoginConfigured, verifyState } from "@/lib/metaLogin";
 import { accountLimitError } from "@/lib/planLimits";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 type BackResult =
   | "connected"
@@ -38,7 +39,7 @@ function back(result: BackResult) {
 
 export async function GET(request: Request) {
   // Outside the try so the /login redirect is not swallowed.
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   // The Connect dialog's "Continue with Instagram" sets ig_flow=instagram (Instagram Login) even
   // when Facebook Login for Business is configured too.
   const flowStore = await cookies();

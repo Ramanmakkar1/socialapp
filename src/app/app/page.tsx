@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { AlertTriangle, ArrowRight, Heart, Inbox, Link2, MessageCircle, Plus, Send, Trophy, UserPlus, Users } from "lucide-react";
-import { getCurrentUser } from "@/lib/auth";
+
 import { TopThumb } from "./TopThumb";
 import { instrumentSans } from "@/lib/fonts";
 import { EMPTY_STATS, getDashboardStats, getRecentPosts, getUpcomingPosts, type RecentPost } from "@/lib/stats";
@@ -25,6 +25,7 @@ import UpcomingPosts from "./UpcomingPosts";
 import AiTools from "./AiTools";
 import { isAdmin } from "@/lib/admin";
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { getWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Dashboard" };
 
@@ -173,7 +174,7 @@ const n = (v: number | null | undefined) => (v == null ? "–" : v.toLocaleStrin
 
 export default async function AppHome() {
   await connection();
-  const user = await getCurrentUser();
+  const user = await getWorkspaceUser();
   // Database only: nothing here calls Instagram, so the page shell renders at once. Graph reads stream in below.
   const [stats, upcoming, snapshot, automations, account, postCreated, unanswered, recentPosts, followers, scopes, dbHandle, nextWeek, anyChannel] = user
     ? await Promise.all([

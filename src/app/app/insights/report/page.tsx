@@ -1,4 +1,4 @@
-import { requireUser } from "@/lib/auth";
+
 import { buildGrowthSeries, getGrowthSnapshots, getPostPerformance, parsePeriod, PERIOD_OPTIONS } from "@/lib/analytics";
 import { CommentTimes, GrowthChart } from "../Charts";
 import { getCommentTimeCells } from "../commentTimes";
@@ -6,6 +6,7 @@ import { BRAND } from "@/lib/brand";
 import LocalTime from "@/components/LocalTime";
 import PrintButton from "./PrintButton";
 import styles from "./report.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Analytics report" };
 
@@ -27,7 +28,7 @@ function formatPlatforms(platforms: string[]): string {
 }
 
 export default async function AnalyticsReportPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const { range: rangeParam } = await searchParams;
   const period = parsePeriod(rangeParam);
 

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { requireUser } from "@/lib/auth";
+
 import { BRAND } from "@/lib/brand";
 import {
   YOUTUBE_COOKIE,
@@ -10,9 +10,10 @@ import {
   sealFlow,
   youtubeAuthorizeUrl,
 } from "@/lib/youtubeAuth";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export async function GET() {
-  await requireUser();
+  await requireWorkspaceUser("admin");
   if (!isYouTubeConfigured()) {
     return NextResponse.redirect(new URL("/app/settings?yt=not_configured", BRAND.url));
   }

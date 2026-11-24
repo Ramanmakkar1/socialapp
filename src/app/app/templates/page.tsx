@@ -1,17 +1,18 @@
 import Link from "next/link";
 import { LayoutTemplate } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import { DM_TEMPLATES } from "@/lib/dmTemplates";
 import { TEMPLATES_LIST_SQL, type PostTemplate } from "@/lib/templates";
 import PostTemplates from "./PostTemplates";
 import TemplatesGallery from "./TemplatesGallery";
 import styles from "./templates.module.css";
+import { requireWorkspaceUser } from "@/lib/workspace";
 
 export const metadata = { title: "Templates" };
 
 export default async function TemplatesPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const { tab } = await searchParams;
   const posts = tab === "posts";
   let postTemplates: PostTemplate[] = [];
