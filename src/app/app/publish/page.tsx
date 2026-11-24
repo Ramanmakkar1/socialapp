@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import ScheduleSeeder from "../settings/ScheduleSeeder";
-import { CalendarDays, LayoutGrid, LayoutTemplate, Lightbulb, List, Plus } from "lucide-react";
+import { CalendarDays, CheckCircle2, LayoutGrid, LayoutTemplate, Lightbulb, List, Plus } from "lucide-react";
 import CalendarToolbar, { type NoDatePost } from "./CalendarToolbar";
 import { PLATFORM_LABEL, weekMonthLabel, type AccountNames, type CalendarPost } from "./calendarUtils";
 import CalendarEmptyState from "./CalendarEmptyState";
@@ -24,7 +24,7 @@ import MonthView from "./MonthView";
 import PostList, { type Post, type PostFilter } from "./PostList";
 import WeekView from "./WeekView";
 import GridView from "./GridView";
-import { getCurrentUser, requireUser } from "@/lib/auth";
+
 import { planForUser, scheduledPostsUsage } from "@/lib/planLimits";
 import { topHours } from "@/lib/bestTime";
 import { isDbConfigured, query } from "@/lib/db";
@@ -34,6 +34,10 @@ import { allPostTags, hasColumn } from "@/lib/tagFilter";
 import { filterPosts, parseChannels, parseStatus, postKind, sundayOnOrBefore } from "./weekGrid";
 import styles from "./calendar.module.css";
 import { isExtraNetwork, EXTRA_NETWORK_IDS } from "@/lib/networks/tokenNetworks";
+import { requireWorkspaceUser, getWorkspaceContext, roleAtLeast } from "@/lib/workspace";
+import { countPendingApprovals, listPendingApprovals } from "@/lib/team";
+import ApprovalsPanel from "./ApprovalsPanel";
+import approvalStyles from "./approvals.module.css";
 
 export const metadata = { title: "Publish" };
 
@@ -161,8 +165,8 @@ export default async function CalendarPage({
 }) {
   const { week, view: viewParam, month, date, status, draft, idea, tag = "", channel = "", campaign, tz = "" } = await searchParams;
   const initialFilter: PostFilter = status === "scheduled" || status === "draft" || status === "failed" ? status : "all";
-  const view: "day" | "week" | "month" | "list" | "grid" | "ideas" =
-    viewParam === "month" ? "month" : viewParam === "day" ? "day" : viewParam === "list" ? "list" : viewParam === "grid" ? "grid" : viewParam === "ideas" ? "ideas" : "week";
+  const view: "day" | "week" | "month" | "list" | "grid" | "ideas" | "approvals" =
+    viewParam === "approvals" ? "approvals" : viewParam === "month" ? "month" : viewParam === "day" ? "day" : viewParam === "list" ? "list" : viewParam === "grid" ? "grid" : viewParam === "ideas" ? "ideas" : "week";
   // Day view: ?date=YYYY-MM-DD (not "day", which the composer uses for "new post on this day").
   const dayStart = date && /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(new Date(`${date}T00:00:00.000Z`).getTime())
     ? new Date(`${date}T00:00:00.000Z`)
@@ -245,7 +249,7 @@ export default async function CalendarPage({
   let scheduledUsage: { used: number; limit: number | null } | null = null;
   let mediaPlan: Awaited<ReturnType<typeof planForUser>> = "Free";
   if (isDbConfigured()) {
-    const user = await requireUser();
+    const user = await requireWorkspaceUser();
     [scheduledUsage, mediaPlan] = await Promise.all([scheduledPostsUsage(user.id).catch(() => null), planForUser(user.id)]);
     try {
       const columnRows = await query<{ exists: boolean }>(
@@ -476,7 +480,22 @@ export default async function CalendarPage({
     .map((p) => ({ id: p.id, caption: p.caption ?? "", platforms: p.platforms }));
   const calendarPosts = filteredWeekRows.map(toCalendarPost);
   // AI on (env or stored key, src/lib/featureReadinessNow.ts)? Admins get a link to switch it on.
-  const [aiReady, viewer] = await Promise.all([isFeatureReadyNow("ai"), getCurrentUser()]);
+  const [aiReady, wctx] = await Promise.all([isFeatureReadyNow("ai"), getWorkspaceContext()]);
+  // Platform super-admin checks use the real signed-in person, not the workspace owner.
+  const viewer = wctx?.user ?? null;
+  // Team workspaces: the Approvals tab shows for anyone in a team (count = posts waiting).
+  const canReview = wctx ? roleAtLeast(wctx.role, "admin") : false;
+  const pendingCount = wctx && isDbConfigured() ? await countPendingApprovals(wctx.ownerId) : 0;
+  let hasTeam = Boolean(wctx && !wctx.isOwnWorkspace);
+  if (wctx && !hasTeam && isDbConfigured()) {
+    hasTeam = (await query<{ n: number }>("select count(*)::int as n from socialapp.workspace_members where owner_user_id=$1", [wctx.ownerId]).catch(() => [{ n: 0 }]))[0]?.n > 0;
+  }
+  const pendingItems =
+    view === "approvals" && wctx && isDbConfigured()
+      ? (await listPendingApprovals(wctx.ownerId))
+          .filter((p) => canReview || p.requestedBy === wctx.user.id)
+          .map((p) => ({ ...p, scheduledAt: p.scheduledAt ? new Date(p.scheduledAt).toISOString() : null }))
+      : [];
   // Channels the user can filter by: every connected channel (YouTube lives in its own table) plus any on loaded posts.
   const connectedChannels = [...new Set([...Object.keys(previewAccountNames), ...(youtubeReady ? ["youtube"] : [])])];
   const channelOptions = [...new Set([...connectedChannels, ...weekRows.flatMap((p) => p.platforms)])].sort();
@@ -542,6 +561,12 @@ export default async function CalendarPage({
               <Link href="/app/publish?view=grid" aria-current={view === "grid" ? "page" : undefined} className={`${styles.viewLink} ${view === "grid" ? styles.viewLinkActive : ""}`}>
                 <LayoutGrid width={16} height={16} aria-hidden="true" /> Grid
               </Link>
+              {(hasTeam || pendingCount > 0) && (
+                <Link href="/app/publish?view=approvals" aria-current={view === "approvals" ? "page" : undefined} className={`${styles.viewLink} ${view === "approvals" ? styles.viewLinkActive : ""}`}>
+                  <CheckCircle2 width={16} height={16} aria-hidden="true" /> Approvals
+                  {pendingCount > 0 && <span className={approvalStyles.count} aria-label={`${pendingCount} waiting`}>{pendingCount > 99 ? "99+" : pendingCount}</span>}
+                </Link>
+              )}
             </nav>
           )}
           <CampaignDialog aiReady={aiReady} aiAdmin={isAdmin(viewer)} autoOpen={campaign === "1"} channels={campaignChannels} mediaPlan={mediaPlan} />
@@ -580,7 +605,7 @@ export default async function CalendarPage({
         </section>
       ) : (
         <ComposerDialog title={initialIdea ? "Create post from idea" : initialDraft ? (initialDraft.status === "scheduled" ? "Edit scheduled post" : "Edit draft") : "Create post"}>
-          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} networkReady={networkReady} captionMaxOverrides={captionMaxOverrides} networkData={networkData} mediaPlan={mediaPlan} accountChoices={accountChoices} />
+          <Composer key={initialIdea ? `idea-${initialIdea.id}` : (initialDraft?.id ?? "new")} rules={rules} bestHoursUtc={bestHoursUtc} initialDraft={initialDraft} initialIdea={initialIdea} facebookReady={facebookReady} threadsReady={threadsReady} schedulePlatforms={schedulePlatforms} youtubeReady={youtubeReady} scheduledUsage={scheduledUsage} accountNames={previewAccountNames} networkReady={networkReady} captionMaxOverrides={captionMaxOverrides} networkData={networkData} mediaPlan={mediaPlan} accountChoices={accountChoices} needsApproval={wctx?.needsApproval ?? false} />
         </ComposerDialog>
       )}
       {view === "month" ? (
@@ -682,6 +707,9 @@ export default async function CalendarPage({
             }
           />
         </>
+      )}
+      {view === "approvals" && wctx && (
+        <ApprovalsPanel items={pendingItems} canReview={canReview} userId={wctx.user.id} platformLabel={PLATFORM_LABEL as Record<string, string>} />
       )}
       {view === "grid" && (
         <GridView

@@ -842,3 +842,83 @@ export const PREVIEWS: Record<string, () => RenderedEmail> = {
   "post-failed": () =>
     postFailedEmail({ name: "Jamie", platform: "Instagram", caption: "5 hooks that doubled my reel views this month (save this!)", error: "Instagram needs an image or video", scheduledFor: new Date("2026-11-12T15:00:00Z") }),
 };
+
+// ---- Team workspaces (migration 054) -------------------------------------------------------------
+
+function clip(text: string, max = 90): string {
+  const t = text.trim();
+  if (!t) return "(no caption)";
+  return t.length > max ? `${t.slice(0, max).trimEnd()}…` : t;
+}
+
+/** Invitation to join someone's Poskoo workspace. `acceptUrl` carries the one-time token. */
+export function teamInviteEmail(d: { inviter: string; workspace: string; role: "admin" | "member"; needsApproval: boolean; acceptUrl: string }): RenderedEmail {
+  const subject = `${d.inviter} invited you to ${d.workspace} on Poskoo`;
+  const preheader = "Accept the invite to plan and schedule posts together.";
+  const roleText = d.role === "admin" ? "an admin" : d.needsApproval ? "a member (posts wait for approval)" : "a member";
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.welcome,
+    body: `${h1("You're invited.")}
+${p(`${esc(d.inviter)} invited you to join <b>${esc(d.workspace)}</b> on Poskoo as ${esc(roleText)}.`)}
+${button("Accept invite", d.acceptUrl)}
+${p("The invite expires in 7 days. If you weren't expecting it, you can ignore this e-mail.", { muted: true, size: 13 })}`,
+  });
+  const text = `${d.inviter} invited you to join ${d.workspace} on Poskoo as ${roleText}.
+
+Accept the invite: ${d.acceptUrl}
+
+The invite expires in 7 days.${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
+/** To owners/admins: a member's post is waiting for approval. */
+export function approvalRequestedEmail(d: { name?: string | null; requester: string; workspace: string; caption: string; scheduledFor: Date | null }): RenderedEmail {
+  const subject = `${d.requester} sent a post for approval`;
+  const preheader = "Approve it to schedule it, or send it back to drafts.";
+  const link = absoluteUrl("/app/publish?view=approvals");
+  const rows: [string, string][] = [["Workspace", d.workspace], ["Post", clip(d.caption)]];
+  if (d.scheduledFor) rows.push(["Requested time", d.scheduledFor.toUTCString()]);
+  const html = layout({
+    subject,
+    preheader,
+    art: ART.welcome,
+    body: `${h1("A post needs your approval.")}
+${p(`${esc(greet(d.name))} ${esc(d.requester)} wants to publish a post in ${esc(d.workspace)}.`)}
+${details(rows)}
+${button("Review the post", link)}`,
+  });
+  const text = `${greet(d.name)}
+
+${d.requester} wants to publish a post in ${d.workspace}.
+${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}
+
+Review it: ${link}${textFooter()}`;
+  return { subject, preheader, html, text };
+}
+
+/** To the requester: their post was approved or sent back. */
+export function approvalDecidedEmail(d: { name?: string | null; approved: boolean; reviewer: string; workspace: string; caption: string; note?: string | null }): RenderedEmail {
+  const subject = d.approved ? "Your post was approved" : "Your post was sent back to drafts";
+  const preheader = d.approved ? "It's on the calendar now." : "Open it to see the note and make changes.";
+  const link = absoluteUrl("/app/publish");
+  const rows: [string, string][] = [["Workspace", d.workspace], ["Post", clip(d.caption)], ["Reviewed by", d.reviewer]];
+  if (d.note) rows.push(["Note", d.note.slice(0, 300)]);
+  const html = layout({
+    subject,
+    preheader,
+    art: d.approved ? ART.welcome : ART.postFailed,
+    body: `${h1(d.approved ? "Approved." : "Sent back to drafts.")}
+${p(`${esc(greet(d.name))} ${d.approved ? "Your post is scheduled." : "Your post needs a few changes before it can go out."}`)}
+${details(rows)}
+${button("Open calendar", link)}`,
+  });
+  const text = `${greet(d.name)}
+
+${d.approved ? "Your post was approved and is scheduled." : "Your post was sent back to drafts."}
+${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}
+
+Open calendar: ${link}${textFooter()}`;
+  return { subject, preheader, html, text };
+}

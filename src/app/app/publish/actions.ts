@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured, query } from "@/lib/db";
 import type { PlatformId } from "@/lib/platforms";
 import { nextSlot, nextSlotForChannel, upcomingSlots, type ChannelSchedule } from "@/lib/postingSchedule";
@@ -11,6 +11,8 @@ import { ALLOWED_PLATFORMS, savePostForUser, type SavePostInput } from "@/lib/sa
 import { hashtagGroupValidationError, parseHashtagGroup, type SavedHashtagGroup } from "@/lib/hashtagSets";
 import { parseTags } from "@/lib/tagFilter";
 import { TEMPLATES_LIST_SQL, templateDeleteResult, templateValidationError, type PostTemplate } from "@/lib/templates";
+import { asOwnerUser, requireWorkspace, requireWorkspaceUser } from "@/lib/workspace";
+import { approvalBlock, notifyApprovalRequested } from "@/lib/team";
 
 export async function deletePost(id: string): Promise<{ ok: boolean; error?: string }> {
   if (typeof id !== "string" || !UUID_RE.test(id)) {
@@ -20,7 +22,7 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
     return { ok: false, error: "Database not configured" };
   }
 
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const result = await deletePostForUser(id, user.id);
     if (!result.ok) return result;
@@ -35,16 +37,21 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
 
 export async function savePost(
   input: SavePostInput,
-): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+): Promise<{ ok: true; id: string; pending?: true } | { ok: false; error: string }> {
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
 
-  const user = await requireUser();
-  const result = await savePostForUser(user.id, input);
+  const ctx = await requireWorkspace();
+  const user = asOwnerUser(ctx);
+  const result = await savePostForUser(user.id, input, { needsApproval: ctx.needsApproval, requestedBy: ctx.user.id });
   if (result.ok) {
     revalidatePath("/app/publish");
     revalidatePath("/app");
+    if (ctx.needsApproval && input.mode !== "draft") {
+      notifyApprovalRequested(ctx, result.id);
+      return { ...result, pending: true as const };
+    }
   }
   return result;
 }
@@ -54,7 +61,10 @@ export async function reorderQueue(orderedIds: string[]): Promise<{ ok: boolean;
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
-  const user = await requireUser();
+  const ctx = await requireWorkspace();
+  const blocked = approvalBlock(ctx);
+  if (blocked) return { ok: false, error: blocked };
+  const user = asOwnerUser(ctx);
   try {
     const result = await reorderQueueForUser(orderedIds, user.id);
     if (!result.ok) return result;
@@ -97,7 +107,7 @@ export async function nextAvailableSlot(
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const valid = platforms.filter((p) => (ALLOWED_PLATFORMS as string[]).includes(p));
   if (valid.length === 0) {
     return { ok: false, error: "Select at least one platform." };
@@ -120,7 +130,7 @@ export async function nextAvailableSlots(
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   const valid = platforms.filter((p) => (ALLOWED_PLATFORMS as string[]).includes(p));
   if (valid.length === 0) {
     return { ok: false, error: "Select at least one platform." };
@@ -150,7 +160,10 @@ export async function shareNow(id: string): Promise<{ ok: boolean; error?: strin
   if (!isDbConfigured()) {
     return { ok: false, error: "Database not configured" };
   }
-  const user = await requireUser();
+  const ctx = await requireWorkspace();
+  const blocked = approvalBlock(ctx);
+  if (blocked) return { ok: false, error: blocked };
+  const user = asOwnerUser(ctx);
   try {
     // Same monthly plan limit as scheduling: the post moves into the current UTC month.
     const result = await sharePostNow(id, user.id, (now) => scheduledPostLimitError(user.id, now, id));
@@ -167,7 +180,7 @@ export async function shareNow(id: string): Promise<{ ok: boolean; error?: strin
 export async function listTemplates(): Promise<PostTemplate[]> {
   if (!isDbConfigured()) return [];
   try {
-    const user = await requireUser();
+    const user = await requireWorkspaceUser();
     return await query<PostTemplate>(TEMPLATES_LIST_SQL, [user.id]);
   } catch {
     // A pending migration must not hide the post composer.
@@ -184,7 +197,7 @@ export async function saveTemplate(input: {
   if (!isDbConfigured()) return { ok: false, error: "Database not configured" };
   const validationError = templateValidationError(input);
   if (validationError) return { ok: false, error: validationError };
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     await query(
       "insert into socialapp.post_templates (user_id, name, caption, first_comment, tags) values ($1, $2, $3, $4, $5)",
@@ -199,7 +212,7 @@ export async function saveTemplate(input: {
 export async function deleteTemplate(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!UUID_RE.test(id)) return { ok: false, error: "Invalid template." };
   if (!isDbConfigured()) return { ok: false, error: "Database not configured" };
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const res = await query<{ id: string }>(
       "delete from socialapp.post_templates where id=$1 and user_id=$2 returning id",
@@ -214,7 +227,7 @@ export async function deleteTemplate(id: string): Promise<{ ok: true } | { ok: f
 export async function listHashtagGroups(): Promise<SavedHashtagGroup[]> {
   if (!isDbConfigured()) return [];
   try {
-    const user = await requireUser();
+    const user = await requireWorkspaceUser();
     return await query<SavedHashtagGroup>(
       "select id, name, hashtags, created_at from socialapp.hashtag_groups where user_id = $1 order by created_at desc",
       [user.id],
@@ -232,7 +245,7 @@ export async function saveHashtagGroup(input: {
   const hashtags = parseHashtagGroup(input.hashtags);
   const validationError = hashtagGroupValidationError(input.name, hashtags);
   if (validationError) return { ok: false, error: validationError };
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     await query(
       "insert into socialapp.hashtag_groups (user_id, name, hashtags) values ($1, $2, $3)",
@@ -247,7 +260,7 @@ export async function saveHashtagGroup(input: {
 export async function deleteHashtagGroup(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!UUID_RE.test(id)) return { ok: false, error: "Invalid hashtag group." };
   if (!isDbConfigured()) return { ok: false, error: "Database not configured" };
-  const user = await requireUser();
+  const user = await requireWorkspaceUser();
   try {
     const res = await query<{ id: string }>(
       "delete from socialapp.hashtag_groups where id=$1 and user_id=$2 returning id",

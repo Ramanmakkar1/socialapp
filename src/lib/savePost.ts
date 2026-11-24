@@ -168,9 +168,17 @@ export async function nextQueueSlot(userId: string, platforms: PlatformId[]): Pr
   return slot === null ? null : new Date(slot);
 }
 
+/**
+ * Team workspaces (migration 054): `needsApproval` = the person saving is a workspace member whose
+ * posts need approval. A schedule / queue save then becomes 'pending_approval' (the publisher only
+ * claims 'scheduled'), remembering who asked (`requestedBy`) and how (schedule / queue).
+ */
+export type SaveAs = { needsApproval?: boolean; requestedBy?: string };
+
 export async function savePostForUser(
   userId: string,
   input: SavePostInput,
+  saveAs: SaveAs = {},
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   if (
     input.draftId !== undefined &&
@@ -400,7 +408,7 @@ export async function savePostForUser(
     }
   }
 
-  const status = input.mode === "draft" ? "draft" : "scheduled";
+  const status = input.mode === "draft" ? "draft" : saveAs.needsApproval ? "pending_approval" : "scheduled";
 
   let pickedTargets: Partial<Record<string, TargetAccount[]>> = {};
   try {
@@ -469,7 +477,7 @@ export async function savePostForUser(
         };
       }
       const lockedStatus = locked.rows[0].status;
-      if (lockedStatus !== "draft" && lockedStatus !== "scheduled") {
+      if (lockedStatus !== "draft" && lockedStatus !== "scheduled" && lockedStatus !== "pending_approval") {
         await client.query("rollback");
         return {
           ok: false,
@@ -541,6 +549,14 @@ export async function savePostForUser(
         await client.query("rollback");
         return { ok: false, error: "Could not save post." };
       }
+    }
+
+    // Approval bookkeeping (migration 054): who asked, and whether they scheduled or queued it.
+    if (status === "pending_approval") {
+      await client.query(
+        "update scheduled_posts set requested_by_user_id=$2, requested_mode=$3, approval_note=null where id=$1",
+        [id, saveAs.requestedBy ?? null, input.mode === "queue" ? "queue" : "schedule"],
+      );
     }
 
     const ytMetadata = youtubeSelected

@@ -76,7 +76,7 @@ function nextSlotLocal(hourUtc: number): Date {
   return d;
 }
 
-export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false, scheduledUsage = null, accountNames = {}, networkReady = {}, captionMaxOverrides = {}, networkData = {}, mediaPlan = "Free", accountChoices = {} }: { accountChoices?: AccountChoices; mediaPlan?: PlanName; networkReady?: Partial<Record<string, boolean>>; captionMaxOverrides?: Partial<Record<string, number>>; networkData?: NetworkPanelData; rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean; scheduledUsage?: { used: number; limit: number | null } | null; accountNames?: Record<string, string> }) {
+export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, initialIdea, facebookReady = false, threadsReady = false, schedulePlatforms = [], youtubeReady = false, scheduledUsage = null, accountNames = {}, networkReady = {}, captionMaxOverrides = {}, networkData = {}, mediaPlan = "Free", accountChoices = {}, needsApproval = false }: { needsApproval?: boolean; accountChoices?: AccountChoices; mediaPlan?: PlanName; networkReady?: Partial<Record<string, boolean>>; captionMaxOverrides?: Partial<Record<string, number>>; networkData?: NetworkPanelData; rules?: RuleOption[]; bestHoursUtc?: number[]; initialDraft?: ComposerDraftInitial; initialIdea?: { id: string; caption: string; mediaUrls: string[] }; facebookReady?: boolean; threadsReady?: boolean; schedulePlatforms?: string[]; youtubeReady?: boolean; scheduledUsage?: { used: number; limit: number | null } | null; accountNames?: Record<string, string> }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const livePlatforms: PlatformId[] = ["instagram"];
@@ -617,6 +617,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       }
       if (mode === "draft") {
         setFeedback({ kind: "ok", text: "Draft saved" });
+      } else if ("pending" in result && result.pending) {
+        // Team workspace member whose posts need approval: nothing is scheduled yet.
+        setFeedback({ kind: "ok", text: "Sent for approval. An owner or admin will schedule it (see Publish → Approvals)." });
       } else if (mode === "queue") {
         setFeedback({ kind: "ok", text: "Added to the queue — it will publish at the next free slot." });
       } else {
@@ -1906,7 +1909,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             title={queueReady ? undefined : "Set a posting schedule in Settings → Channels first"}
             className="whitespace-nowrap rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2 text-sm font-medium text-[var(--poskoo-ink)] transition-colors hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)] disabled:opacity-60 sm:px-4"
           >
-            {isPending ? "Saving…" : "Add to queue"}
+            {isPending ? "Saving…" : needsApproval ? "Queue for approval" : "Add to queue"}
           </button>
           <button
             type="button"
@@ -1914,7 +1917,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             onClick={() => handleSave("schedule")}
             className={`${ui.inkFill} whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold disabled:opacity-60 sm:px-5`}
           >
-            {isPending ? "Saving…" : "Schedule post"}
+            {isPending ? "Saving…" : needsApproval ? "Send for approval" : "Schedule post"}
           </button>
         </div>
         {feedback && (

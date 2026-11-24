@@ -1,0 +1,22 @@
+/* Publish → Approvals (team workspaces). Uses the dashboard's original --poskoo-* palette. */
+.panel { margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
+.heading { font-size: 1.2rem; letter-spacing: -.02em; }
+.list { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.row {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 16px 18px; border: 1px solid var(--poskoo-line); border-radius: 14px;
+  background: var(--poskoo-card); box-shadow: var(--poskoo-shadow-card);
+}
+.meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; color: var(--poskoo-muted); font-size: .84rem; }
+.when { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--poskoo-ink); }
+.who { color: var(--poskoo-muted); }
+.caption { margin: 0; color: var(--poskoo-ink); white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.nets { margin: 0; font-size: .8rem; color: var(--poskoo-muted); }
+.timeField { max-width: 320px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.actions button { display: inline-flex; align-items: center; gap: 6px; }
+.empty { margin: 8px 0 0; padding: 22px; border: 1px dashed var(--poskoo-line); border-radius: 14px; text-align: center; color: var(--poskoo-muted); }
+.count {
+  display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 2px;
+  border-radius: 999px; background: var(--poskoo-violet); color: #fff; font-size: .7rem; font-weight: 700;
+}

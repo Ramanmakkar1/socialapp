@@ -1,10 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+
 import { isDbConfigured } from "@/lib/db";
 import { scheduledPostLimitError } from "@/lib/planLimits";
 import { reschedulePostForUser, reschedulePostToInstantForUser, UUID_RE } from "@/lib/postMutations";
+import { asOwnerUser, requireWorkspace } from "@/lib/workspace";
+import { approvalBlock } from "@/lib/team";
 
 export async function reschedulePost(
   id: string,
@@ -20,7 +22,10 @@ export async function reschedulePost(
     return { ok: false, error: "Database not configured" };
   }
 
-  const user = await requireUser();
+  const ctx = await requireWorkspace();
+  const blocked = approvalBlock(ctx);
+  if (blocked) return { ok: false, error: blocked };
+  const user = asOwnerUser(ctx);
   try {
     // Moving a scheduled post into another month must respect that month's plan limit.
     const result = await reschedulePostForUser(id, user.id, dateKey, (next, state) =>
@@ -50,7 +55,10 @@ export async function reschedulePostAt(
     return { ok: false, error: "Database not configured" };
   }
 
-  const user = await requireUser();
+  const ctx = await requireWorkspace();
+  const blocked = approvalBlock(ctx);
+  if (blocked) return { ok: false, error: blocked };
+  const user = asOwnerUser(ctx);
   try {
     const result = await reschedulePostToInstantForUser(id, user.id, iso, (next, state) =>
       state.status === "scheduled" ? scheduledPostLimitError(user.id, next, id) : Promise.resolve(null));
