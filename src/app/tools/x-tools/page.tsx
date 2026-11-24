@@ -151,7 +151,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: tool.name,
-    url: `${BRAND.url}${tool.href}`,
+    url: `${BRAND.canonicalUrl}${tool.href}`,
   })),
 };
 
@@ -159,7 +159,7 @@ const softwareJsonLd = toolSoftwareJsonLd({
   name: "X (Twitter) tools",
   description:
     "A free collection of X (Twitter) tools for posts, threads, bios, fonts, hashtags, character counts, previews, header sizes, engagement stats and posting times.",
-  url: `${BRAND.url}${PATH}`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
 });
 
 export default function XToolsPage() {
