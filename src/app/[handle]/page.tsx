@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${page.display_name} (@${page.handle})`,
     description: page.bio || `Links from ${page.display_name} on Poskoo.`,
     robots: { index: false, follow: false },
-    alternates: { canonical: `${BRAND.url}/@${page.handle}` },
+    alternates: { canonical: `${BRAND.canonicalUrl}/@${page.handle}` },
   };
 }
 
@@ -40,12 +40,12 @@ export default async function PublicBioPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
     name: `${page.display_name} (@${page.handle})`,
-    url: `${BRAND.url}/@${page.handle}`,
+    url: `${BRAND.canonicalUrl}/@${page.handle}`,
     mainEntity: {
       "@type": "Person",
       name: page.display_name,
       alternateName: `@${page.handle}`,
-      url: `${BRAND.url}/@${page.handle}`,
+      url: `${BRAND.canonicalUrl}/@${page.handle}`,
     },
   };
 
