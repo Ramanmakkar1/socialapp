@@ -27,7 +27,7 @@ type Created = { name: string; posts: { id: string; scheduledAt: string | null; 
  * "Campaign from brief": a brief + channels in, N drafts out on the calendar. Never schedules:
  * the drafts are reviewed and scheduled one by one in the composer. When AI isn't configured on
  * the server (`aiReady` false) it explains that instead of showing the form (admins get a link to
- * the AI settings). `autoOpen` (/app/calendar?campaign=1, linked from the dashboard) opens it at once.
+ * the AI settings). `autoOpen` (/app/publish?campaign=1, linked from the dashboard) opens it at once.
  */
 export default function CampaignDialog({
   aiReady,
@@ -174,8 +174,8 @@ export default function CampaignDialog({
                       <>Campaign drafting uses AI, which is coming soon. </>
                     )}
                     You can still plan posts yourself with{" "}
-                    <Link href="/app/calendar?compose=1" className="font-medium text-[var(--poskoo-violet)] underline">New post</Link>{" "}
-                    or save ideas on the <Link href="/app/calendar?view=ideas" className="font-medium text-[var(--poskoo-violet)] underline">Ideas board</Link>.
+                    <Link href="/app/publish?compose=1" className="font-medium text-[var(--poskoo-violet)] underline">New post</Link>{" "}
+                    or save ideas on the <Link href="/app/create" className="font-medium text-[var(--poskoo-violet)] underline">Ideas board</Link>.
                   </p>
                 </div>
               ) : created ? (
@@ -188,7 +188,7 @@ export default function CampaignDialog({
                       <li key={p.id} className="rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] p-3">
                         <p className="text-xs font-medium text-[var(--poskoo-muted)]">{fmt(p.scheduledAt)}{p.angle ? ` · ${p.angle}` : ""}</p>
                         <p className="mt-1 line-clamp-3 whitespace-pre-wrap text-sm text-[var(--poskoo-ink)]">{p.caption}</p>
-                        <Link href={`/app/calendar?draft=${p.id}#new`} className="mt-1 inline-block text-sm font-medium text-[var(--poskoo-violet)]" onClick={() => setOpen(false)}>Review draft</Link>
+                        <Link href={`/app/publish?draft=${p.id}#new`} className="mt-1 inline-block text-sm font-medium text-[var(--poskoo-violet)]" onClick={() => setOpen(false)}>Review draft</Link>
                       </li>
                     ))}
                   </ul>
@@ -198,7 +198,7 @@ export default function CampaignDialog({
                     </ul>
                   )}
                   <div className="mt-4 flex gap-2">
-                    <Link href={`/app/calendar?view=list&status=draft`} className="rounded-full bg-[var(--poskoo-ink)] px-4 py-2 text-sm font-medium text-white" onClick={() => setOpen(false)}>See all drafts</Link>
+                    <Link href={`/app/publish?view=list&status=draft`} className="rounded-full bg-[var(--poskoo-ink)] px-4 py-2 text-sm font-medium text-white" onClick={() => setOpen(false)}>See all drafts</Link>
                     <button type="button" onClick={() => setCreated(null)} className="rounded-full border border-[var(--poskoo-line)] px-4 py-2 text-sm font-medium text-[var(--poskoo-ink)]">New campaign</button>
                   </div>
                 </div>

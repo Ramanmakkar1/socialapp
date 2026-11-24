@@ -1,5 +1,5 @@
 // Server-only: the one place a post is validated and written. The calendar server
-// action (src/app/app/calendar/actions.ts) and the MCP create_post tool both call
+// action (src/app/app/publish/actions.ts) and the MCP create_post tool both call
 // savePostForUser, so both paths enforce the same rules.
 import { getPool, query } from "@/lib/db";
 import { countChars, PLATFORM_LIMITS } from "@/lib/captionLimits";

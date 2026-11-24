@@ -42,7 +42,7 @@ export default function SignupDraftBanner() {
     <div className={home.sdb} role="status">
       <Sparkles className={home.sdbIcon} width={18} height={18} aria-hidden="true" />
       <span className={home.sdbText}>Your caption from the free tool is ready</span>
-      <Link href="/app/calendar?compose=1" className={home.sdbLink}>Open it in the composer</Link>
+      <Link href="/app/publish?compose=1" className={home.sdbLink}>Open it in the composer</Link>
       <button type="button" className={home.sdbDismiss} onClick={dismiss}>Dismiss</button>
     </div>
   );

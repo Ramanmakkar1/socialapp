@@ -588,7 +588,7 @@ Confirm or reject: ${link}${textFooter()}`;
 export function postFailedEmail(d: { name?: string | null; platform: string; caption: string; error: string; scheduledFor?: Date | null }): RenderedEmail {
   const subject = `A scheduled ${d.platform} post didn’t publish`;
   const preheader = "Open your calendar to see why and retry it in one click.";
-  const link = absoluteUrl("/app/calendar");
+  const link = absoluteUrl("/app/publish");
   const caption = d.caption.trim() ? (d.caption.length > 90 ? `${d.caption.slice(0, 90).trimEnd()}…` : d.caption) : "(no caption)";
   const rows: [string, string][] = [
     ["Channel", d.platform],

@@ -233,7 +233,7 @@ export default async function AppHome() {
             ))}
           </p>
           <div className={home.actions}>
-            <BtnLink href="/app/calendar?compose=1" size="sm">
+            <BtnLink href="/app/publish?compose=1" size="sm">
               <Plus width={16} height={16} aria-hidden="true" /> New post
             </BtnLink>
             <BtnLink href="/app/auto-dm" variant="lime" size="sm">
@@ -254,7 +254,7 @@ export default async function AppHome() {
         <div role="alert" className={home.alert}>
           <AlertTriangle width={18} height={18} aria-hidden="true" />
           <span>{stats.failed} {stats.failed === 1 ? "post" : "posts"} failed to publish.</span>
-          <Link href="/app/calendar?view=list&status=failed">Review and retry</Link>
+          <Link href="/app/publish?view=list&status=failed">Review and retry</Link>
         </div>
       )}
 
@@ -290,7 +290,7 @@ export default async function AppHome() {
           <div>
             <h2 id="snapshot" className={home.sectionTitle}>Performance snapshot <span className={home.dim}>· Last 7 days</span></h2>
           </div>
-          <Link href="/app/analytics?range=7" className={home.textLink}>Open analytics <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
+          <Link href="/app/insights?range=7" className={home.textLink}>Open analytics <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
         </div>
         <div className={home.snap}>
           {tiles.map((t) => (
@@ -374,7 +374,7 @@ export default async function AppHome() {
       <section className={home.section} aria-labelledby="up-next">
         <div className={home.sectionHead}>
           <h2 id="up-next" className={home.sectionTitle}>Up next</h2>
-          <Link href="/app/calendar" className={home.textLink}>View calendar <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
+          <Link href="/app/publish" className={home.textLink}>View calendar <ArrowRight width={14} height={14} aria-hidden="true" /></Link>
         </div>
         <div className={upcoming.length === 0 ? undefined : home.card}>
           {upcoming.length === 0 ? (
@@ -386,7 +386,7 @@ export default async function AppHome() {
               artWidth={1536}
               artHeight={1024}
             >
-              <BtnLink href="/app/calendar?compose=1" size="sm">Schedule your first post</BtnLink>
+              <BtnLink href="/app/publish?compose=1" size="sm">Schedule your first post</BtnLink>
             </EmptyState>
           ) : (
             <UpcomingPosts posts={upcoming} />

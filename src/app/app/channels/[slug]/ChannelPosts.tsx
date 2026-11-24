@@ -4,9 +4,9 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertCircle, CalendarDays, Copy, ListOrdered, MoreHorizontal, PencilLine, Play, Send } from "lucide-react";
-import { shareNow } from "../../calendar/actions";
-import { duplicatePost } from "../../calendar/duplicateActions";
-import { PLATFORM_ICON } from "../../calendar/calendarUtils";
+import { shareNow } from "../../publish/actions";
+import { duplicatePost } from "../../publish/duplicateActions";
+import { PLATFORM_ICON } from "../../publish/calendarUtils";
 import styles from "./channel.module.css";
 
 export type ChannelPost = {
@@ -77,7 +77,7 @@ export default function ChannelPosts({ posts, tab, loadFailed, reloadHref, accou
     return (
       <div className={styles.empty}>
         <p>{EMPTY[tab]}</p>
-        <Link href="/app/calendar?compose=1" className={styles.newBtn}>New post</Link>
+        <Link href="/app/publish?compose=1" className={styles.newBtn}>New post</Link>
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function ChannelPosts({ posts, tab, loadFailed, reloadHref, accou
                         </button>
                       )}
                       {tab !== "sent" && (
-                        <Link href={`/app/calendar?draft=${p.id}`} className={styles.iconBtn} aria-label="Edit post"><PencilLine width={15} height={15} aria-hidden="true" /></Link>
+                        <Link href={`/app/publish?draft=${p.id}`} className={styles.iconBtn} aria-label="Edit post"><PencilLine width={15} height={15} aria-hidden="true" /></Link>
                       )}
                       <details className={styles.menu}>
                         <summary className={styles.iconBtn} aria-label="More actions"><MoreHorizontal width={16} height={16} aria-hidden="true" /></summary>
@@ -181,7 +181,7 @@ export default function ChannelPosts({ posts, tab, loadFailed, reloadHref, accou
                           <button type="button" className={styles.menuItem} onClick={() => run(p.id, () => duplicatePost(p.id), "Could not duplicate this post.")}>
                             <Copy width={15} height={15} aria-hidden="true" /> Duplicate
                           </button>
-                          <Link href={`/app/calendar?view=month&channel=${encodeURIComponent(account.platform)}`} className={styles.menuItem}>
+                          <Link href={`/app/publish?view=month&channel=${encodeURIComponent(account.platform)}`} className={styles.menuItem}>
                             <CalendarDays width={15} height={15} aria-hidden="true" /> View in calendar
                           </Link>
                         </div>

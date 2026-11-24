@@ -69,7 +69,7 @@ export default function PostList({
   title = "Posts",
   published = [],
   showQueueTab = false,
-  composeHref = "/app/calendar?view=list&compose=1",
+  composeHref = "/app/publish?view=list&compose=1",
   accounts = {},
   showStatusFilters = true,
 }: {

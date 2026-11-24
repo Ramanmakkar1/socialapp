@@ -18,7 +18,7 @@ export function useComposerDialog() {
 // so a half-written post is still there when it is opened again).
 export default function ComposerDialog({ title, children }: { title: string; children: ReactNode }) {
   const params = useSearchParams();
-  const pathname = usePathname() ?? "/app/calendar";
+  const pathname = usePathname() ?? "/app/publish";
   const router = useRouter();
   const urlOpen = composerOpenFromParams(new URLSearchParams(params.toString()));
   const [open, setOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function ComposerDialog({ title, children }: { title: string; chi
   }, [urlOpen]);
 
   useEffect(() => {
-    // Old links to /app/calendar#new still open the composer.
+    // Old links to /app/publish#new still open the composer.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the hash is only known in the browser
     if (window.location.hash === "#new") setOpen(true);
   }, []);

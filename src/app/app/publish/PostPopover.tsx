@@ -108,7 +108,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
   const Icon = PLATFORM_ICON[main] ?? PLATFORM_ICON.threads;
   const handle = accounts[main] ?? PLATFORM_LABEL[main] ?? main;
   const editable = isMovable(post.status);
-  const editHref = `/app/calendar?draft=${post.id}`;
+  const editHref = `/app/publish?draft=${post.id}`;
   const caption = post.caption.trim() || "(no caption)";
   const long = caption.length > 160;
   const published = post.status === "published";
@@ -136,7 +136,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
               <PencilLine width={16} height={16} aria-hidden="true" />
             </Link>
           )}
-          <Link href={published ? "/app/analytics" : `/app/calendar?view=list${post.status === "failed" ? "&status=failed" : ""}`} className={styles.iconBtn} aria-label="Post details" title="Post details">
+          <Link href={published ? "/app/insights" : `/app/publish?view=list${post.status === "failed" ? "&status=failed" : ""}`} className={styles.iconBtn} aria-label="Post details" title="Post details">
             <Maximize2 width={16} height={16} aria-hidden="true" />
           </Link>
           <button type="button" className={styles.iconBtn} onClick={() => { onClose(); anchor.focus(); }} aria-label="Close">
@@ -183,7 +183,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
             <div><dt>Eng. rate</dt><dd>{rate == null ? "–" : `${rate}%`}</dd></div>
             <div><dt>Reach</dt><dd>{fmt(post.insights?.reach)}</dd></div>
           </dl>
-          <Link href="/app/analytics" className={styles.iconBtn} aria-label="Open analytics" title="Open analytics">
+          <Link href="/app/insights" className={styles.iconBtn} aria-label="Open analytics" title="Open analytics">
             <BarChart3 width={16} height={16} aria-hidden="true" />
           </Link>
         </div>
@@ -235,7 +235,7 @@ export default function PostPopover({ post, anchor, tz, accounts, onClose }: Pro
                 type="button"
                 className={styles.menuItem}
                 onClick={() => {
-                  const link = post.permalink ?? `${window.location.origin}${editable ? editHref : published ? "/app/analytics" : "/app/calendar?view=list"}`;
+                  const link = post.permalink ?? `${window.location.origin}${editable ? editHref : published ? "/app/insights" : "/app/publish?view=list"}`;
                   navigator.clipboard?.writeText(link).then(() => setMsg("Link copied."), () => setMsg("Could not copy the link."));
                   setMenuOpen(false);
                 }}

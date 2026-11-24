@@ -22,7 +22,7 @@ const STEPS: { title: string; permission: string; href: string; cta: string; bod
   {
     title: "Schedule and publish a post",
     permission: "instagram_business_content_publish",
-    href: "/app/calendar#new",
+    href: "/app/publish#new",
     cta: "Open Calendar",
     body: [
       "Click New post, add an image URL and a caption, pick Instagram and choose a time a few minutes from now. Save it as scheduled.",
@@ -52,7 +52,7 @@ const STEPS: { title: string; permission: string; href: string; cta: string; bod
   {
     title: "View insights",
     permission: "instagram_business_manage_insights",
-    href: "/app/analytics",
+    href: "/app/insights",
     cta: "Open Analytics",
     body: [
       "Analytics shows account insights for the last 7 days (reach, accounts engaged, interactions, profile views) and, for each published post, reach, likes, comments and saves.",

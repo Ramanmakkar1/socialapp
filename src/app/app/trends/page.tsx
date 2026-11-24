@@ -5,7 +5,7 @@ import { isDbConfigured } from "@/lib/db";
 import { planForUser } from "@/lib/planLimits";
 import { accountWeek, isStale, scoreTrends, trendWatchLimit, type TrendMediaInput } from "@/lib/trends";
 import { listTrendMedia, listWatches, trendConnection, type TrendConnection, type WatchRow } from "@/lib/trendsData";
-import LoadFailed from "../calendar/LoadFailed";
+import LoadFailed from "../publish/LoadFailed";
 import RefreshControls from "./RefreshControls";
 import TrendsBoard from "./TrendsBoard";
 import WatchPanel, { type WatchView } from "./WatchPanel";

@@ -43,6 +43,6 @@ export async function duplicatePost(id: string): Promise<{ ok: boolean; error?: 
   } catch {
     return { ok: false, error: "Could not duplicate post." };
   }
-  revalidatePath("/app/calendar");
+  revalidatePath("/app/publish");
   return { ok: true, id: newId };
 }

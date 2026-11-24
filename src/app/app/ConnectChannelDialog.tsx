@@ -598,7 +598,7 @@ export default function ConnectChannelDialog({
                 </p>
               )}
               <div className={styles.connectBtnCol}>
-                <a href={`/app/calendar?compose=1&with=${encodeURIComponent(view.net)}`} className={styles.connectPrimary}>Create your first post</a>
+                <a href={`/app/publish?compose=1&with=${encodeURIComponent(view.net)}`} className={styles.connectPrimary}>Create your first post</a>
                 <button type="button" className={styles.connectSecondary} onClick={() => go({ kind: "grid" })}>Connect another channel</button>
               </div>
             </div>

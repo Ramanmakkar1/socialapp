@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(connectedUrl("gbp", locations[0].title));
     }
     await storePendingGbp(user.id, tokens);
-    return NextResponse.redirect(new URL("/app/calendar?connect_pick=gbp", BRAND.url));
+    return NextResponse.redirect(new URL("/app/publish?connect_pick=gbp", BRAND.url));
   } catch (err) {
     const reason = err instanceof NetworkAuthError ? err.reason : "unexpected";
     console.error("gbp callback failed", reason);

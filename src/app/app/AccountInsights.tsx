@@ -2,7 +2,7 @@ import Link from "next/link";
 import { isDbConfigured, query } from "@/lib/db";
 import { GraphError, type AccountInsights, type GraphAccount, type IgProfile } from "@/lib/igGraph";
 import { cachedAccountInsights, cachedIgProfile } from "@/lib/igCached";
-import styles from "./analytics/analytics.module.css";
+import styles from "./insights/analytics.module.css";
 
 type Row = GraphAccount & { username: string | null };
 

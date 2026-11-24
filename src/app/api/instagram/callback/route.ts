@@ -30,7 +30,7 @@ type BackResult =
 
 function back(result: BackResult) {
   // Success opens the Connect dialog's "connected" step (ConnectChannelDialog); problems keep the Settings banners.
-  if (result === "connected") return NextResponse.redirect(new URL("/app/calendar?connected=instagram", BRAND.url));
+  if (result === "connected") return NextResponse.redirect(new URL("/app/publish?connected=instagram", BRAND.url));
   // Owned by another Poskoo user: the Connect dialog's "already connected to another Poskoo account" message.
   if (result === "taken") return NextResponse.redirect(new URL(INSTAGRAM_TAKEN_PATH, BRAND.url));
   return NextResponse.redirect(new URL(`/app/settings?ig=${result}`, BRAND.url));

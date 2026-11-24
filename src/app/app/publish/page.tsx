@@ -231,12 +231,14 @@ export default async function CalendarPage({
 
   const reloadHref =
     view === "month"
-      ? `/app/calendar?view=month&month=${monthQueryParam(monthStart)}`
+      ? `/app/publish?view=month&month=${monthQueryParam(monthStart)}`
       : view === "day"
-        ? `/app/calendar?view=day&date=${dayKey}`
-        : view === "list" || view === "grid" || view === "ideas"
-          ? `/app/calendar?view=${view}`
-          : `/app/calendar?view=week&week=${weekQueryParam(weekStart)}`;
+        ? `/app/publish?view=day&date=${dayKey}`
+        : view === "ideas"
+          ? "/app/create?tab=ideas"
+          : view === "list" || view === "grid"
+          ? `/app/publish?view=${view}`
+          : `/app/publish?view=week&week=${weekQueryParam(weekStart)}`;
 
   const queueReloadHref = initialFilter === "all" ? reloadHref : `${reloadHref}&status=${initialFilter}`;
 
@@ -531,13 +533,13 @@ export default async function CalendarPage({
         <div className={styles.pubActions}>
           {!isCreate && (
             <nav className={styles.viewSwitch} aria-label="Publish view">
-              <Link href="/app/calendar?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
+              <Link href="/app/publish?view=list" aria-current={view === "list" ? "page" : undefined} className={`${styles.viewLink} ${view === "list" ? styles.viewLinkActive : ""}`}>
                 <List width={16} height={16} aria-hidden="true" /> List
               </Link>
-              <Link href="/app/calendar?view=month" aria-current={calendarActive ? "page" : undefined} className={`${styles.viewLink} ${calendarActive ? styles.viewLinkActive : ""}`}>
+              <Link href="/app/publish?view=month" aria-current={calendarActive ? "page" : undefined} className={`${styles.viewLink} ${calendarActive ? styles.viewLinkActive : ""}`}>
                 <CalendarDays width={16} height={16} aria-hidden="true" /> Calendar
               </Link>
-              <Link href="/app/calendar?view=grid" aria-current={view === "grid" ? "page" : undefined} className={`${styles.viewLink} ${view === "grid" ? styles.viewLinkActive : ""}`}>
+              <Link href="/app/publish?view=grid" aria-current={view === "grid" ? "page" : undefined} className={`${styles.viewLink} ${view === "grid" ? styles.viewLinkActive : ""}`}>
                 <LayoutGrid width={16} height={16} aria-hidden="true" /> Grid
               </Link>
             </nav>
@@ -549,7 +551,7 @@ export default async function CalendarPage({
         </div>
         {isCreate && (
           <nav className={styles.pageTabs} aria-label="Create">
-            <Link href="/app/calendar?view=ideas" aria-current="page" className={`${styles.pageTab} ${styles.pageTabActive}`}>
+            <Link href="/app/create" aria-current="page" className={`${styles.pageTab} ${styles.pageTabActive}`}>
               <Lightbulb width={15} height={15} aria-hidden="true" /> Ideas
             </Link>
             <Link href="/app/templates" className={styles.pageTab}>
@@ -561,7 +563,7 @@ export default async function CalendarPage({
       {draftFailed ? (
         <LoadFailed
           message={draftPublishingSoon ? "This post is about to publish and can no longer be edited." : "We couldn’t load this draft. Your saved post is unchanged."}
-          reloadHref={`/app/calendar?draft=${encodeURIComponent(draft ?? "")}#new`}
+          reloadHref={`/app/publish?draft=${encodeURIComponent(draft ?? "")}#new`}
         />
       ) : ideaFailed ? (
         <LoadFailed
@@ -586,9 +588,9 @@ export default async function CalendarPage({
           <CalendarToolbar
             view="month"
             label={monthStart.toLocaleDateString("en-US", MONTH_FMT)}
-            prevHref={`/app/calendar?view=month&month=${monthQueryParam(prevMonth)}${filterQuery}`}
-            nextHref={`/app/calendar?view=month&month=${monthQueryParam(nextMonth)}${filterQuery}`}
-            todayHref={`/app/calendar?view=month${filterQuery}`}
+            prevHref={`/app/publish?view=month&month=${monthQueryParam(prevMonth)}${filterQuery}`}
+            nextHref={`/app/publish?view=month&month=${monthQueryParam(nextMonth)}${filterQuery}`}
+            todayHref={`/app/publish?view=month${filterQuery}`}
             isCurrent={monthQueryParam(monthStart) === thisMonth}
             channels={channelOptions}
             tags={allTags}
@@ -597,7 +599,7 @@ export default async function CalendarPage({
           <MonthView
             posts={calendarPosts}
             monthStart={monthStart}
-            composeBase={`/app/calendar?view=month&month=${monthQueryParam(monthStart)}&compose=1`}
+            composeBase={`/app/publish?view=month&month=${monthQueryParam(monthStart)}&compose=1`}
             accounts={accountNames}
             loadError={
               weekRowsFailed
@@ -612,9 +614,9 @@ export default async function CalendarPage({
           <CalendarToolbar
             view="day"
             label={dayStart.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" })}
-            prevHref={`/app/calendar?view=day&date=${prevDayKey}${filterQuery}`}
-            nextHref={`/app/calendar?view=day&date=${nextDayKey}${filterQuery}`}
-            todayHref={`/app/calendar?view=day${filterQuery}`}
+            prevHref={`/app/publish?view=day&date=${prevDayKey}${filterQuery}`}
+            nextHref={`/app/publish?view=day&date=${nextDayKey}${filterQuery}`}
+            todayHref={`/app/publish?view=day${filterQuery}`}
             isCurrent={dayKey === now.toISOString().slice(0, 10)}
             channels={channelOptions}
             tags={allTags}
@@ -624,7 +626,7 @@ export default async function CalendarPage({
             posts={calendarPosts}
             weekStart={dayStart}
             singleDay={dayKey}
-            composeBase={`/app/calendar?view=day&date=${dayKey}${filterQuery}&compose=1`}
+            composeBase={`/app/publish?view=day&date=${dayKey}${filterQuery}&compose=1`}
             accounts={accountNames}
             loadError={
               weekRowsFailed
@@ -640,9 +642,9 @@ export default async function CalendarPage({
             view="week"
             label={weekMonthLabel(weekStart, weekEndDay)}
             subLabel={`${shortDay(weekStart)} – ${shortDay(weekEndDay)}`}
-            prevHref={`/app/calendar?view=week&week=${weekQueryParam(prevStart)}${filterQuery}`}
-            nextHref={`/app/calendar?view=week&week=${weekQueryParam(nextStart)}${filterQuery}`}
-            todayHref={`/app/calendar?view=week${filterQuery}`}
+            prevHref={`/app/publish?view=week&week=${weekQueryParam(prevStart)}${filterQuery}`}
+            nextHref={`/app/publish?view=week&week=${weekQueryParam(nextStart)}${filterQuery}`}
+            todayHref={`/app/publish?view=week${filterQuery}`}
             isCurrent={weekQueryParam(weekStart) === thisWeek}
             channels={channelOptions}
             tags={allTags}
@@ -652,7 +654,7 @@ export default async function CalendarPage({
           <WeekView
             posts={calendarPosts}
             weekStart={weekStart}
-            composeBase={`/app/calendar?view=week&week=${weekQueryParam(weekStart)}${filterQuery}&compose=1`}
+            composeBase={`/app/publish?view=week&week=${weekQueryParam(weekStart)}${filterQuery}&compose=1`}
             accounts={accountNames}
             loadError={
               weekRowsFailed
@@ -671,7 +673,7 @@ export default async function CalendarPage({
             initialFilter="draft"
             title="Drafts"
             showStatusFilters={false}
-            composeHref="/app/calendar?view=ideas&compose=1"
+            composeHref="/app/create?tab=ideas&compose=1"
             accounts={accountNames}
             loadError={
               rowsFailed

@@ -22,7 +22,7 @@ a{color:inherit}
 }
 
 const INVALID = () =>
-  page("Link expired", `<h1>This link has expired</h1><p>Open your Poskoo calendar to see the post.</p><a class="btn" href="/app/calendar?view=list">Open calendar</a>`, 400);
+  page("Link expired", `<h1>This link has expired</h1><p>Open your Poskoo calendar to see the post.</p><a class="btn" href="/app/publish?view=list">Open calendar</a>`, 400);
 
 export async function GET(request: Request) {
   const token = new URL(request.url).searchParams.get("t") ?? "";
@@ -41,9 +41,9 @@ export async function POST(request: Request) {
   if (!targetId || !isDbConfigured()) return INVALID();
   try {
     const r = await markReminderPosted(targetId);
-    if (!r) return page("Not found", `<h1>We couldn't find that post</h1><p>It may have been deleted or retried.</p><a class="btn" href="/app/calendar?view=list">Open calendar</a>`, 404);
+    if (!r) return page("Not found", `<h1>We couldn't find that post</h1><p>It may have been deleted or retried.</p><a class="btn" href="/app/publish?view=list">Open calendar</a>`, 404);
     await refreshPostStatus(r.postId);
-    return page("Marked as posted", `<h1>${r.already ? "Already marked as posted" : "Marked as posted"} ✓</h1><p>Nice work. Your calendar now shows it as published.</p><a class="btn" href="/app/calendar?view=list">Open calendar</a>`);
+    return page("Marked as posted", `<h1>${r.already ? "Already marked as posted" : "Marked as posted"} ✓</h1><p>Nice work. Your calendar now shows it as published.</p><a class="btn" href="/app/publish?view=list">Open calendar</a>`);
   } catch (err) {
     console.error("reminder mark-as-posted failed", err instanceof Error ? err.message : err);
     return page("Try again", `<h1>Something went wrong</h1><p>Please try the link again in a minute.</p>`, 500);

@@ -9,8 +9,8 @@ test("composerOpenFromParams: compose or draft opens it", () => {
 });
 
 test("hrefWithoutComposer: keeps the view, drops compose/draft/day", () => {
-  assert.equal(hrefWithoutComposer("/app/calendar", new URLSearchParams("view=week&week=2026-11-09&compose=1&day=2026-11-10")), "/app/calendar?view=week&week=2026-11-09");
-  assert.equal(hrefWithoutComposer("/app/calendar", new URLSearchParams("draft=x")), "/app/calendar");
+  assert.equal(hrefWithoutComposer("/app/publish", new URLSearchParams("view=week&week=2026-11-09&compose=1&day=2026-11-10")), "/app/publish?view=week&week=2026-11-09");
+  assert.equal(hrefWithoutComposer("/app/publish", new URLSearchParams("draft=x")), "/app/publish");
 });
 
 test("dayPrefill: 9:00 on a future day, next full hour when past, null when bad", () => {
@@ -32,5 +32,5 @@ test("slotPrefill: an empty week slot pre-fills its exact time, never a past or 
   assert.equal(slotPrefill("2026-11-14T02:30:00.000Z", now), null);
   assert.equal(slotPrefill("tomorrow", now), null);
   assert.equal(slotPrefill(null, now), null);
-  assert.equal(hrefWithoutComposer("/app/calendar", new URLSearchParams("view=week&compose=1&at=2026-11-17T02:30:00.000Z")), "/app/calendar?view=week");
+  assert.equal(hrefWithoutComposer("/app/publish", new URLSearchParams("view=week&compose=1&at=2026-11-17T02:30:00.000Z")), "/app/publish?view=week");
 });

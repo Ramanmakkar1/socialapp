@@ -91,5 +91,5 @@ test("Facebook Login: race lost on the guarded upsert is 'taken'", async () => {
 });
 
 test("taken redirect reuses the Connect dialog's 'already connected to another Poskoo account' message", () => {
-  assert.equal(INSTAGRAM_TAKEN_PATH, "/app/calendar?net=instagram&connect_error=taken");
+  assert.equal(INSTAGRAM_TAKEN_PATH, "/app/publish?net=instagram&connect_error=taken");
 });

@@ -28,7 +28,7 @@ import { DEFAULT_SCHEDULE_DAYS, DEFAULT_SCHEDULE_TIMES } from "@/lib/postingSche
  * Retry button (ConnectChannelDialog reads ?connect_error=<code>&net=<network>).
  */
 export function settingsResultUrl(network: NetworkId, code: string): URL {
-  return new URL(`/app/calendar?net=${network}&connect_error=${encodeURIComponent(code)}`, BRAND.url);
+  return new URL(`/app/publish?net=${network}&connect_error=${encodeURIComponent(code)}`, BRAND.url);
 }
 
 /**
@@ -37,7 +37,7 @@ export function settingsResultUrl(network: NetworkId, code: string): URL {
  */
 export function connectedUrl(network: NetworkId, handle?: string | null): URL {
   const h = handle ? `&handle=${encodeURIComponent(handle.slice(0, 120))}` : "";
-  return new URL(`/app/calendar?connected=${network}${h}`, BRAND.url);
+  return new URL(`/app/publish?connected=${network}${h}`, BRAND.url);
 }
 
 export async function startOAuth(

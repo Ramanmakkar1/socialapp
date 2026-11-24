@@ -110,7 +110,8 @@ export async function saveIdea(input: SaveIdeaInput): Promise<SaveIdeaResult> {
     client.release();
   }
 
-  revalidatePath("/app/calendar");
+  revalidatePath("/app/publish");
+  revalidatePath("/app/create");
   return { ok: true, id: id! };
 }
 
@@ -129,7 +130,8 @@ export async function deleteIdea(id: string): Promise<{ ok: boolean; error?: str
     } finally {
       client.release();
     }
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
+    revalidatePath("/app/create");
     return { ok: true };
   } catch {
     return { ok: false, error: "Could not delete idea." };
@@ -154,7 +156,8 @@ export async function moveIdea(id: string, status: string): Promise<{ ok: boolea
     } finally {
       client.release();
     }
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
+    revalidatePath("/app/create");
     return { ok: true };
   } catch {
     return { ok: false, error: "Could not move idea." };

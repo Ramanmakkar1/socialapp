@@ -38,7 +38,7 @@ export async function seedDefaultScheduleAction(timezone: string): Promise<{ see
     }
     if (seeds.length > 0) {
       revalidatePath("/app/settings");
-      revalidatePath("/app/calendar");
+      revalidatePath("/app/publish");
     }
     return { seeded: seeds.length };
   } catch (err) {

@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { buildContactQuery, parseContactFilters } from "@/lib/contactsQuery";
 import EmptyState from "../EmptyState";
-import LoadFailed from "../calendar/LoadFailed";
+import LoadFailed from "../publish/LoadFailed";
 import ExportLeadsLink from "../leads/ExportLeadsLink";
 import LeadContactActions from "../leads/LeadContactActions";
 import LocalTime from "@/components/LocalTime";

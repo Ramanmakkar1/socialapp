@@ -83,7 +83,7 @@ export default function FailureDetails({ post, tz, onDone }: Props) {
                 type="button"
                 className={styles.popPrimary}
                 disabled={pending}
-                onClick={() => run(() => duplicatePost(post.id), (id) => id && router.push(`/app/calendar?draft=${id}`))}
+                onClick={() => run(() => duplicatePost(post.id), (id) => id && router.push(`/app/publish?draft=${id}`))}
               >
                 {pending ? "Opening…" : "Fix and repost"}
               </button>

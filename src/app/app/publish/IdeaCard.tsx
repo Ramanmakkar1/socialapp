@@ -171,7 +171,7 @@ export default function IdeaCard({ idea }: { idea: Idea }) {
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <Link
-              href={`/app/calendar?compose=1&idea=${idea.id}`}
+              href={`/app/publish?compose=1&idea=${idea.id}`}
               scroll={false}
               className="inline-flex items-center gap-1 rounded-full bg-[var(--poskoo-violet)] px-3 py-1.5 text-xs font-medium text-white"
             >

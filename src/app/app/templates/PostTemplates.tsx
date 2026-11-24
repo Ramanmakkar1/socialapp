@@ -34,7 +34,7 @@ export default function PostTemplates({ templates, loadFailed }: { templates: Po
         <div className={styles.empty}>
           <p><b>No post templates yet</b></p>
           <p>In the post composer, write a caption and use “Save current as template”. Your templates show up here and in the composer.</p>
-          <Link href="/app/calendar?compose=1" className={styles.primaryBtn}>Write a post</Link>
+          <Link href="/app/publish?compose=1" className={styles.primaryBtn}>Write a post</Link>
         </div>
       ) : visible.length === 0 ? (
         <p className={styles.empty}>No templates match “{q}”.</p>
@@ -49,7 +49,7 @@ export default function PostTemplates({ templates, loadFailed }: { templates: Po
                   <p>{t.caption}</p>
                   {t.first_comment && <span className={styles.miniTag}>+ first comment</span>}
                 </div>
-                <Link href="/app/calendar?compose=1" className={styles.useLink}>Use in a new post</Link>
+                <Link href="/app/publish?compose=1" className={styles.useLink}>Use in a new post</Link>
               </article>
             </li>
           ))}

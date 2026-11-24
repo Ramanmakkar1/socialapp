@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { CalendarDays, LayoutGrid, List, Plus, Settings } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
 import { isExtraNetwork } from "@/lib/networks/tokenNetworks";
-import { PLATFORM_ICON, PLATFORM_LABEL } from "../../calendar/calendarUtils";
+import { channelSlugForId, findChannelBySlug } from "@/lib/sidebarChannels";
+import { PLATFORM_ICON, PLATFORM_LABEL } from "../../publish/calendarUtils";
 import ChannelPosts, { type ChannelPost } from "./ChannelPosts";
 import styles from "./channel.module.css";
 
@@ -54,13 +55,23 @@ function hhmm(at: Date, timeZone: string): string {
 // One channel (connected account): Queue / Drafts / Sent, like a per-channel publishing view.
 // Posts are matched by post_targets.social_account_id; older targets saved without an account id
 // fall back to the platform (the composer targets one account per network today).
-export default async function ChannelPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> }) {
-  const { id } = await params;
+export default async function ChannelPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ tab?: string }> }) {
+  const { slug: rawSlug } = await params;
   const { tab: tabParam } = await searchParams;
   const tab: Tab = tabParam === "drafts" || tabParam === "sent" ? tabParam : "queue";
   const user = await requireUser();
   if (!isDbConfigured()) notFound();
-  const account = await loadAccount(decodeURIComponent(id), user.id).catch(() => null);
+  const key = decodeURIComponent(rawSlug);
+  // Old links used the row id (/app/channels/<uuid>, /app/channels/yt-<uuid>): send them to the readable slug.
+  if (UUID_RE.test(key) || (key.startsWith("yt-") && UUID_RE.test(key.slice(3)))) {
+    const slug = await channelSlugForId(user.id, key).catch(() => null);
+    if (!slug) notFound();
+    permanentRedirect(`/app/channels/${slug}${tab !== "queue" ? `?tab=${tab}` : ""}`);
+  }
+  // Slugs are resolved among the signed-in user's own channels only.
+  const channel = await findChannelBySlug(user.id, key).catch(() => null);
+  if (!channel?.id || !channel.slug) notFound();
+  const account = await loadAccount(channel.id, user.id).catch(() => null);
   if (!account) notFound();
 
   const match = `(t.social_account_id = $2::uuid or (t.social_account_id is null and t.platform = $3))`;
@@ -135,8 +146,8 @@ export default async function ChannelPage({ params, searchParams }: { params: Pr
   }
 
   const Icon = PLATFORM_ICON[account.platform] ?? PLATFORM_ICON.threads;
-  const base = `/app/channels/${encodeURIComponent(account.id)}`;
-  const calendarHref = `/app/calendar?view=month&channel=${encodeURIComponent(account.platform)}`;
+  const base = `/app/channels/${channel.slug}`;
+  const calendarHref = `/app/publish?view=month&channel=${encodeURIComponent(account.platform)}`;
 
   return (
     <div className={styles.page}>
@@ -166,11 +177,11 @@ export default async function ChannelPage({ params, searchParams }: { params: Pr
         </div>
         <div className={styles.actions}>
           <nav className={styles.viewSwitch} aria-label="View">
-            <Link href={`/app/calendar?view=grid&channel=${encodeURIComponent(account.platform)}`} className={styles.viewLink}><LayoutGrid width={16} height={16} aria-hidden="true" /> Grid</Link>
+            <Link href={`/app/publish?view=grid&channel=${encodeURIComponent(account.platform)}`} className={styles.viewLink}><LayoutGrid width={16} height={16} aria-hidden="true" /> Grid</Link>
             <span className={`${styles.viewLink} ${styles.viewLinkActive}`} aria-current="page"><List width={16} height={16} aria-hidden="true" /> List</span>
             <Link href={calendarHref} className={styles.viewLink}><CalendarDays width={16} height={16} aria-hidden="true" /> Calendar</Link>
           </nav>
-          <Link href="/app/calendar?compose=1" className={styles.newBtn}><Plus width={17} height={17} aria-hidden="true" /> New post</Link>
+          <Link href="/app/publish?compose=1" className={styles.newBtn}><Plus width={17} height={17} aria-hidden="true" /> New post</Link>
         </div>
       </header>
 

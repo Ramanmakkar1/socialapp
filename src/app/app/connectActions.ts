@@ -117,7 +117,7 @@ export async function connectGbpLocationsAction(_prev: { error: string } | null,
     if (!r) return { error: "The Google sign-in expired. Connect Google Business Profile again." };
     if (r.connected.length === 0) return { error: r.limited > 0 ? connectErrorPlan() : "Those locations are already connected to another Poskoo account." };
     const name = r.connected.length === 1 ? r.connected[0].title : `${r.connected.length} locations`;
-    target = `/app/calendar?connected=gbp&handle=${encodeURIComponent(name)}`;
+    target = `/app/publish?connected=gbp&handle=${encodeURIComponent(name)}`;
   } catch (err) {
     return { error: err instanceof NetworkAuthError ? err.message : "Could not connect those locations. Try again." };
   }
@@ -242,7 +242,7 @@ export async function saveLinkedInPagesAction(_prev: { error: string } | null, f
     const orgs = orgList(acc.meta.orgsAvailable).filter((o) => wanted.has(o.urn));
     await updateAccountMeta(acc.id, { orgs });
     const name = orgs.length === 0 ? acc.username ?? "LinkedIn" : orgs.length === 1 ? orgs[0].name : `${orgs.length} LinkedIn Pages`;
-    target = `/app/calendar?connected=linkedin&handle=${encodeURIComponent(name)}`;
+    target = `/app/publish?connected=linkedin&handle=${encodeURIComponent(name)}`;
   } catch {
     return { error: "Could not save your Pages. Try again." };
   }

@@ -2,7 +2,7 @@
 import { isDbConfigured, query } from "@/lib/db";
 import { isExtraNetwork } from "@/lib/networks/tokenNetworks";
 
-import { channelHref, type SidebarChannel } from "@/lib/sidebarChannelsShared";
+import { assignChannelSlugs, channelHref, type SidebarChannel } from "@/lib/sidebarChannelsShared";
 export { channelHref, type SidebarChannel };
 
 type AccountRow = { id?: string; platform: string; username: string | null; page_name: string | null; status: string };
@@ -23,7 +23,7 @@ export function buildChannels(accounts: AccountRow[], youtube: YoutubeRow[], cou
   for (const y of youtube) {
     out.push({ platform: "youtube", name: y.title || "YouTube channel", status: y.status, scheduled: countOf("youtube"), ...(y.id ? { id: `yt-${y.id}` } : {}) });
   }
-  return out;
+  return assignChannelSlugs(out);
 }
 
 export async function getSidebarChannels(userId: string): Promise<SidebarChannel[]> {
@@ -58,4 +58,16 @@ export async function getSidebarChannels(userId: string): Promise<SidebarChannel
     counts = [];
   }
   return buildChannels(accounts, youtube, counts);
+}
+
+/** The logged-in user's channel for a readable slug ("instagram-trailandtide"), or null. User-scoped. */
+export async function findChannelBySlug(userId: string, slug: string): Promise<SidebarChannel | null> {
+  const channels = await getSidebarChannels(userId);
+  return channels.find((c) => c.slug === slug) ?? null;
+}
+
+/** The slug of one of the user's channels by its id (social_accounts uuid or "yt-" + uuid), or null. */
+export async function channelSlugForId(userId: string, id: string): Promise<string | null> {
+  const channels = await getSidebarChannels(userId);
+  return channels.find((c) => c.id === id)?.slug ?? null;
 }

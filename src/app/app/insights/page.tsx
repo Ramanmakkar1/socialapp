@@ -203,14 +203,14 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             <p className={styles.headSub}>Insights for your posts and auto-DMs</p>
           </div>
         </div>
-        <Link href={`/app/analytics/report?range=${rangeKey}`} className={styles.ghostBtn}>
+        <Link href={`/app/insights/report?range=${rangeKey}`} className={styles.ghostBtn}>
           <Download width={15} height={15} aria-hidden="true" /> Export
         </Link>
       </header>
 
       <nav className={styles.tabs} aria-label="Analytics sections">
         {TABS.map((t) => (
-          <Link key={t.id} href={`/app/analytics?${qs({ tab: t.id })}`} aria-current={tab === t.id ? "page" : undefined} className={`${styles.tab} ${tab === t.id ? styles.tabActive : ""}`}>
+          <Link key={t.id} href={`/app/insights?${qs({ tab: t.id })}`} aria-current={tab === t.id ? "page" : undefined} className={`${styles.tab} ${tab === t.id ? styles.tabActive : ""}`}>
             {t.label}
           </Link>
         ))}
@@ -223,7 +223,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           {PERIOD_OPTIONS.map((option) => (
             <Link
               key={option.key}
-              href={`/app/analytics?${qs({ range: option.key })}`}
+              href={`/app/insights?${qs({ range: option.key })}`}
               className={`${styles.rangeOption} ${option.key === rangeKey ? styles.rangeActive : ""}`}
               aria-current={option.key === rangeKey ? "true" : undefined}
             >
@@ -236,7 +236,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             <span className={styles.periodLabel}>Channel</span>
             <div className={styles.rangePicker} role="group" aria-label="Channel">
               <Link
-                href={`/app/analytics?${qs({ account: null })}`}
+                href={`/app/insights?${qs({ account: null })}`}
                 className={`${styles.rangeOption} ${!channel ? styles.rangeActive : ""}`}
                 aria-current={!channel ? "true" : undefined}
               >
@@ -245,7 +245,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
               {channels.map((c) => (
                 <Link
                   key={c.id}
-                  href={`/app/analytics?${qs({ account: c.id })}`}
+                  href={`/app/insights?${qs({ account: c.id })}`}
                   className={`${styles.rangeOption} ${channel?.id === c.id ? styles.rangeActive : ""}`}
                   aria-current={channel?.id === c.id ? "true" : undefined}
                 >

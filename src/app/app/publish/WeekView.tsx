@@ -18,7 +18,7 @@ type WeekViewProps = {
   posts: CalendarPost[];
   /** Sunday of the week (UTC midnight); the 7 days are shown in the viewer's time zone. */
   weekStart: Date;
-  /** "/app/calendar?view=week&week=...&compose=1"; "&day=" (header +) or "&at=" (empty slot) is added. */
+  /** "/app/publish?view=week&week=...&compose=1"; "&day=" (header +) or "&at=" (empty slot) is added. */
   composeBase?: string;
   accounts?: AccountNames;
   loadError?: LoadError;
@@ -109,7 +109,7 @@ export default function WeekView({ posts, weekStart, composeBase, accounts = {},
     const next = new URLSearchParams(params.toString());
     for (const k of ["compose", "day", "at", "idea"]) next.delete(k);
     next.set("draft", id);
-    return `/app/calendar?${next.toString()}`;
+    return `/app/publish?${next.toString()}`;
   };
 
   function newPostAt(e: MouseEvent<HTMLDivElement>, key: string, hour: number) {

@@ -204,7 +204,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       params.delete("draft");
       params.delete("idea");
       const query = params.toString();
-      return query ? `/app/calendar?${query}${hash}` : `/app/calendar${hash}`;
+      return query ? `/app/publish?${query}${hash}` : `/app/publish${hash}`;
     },
     [searchParams],
   );
@@ -254,7 +254,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     if (origin) setScheduledAt(origin.local);
   }, [draftScheduledAt]);
 
-  // "+" on a calendar day opens /app/calendar?compose=1&day=YYYY-MM-DD: pre-fill that day's time.
+  // "+" on a calendar day opens /app/publish?compose=1&day=YYYY-MM-DD: pre-fill that day's time.
   // An empty week-grid slot opens ...&at=<ISO instant>: pre-fill that exact time.
   const dayParam = searchParams.get("day");
   const atParam = searchParams.get("at");
@@ -633,11 +633,11 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
         // Done: close the window (and drop ?draft / ?idea so it does not reopen on refresh).
         const params = new URLSearchParams(searchParams.toString());
         params.delete("idea");
-        dialog.close(hrefWithoutComposer("/app/calendar", params));
+        dialog.close(hrefWithoutComposer("/app/publish", params));
       } else if (editingDraftId || initialIdea) {
         router.replace(calendarHrefWithoutDraft());
       }
-      // savePost revalidates /app/calendar, so no extra router.refresh() (it re-rendered the whole page twice).
+      // savePost revalidates /app/publish, so no extra router.refresh() (it re-rendered the whole page twice).
     });
   }
 

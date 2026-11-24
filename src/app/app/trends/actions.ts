@@ -99,7 +99,7 @@ export async function makePostLikeThisAction(formData: FormData): Promise<void> 
   const user = await requireUser();
   const mediaId = String(formData.get("mediaId") ?? "").slice(0, 64);
   const watchId = String(formData.get("watchUser") ?? "").slice(0, 40);
-  if (!mediaId || !isDbConfigured()) redirect("/app/calendar?compose=1");
+  if (!mediaId || !isDbConfigured()) redirect("/app/publish?compose=1");
   const rows = await query<{
     username: string;
     media_type: string | null;
@@ -115,7 +115,7 @@ export async function makePostLikeThisAction(formData: FormData): Promise<void> 
     [user.id, mediaId, watchId],
   );
   const row = rows[0];
-  if (!row) redirect("/app/calendar?compose=1");
+  if (!row) redirect("/app/publish?compose=1");
   const text = draftIdeaText({
     username: row.username,
     kind: kindOf({ mediaType: row.media_type, productType: row.media_product_type }),
@@ -127,5 +127,5 @@ export async function makePostLikeThisAction(formData: FormData): Promise<void> 
   const st = ideaInsertStatement({ userId: user.id, text, mediaUrls: [], status: "todo" });
   const inserted = await query<{ id: string }>(st.text, st.params);
   const id = inserted[0]?.id;
-  redirect(id ? `/app/calendar?compose=1&idea=${id}` : "/app/calendar?compose=1");
+  redirect(id ? `/app/publish?compose=1&idea=${id}` : "/app/publish?compose=1");
 }

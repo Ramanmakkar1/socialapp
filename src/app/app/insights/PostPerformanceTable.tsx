@@ -142,7 +142,7 @@ export default function PostPerformanceTable({ rows, thumbs = {} }: { rows: Post
                   <details className={styles.rowMenu}>
                     <summary aria-label={`Actions for post ${i + 1}`}><MoreHorizontal width={16} height={16} aria-hidden="true" /></summary>
                     <div className={styles.rowMenuList}>
-                      <Link href={`/app/calendar?view=month&month=${(row.publishedAt ?? new Date().toISOString()).slice(0, 7)}`}>View in calendar</Link>
+                      <Link href={`/app/publish?view=month&month=${(row.publishedAt ?? new Date().toISOString()).slice(0, 7)}`}>View in calendar</Link>
                       <button type="button" onClick={() => navigator.clipboard?.writeText(row.caption)}>Copy caption</button>
                     </div>
                   </details>

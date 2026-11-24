@@ -9,7 +9,7 @@ import styles from "./shell.module.css";
 
 const TABS = [
   { href: "/app", icon: LayoutDashboard, label: "Home" },
-  { href: "/app/calendar", icon: CalendarDays, label: "Publish" },
+  { href: "/app/publish", icon: CalendarDays, label: "Publish" },
   { href: "/app/inbox", icon: Inbox, label: "Inbox" },
   { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Auto-DM" },
 ];
@@ -133,7 +133,7 @@ export default function ShellFrame({
           </button>
           {logo}
           <p className={styles.topbarTitle}>{title}</p>
-          <Link href="/app/calendar?compose=1" className={styles.topbarNew}>
+          <Link href="/app/publish?compose=1" className={styles.topbarNew}>
             <Plus width={16} height={16} aria-hidden="true" /> New
           </Link>
           <Link href="/app/settings" className={styles.topbarAvatar} aria-label="Account settings">
@@ -149,12 +149,12 @@ export default function ShellFrame({
             <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`${styles.bottomTab} ${active ? styles.bottomTabActive : ""}`}>
               <span className={styles.bottomIcon}>
                 <Icon width={20} height={20} aria-hidden="true" />
-                {href === "/app/calendar" && failedPosts > 0 && (
+                {href === "/app/publish" && failedPosts > 0 && (
                   <span className={styles.bottomDot} aria-hidden="true" />
                 )}
               </span>
               {label}
-              {href === "/app/calendar" && failedPosts > 0 && (
+              {href === "/app/publish" && failedPosts > 0 && (
                 <span className="sr-only">, {failedPosts} failed {failedPosts === 1 ? "post" : "posts"}</span>
               )}
             </Link>

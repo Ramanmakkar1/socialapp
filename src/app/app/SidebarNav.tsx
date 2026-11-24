@@ -12,9 +12,9 @@ type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; badg
 // then everything else behind a compact "More" group so the channel list stays near the top.
 const primary: NavItem[] = [
   { href: "/app", icon: LayoutDashboard, label: "Home" },
-  { href: "/app/calendar?view=ideas", icon: Lightbulb, label: "Create" },
-  { href: "/app/calendar", icon: CalendarDays, label: "Publish" },
-  { href: "/app/analytics", icon: BarChart3, label: "Insights" },
+  { href: "/app/create", icon: Lightbulb, label: "Create" },
+  { href: "/app/publish", icon: CalendarDays, label: "Publish" },
+  { href: "/app/insights", icon: BarChart3, label: "Insights" },
   { href: "/app/inbox", icon: Inbox, label: "Inbox" },
   { href: "/app/auto-dm", icon: MessageCircleHeart, label: "Automations" },
 ];
@@ -49,7 +49,7 @@ const TITLES: [string, string][] = [
   ["/app/channels", "Channel"],
   ...baseFooter.map((i): [string, string] => [i.href, i.label]),
   ["/app/auto-dm/activity", "Auto-DM activity"],
-  ["/app/analytics/report", "Analytics report"],
+  ["/app/insights/report", "Analytics report"],
   ["/app/leads", "Leads"],
   ["/app/settings/instagram", "Instagram settings"],
 ];
@@ -73,10 +73,10 @@ export function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Create = the ideas board (/app/calendar?view=ideas) and templates; Publish = the rest of the calendar + channel pages. */
+/** Create = the ideas board (/app/create) and templates; Publish = the rest of the calendar + channel pages. */
 function isItemActive(pathname: string, view: string | null, href: string): boolean {
-  if (href === "/app/calendar?view=ideas") return (pathname === "/app/calendar" && view === "ideas") || isActive(pathname, "/app/templates");
-  if (href === "/app/calendar") return (isActive(pathname, "/app/calendar") && view !== "ideas") || isActive(pathname, "/app/channels");
+  if (href === "/app/create") return isActive(pathname, "/app/create") || isActive(pathname, "/app/templates");
+  if (href === "/app/publish") return isActive(pathname, "/app/publish") || isActive(pathname, "/app/channels");
   if (href === "/app/templates") return false; // highlighted as "Create"
   return isActive(pathname, href);
 }
@@ -84,8 +84,8 @@ function isItemActive(pathname: string, view: string | null, href: string): bool
 function Item({ item, pathname, view = null, failedPosts, scheduledPosts = 0, pendingOrders = 0 }: { item: NavItem; pathname: string; view?: string | null; failedPosts: number; scheduledPosts?: number; pendingOrders?: number }) {
   const { href, icon: Icon, label, badge } = item;
   const active = isItemActive(pathname, view, href);
-  const showBadge = href === "/app/calendar" && failedPosts > 0;
-  const showCount = href === "/app/calendar" && !showBadge && scheduledPosts > 0;
+  const showBadge = href === "/app/publish" && failedPosts > 0;
+  const showCount = href === "/app/publish" && !showBadge && scheduledPosts > 0;
   // UPI payments waiting for the seller to confirm (Direct UPI, sellers in India).
   const showOrders = href === "/app/orders" && pendingOrders > 0;
   return (

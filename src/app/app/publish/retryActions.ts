@@ -18,7 +18,7 @@ export async function retryPost(id: string): Promise<{ ok: boolean; error?: stri
   // Not failed? It may be waiting for an automatic retry: "Retry now" brings that attempt forward.
   if (!result.ok && !(await retryWaitingNow(id, user.id).catch(() => false))) return result;
 
-  revalidatePath("/app/calendar");
+  revalidatePath("/app/publish");
   revalidatePath("/app");
   return { ok: true };
 }

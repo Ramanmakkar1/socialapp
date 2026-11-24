@@ -225,7 +225,7 @@ export async function DmActivity({ userId }: { userId: string }) {
       <section aria-labelledby="dm-activity" className={styles.block}>
         <div className={styles.blockHead}>
           <h2 id="dm-activity" className={styles.blockTitle}>Recent Auto-DM activity</h2>
-          <Link href="/app/analytics?tab=activity" className={styles.ghostBtn}><RefreshCw width={14} height={14} aria-hidden="true" /> Refresh</Link>
+          <Link href="/app/insights?tab=activity" className={styles.ghostBtn}><RefreshCw width={14} height={14} aria-hidden="true" /> Refresh</Link>
         </div>
         {rows.length === 0 ? (
           <p className={styles.emptyCopy}>No Auto-DM activity yet. DMs your rules send show up here.</p>
@@ -298,7 +298,7 @@ export async function DmAudience({ userId }: { userId: string }) {
         artHeight={1024}
       >
         <BtnLink href="/app/auto-dm" size="sm">Set up an Auto-DM</BtnLink>
-        <BtnLink href="/app/calendar?compose=1" size="sm" variant="line">Schedule a post</BtnLink>
+        <BtnLink href="/app/publish?compose=1" size="sm" variant="line">Schedule a post</BtnLink>
       </EmptyState>
     );
   }

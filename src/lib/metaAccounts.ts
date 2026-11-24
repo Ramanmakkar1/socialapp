@@ -29,7 +29,7 @@ export function decodePick(raw: string | undefined, userId: string, now = Date.n
 
 /** Where the callbacks send the user when the Instagram account belongs to another Poskoo user
  * (ConnectChannelDialog shows "This Instagram account is already connected to another Poskoo account."). */
-export const INSTAGRAM_TAKEN_PATH = "/app/calendar?net=instagram&connect_error=taken";
+export const INSTAGRAM_TAKEN_PATH = "/app/publish?net=instagram&connect_error=taken";
 
 /** The Poskoo user that owns this Instagram account, or null when nobody has connected it. */
 export async function instagramOwner(igUserId: string): Promise<string | null> {

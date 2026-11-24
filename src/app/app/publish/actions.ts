@@ -24,7 +24,7 @@ export async function deletePost(id: string): Promise<{ ok: boolean; error?: str
   try {
     const result = await deletePostForUser(id, user.id);
     if (!result.ok) return result;
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
     revalidatePath("/app");
     return { ok: true };
   } catch (err) {
@@ -43,7 +43,7 @@ export async function savePost(
   const user = await requireUser();
   const result = await savePostForUser(user.id, input);
   if (result.ok) {
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
     revalidatePath("/app");
   }
   return result;
@@ -58,7 +58,7 @@ export async function reorderQueue(orderedIds: string[]): Promise<{ ok: boolean;
   try {
     const result = await reorderQueueForUser(orderedIds, user.id);
     if (!result.ok) return result;
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
     revalidatePath("/app");
     return { ok: true };
   } catch (err) {
@@ -155,7 +155,7 @@ export async function shareNow(id: string): Promise<{ ok: boolean; error?: strin
     // Same monthly plan limit as scheduling: the post moves into the current UTC month.
     const result = await sharePostNow(id, user.id, (now) => scheduledPostLimitError(user.id, now, id));
     if (!result.ok) return result;
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
     revalidatePath("/app");
     return { ok: true };
   } catch (err) {

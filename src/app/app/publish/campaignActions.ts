@@ -11,7 +11,7 @@ export async function createCampaign(input: CampaignBriefInput): Promise<Campaig
   if (!isDbConfigured()) return { ok: false, error: "The database isn't set up on this server yet." };
   try {
     const result = await createCampaignForUser(user.id, input && typeof input === "object" ? input : {});
-    if (result.ok) revalidatePath("/app/calendar");
+    if (result.ok) revalidatePath("/app/publish");
     return result;
   } catch (err) {
     console.error("createCampaign failed", user.id, err instanceof Error ? err.message : err);

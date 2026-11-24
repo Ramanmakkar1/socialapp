@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     // Pages to choose from: open the Connect dialog's "Select the Pages to connect" step.
     (input, done) => {
       const available = Array.isArray(input.meta?.orgsAvailable) ? input.meta.orgsAvailable : [];
-      return available.length > 0 ? new URL("/app/calendar?connect_pick=linkedin", BRAND.url) : done;
+      return available.length > 0 ? new URL("/app/publish?connect_pick=linkedin", BRAND.url) : done;
     },
   );
 }

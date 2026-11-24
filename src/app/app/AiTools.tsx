@@ -14,9 +14,9 @@ type Tool = { title: string; text: string; where: string; href: string; icon: ty
 export default function AiTools({ ready, repliesReady, isAdmin }: { ready: boolean; repliesReady: boolean; isAdmin: boolean }) {
   const base = ready ? "on" : "off";
   const tools: Tool[] = [
-    { title: "Caption ideas", text: "Three caption ideas with hashtags from a one-line topic, in your brand voice.", where: "Composer → Write with AI", href: "/app/calendar?compose=1", icon: PenLine, state: base },
-    { title: "Tailor per network", text: "Rewrite one caption for each network's length and style.", where: "Composer → Tailor per network", href: "/app/calendar?compose=1", icon: Shuffle, state: base },
-    { title: "Campaign from a brief", text: "Describe a launch or offer; get a sequence of draft posts on your calendar.", where: "Calendar → Campaign from brief", href: "/app/calendar?campaign=1", icon: Megaphone, state: base },
+    { title: "Caption ideas", text: "Three caption ideas with hashtags from a one-line topic, in your brand voice.", where: "Composer → Write with AI", href: "/app/publish?compose=1", icon: PenLine, state: base },
+    { title: "Tailor per network", text: "Rewrite one caption for each network's length and style.", where: "Composer → Tailor per network", href: "/app/publish?compose=1", icon: Shuffle, state: base },
+    { title: "Campaign from a brief", text: "Describe a launch or offer; get a sequence of draft posts on your calendar.", where: "Calendar → Campaign from brief", href: "/app/publish?campaign=1", icon: Megaphone, state: base },
     { title: "DM message ideas", text: "Three friendly Auto-DM messages with your link, ready to edit.", where: "Auto-DM → Write with AI", href: "/app/auto-dm", icon: MessageSquareText, state: base },
     { title: "AI DM replies", text: "Answer incoming Instagram DMs automatically, with your booking link.", where: "Settings → AI DM replies", href: "/app/settings#ai-replies", icon: Bot, state: repliesReady ? "on" : ready ? "hold" : "off" },
   ];

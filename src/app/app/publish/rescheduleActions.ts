@@ -26,7 +26,7 @@ export async function reschedulePost(
     const result = await reschedulePostForUser(id, user.id, dateKey, (next, state) =>
       state.status === "scheduled" ? scheduledPostLimitError(user.id, next, id) : Promise.resolve(null));
     if (!result.ok) return result;
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
     revalidatePath("/app");
     return { ok: true };
   } catch (err) {
@@ -55,7 +55,7 @@ export async function reschedulePostAt(
     const result = await reschedulePostToInstantForUser(id, user.id, iso, (next, state) =>
       state.status === "scheduled" ? scheduledPostLimitError(user.id, next, id) : Promise.resolve(null));
     if (!result.ok) return result;
-    revalidatePath("/app/calendar");
+    revalidatePath("/app/publish");
     revalidatePath("/app");
     return { ok: true };
   } catch (err) {

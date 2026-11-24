@@ -104,7 +104,7 @@ export function DmDeliveryStatus({ rows, loadError, asOf }: Props) {
           <Link href="/app/auto-dm" className={styles.ghostBtn} prefetch={false}>
             <RefreshCw width={14} height={14} aria-hidden="true" /> Refresh
           </Link>
-          <Link href="/app/analytics?tab=activity" className={styles.headLink}>View full log →</Link>
+          <Link href="/app/insights?tab=activity" className={styles.headLink}>View full log →</Link>
         </div>
       </div>
       {loadError ? (

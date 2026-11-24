@@ -1,4 +1,4 @@
-// Retrying a failed post: the one code path behind the calendar's "Retry" (src/app/app/calendar/
+// Retrying a failed post: the one code path behind the calendar's "Retry" (src/app/app/publish/
 // retryActions.ts, for the post's owner) and the admin's "Retry" (src/app/admin/posts/actions.ts).
 // The post goes back to 'scheduled' (now, or its later scheduled time) and its failed targets to
 // 'pending', in one transaction; the publish worker picks it up on its next run.

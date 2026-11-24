@@ -15,7 +15,7 @@ type MonthViewProps = {
   posts: CalendarPost[];
   /** First day of the month (UTC midnight). */
   monthStart: Date;
-  /** "/app/calendar?view=month&month=...&compose=1"; "&day=YYYY-MM-DD" is added per day. */
+  /** "/app/publish?view=month&month=...&compose=1"; "&day=YYYY-MM-DD" is added per day. */
   composeBase?: string;
   accounts?: AccountNames;
   loadError?: LoadError;

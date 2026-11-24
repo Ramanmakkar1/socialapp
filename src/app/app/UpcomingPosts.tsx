@@ -46,7 +46,7 @@ export default function UpcomingPosts({ posts }: { posts: UpcomingPost[] }) {
       <ul className="m-0 list-none divide-y divide-[var(--poskoo-line)] p-0">
         {posts.map((post) => (
           <li key={post.id}>
-            <Link href="/app/calendar" className={row}>
+            <Link href="/app/publish" className={row}>
               <span className={timePill}>{whenById[post.id] ?? "…"}</span>
               <p className="m-0 min-w-0 truncate text-sm text-[var(--poskoo-ink)]">
                 {post.caption.trim() || "Untitled post"}

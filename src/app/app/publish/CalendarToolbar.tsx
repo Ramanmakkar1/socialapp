@@ -33,7 +33,7 @@ type Props = {
 // server filters the posts and a reload or shared link keeps them.
 export default function CalendarToolbar({ view, label, subLabel, prevHref, nextHref, todayHref, isCurrent, channels, tags, noDate = [], scheduleTz }: Props) {
   const router = useRouter();
-  const pathname = usePathname() ?? "/app/calendar";
+  const pathname = usePathname() ?? "/app/publish";
   const params = useSearchParams();
   const id = useId();
   const [tz, setTz] = useState("");
@@ -170,7 +170,7 @@ export default function CalendarToolbar({ view, label, subLabel, prevHref, nextH
                 noDate.map((p) => {
                   const Icon = PLATFORM_ICON[p.platforms[0]] ?? PLATFORM_ICON.threads;
                   return (
-                    <Link key={p.id} href={`/app/calendar?view=week&draft=${p.id}`} scroll={false} className={styles.dropdownItem}>
+                    <Link key={p.id} href={`/app/publish?view=week&draft=${p.id}`} scroll={false} className={styles.dropdownItem}>
                       <Icon width={14} height={14} className={styles[`ico_${p.platforms[0]}`]} aria-hidden="true" />
                       <span className={styles.noDateCaption}>{p.caption.trim() || "(no caption)"}</span>
                     </Link>

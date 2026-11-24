@@ -96,7 +96,7 @@ function AccountMenu({ name, email, plan }: { name: string; email: string; plan:
 function NewButtons() {
   return (
     <div className={styles.newRow}>
-      <Link href="/app/calendar?compose=1" className={styles.newBtn} aria-label="New post">
+      <Link href="/app/publish?compose=1" className={styles.newBtn} aria-label="New post">
         <Plus width={17} height={17} aria-hidden="true" /> <span className={styles.navLabel}>New</span>
       </Link>
       <NewAutomationDialog label="Auto-DM" className={styles.newAutoBtn} />

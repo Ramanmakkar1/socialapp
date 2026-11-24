@@ -124,7 +124,7 @@ async function ContentFeed({ account, scopes }: { account: Account | null; scope
                 artWidth={1536}
                 artHeight={1024}
               >
-                <BtnLink href="/app/calendar?compose=1" size="sm">Create a post</BtnLink>
+                <BtnLink href="/app/publish?compose=1" size="sm">Create a post</BtnLink>
               </EmptyState>
             )}
           </section>

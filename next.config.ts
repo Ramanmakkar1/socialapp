@@ -88,6 +88,14 @@ const nextConfig: NextConfig = {
       { source: "/alternatives/later", destination: "/later-alternative", permanent: true },
       // Duplicate intent: the old /instagram-comment-to-dm page is merged into the features page.
       { source: "/instagram-comment-to-dm", destination: "/features/instagram-comment-to-dm", permanent: true },
+      // 2026-11-24 dashboard URLs follow the nav names: Create / Publish / Insights. Old bookmarks,
+      // e-mails and OAuth returns keep working (308, query string kept). Ideas board first: it was ?view=ideas.
+      { source: "/app/calendar", has: [{ type: "query", key: "view", value: "ideas" }], destination: "/app/create", permanent: true },
+      { source: "/app/publish", has: [{ type: "query", key: "view", value: "ideas" }], destination: "/app/create", permanent: true },
+      { source: "/app/calendar", destination: "/app/publish", permanent: true },
+      { source: "/app/calendar/:path*", destination: "/app/publish/:path*", permanent: true },
+      { source: "/app/analytics", destination: "/app/insights", permanent: true },
+      { source: "/app/analytics/:path*", destination: "/app/insights/:path*", permanent: true },
       { source: "/Home", destination: "/", permanent: true },
       { source: "/home", destination: "/", permanent: true },
       { source: "/:path([Hh][Oo][Mm][Ee])", destination: "/", permanent: true },

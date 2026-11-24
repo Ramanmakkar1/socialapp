@@ -2,7 +2,7 @@ import Link from "next/link";
 import { History, RefreshCw } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { isDbConfigured, query } from "@/lib/db";
-import LoadFailed from "../calendar/LoadFailed";
+import LoadFailed from "../publish/LoadFailed";
 import RewindFlow, { type RewindRule } from "./RewindFlow";
 import LocalTime from "@/components/LocalTime";
 import styles from "./rewind.module.css";
