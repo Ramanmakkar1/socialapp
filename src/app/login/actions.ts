@@ -11,9 +11,13 @@ import { attributeReferralFromCookie } from "@/lib/referralCookie";
 import { clientIp, rateLimit, tooManyMessage } from "@/lib/rateLimit";
 import { reviewerLogin } from "@/lib/reviewer";
 import { UPGRADE_INTENT_COOKIE, billingChoiceHref, parseUpgradeIntent } from "@/lib/upgradeIntent";
+import { INVITE_COOKIE, invitePath } from "@/lib/inviteCookie";
 
 /** After sign-up / log-in: the billing page when the visitor picked a paid plan on /pricing, else the dashboard. */
 async function afterAuthPath(): Promise<string> {
+  // A team invite opened while logged out wins: go back and accept it.
+  const invite = invitePath((await cookies()).get(INVITE_COOKIE)?.value);
+  if (invite) return invite;
   const intent = parseUpgradeIntent((await cookies()).get(UPGRADE_INTENT_COOKIE)?.value);
   return intent ? billingChoiceHref(intent) : "/app";
 }

@@ -63,6 +63,9 @@ export function pageTitle(pathname: string): string {
   return best?.[1] ?? "Dashboard";
 }
 
+// Workspace members (src/lib/workspace.ts) can't open these: settings, products and orders are owner/admin only.
+const MEMBER_HIDDEN = new Set(["/app/settings", "/app/products", "/app/orders"]);
+
 // The Admin link only appears for super-admins (see lib/admin.ts).
 function getFooter(showAdmin: boolean): NavItem[] {
   return showAdmin ? [...baseFooter, { href: "/admin", icon: Shield, label: "Admin" }] : baseFooter;
@@ -124,16 +127,20 @@ export default function SidebarNav({
   scheduledPosts = 0,
   pendingOrders = 0,
   showAdmin = false,
+  isMember = false,
 }: {
   variant?: "sidebar" | "footer";
   failedPosts?: number;
   scheduledPosts?: number;
   pendingOrders?: number;
   showAdmin?: boolean;
+  /** A workspace member (not owner/admin): hide owner/admin-only destinations. */
+  isMember?: boolean;
 }) {
   const pathname = usePathname() ?? "";
   const view = useSearchParams()?.get("view") ?? null;
-  const footer = getFooter(showAdmin);
+  const footer = getFooter(showAdmin).filter((i) => !isMember || !MEMBER_HIDDEN.has(i.href));
+  const moreItems = more.filter((i) => !isMember || !MEMBER_HIDDEN.has(i.href));
   const navRef = useRef<HTMLElement>(null);
 
   // Keep the active item visible inside the scrolling sidebar (only that container scrolls, never the page).
@@ -172,7 +179,7 @@ export default function SidebarNav({
           <ChevronDown width={14} height={14} aria-hidden="true" className={`${styles.moreChevron} ${styles.navLabel}`} />
         </summary>
         <div className={styles.moreBody}>
-          {more.map((item) => (
+          {moreItems.map((item) => (
             <Item key={item.href} item={item} pathname={pathname} view={view} failedPosts={failedPosts} pendingOrders={pendingOrders} />
           ))}
         </div>

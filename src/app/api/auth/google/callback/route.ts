@@ -15,6 +15,7 @@ import {
 } from "@/lib/googleAuth";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 import { attributeReferralFromCookie } from "@/lib/referralCookie";
+import { INVITE_COOKIE, invitePath } from "@/lib/inviteCookie";
 
 function toLogin(reason: string) {
   return NextResponse.redirect(new URL(`/login?google=${reason}`, BRAND.url));
@@ -52,5 +53,6 @@ export async function GET(request: Request) {
     console.error("google sign-in failed", err instanceof Error ? err.message.slice(0, 120) : "unknown");
     return toLogin("error");
   }
-  return NextResponse.redirect(new URL("/app", BRAND.url));
+  // A team invite opened while logged out (src/lib/inviteCookie.ts): back to it to accept.
+  return NextResponse.redirect(new URL(invitePath((request.headers.get("cookie") ?? "").split(/;\s*/).find((c) => c.startsWith(`${INVITE_COOKIE}=`))?.slice(INVITE_COOKIE.length + 1)) ?? "/app", BRAND.url));
 }

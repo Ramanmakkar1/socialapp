@@ -1,0 +1,21 @@
+/* Settings → Team. Original dashboard palette (--poskoo-*). */
+.inline { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.grow { flex: 1 1 240px; }
+.inviteForm { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 4px; }
+.inviteForm > label { flex: 1 1 200px; }
+.list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; }
+.row {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-top: 1px solid var(--poskoo-line);
+}
+.row:first-child { border-top: 0; }
+.who { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.who > div { display: flex; flex-direction: column; min-width: 0; }
+.who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avatar {
+  flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--poskoo-lilac); color: var(--poskoo-violet); font-weight: 700;
+}
+.manage { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.manage select { min-width: 0; }
+.ownerPill { border-color: var(--poskoo-violet); color: var(--poskoo-violet); }

@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { deleteAccountData, disconnectAccounts } from "@/lib/accountData";
 import { createApiKey, revokeApiKey } from "@/lib/apiKeys";
-import { endSession, requireUser } from "@/lib/auth";
+import { endSession } from "@/lib/auth";
+import { requireOwnWorkspaceUser, requireWorkspaceUser } from "@/lib/workspace";
 import { isDbConfigured, query } from "@/lib/db";
 import { defaultSchedulesToSeed, isValidTimeZone, SCHEDULABLE_PLATFORMS } from "@/lib/postingSchedule";
 import { disconnectYouTubeChannel } from "@/lib/youtubeAccounts";
@@ -17,7 +18,7 @@ const validTimeZone = isValidTimeZone;
 // browser's time zone for every connected channel, so "Add to queue" / "Next available" work at once.
 // Called from the browser (it knows the zone). Never overwrites: a no-op once any schedule exists.
 export async function seedDefaultScheduleAction(timezone: string): Promise<{ seeded: number }> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!isDbConfigured()) return { seeded: 0 };
   try {
     const [connected, existing] = await Promise.all([
@@ -49,7 +50,7 @@ export async function seedDefaultScheduleAction(timezone: string): Promise<{ see
 
 // Disconnect: wipes the stored Instagram token right away (history and rules stay).
 export async function disconnectAccountAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const raw = formData.get("account_id");
   const accountId = typeof raw === "string" ? raw.trim().slice(0, 64) : "";
   if (!isDbConfigured() || !accountId) return;
@@ -70,7 +71,7 @@ export async function disconnectAccountAction(formData: FormData): Promise<void>
 
 // Disconnect YouTube: marks the stored channel disconnected and clears the encrypted refresh token.
 export async function disconnectYouTubeAction(): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   if (!isDbConfigured()) return;
   try {
     await disconnectYouTubeChannel(user.id);
@@ -83,7 +84,7 @@ export async function disconnectYouTubeAction(): Promise<void> {
 }
 
 export async function saveBrandVoice(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const raw = formData.get("brand_voice");
   const trimmed = typeof raw === "string" ? raw.trim().slice(0, 500) : "";
   const value = trimmed === "" ? null : trimmed;
@@ -99,7 +100,7 @@ export async function saveBrandVoice(formData: FormData): Promise<void> {
 }
 
 export async function saveAiReplySettings(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const rawId = formData.get("account_id");
   const accountId = typeof rawId === "string" ? rawId.trim().slice(0, 64) : "";
   // AI replies on hold (src/lib/featureReadiness.ts): instructions save, the switch stays off.
@@ -133,7 +134,7 @@ export async function saveAiReplySettings(formData: FormData): Promise<void> {
 
 // Per-channel posting schedule (Settings → Channels): days of week x times in the user's timezone.
 export async function savePostingSchedule(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireWorkspaceUser("admin");
   const rawPlatform = formData.get("platform");
   const platform = typeof rawPlatform === "string" ? rawPlatform.trim() : "";
   const rawTz = formData.get("timezone");
@@ -165,7 +166,7 @@ export async function savePostingSchedule(formData: FormData): Promise<void> {
 // Create an API key for the MCP server (Settings → API keys). The full key is
 // shown once, in the redirect query string; only its hash is stored.
 export async function createApiKeyAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireOwnWorkspaceUser();
   const raw = formData.get("key_name");
   const name = typeof raw === "string" ? raw.trim().slice(0, 60) : "";
   // Unticked (the default): the assistant can only create drafts and paused Auto-DMs to approve.
@@ -179,7 +180,7 @@ export async function createApiKeyAction(formData: FormData): Promise<void> {
 
 // Revoke one of the user's API keys (Settings → API keys).
 export async function revokeApiKeyAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireOwnWorkspaceUser();
   const raw = formData.get("key_id");
   const keyId = typeof raw === "string" ? raw.trim().slice(0, 64) : "";
   if (!isDbConfigured() || !keyId) return;
@@ -192,7 +193,7 @@ export async function revokeApiKeyAction(formData: FormData): Promise<void> {
 // Self-serve account deletion: wipes every table row that belongs to the user, then the user row itself
 // (sessions, dm_rules, contacts, scheduled_posts, dm_queue and short_links cascade off it).
 export async function deleteMyAccountAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireOwnWorkspaceUser();
   if (formData.get("confirm") !== "DELETE") redirect("/app/settings?account=confirm_needed#danger-heading");
   if (!isDbConfigured()) redirect("/app/settings?account=delete_error#danger-heading");
   const reviewer = process.env.REVIEWER_EMAIL;

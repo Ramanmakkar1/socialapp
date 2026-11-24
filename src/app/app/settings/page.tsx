@@ -5,7 +5,7 @@ import EmptyState from "../EmptyState";
 import { BtnA, PageHero } from "@/components/ui/kit";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ui from "@/components/ui/ui.module.css";
-import { requireUser } from "@/lib/auth";
+import { asOwnerUser, requireWorkspace } from "@/lib/workspace";
 import { BRAND } from "@/lib/brand";
 import { listApiKeys } from "@/lib/apiKeys";
 import { isDbConfigured, query } from "@/lib/db";
@@ -37,6 +37,7 @@ import { EXTRA_NETWORK_LABEL } from "@/lib/networks/tokenNetworks";
 
 const SECTIONS = [
   { id: "account", label: "Account" },
+  { id: "team", label: "Team" },
   { id: "channels", label: "Channels" },
   { id: "schedule", label: "Posting schedule" },
   { id: "payments", label: "Payments" },
@@ -127,7 +128,12 @@ const YOUTUBE_BANNERS: Record<string, { tone: "ok" | "warn"; text: string }> = {
 };
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ ig?: string | string[]; voice?: string | string[]; account?: string | string[]; threads?: string | string[]; ai_reply?: string | string[]; schedule?: string | string[]; yt?: string | string[]; api_key?: string | string[]; key?: string | string[]; payments?: string | string[] }> }) {
-  const user = await requireUser();
+  // Workspace settings: owners and admins only (members are sent back to /app). Personal sections
+  // (sign-in email, API keys, delete account) only show in the person's own workspace.
+  const ctx = await requireWorkspace("admin");
+  const user = asOwnerUser(ctx);
+  const own = ctx.isOwnWorkspace;
+  const sections = SECTIONS.filter((s) => (own || !["api-keys", "danger", "plan"].includes(s.id)) && (ctx.role === "owner" || s.id !== "payments"));
   const mediaPending = isDbConfigured() ? await pendingMediaUsage(user.id).catch(() => 0) : 0;
   const plan = await planForUser(user.id);
   const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam, api_key: apiKeyParam, key: keyParam, payments: paymentsParam } = await searchParams;
@@ -218,7 +224,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )
       )[0] ?? null
     : null;
-  const apiKeys = isDbConfigured() ? await listApiKeys(user.id) : [];
+  const apiKeys = isDbConfigured() && own ? await listApiKeys(ctx.user.id) : [];
   // Reconnect only works when the server has that network's keys; otherwise show one "not switched on" note instead.
   const canConnect = (platform: string) =>
     platform === "instagram" || platform === "facebook" ? connectReady : platform === "threads" ? isThreadsConfigured() : platform === "youtube" ? isYouTubeConfigured() : true;
@@ -231,7 +237,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         lede="Your account, connected channels, posting schedule, payments and plan."
         icon={<Settings width={20} height={20} />}
       />
-      <SettingsNav sections={SECTIONS} />
+      <SettingsNav sections={sections} />
       {banner && (
         <p role="status" className={`${ui.notice} ${banner.tone === "warn" ? ui.noticeWarn : ""}`}>{banner.text}</p>
       )}
@@ -249,6 +255,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       )}
 
       <div id="account" className={local.group}>
+        {own ? (
         <section className={styles.section} aria-labelledby="signin-heading">
           <h2 id="signin-heading" className={styles.sectionTitle}>Account</h2>
           <ul className={styles.accountList}>
@@ -271,6 +278,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </p>
             </li>
           </ul>
+        </section>
+        ) : (
+          <section className={styles.section} aria-labelledby="signin-heading">
+            <h2 id="signin-heading" className={styles.sectionTitle}>Workspace</h2>
+            <p className={ui.hint}>You are managing <b>{ctx.owner.workspaceName || ctx.owner.name || ctx.owner.email}</b> as {ctx.role === "owner" ? "its owner" : "an admin"}. Your own sign-in, API keys and billing are in your own workspace.</p>
+          </section>
+        )}
+        <section id="team" className={styles.section} aria-labelledby="team-heading">
+          <div className={styles.sectionHeader}>
+            <h2 id="team-heading" className={styles.sectionTitle}>Team</h2>
+            <BtnA href="/app/settings/team" size="sm">Manage team</BtnA>
+          </div>
+          <p className={ui.hint}>Invite teammates or clients, choose who publishes directly and who needs approval.</p>
         </section>
         <section className={styles.section} aria-labelledby="voice-heading">
           <h2 id="voice-heading" className={styles.sectionTitle}>Brand voice</h2>
@@ -558,11 +578,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </section>
       </div>
 
-      <div id="payments" className={local.group}>
+      {ctx.role === "owner" && <div id="payments" className={local.group}>
         <PaymentsSettings userId={user.id} status={typeof paymentsParam === "string" ? paymentsParam : undefined} />
-      </div>
+      </div>}
 
-      <div id="plan" className={local.group}>
+      {own && <div id="plan" className={local.group}>
         <section className={styles.section} aria-labelledby="plan-heading">
           <div className={styles.sectionHeader}>
             <h2 id="plan-heading" className={styles.sectionTitle}>Plan &amp; billing</h2>
@@ -581,9 +601,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             videos up to {formatBytes(PLAN_MEDIA_LIMITS[plan].videoBytes)} on the {plan} plan (each network may allow less).
           </p>
         </section>
-      </div>
+      </div>}
 
-      <div id="api-keys" className={local.group}>
+      {own && <div id="api-keys" className={local.group}>
         <section className={styles.section} aria-labelledby="api-keys-heading">
           <div className={styles.sectionHeader}>
             <h2 id="api-keys-heading" className={styles.sectionTitle}>API keys</h2>
@@ -640,9 +660,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </ul>
           )}
         </section>
-      </div>
+      </div>}
 
-      <div id="danger" className={local.group}>
+      {own && <div id="danger" className={local.group}>
         <section className={styles.section} aria-labelledby="danger-heading">
           <h2 id="danger-heading" className={styles.sectionTitle}>Danger zone</h2>
           {isDbConfigured() ? (
@@ -662,7 +682,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <p role="alert" className={`${ui.notice} ${ui.noticeWarn}`}>The demo review account can&apos;t be deleted.</p>
           )}
         </section>
-      </div>
+      </div>}
     </div>
   );
 }

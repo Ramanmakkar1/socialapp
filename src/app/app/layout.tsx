@@ -1,13 +1,15 @@
 import { Suspense, type ReactNode } from "react";
 import { MarkLoggedIn } from "@/components/AuthNav";
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { asOwnerUser, listWorkspaces, requireWorkspace, workspaceLabel } from "@/lib/workspace";
+import { teamLimitsFor } from "@/lib/team";
+import WorkspaceSwitcher from "./WorkspaceSwitcher";
 import { isAdmin } from "@/lib/admin";
 import { isDbConfigured, query } from "@/lib/db";
 import { instrumentSans } from "@/lib/fonts";
 import { isIgConfigured } from "@/lib/instagram";
 import { isMetaLoginConfigured } from "@/lib/metaLogin";
-import { autoDmLimitBanner, autoDmLimitReached, monthlyAutoDmLimit, PLAN_LIMITS, type PlanName } from "@/lib/planLimits";
+import { autoDmLimitBanner, autoDmLimitReached, billingOwnerId, monthlyAutoDmLimit, planForUser, PLAN_LIMITS, type PlanName } from "@/lib/planLimits";
 import { getBilling, type StoredBilling } from "@/lib/billing";
 import { graceEndsAt, planFromBilling } from "@/lib/billingState";
 import { cookies } from "next/headers";
@@ -139,7 +141,11 @@ function MediaMeter({ used, plan }: { used: number; plan: PlanName }) {
 }
 
 async function AppShell({ children }: { children: ReactNode }) {
-  const user = await requireUser();
+  // Team workspaces (migration 054): `user` = the workspace OWNER (all data queries), `me` = the real
+  // signed-in person (account menu, e-mail verification, super-admin link, their own billing).
+  const ctx = await requireWorkspace();
+  const user = asOwnerUser(ctx);
+  const me = ctx.user;
   // Started now, awaited at render: a folder listing + one query, in parallel with the rest.
   const mediaPendingPromise = isDbConfigured() ? pendingMediaUsage(user.id).catch(() => 0) : Promise.resolve(0);
   let needsReconnect = false;
@@ -174,14 +180,15 @@ async function AppShell({ children }: { children: ReactNode }) {
     }
   }
   const channels = await getSidebarChannels(user.id);
-  // Same rule as planLimits.planForUser (one read gives the plan AND the payment-failed state).
-  const billing: StoredBilling | null = isDbConfigured() ? await getBilling(user.id).catch(() => null) : null;
-  // Admins get Agency limits (same rule as planLimits.planForUser).
-  const plan: PlanName = isAdmin(user) ? "Agency" : planFromBilling(billing);
+  // Client workspaces bill to their creator (planLimits.billingOwnerId); members see the owner's plan.
+  const billingUserId = isDbConfigured() ? await billingOwnerId(ctx.ownerId) : ctx.ownerId;
+  const billing: StoredBilling | null = isDbConfigured() ? await getBilling(billingUserId).catch(() => null) : null;
+  const plan: PlanName = isDbConfigured() ? await planForUser(ctx.ownerId) : planFromBilling(billing);
+  const ownBilling = billingUserId === me.id;
   const limits = PLAN_LIMITS[plan];
   // No "Continue to checkout" banner while paid plans aren't on sale (src/lib/featureReadiness.ts).
-  const upgradeIntent = plan === "Free" && isFeatureReady("billing") ? parseUpgradeIntent((await cookies()).get(UPGRADE_INTENT_COOKIE)?.value) : null;
-  const paymentFailed = billing?.status === "past_due" || billing?.status === "unpaid";
+  const upgradeIntent = ownBilling && plan === "Free" && isFeatureReady("billing") ? parseUpgradeIntent((await cookies()).get(UPGRADE_INTENT_COOKIE)?.value) : null;
+  const paymentFailed = ownBilling && (billing?.status === "past_due" || billing?.status === "unpaid");
   const graceEnd = billing?.status === "past_due" ? graceEndsAt(billing.past_due_since) : null;
   // Same number the send worker enforces (plan + Refer-and-earn bonus).
   const dmLimit = await monthlyAutoDmLimit(user.id).then((r) => r.limit, () => limits.autoDmsPerMonth);
@@ -224,12 +231,19 @@ async function AppShell({ children }: { children: ReactNode }) {
     ig_personal: reminderChannelStatus("Instagram (personal)", process.env),
     fb_group: reminderChannelStatus("Facebook Group", process.env),
   };
-  const displayName = user.name?.trim() || user.email.split("@")[0];
+  const displayName = me.name?.trim() || me.email.split("@")[0];
+  const [workspaces, myTeamLimits] = await Promise.all([listWorkspaces(me), teamLimitsFor(me.id).catch(() => null)]);
+  const currentWorkspace = {
+    ownerId: ctx.ownerId,
+    name: ctx.isOwnWorkspace ? (workspaces[0]?.name ?? "My workspace") : workspaceLabel({ workspace_name: ctx.owner.workspaceName, name: ctx.owner.name, email: ctx.owner.email }),
+    role: ctx.role,
+    isClient: ctx.isClient,
+  };
   const mediaPending = await mediaPendingPromise;
   // Same rule as the connect callbacks (planLimits.accountLimitError): anything not disconnected holds a slot.
   const connectedAccounts = channels.filter((c) => c.status !== "disconnected").length;
   // "We sent you a code" is only true when e-mail is switched on; verification never blocks the app.
-  const showVerify = user.emailVerified !== true && isFeatureReady("email") && (await cookies()).get(VERIFY_DISMISS_COOKIE)?.value !== "1";
+  const showVerify = me.emailVerified !== true && isFeatureReady("email") && (await cookies()).get(VERIFY_DISMISS_COOKIE)?.value !== "1";
 
   // One compact alert bar, most important first (the rest sit behind "+N more").
   const alerts: ShellAlert[] = [];
@@ -276,7 +290,7 @@ async function AppShell({ children }: { children: ReactNode }) {
     alerts.push({
       id: "verify",
       tone: "info",
-      text: `Verify your email: we sent a 6-digit code to ${user.email}.`,
+      text: `Verify your email: we sent a 6-digit code to ${me.email}.`,
       action: <VerifyEmailActions />,
     });
   }
@@ -296,13 +310,16 @@ async function AppShell({ children }: { children: ReactNode }) {
             <div className={styles.sideTop}>
               <Logo />
             </div>
+            {(workspaces.length > 1 || (myTeamLimits?.clientWorkspaces ?? 0) > 0) && (
+              <WorkspaceSwitcher current={currentWorkspace} workspaces={workspaces} canCreateClient={(myTeamLimits?.clientWorkspaces ?? 0) > 0} />
+            )}
             <NewButtons />
             <div className={styles.sideScroll}>
-              <SidebarNav failedPosts={failedPosts} scheduledPosts={scheduledPosts} pendingOrders={pendingOrders} />
+              <SidebarNav failedPosts={failedPosts} scheduledPosts={scheduledPosts} pendingOrders={pendingOrders} isMember={ctx.role === "member"} />
               <SidebarChannels
                 channels={channels}
                 reconnectHrefs={Object.fromEntries(channels.filter((c) => c.status !== "active").map((c) => [c.platform, connectHref(c.platform)]))}
-                connect={<ConnectChannelDialog availability={availability} slots={{ used: connectedAccounts, limit: limits.socialAccounts }} label={channels.length ? "Connect more channels" : "Connect a channel"} />}
+                connect={ctx.role === "member" ? null : <ConnectChannelDialog availability={availability} slots={{ used: connectedAccounts, limit: limits.socialAccounts }} label={channels.length ? "Connect more channels" : "Connect a channel"} />}
               />
               <details className={styles.usage}>
                 <summary className={styles.usageSummary}>
@@ -325,10 +342,10 @@ async function AppShell({ children }: { children: ReactNode }) {
                   )}
                 </div>
               </details>
-              <SidebarNav variant="footer" failedPosts={failedPosts} showAdmin={isAdmin(user)} />
+              <SidebarNav variant="footer" failedPosts={failedPosts} showAdmin={isAdmin(me)} isMember={ctx.role === "member"} />
             </div>
             <div className={styles.userCard}>
-              <AccountMenu name={displayName} email={user.email} plan={plan} />
+              <AccountMenu name={displayName} email={me.email} plan={plan} />
               <SidebarCollapse />
             </div>
           </>
