@@ -185,7 +185,7 @@ const moreTools = [
 });
 
 const appJsonLd = {
-  ...toolSoftwareJsonLd({ name: config.name, description, url: `${BRAND.url}${PATH}` }),
+  ...toolSoftwareJsonLd({ name: config.name, description, url: `${BRAND.canonicalUrl}${PATH}` }),
   featureList: config.schema?.features,
 };
 
