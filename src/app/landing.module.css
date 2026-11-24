@@ -1,4 +1,5 @@
 /* OWNER-APPROVED HOMEPAGE DESIGN (restored 2026-11-18 from 60cad71). Do NOT change layout, sections, hero, demo or styles. SEO bots: text/meta only, never design. */
+/* OWNER-APPROVED 2026-11-24: TryPost-style hero with Poskoo illustrations (.tpHero block at the end of this file) — do not change without Raman. */
 .landing{
   
   --paper:var(--poskoo-paper);
@@ -1377,3 +1378,105 @@
 @media (max-width: 760px) {
   .landing :global(.heroAlt){ position:relative;z-index:3; }
 }
+
+/* ---------- OWNER-APPROVED 2026-11-24: TryPost-style hero with Poskoo illustrations — do not change without Raman. ----------
+   Rounded lavender panel, floating network tiles, centred copy + violet CTA, doodle characters on the
+   ground, then a browser-framed dashboard screenshot overlapping the panel's bottom edge. */
+.landing :global(.tpHero){
+  --tp-ink:#292928;--tp-violet:#6d28d9;--tp-violet-hover:#5b21b6;--tp-lav:#ede9fe;--tp-lav-2:#ddd6fe;
+  position:relative;overflow:hidden;margin-top:10px;border-radius:28px;
+  margin-left:calc(-1 * max(16px, env(safe-area-inset-left, 0px)) + 10px);margin-right:calc(-1 * max(16px, env(safe-area-inset-right, 0px)) + 10px);
+  padding-inline:max(6px, env(safe-area-inset-left, 0px));padding-bottom:clamp(190px, 21vw, 300px);
+  background:radial-gradient(120% 70% at 50% 0%, var(--tp-lav-2) 0%, var(--tp-lav) 38%, #f5f3ff 72%, #fbfaff 100%);color:var(--tp-ink)}
+.landing :global(.tpHero > .wrap){position:relative;z-index:2}
+.landing :global(.tpHero nav.top){
+  position:relative;margin-top:14px;padding:10px 12px 10px 22px;border-radius:var(--poskoo-radius-pill);
+  background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.9);box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 10px 30px -12px rgba(76,29,149,.18)}
+/* Copy */
+.landing :global(.tpHero .hero.heroCenter){padding-block:clamp(36px, 6vh, 64px) 10px;gap:16px}
+.landing :global(.tpHero .hero.heroCenter h1){color:var(--tp-ink);letter-spacing:-.04em}
+.landing :global(.tpHero .mark){background:linear-gradient(transparent 14%, var(--tp-lav-2) 14%, var(--tp-lav-2) 88%, transparent 88%)}
+.landing :global(.tpHero .lede){color:#5a5a59}
+.landing :global(.tpHero .heroPill){background:rgba(255,255,255,.7);border:1px solid rgba(109,40,217,.14)}
+.landing :global(.tpHero .heroPill span){background:var(--tp-violet)}
+.landing :global(.tpHero .glassBar){background:#fff;box-shadow:0 10px 30px -14px rgba(76,29,149,.28),0 0 0 1px rgba(109,40,217,.10)}
+.landing :global(.tpHero .glassBar)::before{display:none}
+.landing :global(.tpHero .heroSignup) :global(.glassBar button){
+  background:var(--tp-violet);color:#fff;border:1px solid var(--tp-violet);box-shadow:0 8px 18px -8px rgba(109,40,217,.7)}
+.landing :global(.tpHero .heroSignup) :global(.glassBar button:hover){background:var(--tp-violet-hover);box-shadow:0 10px 22px -8px rgba(109,40,217,.75)}
+.landing :global(.tpHero .glassBar:focus-within){box-shadow:0 10px 30px -14px rgba(76,29,149,.28),0 0 0 3px rgba(124,58,237,.35)}
+.landing :global(.tpHero .googleChip){background:#fff;border-color:rgba(41,41,40,.12);box-shadow:0 4px 12px -6px rgba(76,29,149,.25)}
+.landing :global(.tpHero .heroAlt){color:#5a5a59;background:transparent;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.landing :global(.tpHero .heroAlt)::before{display:none}
+.landing :global(.tpHero .heroLogin){border-left-color:rgba(109,40,217,.16)}
+/* Sky: clouds + floating network tiles */
+.landing :global(.tpSky){position:absolute;inset:0;pointer-events:none;z-index:1}
+.landing :global(.tpCloud){position:absolute;height:auto;opacity:.9}
+.landing :global(.tpCloudL){top:118px;left:3.5%;width:clamp(90px, 8vw, 130px)}
+.landing :global(.tpCloudR){top:104px;right:4%;width:clamp(86px, 7.6vw, 124px)}
+.landing :global(.tpTile){
+  position:absolute;display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#fff;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 10px 24px -10px rgba(76,29,149,.35),0 0 0 1px rgba(41,41,40,.05);
+  animation:tpFloat 6s ease-in-out infinite}
+.landing :global(.tpTile-instagram){top:168px;left:15%}
+.landing :global(.tpTile-facebook){top:248px;left:11.5%;animation-delay:-1.2s}
+.landing :global(.tpTile-linkedin){top:312px;left:18.5%;animation-delay:-2.4s;width:42px;height:42px}
+.landing :global(.tpTile-x){top:340px;left:6.5%;animation-delay:-3.1s;width:54px;height:54px}
+.landing :global(.tpTile-youtube){top:410px;left:14%;animation-delay:-.6s;width:42px;height:42px}
+.landing :global(.tpTile-tiktok){top:452px;left:21.5%;animation-delay:-4s;width:42px;height:42px}
+.landing :global(.tpTile-pinterest){top:176px;right:15.5%;animation-delay:-2s;width:42px;height:42px}
+.landing :global(.tpTile-threads){top:256px;right:11%;animation-delay:-3.6s;width:50px;height:50px}
+.landing :global(.tpTile-bluesky){top:330px;right:18.5%;animation-delay:-1.6s;width:42px;height:42px}
+.landing :global(.tpTile-mastodon){top:384px;right:7%;animation-delay:-4.4s;width:42px;height:42px}
+.landing :global(.tpTile-telegram){top:448px;right:13.5%;animation-delay:-.9s}
+.landing :global(.tpTile-discord){top:452px;left:5.5%;animation-delay:-2.8s;width:44px;height:44px}
+@keyframes tpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+/* Ground: our doodle characters, in front of the screenshot's lower corners */
+.landing :global(.tpGround){position:absolute;left:0;right:0;bottom:0;height:0;z-index:3;pointer-events:none}
+.landing :global(.tpGround img){position:absolute;bottom:0;height:auto}
+.landing :global(.tpArtL){left:0;width:clamp(230px, 25vw, 420px)}
+.landing :global(.tpArtR){right:0;width:clamp(200px, 21.5vw, 360px)}
+.landing :global(.tpArtPlane){right:2.5%;bottom:calc(clamp(112px, 12vw, 202px) + 26px) !important;width:clamp(120px, 10vw, 170px)}
+/* Framed dashboard screenshot */
+.landing :global(.tpShotWrap){position:relative;z-index:2;margin-top:calc(-1 * clamp(150px, 17vw, 250px))}
+.landing :global(.tpShot){
+  margin:0 auto;max-width:1040px;border-radius:16px;overflow:hidden;background:#fff;
+  border:1px solid #e9e5f5;box-shadow:0 40px 90px -30px rgba(76,29,149,.35),0 12px 30px -18px rgba(41,41,40,.25)}
+.landing :global(.tpBar){display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-bottom:1px solid #eeebf5;background:#fbfaf8}
+.landing :global(.tpBar i){width:11px;height:11px;border-radius:50%;background:#ff5f57}
+.landing :global(.tpBar i:nth-child(2)){background:#febc2e}
+.landing :global(.tpBar i:nth-child(3)){background:#28c840}
+.landing :global(.tpBar span){margin-inline:auto;transform:translateX(-24px);padding:4px 14px;border-radius:8px;background:#f1eff8;color:#5a5a59;font:500 .78rem/1.2 var(--sans)}
+.landing :global(.tpShot img){display:block;width:100%;height:auto}
+@media (max-width: 1180px){
+  .landing :global(.tpTile-linkedin),.landing :global(.tpTile-bluesky),.landing :global(.tpTile-tiktok),.landing :global(.tpTile-telegram){display:none}
+  .landing :global(.tpTile-instagram){left:9%}.landing :global(.tpTile-facebook){left:4%}
+  .landing :global(.tpTile-pinterest){right:9%}.landing :global(.tpTile-threads){right:4%}
+  .landing :global(.tpCloud){display:none}
+  .landing :global(.tpArtL){width:19vw}
+  .landing :global(.tpArtR){width:16.5vw}
+  .landing :global(.tpArtPlane){width:96px;bottom:calc(9.5vw + 30px) !important}
+  /* Characters stand above the frame; the screenshot only tucks under their plants. */
+  .landing :global(.tpHero){padding-bottom:calc(10vw + 56px)}
+  .landing :global(.tpShotWrap){margin-top:-40px}
+  .landing :global(.tpGround){z-index:1}
+}
+@media (max-width: 860px){
+  .landing :global(.tpTile),.landing :global(.tpCloud),.landing :global(.tpArtPlane){display:none}
+  /* Characters stand fully visible above the screenshot, which only tucks under their plants. */
+  .landing :global(.tpHero){padding-bottom:calc(23vw + 44px)}
+  .landing :global(.tpArtL){width:44vw}
+  .landing :global(.tpArtR){width:38vw}
+  .landing :global(.tpShotWrap){margin-top:-30px}
+  .landing :global(.tpGround){z-index:1}
+}
+@media (max-width: 640px){
+  .landing :global(.tpHero){border-radius:22px;margin-top:6px}
+  .landing :global(.tpHero nav.top){margin-top:10px;padding-left:16px}
+  .landing :global(.tpShot){border-radius:12px}
+  .landing :global(.tpBar){height:28px;gap:5px;padding:0 10px}
+  .landing :global(.tpBar i){width:8px;height:8px}
+  .landing :global(.tpBar span){font-size:.68rem;padding:3px 10px;transform:translateX(-14px)}
+}
+@media (prefers-reduced-motion: reduce){ .landing :global(.tpTile){animation:none} }

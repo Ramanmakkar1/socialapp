@@ -1,6 +1,6 @@
 // OWNER-APPROVED HOMEPAGE DESIGN (restored 2026-11-18 from 60cad71). Do NOT change layout, sections, hero, demo or styles. SEO bots: text/meta only, never design.
+// OWNER-APPROVED 2026-11-24: TryPost-style hero with Poskoo illustrations — do not change without Raman.
 import Image from "next/image";
-import { preload } from "react-dom";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
@@ -16,10 +16,10 @@ import styles from "./landing.module.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LandingDemo } from "./LandingDemo";
-import { HeroVideo } from "@/components/HeroVideo";
 import { GoogleButton } from "@/components/GoogleButton";
 import { AnimArt, ANIM_LABELS } from "@/components/AnimArt";
-import { ArrowRight, AtSign, Facebook, Instagram, Youtube } from "lucide-react";
+import { ArrowRight, AtSign, Facebook, Instagram, Youtube, Send, MessageCircle } from "lucide-react";
+import { BlueskyIcon, LinkedInIcon, MastodonIcon, PinterestIcon, TikTokIcon, XIcon } from "@/components/brandIcons";
 import { homePageJsonLd } from "./homeJsonLd";
 import { HomeSchema } from "@/components/HomeSchema";
 const title = `Instagram Scheduler & Auto-DM Automation Tool | ${BRAND.name}`;
@@ -48,6 +48,21 @@ export const dynamic = "force-static";
 // regenerate in the background at most every 10 minutes.
 export const revalidate = 600;
 const WORKS_COLOR: Record<string, string> = { instagram: "#E1306C", facebook: "#1877F2", threads: "var(--ink)", youtube: "#FF0033", linkedin: "#0A66C2", linkedin_pages: "#0A66C2", tiktok: "var(--ink)", pinterest: "#E60023", x: "var(--ink)", gbp: "#4285F4", bluesky: "#1185FE", mastodon: "#6364FF", tumblr: "#001935", farcaster: "#855dcd", plurk: "#ff574d" };
+// Hero: network tiles floating around the headline (left / right clusters, positions in landing.module.css).
+const HERO_TILES = [
+  { id: "instagram", Icon: Instagram, color: "#E1306C" },
+  { id: "facebook", Icon: Facebook, color: "#1877F2" },
+  { id: "linkedin", Icon: LinkedInIcon, color: "#0A66C2" },
+  { id: "x", Icon: XIcon, color: "#111111" },
+  { id: "youtube", Icon: Youtube, color: "#FF0033" },
+  { id: "tiktok", Icon: TikTokIcon, color: "#111111" },
+  { id: "pinterest", Icon: PinterestIcon, color: "#E60023" },
+  { id: "threads", Icon: AtSign, color: "#111111" },
+  { id: "bluesky", Icon: BlueskyIcon, color: "#1185FE" },
+  { id: "mastodon", Icon: MastodonIcon, color: "#6364FF" },
+  { id: "telegram", Icon: Send, color: "#229ED9" },
+  { id: "discord", Icon: MessageCircle, color: "#5865F2" },
+];
 const faqs = [{"q": "What is Poskoo?", "a": "Poskoo is a web app that schedules and auto-publishes your social media posts, and automatically sends an Instagram DM with your link to everyone who comments a keyword. It also captures emails in the DM, gives you a link-in-bio page and shows which posts bring in clicks and leads. It uses each platform's official API, and the Free plan costs $0."}, {"q": "Is it safe for my Instagram account?", "a": "Yes. Poskoo uses Meta's official Instagram API. You log in on Instagram's own screen, we never see your password, and you can disconnect any time."}, {"q": "Which platforms are supported?", "a": PLATFORMS_ANSWER}, {"q": "Do I need a business account?", "a": "For auto-DMs and insights your Instagram needs to be a professional account (Business or Creator). Switching is free in the Instagram app."}, {"q": "Can I cancel any time?", "a": "Yes. Pro and Agency are month to month (or yearly) with no contract. Cancel from Settings > Plan & billing and you keep your plan until the end of the period you paid for."}, {"q": "Is Poskoo free?", "a": "Yes. The Free plan costs $0 and includes 2 social accounts, 10 scheduled posts a month and 500 auto-DMs a month. No card is needed to sign up."}, {"q": "How does comment-to-DM work?", "a": "You pick a post and a keyword. When someone comments that keyword, Poskoo sends them a private Instagram DM with your link, and can ask for their email first so you collect a lead."}, {"q": "Can I schedule Reels and carousels?", "a": "Yes. Paste a public .mp4 link to schedule a Reel, or 2 to 10 image links to schedule a carousel. Poskoo publishes it at the time you pick and shows clear success or failure status."}];
 export default async function Home() {
 // Paid plans / AI items: "Launching soon" until featureReadiness says they're switched on.
@@ -67,9 +82,6 @@ const worksWith = [
 ];
 const faqList = faqs.map((f) => (f.q === "Can I cancel any time?" ? { ...f, a: cancelAnswer(r) } : f));
 const jsonLd = homePageJsonLd(faqList, r, title);
-// The hero poster is the first thing painted above the fold (the video fades in over it):
-// fetch it early and at high priority so it, not the lazy art below, is the LCP candidate.
-preload("/landing/hero-poster.webp?v=2", { as: "image", fetchPriority: "high" });
 return <main className={`${styles.landing} ${instrumentSans.variable} ${instrumentSerif.variable}`}>
 <HomeSchema data={jsonLd} />
 <svg width="0" height="0" style={{"position": "absolute"}} aria-hidden="true"><defs>
@@ -77,13 +89,20 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
   <symbol id="no" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="var(--red)"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/></symbol>
 </defs></svg>
 
-<div className="videoHero">
-  {/* OWNER DECISION 2026-11-15: the hero is the Grok-designed video loop (hero-loop.mp4).
-      Do NOT replace it with static artwork or remove it (an automated change did on 2026-11-15 and was reverted). */}
-  <HeroVideo src="/landing/hero-loop.mp4?v=2" poster="/landing/hero-poster.webp?v=2" />
+{/* OWNER-APPROVED 2026-11-24: TryPost-style hero with Poskoo illustrations — do not change without Raman.
+    Lavender panel, floating network tiles, centred copy + signup, our doodle characters on the ground,
+    then a framed screenshot of the Poskoo dashboard overlapping the panel's bottom edge. */}
+<div className="tpHero">
+  <div className="tpSky" aria-hidden="true">
+    <Image className="tpCloud tpCloudL" src="/landing/hero-cloud-left.webp" width={188} height={102} sizes="130px" alt="" />
+    <Image className="tpCloud tpCloudR" src="/landing/hero-cloud-right.webp" width={182} height={94} sizes="124px" alt="" />
+    {HERO_TILES.map(({ id, Icon, color }) => (
+      <span key={id} className={`tpTile tpTile-${id}`} style={{ color }}><Icon width={22} height={22} strokeWidth={2} /></span>
+    ))}
+  </div>
   <div className="wrap">
     <SiteHeader onHome />
-    <header className="hero heroCenter" id="top">
+    <header className="hero heroCenter tpCopy" id="top">
       <Link className="pill glass heroPill" href="#channels"><span>NEW</span><b>Now publishing to {platforms.liveCountText}</b> <i aria-hidden="true">→</i></Link>
       <h1><span className="h1Line">Schedule posts.</span> <span className="h1Line">Auto&#8209;DM every comment.</span> <em className="s mark">Grow on Poskoo.</em></h1>
       <p className="lede">Plan every post on one calendar. Anyone who comments your keyword gets your link by DM, usually within a minute.</p>
@@ -101,6 +120,17 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
       </div>
     </header>
   </div>
+  <div className="tpGround" aria-hidden="true">
+    <Image className="tpArtL" src="/landing/hero-art-left.webp" width={725} height={381} sizes="(max-width: 860px) 44vw, 25vw" alt="" />
+    <Image className="tpArtPlane" src="/landing/hero-art-plane.webp" width={520} height={312} sizes="190px" alt="" />
+    <Image className="tpArtR" src="/landing/hero-art-right.webp" width={615} height={344} sizes="(max-width: 860px) 38vw, 22vw" alt="" />
+  </div>
+</div>
+<div className="wrap tpShotWrap">
+  <figure className="tpShot">
+    <div className="tpBar" aria-hidden="true"><i></i><i></i><i></i><span>poskoo.com/app/calendar</span></div>
+    <Image src="/landing/hero-dashboard.webp" width={2080} height={1300} sizes="(max-width: 1120px) 94vw, 1040px" priority alt="The Poskoo dashboard: a month calendar of scheduled Instagram, TikTok, LinkedIn, Facebook, Threads, Bluesky, Pinterest and X posts, with the channel list in the sidebar" />
+  </figure>
 </div>
 <div className="wrap">
   <div className="works"><span>Works with</span>{worksWith.map((e) => <b key={e.id}><i style={{ background: WORKS_COLOR[e.id] ?? "var(--ink)" }}></i>{e.label}</b>)}{moreLive > 0 && <span>+ {moreLive} more</span>}<span>· Official APIs only</span></div>
