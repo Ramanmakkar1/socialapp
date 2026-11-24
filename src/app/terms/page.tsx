@@ -17,11 +17,11 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": BRAND.url + "/terms#webpage",
-      url: BRAND.url + "/terms",
+      "@id": BRAND.canonicalUrl + "/terms#webpage",
+      url: BRAND.canonicalUrl + "/terms",
       name: "Terms of service",
       inLanguage: "en",
-      isPartOf: { "@id": BRAND.url + "#website" },
+      isPartOf: { "@id": BRAND.canonicalUrl + "#website" },
     },
     {
       "@type": "BreadcrumbList",
