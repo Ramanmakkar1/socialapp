@@ -52,6 +52,14 @@ export type ConnectAvailability = {
   plurk?: boolean;
   twitch?: boolean;
   farcaster?: boolean;
+  /** 2026-11-24 app networks ported from Postiz (src/lib/networks/moreApps.ts). */
+  reddit?: boolean;
+  dribbble?: boolean;
+  vk?: boolean;
+  kick?: boolean;
+  whop?: boolean;
+  mewe?: boolean;
+  tiktok_business?: boolean;
   /** Neynar client id for "Sign in with Neynar" (public; only set when Farcaster is configured). */
   farcasterClientId?: string;
   /** Pills + explanations for channels that are built but not switched on (src/lib/channelStatus.ts). */
@@ -107,6 +115,13 @@ export function networks(a: ConnectAvailability): Network[] {
     { id: "farcaster", name: "Farcaster", sub: "Profile", icon: icon(NEW_NETWORK_ICON.farcaster), step: "farcaster", status: coming(a, "farcaster", "Farcaster") },
     { id: "twitch", name: "Twitch", sub: "Channel chat", icon: icon(NEW_NETWORK_ICON.twitch), href: "/api/twitch/connect", status: coming(a, "twitch", "Twitch") },
     { id: "plurk", name: "Plurk", sub: "Profile", icon: icon(NEW_NETWORK_ICON.plurk), href: "/api/plurk/connect", status: coming(a, "plurk", "Plurk") },
+    { id: "reddit", name: "Reddit", sub: "Subreddits", icon: icon(NEW_NETWORK_ICON.reddit), href: "/api/reddit/connect", status: coming(a, "reddit", "Reddit") },
+    { id: "tiktok_business", name: "TikTok Business", sub: "Business account", icon: icon(NEW_NETWORK_ICON.tiktok_business), href: "/api/tiktok_business/connect", status: coming(a, "tiktok_business", "TikTok Business") },
+    { id: "dribbble", name: "Dribbble", sub: "Shots", icon: icon(NEW_NETWORK_ICON.dribbble), href: "/api/dribbble/connect", status: coming(a, "dribbble", "Dribbble") },
+    { id: "vk", name: "VK", sub: "Wall", icon: icon(NEW_NETWORK_ICON.vk), href: "/api/vk/connect", status: coming(a, "vk", "VK") },
+    { id: "kick", name: "Kick", sub: "Channel chat", icon: icon(NEW_NETWORK_ICON.kick), href: "/api/kick/connect", status: coming(a, "kick", "Kick") },
+    { id: "whop", name: "Whop", sub: "Forum", icon: icon(NEW_NETWORK_ICON.whop), href: "/api/whop/connect", status: coming(a, "whop", "Whop") },
+    { id: "mewe", name: "MeWe", sub: "Timeline", icon: icon(NEW_NETWORK_ICON.mewe), href: "/api/mewe/connect", status: coming(a, "mewe", "MeWe") },
   ];
 }
 

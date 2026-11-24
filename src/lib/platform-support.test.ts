@@ -4,23 +4,26 @@ import { buildPlatformCatalog, PLATFORM_CATALOG, platformCopy } from "@/lib/plat
 
 const allKeys = Object.fromEntries(PLATFORM_CATALOG.map((e) => [e.id, true]));
 const base = { instagram: true, facebook: true, threads: true, youtube: true, linkedin: true, bluesky: true, mastodon: true };
-const tokenIds = PLATFORM_CATALOG.filter((e) => !["social"].includes(e.group) || ["bluesky", "mastodon"].includes(e.id)).map((e) => e.id);
+// Networks that need no server keys: every non-social entry except the app networks (Twitch, Kick chat,
+// WordPress.com), plus Bluesky / Mastodon and the keyless social token networks (Lemmy, Moltbook).
+const tokenIds = PLATFORM_CATALOG.filter((e) => !["social"].includes(e.group) || ["bluesky", "mastodon", "lemmy", "moltbook"].includes(e.id)).map((e) => e.id);
 
 test("no keys at all (a build without env) counts only the networks that need none", () => {
   const configured = Object.fromEntries(tokenIds.map((id) => [id, true]));
-  for (const id of ["twitch", "wpcom"]) delete configured[id];
+  for (const id of ["twitch", "wpcom", "kick"]) delete configured[id];
   const copy = platformCopy(buildPlatformCatalog(configured, {}), false);
-  assert.deepEqual(copy.live.social, ["Bluesky", "Mastodon"]);
-  assert.equal(copy.liveCount, 2 + 5 + 10);
+  assert.deepEqual(copy.live.social, ["Bluesky", "Mastodon", "Lemmy", "Moltbook"]);
+  // social 4 + chat 5 + blogs 11 (Medium joined the 10 blog/self-hosted networks on 2026-11-24)
+  assert.equal(copy.liveCount, 4 + 5 + 11);
   assert.ok(!copy.answer.includes("reminders"), "no reminder copy while e-mail is off");
 });
 
-test("keys for the original networks give 22 live platforms", () => {
-  const configured = { ...Object.fromEntries(tokenIds.map((id) => [id, true])), ...base, twitch: false, wpcom: false };
+test("keys for the original networks give 25 live platforms (22 + Medium, Lemmy, Moltbook)", () => {
+  const configured = { ...Object.fromEntries(tokenIds.map((id) => [id, true])), ...base, twitch: false, wpcom: false, kick: false };
   const copy = platformCopy(buildPlatformCatalog(configured, {}), true);
-  assert.equal(copy.liveCount, 22);
-  assert.equal(copy.liveCountText, "22 platforms");
-  assert.ok(copy.answer.startsWith("Scheduling works today on 22 platforms: Instagram, Facebook Pages, Threads"));
+  assert.equal(copy.liveCount, 25);
+  assert.equal(copy.liveCountText, "25 platforms");
+  assert.ok(copy.answer.startsWith("Scheduling works today on 25 platforms: Instagram, Facebook Pages, Threads"));
   assert.ok(copy.answer.includes("for chat"));
   assert.ok(copy.answer.includes("reminders"));
 });
@@ -38,8 +41,9 @@ test("approval channels need CHANNEL_STATUS_<ID>=ready on top of their keys", ()
     CHANNEL_STATUS_GBP: "ready",
     CHANNEL_STATUS_LINKEDIN_PAGES: "ready",
   });
-  const copy = platformCopy(approved.map((e) => (["tumblr", "farcaster", "plurk", "twitch", "wpcom"].includes(e.id) ? { ...e, live: false } : e)), true);
-  assert.equal(copy.liveCount, 27, "the owner's target: 22 + TikTok, Pinterest, GBP, LinkedIn Pages and X");
+  const soonApps = ["tumblr", "farcaster", "plurk", "twitch", "wpcom", "reddit", "dribbble", "vk", "kick", "whop"];
+  const copy = platformCopy(approved.map((e) => (soonApps.includes(e.id) ? { ...e, live: false } : e)), true);
+  assert.equal(copy.liveCount, 30, "the owner's target: 25 + TikTok, Pinterest, GBP, LinkedIn Pages and X");
 });
 
 test("an override never turns on a network without its keys, and pending overrides win", () => {

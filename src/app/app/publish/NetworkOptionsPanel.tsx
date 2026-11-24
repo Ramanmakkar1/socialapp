@@ -7,6 +7,9 @@
 import { useEffect, useId, useState } from "react";
 import { mediaKindFromUrl } from "@/lib/mediaUpload";
 import {
+  DEST_OPTION,
+  destOptionsError,
+  parseDestOptions,
   GBP_CTA_LABEL,
   GBP_TITLE_MAX,
   GBP_TYPE_LABEL,
@@ -52,7 +55,35 @@ export default function NetworkOptionsPanel({ enabled, options, onChange, mediaU
       {enabled.linkedin && (data.linkedinOrgs?.length ?? 0) > 0 && (
         <LinkedInPanel value={options.linkedin ?? {}} orgs={data.linkedinOrgs ?? []} onChange={(v) => onChange("linkedin", v)} />
       )}
+      {(Object.keys(DEST_OPTION) as string[])
+        .filter((net) => (enabled as Record<string, boolean>)[net])
+        .map((net) => (
+          <DestinationPanel key={net} network={net} value={options[net] ?? {}} onChange={(v) => onChange(net, v)} />
+        ))}
     </>
+  );
+}
+
+const DEST_TITLE: Record<string, string> = { reddit: "Reddit", whop: "Whop" };
+
+/** Where the post goes on networks that need it per post (Reddit subreddit, Whop forum). */
+function DestinationPanel({ network, value, onChange }: { network: string; value: Record<string, unknown>; onChange: (v: Record<string, unknown>) => void }) {
+  const id = useId();
+  const spec = DEST_OPTION[network];
+  if (!spec) return null;
+  const opts = parseDestOptions(value);
+  const problem = opts.dest ? destOptionsError(network, opts) : null;
+  return (
+    <section className={box} aria-labelledby={`${id}-h`}>
+      <h3 id={`${id}-h`} className="text-sm font-semibold text-[var(--poskoo-ink)]">{DEST_TITLE[network] ?? network} settings</h3>
+      <label className="mt-3 block text-sm font-medium text-[var(--poskoo-ink)]">
+        {spec.label}
+        {spec.required ? "" : " (optional)"}
+        <input value={opts.dest} onChange={(e) => onChange({ ...value, dest: e.target.value })} className={field} placeholder={spec.placeholder} />
+      </label>
+      <p className="mt-2 text-xs text-[var(--poskoo-muted)]">{spec.help}</p>
+      {problem && <p className="mt-2 text-sm text-[var(--poskoo-coral)]" role="alert">{problem}</p>}
+    </section>
   );
 }
 

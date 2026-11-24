@@ -2,7 +2,7 @@
 // in post_targets.net_options. Safe to import on the client (no server-only modules).
 import type { MediaItem, NetworkId } from "@/lib/networks/common";
 import { isExtraNetwork, extraMediaError } from "@/lib/networks/tokenNetworks";
-import { gbpOptionsError, parseGbpOptions, parsePinterestOptions, parseTikTokOptions, pinterestOptionsError, tiktokOptionsError } from "@/lib/networks/options";
+import { DEST_OPTION, destOptionsError, gbpOptionsError, parseDestOptions, parseGbpOptions, parsePinterestOptions, parseTikTokOptions, pinterestOptionsError, tiktokOptionsError } from "@/lib/networks/options";
 
 function obj(v: unknown): Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -13,6 +13,7 @@ export function normalizeNetOptions(platform: NetworkId, raw: unknown): Record<s
   if (platform === "tiktok") return parseTikTokOptions(raw);
   if (platform === "pinterest") return parsePinterestOptions(raw);
   if (platform === "gbp") return parseGbpOptions(raw);
+  if (DEST_OPTION[platform]) return parseDestOptions(raw);
   if (platform === "linkedin") {
     const a = obj(raw).author;
     const author = typeof a === "string" ? a.trim() : "";
@@ -57,7 +58,11 @@ export function networkTargetError(platform: NetworkId, media: MediaItem[], rawO
     case "fb_group":
       // Reminder channels: the owner posts it by hand, so any caption / media mix is fine.
       return null;
-    default:
+    default: {
+      // Reddit / Whop: where the post goes (checked on drafts too, so a typo shows early).
+      const destError = DEST_OPTION[platform] ? destOptionsError(platform, parseDestOptions(rawOptions)) : null;
+      if (destError && (scheduling || parseDestOptions(rawOptions).dest)) return destError;
       return isExtraNetwork(platform) ? extraMediaError(platform, media, scheduling) : null;
+    }
   }
 }

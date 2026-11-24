@@ -9,7 +9,9 @@ Poskoo includes or adapts work from these AGPL-3.0 projects. Thank you to their 
 
 - **Postiz** (https://github.com/gitroomhq/postiz-app), AGPL-3.0, Copyright (C) Gitroom.
   The per-network publish error mappings in `src/lib/publishErrors.ts` are adapted from Postiz's
-  social providers (`handleErrors`).
+  social providers (`handleErrors`). The Medium, Lemmy and Moltbook adapters
+  (`src/lib/networks/moreTokens.ts`) and the Reddit, Dribbble, VK, Kick, Whop, MeWe and TikTok
+  Business adapters (`src/lib/networks/moreApps.ts`) are adapted from the matching Postiz providers.
 - **TryPost** (https://github.com/trypostit/trypost), AGPL-3.0.
   The in-app dashboard layout and colour palette are inspired by TryPost's interface (no code copied).
 

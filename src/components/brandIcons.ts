@@ -1,9 +1,12 @@
 // Simple line marks for networks lucide has no icon for. Built with createLucideIcon so they are
 // drop-in replacements wherever a lucide icon is used (same props, same `typeof Instagram` type).
 import {
+  Bot,
+  BookOpen,
   Brackets,
   Clapperboard,
   Code,
+  Dribbble,
   Earth,
   createLucideIcon,
   Facebook,
@@ -16,15 +19,20 @@ import {
   Linkedin,
   Mail,
   MessageCircle,
+  MessageSquareText,
   MessagesSquare,
+  Newspaper,
   NotebookPen,
   PenLine,
   RadioTower,
+  Radio,
   Send,
+  ShoppingBag,
   Smile,
   Sparkles,
   Store,
   Tv,
+  Users,
   Zap,
 } from "lucide-react";
 import { EXTRA_NETWORK_COLOR } from "@/lib/networks/tokenNetworks";
@@ -97,6 +105,17 @@ export const NEW_NETWORK_ICON = {
   plurk: Smile,
   twitch: Tv,
   farcaster: RadioTower,
+  // 2026-11-24 (ported from Postiz). Line icons here; real marks live in src/components/BrandLogo.tsx.
+  medium: BookOpen,
+  lemmy: Users,
+  moltbook: Bot,
+  reddit: MessageSquareText,
+  dribbble: Dribbble,
+  vk: Newspaper,
+  kick: Radio,
+  whop: ShoppingBag,
+  mewe: MessagesSquare,
+  tiktok_business: TikTokIcon,
 };
 
 export const NEW_NETWORK_COLOR = {
