@@ -82,7 +82,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: tool.name,
-    url: `${BRAND.url}${tool.href}`,
+    url: `${BRAND.canonicalUrl}${tool.href}`,
   })),
 };
 
