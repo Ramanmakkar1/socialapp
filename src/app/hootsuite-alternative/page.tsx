@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER, PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
@@ -45,7 +45,7 @@ const faqs = [
   { q: `Is ${BRAND.name} a Hootsuite alternative?`, a: `Yes, especially for Instagram. ${BRAND.name} schedules and publishes to ${LIVE_PLATFORMS_TEXT} on one calendar, and also sends an automatic DM to everyone who comments a keyword, with email capture built in. Hootsuite covers more networks and team features today.` },
   { q: "Can I import my Hootsuite schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your schedule there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs only?", a: OFFICIAL_API_ANSWER },
 ];
 
 const faqJsonLd = {
