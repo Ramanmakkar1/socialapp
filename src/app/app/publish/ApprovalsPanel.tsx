@@ -21,6 +21,7 @@ export type PendingItem = {
   platforms: string[];
 };
 
+// Local time differs between the server render and the browser: the span suppresses that warning.
 function when(iso: string | null): string {
   if (!iso) return "No time picked";
   return new Date(iso).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
@@ -56,7 +57,7 @@ function Row({ item, canReview, userId, platformLabel }: { item: PendingItem; ca
   return (
     <li className={styles.row}>
       <div className={styles.meta}>
-        <span className={styles.when}><Clock width={14} height={14} aria-hidden="true" /> {when(item.scheduledAt)}{item.requestedMode === "queue" ? " · queue" : ""}</span>
+        <span className={styles.when} suppressHydrationWarning><Clock width={14} height={14} aria-hidden="true" /> {when(item.scheduledAt)}{item.requestedMode === "queue" ? " · queue" : ""}</span>
         <span className={styles.who}>{mine ? "You" : item.requestedByEmail ?? "A teammate"} asked to publish</span>
       </div>
       <p className={styles.caption}>{item.caption.trim() || "(no caption)"}</p>
