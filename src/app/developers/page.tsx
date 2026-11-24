@@ -85,7 +85,7 @@ const collectionJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Poskoo developers",
-  url: `${BRAND.url}/developers`,
+  url: `${BRAND.canonicalUrl}/developers`,
   description,
 };
 
