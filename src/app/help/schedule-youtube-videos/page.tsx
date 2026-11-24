@@ -47,9 +47,9 @@ const steps = [
     text: "Enter a video title of up to 100 characters; it is required. Write the description in the caption field and add optional comma-separated tags.",
     body: (
       <>
-        Enter a <strong>video title</strong> of up to 100 characters; it is required. Write the description in the caption
-        field and add optional <strong>comma-separated tags</strong>. {BRAND.name} sends these details with the scheduled
-        upload.
+        Enter a <strong>video title</strong> of up to 100 characters; it is required. Write the{" "}
+        <Link href="/tools/youtube-description-generator">YouTube description</Link> in the caption field and add
+        optional <strong>comma-separated tags</strong>. {BRAND.name} sends these details with the scheduled upload.
       </>
     ),
   },
