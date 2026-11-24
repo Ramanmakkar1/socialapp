@@ -114,7 +114,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: tool.name,
-    url: `${BRAND.url}${tool.href}`,
+    url: `${BRAND.canonicalUrl}${tool.href}`,
   })),
 };
 
@@ -122,7 +122,7 @@ const softwareJsonLd = toolSoftwareJsonLd({
   name: "TikTok tools",
   description:
     "A free collection of TikTok tools for captions, hooks, hashtags, video ideas, bios, usernames, video and photo sizes, engagement and earnings.",
-  url: `${BRAND.url}${PATH}`,
+  url: `${BRAND.canonicalUrl}${PATH}`,
 });
 
 export default function TikTokToolsPage() {
