@@ -37,6 +37,7 @@ export default function CommentPicker() {
   const [winners, setWinners] = useState<CommentEntry[]>([]);
   const [shuffling, setShuffling] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [pickedFrom, setPickedFrom] = useState(0);
   const timers = useRef<number[]>([]);
 
   const parsed = useMemo(() => parseComments(text), [text]);
@@ -55,11 +56,20 @@ export default function CommentPicker() {
     return () => list.forEach((t) => window.clearTimeout(t));
   }, []);
 
+  function resetDraw() {
+    timers.current.forEach((t) => window.clearTimeout(t));
+    timers.current = [];
+    setWinners([]);
+    setShuffling(null);
+    setCopied(false);
+  }
+
   function pick() {
     if (valid.length === 0 || shuffling !== null) return;
     timers.current.forEach((t) => window.clearTimeout(t));
     timers.current = [];
     setCopied(false);
+    setPickedFrom(valid.length);
     const result = pickWinners(valid, winnerCount);
     if (prefersReducedMotion()) {
       setWinners(result);
@@ -85,7 +95,7 @@ export default function CommentPicker() {
 
   async function copyResult() {
     const lines = winners.map((w, i) => `${i + 1}. ${label(w)}${w.text ? ` — ${w.text}` : ""}`);
-    const summary = `Instagram giveaway winner${winners.length > 1 ? "s" : ""} (picked from ${valid.length} valid entries):\n${lines.join("\n")}`;
+    const summary = `Instagram giveaway winner${winners.length > 1 ? "s" : ""} (picked from ${pickedFrom} valid entries):\n${lines.join("\n")}`;
     try {
       await navigator.clipboard.writeText(summary);
       setCopied(true);
@@ -107,7 +117,10 @@ export default function CommentPicker() {
           ) : (
             <button
               type="button"
-              onClick={() => setText(SAMPLE)}
+              onClick={() => {
+                resetDraw();
+                setText(SAMPLE);
+              }}
               className="min-h-11 rounded-lg px-2 text-sm font-medium text-[var(--poskoo-violet)] underline underline-offset-2 hover:bg-[var(--poskoo-band)]"
             >
               Try sample comments
@@ -117,7 +130,10 @@ export default function CommentPicker() {
         <textarea
           id={`${uid}-comments`}
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            resetDraw();
+            setText(e.target.value);
+          }}
           rows={7}
           placeholder={"@username: comment text\nusername comment text"}
           className={`${field} resize-y font-mono text-sm sm:text-[15px]`}
@@ -135,7 +151,10 @@ export default function CommentPicker() {
               id={`${uid}-keyword`}
               type="text"
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                resetDraw();
+                setKeyword(e.target.value);
+              }}
               placeholder="e.g. win"
               className={field}
             />
@@ -151,7 +170,10 @@ export default function CommentPicker() {
               max={20}
               inputMode="numeric"
               value={minMentions}
-              onChange={(e) => setMinMentions(e.target.value)}
+              onChange={(e) => {
+                resetDraw();
+                setMinMentions(e.target.value);
+              }}
               className={`${field} tabular-nums`}
             />
           </div>
@@ -166,7 +188,10 @@ export default function CommentPicker() {
               max={10}
               inputMode="numeric"
               value={count}
-              onChange={(e) => setCount(e.target.value)}
+              onChange={(e) => {
+                resetDraw();
+                setCount(e.target.value);
+              }}
               className={`${field} tabular-nums`}
             />
           </div>
@@ -176,7 +201,10 @@ export default function CommentPicker() {
               <input
                 type="checkbox"
                 checked={dedupe}
-                onChange={(e) => setDedupe(e.target.checked)}
+                onChange={(e) => {
+                  resetDraw();
+                  setDedupe(e.target.checked);
+                }}
                 className="h-[18px] w-[18px] accent-[var(--poskoo-violet)]"
               />
               One entry per person
