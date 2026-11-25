@@ -14,9 +14,9 @@ import {
 } from "./mediaLimits.ts";
 
 test("plan table matches the owner's numbers", () => {
-  assert.deepEqual(PLAN_MEDIA_LIMITS.Free, { imageBytes: 20 * MB, videoBytes: 250 * MB, pendingBytes: 2 * GB });
-  assert.deepEqual(PLAN_MEDIA_LIMITS.Pro, { imageBytes: 30 * MB, videoBytes: 1 * GB, pendingBytes: 20 * GB });
-  assert.deepEqual(PLAN_MEDIA_LIMITS.Agency, { imageBytes: 30 * MB, videoBytes: 2 * GB, pendingBytes: 100 * GB });
+  assert.deepEqual(PLAN_MEDIA_LIMITS.Free, { imageBytes: 20 * MB, videoBytes: 250 * MB, pendingBytes: 2 * GB, libraryBytes: 500 * MB });
+  assert.deepEqual(PLAN_MEDIA_LIMITS.Pro, { imageBytes: 30 * MB, videoBytes: 1 * GB, pendingBytes: 20 * GB, libraryBytes: 10 * GB });
+  assert.deepEqual(PLAN_MEDIA_LIMITS.Agency, { imageBytes: 30 * MB, videoBytes: 2 * GB, pendingBytes: 100 * GB, libraryBytes: 50 * GB });
 });
 
 test("rule lookup: Instagram feed video is a Reel, Story format uses Story limits", () => {

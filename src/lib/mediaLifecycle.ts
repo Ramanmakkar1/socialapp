@@ -11,6 +11,9 @@
 //   posted or the 7-day hold ends (src/lib/networks/reminderSend.ts expireReminders).
 // - Deleting a post / draft releases its files the same way.
 // - Storage quota counts only files waiting to be posted (see pendingBytesFor).
+// - Media library (2026-11-25): a LIVE library asset (socialapp.media_assets, deleted_at is null)
+//   counts as a reference, so publishing never deletes it and its post keeps the real file URL.
+//   Deleting it from the library releases the file the same way (src/lib/mediaLibrary.ts).
 import { getPool, query } from "@/lib/db";
 import { UNATTACHED_KEEP_DAYS, checkMediaForTargets } from "@/lib/mediaLimits";
 import { probeVideoDurationSec } from "@/lib/mediaProbe";
@@ -109,6 +112,7 @@ export function releasedMediaJson(
   media: unknown,
   posterFor: (key: string) => string | null,
   platformThumb: string | null = null,
+  keepKeys: ReadonlySet<string> = new Set(),
 ): unknown[] {
   if (!Array.isArray(media)) return [];
   return media.map((raw) => {
@@ -116,7 +120,8 @@ export function releasedMediaJson(
     const item = raw as MediaJsonItem;
     if (item.purged === true || typeof item.url !== "string") return item;
     const key = ownMediaKeys(userId, [item])[0];
-    if (!key) return item;
+    // Media-library files stay on disk, so the post keeps pointing at the real file.
+    if (!key || keepKeys.has(key)) return item;
     const isVideo = item.type === "video";
     const thumb = posterFor(key) ?? (isVideo ? platformThumb : null) ?? (isVideo ? VIDEO_PLACEHOLDER : IMAGE_PLACEHOLDER);
     return { ...item, thumb, purged: true };
@@ -166,7 +171,28 @@ const OTHER_REFERENCE_SQL = [
   "select to_jsonb(x)::text as t from socialapp.bio_pages x where user_id=$1",
   "select to_jsonb(x)::text as t from socialapp.lead_magnets x where user_id=$1",
   "select to_jsonb(x)::text as t from socialapp.products x where user_id=$1",
+  // Live media-library files (and their posters) stay until they are deleted from the library.
+  "select '/api/media/' || storage_key || coalesce(' /api/media/' || thumb_key, '') as t from socialapp.media_assets x where user_id=$1 and deleted_at is null",
 ];
+
+/** Keys (lowercase) of this owner's live media-library files. */
+export async function liveLibraryKeys(userId: string): Promise<Set<string>> {
+  const rows = await query<{ k: string }>(
+    "select lower(storage_key) as k from socialapp.media_assets where user_id=$1 and deleted_at is null",
+    [userId],
+  );
+  return new Set(rows.map((r) => r.k));
+}
+
+/** Non-post rows that mention a user's uploads (ideas, automations, bio, lead magnets, products, live library). */
+export async function nonPostReferenceTexts(userId: string): Promise<string[]> {
+  const out: string[] = [];
+  for (const sql of OTHER_REFERENCE_SQL) {
+    const rows = await query<{ t: string | null }>(sql, [userId]);
+    for (const r of rows) if (r.t && r.t.includes("/api/media/")) out.push(r.t);
+  }
+  return out;
+}
 
 /** All rows that mention a user's uploads (posts + others). Used by the daily unused-file cleanup. */
 export async function mediaReferenceTexts(userId: string): Promise<string[]> {
@@ -243,7 +269,8 @@ export async function releasePostMedia(postId: string, nowMs = Date.now()): Prom
     }
     const yt = targets.find((t) => t.platform === "youtube" && t.status === "published" && t.external_post_id);
     const ytThumb = yt?.external_post_id && /^[\w-]{6,20}$/.test(yt.external_post_id) ? `https://i.ytimg.com/vi/${yt.external_post_id}/hqdefault.jpg` : null;
-    const nextMedia = releasedMediaJson(userId, post.media, (k) => posters.get(k) ?? null, ytThumb);
+    const library = await liveLibraryKeys(userId).catch(() => new Set<string>());
+    const nextMedia = releasedMediaJson(userId, post.media, (k) => posters.get(k) ?? null, ytThumb, library);
 
     // Mark first: if the row changed meanwhile (e.g. Retry), nothing is deleted.
     const marked = await query<{ id: string }>(

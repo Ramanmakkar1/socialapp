@@ -12,10 +12,10 @@ export const GB = 1_000_000_000;
 export type MediaKind = "image" | "video";
 
 /** What each plan allows per file, and how much "waiting to be posted" storage it gets. */
-export const PLAN_MEDIA_LIMITS: Record<PlanName, { imageBytes: number; videoBytes: number; pendingBytes: number }> = {
-  Free: { imageBytes: 20 * MB, videoBytes: 250 * MB, pendingBytes: 2 * GB },
-  Pro: { imageBytes: 30 * MB, videoBytes: 1 * GB, pendingBytes: 20 * GB },
-  Agency: { imageBytes: 30 * MB, videoBytes: 2 * GB, pendingBytes: 100 * GB },
+export const PLAN_MEDIA_LIMITS: Record<PlanName, { imageBytes: number; videoBytes: number; pendingBytes: number; libraryBytes: number }> = {
+  Free: { imageBytes: 20 * MB, videoBytes: 250 * MB, pendingBytes: 2 * GB, libraryBytes: 500 * MB },
+  Pro: { imageBytes: 30 * MB, videoBytes: 1 * GB, pendingBytes: 20 * GB, libraryBytes: 10 * GB },
+  Agency: { imageBytes: 30 * MB, videoBytes: 2 * GB, pendingBytes: 100 * GB, libraryBytes: 50 * GB },
 };
 
 /** Days an upload that is not attached to any post still counts (and is kept). */
@@ -233,4 +233,14 @@ export function pendingStorageLabel(usedBytes: number, plan: PlanName): string {
 export function pendingQuotaMessage(usedBytes: number, plan: PlanName): string {
   const quota = PLAN_MEDIA_LIMITS[plan].pendingBytes;
   return `Your media storage is full (${formatBytes(usedBytes)} of ${formatBytes(quota)} waiting to be posted). Files free up as soon as their posts are published. Delete unused drafts, or use a link to the file instead.`;
+}
+
+/** Media library line: "Media library: 120 MB of 500 MB" (live library files + files waiting to be posted). */
+export function libraryStorageLabel(usedBytes: number, plan: PlanName): string {
+  return `Media library: ${formatBytes(usedBytes)} of ${formatBytes(PLAN_MEDIA_LIMITS[plan].libraryBytes)}`;
+}
+
+export function libraryQuotaMessage(usedBytes: number, plan: PlanName): string {
+  const quota = PLAN_MEDIA_LIMITS[plan].libraryBytes;
+  return `Your media library is full (${formatBytes(usedBytes)} of ${formatBytes(quota)} on the ${plan} plan). Delete files you no longer need in Media library, or upgrade for more space.`;
 }
