@@ -172,6 +172,10 @@ export async function uploadXMedia(
     info = obj(obj(st.json.data).processing_info);
   }
   if (str(info.state) !== "" && str(info.state) !== "succeeded") return { ok: false, error: "X is still processing the video; retry in a few minutes." };
+  // Image description (best effort: a failed alt text never blocks the post).
+  if (item.type === "image" && item.alt) {
+    await call("/2/media/metadata", token, { method: "POST", json: { id, metadata: { alt_text: { text: item.alt.slice(0, 1000) } } } }, fetchImpl).catch(() => undefined);
+  }
   return { ok: true, id };
 }
 

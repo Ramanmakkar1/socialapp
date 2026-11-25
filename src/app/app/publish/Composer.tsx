@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useId, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, AtSign, Bell, CalendarClock, ChevronDown, Clock, Facebook, Hash, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
+import { ArrowLeft, ArrowRight, AtSign, Bell, CalendarClock, ChevronDown, Clock, Facebook, Hash, Images, Instagram, Link2, Loader2, Plus, Smile, Sparkles, UploadCloud, X, Youtube as YouTube } from "lucide-react";
 import { deleteHashtagGroup, deleteTemplate, listHashtagGroups, listTemplates, nextAvailableSlot, nextAvailableSlots, saveHashtagGroup, savePost, saveTemplate } from "./actions";
 import PublishingChecklist, { type ChecklistFixTarget } from "./PublishingChecklist";
 import PostPreview from "./PostPreview";
+import LibraryPicker from "./LibraryPicker";
+import type { MediaAssetView } from "@/lib/mediaLibrary";
 import { useComposerDialog } from "./ComposerDialog";
 import { COMPOSER_EMOJI, insertAtCursor } from "@/lib/captionInsert";
 import { isReminderNetwork } from "@/lib/networks/reminder";
@@ -166,6 +168,9 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
   const [mediaFacts, setMediaFacts] = useState<Record<string, MediaFacts>>({});
   const [dragActive, setDragActive] = useState(false);
   const [linkMode, setLinkMode] = useState(false);
+  // Media library picker + alt text per attached image URL (sent with the post, src/lib/savePost.ts).
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [mediaAlts, setMediaAlts] = useState<Record<string, string>>(() => ({ ...(initialDraft?.mediaAlts ?? {}) }));
   const [igFormat, setIgFormat] = useState<"feed" | "story">(init.igFormat);
   const [selectedRuleId, setSelectedRuleId] = useState(init.selectedRuleId);
   const [scheduledAt, setScheduledAt] = useState("");
@@ -219,6 +224,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     setHashtagText("");
     setCustomCaption(blank.customCaption);
     setMediaUrls(blank.mediaUrls);
+    setMediaAlts({});
     setUploadError("");
     setMediaWarnings([]);
     setLinkMode(false);
@@ -392,6 +398,7 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
       mode,
       imageUrl: mediaUrls[0]?.trim() !== "" ? mediaUrls[0].trim() : null,
       mediaUrls,
+      mediaAlts: Object.fromEntries(mediaUrls.map((u) => u.trim()).filter((u) => u && mediaAlts[u]?.trim()).map((u) => [u, mediaAlts[u].trim()])),
       dmRuleId: selectedRuleId || null,
       igFormat: enabled.instagram ? igFormat : "feed",
       ytTitle: enabled.youtube ? ytTitle : undefined,
@@ -458,6 +465,49 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
     });
   }
 
+  /** Files picked in the media library (or ?assets= from Media library → "Use in new post"). */
+  function attachLibraryAssets(assets: MediaAssetView[]) {
+    const storyMode = enabled.instagram && igFormat === "story";
+    const usable = assets.filter((a) => a.url);
+    if (usable.length === 0) return;
+    setMediaFacts((prev) => {
+      const next = { ...prev };
+      for (const a of usable) next[a.url!] = { kind: a.kind, type: a.mime, size: a.bytes, width: a.width, height: a.height, durationSec: a.durationSec };
+      return next;
+    });
+    setMediaAlts((prev) => {
+      const next = { ...prev };
+      for (const a of usable) if (a.alt && !next[a.url!]) next[a.url!] = a.alt;
+      return next;
+    });
+    if (storyMode) {
+      setMediaUrls([usable[0].url!]);
+      return;
+    }
+    setMediaUrls((prev) => {
+      const next = prev.map((u) => u.trim()).filter((u) => u !== "");
+      for (const a of usable) if (next.length < 10 && !next.includes(a.url!)) next.push(a.url!);
+      return next.length > 0 ? next : [""];
+    });
+  }
+
+  // Media library → "Use in new post" opens /app/publish?compose=1&assets=<ids>.
+  const assetParam = searchParams.get("assets");
+  const assetsLoadedRef = useRef(false);
+  useEffect(() => {
+    if (!assetParam || assetsLoadedRef.current || initialDraft || initialIdea) return;
+    assetsLoadedRef.current = true;
+    const ids = assetParam.split(",").filter((id) => /^[0-9a-f-]{36}$/i.test(id)).slice(0, 10);
+    if (ids.length === 0) return;
+    fetch(`/api/media/library?ids=${ids.join(",")}`, { cache: "no-store" })
+      .then((r) => (r.ok ? (r.json() as Promise<{ items: MediaAssetView[] }>) : null))
+      .then((d) => {
+        if (d) attachLibraryAssets(ids.map((id) => d.items.find((a) => a.id === id)).filter((a): a is MediaAssetView => Boolean(a)));
+      })
+      .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetParam]);
+
   async function uploadFiles(files: File[]) {
     if (files.length === 0) return;
     setUploadError("");
@@ -505,6 +555,8 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
             "X-File-Name": encodeURIComponent(file.name),
             "X-Networks": platforms.join(","),
             "X-Ig-Format": igFormatNow,
+            ...(facts.width ? { "X-Media-Width": String(facts.width) } : {}),
+            ...(facts.height ? { "X-Media-Height": String(facts.height) } : {}),
           },
           (loaded, total) => setUploadProgress({ name: file.name, loaded, total }),
           controller.signal,
@@ -1357,14 +1409,69 @@ export default function Composer({ rules = [], bestHoursUtc = [], initialDraft, 
                 })}
               </ul>
             )}
-            <button
-              type="button"
-              onClick={() => setLinkMode((open) => !open)}
-              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)]"
-            >
-              <Link2 className="h-4 w-4" aria-hidden />
-              {linkMode ? "Hide link fields" : "Add from link"}
-            </button>
+            {mediaUrls.some((u) => u.trim() && mediaKindFromUrl(u.trim()) !== "video") && (
+              <details className="mt-3 rounded-xl border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-3 py-2">
+                <summary className="cursor-pointer text-sm font-medium text-[var(--poskoo-ink)]">
+                  Alt text{" "}
+                  <span className="font-normal text-[var(--poskoo-muted)]">
+                    ({mediaUrls.filter((u) => u.trim() && mediaAlts[u.trim()]?.trim()).length} of {mediaUrls.filter((u) => u.trim() && mediaKindFromUrl(u.trim()) !== "video").length} described)
+                  </span>
+                </summary>
+                <div className="mt-2 space-y-2">
+                  {mediaUrls.map((url, index) => {
+                    const trimmed = url.trim();
+                    if (!trimmed || mediaKindFromUrl(trimmed) === "video") return null;
+                    const altId = `${imageId}-alt-${index}`;
+                    return (
+                      <div key={altId} className="flex items-start gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={trimmed} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
+                        <label htmlFor={altId} className="sr-only">Alt text for image {index + 1}</label>
+                        <textarea
+                          id={altId}
+                          rows={2}
+                          maxLength={1000}
+                          value={mediaAlts[trimmed] ?? ""}
+                          onChange={(e) => setMediaAlts((prev) => ({ ...prev, [trimmed]: e.target.value }))}
+                          placeholder={`Describe image ${index + 1} for screen readers`}
+                          className="min-w-0 flex-1 resize-y rounded-lg border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-2.5 py-1.5 text-sm text-[var(--poskoo-ink)] placeholder:text-[var(--poskoo-muted)] focus:border-[var(--poskoo-violet)] focus:outline-none"
+                        />
+                      </div>
+                    );
+                  })}
+                  <p className="text-xs text-[var(--poskoo-muted)]">Sent to Bluesky, Mastodon, X and LinkedIn with the post.</p>
+                </div>
+              </details>
+            )}
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <button
+                type="button"
+                onClick={() => setLibraryOpen(true)}
+                disabled={!(enabled.instagram && igFormat === "story") && filledMediaCount >= 10}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)] disabled:opacity-50"
+              >
+                <Images className="h-4 w-4" aria-hidden />
+                From media library
+              </button>
+              <button
+                type="button"
+                onClick={() => setLinkMode((open) => !open)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)]"
+              >
+                <Link2 className="h-4 w-4" aria-hidden />
+                {linkMode ? "Hide link fields" : "Add from link"}
+              </button>
+            </div>
+            {libraryOpen && (
+              <LibraryPicker
+                max={enabled.instagram && igFormat === "story" ? 1 : Math.max(0, 10 - filledMediaCount)}
+                onClose={() => setLibraryOpen(false)}
+                onPick={(assets) => {
+                  attachLibraryAssets(assets);
+                  setLibraryOpen(false);
+                }}
+              />
+            )}
             {linkMode && (
               <div className="mt-2 space-y-2">
                 {mediaUrls.map((url, index) => {

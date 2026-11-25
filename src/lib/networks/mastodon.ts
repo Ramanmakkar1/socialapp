@@ -188,6 +188,7 @@ async function uploadMedia(
   url: string,
   fetchImpl: Fetch,
   sleep: (ms: number) => Promise<void>,
+  alt = "",
 ): Promise<{ ok: true; id: string } | { ok: false; error: string; tokenDead?: boolean }> {
   const file = await downloadMedia(url, fetchImpl, 200 * 1024 * 1024);
   if (!file.ok) return file;
@@ -201,6 +202,7 @@ async function uploadMedia(
     }
   })();
   form.append("file", new Blob([new Uint8Array(file.bytes)], { type }), name);
+  if (alt) form.append("description", alt.slice(0, 1500));
   const r = await api(instance, token, "/api/v2/media", { method: "POST", body: form }, fetchImpl);
   if (!r.ok) return { ok: false, error: `Mastodon media upload failed: ${r.error}`, tokenDead: r.status === 401 };
   const id = str(r.json.id);
@@ -232,7 +234,7 @@ export async function publishToMastodon(input: PublishInput): Promise<PublishOut
   }
   const mediaIds: string[] = [];
   for (const m of input.media) {
-    const up = await uploadMedia(instance, token, m.url, fetchImpl, sleep);
+    const up = await uploadMedia(instance, token, m.url, fetchImpl, sleep, m.alt ?? "");
     if (!up.ok) return up;
     mediaIds.push(up.id);
   }

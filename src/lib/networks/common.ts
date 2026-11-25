@@ -32,7 +32,8 @@ export function isNetworkId(value: unknown): value is NetworkId {
 
 export type Fetch = typeof fetch;
 
-export type MediaItem = { type: "image" | "video"; url: string };
+/** alt: image description from the media library / composer (networks that support it send it on). */
+export type MediaItem = { type: "image" | "video"; url: string; alt?: string };
 
 /** A stored account with decrypted tokens, handed to a network's publish function. */
 export type NetAccount = {
@@ -180,7 +181,8 @@ export function mediaItems(raw: unknown): MediaItem[] {
   for (const item of raw) {
     const row = obj(item);
     if ((row.type === "image" || row.type === "video") && typeof row.url === "string" && row.url !== "") {
-      out.push({ type: row.type, url: row.url });
+      const alt = typeof row.alt === "string" ? row.alt.trim().slice(0, 1000) : "";
+      out.push(alt ? { type: row.type, url: row.url, alt } : { type: row.type, url: row.url });
     }
   }
   return out;

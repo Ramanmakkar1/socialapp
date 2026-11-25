@@ -33,6 +33,8 @@ export type SavePostInput = {
   mode: "draft" | "schedule" | "queue";
   imageUrl?: string | null;
   mediaUrls?: string[];
+  /** Alt text per media URL (from the composer / media library); passed to networks that support it. */
+  mediaAlts?: Partial<Record<string, string>>;
   dmRuleId?: string | null;
   igFormat?: "feed" | "story";
   ytTitle?: string;
@@ -108,7 +110,7 @@ function platformLabel(platform: string): string {
   return { instagram: "Instagram", facebook: "Facebook", threads: "Threads", youtube: "YouTube" }[platform] ?? platform;
 }
 
-type MediaItem = { type: "image" | "video"; url: string };
+type MediaItem = { type: "image" | "video"; url: string; alt?: string };
 
 function parseMediaLink(
   trimmed: string,
@@ -129,7 +131,9 @@ function parseMediaLink(
   } else if (pathname.endsWith(".mp4") || pathname.endsWith(".mov")) {
     detectedType = "video";
   }
-  if (parsed.protocol !== "https:" || trimmed.length > 2000 || !detectedType) {
+  // Local development serves uploads from http://localhost; production links must be https.
+  const localDev = process.env.NODE_ENV !== "production" && parsed.protocol === "http:" && ["localhost", "127.0.0.1"].includes(parsed.hostname);
+  if ((parsed.protocol !== "https:" && !localDev) || trimmed.length > 2000 || !detectedType) {
     return {
       ok: false,
       error: "Media link must be a public https link to a .jpg, .png or .mp4 file.",
@@ -241,7 +245,8 @@ export async function savePostForUser(
     if (!parsed.ok) {
       return { ok: false, error: parsed.error };
     }
-    mediaItems.push(parsed.item);
+    const alt = typeof input.mediaAlts?.[trimmed] === "string" ? input.mediaAlts[trimmed]!.replace(/\s+/g, " ").trim().slice(0, 1000) : "";
+    mediaItems.push(alt && parsed.item.type === "image" ? { ...parsed.item, alt } : parsed.item);
   }
 
   if (mediaItems.length > 1 && mediaItems.some((m) => m.type === "video")) {

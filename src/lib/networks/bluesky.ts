@@ -272,7 +272,7 @@ export async function publishToBluesky(input: PublishInput): Promise<PublishOutc
       if (!fitted) return { ok: false, error: "A Bluesky image must be 1 MB or smaller. Use a smaller image." };
       const r = await xrpc(service, "com.atproto.repo.uploadBlob", { token, raw: new Uint8Array(fitted.bytes), contentType: fitted.contentType }, fetchImpl);
       if (!r.ok) return fail(r, "image upload");
-      uploaded.push({ alt: "", image: r.json.blob });
+      uploaded.push({ alt: (img.alt ?? "").slice(0, 2000), image: r.json.blob });
     }
     embed = { $type: "app.bsky.embed.images", images: uploaded };
   } else {

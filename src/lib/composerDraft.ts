@@ -11,6 +11,8 @@ export type ComposerDraftInitial = {
   platforms: string[];
   overrides: Partial<Record<PlatformId, string>>;
   mediaUrls: string[];
+  /** Alt text per media URL (image descriptions). */
+  mediaAlts?: Record<string, string>;
   igFormat: "feed" | "story";
   dmRuleId: string | null;
   /** Exact UTC instant (ISO string) or null. */

@@ -111,7 +111,7 @@ type DraftRow = Omit<ComposerDraftInitial, "scheduledAt" | "firstComment" | "med
   status: "draft" | "scheduled";
   scheduled_at: Date | string | null;
   first_comment: string | null;
-  media: { url: string }[];
+  media: { url: string; alt?: string }[];
   dm_rule_id: string | null;
   ig_format: "feed" | "story";
 };
@@ -285,6 +285,7 @@ export default async function CalendarPage({
             initialDraft = {
               id: row.id, caption: row.caption, platforms: row.platforms, overrides: row.overrides,
               firstComment: row.first_comment ?? "", tags: Array.isArray(row.tags) ? row.tags : [], mediaUrls: Array.isArray(row.media) ? row.media.map((item) => item?.url).filter((url): url is string => typeof url === "string") : [],
+              mediaAlts: Object.fromEntries((Array.isArray(row.media) ? row.media : []).flatMap((item) => (typeof item?.url === "string" && typeof item.alt === "string" && item.alt ? [[item.url, item.alt]] : []))),
               scheduledAt: row.scheduled_at ? new Date(row.scheduled_at).toISOString() : null,
               dmRuleId: row.dm_rule_id, igFormat: row.ig_format,
               status: row.status,

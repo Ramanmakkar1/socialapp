@@ -230,17 +230,17 @@ export async function publishToLinkedIn(input: PublishInput): Promise<PublishOut
   const orgs = Array.isArray(input.account.meta.orgs) ? (input.account.meta.orgs as { urn?: unknown }[]) : [];
   const author = wanted && linkedinConfig().companyPages && orgs.some((o) => o.urn === wanted) ? wanted : person;
 
-  const urns: string[] = [];
+  const urns: { id: string; altText: string }[] = [];
   for (const img of images) {
     const up = await uploadImage(token, author, img.url, fetchImpl);
     if (!up.ok) return up;
-    urns.push(up.urn);
+    urns.push({ id: up.urn, altText: (img.alt ?? "").slice(0, 4086) });
   }
   const content =
     urns.length === 1
-      ? { content: { media: { id: urns[0] } } }
+      ? { content: { media: urns[0].altText ? { id: urns[0].id, altText: urns[0].altText } : { id: urns[0].id } } }
       : urns.length > 1
-        ? { content: { multiImage: { images: urns.map((id) => ({ id, altText: "" })) } } }
+        ? { content: { multiImage: { images: urns } } }
         : {};
   const body = {
     author,
