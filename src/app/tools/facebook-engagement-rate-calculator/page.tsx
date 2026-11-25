@@ -27,7 +27,7 @@ const config: ToolPageConfig = {
     },
     {
       title: "Enter the post's numbers",
-      text: "Type Reactions, Comments and Shares, then either Reach or Followers. Comments and shares are optional: leave them blank and they count as zero.",
+      text: "Type Reactions, Comments and Shares, then either Reach or Followers. Shares are optional: leave them blank and they count as zero.",
       art: "writing",
     },
     {
