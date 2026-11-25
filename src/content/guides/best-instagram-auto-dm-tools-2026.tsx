@@ -164,7 +164,7 @@ export const body: GuideBody = {
             <li><strong>Price:</strong> Free connects 1 Instagram account with up to 1,000 DMs a month. Pro is $19/mo or $182/yr for up to 3 accounts and 25,000 DMs a month. Platinum+ is $99/mo for 10 accounts.</li>
             <li><strong>Cons:</strong> no post scheduler, so you still need a second tool to plan content.</li>
           </ul>
-          <p><strong>Best for:</strong> accounts that run frequent giveaways or launches with thousands of comments.</p>
+          <p><strong>Best for:</strong> accounts that run frequent <Link href="/tools/instagram-comment-picker">giveaways</Link> or launches with thousands of comments.</p>
 
           <h3>5. Inrō: a CRM for Instagram DMs</h3>
           <p>
