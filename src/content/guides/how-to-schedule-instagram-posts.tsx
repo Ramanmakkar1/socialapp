@@ -97,7 +97,10 @@ export const body: GuideBody = {
           </ol>
           <p>
             Business Suite is a solid free choice if Facebook and Instagram are your only channels. It is less useful
-            when you also post to LinkedIn, YouTube, Threads or Bluesky, because you would need a second tool for those.
+            when you also post to <Link href="/linkedin-scheduler">LinkedIn</Link>,{" "}
+            <Link href="/youtube-scheduler">YouTube</Link>,{" "}
+            <Link href="/threads-scheduler">Threads</Link>{" "}
+            or <Link href="/bluesky-scheduler">Bluesky</Link>, because you would need a second tool for those.
           </p>
           <p>
             It also works well for a small team. You can leave a post scheduled and let someone else review the
