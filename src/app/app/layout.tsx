@@ -121,7 +121,7 @@ function Meter({ label, used, limit }: { label: string; used: number; limit: num
   );
 }
 
-/** "Media library: 120 MB of 500 MB": live media-library files (src/lib/mediaLibrary.ts). */
+/** "Media library: 120 MB of 2 GB": live media-library files (src/lib/mediaLibrary.ts). */
 function MediaMeter({ used, plan }: { used: number; plan: PlanName }) {
   const limit = PLAN_MEDIA_LIMITS[plan].libraryBytes;
   const pct = Math.min(100, Math.round((used / limit) * 100));

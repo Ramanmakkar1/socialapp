@@ -235,7 +235,7 @@ export function pendingQuotaMessage(usedBytes: number, plan: PlanName): string {
   return `Your media storage is full (${formatBytes(usedBytes)} of ${formatBytes(quota)} waiting to be posted). Files free up as soon as their posts are published. Delete unused drafts, or use a link to the file instead.`;
 }
 
-/** Media library line: "Media library: 120 MB of 500 MB" (live library files + files waiting to be posted). */
+/** Media library line: "Media library: 120 MB of 2 GB" (live library files + files waiting to be posted). */
 export function libraryStorageLabel(usedBytes: number, plan: PlanName): string {
   return `Media library: ${formatBytes(usedBytes)} of ${formatBytes(PLAN_MEDIA_LIMITS[plan].libraryBytes)}`;
 }
