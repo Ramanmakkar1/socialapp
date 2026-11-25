@@ -16,6 +16,8 @@ import { createDmRuleForUser, type RuleTrigger } from "@/lib/dmRuleCreate";
 import { ANY_COMMENT_KEYWORD } from "@/lib/keywordChips";
 import { createCampaignForUser } from "@/lib/campaign";
 import { createHash } from "node:crypto";
+import { getAssets, listAssets, viewOf } from "@/lib/mediaLibrary";
+import { BRAND } from "@/lib/brand";
 import { rateLimit, type RateLimitResult } from "@/lib/rateLimit";
 
 // MCP request limits: per API key (authenticated use) and per IP (stops key guessing before the DB lookup).
@@ -70,7 +72,7 @@ export const MCP_TOOLS: McpTool[] = [
   {
     name: "create_post",
     description:
-      `Create a post in Poskoo. caption is required. channels: any of ${CHANNEL_LIST} (default: every connected channel; \"channel\" with one id also works). mediaUrls: up to 10 public https .jpg/.png/.mp4 links (a carousel, or one video). captions: optional per-network caption overrides, e.g. {\"x\": \"short version\"}. scheduleAt: an ISO time like 2026-12-01T09:00:00Z or \"next slot\" (the default) for the next free slot from the channel schedules. mode: \"draft\" or \"schedule\". ${DRAFT_NOTE} networkOptions passes per-network settings (e.g. {\"pinterest\": {\"boardId\": \"…\"}}); ytTitle is required for YouTube.`,
+      `Create a post in Poskoo. caption is required. channels: any of ${CHANNEL_LIST} (default: every connected channel; \"channel\" with one id also works). mediaUrls: up to 10 public https .jpg/.png/.mp4 links (a carousel, or one video). captions: optional per-network caption overrides, e.g. {\"x\": \"short version\"}. scheduleAt: an ISO time like 2026-12-01T09:00:00Z or \"next slot\" (the default) for the next free slot from the channel schedules. mode: \"draft\" or \"schedule\". mediaAssetIds: ids from list_media (this account's media library), attached after any mediaUrls with their saved alt text. ${DRAFT_NOTE} networkOptions passes per-network settings (e.g. {\"pinterest\": {\"boardId\": \"…\"}}); ytTitle is required for YouTube.`,
     inputSchema: {
       type: "object",
       properties: {
@@ -79,6 +81,7 @@ export const MCP_TOOLS: McpTool[] = [
         channel: { type: "string", enum: [...CHANNELS] },
         mediaUrls: { type: "array", items: { type: "string" }, maxItems: 10 },
         mediaUrl: { type: "string" },
+        mediaAssetIds: { type: "array", items: { type: "string" }, maxItems: 10 },
         captions: { type: "object", additionalProperties: { type: "string" } },
         scheduleAt: { type: "string" },
         mode: { type: "string", enum: ["draft", "schedule"] },
@@ -88,6 +91,20 @@ export const MCP_TOOLS: McpTool[] = [
         networkOptions: { type: "object" },
       },
       required: ["caption"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "list_media",
+    description:
+      "List this account's media library (uploaded images and videos), newest first. Optional: query (matches file name or alt text), kind (image or video), limit (1-50, default 20). Returns ids to pass as mediaAssetIds to create_post.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string" },
+        kind: { type: "string", enum: ["image", "video"] },
+        limit: { type: "number" },
+      },
       additionalProperties: false,
     },
   },
@@ -386,10 +403,14 @@ async function createPost(userId: string, args: Record<string, unknown>, access:
   if (isArgError(channels)) return channels;
   const media = mediaArg(args);
   if (isArgError(media)) return media;
+  const library = await libraryMediaArg(userId, args);
+  if (isArgError(library)) return library;
   const captions = captionsArg(args);
   if (isArgError(captions)) return captions;
   const mode = modeArg(args);
   if (isArgError(mode)) return mode;
+  const allMedia = [...(media ?? []), ...library.urls];
+  if (allMedia.length > 10) return { error: "Up to 10 media items per post (mediaUrls + mediaAssetIds)." };
 
   // Channels: the requested ones, or every connected active channel when omitted.
   const platforms = channels ?? (await connectedChannels(userId));
@@ -412,7 +433,8 @@ async function createPost(userId: string, args: Record<string, unknown>, access:
     overrides,
     scheduledAt,
     mode: schedule ? (when.nextSlot ? "queue" : "schedule") : "draft",
-    mediaUrls: media ?? [],
+    mediaUrls: allMedia,
+    ...(Object.keys(library.alts).length ? { mediaAlts: library.alts } : {}),
     ...(platforms.includes("youtube") ? { ytTitle: str(args, "ytTitle") ?? caption.slice(0, 100) } : {}),
     ...(str(args, "firstComment") ? { firstComment: str(args, "firstComment")! } : {}),
     ...(Array.isArray(args.tags) ? { tags: args.tags.filter((t): t is string => typeof t === "string") } : {}),
@@ -707,6 +729,47 @@ async function analyticsSummary(userId: string, args: Record<string, unknown>): 
   };
 }
 
+/** mediaAssetIds -> signed links of the key owner's own library files (+ their alt text). */
+async function libraryMediaArg(userId: string, args: Record<string, unknown>): Promise<{ urls: string[]; alts: Record<string, string> } | ArgError> {
+  if (args.mediaAssetIds === undefined || args.mediaAssetIds === null) return { urls: [], alts: {} };
+  if (!Array.isArray(args.mediaAssetIds) || args.mediaAssetIds.some((x) => typeof x !== "string")) {
+    return { error: "mediaAssetIds must be a list of ids from list_media." };
+  }
+  const ids = (args.mediaAssetIds as string[]).slice(0, 10);
+  const assets = await getAssets(userId, ids);
+  const missing = ids.filter((id) => !assets.some((a) => a.id === id));
+  if (missing.length > 0) return { error: `Media not found in this account's library: ${missing.join(", ")}` };
+  const urls: string[] = [];
+  const alts: Record<string, string> = {};
+  for (const id of ids) {
+    const v = viewOf(assets.find((a) => a.id === id)!, BRAND.url);
+    if (!v.url) return { error: "Media links are not configured on this server." };
+    urls.push(v.url);
+    if (v.alt) alts[v.url] = v.alt;
+  }
+  return { urls, alts };
+}
+
+async function listMedia(userId: string, args: Record<string, unknown>): Promise<unknown> {
+  const kindRaw = str(args, "kind");
+  const kind = kindRaw === "image" || kindRaw === "video" ? kindRaw : "all";
+  const limit = Math.min(50, Math.max(1, Number(args.limit) || 20));
+  const items = await listAssets(userId, { q: str(args, "query") ?? "", kind, limit });
+  return {
+    media: items.map((a) => ({
+      id: a.id,
+      name: a.name,
+      kind: a.kind,
+      bytes: a.bytes,
+      width: a.width,
+      height: a.height,
+      durationSec: a.durationSec,
+      alt: a.alt,
+      createdAt: a.createdAt,
+    })),
+  };
+}
+
 /** Runs one MCP tool for the API key's owner. Unknown tools and bad input return isError results. */
 export async function callMcpTool(
   name: string,
@@ -737,6 +800,8 @@ export async function callMcpTool(
         return textResult(await createCampaign(userId, safeArgs));
       case "add_idea":
         return textResult(await addIdea(userId, safeArgs));
+      case "list_media":
+        return textResult(await listMedia(userId, safeArgs));
       case "get_analytics_summary":
         return textResult(await analyticsSummary(userId, safeArgs));
       default:

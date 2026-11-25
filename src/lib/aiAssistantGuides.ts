@@ -36,6 +36,7 @@ export const ASSISTANT_TOOLS: { name: string; text: string }[] = [
   { name: "delete_post", text: "Deletes a draft, scheduled or failed post (never one that is publishing or published)." },
   { name: "get_post_status", text: "Shows whether a post is pending, publishing, published or failed on each network, with the error if there is one." },
   { name: "add_idea", text: "Saves a post idea to your Poskoo ideas board." },
+  { name: "list_media", text: "Lists the images and videos in your Poskoo media library, so the assistant can attach them to a post." },
   { name: "list_contacts", text: "Lists contacts your Instagram Auto-DMs have captured, with any email or phone they shared." },
   { name: "create_dm_rule", text: "Creates an Instagram Auto-DM: comment a keyword, get a DM (optionally after sharing an email)." },
   { name: "create_campaign_from_brief", text: "Drafts a whole campaign from a short brief with Poskoo's AI, as drafts for you to review (when AI is switched on for your account)." },

@@ -452,6 +452,7 @@ test("route: initialize, tools/list and tools/call work for a valid key", async 
       "get_post_status",
       "list_channels",
       "list_contacts",
+      "list_media",
       "list_posts",
       "update_post",
     ],
