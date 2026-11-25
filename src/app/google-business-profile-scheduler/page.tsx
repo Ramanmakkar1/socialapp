@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { networkAvailability } from "@/components/ChannelStatusNote";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
@@ -119,6 +120,7 @@ const appJsonLd = {
 };
 
 export default function GoogleBusinessProfileSchedulerPage() {
+  const isLive = networkAvailability("gbp") === "live";
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Google Business Profile scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -131,14 +133,20 @@ export default function GoogleBusinessProfileSchedulerPage() {
 
       <header className="hero">
         <div className={s.heroText}>
-        <span className="pill">Official Google Business Profile API · No password needed</span>
+        <span className="pill">{isLive ? "Official Google Business Profile API · No password needed" : "Official Google Business Profile API · Not live yet"}</span>
         <p className="eyebrow">Google Business Profile scheduler</p>
         <h1>
           Google Business Profile <em className="s mark">scheduler</em>
         </h1>
+        {isLive ? (
         <p className="lede">
           Yes, you can schedule Google Business Profile posts: connect your business with Google&apos;s official sign-in, write an update, offer or event post, pick a location and time, and Poskoo publishes it through the Business Profile API. The Free plan is $0 with no credit card.
         </p>
+        ) : (
+        <p className="lede">
+          Google Business Profile scheduling in Poskoo is built and waiting on Google&apos;s API approval. Once it&apos;s approved you&apos;ll connect your business with Google&apos;s official sign-in, write an update, offer or event post, pick a location and time, and Poskoo will publish it through the Business Profile API. The Free plan is $0 with no credit card.
+        </p>
+        )}
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling GBP posts <span aria-hidden="true">→</span></Link>
           <Link className="btn btn-line" href="/pricing">See plans and pricing</Link>
