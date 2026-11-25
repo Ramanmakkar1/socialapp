@@ -255,7 +255,7 @@ export const body: GuideBody = {
               <strong>Profile photo:</strong> a clear face or a simple logo that is readable at small size.
             </li>
             <li>
-              <strong>Highlights:</strong> group your best content into a few named highlights so new visitors can
+              <strong>Highlights:</strong> group your best content into a few <Link href="/tools/instagram-highlight-cover-maker">named highlights</Link> so new visitors can
               browse by topic.
             </li>
             <li>
