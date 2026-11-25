@@ -13,9 +13,9 @@ export type MediaKind = "image" | "video";
 
 /** What each plan allows per file, and how much "waiting to be posted" storage it gets. */
 export const PLAN_MEDIA_LIMITS: Record<PlanName, { imageBytes: number; videoBytes: number; pendingBytes: number; libraryBytes: number }> = {
-  Free: { imageBytes: 20 * MB, videoBytes: 250 * MB, pendingBytes: 2 * GB, libraryBytes: 500 * MB },
-  Pro: { imageBytes: 30 * MB, videoBytes: 1 * GB, pendingBytes: 20 * GB, libraryBytes: 10 * GB },
-  Agency: { imageBytes: 30 * MB, videoBytes: 2 * GB, pendingBytes: 100 * GB, libraryBytes: 50 * GB },
+  Free: { imageBytes: 20 * MB, videoBytes: 250 * MB, pendingBytes: 2 * GB, libraryBytes: 2 * GB },
+  Pro: { imageBytes: 30 * MB, videoBytes: 1 * GB, pendingBytes: 20 * GB, libraryBytes: 20 * GB },
+  Agency: { imageBytes: 30 * MB, videoBytes: 2 * GB, pendingBytes: 100 * GB, libraryBytes: 100 * GB },
 };
 
 /** Days an upload that is not attached to any post still counts (and is kept). */

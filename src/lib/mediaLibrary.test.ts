@@ -101,9 +101,9 @@ test("alt text: cleaned, capped, and carried to networks", () => {
 });
 
 test("library quotas per plan", () => {
-  assert.equal(PLAN_MEDIA_LIMITS.Free.libraryBytes, 500 * MB);
-  assert.equal(PLAN_MEDIA_LIMITS.Pro.libraryBytes, 10 * GB);
-  assert.equal(PLAN_MEDIA_LIMITS.Agency.libraryBytes, 50 * GB);
+  assert.equal(PLAN_MEDIA_LIMITS.Free.libraryBytes, 2 * GB);
+  assert.equal(PLAN_MEDIA_LIMITS.Pro.libraryBytes, 20 * GB);
+  assert.equal(PLAN_MEDIA_LIMITS.Agency.libraryBytes, 100 * GB);
   assert.match(libraryQuotaMessage(499 * MB, "Free"), /499 MB of 500 MB/);
 });
 
