@@ -14,8 +14,8 @@ import { getBilling, type StoredBilling } from "@/lib/billing";
 import { graceEndsAt, planFromBilling } from "@/lib/billingState";
 import { cookies } from "next/headers";
 import { UPGRADE_INTENT_COOKIE, parseUpgradeIntent } from "@/lib/upgradeIntent";
-import { pendingMediaUsage } from "@/lib/mediaLifecycle";
-import { GB, PLAN_MEDIA_LIMITS, pendingStorageLabel } from "@/lib/mediaLimits";
+import { libraryUsage } from "@/lib/mediaLibrary";
+import { PLAN_MEDIA_LIMITS, libraryStorageLabel } from "@/lib/mediaLimits";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
 import { connectHref, networkAvailability } from "@/lib/networks/registry";
@@ -121,21 +121,20 @@ function Meter({ label, used, limit }: { label: string; used: number; limit: num
   );
 }
 
-/** "Media storage: 0.4 / 2 GB": only files waiting to be posted count (src/lib/mediaLifecycle.ts). */
+/** "Media library: 120 MB of 500 MB": live media-library files (src/lib/mediaLibrary.ts). */
 function MediaMeter({ used, plan }: { used: number; plan: PlanName }) {
-  const limit = PLAN_MEDIA_LIMITS[plan].pendingBytes;
+  const limit = PLAN_MEDIA_LIMITS[plan].libraryBytes;
   const pct = Math.min(100, Math.round((used / limit) * 100));
-  const label = pendingStorageLabel(used, plan);
+  const label = libraryStorageLabel(used, plan);
   return (
-    <div className={styles.meter} title="Only files waiting to be posted count. Files are deleted once their post is published.">
+    <div className={styles.meter} title="Files in your media library. Delete files you no longer need in Media library.">
       <p className={styles.meterTop}>
-        <span>Media storage</span>
-        <span className={styles.meterNum}>{label.replace("Media storage: ", "")}</span>
+        <span>Media library</span>
+        <span className={styles.meterNum}>{label.replace("Media library: ", "")}</span>
       </p>
-      <span className={styles.meterBar} role="meter" aria-label={`${label} (only files waiting to be posted count)`} aria-valuemin={0} aria-valuemax={Math.round(limit / GB)} aria-valuenow={Number((used / GB).toFixed(1))}>
+      <span className={styles.meterBar} role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={limit} aria-valuenow={Math.min(used, limit)}>
         <span style={{ width: `${pct}%` }} className={pct >= 90 ? styles.meterHot : undefined} />
       </span>
-      <p className={styles.meterTop}><span>Only files waiting to be posted count</span></p>
     </div>
   );
 }
@@ -147,7 +146,7 @@ async function AppShell({ children }: { children: ReactNode }) {
   const user = asOwnerUser(ctx);
   const me = ctx.user;
   // Started now, awaited at render: a folder listing + one query, in parallel with the rest.
-  const mediaPendingPromise = isDbConfigured() ? pendingMediaUsage(user.id).catch(() => 0) : Promise.resolve(0);
+  const mediaPendingPromise = isDbConfigured() ? libraryUsage(user.id).catch(() => 0) : Promise.resolve(0);
   let needsReconnect = false;
   let failedPosts = 0;
   let scheduledPosts = 0;

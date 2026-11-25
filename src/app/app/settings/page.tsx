@@ -18,8 +18,8 @@ import { isMetaLoginConfigured } from "@/lib/metaLogin";
 import { isThreadsConfigured } from "@/lib/threadsAuth";
 import { facebookPageStatus } from "@/lib/facebookPublish";
 import { accountLimitMessage, PLAN_LIMITS, planForUser } from "@/lib/planLimits";
-import { pendingMediaUsage } from "@/lib/mediaLifecycle";
-import { PLAN_MEDIA_LIMITS, formatBytes, pendingStorageLabel } from "@/lib/mediaLimits";
+import { libraryUsage } from "@/lib/mediaLibrary";
+import { PLAN_MEDIA_LIMITS, formatBytes, libraryStorageLabel } from "@/lib/mediaLimits";
 import { isYouTubeConfigured } from "@/lib/youtubeAuth";
 import { connectHref } from "@/lib/networks/registry";
 import { createApiKeyAction, deleteMyAccountAction, disconnectAccountAction, disconnectYouTubeAction, revokeApiKeyAction, saveAiReplySettings, saveBrandVoice } from "./actions";
@@ -134,7 +134,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const user = asOwnerUser(ctx);
   const own = ctx.isOwnWorkspace;
   const sections = SECTIONS.filter((s) => (own || !["api-keys", "danger", "plan"].includes(s.id)) && (ctx.role === "owner" || s.id !== "payments"));
-  const mediaPending = isDbConfigured() ? await pendingMediaUsage(user.id).catch(() => 0) : 0;
+  const mediaPending = isDbConfigured() ? await libraryUsage(user.id).catch(() => 0) : 0;
   const plan = await planForUser(user.id);
   const { ig, voice: voiceParam, account: accountParam, threads: threadsParam, ai_reply: aiReplyParam, schedule: scheduleParam, yt: ytParam, api_key: apiKeyParam, key: keyParam, payments: paymentsParam } = await searchParams;
   const apiKey = typeof apiKeyParam === "string" ? apiKeyParam : null;
@@ -593,11 +593,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <section className={styles.section} aria-labelledby="media-heading">
           <h2 id="media-heading" className={styles.sectionTitle}>Media storage</h2>
           <p className={ui.hint}>
-            {pendingStorageLabel(mediaPending, plan)} (only files waiting to be posted count).
+            {libraryStorageLabel(mediaPending, plan)}. <Link href="/app/media">Open Media library</Link>
           </p>
           <p className={ui.hint}>
-            Uploads are deleted as soon as every network has published the post; a small preview stays in your calendar.
-            Files not attached to a post are removed after 7 days. Per file: images up to {formatBytes(PLAN_MEDIA_LIMITS[plan].imageBytes)},
+            Every upload is saved to your media library and stays there after its post is published, so you can reuse it.
+            Delete files you no longer need in Media library to free up space. Per file: images up to {formatBytes(PLAN_MEDIA_LIMITS[plan].imageBytes)},
             videos up to {formatBytes(PLAN_MEDIA_LIMITS[plan].videoBytes)} on the {plan} plan (each network may allow less).
           </p>
         </section>

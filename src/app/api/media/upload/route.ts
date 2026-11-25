@@ -1,6 +1,6 @@
 
-import { pendingMediaUsage } from "@/lib/mediaLifecycle";
-import { PLAN_MEDIA_LIMITS, checkMediaForTargets, formatBytes, pendingQuotaMessage } from "@/lib/mediaLimits";
+import { libraryUsage, recordAsset, setAssetThumb } from "@/lib/mediaLibrary";
+import { PLAN_MEDIA_LIMITS, checkMediaForTargets, formatBytes, libraryQuotaMessage } from "@/lib/mediaLimits";
 import { probeVideoDurationSec } from "@/lib/mediaProbe";
 import {
   DISK_FULL_MESSAGE,
@@ -20,7 +20,7 @@ import {
 } from "@/lib/mediaStorage";
 import { validateMediaFile } from "@/lib/mediaUpload";
 import { planForUser } from "@/lib/planLimits";
-import { getWorkspaceUser } from "@/lib/workspace";
+import { asOwnerUser, getWorkspaceContext } from "@/lib/workspace";
 
 export const runtime = "nodejs";
 
@@ -33,12 +33,15 @@ export const runtime = "nodejs";
  * so the file is checked against every selected network's limits (src/lib/mediaLimits.ts).
  * X-Thumb-For: <key of an upload> stores a small JPEG poster for that upload instead (kept after
  * the upload itself is deleted on publish, so published posts still show a picture).
+ * X-Media-Width / X-Media-Height: pixel size measured in the browser (stored on the library asset).
+ * Every upload becomes a media-library asset of the WORKSPACE OWNER (src/lib/mediaLibrary.ts).
  */
 export async function POST(request: Request) {
-  const user = await getWorkspaceUser();
-  if (!user) {
+  const ctx = await getWorkspaceContext();
+  if (!ctx) {
     return Response.json({ error: "Please sign in again." }, { status: 401 });
   }
+  const user = asOwnerUser(ctx);
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
   if (!mediaSecret()) {
@@ -93,6 +96,7 @@ export async function POST(request: Request) {
     try {
       const thumbKey = thumbKeyFor(thumbFor);
       await saveMediaStream(user.id, body, "jpg", THUMB_MAX_BYTES, thumbKey);
+      await setAssetThumb(user.id, thumbFor, thumbKey).catch(() => undefined);
       return Response.json({ ok: true, thumbUrl: signedMediaUrl(thumbKey, baseUrl) });
     } catch {
       return Response.json({ error: "Could not save the poster." }, { status: 400 });
@@ -122,11 +126,11 @@ export async function POST(request: Request) {
     if (decision === "warn") console.warn(`media disk is getting full: ${formatBytes(disk.freeBytes)} free`);
   }
 
-  // Quota: only files waiting to be posted count.
-  const quota = PLAN_MEDIA_LIMITS[plan].pendingBytes;
-  const used = await pendingMediaUsage(user.id).catch(() => 0);
+  // Quota: the plan's media library (live library files + older uploads still waiting to be posted).
+  const quota = PLAN_MEDIA_LIMITS[plan].libraryBytes;
+  const used = await libraryUsage(user.id).catch(() => 0);
   if (used + size > quota) {
-    return Response.json({ error: pendingQuotaMessage(used, plan) }, { status: 413 });
+    return Response.json({ error: libraryQuotaMessage(used, plan) }, { status: 413 });
   }
   const kindMax = validation.kind === "image" ? PLAN_MEDIA_LIMITS[plan].imageBytes : PLAN_MEDIA_LIMITS[plan].videoBytes;
   const maxBytes = Math.min(kindMax, quota - used);
@@ -147,7 +151,27 @@ export async function POST(request: Request) {
     if (!url) {
       return Response.json({ error: "Could not create a media link." }, { status: 500 });
     }
-    return Response.json({ ok: true, url, key, kind: validation.kind, name: name ?? "", durationSec });
+    const px = (h: string) => {
+      const n = Number(request.headers.get(h));
+      return Number.isFinite(n) && n > 0 ? n : null;
+    };
+    const saved = await statMediaUpload(key);
+    const asset = await recordAsset({
+      ownerId: user.id,
+      key,
+      name: name ?? "",
+      mime: type,
+      kind: validation.kind,
+      bytes: saved?.size ?? size,
+      width: px("x-media-width"),
+      height: px("x-media-height"),
+      durationSec,
+      uploadedBy: ctx.user.id,
+    }).catch((err) => {
+      console.error("media library record failed", err instanceof Error ? err.message : err);
+      return null;
+    });
+    return Response.json({ ok: true, url, key, kind: validation.kind, name: name ?? "", durationSec, assetId: asset?.id ?? null });
   } catch (err) {
     if (err instanceof MediaTooLargeError) {
       return Response.json(

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard, Flame, Lightbulb, MoreHorizontal, ChevronDown } from "lucide-react";
+import { LayoutDashboard, CalendarDays, MessageCircleHeart, LayoutTemplate, Inbox, Users, BarChart3, Settings, BookOpenCheck, History, Link2, Shield, LifeBuoy, Package, Receipt, Magnet, Gift, Clapperboard, Flame, Lightbulb, MoreHorizontal, ChevronDown, Images } from "lucide-react";
 import styles from "./shell.module.css";
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; badge?: string };
@@ -22,6 +22,7 @@ const primary: NavItem[] = [
 const more: NavItem[] = [
   { href: "/app/contacts", icon: Users, label: "Contacts" },
   { href: "/app/rewind", icon: History, label: "Rewind" },
+  { href: "/app/media", icon: Images, label: "Media library", badge: "New" },
   { href: "/app/content", icon: Clapperboard, label: "Posts & Reels" },
   { href: "/app/templates", icon: LayoutTemplate, label: "Templates" },
   { href: "/app/bio", icon: Link2, label: "Link in bio" },

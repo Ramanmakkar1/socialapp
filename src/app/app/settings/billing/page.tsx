@@ -19,8 +19,8 @@ import {
 } from "@/lib/billingState";
 import { isDbConfigured, query } from "@/lib/db";
 import { FEATURE_COPY, isFeatureReady } from "@/lib/featureReadiness";
-import { pendingMediaUsage } from "@/lib/mediaLifecycle";
-import { PLAN_MEDIA_LIMITS, pendingStorageLabel } from "@/lib/mediaLimits";
+import { libraryUsage } from "@/lib/mediaLibrary";
+import { PLAN_MEDIA_LIMITS, libraryStorageLabel } from "@/lib/mediaLimits";
 import { PLAN_LIMITS, monthlyAutoDmLimit, scheduledPostsUsage, type PlanName } from "@/lib/planLimits";
 import { PLANS } from "@/lib/plans";
 import styles from "../../app-page.module.css";
@@ -86,7 +86,7 @@ async function usageFor(userId: string, plan: PlanName) {
            (select count(*)::int from socialapp.bio_links l join socialapp.bio_pages p on p.id = l.page_id where p.user_id=$1) as links`,
         [userId],
       ),
-      pendingMediaUsage(userId).catch(() => 0),
+      libraryUsage(userId).catch(() => 0),
     ]);
     return { scheduled, dms: rows[0]?.dms ?? 0, dmLimit, accounts: rows[0]?.accounts ?? 0, bioLinks: rows[0]?.links ?? 0, media };
   } catch {
@@ -235,7 +235,7 @@ export default async function BillingPage({
           <Meter label="Auto-DMs sent" used={usage.dms} limit={usage.dmLimit} note={usage.dmLimit > limits.autoDmsPerMonth ? "Includes your Refer-and-earn bonus." : undefined} />
           <Meter label="Connected accounts" used={usage.accounts} limit={limits.socialAccounts} note={usage.accounts > limits.socialAccounts ? "Over the limit: your accounts keep working. Disconnect one to connect a new one." : undefined} />
           <Meter label="Link-in-bio links" used={usage.bioLinks} limit={limits.bioLinks} note={usage.bioLinks > limits.bioLinks ? "Over the limit: your links stay. Remove one before adding another." : undefined} />
-          <Meter label="Media storage (GB)" used={Number((usage.media / 1e9).toFixed(1))} limit={Math.round(PLAN_MEDIA_LIMITS[plan].pendingBytes / 1e9)} note={pendingStorageLabel(usage.media, plan)} />
+          <Meter label="Media library (MB)" used={Math.round(usage.media / 1e6)} limit={Math.round(PLAN_MEDIA_LIMITS[plan].libraryBytes / 1e6)} note={libraryStorageLabel(usage.media, plan)} />
         </div>
         <p className={ui.hint}>Auto-DM and scheduled-post counts reset on the 1st of each month (UTC). Nothing is ever deleted when you change plans.</p>
       </section>
