@@ -132,6 +132,9 @@ export default function EngagementCalculator({
   const hasInput = Object.values(values).some((v) => v.trim() !== "");
   const invalid = filled && rate === null;
 
+  const likesWord = labels?.likes?.toLowerCase() ?? "likes";
+  const commentsWord = labels?.comments?.toLowerCase() ?? "comments";
+
   async function copyResult() {
     if (rate === null) return;
     try {
@@ -220,7 +223,7 @@ export default function EngagementCalculator({
       {rate === null ? (
         <div className="grid place-items-center gap-2 rounded-2xl border border-dashed border-[var(--poskoo-line)] px-4 py-8 text-center text-sm text-[#3d3450]">
           <Calculator className="h-7 w-7 text-[var(--poskoo-violet)]" aria-hidden="true" />
-          <p>Enter likes, comments and {baseWord} to see your rate and interaction breakdown.</p>
+          <p>Enter {likesWord}, {commentsWord} and {baseWord} to see your rate and interaction breakdown.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
