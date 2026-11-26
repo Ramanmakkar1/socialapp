@@ -10,6 +10,7 @@ import { StaySection } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: `Meta Business Suite Alternative for Instagram | ${BRAND.name}` },
@@ -42,7 +43,7 @@ const compare: [string, string, string][] = [
   ["Comment→DM keyword automation with link delivery", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
   ["Lead / email list export (CSV)", "Yes", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site"],
+  ["AI caption ideas", "Built, launching soon", "Check their site"],
   ["Free plan", "Yes", "Yes"],
   ["Made by Meta", "No", "Yes"],
 ];
@@ -72,7 +73,9 @@ function Cell({ v }: { v: string }) {
   return <span>{v}</span>;
 }
 
-export default function MetaBusinessSuiteAlternative() {
+export default async function MetaBusinessSuiteAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string] => (row[0] === "AI caption ideas" && ai ? [row[0], "Yes", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Meta Business Suite alternative", path: "/meta-business-suite-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
@@ -140,7 +143,7 @@ export default function MetaBusinessSuiteAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, theirs]) => (
+                {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
