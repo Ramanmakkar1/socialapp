@@ -67,7 +67,7 @@ export const body: GuideBody = {
             <li><strong>Format and aspect ratio:</strong> vertical video, square image, landscape link card.</li>
             <li><strong>Length:</strong> each network has a different limit and a different sweet spot.</li>
             <li><strong>First line:</strong> the only part most people read before they decide.</li>
-            <li><strong>Hashtags:</strong> a few on Instagram, almost none on LinkedIn, CamelCase on Mastodon.</li>
+            <li><strong>Hashtags:</strong> <Link href="/tools/instagram-hashtag-generator">a few on Instagram</Link>, almost none on LinkedIn, CamelCase on Mastodon.</li>
             <li><strong>Links:</strong> clickable in some captions, dead text in others.</li>
             <li><strong>Mentions and tags:</strong> handles differ across networks, so check every @.</li>
             <li><strong>Tone:</strong> casual on Threads, professional on LinkedIn, direct on Bluesky.</li>
