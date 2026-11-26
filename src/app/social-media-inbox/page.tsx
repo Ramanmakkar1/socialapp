@@ -91,8 +91,6 @@ const faqs = [
   },
 ];
 
-const faqLd = faqJsonLd(faqs);
-
 const appJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -114,6 +112,17 @@ const appJsonLd = {
 
 export default async function SocialMediaInboxPage() {
   const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai
+    ? faqs
+    : faqs.map((f) =>
+        f.q === "How do AI reply suggestions work?"
+          ? {
+              ...f,
+              a: "AI reply suggestions are built but not switched on yet. Until they are, you read and answer every conversation yourself in the inbox, and keyword rules still send your saved reply and link automatically.",
+            }
+          : f
+      );
+  const faqLd = faqJsonLd(faqItems);
   const appLd = {
     ...appJsonLd,
     featureList: appJsonLd.featureList.filter((f) => ai || f !== "AI reply suggestions"),
@@ -247,7 +256,7 @@ export default async function SocialMediaInboxPage() {
             <h2>Social media inbox questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq) => (
+            {faqItems.map((faq) => (
               <details key={faq.q}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>
