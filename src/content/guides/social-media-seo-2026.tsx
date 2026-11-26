@@ -325,7 +325,7 @@ export const body: GuideBody = {
           />
           <p>
             Clusters are easier when you plan a month at a time. With Poskoo you can schedule the same series to
-            Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon from one calendar, and adjust
+            Instagram, Facebook Pages, Threads, YouTube, LinkedIn, <Link href="/bluesky-scheduler">Bluesky</Link> and <Link href="/mastodon-scheduler">Mastodon</Link> from one calendar, and adjust
             each caption per platform (TikTok and Pinterest are waiting on platform approval). See the{" "}
             <Link href="/youtube-scheduler">YouTube scheduler</Link> and{" "}
             <Link href="/linkedin-scheduler">LinkedIn scheduler</Link> for details.
