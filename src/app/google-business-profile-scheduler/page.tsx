@@ -17,14 +17,19 @@ export const revalidate = 600;
 const PATH = "/google-business-profile-scheduler";
 const title = `Google Business Profile Scheduler: Schedule Posts | ${BRAND.name}`;
 const description = "Schedule Google Business Profile posts, offers and events to your locations with the official API. Add a photo and a button like Book or Call. Free plan.";
+const SOON_DESCRIPTION = "Plan Google Business Profile posts, offers and events in Poskoo. Publishing is built and waiting on Google's approval; Instagram and Facebook work today.";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: title },
-  description,
-  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
-  twitter: { card: "summary_large_image", title, description },
-});
+// The description only says publishing works once Google Business Profile is live (src/lib/platform-support.ts).
+export async function generateMetadata(): Promise<Metadata> {
+  const desc = networkAvailability("gbp") === "live" ? description : SOON_DESCRIPTION;
+  return withSocial({
+    title: { absolute: title },
+    description: desc,
+    alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+    openGraph: { title, description: desc, url: new URL(PATH, BRAND.canonicalUrl).toString() },
+    twitter: { card: "summary_large_image", title, description: desc },
+  });
+}
 
 const features = [
   {
@@ -100,10 +105,10 @@ const faqs = [
   },
 ];
 
-const appJsonLd = {
+const appJsonLdFor = (desc: string) => ({
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} Google Business Profile scheduler`,
-    description,
+    description: desc,
     url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
@@ -117,10 +122,11 @@ const appJsonLd = {
   ],
   // Paid offers only once Pro/Agency checkout is live, matching /pricing.
   offers: softwareOffers(planReadiness()),
-};
+});
 
 export default function GoogleBusinessProfileSchedulerPage() {
   const isLive = networkAvailability("gbp") === "live";
+  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Google Business Profile scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
