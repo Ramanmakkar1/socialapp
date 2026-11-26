@@ -11,6 +11,7 @@ import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: `Meta Business Suite Alternative for Instagram | ${BRAND.name}` },
@@ -56,12 +57,6 @@ const faqs = [
   { q: "Is it safe for my Instagram account?", a: "Yes. We connect through the official Meta login and APIs, never ask for your password, never scrape, and follow Meta's messaging limits." },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
-
 const appJsonLd = {
   ...toolSoftwareJsonLd({ name: `${BRAND.name} Meta Business Suite alternative`, description: "A Meta Business Suite alternative that schedules Instagram and Facebook Page posts and auto-DMs keyword commenters, with email capture.", url: `${BRAND.canonicalUrl}/meta-business-suite-alternative` }),
   "@id": `${BRAND.canonicalUrl}/meta-business-suite-alternative#software`,
@@ -75,6 +70,12 @@ function Cell({ v }: { v: string }) {
 
 export default async function MetaBusinessSuiteAlternative() {
   const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
   const compareRows = compare.map((row): [string, string, string] => (row[0] === "AI caption ideas" && ai ? [row[0], "Yes", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Meta Business Suite alternative", path: "/meta-business-suite-alternative" }]}>
@@ -89,7 +90,7 @@ export default async function MetaBusinessSuiteAlternative() {
             Meta Business Suite alternative with Instagram <em className="s">auto-DM</em> built in
           </h1>
           <p className="lede">
-            Tired of posts that fail or get stuck in Meta Business Suite? {BRAND.name} schedules your Instagram and Facebook Page posts on a clear calendar and auto-DMs every keyword commenter, so you can capture emails, write captions with AI and export leads in one place.
+            Tired of posts that fail or get stuck in Meta Business Suite? {BRAND.name} schedules your Instagram and Facebook Page posts on a clear calendar and auto-DMs every keyword commenter, so you can {ai ? "capture emails, write captions with AI and export leads" : "capture emails and export leads"} in one place.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -159,7 +160,7 @@ export default async function MetaBusinessSuiteAlternative() {
       </section>
 
       <StaySection name="Meta Business Suite" title="When Meta Business Suite is enough">
-        Stay on Meta Business Suite if your posts publish without problems, you also run Meta ads from the same place, and you do not need comments turned into DMs with a link or an email list. It is free, made by Meta and covers basic Facebook and Instagram scheduling well. Switch when you want keyword comment-to-DM, lead capture and AI caption ideas in one tool.
+        Stay on Meta Business Suite if your posts publish without problems, you also run Meta ads from the same place, and you do not need comments turned into DMs with a link or an email list. It is free, made by Meta and covers basic Facebook and Instagram scheduling well. Switch when you want keyword comment-to-DM{ai ? ", lead capture and AI caption ideas" : " and lead capture"} in one tool.
       </StaySection>
 
       {/* FAQ */}
@@ -170,7 +171,7 @@ export default async function MetaBusinessSuiteAlternative() {
             <h2>Meta Business Suite alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
