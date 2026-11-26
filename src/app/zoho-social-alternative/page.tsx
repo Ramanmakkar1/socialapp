@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary, softwareOffers } from "@/lib/plans";
 import { publisherRef } from "@/lib/tool-schema";
 import { planReadiness } from "@/lib/featureReadiness";
@@ -47,7 +47,7 @@ const faqs = [
   { q: "What is Zoho Social?", a: "Zoho Social is the social media tool in the Zoho suite, aimed at businesses and agencies. See their site for current features and plans." },
   { q: "Can I import my Zoho Social schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
 const description =
