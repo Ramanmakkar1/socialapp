@@ -1,5 +1,5 @@
 /** Image sizes per platform, shared by the page tables and the interactive finder. */
-export type SizeRow = { format: string; size: string; ratio: string };
+export type SizeRow = { format: string; size: string; ratio: string; checker?: string };
 export type Platform = {
   name: string;
   scheduler: string;
@@ -70,7 +70,7 @@ export const platforms: Platform[] = [
     scheduler: "/tiktok-scheduler",
     note: "Design video full-screen at 9:16 and keep the profile picture clear inside its circular crop.",
     rows: [
-      { format: "Video", size: "1080×1920", ratio: "9:16" },
+      { format: "Video", size: "1080×1920", ratio: "9:16", checker: "/tools/tiktok-video-size-checker" },
       { format: "Profile photo", size: "200×200", ratio: "1:1" },
     ],
   },
@@ -78,7 +78,7 @@ export const platforms: Platform[] = [
     name: "Pinterest",
     scheduler: "/pinterest-scheduler",
     note: "A vertical 2:3 Pin is the standard format and leaves enough room for a clear title or product image.",
-    rows: [{ format: "Standard Pin", size: "1000×1500", ratio: "2:3" }],
+    rows: [{ format: "Standard Pin", size: "1000×1500", ratio: "2:3", checker: "/tools/pinterest-pin-size-checker" }],
   },
   {
     name: "YouTube",
@@ -87,7 +87,7 @@ export const platforms: Platform[] = [
     rows: [
       { format: "Video thumbnail", size: "1280×720", ratio: "16:9" },
       { format: "Short", size: "1080×1920", ratio: "9:16" },
-      { format: "Channel banner", size: "2560×1440 (safe area 1546×423)", ratio: "16:9" },
+      { format: "Channel banner", size: "2560×1440 (safe area 1546×423)", ratio: "16:9", checker: "/tools/youtube-banner-size-checker" },
     ],
   },
   {
