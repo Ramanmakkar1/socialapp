@@ -114,7 +114,7 @@ export default async function BufferAlternative() {
             <h2>Why people switch</h2>
           </div>
           <div className="cards">
-            {whySwitch.map((c) => (
+            {(ai ? whySwitch : whySwitch.map((c) => ({ ...c, text: withoutAiClaims(c.text) }))).map((c) => (
               <article key={c.title} className="pcard">
                 <span className="no">{c.no}</span>
                 <h3>{c.title.replace(/-/g, "\u2011")}</h3>
