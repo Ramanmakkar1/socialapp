@@ -165,8 +165,7 @@ const appJsonLd = {
   description,
   featureList: [
     "Instagram post, reel, carousel and Story scheduling",
-    "Facebook Page post scheduling",
-    "Threads post scheduling",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
     "Week and month content calendar",
     "Publishing status and retries",
     "Instagram comment-to-DM automation",
