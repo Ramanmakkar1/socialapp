@@ -35,7 +35,7 @@ export const BRAND = {
   name: "Poskoo",
   tagline: "Schedule posts. Auto-DM every comment. Grow on Poskoo.",
   description:
-    "One tool to plan and auto-publish your social posts and automatically DM everyone who comments — with AI captions and lead capture built in.",
+    "One tool to plan and auto-publish your social posts and automatically DM everyone who comments, with lead capture built in.",
   url: rawUrl.replace(/\/+$/, ""),
   // Canonicals and metadataBase always use the final production origin, even
   // when NEXT_PUBLIC_SITE_URL points at the legacy staging host.
