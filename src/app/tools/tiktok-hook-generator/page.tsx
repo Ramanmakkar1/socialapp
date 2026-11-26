@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import HookGenerator from "../instagram-hook-generator/HookGenerator";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/tiktok-hook-generator",
@@ -258,8 +261,10 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function TikTokHookGeneratorPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig = state === "live" ? config : { ...config, faqs: config.faqs.map((f) => f.q === "Can I schedule the video once I have a hook?" ? { ...f, a: `Not yet. TikTok publishing in Poskoo is ${availabilityPhrase(state, "TikTok")}. Until then, write the hook, film the video and post it from the TikTok app.` } : f) };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <HookGenerator platform="tiktok" />
     </ToolPageTemplate>
   );
