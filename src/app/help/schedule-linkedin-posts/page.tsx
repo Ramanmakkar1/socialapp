@@ -34,7 +34,8 @@ const steps = [
     text: "Write the post text, then add media. LinkedIn takes JPEG or PNG images up to 10 MB each, or one MP4/MOV video between 3 seconds and 30 minutes, up to 200 MB. Poskoo publishes text and images today.",
     body: (
       <>
-        Write the post text, then add media. LinkedIn takes JPEG or PNG images up to 10 MB each, or one MP4/MOV video
+        Write the{" "}
+        <Link className={s.vlink} href="/tools/linkedin-text-formatter">post text</Link>, then add media. LinkedIn takes JPEG or PNG images up to 10 MB each, or one MP4/MOV video
         between 3 seconds and 30 minutes, up to 200 MB. {BRAND.name} publishes text and images today.
       </>
     ),
