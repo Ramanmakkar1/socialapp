@@ -6,6 +6,7 @@ import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -30,13 +31,14 @@ const whyLook = [
   { no: "03 / Leads", title: "Leads from scheduled content", text: "Ask for an email in the DM before the link is sent, so posts you planned weeks ahead can still fill a lead list." },
 ];
 
+const AI_ROW = "AI DM message ideas";
 const compare: [string, string, string][] = [
   ["Instagram scheduling", "Yes", "Yes"],
   ["Visual calendar", "Yes", "Yes"],
   ["Facebook & Threads publishing", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site"],
+  [AI_ROW, "Built, launching soon", "Check their site"],
   ["Lead CSV export", "Yes", "Check their site"],
   ["Price", priceSummary(planReadiness()), "Per-seat pricing"],
 ];
@@ -73,7 +75,9 @@ function Cell({ v }: { v: string }) {
   return <span>{v}</span>;
 }
 
-export default function SproutSocialAlternative() {
+export default async function SproutSocialAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string] => (row[0] === AI_ROW && ai ? [row[0], "Yes", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Sprout Social alternative", path: "/sprout-social-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
@@ -134,7 +138,7 @@ export default function SproutSocialAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, theirs]) => (
+                {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
