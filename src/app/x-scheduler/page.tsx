@@ -95,27 +95,30 @@ const faqs = [
   },
 ];
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} X scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  featureList: [
-    "X post text composer",
-    "Up to 4 images or 1 video per post",
-    "Images up to 5 MB and video up to 512 MB",
-    "Official X v2 chunked media upload",
-    "Week and month content calendar",
-    "Published or failed status with retries",
-  ],
-  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
-  offers: softwareOffers(planReadiness()),
-};
+function appJsonLdFor(desc: string) {
+  return {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} X scheduler`,
+      description: desc,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    featureList: [
+      "X post text composer",
+      "Up to 4 images or 1 video per post",
+      "Images up to 5 MB and video up to 512 MB",
+      "Official X v2 chunked media upload",
+      "Week and month content calendar",
+      "Published or failed status with retries",
+    ],
+    // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+    offers: softwareOffers(planReadiness()),
+  };
+}
 
 export default function XSchedulerPage() {
   const availability = networkAvailability("x");
   const isLive = availability === "live";
+  const appJsonLd = appJsonLdFor(availability === "live" ? description : SOON_DESCRIPTION);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "X scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
