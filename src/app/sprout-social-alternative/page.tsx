@@ -12,6 +12,7 @@ import { CompareNote } from "@/components/CompareNote";
 import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -61,6 +62,11 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({ name: `${BRAND.name} Sprout Social alternative`, description: "A Sprout Social alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export.", url: `${BRAND.canonicalUrl}/sprout-social-alternative` }),
+  "@id": `${BRAND.canonicalUrl}/sprout-social-alternative#software`,
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -71,6 +77,7 @@ export default function SproutSocialAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Sprout Social alternative", path: "/sprout-social-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
