@@ -16,7 +16,7 @@ import { withoutAiClaims } from "@/lib/aiClaims";
 export const metadata: Metadata = withSocial({
   title: { absolute: `Meta Business Suite Alternative for Instagram | ${BRAND.name}` },
   description:
-    "Meta Business Suite alternative for Instagram: schedule posts on a calendar, auto-DM every keyword commenter, capture emails and write captions with AI.",
+    "Meta Business Suite alternative for Instagram: schedule posts on a calendar, auto-DM every keyword commenter, capture emails and export leads.",
   alternates: { canonical: "/meta-business-suite-alternative" },
 });
 
