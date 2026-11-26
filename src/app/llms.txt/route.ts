@@ -76,7 +76,7 @@ export async function GET() {
     "",
     "## About",
     "",
-    `- ${BRAND.name} is a social media scheduler with Instagram comment-to-DM automation, AI replies and lead capture for creators and small businesses, made by ${BRAND.company}.`,
+    `- ${BRAND.name} is a social media scheduler with ${aiReplies ? "Instagram comment-to-DM automation, AI replies and lead capture" : "Instagram comment-to-DM automation and lead capture"} for creators and small businesses, made by ${BRAND.company}.`,
     `- Official website: ${SITE_URL}`,
     `- Tagline: ${BRAND.tagline}`,
     `- Support: ${BRAND.supportEmail} or ${SITE_URL}/contact`,
