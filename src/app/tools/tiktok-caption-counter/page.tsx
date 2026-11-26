@@ -68,7 +68,7 @@ const config: ToolPageConfig = {
         title: "What is the TikTok caption character limit?",
         body: (
           <p>
-            TikTok captions can be up to <b>4,000 characters</b>. Hashtags, mentions, spaces, punctuation and line breaks
+            TikTok captions can be up to <b>4,000 characters</b>. <Link href="/tools/tiktok-hashtag-generator">Hashtags</Link>, mentions, spaces, punctuation and line breaks
             all count toward that total. This counter uses code points, so a standalone emoji such as 😀 counts as one
             character rather than two UTF-16 code units.
           </p>
