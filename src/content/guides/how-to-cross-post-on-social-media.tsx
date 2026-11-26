@@ -334,7 +334,8 @@ export const body: GuideBody = {
         <>
           <p>
             <Link href="/social-media-scheduler">Poskoo&apos;s social media scheduler</Link> is built for this workflow.
-            Today it publishes to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles, Bluesky and Mastodon.
+            Today it publishes to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles,{" "}
+            <Link href="/bluesky-scheduler">Bluesky</Link> and <Link href="/mastodon-scheduler">Mastodon</Link>.
           </p>
           <ol>
             <li>Write your main caption once and add your media.</li>
