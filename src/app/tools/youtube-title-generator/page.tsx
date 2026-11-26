@@ -88,8 +88,8 @@ const config: ToolPageConfig = {
           <p>
             Yes. The title and thumbnail are seen together, so they should tell one clear story rather than repeat each
             other word for word. Let the thumbnail carry the visual hook and use the title for the specific promise. A
-            mismatch gets clicks but loses viewers in the first seconds, which hurts the video. Once the title and
-            thumbnail are ready, queue the upload with the{" "}
+            mismatch gets clicks but loses viewers in the first seconds, which hurts the video. Once the title and{" "}
+            <Link href="/tools/youtube-thumbnail-size-checker">thumbnail</Link> are ready, queue the upload with the{" "}
             <Link href="/youtube-scheduler">YouTube scheduler</Link>.
           </p>
         ),
