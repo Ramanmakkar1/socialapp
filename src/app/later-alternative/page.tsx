@@ -61,7 +61,7 @@ const appJsonLd = {
   "@id": `${BRAND.canonicalUrl}/later-alternative#software`,
   featureList: [
     "Post scheduling with a calendar view",
-    "Instagram, Facebook Page and Threads publishing",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
     "Comment-to-DM automation",
     "Email capture in DMs",
   ],
