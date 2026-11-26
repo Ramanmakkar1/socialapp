@@ -55,7 +55,7 @@ const faqs = [
 const appJsonLd = {
   ...toolSoftwareJsonLd({ name: `${BRAND.name} Planoly alternative`, description: "A Planoly alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export.", url: `${BRAND.canonicalUrl}/planoly-alternative` }),
   "@id": `${BRAND.canonicalUrl}/planoly-alternative#software`,
-  featureList: ["Post scheduling with a calendar view", "Instagram, Facebook Page and Threads publishing", "Comment-to-DM automation", "Email capture in DMs"],
+  featureList: ["Post scheduling with a calendar view", `Publishing to ${LIVE_PLATFORMS_TEXT}`, "Comment-to-DM automation", "Email capture in DMs"],
 };
 
 const faqJsonLd = {
