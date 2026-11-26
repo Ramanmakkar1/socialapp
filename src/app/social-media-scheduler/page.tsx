@@ -10,6 +10,7 @@ import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 import { LandingDemo } from "@/app/LandingDemo";
 import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { networkAvailability } from "@/components/ChannelStatusNote";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -17,14 +18,23 @@ export const revalidate = 600;
 const PATH = "/social-media-scheduler";
 const title = `Social Media Scheduler: Plan & Auto-Publish Posts | ${BRAND.name}`;
 const description = `Free social media scheduler for Instagram, Facebook, Threads, TikTok, LinkedIn, Pinterest, YouTube, X, Bluesky and Mastodon. One calendar, official APIs.`;
+const SOON_DESCRIPTION = "Free social media scheduler for Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon on one calendar. Official APIs, no credit card.";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: title },
-  description,
-  alternates: { canonical: PATH },
-  openGraph: { title, description, url: PATH },
-  twitter: { card: "summary_large_image", title, description },
-});
+function pageDescription() {
+  const allLive = ["tiktok", "pinterest", "x"].every((id) => networkAvailability(id) === "live");
+  return allLive ? description : SOON_DESCRIPTION;
+}
+
+export function generateMetadata(): Metadata {
+  const desc = pageDescription();
+  return withSocial({
+    title: { absolute: title },
+    description: desc,
+    alternates: { canonical: PATH },
+    openGraph: { title, description: desc, url: PATH },
+    twitter: { card: "summary_large_image", title, description: desc },
+  });
+}
 
 const platforms = [
   {
@@ -126,12 +136,13 @@ const faqs = [
   },
 ];
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} social media scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
+function appJsonLd(desc: string) {
+  return {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} social media scheduler`,
+      description: desc,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
   "@id": `${BRAND.canonicalUrl}${PATH}#software`,
   featureList: [
     "Schedule posts to 10 social platforms from one calendar",
@@ -140,41 +151,47 @@ const appJsonLd = {
     "Per-channel captions and media",
     "Publishing status and retries",
   ],
-  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
-  offers: softwareOffers(planReadiness()),
-};
+    // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+    offers: softwareOffers(planReadiness()),
+  };
+}
 
-const howToJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "How to schedule social media posts in Poskoo",
-  description,
-  image: `${BRAND.canonicalUrl}/landing/hero.webp`,
-  totalTime: "PT5M",
-  step: steps.map((st, i) => ({
-    "@type": "HowToStep",
-    position: i + 1,
-    name: st.title,
-    text: st.text,
-    url: `${BRAND.canonicalUrl}${PATH}#how-it-works`,
-  })),
-};
+function howToJsonLd(desc: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "How to schedule social media posts in Poskoo",
+    description: desc,
+    image: `${BRAND.canonicalUrl}/landing/hero.webp`,
+    totalTime: "PT5M",
+    step: steps.map((st, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: st.title,
+      text: st.text,
+      url: `${BRAND.canonicalUrl}${PATH}#how-it-works`,
+    })),
+  };
+}
 
-const webPageJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "@id": `${BRAND.canonicalUrl}${PATH}#webpage`,
-  url: `${BRAND.canonicalUrl}${PATH}`,
-  name: title,
-  description,
-  isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
-  about: { "@id": `${BRAND.canonicalUrl}${PATH}#software` },
-};
+function webPageJsonLd(desc: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${BRAND.canonicalUrl}${PATH}#webpage`,
+    url: `${BRAND.canonicalUrl}${PATH}`,
+    name: title,
+    description: desc,
+    isPartOf: { "@id": `${BRAND.canonicalUrl}#website` },
+    about: { "@id": `${BRAND.canonicalUrl}${PATH}#software` },
+  };
+}
 
 export default function SocialMediaSchedulerPage() {
+  const desc = pageDescription();
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Social media scheduler", path: PATH }]}>
-      {[appJsonLd, webPageJsonLd, howToJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd(desc), webPageJsonLd(desc), howToJsonLd(desc), faqJsonLd(faqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
