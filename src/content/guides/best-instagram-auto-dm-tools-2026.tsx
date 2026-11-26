@@ -123,7 +123,7 @@ export const body: GuideBody = {
             <li><strong>Cons:</strong> auto-DM is Instagram only. DM limits are lower than LinkDM or CreatorFlow at a similar price. No visual flow builder for long multi-step chats.</li>
           </ul>
           <p>
-            <strong>Best for:</strong> creators and small businesses who want to plan posts and send keyword DMs
+            <strong>Best for:</strong> <Link href="/social-media-scheduler-for-creators">creators</Link> and small businesses who want to plan posts and send keyword DMs
             without paying for two tools.
           </p>
 
