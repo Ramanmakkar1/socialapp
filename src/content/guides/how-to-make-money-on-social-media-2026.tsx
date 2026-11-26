@@ -306,7 +306,8 @@ export const body: GuideBody = {
             <Link href="/instagram-link-in-bio">link in bio page</Link> holds your offers, and lead magnets hand out a
             free file once someone shares their email. You can also create digital product pages paid through your
             own Stripe account (payments are switching on soon). Auto-DM works on Instagram; scheduling covers
-            Instagram, Facebook Pages, Threads, YouTube, LinkedIn, Bluesky and Mastodon. The{" "}
+            Instagram, Facebook Pages, Threads, YouTube, LinkedIn, <Link href="/bluesky-scheduler">Bluesky</Link> and{" "}
+            <Link href="/mastodon-scheduler">Mastodon</Link>. The{" "}
             <Link href="/pricing">free plan</Link> includes auto-DMs and a link in bio page, so you can test the
             funnel before paying for anything.
           </p>
