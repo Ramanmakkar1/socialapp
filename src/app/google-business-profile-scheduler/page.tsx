@@ -88,7 +88,7 @@ function faqsFor(isLive: boolean) {
     q: "Can I schedule Google Business Profile posts?",
     a: isLive
       ? "Yes. Poskoo schedules Google Business Profile posts through Google's official Business Profile API. Connect your Google account, pick a location, write the post and choose a publishing time."
-      : "Yes. Poskoo schedules Google Business Profile posts through Google's official Business Profile API. Connect your Google account, pick a location, write the post and choose a publishing time. Posting is built and waiting for Google's app-by-app API approval, so you can sign up now and connect as soon as it is switched on.",
+      : "Not yet. Google Business Profile publishing in Poskoo is built and waiting for Google's API approval. Once it is switched on, you connect your Google account, pick a location, write the post and choose a publishing time. You can sign up now and connect as soon as it is live.",
   },
   {
     q: "Which post types can I schedule?",
