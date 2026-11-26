@@ -7,7 +7,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
-import { linkedinPagesFlag } from "@/lib/networks/linkedin";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import { faqJsonLd, ldJson, publisherRef, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -76,36 +76,32 @@ const comparison = [
   { task: "Recovering from a failed post", manual: "Start again from LinkedIn", scheduled: "Fix the cause and retry the failed post" },
 ];
 
-function faqsFor(pagesOn: boolean) {
-  return [
-    {
-      q: "Can I schedule LinkedIn posts?",
-      a: "Yes. You can compose a LinkedIn post, choose a date and time, and let Poskoo publish it automatically through LinkedIn's official API.",
-    },
-    {
-      q: "Can I post to a LinkedIn company page?",
-      a: pagesOn
-        ? "Yes. Poskoo can publish to a LinkedIn company page you administer as well as your personal profile, through LinkedIn's Community Management API."
-        : "Not yet. Poskoo publishes to personal LinkedIn profiles today. Company page publishing is built and waiting for LinkedIn's Community Management API approval.",
-    },
-    {
-      q: "What can I post to LinkedIn?",
-      a: "A LinkedIn post can be text up to 3,000 characters, with up to 20 images in one post. Images can be JPG or PNG up to 10 MB each. Video is not supported from Poskoo yet.",
-    },
-    {
-      q: "Can I edit or reschedule a scheduled post?",
-      a: "Yes. Scheduled posts can be edited, moved to a new time, duplicated or deleted before they publish.",
-    },
-    {
-      q: "What is the best time to post on LinkedIn?",
-      a: "There is no single best time for every account. Post when your audience is active, usually on weekday mornings and early afternoons, then check your results and adjust. Scheduling lets you test a few times without posting by hand.",
-    },
-    {
-      q: "Is there a free plan?",
-      a: "Yes. Every account starts on the $0 Free plan with 2 social accounts and 10 scheduled posts per month. No credit card is needed to sign up. Pro and Agency add more accounts and unlimited scheduling.",
-    },
-  ];
-}
+const faqs = [
+  {
+    q: "Can I schedule LinkedIn posts?",
+    a: "Yes. You can compose a LinkedIn post, choose a date and time, and let Poskoo publish it automatically through LinkedIn's official API.",
+  },
+  {
+    q: "Can I post to a LinkedIn company page?",
+    a: "Yes. Poskoo can publish to a LinkedIn company page you administer as well as your personal profile, through LinkedIn's Community Management API.",
+  },
+  {
+    q: "What can I post to LinkedIn?",
+    a: "A LinkedIn post can be text up to 3,000 characters, with up to 20 images in one post. Images can be JPG or PNG up to 10 MB each. Video is not supported from Poskoo yet.",
+  },
+  {
+    q: "Can I edit or reschedule a scheduled post?",
+    a: "Yes. Scheduled posts can be edited, moved to a new time, duplicated or deleted before they publish.",
+  },
+  {
+    q: "What is the best time to post on LinkedIn?",
+    a: "There is no single best time for every account. Post when your audience is active, usually on weekday mornings and early afternoons, then check your results and adjust. Scheduling lets you test a few times without posting by hand.",
+  },
+  {
+    q: "Is there a free plan?",
+    a: "Yes. Every account starts on the $0 Free plan with 2 social accounts and 10 scheduled posts per month. No credit card is needed to sign up. Pro and Agency add more accounts and unlimited scheduling.",
+  },
+];
 
 const webPageJsonLd = {
   "@context": "https://schema.org",
@@ -119,32 +115,51 @@ const webPageJsonLd = {
   publisher: publisherRef(),
 };
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} LinkedIn scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  applicationSubCategory: "Social media scheduling",
-  inLanguage: "en",
-  featureList: [
-    "LinkedIn text post scheduling",
-    "Up to 20 images per post",
-    "Personal profile and company page publishing",
-    "Week and month content calendar",
-    "Edit, reschedule and delete scheduled posts",
-    "Publishing status and retries",
-    "Instagram, Facebook Page and Threads scheduling in the same queue",
-  ],
-  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
-  offers: softwareOffers(planReadiness()),
-};
-
 export default function LinkedInSchedulerPage() {
-  const faqs = faqsFor(linkedinPagesFlag(process.env));
+  const state = networkAvailability("linkedin_pages");
+  const pagesLive = state === "live";
+
+  const pageFaqs =
+    state === "live"
+      ? faqs
+      : faqs.map((faq) =>
+          faq.q === "Can I post to a LinkedIn company page?"
+            ? {
+                ...faq,
+                a: `Not yet. Posting to LinkedIn company Pages is ${availabilityPhrase(
+                  state,
+                  "LinkedIn"
+                )}. Today Poskoo publishes scheduled posts to your personal LinkedIn profile.`,
+              }
+            : faq
+        );
+
+  const appJsonLd = {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} LinkedIn scheduler`,
+      description,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    applicationSubCategory: "Social media scheduling",
+    inLanguage: "en",
+    featureList: [
+      "LinkedIn text post scheduling",
+      "Up to 20 images per post",
+      pagesLive
+        ? "Personal profile and company page publishing"
+        : "Personal LinkedIn profile publishing",
+      "Week and month content calendar",
+      "Edit, reschedule and delete scheduled posts",
+      "Publishing status and retries",
+      "Instagram, Facebook Page and Threads scheduling in the same queue",
+    ],
+    // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+    offers: softwareOffers(planReadiness()),
+  };
+
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "LinkedIn scheduler", path: PATH }]}>
-      {[webPageJsonLd, appJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[webPageJsonLd, appJsonLd, faqJsonLd(pageFaqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -275,7 +290,7 @@ export default function LinkedInSchedulerPage() {
             <h2>Accounts, formats and publishing</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq, index) => (
+            {pageFaqs.map((faq, index) => (
               <details key={faq.q} open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>
