@@ -232,7 +232,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Know your worth,",
     mark: "then land the brand deal.",
-    text: "Schedule your sponsored videos with Poskoo and DM everyone who comments your keyword, on the official TikTok API.",
+    text: "Schedule your sponsored videos with Poskoo, then auto-DM everyone who comments your keyword on Instagram through Meta's official API.",
   },
 };
 
@@ -278,8 +278,7 @@ const signupCta = (
         </h2>
         <p>
           Turn this estimate into a posting plan: schedule your sponsored videos, auto-DM
-          everyone who comments your keyword on Instagram, and let AI draft replies in your
-          voice.
+          everyone who comments your keyword on Instagram.
         </p>
         <Link className="btn btn-dark" href="/signup">
           Start free on Poskoo <span aria-hidden="true">→</span>
@@ -287,7 +286,7 @@ const signupCta = (
         <ul className="ctaChecks">
           <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Schedule posts on your calendar</li>
           <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Instagram comment-to-DM automation</li>
-          <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>AI replies in your voice</li>
+          <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Email capture in the DM</li>
         </ul>
       </div>
       <AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" />
