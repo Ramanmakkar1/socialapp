@@ -16,7 +16,7 @@ export const revalidate = 600;
 const PATH = "/social-media-inbox";
 const title = "Social Media Inbox: All Comments & DMs in One Place";
 const description =
-  "A social media inbox brings every comment and DM from all your channels into one shared place, with AI suggestions, keyword automation and lead capture.";
+  "A social media inbox brings every comment and DM from all your channels into one shared place, with keyword automation and lead capture.";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
