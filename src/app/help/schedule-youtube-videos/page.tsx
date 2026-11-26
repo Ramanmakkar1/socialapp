@@ -68,7 +68,7 @@ const steps = [
     text: "For a vertical video under 60 seconds, tick This is a Short. Poskoo adds #Short to the description when it is not already there.",
     body: (
       <>
-        For a vertical video under 60 seconds, tick <strong>This is a Short</strong>. {BRAND.name} adds #Short to the
+        For a <Link className={s.vlink} href="/tools/youtube-shorts-size-checker">vertical video</Link> under 60 seconds, tick <strong>This is a Short</strong>. {BRAND.name} adds #Short to the
         description when it is not already there.
       </>
     ),
