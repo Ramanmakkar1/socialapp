@@ -12,6 +12,7 @@ import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { networkAvailability } from "@/components/ChannelStatusNote";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -70,9 +71,20 @@ export default async function TailwindAlternative() {
     row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row
   );
   const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const pinterestFaqItems = faqItems.map((f) =>
+    f.q === "Can I schedule Pinterest pins with Poskoo?"
+      ? {
+          ...f,
+          a:
+            networkAvailability("pinterest") === "live"
+              ? "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a time; Poskoo creates the Pin through the official Pinterest API."
+              : "Not yet. Pinterest publishing is built and waiting on Pinterest platform approval. " + PLATFORMS_ANSWER,
+        }
+      : f
+  );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Tailwind alternative", path: "/tailwind-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(faqItems)).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(pinterestFaqItems)).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
@@ -172,7 +184,7 @@ export default async function TailwindAlternative() {
             <h2>Tailwind alternative questions</h2>
           </div>
           <div className="faq">
-            {faqItems.map((f) => (
+            {pinterestFaqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
