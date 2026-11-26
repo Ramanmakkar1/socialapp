@@ -44,7 +44,7 @@ const steps = [
     text: "Choose the date and time for the post. Times are shown in your browser's time zone, so the post goes out when you expect it to.",
     body: (
       <>
-        Choose the date and time for the post. Times are shown in your browser&apos;s time zone, so the post goes out
+        Choose the <Link className={s.vlink} href="/tools/best-time-to-post-on-facebook">date and time</Link> for the post. Times are shown in your browser&apos;s time zone, so the post goes out
         when you expect it to.
       </>
     ),
@@ -164,7 +164,7 @@ export default function ScheduleFacebookPostsHelpPage() {
                 the &quot;Manage Page posts&quot; permission.
               </li>
               <li>
-                Your post text, and optionally one public image link, up to 10 public image links, or one public video
+                Your post text, and optionally <Link className={s.vlink} href="/tools/facebook-post-size-checker">one public image link</Link>, up to 10 public image links, or one public video
                 link.
               </li>
             </ul>
