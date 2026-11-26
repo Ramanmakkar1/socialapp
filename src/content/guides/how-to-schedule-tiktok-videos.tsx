@@ -66,8 +66,8 @@ export const body: GuideBody = {
               <strong>Open TikTok Studio.</strong> Sign in on tiktok.com and open Studio, then choose to upload a video.
             </li>
             <li>
-              <strong>Upload the video and write the caption.</strong> Add your file, then write the caption and any
-              hashtags. Check the preview so you know how the post will look in the feed.
+              <strong>Upload the video and write the caption.</strong> Add your file, then write the caption and any{" "}
+              <Link href="/tools/tiktok-hashtag-generator">hashtags</Link>. Check the preview so you know how the post will look in the feed.
             </li>
             <li>
               <strong>Set who can see it and the post options.</strong> Pick the audience, and turn comments, Duet and
