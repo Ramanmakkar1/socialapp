@@ -82,10 +82,13 @@ const steps = [
   },
 ];
 
-const faqs = [
+function faqsFor(isLive: boolean) {
+  return [
   {
     q: "Can I schedule Google Business Profile posts?",
-    a: "Yes. Poskoo schedules Google Business Profile posts through Google's official Business Profile API. Connect your Google account, pick a location, write the post and choose a publishing time. Posting is built and waiting for Google's app-by-app API approval, so you can sign up now and connect as soon as it is switched on.",
+    a: isLive
+      ? "Yes. Poskoo schedules Google Business Profile posts through Google's official Business Profile API. Connect your Google account, pick a location, write the post and choose a publishing time."
+      : "Yes. Poskoo schedules Google Business Profile posts through Google's official Business Profile API. Connect your Google account, pick a location, write the post and choose a publishing time. Posting is built and waiting for Google's app-by-app API approval, so you can sign up now and connect as soon as it is switched on.",
   },
   {
     q: "Which post types can I schedule?",
@@ -103,7 +106,8 @@ const faqs = [
     q: "Do you need my Google password?",
     a: "No. You connect through Google's official sign-in and approve the business.manage permission. Poskoo never asks for, stores or scrapes your Google password.",
   },
-];
+  ];
+}
 
 const appJsonLdFor = (desc: string) => ({
   ...toolSoftwareJsonLd({
@@ -126,6 +130,7 @@ const appJsonLdFor = (desc: string) => ({
 
 export default function GoogleBusinessProfileSchedulerPage() {
   const isLive = networkAvailability("gbp") === "live";
+  const faqs = faqsFor(isLive);
   const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Google Business Profile scheduler", path: PATH }]}>
