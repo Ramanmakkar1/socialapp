@@ -86,7 +86,7 @@ const config: ToolPageConfig = {
             <ol>
               <li>Choose the days you can post and copy the plan.</li>
               <li>Post at the same slots for 14 days, without changing your content style.</li>
-              <li>After two weeks, compare reach and engagement for each slot in Meta Business Suite insights.</li>
+              <li>After two weeks, compare reach and <Link href="/tools/facebook-engagement-rate-calculator">engagement</Link> for each slot in Meta Business Suite insights.</li>
               <li>Keep the best slot, drop the weakest, and test one new time next.</li>
             </ol>
             <p>
