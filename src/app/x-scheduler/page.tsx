@@ -72,10 +72,13 @@ const steps = [
   },
 ];
 
-const faqs = [
+function faqsFor(isLive: boolean) {
+  return [
   {
     q: "How do I schedule a tweet on X?",
-    a: "Connect your X account with X's official OAuth sign-in, write the post, add up to 4 images or one video, and pick a date and time. Poskoo publishes the post through X's official API when it is due.",
+    a: isLive
+      ? "Connect your X account with X's official OAuth sign-in, write the post, add up to 4 images or one video, and pick a date and time. Poskoo publishes the post through X's official API when it is due."
+      : "Publishing to X in Poskoo is coming soon. Once it is on, you connect your X account with X's official OAuth sign-in, write the post, add up to 4 images or one video, and pick a date and time, and Poskoo publishes it through X's official API.",
   },
   {
     q: "Do I need to give Poskoo my X password?",
@@ -93,7 +96,8 @@ const faqs = [
     q: "What happens if a scheduled post fails?",
     a: "The post shows a published or failed status. If X rate-limits the post, the status says so, and you can retry it later.",
   },
-];
+  ];
+}
 
 function appJsonLdFor(desc: string) {
   return {
@@ -119,6 +123,7 @@ export default function XSchedulerPage() {
   const availability = networkAvailability("x");
   const isLive = availability === "live";
   const appJsonLd = appJsonLdFor(availability === "live" ? description : SOON_DESCRIPTION);
+  const faqs = faqsFor(isLive);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "X scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
