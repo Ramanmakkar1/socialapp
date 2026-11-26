@@ -61,7 +61,7 @@ const config: ToolPageConfig = {
         body: (
           <p>
             YouTube says tags are mainly useful for common misspellings and variations of your topic. They play a minimal
-            role compared with the title, description and the video itself, so use a few accurate variations rather than
+            role compared with the title, <Link href="/tools/youtube-description-generator">description</Link> and the video itself, so use a few accurate variations rather than
             expecting tags to improve a weak video. Put the clearest wording in your title first; you can check its length
             with the <Link href="/tools/youtube-title-counter">YouTube title and description counter</Link>.
           </p>
