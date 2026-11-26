@@ -81,14 +81,17 @@ const comparison = [
   { task: "Recovering from a failed post", manual: "Start again from the app", scheduled: "Fix the cause and retry the failed post" },
 ];
 
-const faqs = [
+function faqsFor(isLive: boolean) {
+  return [
   {
     q: "Is it safe to connect TikTok to Poskoo?",
     a: "Yes. Poskoo uses TikTok's official Login Kit and Content Posting API. You sign in on TikTok, approve publishing access, and never give Poskoo your TikTok password. You can revoke access from your TikTok account at any time.",
   },
   {
     q: "Can I schedule TikTok photo posts?",
-    a: "Yes, up to 35 photos in one post. The photos must be uploaded in Poskoo rather than linked from another site, because TikTok only pulls photo posts from our verified media domain. A photo post uses the first caption line as its title (up to 90 characters) and the rest as the description (up to 4,000 characters).",
+    a: isLive
+      ? "Yes, up to 35 photos in one post. The photos must be uploaded in Poskoo rather than linked from another site, because TikTok only pulls photo posts from our verified media domain. A photo post uses the first caption line as its title (up to 90 characters) and the rest as the description (up to 4,000 characters)."
+      : "TikTok publishing is built and waiting for TikTok's approval. Once it is switched on, photo posts take up to 35 photos. The photos must be uploaded in Poskoo rather than linked from another site, because TikTok only pulls photo posts from our verified media domain. A photo post uses the first caption line as its title (up to 90 characters) and the rest as the description (up to 4,000 characters).",
   },
   {
     q: "What video length and size does TikTok accept?",
@@ -102,7 +105,8 @@ const faqs = [
     q: "Is there a free plan?",
     a: "Yes. Every account starts on the $0 Free plan with 2 social accounts and 10 scheduled posts per month. No credit card is needed to sign up. Pro and Agency add more accounts, unlimited scheduling and more auto-DMs.",
   },
-];
+  ];
+}
 
 function appJsonLdFor(desc: string) {
   return {
@@ -127,6 +131,7 @@ function appJsonLdFor(desc: string) {
 export default function TikTokSchedulerPage() {
   const availability = networkAvailability("tiktok");
   const isLive = availability === "live";
+  const faqs = faqsFor(isLive);
   const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "TikTok scheduler", path: PATH }]}>
