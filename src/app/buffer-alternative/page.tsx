@@ -7,6 +7,8 @@ import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -37,7 +39,7 @@ const compare: [string, string, string, string][] = [
   ["Threads publishing", "Yes", "Yes", "Yes"],
   ["Comment-to-DM automation", "Yes", "Check their site", "Yes"],
   ["Email capture in DMs", "Yes", "Check their site", "Yes"],
-  ["AI DM message ideas", "Yes", "Check their site", "Yes"],
+  ["AI DM message ideas", "Built, launching soon", "Check their site", "Yes"],
   ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
 
@@ -63,11 +65,13 @@ const appJsonLd = {
   ],
 };
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
 
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
@@ -75,10 +79,13 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function BufferAlternative() {
+export default async function BufferAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const compareRows = compare.map(row => row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Buffer alternative", path: "/buffer-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(faqItems)).replace(/</g, "\\u003c") }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
@@ -137,7 +144,7 @@ export default function BufferAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, buffer, combo]) => (
+                {compareRows.map(([label, ours, buffer, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -179,7 +186,7 @@ export default function BufferAlternative() {
             <h2>Buffer alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
