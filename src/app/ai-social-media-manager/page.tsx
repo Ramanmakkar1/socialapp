@@ -8,6 +8,7 @@ import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -109,7 +110,7 @@ const faqs = [
   },
   {
     q: "Which platforms does Poskoo support?",
-    a: "Poskoo schedules Instagram, Facebook Pages, Threads, YouTube, LinkedIn, TikTok, Pinterest, X, Bluesky and Mastodon from one calendar. Instagram comment-to-DM automation runs on the official Instagram API.",
+    a: PLATFORMS_ANSWER,
   },
 ];
 
