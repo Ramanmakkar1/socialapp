@@ -45,7 +45,11 @@ const steps = [
     text: "Choose the date and time for the post. Times are shown in your browser's time zone, so the post goes out when you expect it to.",
     body: (
       <>
-        Choose the date and time for the post. Times are shown in your browser&apos;s time zone, so the post goes out
+        Choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-linkedin">
+          date and time
+        </Link>{" "}
+        for the post. Times are shown in your browser&apos;s time zone, so the post goes out
         when you expect it to.
       </>
     ),
