@@ -164,7 +164,7 @@ export default function ScheduleLinkedInPostsHelpPage() {
                 &quot;Sign In with LinkedIn&quot; and &quot;Share on LinkedIn&quot; permissions.
               </li>
               <li>
-                Your post text, and optionally JPEG or PNG images up to 10 MB each. {BRAND.name} publishes text and
+                Your post text, and optionally <Link className={s.vlink} href="/tools/linkedin-post-image-size-checker">JPEG or PNG images</Link> up to 10 MB each. {BRAND.name} publishes text and
                 images to LinkedIn today.
               </li>
             </ul>
