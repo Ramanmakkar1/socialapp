@@ -31,7 +31,7 @@ const whySwitch = [
 
 const compare: [string, string, string, string][] = [
   ["Social media scheduling", "Yes", "Yes", "Yes"],
-  ["Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon publishing", "Yes", "Check their site", "Depends on the tools"],
+  [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Depends on the tools"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Depends on the DM tool"],
   ["Email capture in the DM", "Yes", "Check their site", "Depends on the DM tool"],
   ["AI caption ideas", "Yes", "Check their site", "Check their site"],
