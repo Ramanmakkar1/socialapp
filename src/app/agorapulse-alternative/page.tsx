@@ -6,6 +6,7 @@ import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -53,6 +54,22 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Agorapulse alternative`,
+    description:
+      "Poskoo is an Agorapulse alternative: schedule Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky, and Mastodon posts & auto-DM commenters. Free plan.",
+    url: `${BRAND.canonicalUrl}/agorapulse-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/agorapulse-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -63,6 +80,7 @@ export default function AgorapulseAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Agorapulse alternative", path: "/agorapulse-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
