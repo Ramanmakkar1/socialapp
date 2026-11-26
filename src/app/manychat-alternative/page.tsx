@@ -6,6 +6,7 @@ import { BRAND } from "@/lib/brand";
 import { priceSummary, softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { publisherRef } from "@/lib/tool-schema";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -28,6 +29,7 @@ const whySwitch = [
   { no: "03 / Leads", title: "Email before the link", text: "Turn on the email gate and the DM asks for an email address before it sends your link, so comments become leads." },
 ];
 
+const AI_ROW = "AI DM message ideas";
 const compare: [string, string, string][] = [
   ["Comment-to-DM on posts and Reels", "Yes", "Yes"],
   ["Keyword triggers with a link in the DM", "Yes", "Yes"],
@@ -35,7 +37,7 @@ const compare: [string, string, string][] = [
   ["Post scheduling and calendar", "Yes", "No"],
   ["DM rule attached to a scheduled post", "Yes", "No"],
   ["Leads list with CSV export", "Yes", "Yes"],
-  ["AI DM message ideas", "Yes", "Yes"],
+  [AI_ROW, "Built, launching soon", "Yes"],
   ["Visual flow builder", "Not yet", "Yes"],
   ["WhatsApp", "On the roadmap, no date", "Yes"],
   ["Facebook Messenger", "On the roadmap, no date", "Yes"],
@@ -79,7 +81,9 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function ManyChatAlternative() {
+export default async function ManyChatAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string] => (row[0] === AI_ROW && ai ? [row[0], "Yes", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "ManyChat alternative", path: "/manychat-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
@@ -140,7 +144,7 @@ export default function ManyChatAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, theirs]) => (
+                {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
