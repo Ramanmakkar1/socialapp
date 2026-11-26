@@ -77,7 +77,8 @@ const steps = [
     name: "Pick a date and time, then Schedule",
     body: (
       <>
-        Choose the date and time in your own time zone (the composer shows your time zone under the field), then press{" "}
+        Choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">date and time</Link> in your own time zone (the composer shows your time zone under the field), then press{" "}
         <strong>Schedule</strong>.
       </>
     ),
