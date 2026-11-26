@@ -9,6 +9,7 @@ import { CompareNote } from "@/components/CompareNote";
 import { StaySection } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: `Meta Business Suite Alternative for Instagram | ${BRAND.name}` },
@@ -60,6 +61,11 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({ name: `${BRAND.name} Meta Business Suite alternative`, description: "A Meta Business Suite alternative that schedules Instagram and Facebook Page posts and auto-DMs keyword commenters, with email capture.", url: `${BRAND.canonicalUrl}/meta-business-suite-alternative` }),
+  "@id": `${BRAND.canonicalUrl}/meta-business-suite-alternative#software`,
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -70,6 +76,7 @@ export default function MetaBusinessSuiteAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Meta Business Suite alternative", path: "/meta-business-suite-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
