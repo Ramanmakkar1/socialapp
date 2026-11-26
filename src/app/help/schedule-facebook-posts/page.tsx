@@ -34,7 +34,7 @@ const steps = [
     text: "Write the post text, then optionally add one public image link, up to 10 public image links for an album, or one public video link. Photos and video cannot be mixed in one post.",
     body: (
       <>
-        Write the post text, then optionally add one public image link, up to 10 public image links for an album, or one
+        Write the{" "}<Link className={s.vlink} href="/tools/facebook-caption-generator">post text</Link>, then optionally add one public image link, up to 10 public image links for an album, or one
         public video link. Photos and video cannot be mixed in one post.
       </>
     ),
