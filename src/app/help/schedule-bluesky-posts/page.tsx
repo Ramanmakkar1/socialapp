@@ -48,7 +48,7 @@ const steps = [
         <Link className={s.vlink} href="/app/calendar">
           calendar composer
         </Link>
-        , select Bluesky and write up to <strong>300 characters</strong>. Add up to <strong>4 images</strong>; images over
+        , select Bluesky and write up to <Link className={s.vlink} href="/tools/bluesky-character-counter"><strong>300 characters</strong></Link>. Add up to <strong>4 images</strong>; images over
         1 MB are shrunk automatically when possible. Links and resolvable @mentions become clickable, and the first link
         in a post without images becomes a <strong>link-preview card</strong>.
       </>
