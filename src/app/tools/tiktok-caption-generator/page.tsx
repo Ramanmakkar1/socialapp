@@ -188,6 +188,13 @@ const config: ToolPageConfig = {
     {
       q: "Should TikTok captions include hashtags?",
       a: "They can, but hashtags are optional. Start with a caption that names the topic in plain words, then add a small set of relevant hashtags. Avoid tags that do not describe the video.",
+      aNode: (
+        <>
+          They can, but hashtags are optional. Start with a caption that names the topic in plain words, then add a{" "}
+          <Link href="/tools/tiktok-hashtag-generator">small set of relevant hashtags</Link>
+          . Avoid tags that do not describe the video.
+        </>
+      ),
     },
     {
       q: "Does this TikTok caption generator use AI?",
