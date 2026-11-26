@@ -78,7 +78,7 @@ const steps = [
     text: "Choose when the video should go out. Times are shown in your browser's time zone, so the upload starts when you expect it to.",
     body: (
       <>
-        Choose when the video should go out. Times are shown in your browser&apos;s <strong>time zone</strong>, so the
+        Choose <Link className={s.vlink} href="/tools/best-time-to-post-on-youtube">when the video should go out</Link>. Times are shown in your browser&apos;s <strong>time zone</strong>, so the
         upload starts when you expect it to.
       </>
     ),
