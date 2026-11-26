@@ -21,7 +21,7 @@ export const revalidate = 600;
 export const metadata: Metadata = withSocial({
   title: { absolute: `Buffer Alternative With Instagram Auto-DM | ${BRAND.name}` },
   description:
-    "A Buffer alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and AI captions. Facebook Pages, Threads and YouTube too.",
+    "A Buffer alternative that schedules Instagram posts and auto-DMs keyword commenters, then captures their email. Facebook Pages, Threads and YouTube too.",
   alternates: { canonical: "/buffer-alternative" },
 });
 
