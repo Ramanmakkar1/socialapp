@@ -104,27 +104,30 @@ const faqs = [
   },
 ];
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} TikTok scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  featureList: [
-    "TikTok video and photo post scheduling",
-    "Videos from 3 seconds to 10 minutes, up to 1 GB",
-    "Photo posts with up to 35 photos",
-    "Visibility, comment, Duet and Stitch options",
-    "Week and month content calendar",
-    "Instagram, Threads and Facebook Page scheduling in the same queue",
-  ],
-  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
-  offers: softwareOffers(planReadiness()),
-};
+function appJsonLdFor(desc: string) {
+  return {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} TikTok scheduler`,
+      description: desc,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    featureList: [
+      "TikTok video and photo post scheduling",
+      "Videos from 3 seconds to 10 minutes, up to 1 GB",
+      "Photo posts with up to 35 photos",
+      "Visibility, comment, Duet and Stitch options",
+      "Week and month content calendar",
+      "Instagram, Threads and Facebook Page scheduling in the same queue",
+    ],
+    // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+    offers: softwareOffers(planReadiness()),
+  };
+}
 
 export default function TikTokSchedulerPage() {
   const availability = networkAvailability("tiktok");
   const isLive = availability === "live";
+  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "TikTok scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
