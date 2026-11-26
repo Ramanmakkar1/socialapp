@@ -105,7 +105,7 @@ const config: ToolPageConfig = {
         body: (
           <>
             <p>
-              Put hashtags in your video description, usually at the end after your summary and links. You can also add
+              Put hashtags in your <Link href="/tools/youtube-description-generator">video description</Link>, usually at the end after your summary and links. You can also add
               them to the title, but the description is the cleaner place. The first 3 hashtags from the description
               appear above or below the title, so put the tags you most want viewers to see in those first three slots.
             </p>
