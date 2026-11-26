@@ -53,7 +53,7 @@ const steps = [
     text: "Add one image or a carousel of up to five images. Each file can be a JPG or PNG up to 20 MB. Poskoo schedules image Pins only, not video Pins.",
     body: (
       <>
-        Add one image or a <strong>carousel of up to five images</strong>. Each file can be a JPG or PNG up to 20 MB.
+        Add <Link className={s.vlink} href="/tools/pinterest-pin-size-checker">one image</Link> or a <strong>carousel of up to five images</strong>. Each file can be a JPG or PNG up to 20 MB.
         Pinterest publishing currently supports image Pins only, not video Pins.
       </>
     ),
@@ -63,7 +63,7 @@ const steps = [
     text: "Choose when the Pin should go out. Times are shown in your browser's time zone, so the Pin publishes when you expect it to.",
     body: (
       <>
-        Choose when the Pin should go out. Times are shown in your browser&apos;s time zone, so the Pin publishes when
+        Choose <Link className={s.vlink} href="/tools/best-time-to-post-on-pinterest">when the Pin should go out</Link>. Times are shown in your browser&apos;s time zone, so the Pin publishes when
         you expect it to.
       </>
     ),
