@@ -7,6 +7,8 @@ import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/li
 import { priceSummary, softwareOffers } from "@/lib/plans";
 import { publisherRef } from "@/lib/tool-schema";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -36,8 +38,8 @@ const compare: [string, string, string, string][] = [
   [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check the provider", "Check the provider"],
   ["Instagram comment-to-DM automation", "Yes", "Check the provider", "Check the provider"],
   ["Email capture in the DM", "Yes", "Check the provider", "Check the provider"],
-  ["AI caption ideas", "Yes", "Check the provider", "Check the provider"],
-  ["AI DM message ideas", "Yes", "Check the provider", "Check the provider"],
+  ["AI caption ideas", "Built, launching soon", "Check the provider", "Check the provider"],
+  ["AI DM message ideas", "Built, launching soon", "Check the provider", "Check the provider"],
   ["Lead tracking from comment to DM", "Yes", "Check the provider", "Check the provider"],
   ["Price", priceSummary(planReadiness()), "Check the provider", "Check the provider"],
 ];
@@ -73,11 +75,13 @@ const appJsonLd = {
   publisher: publisherRef(),
 };
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
 
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
@@ -85,10 +89,15 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function ZohoSocialAlternative() {
+export default async function ZohoSocialAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const compareRows: [string, string, string, string][] = compare.map((r) =>
+    r[0].startsWith("AI ") && ai ? [r[0], "Yes", r[2], r[3]] : r
+  );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Zoho Social alternative", path: PATH }]}>
-      {[appJsonLd, faqJsonLd].map((data) => (
+      {[appJsonLd, faqJsonLdFor(faqItems)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -152,7 +161,7 @@ export default function ZohoSocialAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, zoho, combo]) => (
+                {compareRows.map(([label, ours, zoho, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -194,7 +203,7 @@ export default function ZohoSocialAlternative() {
             <h2>Zoho Social alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
