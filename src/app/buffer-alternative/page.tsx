@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
-import { PLATFORMS_ANSWER, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
+import { LIVE_PLATFORMS_TEXT, PLATFORMS_ANSWER, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
@@ -57,7 +57,7 @@ const appJsonLd = {
   "@id": `${BRAND.canonicalUrl}/buffer-alternative#software`,
   featureList: [
     "Post scheduling with a calendar view",
-    "Instagram, Facebook Page and Threads publishing",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
     "Comment-to-DM automation",
     "Email capture in DMs",
   ],
