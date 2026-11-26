@@ -56,7 +56,7 @@ const steps = [
         <Link className={s.vlink} href="/app/calendar">
           calendar composer
         </Link>
-        , select Mastodon and write your post. The default limit is <strong>500 characters</strong>; some servers allow
+        , select Mastodon and write your post. The default limit is <Link className={s.vlink} href="/tools/mastodon-character-counter"><strong>500 characters</strong></Link>; some servers allow
         more, and {BRAND.name} reads your server&apos;s limit.
       </>
     ),
