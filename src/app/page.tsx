@@ -277,7 +277,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <article className="bentoCard">
       <div className="bentoArt"><AnimArt name="feat-ai" label={ANIM_LABELS["feat-ai"]} /></div>
       <h3>AI captions</h3>
-      <p>Draft captions in your brand voice with AI, then edit and schedule.</p>
+      <p>{r.ai ? "Draft captions in your brand voice with AI, then edit and schedule." : "AI caption drafts in your brand voice are coming soon. Until then, write captions yourself and schedule them."}</p>
     </article>
     <article className="bentoCard">
       <div className="bentoArt"><AnimArt name="feat-leads" label={ANIM_LABELS["feat-leads"]} /></div>
