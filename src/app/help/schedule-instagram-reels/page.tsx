@@ -64,7 +64,11 @@ const steps = [
     name: "Write your caption",
     body: (
       <>
-        Write the caption that will appear under the Reel. If you run a comment-to-DM rule, put your keyword in the
+        Write the{" "}
+        <Link className={s.vlink} href="/tools/instagram-caption-generator">
+          caption
+        </Link>{" "}
+        that will appear under the Reel. If you run a comment-to-DM rule, put your keyword in the
         caption so viewers know what to comment.
       </>
     ),
