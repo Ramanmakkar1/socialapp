@@ -59,8 +59,8 @@ const steps = [
     text: "Choose when the post should go out. Times are shown in your browser's time zone, so the post publishes when you expect it to.",
     body: (
       <>
-        Choose when the post should go out. Times are shown in your browser&apos;s <strong>time zone</strong>, so the
-        post publishes when you expect it to.
+        Choose <Link className={s.vlink} href="/tools/best-time-to-post-on-bluesky">when the post should go out</Link>.
+        Times are shown in your browser&apos;s <strong>time zone</strong>, so the post publishes when you expect it to.
       </>
     ),
   },
