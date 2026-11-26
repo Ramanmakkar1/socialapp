@@ -143,7 +143,8 @@ export const body: GuideBody = {
 
           <h3>TikTok</h3>
           <p>
-            Say your keyword out loud in the first seconds, show it as on-screen text and use it in the caption.
+            Say your keyword out loud in the first seconds, show it as on-screen text and use it in the{" "}
+            <Link href="/tools/tiktok-caption-generator">caption</Link>.
             TikTok confirms captions, sounds and hashtags are part of the <Ext href={SRC.tiktokRecs}>video
             information</Ext> it looks at. Many creators also turn on auto captions so the spoken words are visible as
             text for viewers watching on mute.
@@ -152,7 +153,8 @@ export const body: GuideBody = {
           <h3>YouTube</h3>
           <p>
             YouTube is a search engine first. Put the phrase people search in the title, explain the video in the
-            first lines of the description and add chapters for longer videos.{" "}
+            first lines of the{" "}
+            <Link href="/tools/youtube-description-generator">description</Link> and add chapters for longer videos.{" "}
             <Ext href={SRC.ytCaptions}>Subtitles and captions</Ext> help you reach viewers who are deaf or hard of
             hearing and people who speak other languages, so add them or correct the automatic ones.
           </p>
@@ -193,7 +195,8 @@ export const body: GuideBody = {
               ignores all of them, and unrelated or misleading hashtags can get a video removed.
             </li>
             <li>
-              <strong>TikTok:</strong> hashtags are one input among several. A few accurate ones help; a wall of
+              <strong>TikTok:</strong> hashtags are one input among several.{" "}
+              <Link href="/tools/tiktok-hashtag-generator">A few accurate ones</Link> help; a wall of
               trending tags that don&apos;t match the video doesn&apos;t.
             </li>
           </ul>
