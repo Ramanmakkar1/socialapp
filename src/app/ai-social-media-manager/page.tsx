@@ -265,7 +265,7 @@ export default async function AiSocialMediaManagerPage() {
           <div className="cta">
             <div>
               <h2>Draft, schedule and <em className="s">capture leads</em> in one place</h2>
-              <p>Start free, write your first post with AI ideas, and see the replies and leads land in one dashboard.</p>
+              <p>{ai ? "Start free, write your first post with AI ideas, and see the replies and leads land in one dashboard." : "Start free, write and schedule your first post, and see the replies and leads land in one dashboard."}</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
               {" "}
               <Link className="btn" href="/pricing">Compare plans</Link>
