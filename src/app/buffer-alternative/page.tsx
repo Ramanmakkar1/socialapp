@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
@@ -45,7 +45,7 @@ const faqs = [
   { q: `Is ${BRAND.name} a Buffer alternative?`, a: `Yes. ${BRAND.name} schedules and publishes your posts like Buffer does, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
   { q: "Can I import my existing Buffer schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
 const appJsonLd = {
