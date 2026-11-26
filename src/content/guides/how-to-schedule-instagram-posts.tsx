@@ -186,7 +186,7 @@ export const body: GuideBody = {
             ]}
           />
           <p>
-            Use the Instagram app for a one-off post you are already composing on your phone. Use <Link href="/meta-business-suite-alternative">Meta Business Suite</Link>
+            Use the Instagram app for a one-off post you are already composing on your phone. Use <Link href="/meta-business-suite-alternative">Meta Business Suite</Link>{" "}
             if you only manage Facebook and Instagram and want a free desktop planner. Use Poskoo when you want one
             queue for several networks, reliable Reels and Story publishing, or a keyword rule that DMs everyone who
             comments.
