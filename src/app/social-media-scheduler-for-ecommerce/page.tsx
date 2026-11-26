@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import { BRAND } from "@/lib/brand";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
+import { networkAvailability } from "@/components/ChannelStatusNote";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const PATH = "/social-media-scheduler-for-ecommerce";
 const title = `Social Media Scheduler for Ecommerce Brands | ${BRAND.name}`;
@@ -86,5 +90,17 @@ const content: AudiencePageContent = {
 };
 
 export default function SocialMediaSchedulerForEcommercePage() {
-  return <AudienceSchedulerPage c={content} />;
+  const c: AudiencePageContent = {
+    ...content,
+    faqs: content.faqs.map((faq) => {
+      if (faq.q === "Can I schedule Pinterest Pins?" && networkAvailability("pinterest") === "live") {
+        return {
+          ...faq,
+          a: "Yes. Connect Pinterest, pick a board, add the product image and link, and choose a time; Poskoo creates the Pin through the official Pinterest API.",
+        };
+      }
+      return faq;
+    }),
+  };
+  return <AudienceSchedulerPage c={c} />;
 }
