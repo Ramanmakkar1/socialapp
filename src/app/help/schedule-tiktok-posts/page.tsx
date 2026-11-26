@@ -55,7 +55,7 @@ const steps = [
     text: "Choose the date and time for the video. Times are shown in your browser's time zone, so the post goes out when you expect it to.",
     body: (
       <>
-        Choose the date and time for the video. Times are shown in your browser&apos;s time zone, so the post goes out
+        Choose the <Link className={s.vlink} href="/tools/best-time-to-post-on-tiktok">date and time</Link> for the video. Times are shown in your browser&apos;s time zone, so the post goes out
         when you expect it to.
       </>
     ),
