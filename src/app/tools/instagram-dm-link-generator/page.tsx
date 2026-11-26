@@ -14,7 +14,7 @@ const config: ToolPageConfig = {
   h1: { before: "Instagram DM link generator:", mark: "ig.me links", after: "in one step" },
   lede: "Turn your @username into an ig.me link that opens a direct message with your account. Copy it for your bio, Story sticker, email or website button.",
   art: "card-dm",
-  artLabel: "A relaxed creator on a beanbag while DMs fly out of his phone to followers",
+  artLabel: "A relaxed creator on a beanbag shares an Instagram DM link as messages fly from their phone to followers",
   heroPoints: ["ig.me/m format", "Bio, HTML and Story copy", "No login"],
   toolTitle: "Create your Instagram DM link",
   toolNote: "Free · nothing leaves your browser",
