@@ -85,7 +85,7 @@ export const platforms: Platform[] = [
     scheduler: "/youtube-scheduler",
     note: "Thumbnails are landscape, Shorts are vertical and channel art needs its central safe area kept clear.",
     rows: [
-      { format: "Video thumbnail", size: "1280×720", ratio: "16:9" },
+      { format: "Video thumbnail", size: "1280×720", ratio: "16:9", checker: "/tools/youtube-thumbnail-size-checker" },
       { format: "Short", size: "1080×1920", ratio: "9:16" },
       { format: "Channel banner", size: "2560×1440 (safe area 1546×423)", ratio: "16:9", checker: "/tools/youtube-banner-size-checker" },
     ],

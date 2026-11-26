@@ -20,7 +20,7 @@ function SizeTable({ rows, label }: { rows: SizeRow[]; label: string }) {
           {rows.map((row) => (
             <tr key={row.format}>
               <th scope="row">{row.format}</th>
-              <td>{row.size}</td>
+              <td>{row.checker ? <Link href={row.checker}>{row.size}</Link> : row.size}</td>
               <td>{row.ratio}</td>
             </tr>
           ))}
