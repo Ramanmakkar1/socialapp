@@ -63,7 +63,8 @@ const steps = [
     text: "Choose the date and time in your own time zone. The composer shows your time zone under the field.",
     body: (
       <>
-        Choose the date and time in your own time zone — the composer shows your time zone under the field, so the
+        Choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">date and time</Link> in your own time zone — the composer shows your time zone under the field, so the
         Story publishes when you expect it to.
       </>
     ),
