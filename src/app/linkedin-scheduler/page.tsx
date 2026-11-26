@@ -7,6 +7,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { linkedinPagesFlag } from "@/lib/networks/linkedin";
 import { faqJsonLd, ldJson, publisherRef, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -75,32 +76,36 @@ const comparison = [
   { task: "Recovering from a failed post", manual: "Start again from LinkedIn", scheduled: "Fix the cause and retry the failed post" },
 ];
 
-const faqs = [
-  {
-    q: "Can I schedule LinkedIn posts?",
-    a: "Yes. You can compose a LinkedIn post, choose a date and time, and let Poskoo publish it automatically through LinkedIn's official API.",
-  },
-  {
-    q: "Can I post to a LinkedIn company page?",
-    a: "Yes, when company page access is enabled for your account. Poskoo can publish to a company page you administer as well as your personal profile. Company page publishing needs LinkedIn's Community Management API access, which is granted after a separate review.",
-  },
-  {
-    q: "What can I post to LinkedIn?",
-    a: "A LinkedIn post can be text up to 3,000 characters, with up to 20 images in one post. Images can be JPG or PNG up to 10 MB each. Video is not supported from Poskoo yet.",
-  },
-  {
-    q: "Can I edit or reschedule a scheduled post?",
-    a: "Yes. Scheduled posts can be edited, moved to a new time, duplicated or deleted before they publish.",
-  },
-  {
-    q: "What is the best time to post on LinkedIn?",
-    a: "There is no single best time for every account. Post when your audience is active, usually on weekday mornings and early afternoons, then check your results and adjust. Scheduling lets you test a few times without posting by hand.",
-  },
-  {
-    q: "Is there a free plan?",
-    a: "Yes. Every account starts on the $0 Free plan with 2 social accounts and 10 scheduled posts per month. No credit card is needed to sign up. Pro and Agency add more accounts and unlimited scheduling.",
-  },
-];
+function faqsFor(pagesOn: boolean) {
+  return [
+    {
+      q: "Can I schedule LinkedIn posts?",
+      a: "Yes. You can compose a LinkedIn post, choose a date and time, and let Poskoo publish it automatically through LinkedIn's official API.",
+    },
+    {
+      q: "Can I post to a LinkedIn company page?",
+      a: pagesOn
+        ? "Yes. Poskoo can publish to a LinkedIn company page you administer as well as your personal profile, through LinkedIn's Community Management API."
+        : "Not yet. Poskoo publishes to personal LinkedIn profiles today. Company page publishing is built and waiting for LinkedIn's Community Management API approval.",
+    },
+    {
+      q: "What can I post to LinkedIn?",
+      a: "A LinkedIn post can be text up to 3,000 characters, with up to 20 images in one post. Images can be JPG or PNG up to 10 MB each. Video is not supported from Poskoo yet.",
+    },
+    {
+      q: "Can I edit or reschedule a scheduled post?",
+      a: "Yes. Scheduled posts can be edited, moved to a new time, duplicated or deleted before they publish.",
+    },
+    {
+      q: "What is the best time to post on LinkedIn?",
+      a: "There is no single best time for every account. Post when your audience is active, usually on weekday mornings and early afternoons, then check your results and adjust. Scheduling lets you test a few times without posting by hand.",
+    },
+    {
+      q: "Is there a free plan?",
+      a: "Yes. Every account starts on the $0 Free plan with 2 social accounts and 10 scheduled posts per month. No credit card is needed to sign up. Pro and Agency add more accounts and unlimited scheduling.",
+    },
+  ];
+}
 
 const webPageJsonLd = {
   "@context": "https://schema.org",
@@ -136,6 +141,7 @@ const appJsonLd = {
 };
 
 export default function LinkedInSchedulerPage() {
+  const faqs = faqsFor(linkedinPagesFlag(process.env));
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "LinkedIn scheduler", path: PATH }]}>
       {[webPageJsonLd, appJsonLd, faqJsonLd(faqs)].map((data) => (
