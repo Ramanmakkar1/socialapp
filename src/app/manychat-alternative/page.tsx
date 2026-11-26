@@ -59,13 +59,15 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
-const productJsonLd = {
+const appJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Product",
-  name: `${BRAND.name} — ManyChat alternative`,
+  "@type": "SoftwareApplication",
+  "@id": `${BRAND.canonicalUrl}/manychat-alternative#software`,
+  name: `${BRAND.name} ManyChat alternative`,
   description:
     "Instagram comment-to-DM automation, lead capture and post scheduling in one tool, built on the official Meta API.",
-  brand: { "@type": "Brand", name: BRAND.name },
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
   url: `${BRAND.canonicalUrl}/manychat-alternative`,
   offers: softwareOffers(planReadiness()),
   publisher: publisherRef(),
@@ -81,7 +83,7 @@ export default function ManyChatAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "ManyChat alternative", path: "/manychat-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
