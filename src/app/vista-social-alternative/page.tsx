@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
@@ -34,7 +34,7 @@ const faqs = [
   { q: "What is Vista Social?", a: "Vista Social is a social media management tool for scheduling, engagement and reporting. For its exact features and plans, see their site." },
   { q: "Can I move my Vista Social schedule to Poskoo?", a: `Not yet. Recreate your upcoming posts in the ${BRAND.name} calendar and rebuild your queue there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
 const faqJsonLd = {
