@@ -6,6 +6,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -112,24 +113,6 @@ const faqs = [
   },
 ];
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} AI social media manager`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  "@id": `${BRAND.canonicalUrl}${PATH}#software`,
-  featureList: [
-    "AI caption ideas in the post composer",
-    "Per-platform captions and media for one post",
-    "AI DM reply suggestions from saved instructions",
-    "Auto-DM keyword rules with email lead capture",
-    "Reach, engagement, clicks, DMs and leads analytics",
-    "CSV export of captured contacts",
-  ],
-  offers: softwareOffers(planReadiness()),
-};
-
 const webPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
@@ -141,7 +124,28 @@ const webPageJsonLd = {
   about: { "@id": `${BRAND.canonicalUrl}${PATH}#software` },
 };
 
-export default function AiSocialMediaManagerPage() {
+export default async function AiSocialMediaManagerPage() {
+  const ai = await isFeatureReadyNow("ai");
+  const aiReplies = await isFeatureReadyNow("ai_replies");
+
+  const appJsonLd = {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} AI social media manager`,
+      description,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    "@id": `${BRAND.canonicalUrl}${PATH}#software`,
+    featureList: [
+      ...(ai ? ["AI caption ideas in the post composer"] : []),
+      "Per-platform captions and media for one post",
+      ...(aiReplies ? ["AI DM reply suggestions from saved instructions"] : []),
+      "Auto-DM keyword rules with email lead capture",
+      "Reach, engagement, clicks, DMs and leads analytics",
+      "CSV export of captured contacts",
+    ],
+    offers: softwareOffers(planReadiness()),
+  };
+
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "AI social media manager", path: PATH }]}>
       {[appJsonLd, webPageJsonLd, faqJsonLd(faqs)].map((data) => (
