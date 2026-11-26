@@ -67,7 +67,6 @@ const appJsonLd = {
     `Publishing to ${LIVE_PLATFORMS_TEXT}`,
     "Comment-to-DM automation",
     "Email capture in DMs",
-    "AI DM message ideas",
   ],
 };
 
