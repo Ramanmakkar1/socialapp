@@ -6,9 +6,13 @@ import { AnimArt } from "@/components/AnimArt";
 import { ToolCta, ToolFaqSection, toolMetadata } from "@/components/tools/ToolPageTemplate";
 import { faqJsonLd, ldJson } from "@/components/tools/seo";
 import { toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import t from "@/components/tools/tools.module.css";
 
 const PATH = "/tools/tiktok-tools";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 export const metadata = toolMetadata({
   path: PATH,
@@ -66,44 +70,57 @@ const groups: { id: string; title: string; intro: string; tools: Tool[] }[] = [
 
 const allTools = groups.flatMap((g) => g.tools);
 
-const faqs = [
-  {
-    q: "What are the best TikTok tools?",
-    a: "The best TikTok tools are the ones that fix the job in front of you: a caption generator and counter for writing, a hook and hashtag generator for reach, size checkers for video and photos, a bio and username generator for your profile, and a scheduler for publishing. This hub groups all of them by task so you can start with the one you need.",
-    aNode: (
-      <>
-        The best TikTok tools are the ones that fix the job in front of you: a caption generator and counter for
-        writing, a hook and hashtag generator for reach, size checkers for video and photos, a bio and username
-        generator for your profile, and a scheduler for publishing. This hub groups all of them by task so you can start
-        with the one you need.
-      </>
-    ),
-  },
-  {
-    q: "Are these TikTok tools free?",
-    a: `Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by ${BRAND.name}, a social media scheduler with TikTok scheduling, which has its own free plan if you want to schedule what you create.`,
-    aNode: (
-      <>
-        Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by {BRAND.name}, a
-        social media scheduler with TikTok scheduling, which has its own free plan if you want to schedule what you
-        create.
-      </>
-    ),
-  },
-  {
-    q: "How do I schedule a TikTok video with Poskoo?",
-    a: `Draft your caption, hook and hashtags here, then open the TikTok scheduler to add the video to your calendar. Connect your TikTok account through the official login, pick a date and time, and ${BRAND.name} publishes it for you. You can create a free account to start.`,
-    aNode: (
-      <>
-        Draft your caption, hook and hashtags here, then open the{" "}
-        <Link href="/tiktok-scheduler">TikTok scheduler</Link> to add the video to your calendar. Connect your TikTok
-        account through the official login, pick a date and time, and {BRAND.name} publishes it for you. You can{" "}
-        <Link href="/signup">create a free account</Link> to start, or follow the{" "}
-        <Link href="/help/schedule-tiktok-posts">step-by-step guide to scheduling TikTok videos</Link>.
-      </>
-    ),
-  },
-];
+function faqsFor(state: ReturnType<typeof networkAvailability>) {
+  const notLive = state !== "live";
+  const tiktokPhrase = availabilityPhrase(state, "TikTok");
+
+  return [
+    {
+      q: "What are the best TikTok tools?",
+      a: "The best TikTok tools are the ones that fix the job in front of you: a caption generator and counter for writing, a hook and hashtag generator for reach, size checkers for video and photos, a bio and username generator for your profile, and a scheduler for publishing. This hub groups all of them by task so you can start with the one you need.",
+      aNode: (
+        <>
+          The best TikTok tools are the ones that fix the job in front of you: a caption generator and counter for
+          writing, a hook and hashtag generator for reach, size checkers for video and photos, a bio and username
+          generator for your profile, and a scheduler for publishing. This hub groups all of them by task so you can start
+          with the one you need.
+        </>
+      ),
+    },
+    {
+      q: "Are these TikTok tools free?",
+      a: `Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by ${BRAND.name}, a social media scheduler${notLive ? "" : " with TikTok scheduling"}, which has its own free plan if you want to schedule what you create.`,
+      aNode: (
+        <>
+          Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by {BRAND.name}, a
+          social media scheduler{notLive ? "" : " with TikTok scheduling"}, which has its own free plan if you want to schedule what you
+          create.
+        </>
+      ),
+    },
+    {
+      q: "How do I schedule a TikTok video with Poskoo?",
+      a: notLive
+        ? `Not yet. TikTok publishing in Poskoo is ${tiktokPhrase}. Until then, draft your caption, hook and hashtags here and post from the TikTok app.`
+        : `Draft your caption, hook and hashtags here, then open the TikTok scheduler to add the video to your calendar. Connect your TikTok account through the official login, pick a date and time, and ${BRAND.name} publishes it for you. You can create a free account to start.`,
+      aNode: notLive ? (
+        <>
+          Not yet. TikTok publishing in Poskoo is {tiktokPhrase}. Until then, draft your caption, hook and hashtags here
+          and post from the TikTok app. Follow the{" "}
+          <Link href="/help/schedule-tiktok-posts">step-by-step guide to scheduling TikTok videos</Link>.
+        </>
+      ) : (
+        <>
+          Draft your caption, hook and hashtags here, then open the{" "}
+          <Link href="/tiktok-scheduler">TikTok scheduler</Link> to add the video to your calendar. Connect your TikTok
+          account through the official login, pick a date and time, and {BRAND.name} publishes it for you. You can{" "}
+          <Link href="/signup">create a free account</Link> to start, or follow the{" "}
+          <Link href="/help/schedule-tiktok-posts">step-by-step guide to scheduling TikTok videos</Link>.
+        </>
+      ),
+    },
+  ];
+}
 
 const itemListJsonLd = {
   "@context": "https://schema.org",
@@ -126,6 +143,8 @@ const softwareJsonLd = toolSoftwareJsonLd({
 });
 
 export default function TikTokToolsPage() {
+  const state = networkAvailability("tiktok");
+  const faqs = faqsFor(state);
   return (
     <PublicShell breadcrumbs={[{ name: "TikTok tools", path: PATH }]}>
       {[itemListJsonLd, softwareJsonLd, faqJsonLd(faqs)].map((data, i) => (
