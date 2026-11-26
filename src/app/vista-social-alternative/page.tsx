@@ -7,6 +7,7 @@ import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/li
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -65,14 +66,15 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function VistaSocialAlternative() {
+export default async function VistaSocialAlternative() {
+  const ai = await isFeatureReadyNow("ai");
   const compare: [string, string, string, string][] = [
     ["Social media scheduling", "Yes", "Check their site", "Check their site"],
     [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
     ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
     ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-    ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-    ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+    ["AI caption ideas", ai ? "Yes" : "Built, launching soon", "Check their site", "Check their site"],
+    ["AI DM message ideas", ai ? "Yes" : "Built, launching soon", "Check their site", "Check their site"],
     ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
     ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
   ];
