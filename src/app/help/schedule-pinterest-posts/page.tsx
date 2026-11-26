@@ -43,7 +43,7 @@ const steps = [
     text: "Write a Pin title and description, then add an optional destination link as a full http:// or https:// web address.",
     body: (
       <>
-        Write a Pin <strong>title</strong> and <strong>description</strong>, then add an optional destination link as a
+        Write a Pin <strong>title</strong> and <Link className={s.vlink} href="/tools/pinterest-description-generator"><strong>description</strong></Link>, then add an optional destination link as a
         full http:// or https:// web address so the Pin can send readers to your product, article or page.
       </>
     ),
