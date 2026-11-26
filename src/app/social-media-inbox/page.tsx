@@ -7,6 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -111,13 +112,19 @@ const appJsonLd = {
   publisher: publisherRef(),
 };
 
-export default function SocialMediaInboxPage() {
+export default async function SocialMediaInboxPage() {
+  const ai = await isFeatureReadyNow("ai");
+  const appLd = {
+    ...appJsonLd,
+    featureList: appJsonLd.featureList.filter((f) => ai || f !== "AI reply suggestions"),
+  };
+
   return (
     <PublicShell
       className={`${s.sched} ${s.pub}`}
       breadcrumbs={[{ name: "Social media inbox", path: PATH }]}
     >
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqLd) }} />
 
       <header className="hero">
