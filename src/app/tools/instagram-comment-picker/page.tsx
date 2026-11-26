@@ -101,7 +101,7 @@ const config: ToolPageConfig = {
         body: (
           <ul>
             <li>
-              <b>Write the rules in the caption:</b> what counts as an entry, the deadline, who can enter and what the
+              <b>Write the rules in the <Link href="/tools/instagram-caption-generator">caption</Link>:</b> what counts as an entry, the deadline, who can enter and what the
               prize is.
             </li>
             <li>
