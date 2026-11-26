@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
@@ -99,15 +100,15 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
+const faqJsonLdFor = (list: typeof faqs) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
+  mainEntity: list.map((f) => ({
     "@type": "Question",
     name: f.q,
     acceptedAnswer: { "@type": "Answer", text: f.a },
   })),
-};
+});
 
 const howToJsonLd = {
   "@context": "https://schema.org",
@@ -132,6 +133,21 @@ const related = [
 ];
 
 export default function SchedulePinterestPostsHelpPage() {
+  const state = networkAvailability("pinterest");
+  const pageFaqs =
+    state === "live"
+      ? faqs
+      : faqs.map((f) =>
+          f.q === "Can I schedule Pinterest Pins with Poskoo?"
+            ? {
+                ...f,
+                a: `Not yet. Pinterest publishing in Poskoo is ${availabilityPhrase(
+                  state,
+                  "Pinterest"
+                )}. Once it is switched on, connect Pinterest, pick a board, add an image and Pin details, then choose a publishing time.`,
+              }
+            : f
+        );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
@@ -145,7 +161,7 @@ export default function SchedulePinterestPostsHelpPage() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(pageFaqs)).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
         <div className={s.heroText}>
@@ -254,7 +270,7 @@ export default function SchedulePinterestPostsHelpPage() {
             <h2>FAQ</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {pageFaqs.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
