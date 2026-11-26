@@ -36,7 +36,7 @@ const compare: [string, string, string, string][] = [
   [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
+  ["AI caption ideas", "Built, launching soon", "Check their site", "Check their site"],
   ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
   ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
   ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
@@ -81,6 +81,7 @@ function Cell({ v }: { v: string }) {
 
 export default async function SocialBeeAlternative() {
   const ai = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string, string] => row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row);
   const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "SocialBee alternative", path: "/socialbee-alternative" }]}>
@@ -143,7 +144,7 @@ export default async function SocialBeeAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, socialbee, combo]) => (
+                {compareRows.map(([label, ours, socialbee, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
