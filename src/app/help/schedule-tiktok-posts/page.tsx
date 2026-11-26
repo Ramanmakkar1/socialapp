@@ -34,7 +34,7 @@ const steps = [
     body: (
       <>
         Upload a vertical MP4 or MOV video from 3 seconds to 10 minutes, up to 1 GB (250 MB on the Free plan), then
-        write your caption. A 9:16 video such as 1080×1920 looks best in the TikTok feed.
+        write your <Link className={s.vlink} href="/tools/tiktok-caption-generator">caption</Link>. A 9:16 video such as 1080×1920 looks best in the TikTok feed.
       </>
     ),
   },
