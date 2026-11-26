@@ -72,10 +72,13 @@ const steps = [
   },
 ];
 
-const faqs = [
+function faqsFor(isLive: boolean) {
+  return [
   {
     q: "Can I schedule Pinterest Pins with Poskoo?",
-    a: "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time. Poskoo creates the Pin through the official Pinterest API when it is due.",
+    a: isLive
+      ? "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time. Poskoo creates the Pin through the official Pinterest API when it is due."
+      : "Pinterest publishing is built and waiting on Pinterest platform approval. Once it is switched on, connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time; Poskoo creates the Pin through the official Pinterest API. Instagram, Threads and Facebook work today.",
   },
   {
     q: "Do I need to give Poskoo my Pinterest password?",
@@ -93,7 +96,8 @@ const faqs = [
     q: "Can I edit or reschedule a Pinterest Pin before it publishes?",
     a: "Yes. You can edit, reschedule or delete a scheduled post from the queue before it publishes. If publishing fails, the queue shows the error and lets you retry after fixing the issue.",
   },
-];
+  ];
+}
 
 const appJsonLd = {
   ...toolSoftwareJsonLd({
@@ -116,6 +120,7 @@ const appJsonLd = {
 export default function PinterestSchedulerPage() {
   const availability = networkAvailability("pinterest");
   const isLive = availability === "live";
+  const faqs = faqsFor(isLive);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Pinterest scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
