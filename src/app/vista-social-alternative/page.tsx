@@ -96,7 +96,7 @@ export default async function VistaSocialAlternative() {
             A Vista Social alternative that also <em className="s">auto-DMs every comment</em>
           </h1>
           <p className="lede">
-            {BRAND.name} is a good Vista Social alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. Capture their email, write captions with AI and track every lead.
+            {BRAND.name} is a good Vista Social alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. {ai ? "Capture their email, write captions with AI and track every lead." : "Capture their email and track every lead."}
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
