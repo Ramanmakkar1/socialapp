@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import PublicShell from "@/components/PublicShell";
@@ -42,6 +43,22 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Vista Social alternative`,
+    description:
+      "Poskoo is a Vista Social alternative: schedule Instagram, Facebook, Threads, YouTube and LinkedIn posts and auto-DM every keyword commenter. Free plan.",
+    url: `${BRAND.canonicalUrl}/vista-social-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/vista-social-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
   if (v === "No") return <span style={{ color: "var(--poskoo-muted)" }}>No</span>;
@@ -63,6 +80,7 @@ export default function VistaSocialAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Vista Social alternative", path: "/vista-social-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
