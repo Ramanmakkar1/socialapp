@@ -137,8 +137,7 @@ export default async function SocialMediaInboxPage() {
           <p className="lede">
             A social media inbox is one place where you read and answer every comment and direct
             message from all your connected accounts. {BRAND.name} brings Instagram, Facebook and
-            Threads conversations into one shared list, then helps you reply faster with AI
-            suggestions and keyword automation.
+            Threads conversations into one shared list, {ai ? "then helps you reply faster with AI suggestions and keyword automation." : "then helps you reply faster with keyword automation."}
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/app/inbox">
@@ -181,7 +180,17 @@ export default async function SocialMediaInboxPage() {
             </p>
           </div>
           <div className="cards">
-            {features.map((feature) => (
+            {(ai
+              ? features
+              : features.map((feature) =>
+                  feature.no === "02 / AI replies"
+                    ? {
+                        ...feature,
+                        text: "AI reply suggestions are built and launching soon. Until then you write each reply yourself, and keyword automation answers the repeat questions.",
+                      }
+                    : feature
+                )
+            ).map((feature) => (
               <article key={feature.title} className="pcard">
                 <span className="no">{feature.no}</span>
                 <h3>{feature.title}</h3>
