@@ -63,9 +63,9 @@ const appJsonLd = {
   description,
   featureList: [
     "Social media post scheduling",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
     "Instagram comment-to-DM automation",
     "Email capture in the DM",
-    "AI caption ideas",
     "Lead tracking from comment to DM",
   ],
   // Paid offers only once Pro/Agency checkout is live, matching /pricing.
