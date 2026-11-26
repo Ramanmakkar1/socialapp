@@ -129,6 +129,8 @@ export default async function AiSocialMediaManagerPage() {
   const ai = await isFeatureReadyNow("ai");
   const aiReplies = await isFeatureReadyNow("ai_replies");
 
+  const faqItems = faqs.map((f) => f.q !== "Which AI features are included?" || ai ? f : { ...f, a: "AI caption ideas and DM message ideas are built and launching soon. Until they are switched on, you write captions and replies yourself, and AI replies stay off until you enable them." });
+
   const appJsonLd = {
     ...toolSoftwareJsonLd({
       name: `${BRAND.name} AI social media manager`,
@@ -149,7 +151,7 @@ export default async function AiSocialMediaManagerPage() {
 
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "AI social media manager", path: PATH }]}>
-      {[appJsonLd, webPageJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd, webPageJsonLd, faqJsonLd(faqItems)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -251,7 +253,7 @@ export default async function AiSocialMediaManagerPage() {
             <h2>AI features, publishing and lead capture</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq, index) => (
+            {faqItems.map((faq, index) => (
               <details key={faq.q} open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>
