@@ -197,7 +197,7 @@ export default function ScheduleXPostsHelpPage() {
             <h2>What you need</h2>
             <ul>
               <li>An X account connected to {BRAND.name} through X&apos;s official OAuth sign-in.</li>
-              <li>Your post text, up to 280 characters for standard X accounts.</li>
+              <li>Your post text, up to{" "}<Link className={s.vlink} href="/tools/x-character-counter">280 characters</Link>{" "}for standard X accounts.</li>
               <li>Optionally, up to 4 images of 5 MB each or one video of up to 512 MB.</li>
             </ul>
             <p>
