@@ -230,6 +230,33 @@ export default function TikTokVideoIdeasGeneratorPage() {
                 }
               : f,
           ),
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How often should you post on TikTok?"
+                ? {
+                    ...section,
+                    body: (
+                      <>
+                        <p>
+                          There is no single number that works for every account. A practical starting point is <b>three
+                          to five videos a week</b>, posted consistently, then adjust based on what your audience watches
+                          and saves.
+                        </p>
+                        <p>
+                          Consistency matters more than volume: a steady schedule you can keep beats a burst of posts
+                          followed by a quiet month. Pick a few days that fit your filming time, use the{" "}
+                          <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder to
+                          choose a starting time, and post from the TikTok app. TikTok publishing in the{" "}
+                          <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state,
+                          "TikTok")}.
+                        </p>
+                      </>
+                    ),
+                  }
+                : section
+            ),
+          },
         };
   return (
     <ToolPageTemplate config={pageConfig}>
