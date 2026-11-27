@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Callout, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { pendingNetworksText } from "@/lib/platform-support";
+
+const PENDING = pendingNetworksText(["tiktok", "x", "pinterest"]);
 
 // Platform limits are taken from official docs (Mastodon, Instagram) and Poskoo's own counter tools.
 // No invented reach numbers: tailoring advice is framed as practice, not a guaranteed result.
@@ -94,8 +97,10 @@ export const body: GuideBody = {
           </p>
           <Callout kind="warning" title="TikTok, X and Pinterest">
             <p>
-              The same tailoring applies to TikTok, X and Pinterest. In Poskoo, publishing to those three is waiting on
-              platform approval, so for now post there natively and use Poskoo for the networks above.
+              The same tailoring applies to TikTok, X and Pinterest.
+              {PENDING
+                ? ` In Poskoo: ${PENDING} Until then, post there natively and use Poskoo for the networks above.`
+                : " Poskoo publishes to all three, so you can schedule them next to the networks above."}
             </p>
           </Callout>
         </>
