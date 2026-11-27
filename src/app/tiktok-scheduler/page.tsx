@@ -108,7 +108,7 @@ function faqsFor(isLive: boolean) {
   ];
 }
 
-function appJsonLdFor(desc: string) {
+function appJsonLdFor(desc: string, isLive: boolean) {
   return {
     ...toolSoftwareJsonLd({
       name: `${BRAND.name} TikTok scheduler`,
@@ -116,7 +116,7 @@ function appJsonLdFor(desc: string) {
       url: `${BRAND.canonicalUrl}${PATH}`,
     }),
     featureList: [
-      "TikTok video and photo post scheduling",
+      isLive ? "TikTok video and photo post scheduling" : "TikTok video and photo post planning (publishing awaiting TikTok approval)",
       "Videos from 3 seconds to 10 minutes, up to 1 GB",
       "Photo posts with up to 35 photos",
       "Visibility, comment, Duet and Stitch options",
@@ -134,7 +134,7 @@ export default function TikTokSchedulerPage() {
   const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Choose the date and time. Once TikTok approves Poskoo, the post will publish through TikTok's Content Posting API when it is due, with a published or failed status you can retry." } : st);
   const comparisonRows = isLive ? comparison : comparison.map((row) => row.task === "Posting while busy or offline" ? { ...row, scheduled: "Once TikTok approves Poskoo, the worker will publish at the scheduled time" } : row);
   const faqs = faqsFor(isLive);
-  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
+  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION, isLive);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "TikTok scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
