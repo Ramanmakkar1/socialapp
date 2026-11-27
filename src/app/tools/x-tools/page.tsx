@@ -14,12 +14,16 @@ const PATH = "/tools/x-tools";
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
 
-export const metadata = toolMetadata({
-  path: PATH,
-  title: "Free X (Twitter) Tools: Threads, Bios, Counters & More",
-  description:
-    "Free X (Twitter) tools for posts, threads, bios, fonts, hashtags, character counts, previews, header sizes and engagement stats. No signup, then schedule.",
-});
+export function generateMetadata() {
+  return toolMetadata({
+    path: PATH,
+    title: "Free X (Twitter) Tools: Threads, Bios, Counters & More",
+    description:
+      networkAvailability("x") === "live"
+        ? "Free X (Twitter) tools for posts, threads, bios, fonts, hashtags, character counts, previews, header sizes and engagement stats. No signup, then schedule."
+        : "Free X (Twitter) tools for posts, threads, bios, fonts, hashtags, character counts, previews, header sizes and engagement stats. No signup needed.",
+  });
+}
 
 type Tool = { href: string; name: string; text: string };
 
@@ -193,8 +197,10 @@ export default function XToolsPage() {
           <p className="lede">
             X, formerly Twitter, is the microblogging network where you post short updates and threads. These free X
             tools cover every step: write the post or thread, check the character count and preview, build your bio and
-            profile, find hashtags, measure engagement and pick when to publish. Draft and check everything here, then
-            schedule it with {BRAND.name}.
+            profile, find hashtags, measure engagement and pick when to publish.{" "}
+            {state === "live"
+              ? `Draft and check everything here, then schedule it with ${BRAND.name}.`
+              : `Draft and check everything here, then post from the X app. X publishing in ${BRAND.name} is ${availabilityPhrase(state, "X")}.`}
           </p>
           <div className={t.heroCtas}>
             <Link className="btn btn-dark" href="/x-scheduler">
