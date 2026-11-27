@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import XPostPreview from "./XPostPreview";
+
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/x-post-preview",
@@ -149,8 +152,23 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function XPostPreviewPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          faqs: config.faqs.map((f) =>
+            f.q === "Can I schedule X posts?"
+              ? {
+                  ...f,
+                  a: `Not yet. X publishing in Poskoo is ${availabilityPhrase(state, "X")}. Until then, preview your draft here, copy it and post it on X yourself.`,
+                }
+              : f,
+          ),
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <XPostPreview />
     </ToolPageTemplate>
   );
