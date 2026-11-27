@@ -14,12 +14,16 @@ const PATH = "/tools/tiktok-tools";
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
 
-export const metadata = toolMetadata({
-  path: PATH,
-  title: "Free TikTok Tools: Captions, Hashtags, Sizes & Ideas",
-  description:
-    "Free TikTok tools for captions, hooks, hashtags, video ideas, bios, usernames and video sizes. Use them in your browser, then schedule in Poskoo.",
-});
+export function generateMetadata() {
+  return toolMetadata({
+    path: PATH,
+    title: "Free TikTok Tools: Captions, Hashtags, Sizes & Ideas",
+    description:
+      networkAvailability("tiktok") === "live"
+        ? "Free TikTok tools for captions, hooks, hashtags, video ideas, bios, usernames and video sizes. Use them in your browser, then schedule in Poskoo."
+        : "Free TikTok tools for captions, hooks, hashtags, video ideas, bios, usernames and video sizes. Use them free in your browser with no signup or download.",
+  });
+}
 
 type Tool = { href: string; name: string; text: string };
 
