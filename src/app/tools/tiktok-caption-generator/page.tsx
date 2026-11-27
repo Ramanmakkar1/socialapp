@@ -274,6 +274,22 @@ export default function TikTokCaptionGeneratorPage() {
                 : section
             ),
           },
+          faqs: config.faqs.map((faq) =>
+            faq.q === "When is the best time to post my TikTok caption and video?"
+              ? {
+                  ...faq,
+                  aNode: (
+                    <>
+                      Use the{" "}
+                      <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder to get
+                      three starting slots for your audience and time zone, then test them and keep what works. Once you
+                      have a slot, post it from the TikTok app; publishing in the{" "}
+                      <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state, "TikTok")}.
+                    </>
+                  ),
+                }
+              : faq
+          ),
         };
   return (
     <ToolPageTemplate
