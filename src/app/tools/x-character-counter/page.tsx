@@ -4,6 +4,9 @@ import { networkAvailability, availabilityPhrase } from "@/components/ChannelSta
 import t from "@/components/tools/tools.module.css";
 import XCharCounter from "./XCharCounter";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const limitRows: [string, string][] = [
   ["Standard post", "280 weighted characters"],
   ["X Premium post", "25,000 weighted characters"],
