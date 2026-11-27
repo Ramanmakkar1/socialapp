@@ -4,6 +4,9 @@ import t from "@/components/tools/tools.module.css";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import CaptionGeneratorTool from "../instagram-caption-generator/CaptionGeneratorTool";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/tiktok-caption-generator",
   name: "TikTok caption generator",
