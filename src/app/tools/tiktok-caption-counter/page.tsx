@@ -4,6 +4,9 @@ import { networkAvailability, availabilityPhrase } from "@/components/ChannelSta
 import t from "@/components/tools/tools.module.css";
 import TikTokCaptionCounter from "./TikTokCaptionCounter";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const limitRows: [string, string][] = [
   ["Caption", "4,000 characters"],
   ["Bio", "80 characters"],
