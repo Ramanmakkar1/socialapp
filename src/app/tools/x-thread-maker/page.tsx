@@ -1,5 +1,9 @@
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import ThreadMaker from "./ThreadMaker";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/x-thread-maker",
@@ -149,8 +153,10 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function XThreadMakerPage() {
+  const state = networkAvailability("x");
+  const pageConfig = state === "live" ? config : { ...config, faqs: config.faqs.map((f) => f.q === "Can I schedule a thread?" ? { ...f, a: `Not yet. X publishing in Poskoo is ${availabilityPhrase(state, "X")}. Until then, copy each post and publish the thread from the X app.` } : f) };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <ThreadMaker />
     </ToolPageTemplate>
   );

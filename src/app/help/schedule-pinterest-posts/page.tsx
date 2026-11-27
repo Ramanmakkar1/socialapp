@@ -3,8 +3,12 @@ import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule Pinterest Pins in Poskoo: Step-by-Step Help" },
@@ -43,7 +47,7 @@ const steps = [
     text: "Write a Pin title and description, then add an optional destination link as a full http:// or https:// web address.",
     body: (
       <>
-        Write a Pin <strong>title</strong> and <strong>description</strong>, then add an optional destination link as a
+        Write a Pin <strong>title</strong> and <Link className={s.vlink} href="/tools/pinterest-description-generator"><strong>description</strong></Link>, then add an optional destination link as a
         full http:// or https:// web address so the Pin can send readers to your product, article or page.
       </>
     ),
@@ -53,7 +57,7 @@ const steps = [
     text: "Add one image or a carousel of up to five images. Each file can be a JPG or PNG up to 20 MB. Poskoo schedules image Pins only, not video Pins.",
     body: (
       <>
-        Add one image or a <strong>carousel of up to five images</strong>. Each file can be a JPG or PNG up to 20 MB.
+        Add <Link className={s.vlink} href="/tools/pinterest-pin-size-checker">one image</Link> or a <strong>carousel of up to five images</strong>. Each file can be a JPG or PNG up to 20 MB.
         Pinterest publishing currently supports image Pins only, not video Pins.
       </>
     ),
@@ -63,7 +67,7 @@ const steps = [
     text: "Choose when the Pin should go out. Times are shown in your browser's time zone, so the Pin publishes when you expect it to.",
     body: (
       <>
-        Choose when the Pin should go out. Times are shown in your browser&apos;s time zone, so the Pin publishes when
+        Choose <Link className={s.vlink} href="/tools/best-time-to-post-on-pinterest">when the Pin should go out</Link>. Times are shown in your browser&apos;s time zone, so the Pin publishes when
         you expect it to.
       </>
     ),
@@ -99,15 +103,15 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
+const faqJsonLdFor = (list: typeof faqs) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
+  mainEntity: list.map((f) => ({
     "@type": "Question",
     name: f.q,
     acceptedAnswer: { "@type": "Answer", text: f.a },
   })),
-};
+});
 
 const howToJsonLd = {
   "@context": "https://schema.org",
@@ -132,6 +136,21 @@ const related = [
 ];
 
 export default function SchedulePinterestPostsHelpPage() {
+  const state = networkAvailability("pinterest");
+  const pageFaqs =
+    state === "live"
+      ? faqs
+      : faqs.map((f) =>
+          f.q === "Can I schedule Pinterest Pins with Poskoo?"
+            ? {
+                ...f,
+                a: `Not yet. Pinterest publishing in Poskoo is ${availabilityPhrase(
+                  state,
+                  "Pinterest"
+                )}. Once it is switched on, connect Pinterest, pick a board, add an image and Pin details, then choose a publishing time.`,
+              }
+            : f
+        );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
@@ -145,7 +164,7 @@ export default function SchedulePinterestPostsHelpPage() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(pageFaqs)).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
         <div className={s.heroText}>
@@ -155,8 +174,16 @@ export default function SchedulePinterestPostsHelpPage() {
             </h1>
           <p className="lede">
             To schedule a Pinterest Pin, connect Pinterest with its official login in {BRAND.name}, pick a destination
-            board, add an image, title and link, then choose a date and time. {BRAND.name} creates the Pin through the
-            official Pinterest API at that moment. Here is exactly how it works, step by step.
+            board, add an image, title and link, then choose a date and time. {state === "live" ? (
+              <>
+                {BRAND.name} creates the Pin through the official Pinterest API at that moment.
+              </>
+            ) : (
+              <>
+                Pinterest publishing in {BRAND.name} is {availabilityPhrase(state, "Pinterest")}, so these steps work
+                once it is switched on.
+              </>
+            )} Here is exactly how it works, step by step.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
@@ -254,7 +281,7 @@ export default function SchedulePinterestPostsHelpPage() {
             <h2>FAQ</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {pageFaqs.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

@@ -6,9 +6,13 @@ import { AnimArt } from "@/components/AnimArt";
 import { ToolCta, ToolFaqSection, toolMetadata } from "@/components/tools/ToolPageTemplate";
 import { faqJsonLd, ldJson } from "@/components/tools/seo";
 import { toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import t from "@/components/tools/tools.module.css";
 
 const PATH = "/tools/x-tools";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 export const metadata = toolMetadata({
   path: PATH,
@@ -95,52 +99,64 @@ const groups: { id: string; title: string; intro: string; tools: Tool[] }[] = [
 
 const allTools = groups.flatMap((g) => g.tools);
 
-const faqs = [
-  {
-    q: "What are the best free X tools?",
-    a: "The best free X tools are the ones that fix the job in front of you: a post generator and thread maker for writing, a character counter and post preview for checking, a bio and font generator for your profile, a header size checker for images, a hashtag generator for reach, an engagement rate calculator for stats and a best-time guide for planning. This hub groups all of them by task so you can start with the one you need.",
-    aNode: (
-      <>
-        The best free X tools are the ones that fix the job in front of you: a post generator and thread maker for
-        writing, a character counter and post preview for checking, a bio and font generator for your profile, a header
-        size checker for images, a hashtag generator for reach, an engagement rate calculator for stats and a best-time
-        guide for planning. This hub groups all of them by task so you can start with the one you need.
-      </>
-    ),
-  },
-  {
-    q: "Are these X (Twitter) tools free?",
-    a: `Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by ${BRAND.name}, a social media scheduler with X scheduling, which has its own free plan if you want to schedule what you create.`,
-    aNode: (
-      <>
-        Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by {BRAND.name}, a
-        social media scheduler with X scheduling, which has its own free plan if you want to schedule what you create.
-      </>
-    ),
-  },
-  {
-    q: "How do I schedule an X post with Poskoo?",
-    a: `Draft your post or thread here, then open the X scheduler to add it to your calendar. Connect your X account through the official login, pick a date and time, and ${BRAND.name} publishes it for you. You can create a free account to start.`,
-    aNode: (
-      <>
-        Draft your post or thread here, then open the <Link href="/x-scheduler">X scheduler</Link> to add it to your
-        calendar. Connect your X account through the official login, pick a date and time, and {BRAND.name} publishes it
-        for you. You can <Link href="/signup">create a free account</Link> to start.
-      </>
-    ),
-  },
-  {
-    q: "Do these tools upload my text or images?",
-    a: "No. Every tool runs in your browser and nothing is uploaded to a server. Size checkers read your image locally, and text tools only work on what you type. Your files stay on your device until you choose to upload them to X yourself or schedule them in Poskoo.",
-    aNode: (
-      <>
-        No. Every tool runs in your browser and nothing is uploaded to a server. Size checkers read your image locally,
-        and text tools only work on what you type. Your files stay on your device until you choose to upload them to X
-        yourself or schedule them in Poskoo.
-      </>
-    ),
-  },
-];
+function faqsFor(state: ReturnType<typeof networkAvailability>) {
+  const notLive = state !== "live";
+  const xPhrase = availabilityPhrase(state, "X");
+
+  return [
+    {
+      q: "What are the best free X tools?",
+      a: "The best free X tools are the ones that fix the job in front of you: a post generator and thread maker for writing, a character counter and post preview for checking, a bio and font generator for your profile, a header size checker for images, a hashtag generator for reach, an engagement rate calculator for stats and a best-time guide for planning. This hub groups all of them by task so you can start with the one you need.",
+      aNode: (
+        <>
+          The best free X tools are the ones that fix the job in front of you: a post generator and thread maker for
+          writing, a character counter and post preview for checking, a bio and font generator for your profile, a header
+          size checker for images, a hashtag generator for reach, an engagement rate calculator for stats and a best-time
+          guide for planning. This hub groups all of them by task so you can start with the one you need.
+        </>
+      ),
+    },
+    {
+      q: "Are these X (Twitter) tools free?",
+      a: `Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by ${BRAND.name}, a social media scheduler${notLive ? "" : " with X scheduling"}, which has its own free plan if you want to schedule what you create.`,
+      aNode: (
+        <>
+          Yes. Every tool on this page is free to use with no signup and no usage limit. They are made by {BRAND.name}, a
+          social media scheduler{notLive ? "" : " with X scheduling"}, which has its own free plan if you want to schedule what you create.
+        </>
+      ),
+    },
+    {
+      q: "How do I schedule an X post with Poskoo?",
+      a: notLive
+        ? `Not yet. X publishing in Poskoo is ${xPhrase}. Until then, draft and check your post here and publish it from the X app.`
+        : `Draft your post or thread here, then open the X scheduler to add it to your calendar. Connect your X account through the official login, pick a date and time, and ${BRAND.name} publishes it for you. You can create a free account to start.`,
+      aNode: notLive ? (
+        <>
+          Not yet. X publishing in Poskoo is {xPhrase}. Until then, draft and check your post here and publish it from
+          the X app.
+        </>
+      ) : (
+        <>
+          Draft your post or thread here, then open the <Link href="/x-scheduler">X scheduler</Link> to add it to your
+          calendar. Connect your X account through the official login, pick a date and time, and {BRAND.name} publishes it
+          for you. You can <Link href="/signup">create a free account</Link> to start.
+        </>
+      ),
+    },
+    {
+      q: "Do these tools upload my text or images?",
+      a: "No. Every tool runs in your browser and nothing is uploaded to a server. Size checkers read your image locally, and text tools only work on what you type. Your files stay on your device until you choose to upload them to X yourself or schedule them in Poskoo.",
+      aNode: (
+        <>
+          No. Every tool runs in your browser and nothing is uploaded to a server. Size checkers read your image locally,
+          and text tools only work on what you type. Your files stay on your device until you choose to upload them to X
+          yourself or schedule them in Poskoo.
+        </>
+      ),
+    },
+  ];
+}
 
 const itemListJsonLd = {
   "@context": "https://schema.org",
@@ -163,6 +179,8 @@ const softwareJsonLd = toolSoftwareJsonLd({
 });
 
 export default function XToolsPage() {
+  const state = networkAvailability("x");
+  const faqs = faqsFor(state);
   return (
     <PublicShell breadcrumbs={[{ name: "X tools", path: PATH }]}>
       {[itemListJsonLd, softwareJsonLd, faqJsonLd(faqs)].map((data, i) => (
@@ -242,7 +260,10 @@ export default function XToolsPage() {
           cta={{
             title: "Draft it here,",
             mark: "schedule it on X.",
-            text: `${BRAND.name} publishes your posts and threads on time on the official X API, so you can plan a week of posts in one sitting.`,
+            text:
+              state === "live"
+                ? `${BRAND.name} publishes your posts and threads on time on the official X API, so you can plan a week of posts in one sitting.`
+                : `X publishing in ${BRAND.name} is ${availabilityPhrase(state, "X")}. Draft and check your post here and publish it from the X app for now.`,
           }}
         />
       </div>

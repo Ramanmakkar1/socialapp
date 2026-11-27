@@ -107,7 +107,7 @@ export const body: GuideBody = {
             <li><strong>Why it is cheap:</strong> one flat price, not per channel. Five accounts on Pro cost the same as two.</li>
             <li><strong>Cons:</strong> the free plan has fewer posts than Buffer&apos;s or Publer&apos;s. {POSKOO.pendingSentence} Auto-DM is Instagram only.</li>
           </ul>
-          <p><strong>Best for:</strong> creators and small businesses on 3 to 5 accounts who also want comment-to-DM.</p>
+          <p><strong>Best for:</strong> <Link href="/social-media-scheduler-for-creators">creators</Link> and small businesses on 3 to 5 accounts who also want comment-to-DM.</p>
 
           <h3>2. Meta Business Suite: free for Facebook and Instagram</h3>
           <p>
@@ -209,7 +209,7 @@ export const body: GuideBody = {
             <li><strong>Price:</strong> Bootstrap is $29/mo or $290/yr for 5 profiles and 1 user. Accelerate is $49/mo or $490/yr for 10 profiles. A 14-day trial needs no card.</li>
             <li><strong>Cons:</strong> the priciest entry plan on this list, and no free plan.</li>
           </ul>
-          <p><strong>Best for:</strong> businesses with an evergreen library to reuse.</p>
+          <p><strong>Best for:</strong> businesses with an evergreen library to reuse. Moving off it? See our <Link href="/socialbee-alternative">SocialBee alternative</Link>.</p>
         </>
       ),
     },

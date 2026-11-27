@@ -164,6 +164,7 @@ const jsonLd = (aiReady: boolean) => ({
 export default async function FeaturesPage() {
   const cardPaymentsReady = featureReadiness("card_payments", process.env).ready;
   const aiReady = await isFeatureReadyNow("ai");
+  const aiRepliesReady = await isFeatureReadyNow("ai_replies");
   const faqs = featuresFaqs(aiReady);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Features", path: "/features" }]}>
@@ -326,7 +327,7 @@ export default async function FeaturesPage() {
               <Link className="btn btn-line" href="/signup">
                 {aiReady ? "Try AI captions free" : "Start free, write captions yourself"} <span aria-hidden="true">&rarr;</span>
               </Link>
-              {aiReady ? <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p> : null}
+              {aiReady && !aiRepliesReady ? <p className="small">AI replies are not available in Poskoo yet; current AI features generate captions and DM message ideas for your review.</p> : null}
               <p className="small">See how it fits together on the <Link className={s.vlink} href="/ai-social-media-manager">AI social media manager</Link> page, reply from one <Link className={s.vlink} href="/social-media-inbox">social media inbox</Link> and track results with <Link className={s.vlink} href="/social-media-analytics">social media analytics</Link>.</p>
             </div>
             <div className="art">

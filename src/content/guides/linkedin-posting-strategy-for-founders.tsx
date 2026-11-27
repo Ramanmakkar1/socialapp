@@ -241,7 +241,7 @@ export const body: GuideBody = {
           </Callout>
           <p>
             Each one opens with a clear line, gives something useful in the middle and ends with a question or a simple
-            ask. None of them needs hashtags to make sense. If you add any, keep it to a couple of specific ones.
+            ask. None of them needs hashtags to make sense. If you add any, keep it to <Link href="/tools/linkedin-hashtag-generator">a couple of specific ones</Link>.
           </p>
         </>
       ),

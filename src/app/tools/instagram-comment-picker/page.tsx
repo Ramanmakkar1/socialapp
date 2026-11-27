@@ -12,9 +12,9 @@ const config: ToolPageConfig = {
     "Free Instagram comment picker: paste giveaway comments, filter by keyword and tagged friends, keep one entry per person and pick up to 10 random winners.",
   pill: "Free · no login · comments never leave your browser",
   h1: { before: "Instagram comment", mark: "picker", after: "for giveaways" },
-  lede: "Paste the comments from your giveaway post, filter by keyword and tagged friends, and pick random winners in seconds. No Instagram login, no scraping.",
+  lede: "An Instagram comment picker chooses random giveaway winners from your post's comments. Paste the comments, filter by keyword and tagged friends, and pick up to 10 winners in seconds, with no Instagram login and no scraping.",
   art: "card-dm",
-  artLabel: "A relaxed creator on a beanbag while DMs fly out of his phone to followers",
+  artLabel: "A creator relaxes on a beanbag while messages fly from a phone to followers",
   heroPoints: ["Up to 10 winners", "One entry per person", "No login"],
   toolTitle: "Pick your giveaway winner",
   toolNote: "Free · comments stay in your browser",
@@ -101,7 +101,7 @@ const config: ToolPageConfig = {
         body: (
           <ul>
             <li>
-              <b>Write the rules in the caption:</b> what counts as an entry, the deadline, who can enter and what the
+              <b>Write the rules in the <Link href="/tools/instagram-caption-generator">caption</Link>:</b> what counts as an entry, the deadline, who can enter and what the
               prize is.
             </li>
             <li>

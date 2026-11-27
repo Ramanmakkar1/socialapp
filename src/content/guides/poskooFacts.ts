@@ -5,7 +5,7 @@
 // revalidate every 10 minutes.
 import { PLANS, type Plan } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
-import { getPlatformCopy, listText } from "@/lib/platform-support";
+import { getPlatformCopy, listText, pendingNetworksText } from "@/lib/platform-support";
 
 const plan = (name: string) => PLANS.find((p) => p.name === name) as Plan;
 const yearly = (p: Plan) => (p.yearly ?? "").match(/\$\d+/)?.[0] ?? "";
@@ -14,7 +14,7 @@ const agency = plan("Agency");
 
 const { paidPlans } = planReadiness();
 const copy = getPlatformCopy();
-const pending = [...copy.awaiting, ...copy.soon.filter((l) => ["TikTok", "Pinterest", "X"].includes(l))];
+const pendingIds = copy.catalog.filter((e) => !e.live && (e.awaiting || ["tiktok", "pinterest", "x"].includes(e.id))).map((e) => e.id);
 
 export const POSKOO = {
   paidPlans,
@@ -29,8 +29,6 @@ export const POSKOO = {
   paidLead: paidPlans ? "" : "Pro and Agency are launching soon. ",
   /** Live social networks, e.g. "Instagram, Facebook Pages, Threads and YouTube". */
   socialNetworks: listText(copy.live.social),
-  /** "TikTok, Pinterest and X are waiting on platform approval." (or "") */
-  pendingSentence: pending.length
-    ? `${listText(pending)} ${pending.length === 1 ? "is" : "are"} not live yet: ${pending.length === 1 ? "it is" : "they are"} waiting on platform approval.`
-    : "",
+  /** "TikTok and Pinterest are built and waiting on platform approval; X is coming soon." */
+  pendingSentence: pendingNetworksText(pendingIds, copy.catalog),
 };

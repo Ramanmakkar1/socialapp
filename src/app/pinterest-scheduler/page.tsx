@@ -3,7 +3,8 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
-import { ChannelStatusNote, networkAvailability } from "@/components/ChannelStatusNote";
+import { ChannelStatusNote, availabilityPhrase, networkAvailability, type NetworkAvailability } from "@/components/ChannelStatusNote";
+import { getPlatformCopy } from "@/lib/platform-support";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
@@ -72,10 +73,14 @@ const steps = [
   },
 ];
 
-const faqs = [
+function faqsFor(availability: NetworkAvailability) {
+  const isLive = availability === "live";
+  return [
   {
     q: "Can I schedule Pinterest Pins with Poskoo?",
-    a: "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time. Poskoo creates the Pin through the official Pinterest API when it is due.",
+    a: isLive
+      ? "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time. Poskoo creates the Pin through the official Pinterest API when it is due."
+      : `Not yet. Pinterest publishing is ${availabilityPhrase(availability, "Pinterest")}. Once it is switched on, connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time; Poskoo creates the Pin through the official Pinterest API. ${getPlatformCopy().liveText} work today.`,
   },
   {
     q: "Do I need to give Poskoo my Pinterest password?",
@@ -93,14 +98,16 @@ const faqs = [
     q: "Can I edit or reschedule a Pinterest Pin before it publishes?",
     a: "Yes. You can edit, reschedule or delete a scheduled post from the queue before it publishes. If publishing fails, the queue shows the error and lets you retry after fixing the issue.",
   },
-];
+  ];
+}
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} Pinterest scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
+function appJsonLdFor(desc: string) {
+  return {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} Pinterest scheduler`,
+      description: desc,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
   featureList: [
     "Pinterest board selection",
     "Pin titles up to 100 characters and descriptions up to 500 characters",
@@ -111,11 +118,15 @@ const appJsonLd = {
   ],
   // Paid offers only once Pro/Agency checkout is live, matching /pricing.
   offers: softwareOffers(planReadiness()),
-};
+  };
+}
 
 export default function PinterestSchedulerPage() {
   const availability = networkAvailability("pinterest");
   const isLive = availability === "live";
+  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
+  const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Pick the date and time. Once Pinterest approves Poskoo, the Pin will be created through the official Pinterest API when it is due, with a published or failed status so you can retry if needed." } : st);
+  const faqs = faqsFor(availability);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Pinterest scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -180,7 +191,7 @@ export default function PinterestSchedulerPage() {
               <p className="eyebrow">How Pinterest scheduling works</p>
               <h2>Schedule your first <em className="s mark">Pinterest Pin.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>
@@ -242,7 +253,7 @@ export default function PinterestSchedulerPage() {
             <h2>Plan Pinterest next to <em className="s">Instagram on one calendar.</em></h2>
             <p>
               Select Pinterest and Instagram in the same composer, tailor the copy for each channel, and review the
-              week or month without switching between separate planning tools. Scheduled posts stay in one queue where
+              week or month without switching between separate planning tools such as <Link className={s.vlink} href="/tailwind-alternative">Tailwind</Link>. Scheduled posts stay in one queue where
               you can edit, reschedule or delete them before they go live.
             </p>
           </div>

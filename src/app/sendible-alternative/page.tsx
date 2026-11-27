@@ -3,9 +3,11 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -33,8 +35,8 @@ const compare: [string, string, string, string][] = [
   [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+  ["AI caption ideas", "Built, launching soon", "Check their site", "Check their site"],
+  ["AI DM message ideas", "Built, launching soon", "Check their site", "Check their site"],
   ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
   ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
@@ -44,14 +46,16 @@ const faqs = [
   { q: "What is Sendible?", a: "Sendible is a social media management tool aimed at agencies. For its exact features and plans, see their site — this page focuses on what Poskoo does." },
   { q: "Can I move my Sendible schedule to Poskoo?", a: `Not yet. Recreate your upcoming posts in the ${BRAND.name} calendar and rebuild your queue there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
 
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
@@ -59,10 +63,15 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function SendibleAlternative() {
+export default async function SendibleAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const compareRows: [string, string, string, string][] = compare.map((r) =>
+    r[0].startsWith("AI ") && ai ? [r[0], "Yes", r[2], r[3]] : r
+  );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Sendible alternative", path: "/sendible-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(faqItems)).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
@@ -72,7 +81,7 @@ export default function SendibleAlternative() {
             A Sendible alternative that also <em className="s">auto-DMs every comment</em>
           </h1>
           <p className="lede">
-            {BRAND.name} is a good Sendible alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. Capture their email, write captions with AI and track every lead.
+            {BRAND.name} is a good Sendible alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. Capture their email{ai ? ", write captions with AI" : ""} and track every lead.
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -120,7 +129,7 @@ export default function SendibleAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, sendible, combo]) => (
+                {compareRows.map(([label, ours, sendible, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -162,7 +171,7 @@ export default function SendibleAlternative() {
             <h2>Sendible alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

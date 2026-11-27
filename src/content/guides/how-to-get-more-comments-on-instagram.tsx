@@ -193,7 +193,7 @@ export const body: GuideBody = {
             ]}
           />
           <p>
-            A good rhythm is mostly question posts, with a keyword post when you have something worth sending. If every
+            A good rhythm is mostly question posts, with <Link href="/tools/instagram-comment-keyword-tester">a keyword post</Link> when you have something worth sending. If every
             post asks for a keyword, the comment section turns into a wall of one-word replies and loses the
             conversation that makes people stay.
           </p>
@@ -221,8 +221,7 @@ export const body: GuideBody = {
               <strong>Use their name and details.</strong> Mention what they said, so the reply could only be for them.
             </li>
             <li>
-              <strong>Answer questions fully.</strong> If the answer is long, reply briefly and offer to send more by
-              DM.
+              <strong>Answer questions fully.</strong> If the answer is long, reply briefly and offer to <Link href="/tools/instagram-dm-link-generator">send more by DM</Link>.
             </li>
             <li>
               <strong>Handle criticism calmly.</strong> Thank people for honest feedback, fix what is fair and move on.

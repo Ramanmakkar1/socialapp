@@ -11,6 +11,7 @@ import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: "Linktree Alternative With Click Tracking & Auto-DM | Poskoo" },
@@ -82,6 +83,17 @@ const faqJsonLd = {
   mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Linktree alternative`,
+    description:
+      "A free Linktree alternative: build a link-in-bio page at poskoo.com/@yourname, track clicks on every link, and auto-DM people who comment on your posts.",
+    url: `${BRAND.canonicalUrl}/linktree-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/linktree-alternative#software`,
+  featureList: ["Link-in-bio page", "Click tracking on every link", "Comment-to-DM automation"],
+};
+
 const steps = [
   {
     n: "1",
@@ -110,6 +122,7 @@ export default function LinktreeAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Linktree alternative", path: "/linktree-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">

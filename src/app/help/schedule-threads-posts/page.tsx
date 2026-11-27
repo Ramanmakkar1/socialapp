@@ -54,7 +54,7 @@ const steps = [
   },
   {
     name: "Write your text",
-    body: <>Write the post you want to publish, up to 500 characters.</>,
+    body: <>Write the post you want to publish, up to{" "}<Link className={s.vlink} href="/tools/threads-character-counter">500 characters</Link>.</>,
   },
   {
     name: "Add one image or one video link (optional)",
@@ -69,7 +69,11 @@ const steps = [
     name: "Select Threads and pick a date and time",
     body: (
       <>
-        Select Threads as the channel, then choose the date and time for the post and press <strong>Schedule</strong>.
+        Select Threads as the channel, then choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-threads">
+          date and time
+        </Link>
+        {" "}for the post and press <strong>Schedule</strong>.
       </>
     ),
   },

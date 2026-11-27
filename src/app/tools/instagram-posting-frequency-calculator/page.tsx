@@ -91,7 +91,7 @@ const config: ToolPageConfig = {
               feels easy.
             </li>
             <li>
-              <b>Mix formats by job.</b> Many creators use Reels to reach new people, carousels and feed posts for
+              <b>Mix formats by job.</b> Many <Link href="/social-media-scheduler-for-creators">creators</Link> use Reels to reach new people, carousels and feed posts for
               saves, and Stories to stay visible to existing followers.
             </li>
             <li>

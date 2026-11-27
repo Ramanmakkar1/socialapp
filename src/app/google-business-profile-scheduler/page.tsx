@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
+import { networkAvailability } from "@/components/ChannelStatusNote";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
@@ -16,14 +17,19 @@ export const revalidate = 600;
 const PATH = "/google-business-profile-scheduler";
 const title = `Google Business Profile Scheduler: Schedule Posts | ${BRAND.name}`;
 const description = "Schedule Google Business Profile posts, offers and events to your locations with the official API. Add a photo and a button like Book or Call. Free plan.";
+const SOON_DESCRIPTION = "Plan Google Business Profile posts, offers and events in Poskoo. Publishing is built and waiting on Google's approval; Instagram and Facebook work today.";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: title },
-  description,
-  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
-  twitter: { card: "summary_large_image", title, description },
-});
+// The description only says publishing works once Google Business Profile is live (src/lib/platform-support.ts).
+export async function generateMetadata(): Promise<Metadata> {
+  const desc = networkAvailability("gbp") === "live" ? description : SOON_DESCRIPTION;
+  return withSocial({
+    title: { absolute: title },
+    description: desc,
+    alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+    openGraph: { title, description: desc, url: new URL(PATH, BRAND.canonicalUrl).toString() },
+    twitter: { card: "summary_large_image", title, description: desc },
+  });
+}
 
 const features = [
   {
@@ -76,10 +82,13 @@ const steps = [
   },
 ];
 
-const faqs = [
+function faqsFor(isLive: boolean) {
+  return [
   {
     q: "Can I schedule Google Business Profile posts?",
-    a: "Yes. Poskoo schedules Google Business Profile posts through Google's official Business Profile API. Connect your Google account, pick a location, write the post and choose a publishing time. Posting is built and waiting for Google's app-by-app API approval, so you can sign up now and connect as soon as it is switched on.",
+    a: isLive
+      ? "Yes. Poskoo schedules Google Business Profile posts through Google's official Business Profile API. Connect your Google account, pick a location, write the post and choose a publishing time."
+      : "Not yet. Google Business Profile publishing in Poskoo is built and waiting for Google's API approval. Once it is switched on, you connect your Google account, pick a location, write the post and choose a publishing time. You can sign up now and connect as soon as it is live.",
   },
   {
     q: "Which post types can I schedule?",
@@ -97,12 +106,13 @@ const faqs = [
     q: "Do you need my Google password?",
     a: "No. You connect through Google's official sign-in and approve the business.manage permission. Poskoo never asks for, stores or scrapes your Google password.",
   },
-];
+  ];
+}
 
-const appJsonLd = {
+const appJsonLdFor = (desc: string) => ({
   ...toolSoftwareJsonLd({
     name: `${BRAND.name} Google Business Profile scheduler`,
-    description,
+    description: desc,
     url: `${BRAND.canonicalUrl}${PATH}`,
   }),
   featureList: [
@@ -116,9 +126,13 @@ const appJsonLd = {
   ],
   // Paid offers only once Pro/Agency checkout is live, matching /pricing.
   offers: softwareOffers(planReadiness()),
-};
+});
 
 export default function GoogleBusinessProfileSchedulerPage() {
+  const isLive = networkAvailability("gbp") === "live";
+  const stepList = isLive ? steps : steps.map((st) => st.n === "4" ? { ...st, text: "Choose the date and time. Once Google approves Poskoo, the local post will be created through Google's official Business Profile API when it is due, with a published or failed status." } : st);
+  const faqs = faqsFor(isLive);
+  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Google Business Profile scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -131,14 +145,20 @@ export default function GoogleBusinessProfileSchedulerPage() {
 
       <header className="hero">
         <div className={s.heroText}>
-        <span className="pill">Official Google Business Profile API · No password needed</span>
+        <span className="pill">{isLive ? "Official Google Business Profile API · No password needed" : "Official Google Business Profile API · Not live yet"}</span>
         <p className="eyebrow">Google Business Profile scheduler</p>
         <h1>
           Google Business Profile <em className="s mark">scheduler</em>
         </h1>
+        {isLive ? (
         <p className="lede">
           Yes, you can schedule Google Business Profile posts: connect your business with Google&apos;s official sign-in, write an update, offer or event post, pick a location and time, and Poskoo publishes it through the Business Profile API. The Free plan is $0 with no credit card.
         </p>
+        ) : (
+        <p className="lede">
+          Google Business Profile scheduling in Poskoo is built and waiting on Google&apos;s API approval. Once it&apos;s approved you&apos;ll connect your business with Google&apos;s official sign-in, write an update, offer or event post, pick a location and time, and Poskoo will publish it through the Business Profile API. The Free plan is $0 with no credit card.
+        </p>
+        )}
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start scheduling GBP posts <span aria-hidden="true">→</span></Link>
           <Link className="btn btn-line" href="/pricing">See plans and pricing</Link>
@@ -202,7 +222,7 @@ export default function GoogleBusinessProfileSchedulerPage() {
               <p className="eyebrow">How Google Business Profile scheduling works</p>
               <h2>Schedule your first <em className="s mark">Google post.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>

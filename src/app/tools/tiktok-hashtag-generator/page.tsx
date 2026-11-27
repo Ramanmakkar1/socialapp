@@ -106,7 +106,7 @@ const config: ToolPageConfig = {
           <ul>
             <li>
               <b>Name the topic in words.</b> TikTok search reads captions and on-screen text, so say what the video is
-              about in plain words in the caption and as text on the video, and let hashtags add context.
+              about in plain words in the <Link href="/tools/tiktok-caption-generator">caption</Link> and as text on the video, and let hashtags add context.
             </li>
             <li>
               <b>Relevance over reach.</b> A tag that matches the video brings viewers who care about the topic. A popular

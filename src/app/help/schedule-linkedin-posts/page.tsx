@@ -34,7 +34,8 @@ const steps = [
     text: "Write the post text, then add media. LinkedIn takes JPEG or PNG images up to 10 MB each, or one MP4/MOV video between 3 seconds and 30 minutes, up to 200 MB. Poskoo publishes text and images today.",
     body: (
       <>
-        Write the post text, then add media. LinkedIn takes JPEG or PNG images up to 10 MB each, or one MP4/MOV video
+        Write the{" "}
+        <Link className={s.vlink} href="/tools/linkedin-text-formatter">post text</Link>, then add media. LinkedIn takes JPEG or PNG images up to 10 MB each, or one MP4/MOV video
         between 3 seconds and 30 minutes, up to 200 MB. {BRAND.name} publishes text and images today.
       </>
     ),
@@ -44,7 +45,11 @@ const steps = [
     text: "Choose the date and time for the post. Times are shown in your browser's time zone, so the post goes out when you expect it to.",
     body: (
       <>
-        Choose the date and time for the post. Times are shown in your browser&apos;s time zone, so the post goes out
+        Choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-linkedin">
+          date and time
+        </Link>{" "}
+        for the post. Times are shown in your browser&apos;s time zone, so the post goes out
         when you expect it to.
       </>
     ),
@@ -163,7 +168,7 @@ export default function ScheduleLinkedInPostsHelpPage() {
                 &quot;Sign In with LinkedIn&quot; and &quot;Share on LinkedIn&quot; permissions.
               </li>
               <li>
-                Your post text, and optionally JPEG or PNG images up to 10 MB each. {BRAND.name} publishes text and
+                Your post text, and optionally <Link className={s.vlink} href="/tools/linkedin-post-image-size-checker">JPEG or PNG images</Link> up to 10 MB each. {BRAND.name} publishes text and
                 images to LinkedIn today.
               </li>
             </ul>

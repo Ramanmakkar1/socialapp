@@ -72,10 +72,13 @@ const steps = [
   },
 ];
 
-const faqs = [
+function faqsFor(isLive: boolean) {
+  return [
   {
     q: "How do I schedule a tweet on X?",
-    a: "Connect your X account with X's official OAuth sign-in, write the post, add up to 4 images or one video, and pick a date and time. Poskoo publishes the post through X's official API when it is due.",
+    a: isLive
+      ? "Connect your X account with X's official OAuth sign-in, write the post, add up to 4 images or one video, and pick a date and time. Poskoo publishes the post through X's official API when it is due."
+      : "Publishing to X in Poskoo is coming soon. Once it is on, you connect your X account with X's official OAuth sign-in, write the post, add up to 4 images or one video, and pick a date and time, and Poskoo publishes it through X's official API.",
   },
   {
     q: "Do I need to give Poskoo my X password?",
@@ -93,29 +96,36 @@ const faqs = [
     q: "What happens if a scheduled post fails?",
     a: "The post shows a published or failed status. If X rate-limits the post, the status says so, and you can retry it later.",
   },
-];
+  ];
+}
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} X scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  featureList: [
-    "X post text composer",
-    "Up to 4 images or 1 video per post",
-    "Images up to 5 MB and video up to 512 MB",
-    "Official X v2 chunked media upload",
-    "Week and month content calendar",
-    "Published or failed status with retries",
-  ],
-  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
-  offers: softwareOffers(planReadiness()),
-};
+function appJsonLdFor(desc: string) {
+  return {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} X scheduler`,
+      description: desc,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    featureList: [
+      "X post text composer",
+      "Up to 4 images or 1 video per post",
+      "Images up to 5 MB and video up to 512 MB",
+      "Official X v2 chunked media upload",
+      "Week and month content calendar",
+      "Published or failed status with retries",
+    ],
+    // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+    offers: softwareOffers(planReadiness()),
+  };
+}
 
 export default function XSchedulerPage() {
   const availability = networkAvailability("x");
   const isLive = availability === "live";
+  const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Choose the date and time. Once publishing to X is switched on, Poskoo will publish through X's official API when the post is due, with a published or failed status so you can retry if needed." } : st);
+  const featureList = isLive ? features : features.map((f) => f.no === "01 / Text" ? { ...f, text: "Add the text for your tweet, then choose when it should go out. Once publishing to X is switched on, Poskoo will send it to X at the scheduled time, so you can plan ahead instead of posting live." } : f);
+  const appJsonLd = appJsonLdFor(availability === "live" ? description : SOON_DESCRIPTION);
+  const faqs = faqsFor(isLive);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "X scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -161,7 +171,7 @@ export default function XSchedulerPage() {
             <h2>What you can <em className="s">schedule on X.</em></h2>
           </div>
           <div className="cards">
-            {features.map((feature) => (
+            {featureList.map((feature) => (
               <article key={feature.title} className="pcard">
                 <span className="no">{feature.no}</span>
                 <h3>{feature.title.replace(/-/g, "\u2011")}</h3>
@@ -179,7 +189,7 @@ export default function XSchedulerPage() {
               <p className="eyebrow">How X scheduling works</p>
               <h2>Schedule your first <em className="s mark">post on X.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>

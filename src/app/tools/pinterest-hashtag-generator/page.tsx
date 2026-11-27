@@ -2,6 +2,10 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import HashtagGenerator from "../instagram-hashtag-generator/HashtagGenerator";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/pinterest-hashtag-generator",
@@ -236,8 +240,37 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function PinterestHashtagGeneratorPage() {
+  const state = networkAvailability("pinterest");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Check the Pin before you schedule it"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Hashtags are only one part of a Pin. Write the description with the{" "}
+                        <Link href="/tools/pinterest-description-generator">Pinterest description generator</Link>, check
+                        the title, description and alt text limits with the{" "}
+                        <Link href="/tools/pinterest-character-counter">Pinterest character counter</Link>, and make
+                        sure the image fits the feed with the{" "}
+                        <Link href="/tools/pinterest-pin-size-checker">Pinterest pin size checker</Link>. When the Pin is
+                        ready, create it on Pinterest. Publishing in the{" "}
+                        <Link href="/pinterest-scheduler">Pinterest scheduler</Link> is {availabilityPhrase(state, "Pinterest")}.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <HashtagGenerator platform="pinterest" />
     </ToolPageTemplate>
   );

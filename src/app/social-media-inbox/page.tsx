@@ -7,6 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, publisherRef } from "@/lib/tool-schema";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -15,7 +16,7 @@ export const revalidate = 600;
 const PATH = "/social-media-inbox";
 const title = "Social Media Inbox: All Comments & DMs in One Place";
 const description =
-  "A social media inbox brings every comment and DM from all your channels into one shared place, with AI suggestions, keyword automation and lead capture.";
+  "A social media inbox brings every comment and DM from all your channels into one shared place, with keyword automation and lead capture.";
 
 export const metadata: Metadata = withSocial({
   title: { absolute: title },
@@ -90,8 +91,6 @@ const faqs = [
   },
 ];
 
-const faqLd = faqJsonLd(faqs);
-
 const appJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -111,13 +110,30 @@ const appJsonLd = {
   publisher: publisherRef(),
 };
 
-export default function SocialMediaInboxPage() {
+export default async function SocialMediaInboxPage() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai
+    ? faqs
+    : faqs.map((f) =>
+        f.q === "How do AI reply suggestions work?"
+          ? {
+              ...f,
+              a: "AI reply suggestions are built but not switched on yet. Until they are, you read and answer every conversation yourself in the inbox, and keyword rules still send your saved reply and link automatically.",
+            }
+          : f
+      );
+  const faqLd = faqJsonLd(faqItems);
+  const appLd = {
+    ...appJsonLd,
+    featureList: appJsonLd.featureList.filter((f) => ai || f !== "AI reply suggestions"),
+  };
+
   return (
     <PublicShell
       className={`${s.sched} ${s.pub}`}
       breadcrumbs={[{ name: "Social media inbox", path: PATH }]}
     >
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqLd) }} />
 
       <header className="hero">
@@ -130,8 +146,7 @@ export default function SocialMediaInboxPage() {
           <p className="lede">
             A social media inbox is one place where you read and answer every comment and direct
             message from all your connected accounts. {BRAND.name} brings Instagram, Facebook and
-            Threads conversations into one shared list, then helps you reply faster with AI
-            suggestions and keyword automation.
+            Threads conversations into one shared list, {ai ? "then helps you reply faster with AI suggestions and keyword automation." : "then helps you reply faster with keyword automation."}
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/app/inbox">
@@ -174,7 +189,17 @@ export default function SocialMediaInboxPage() {
             </p>
           </div>
           <div className="cards">
-            {features.map((feature) => (
+            {(ai
+              ? features
+              : features.map((feature) =>
+                  feature.no === "02 / AI replies"
+                    ? {
+                        ...feature,
+                        text: "AI reply suggestions are built and launching soon. Until then you write each reply yourself, and keyword automation answers the repeat questions.",
+                      }
+                    : feature
+                )
+            ).map((feature) => (
               <article key={feature.title} className="pcard">
                 <span className="no">{feature.no}</span>
                 <h3>{feature.title}</h3>
@@ -231,7 +256,7 @@ export default function SocialMediaInboxPage() {
             <h2>Social media inbox questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq) => (
+            {faqItems.map((faq) => (
               <details key={faq.q}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>

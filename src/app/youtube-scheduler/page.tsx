@@ -9,6 +9,7 @@ import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -117,9 +118,22 @@ const appJsonLd = {
 };
 
 export default function YouTubeSchedulerPage() {
+  const tiktok = networkAvailability("tiktok");
+  const tiktokLive = tiktok === "live";
+
+  const pageFaqs = faqs.map((faq) => {
+    if (faq.q === "Can I post the same video to TikTok and Instagram Reels too?" && !tiktokLive) {
+      return {
+        ...faq,
+        a: `Instagram Reels, yes: select YouTube and Instagram in the same composer and tailor each version before scheduling. TikTok publishing is ${availabilityPhrase(tiktok, "TikTok")}, so post the TikTok version from the TikTok app for now.`,
+      };
+    }
+    return faq;
+  });
+
   return (
-    <PublicShell className={s.sched} breadcrumbs={[{ name: "YouTube scheduler", path: PATH }]}>
-      {[appJsonLd, faqJsonLd(faqs)].map((data) => (
+    <PublicShell className={s.sched} breadcrumbs={[{ name: "YouTube scheduler", path: PATH }]}>  
+      {[appJsonLd, faqJsonLd(pageFaqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -282,7 +296,7 @@ export default function YouTubeSchedulerPage() {
             <h2>Shorts, privacy and publishing</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq, index) => (
+            {pageFaqs.map((faq, index) => (
               <details key={faq.q} open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>

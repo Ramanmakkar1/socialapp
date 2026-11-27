@@ -64,7 +64,11 @@ const steps = [
     name: "Write your caption",
     body: (
       <>
-        Write the caption that will appear under the Reel. If you run a comment-to-DM rule, put your keyword in the
+        Write the{" "}
+        <Link className={s.vlink} href="/tools/instagram-caption-generator">
+          caption
+        </Link>{" "}
+        that will appear under the Reel. If you run a comment-to-DM rule, put your keyword in the
         caption so viewers know what to comment.
       </>
     ),
@@ -73,7 +77,8 @@ const steps = [
     name: "Pick a date and time, then Schedule",
     body: (
       <>
-        Choose the date and time in your own time zone (the composer shows your time zone under the field), then press{" "}
+        Choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">date and time</Link> in your own time zone (the composer shows your time zone under the field), then press{" "}
         <strong>Schedule</strong>.
       </>
     ),

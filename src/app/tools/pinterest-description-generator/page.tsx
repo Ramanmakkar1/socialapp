@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import CaptionGeneratorTool from "../instagram-caption-generator/CaptionGeneratorTool";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/pinterest-description-generator",
@@ -69,8 +72,19 @@ const config: ToolPageConfig = {
             </p>
             <p>
               The descriptions come from fixed writing templates in your browser. The tool does <b>not use AI</b>,
-              upload your text or scrape Pinterest. When a description is ready, plan the Pin on the calendar with the{" "}
-              <Link href="/pinterest-scheduler">Pinterest scheduler</Link>.
+              upload your text or scrape Pinterest.{" "}
+              {networkAvailability("pinterest") === "live" ? (
+                <>
+                  When a description is ready, plan the Pin on the calendar with the{" "}
+                  <Link href="/pinterest-scheduler">Pinterest scheduler</Link>.
+                </>
+              ) : (
+                <>
+                  When a description is ready, paste it into your Pin. Pinterest publishing in the{" "}
+                  <Link href="/pinterest-scheduler">Pinterest scheduler</Link> is{" "}
+                  {availabilityPhrase(networkAvailability("pinterest"), "Pinterest")}.
+                </>
+              )}
             </p>
           </>
         ),
@@ -194,8 +208,10 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function PinterestDescriptionGeneratorPage() {
+  const state = networkAvailability("pinterest");
+  const pageConfig = state === "live" ? config : { ...config, faqs: config.faqs.map((f) => f.q === "Can I schedule Pins with Poskoo?" ? { ...f, a: `Not yet. Pinterest publishing in Poskoo is ${availabilityPhrase(state, "Pinterest")}. Until then, copy the description and add it when you create the Pin on Pinterest.` } : f) };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <CaptionGeneratorTool platform="pinterest" />
     </ToolPageTemplate>
   );

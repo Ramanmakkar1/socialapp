@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import t from "@/components/tools/tools.module.css";
 import TikTokCaptionCounter from "./TikTokCaptionCounter";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const limitRows: [string, string][] = [
   ["Caption", "4,000 characters"],
@@ -68,7 +72,7 @@ const config: ToolPageConfig = {
         title: "What is the TikTok caption character limit?",
         body: (
           <p>
-            TikTok captions can be up to <b>4,000 characters</b>. Hashtags, mentions, spaces, punctuation and line breaks
+            TikTok captions can be up to <b>4,000 characters</b>. <Link href="/tools/tiktok-hashtag-generator">Hashtags</Link>, mentions, spaces, punctuation and line breaks
             all count toward that total. This counter uses code points, so a standalone emoji such as 😀 counts as one
             character rather than two UTF-16 code units.
           </p>
@@ -154,8 +158,34 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function TikTokCaptionCounterPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How do I schedule a checked TikTok caption?"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Finish your caption here, then post it from the TikTok app. Publishing in the{" "}
+                        <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state, "TikTok")};{" "}
+                        the{" "}
+                        <Link href="/help/schedule-tiktok-posts">step-by-step TikTok scheduling guide</Link> shows the
+                        setup once it is live.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <TikTokCaptionCounter />
     </ToolPageTemplate>
   );

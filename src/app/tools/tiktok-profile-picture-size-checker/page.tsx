@@ -181,10 +181,7 @@ const config: ToolPageConfig = {
             <li>Using an image smaller than 200 × 200 px, which can look soft in the app.</li>
             <li>Putting a logo or face in a corner where the circle cuts it off.</li>
             <li>Using a busy background that makes a small circular avatar hard to read.</li>
-            <li>
-              Changing the photo whenever you remember. Plan profile updates with the{" "}
-              <Link href="/tiktok-scheduler">TikTok scheduler</Link>.
-            </li>
+            <li>Changing the photo often. Keep one clear photo so viewers recognise your videos in the feed.</li>
           </ul>
         ),
       },

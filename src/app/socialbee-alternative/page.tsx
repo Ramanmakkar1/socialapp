@@ -3,14 +3,17 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -33,7 +36,7 @@ const compare: [string, string, string, string][] = [
   [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
+  ["AI caption ideas", "Built, launching soon", "Check their site", "Check their site"],
   ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
   ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
   ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
@@ -44,13 +47,30 @@ const faqs = [
   { q: "What is SocialBee?", a: "SocialBee is a social media scheduler built around content categories. For its exact features and plans, see their site — this page focuses on what Poskoo does." },
   { q: "Can I import my SocialBee categories?", a: `Not yet. Recreate your posts in the ${BRAND.name} calendar and rebuild your categories there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
+
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} SocialBee alternative`,
+    description: "A SocialBee alternative that schedules social posts and auto-DMs Instagram keyword commenters, with email capture.",
+    url: `${BRAND.canonicalUrl}/socialbee-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/socialbee-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
 };
 
 function Cell({ v }: { v: string }) {
@@ -59,10 +79,14 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function SocialBeeAlternative() {
+export default async function SocialBeeAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string, string] => row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row);
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "SocialBee alternative", path: "/socialbee-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLdFor(faqItems)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
@@ -72,7 +96,7 @@ export default function SocialBeeAlternative() {
             A SocialBee alternative that also <em className="s">auto-DMs every comment</em>
           </h1>
           <p className="lede">
-            {BRAND.name} is a good SocialBee alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. Capture their email, write captions with AI and track every lead.
+            {BRAND.name} is a good SocialBee alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. {ai ? "Capture their email, write captions with AI and track every lead." : "Capture their email and track every lead."}
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -120,7 +144,7 @@ export default function SocialBeeAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, socialbee, combo]) => (
+                {compareRows.map(([label, ours, socialbee, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -162,7 +186,7 @@ export default function SocialBeeAlternative() {
             <h2>SocialBee alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

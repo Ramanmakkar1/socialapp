@@ -81,14 +81,17 @@ const comparison = [
   { task: "Recovering from a failed post", manual: "Start again from the app", scheduled: "Fix the cause and retry the failed post" },
 ];
 
-const faqs = [
+function faqsFor(isLive: boolean) {
+  return [
   {
     q: "Is it safe to connect TikTok to Poskoo?",
     a: "Yes. Poskoo uses TikTok's official Login Kit and Content Posting API. You sign in on TikTok, approve publishing access, and never give Poskoo your TikTok password. You can revoke access from your TikTok account at any time.",
   },
   {
     q: "Can I schedule TikTok photo posts?",
-    a: "Yes, up to 35 photos in one post. The photos must be uploaded in Poskoo rather than linked from another site, because TikTok only pulls photo posts from our verified media domain. A photo post uses the first caption line as its title (up to 90 characters) and the rest as the description (up to 4,000 characters).",
+    a: isLive
+      ? "Yes, up to 35 photos in one post. The photos must be uploaded in Poskoo rather than linked from another site, because TikTok only pulls photo posts from our verified media domain. A photo post uses the first caption line as its title (up to 90 characters) and the rest as the description (up to 4,000 characters)."
+      : "TikTok publishing is built and waiting for TikTok's approval. Once it is switched on, photo posts take up to 35 photos. The photos must be uploaded in Poskoo rather than linked from another site, because TikTok only pulls photo posts from our verified media domain. A photo post uses the first caption line as its title (up to 90 characters) and the rest as the description (up to 4,000 characters).",
   },
   {
     q: "What video length and size does TikTok accept?",
@@ -102,29 +105,36 @@ const faqs = [
     q: "Is there a free plan?",
     a: "Yes. Every account starts on the $0 Free plan with 2 social accounts and 10 scheduled posts per month. No credit card is needed to sign up. Pro and Agency add more accounts, unlimited scheduling and more auto-DMs.",
   },
-];
+  ];
+}
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} TikTok scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  featureList: [
-    "TikTok video and photo post scheduling",
-    "Videos from 3 seconds to 10 minutes, up to 1 GB",
-    "Photo posts with up to 35 photos",
-    "Visibility, comment, Duet and Stitch options",
-    "Week and month content calendar",
-    "Instagram, Threads and Facebook Page scheduling in the same queue",
-  ],
-  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
-  offers: softwareOffers(planReadiness()),
-};
+function appJsonLdFor(desc: string, isLive: boolean) {
+  return {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} TikTok scheduler`,
+      description: desc,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    featureList: [
+      isLive ? "TikTok video and photo post scheduling" : "TikTok video and photo post planning (publishing awaiting TikTok approval)",
+      "Videos from 3 seconds to 10 minutes, up to 1 GB",
+      "Photo posts with up to 35 photos",
+      "Visibility, comment, Duet and Stitch options",
+      "Week and month content calendar",
+      "Instagram, Threads and Facebook Page scheduling in the same queue",
+    ],
+    // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+    offers: softwareOffers(planReadiness()),
+  };
+}
 
 export default function TikTokSchedulerPage() {
   const availability = networkAvailability("tiktok");
   const isLive = availability === "live";
+  const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Choose the date and time. Once TikTok approves Poskoo, the post will publish through TikTok's Content Posting API when it is due, with a published or failed status you can retry." } : st);
+  const comparisonRows = isLive ? comparison : comparison.map((row) => row.task === "Posting while busy or offline" ? { ...row, scheduled: "Once TikTok approves Poskoo, the worker will publish at the scheduled time" } : row);
+  const faqs = faqsFor(isLive);
+  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION, isLive);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "TikTok scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
@@ -154,8 +164,9 @@ export default function TikTokSchedulerPage() {
         </p>
         )}
         <p className="lede">
-          Upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it
-          while you are busy.
+          {isLive
+            ? "Upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it while you are busy."
+            : "Once it is on, you will upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it while you are busy."}
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -198,7 +209,7 @@ export default function TikTokSchedulerPage() {
               <p className="eyebrow">How TikTok scheduling works</p>
               <h2>Schedule your first <em className="s mark">TikTok post.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>
@@ -239,7 +250,7 @@ export default function TikTokSchedulerPage() {
                 </tr>
               </thead>
               <tbody>
-                {comparison.map((row) => (
+                {comparisonRows.map((row) => (
                   <tr key={row.task}>
                     <td className={s.td} style={{ fontWeight: 600 }}>{row.task}</td>
                     <td className={s.td}>{row.manual}</td>

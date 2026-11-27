@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import CaptionGeneratorTool from "../instagram-caption-generator/CaptionGeneratorTool";
+
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/x-post-generator",
@@ -150,8 +153,23 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function XPostGeneratorPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          faqs: config.faqs.map((f) =>
+            f.q === "Can I schedule X posts with Poskoo?"
+              ? {
+                  ...f,
+                  a: `Not yet. X publishing in Poskoo is ${availabilityPhrase(state, "X")}. Until then, copy a draft from this generator and post it on X yourself.`,
+                }
+              : f,
+          ),
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <CaptionGeneratorTool platform="x" />
     </ToolPageTemplate>
   );

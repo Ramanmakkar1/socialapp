@@ -67,7 +67,7 @@ export const homePageJsonLd = (
       featureList: [
         "Social media post scheduling calendar",
         "Instagram comment-to-DM automation",
-        "AI caption drafting",
+        ...(r.ai ? ["AI caption drafting"] : []),
         "Lead capture by email in the DM",
         "Instagram link-in-bio page",
         "Analytics for reach, comments, DMs, link clicks and leads",

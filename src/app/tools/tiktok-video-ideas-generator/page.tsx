@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import PostIdeasGenerator from "../instagram-post-ideas-generator/PostIdeasGenerator";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/tiktok-video-ideas-generator",
@@ -213,8 +216,50 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function TikTokVideoIdeasGeneratorPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          faqs: config.faqs.map((f) =>
+            f.q === "Can I schedule these TikTok videos automatically?"
+              ? {
+                  ...f,
+                  a: `Not yet. TikTok publishing in Poskoo is ${availabilityPhrase(state, "TikTok")}. Until then, copy an idea, film the video and post it from the TikTok app.`,
+                }
+              : f,
+          ),
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How often should you post on TikTok?"
+                ? {
+                    ...section,
+                    body: (
+                      <>
+                        <p>
+                          There is no single number that works for every account. A practical starting point is <b>three
+                          to five videos a week</b>, posted consistently, then adjust based on what your audience watches
+                          and saves.
+                        </p>
+                        <p>
+                          Consistency matters more than volume: a steady schedule you can keep beats a burst of posts
+                          followed by a quiet month. Pick a few days that fit your filming time, use the{" "}
+                          <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder to
+                          choose a starting time, and post from the TikTok app. TikTok publishing in the{" "}
+                          <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state,
+                          "TikTok")}.
+                        </p>
+                      </>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <PostIdeasGenerator platform="tiktok" />
     </ToolPageTemplate>
   );

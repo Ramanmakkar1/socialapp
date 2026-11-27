@@ -137,7 +137,7 @@ export const body: GuideBody = {
               public.
             </li>
             <li>
-              <strong>Highlights:</strong> save the Stories about your freebie to a highlight called &quot;Free
+              <strong>Highlights:</strong> save the Stories about your freebie to a <Link href="/tools/instagram-highlight-cover-maker">highlight</Link> called &quot;Free
               guide&quot; so new visitors find it any time.
             </li>
           </ul>

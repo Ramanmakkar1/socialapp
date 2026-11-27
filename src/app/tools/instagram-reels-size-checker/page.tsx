@@ -65,7 +65,7 @@ const config: ToolPageConfig = {
           <>
             <p>
               The best Instagram Reels size is <b>1080 × 1920 pixels</b> in a <b>9:16 vertical frame</b>. That fills a
-              phone screen without cropping or black bars and is the size most creators export for Reels.
+              phone screen without cropping or black bars and is the size most <Link href="/social-media-scheduler-for-creators">creators</Link> export for Reels.
             </p>
             <ul>
               <li>

@@ -14,7 +14,7 @@ const config: ToolPageConfig = {
   h1: { before: "Instagram comment-to-DM", mark: "flow preview" },
   lede: "See how a keyword comment becomes an Instagram DM before you set up a rule. Edit every step and the simulated flow updates in your browser, without contacting Instagram.",
   art: "card-dm",
-  artLabel: "A relaxed creator on a beanbag while DMs fly out of his phone to followers",
+  artLabel: "A relaxed creator on a beanbag previews the auto-DM a commenter will get, with DMs flying from their phone",
   heroPoints: ["Contains or exact match", "Optional email step", "Nothing is sent"],
   toolTitle: "Preview your comment-to-DM flow",
   toolNote: "Free · preview only, not a live Meta connection",

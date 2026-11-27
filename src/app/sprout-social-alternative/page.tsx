@@ -6,12 +6,15 @@ import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
 import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -19,7 +22,7 @@ export const revalidate = 600;
 export const metadata: Metadata = withSocial({
   title: { absolute: "Sprout Social Alternative for Instagram Auto-DM | Poskoo" },
   description:
-    "A Sprout Social alternative that schedules Instagram posts and auto-DMs every keyword comment, with email capture, AI captions and lead export in one tool.",
+    "A Sprout Social alternative that schedules Instagram posts and auto-DMs every keyword comment, with email capture and lead export in one tool.",
   alternates: { canonical: "/sprout-social-alternative" },
 });
 
@@ -29,13 +32,14 @@ const whyLook = [
   { no: "03 / Leads", title: "Leads from scheduled content", text: "Ask for an email in the DM before the link is sent, so posts you planned weeks ahead can still fill a lead list." },
 ];
 
+const AI_ROW = "AI DM message ideas";
 const compare: [string, string, string][] = [
   ["Instagram scheduling", "Yes", "Yes"],
   ["Visual calendar", "Yes", "Yes"],
   ["Facebook & Threads publishing", "Yes", "Yes"],
   ["Comment→DM keyword automation", "Yes", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site"],
+  [AI_ROW, "Built, launching soon", "Check their site"],
   ["Lead CSV export", "Yes", "Check their site"],
   ["Price", priceSummary(planReadiness()), "Per-seat pricing"],
 ];
@@ -55,10 +59,17 @@ const faqs = [
   { q: "Does it use the official APIs only?", a: OFFICIAL_API_ANSWER },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
+
+const appJsonLd = {
+  ...toolSoftwareJsonLd({ name: `${BRAND.name} Sprout Social alternative`, description: "A Sprout Social alternative that schedules Instagram posts and auto-DMs keyword commenters, with email capture and lead export.", url: `${BRAND.canonicalUrl}/sprout-social-alternative` }),
+  "@id": `${BRAND.canonicalUrl}/sprout-social-alternative#software`,
 };
 
 function Cell({ v }: { v: string }) {
@@ -67,10 +78,14 @@ function Cell({ v }: { v: string }) {
   return <span>{v}</span>;
 }
 
-export default function SproutSocialAlternative() {
+export default async function SproutSocialAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const compareRows = compare.map((row): [string, string, string] => (row[0] === AI_ROW && ai ? [row[0], "Yes", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Sprout Social alternative", path: "/sprout-social-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(faqItems)).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
@@ -127,7 +142,7 @@ export default function SproutSocialAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, theirs]) => (
+                {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -156,7 +171,7 @@ export default function SproutSocialAlternative() {
             <h2>Sprout Social alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

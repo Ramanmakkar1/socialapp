@@ -63,7 +63,8 @@ const steps = [
     text: "Choose the date and time in your own time zone. The composer shows your time zone under the field.",
     body: (
       <>
-        Choose the date and time in your own time zone — the composer shows your time zone under the field, so the
+        Choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">date and time</Link> in your own time zone — the composer shows your time zone under the field, so the
         Story publishes when you expect it to.
       </>
     ),
@@ -215,7 +216,7 @@ export default function ScheduleInstagramStoriesHelpPage() {
           <div className={s.prose}>
             <h2>Story sizes</h2>
             <p>
-              Use 9:16 vertical, 1080 × 1920 px recommended. Keep text and key details out of the top and bottom edges
+              Use 9:16 vertical, <Link className={s.vlink} href="/tools/instagram-story-size-checker">1080 × 1920 px</Link> recommended. Keep text and key details out of the top and bottom edges
               where the Instagram interface sits — check your layout with the{" "}
               <Link className={s.vlink} href="/tools/instagram-safe-zone-checker">
                 Story safe zone checker

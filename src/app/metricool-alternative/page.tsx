@@ -3,9 +3,11 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -65,14 +67,16 @@ const faqs = [
   { q: "Can I import my Metricool schedule?", a: `There is no Metricool import yet. Add your upcoming posts to the ${BRAND.name} calendar. Most teams rebuild the next one to two weeks of posts in under ten minutes.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
   { q: "Is there a free plan?", a: `Yes. The Free plan is $0 and includes Instagram scheduling and 500 auto-DMs a month. Every account starts on it, and you can upgrade to Pro or Agency any time.` },
-  { q: "Does it use the official APIs only?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs only?", a: OFFICIAL_API_ANSWER },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
 
 const appJsonLd = {
   ...toolSoftwareJsonLd({
@@ -90,11 +94,13 @@ function Cell({ v }: { v: string }) {
   return <span>{v}</span>;
 }
 
-export default function MetricoolAlternative() {
+export default async function MetricoolAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Metricool alternative", path: "/metricool-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLdFor(faqItems)) }} />
 
       {/* Hero */}
       <header className="hero">
@@ -182,7 +188,7 @@ export default function MetricoolAlternative() {
             <h2>Metricool alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

@@ -14,7 +14,7 @@ const config: ToolPageConfig = {
   h1: { before: "Instagram comment", mark: "keyword tester" },
   lede: "Check which comments would trigger your auto-DM keyword before you publish the rule. The tester uses the same matching code as Poskoo's in-app rule editor.",
   art: "card-dm",
-  artLabel: "A relaxed creator on a beanbag while DMs fly out of his phone to followers",
+  artLabel: "A relaxed creator on a beanbag tests comment keywords as DMs fly from their phone to followers",
   heroPoints: ["Contains or exact match", "Same logic as live rules", "No login"],
   toolTitle: "Test your comment keywords",
   toolNote: "Free · local simulation only",

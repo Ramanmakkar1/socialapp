@@ -6,7 +6,9 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -108,27 +110,9 @@ const faqs = [
   },
   {
     q: "Which platforms does Poskoo support?",
-    a: "Poskoo schedules Instagram, Facebook Pages, Threads, YouTube, LinkedIn, TikTok, Pinterest, X, Bluesky and Mastodon from one calendar. Instagram comment-to-DM automation runs on the official Instagram API.",
+    a: PLATFORMS_ANSWER,
   },
 ];
-
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} AI social media manager`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  "@id": `${BRAND.canonicalUrl}${PATH}#software`,
-  featureList: [
-    "AI caption ideas in the post composer",
-    "Per-platform captions and media for one post",
-    "AI DM reply suggestions from saved instructions",
-    "Auto-DM keyword rules with email lead capture",
-    "Reach, engagement, clicks, DMs and leads analytics",
-    "CSV export of captured contacts",
-  ],
-  offers: softwareOffers(planReadiness()),
-};
 
 const webPageJsonLd = {
   "@context": "https://schema.org",
@@ -141,10 +125,33 @@ const webPageJsonLd = {
   about: { "@id": `${BRAND.canonicalUrl}${PATH}#software` },
 };
 
-export default function AiSocialMediaManagerPage() {
+export default async function AiSocialMediaManagerPage() {
+  const ai = await isFeatureReadyNow("ai");
+  const aiReplies = await isFeatureReadyNow("ai_replies");
+
+  const faqItems = faqs.map((f) => f.q !== "Which AI features are included?" || ai ? f : { ...f, a: "AI caption ideas and DM message ideas are built and launching soon. Until they are switched on, you write captions and replies yourself, and AI replies stay off until you enable them." });
+
+  const appJsonLd = {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} AI social media manager`,
+      description,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    "@id": `${BRAND.canonicalUrl}${PATH}#software`,
+    featureList: [
+      ...(ai ? ["AI caption ideas in the post composer"] : []),
+      "Per-platform captions and media for one post",
+      ...(aiReplies ? ["AI DM reply suggestions from saved instructions"] : []),
+      "Auto-DM keyword rules with email lead capture",
+      "Reach, engagement, clicks, DMs and leads analytics",
+      "CSV export of captured contacts",
+    ],
+    offers: softwareOffers(planReadiness()),
+  };
+
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "AI social media manager", path: PATH }]}>
-      {[appJsonLd, webPageJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd, webPageJsonLd, faqJsonLd(faqItems)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -246,7 +253,7 @@ export default function AiSocialMediaManagerPage() {
             <h2>AI features, publishing and lead capture</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq, index) => (
+            {faqItems.map((faq, index) => (
               <details key={faq.q} open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>
@@ -261,7 +268,7 @@ export default function AiSocialMediaManagerPage() {
           <div className="cta">
             <div>
               <h2>Draft, schedule and <em className="s">capture leads</em> in one place</h2>
-              <p>Start free, write your first post with AI ideas, and see the replies and leads land in one dashboard.</p>
+              <p>{ai ? "Start free, write your first post with AI ideas, and see the replies and leads land in one dashboard." : "Start free, write and schedule your first post, and see the replies and leads land in one dashboard."}</p>
               <Link className="btn" href="/signup">Start free <span aria-hidden="true">→</span></Link>
               {" "}
               <Link className="btn" href="/pricing">Compare plans</Link>

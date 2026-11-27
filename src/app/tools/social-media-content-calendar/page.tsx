@@ -2,6 +2,11 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import CalendarTemplate from "./CalendarTemplate";
+import { getPlatformCopy, listText } from "@/lib/platform-support";
+
+export const revalidate = 600;
+
+const planningOnly = getPlatformCopy().catalog.filter((e) => ["tiktok", "pinterest", "x"].includes(e.id) && !e.live).map((e) => e.label);
 
 const config: ToolPageConfig = {
   path: "/tools/social-media-content-calendar",
@@ -143,7 +148,7 @@ const config: ToolPageConfig = {
             A plan only helps if the posts go out. Once the week is set, add each post to Poskoo with its date, time and
             media: the <Link href="/instagram-scheduler">Instagram scheduler</Link> handles feed posts, Reels, carousels and
             Stories, and Poskoo also schedules Facebook Page, Threads, YouTube, LinkedIn, Bluesky and Mastodon posts.
-            TikTok, Pinterest and X rows in the template are for planning only for now.
+            {planningOnly.length ? ` ${listText(planningOnly)} rows in the template are for planning only for now.` : null}
           </p>
         ),
       },

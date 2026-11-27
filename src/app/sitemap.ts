@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { BRAND, isApprovedProductionOrigin } from "@/lib/brand";
 import { isPathIndexable } from "@/lib/indexability";
 import { PUBLIC_PATHS, META, type PublicPath } from "@/lib/public-pages";
+import { GUIDES } from "@/content/guides/registry";
 
 // Evaluate indexability per request so a build never freezes the staging noindex.
 export const dynamic = "force-dynamic";
@@ -21,6 +22,12 @@ function resolveSitemapLastModified(): Date {
 }
 
 export const SITEMAP_LAST_MODIFIED = resolveSitemapLastModified();
+
+// Each guide's real updated date as lastmod, so the sitemap shows when an
+// article was actually changed instead of the site-wide default date.
+const GUIDE_LASTMOD = new Map<string, Date>(
+  GUIDES.map((guide) => [`/guides/${guide.slug}`, new Date(`${guide.updated}T00:00:00Z`)]),
+);
 
 // The staging homepage URL that must never appear in the sitemap while the
 // site remains noindex. Named explicitly so the exclusion is visible at a
@@ -81,7 +88,7 @@ export function sitemapEntries(host?: string | null): MetadataRoute.Sitemap {
     .map((path) => {
       return {
         url: `${BRAND.url}${path}`,
-        lastModified: SITEMAP_LAST_MODIFIED,
+        lastModified: GUIDE_LASTMOD.get(path) ?? SITEMAP_LAST_MODIFIED,
         changeFrequency: META[path]?.changeFrequency ?? ("yearly" as const),
         priority: META[path]?.priority ?? 0.3,
       };

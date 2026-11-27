@@ -48,7 +48,7 @@ const steps = [
         <Link className={s.vlink} href="/app/calendar">
           calendar composer
         </Link>
-        , select Bluesky and write up to <strong>300 characters</strong>. Add up to <strong>4 images</strong>; images over
+        , select Bluesky and write up to <Link className={s.vlink} href="/tools/bluesky-character-counter"><strong>300 characters</strong></Link>. Add up to <strong>4 images</strong>; images over
         1 MB are shrunk automatically when possible. Links and resolvable @mentions become clickable, and the first link
         in a post without images becomes a <strong>link-preview card</strong>.
       </>
@@ -59,8 +59,8 @@ const steps = [
     text: "Choose when the post should go out. Times are shown in your browser's time zone, so the post publishes when you expect it to.",
     body: (
       <>
-        Choose when the post should go out. Times are shown in your browser&apos;s <strong>time zone</strong>, so the
-        post publishes when you expect it to.
+        Choose <Link className={s.vlink} href="/tools/best-time-to-post-on-bluesky">when the post should go out</Link>.
+        Times are shown in your browser&apos;s <strong>time zone</strong>, so the post publishes when you expect it to.
       </>
     ),
   },

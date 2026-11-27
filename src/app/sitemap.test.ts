@@ -326,8 +326,15 @@ test("sitemap uses one stable lastModified date across repeated calls", () => {
     const firstTimes = first.map((entry) => new Date(entry.lastModified as Date | string).getTime());
     const secondTimes = second.map((entry) => new Date(entry.lastModified as Date | string).getTime());
     assert.deepEqual(secondTimes, firstTimes, "repeated sitemap calls must return the same lastModified values");
-    for (const time of firstTimes) {
-      assert.equal(time, SITEMAP_LAST_MODIFIED.getTime(), "every entry must use SITEMAP_LAST_MODIFIED");
+    for (const entry of first) {
+      const path = entry.url.slice(BRAND.url.length) || "/";
+      const guide = GUIDES.find((g) => guidePath(g.slug) === path);
+      const expected = guide ? new Date(`${guide.updated}T00:00:00Z`).getTime() : SITEMAP_LAST_MODIFIED.getTime();
+      assert.equal(
+        new Date(entry.lastModified as Date | string).getTime(),
+        expected,
+        `${path} lastModified must be its guide's updated date or SITEMAP_LAST_MODIFIED`,
+      );
     }
   } finally {
     BRAND.indexable = was;

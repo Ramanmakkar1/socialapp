@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import { BRAND } from "@/lib/brand";
 import { featureReadiness } from "@/lib/featureReadiness";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
+import { networkAvailability } from "@/components/ChannelStatusNote";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -96,5 +97,23 @@ const content: AudiencePageContent = {
 };
 
 export default function SocialMediaSchedulerForCoachesPage() {
-  return <AudienceSchedulerPage c={content} />;
+  const linkedinPagesLive = networkAvailability("linkedin_pages") === "live";
+  const c = linkedinPagesLive
+    ? {
+        ...content,
+        faqs: content.faqs.map((faq) =>
+          faq.q === "Can I schedule LinkedIn posts as a coach?"
+            ? {
+                ...faq,
+                a: "Yes, to your personal LinkedIn profile and to LinkedIn company Pages you manage.",
+              }
+            : faq
+        ),
+        limits: content.limits.replace(
+          "Posting to LinkedIn company Pages is waiting for LinkedIn's approval, so only personal profiles work today. ",
+          ""
+        ),
+      }
+    : content;
+  return <AudienceSchedulerPage c={c} />;
 }

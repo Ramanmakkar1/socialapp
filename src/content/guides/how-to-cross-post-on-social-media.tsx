@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Callout, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { pendingNetworksText } from "@/lib/platform-support";
+
+const PENDING = pendingNetworksText(["tiktok", "x", "pinterest"]);
 
 // Platform limits are taken from official docs (Mastodon, Instagram) and Poskoo's own counter tools.
 // No invented reach numbers: tailoring advice is framed as practice, not a guaranteed result.
@@ -67,7 +70,7 @@ export const body: GuideBody = {
             <li><strong>Format and aspect ratio:</strong> vertical video, square image, landscape link card.</li>
             <li><strong>Length:</strong> each network has a different limit and a different sweet spot.</li>
             <li><strong>First line:</strong> the only part most people read before they decide.</li>
-            <li><strong>Hashtags:</strong> a few on Instagram, almost none on LinkedIn, CamelCase on Mastodon.</li>
+            <li><strong>Hashtags:</strong> <Link href="/tools/instagram-hashtag-generator">a few on Instagram</Link>, almost none on LinkedIn, CamelCase on Mastodon.</li>
             <li><strong>Links:</strong> clickable in some captions, dead text in others.</li>
             <li><strong>Mentions and tags:</strong> handles differ across networks, so check every @.</li>
             <li><strong>Tone:</strong> casual on Threads, professional on LinkedIn, direct on Bluesky.</li>
@@ -94,8 +97,10 @@ export const body: GuideBody = {
           </p>
           <Callout kind="warning" title="TikTok, X and Pinterest">
             <p>
-              The same tailoring applies to TikTok, X and Pinterest. In Poskoo, publishing to those three is waiting on
-              platform approval, so for now post there natively and use Poskoo for the networks above.
+              The same tailoring applies to TikTok, X and Pinterest.
+              {PENDING
+                ? ` In Poskoo: ${PENDING} Until then, post there natively and use Poskoo for the networks above.`
+                : " Poskoo publishes to all three, so you can schedule them next to the networks above."}
             </p>
           </Callout>
         </>
@@ -334,7 +339,8 @@ export const body: GuideBody = {
         <>
           <p>
             <Link href="/social-media-scheduler">Poskoo&apos;s social media scheduler</Link> is built for this workflow.
-            Today it publishes to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles, Bluesky and Mastodon.
+            Today it publishes to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles,{" "}
+            <Link href="/bluesky-scheduler">Bluesky</Link> and <Link href="/mastodon-scheduler">Mastodon</Link>.
           </p>
           <ol>
             <li>Write your main caption once and add your media.</li>

@@ -2,6 +2,10 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import CoverSizeChecker from "@/components/tools/CoverSizeChecker";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/x-header-size-checker",
@@ -203,8 +207,43 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function XHeaderSizeCheckerPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How to change your X header"
+                ? {
+                    ...section,
+                    body: (
+                      <>
+                        <p>
+                          On X, open your profile, tap <b>Edit profile</b> and choose the header image, or upload it from
+                          the profile settings on desktop. Select your 1500 × 500 file, drag it to frame the centre, and
+                          save.
+                        </p>
+                        <p>
+                          Before you upload, check the words with the{" "}
+                          <Link href="/tools/x-character-counter">X character counter</Link>, preview your next post with
+                          the{" "}
+                          <Link href="/tools/x-post-preview">X post preview</Link>, and compare other formats in the{" "}
+                          <Link href="/tools/social-media-image-sizes">social media image sizes guide</Link>. When the
+                          profile is ready, post the announcement from the X app. Publishing in the{" "}
+                          <Link href="/x-scheduler">X scheduler</Link> is {availabilityPhrase(state, "X")}.
+                        </p>
+                      </>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <CoverSizeChecker
         platform="X"
         targetW={1500}

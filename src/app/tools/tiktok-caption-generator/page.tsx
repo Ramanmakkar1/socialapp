@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import CaptionGeneratorTool from "../instagram-caption-generator/CaptionGeneratorTool";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/tiktok-caption-generator",
@@ -188,6 +192,13 @@ const config: ToolPageConfig = {
     {
       q: "Should TikTok captions include hashtags?",
       a: "They can, but hashtags are optional. Start with a caption that names the topic in plain words, then add a small set of relevant hashtags. Avoid tags that do not describe the video.",
+      aNode: (
+        <>
+          They can, but hashtags are optional. Start with a caption that names the topic in plain words, then add a{" "}
+          <Link href="/tools/tiktok-hashtag-generator">small set of relevant hashtags</Link>
+          . Avoid tags that do not describe the video.
+        </>
+      ),
     },
     {
       q: "Does this TikTok caption generator use AI?",
@@ -241,9 +252,51 @@ export const metadata = {
 };
 
 export default function TikTokCaptionGeneratorPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Turn your caption into a scheduled TikTok post"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        When a caption is ready, post it from the TikTok app. TikTok publishing in the{" "}
+                        <Link href="/tiktok-scheduler">TikTok scheduler</Link> is{" "}
+                        {availabilityPhrase(state, "TikTok")}; read{" "}
+                        <Link href="/guides/how-to-schedule-tiktok-videos">how to schedule TikTok videos</Link> for the
+                        other options today.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+          faqs: config.faqs.map((faq) =>
+            faq.q === "When is the best time to post my TikTok caption and video?"
+              ? {
+                  ...faq,
+                  aNode: (
+                    <>
+                      Use the{" "}
+                      <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder to get
+                      three starting slots for your audience and time zone, then test them and keep what works. Once you
+                      have a slot, post it from the TikTok app; publishing in the{" "}
+                      <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state, "TikTok")}.
+                    </>
+                  ),
+                }
+              : faq
+          ),
+        };
   return (
     <ToolPageTemplate
-      config={config}
+      config={pageConfig}
       afterTool={
         <section className={`${t.section} ${t.related}`}>
           <p className={t.prose}>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AnimArt } from "@/components/AnimArt";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import t from "@/components/tools/tools.module.css";
 import MoneyCalculator from "../instagram-money-calculator/MoneyCalculator";
 
@@ -232,7 +233,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Know your worth,",
     mark: "then land the brand deal.",
-    text: "Schedule your sponsored videos with Poskoo and DM everyone who comments your keyword, on the official TikTok API.",
+    text: "Schedule your sponsored videos with Poskoo, then auto-DM everyone who comments your keyword on Instagram through Meta's official API.",
   },
 };
 
@@ -278,8 +279,7 @@ const signupCta = (
         </h2>
         <p>
           Turn this estimate into a posting plan: schedule your sponsored videos, auto-DM
-          everyone who comments your keyword on Instagram, and let AI draft replies in your
-          voice.
+          everyone who comments your keyword on Instagram.
         </p>
         <Link className="btn btn-dark" href="/signup">
           Start free on Poskoo <span aria-hidden="true">→</span>
@@ -287,7 +287,7 @@ const signupCta = (
         <ul className="ctaChecks">
           <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Schedule posts on your calendar</li>
           <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Instagram comment-to-DM automation</li>
-          <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>AI replies in your voice</li>
+          <li><svg width="18" height="18" aria-hidden="true"><use href="#tool-ok" /></svg>Email capture in the DM</li>
         </ul>
       </div>
       <AnimArt name="card-schedule" label="A creator pins post cards onto a weekly calendar next to a smiling alarm clock" />
@@ -296,8 +296,46 @@ const signupCta = (
 );
 
 export default function TikTokMoneyCalculatorPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How do you grow TikTok income?"
+                ? {
+                    ...section,
+                    body: (
+                      <>
+                        <p>
+                          Brand deals and rewards both follow reach and engagement. Track your{" "}
+                          <Link href="/tools/tiktok-engagement-rate-calculator">TikTok engagement rate</Link> to see
+                          which videos hold attention, then post consistently so your best formats keep shipping (TikTok
+                          publishing in the <Link href="/tiktok-scheduler">TikTok scheduler</Link> is{" "}
+                          {availabilityPhrase(state, "TikTok")}), and use the{" "}
+                          <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to turn each
+                          video into a ready-to-post caption. See how to plan and schedule those videos in our guide to{" "}
+                          <Link href="/guides/how-to-schedule-tiktok-videos">scheduling TikTok videos</Link>.
+                        </p>
+                        <p>
+                          For more ways creators earn beyond one-off videos, read the{" "}
+                          <Link href="/guides/how-to-make-money-on-social-media-2026">
+                            guide to making money on social media in 2026
+                          </Link>
+                          .
+                        </p>
+                      </>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config} afterTool={payoutFactors} signupCta={signupCta}>
+    <ToolPageTemplate config={pageConfig} afterTool={payoutFactors} signupCta={signupCta}>
       <MoneyCalculator platform="tiktok" />
     </ToolPageTemplate>
   );

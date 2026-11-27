@@ -3,15 +3,28 @@ import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: "Schedule TikTok Videos in Poskoo: Step-by-Step Help" },
-  description:
-    `Step-by-step help for scheduling TikTok videos in ${BRAND.name}: connect TikTok with its login, upload a vertical video, set privacy, pick a time and publish.`,
-  alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.canonicalUrl).toString() },
-});
+export const revalidate = 600;
+
+const title = "Schedule TikTok Videos in Poskoo: Step-by-Step Help";
+
+const liveDescription =
+  "Step-by-step help for scheduling TikTok videos in Poskoo: connect TikTok with its login, upload a vertical video, set privacy, pick a time and publish.";
+
+const soonDescription =
+  "How to schedule TikTok videos in Poskoo: connect TikTok, upload a vertical video, set privacy and pick a time. Publishing awaits TikTok's approval.";
+
+export function generateMetadata(): Metadata {
+  const description = networkAvailability("tiktok") === "live" ? liveDescription : soonDescription;
+  return withSocial({
+    title: { absolute: title },
+    description,
+    alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.canonicalUrl).toString() },
+  });
+}
 
 const steps = [
   {
@@ -34,7 +47,7 @@ const steps = [
     body: (
       <>
         Upload a vertical MP4 or MOV video from 3 seconds to 10 minutes, up to 1 GB (250 MB on the Free plan), then
-        write your caption. A 9:16 video such as 1080×1920 looks best in the TikTok feed.
+        write your <Link className={s.vlink} href="/tools/tiktok-caption-generator">caption</Link>. A 9:16 video such as <Link className={s.vlink} href="/tools/tiktok-video-size-checker">1080×1920</Link> looks best in the TikTok feed.
       </>
     ),
   },
@@ -55,7 +68,7 @@ const steps = [
     text: "Choose the date and time for the video. Times are shown in your browser's time zone, so the post goes out when you expect it to.",
     body: (
       <>
-        Choose the date and time for the video. Times are shown in your browser&apos;s time zone, so the post goes out
+        Choose the <Link className={s.vlink} href="/tools/best-time-to-post-on-tiktok">date and time</Link> for the video. Times are shown in your browser&apos;s time zone, so the post goes out
         when you expect it to.
       </>
     ),
@@ -92,21 +105,21 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
+const faqJsonLdFor = (list: typeof faqs) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
+  mainEntity: list.map((f) => ({
     "@type": "Question",
     name: f.q,
     acceptedAnswer: { "@type": "Answer", text: f.a },
   })),
-};
+});
 
-const howToJsonLd = {
+const howToJsonLdFor = (state: ReturnType<typeof networkAvailability>) => ({
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: "How to schedule TikTok videos",
-  description: metadata.description,
+  description: state === "live" ? liveDescription : soonDescription,
   image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
@@ -116,15 +129,30 @@ const howToJsonLd = {
     text: st.text,
     url: `${BRAND.canonicalUrl}/help/schedule-tiktok-posts#step-${i + 1}`,
   })),
-};
+});
 
 const related = [
   { href: "/tiktok-scheduler", label: "TikTok scheduler" },
   { href: "/tools/tiktok-safe-zone-checker", label: "9:16 safe zone checker" },
-  { href: "/help/getting-started", label: "Getting started guide" },
+  { href: "/guides/how-to-schedule-tiktok-videos", label: "How to schedule TikTok videos (full guide)" },
 ];
 
 export default function ScheduleTikTokPostsHelpPage() {
+  const state = networkAvailability("tiktok");
+  const pageFaqs =
+    state === "live"
+      ? faqs
+      : faqs.map((f) =>
+          f.q === "Does TikTok allow scheduling from other apps?"
+            ? {
+                ...f,
+                a: `Yes, TikTok allows approved apps to post through its official Content Posting API. TikTok publishing in Poskoo is ${availabilityPhrase(
+                  state,
+                  "TikTok"
+                )}; once it is switched on you connect with TikTok's own login and never share your password.`,
+              }
+            : f
+        );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
@@ -134,11 +162,11 @@ export default function ScheduleTikTokPostsHelpPage() {
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLdFor(state)).replace(/</g, "\\u003c") }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(pageFaqs)).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
         <div className={s.heroText}>
@@ -148,8 +176,18 @@ export default function ScheduleTikTokPostsHelpPage() {
             </h1>
           <p className="lede">
             To schedule a TikTok video, connect TikTok in {BRAND.name} with TikTok&apos;s official login, upload a
-            vertical video, write a caption and pick a date and time. {BRAND.name} then publishes it, or sends it to your
-            TikTok inbox, at that moment. Here is exactly how it works, step by step.
+            vertical video, write a caption and pick a date and time.{" "}
+            {state !== "live" ? (
+              <>
+                TikTok publishing is {availabilityPhrase(state, "TikTok")}; once it is on, {BRAND.name} publishes it or
+                sends it to your TikTok inbox at that moment.
+              </>
+            ) : (
+              <>
+                {BRAND.name} then publishes it, or sends it to your TikTok inbox, at that moment.
+              </>
+            )}{" "}
+            Here is exactly how it works, step by step.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
@@ -239,7 +277,7 @@ export default function ScheduleTikTokPostsHelpPage() {
             <h2>FAQ</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {pageFaqs.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

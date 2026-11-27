@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Callout, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
 const SRC = {
   tiktokStudio: "https://www.tiktok.com/creator",
@@ -7,14 +8,23 @@ const SRC = {
   tiktokApi: "https://developers.tiktok.com/doc/content-posting-api-get-started",
 };
 
+const TIKTOK_STATE = networkAvailability("tiktok");
+
 export const body: GuideBody = {
   intro: (
     <>
       <p>
         <strong>
           You can schedule TikTok videos with TikTok&apos;s own web Studio scheduler on a desktop, up to about 10 days
-          ahead, or with a scheduler that uses TikTok&apos;s official Content Posting API, such as Poskoo, which
-          publishes the video at the time you set.
+          ahead, or with a scheduler{TIKTOK_STATE === "live" ? (
+            <> that uses TikTok&apos;s official Content Posting API, such as Poskoo, which publishes the video at the
+            time you set.</>
+          ) : (
+            <>
+              built on TikTok&apos;s official Content Posting API, such as Poskoo, where TikTok publishing is{" "}
+              {availabilityPhrase(TIKTOK_STATE, "TikTok")}.
+            </>
+          )}
         </strong>{" "}
         Both routes are official, so neither one asks for your TikTok password.
       </p>
@@ -23,9 +33,21 @@ export const body: GuideBody = {
         and the reasons a scheduled TikTok sometimes fails.
       </p>
       <p>
-        Ready to plan a week of TikToks? Open the <Link href="/tiktok-scheduler">TikTok scheduler</Link> to queue
-        videos on a calendar, and use the <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link>{" "}
-        to write captions and hashtags before you schedule.
+        {TIKTOK_STATE === "live" ? (
+          <>
+            Ready to plan a week of TikToks? Open the <Link href="/tiktok-scheduler">TikTok scheduler</Link> to queue
+            videos on a calendar, and use the{" "}
+            <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to write captions and
+            hashtags before you schedule.
+          </>
+        ) : (
+          <>
+            Ready to plan a week of TikToks? TikTok publishing in the{" "}
+            <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(TIKTOK_STATE, "TikTok")};
+            until then, use the <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to write
+            captions and hashtags, then post from the TikTok app.
+          </>
+        )}
       </p>
     </>
   ),
@@ -66,8 +88,8 @@ export const body: GuideBody = {
               <strong>Open TikTok Studio.</strong> Sign in on tiktok.com and open Studio, then choose to upload a video.
             </li>
             <li>
-              <strong>Upload the video and write the caption.</strong> Add your file, then write the caption and any
-              hashtags. Check the preview so you know how the post will look in the feed.
+              <strong>Upload the video and write the caption.</strong> Add your file, then write the caption and any{" "}
+              <Link href="/tools/tiktok-hashtag-generator">hashtags</Link>. Check the preview so you know how the post will look in the feed.
             </li>
             <li>
               <strong>Set who can see it and the post options.</strong> Pick the audience, and turn comments, Duet and
@@ -92,8 +114,16 @@ export const body: GuideBody = {
       body: (
         <>
           <p>
-            The <Link href="/tiktok-scheduler">Poskoo TikTok scheduler</Link> connects through TikTok&apos;s official
-            login and publishes with the Content Posting API. Here is the full flow, or follow the short{" "}
+            The <Link href="/tiktok-scheduler">Poskoo TikTok scheduler</Link>{" "}
+            {TIKTOK_STATE === "live" ? (
+              <>connects through TikTok&apos;s official login and publishes with the Content Posting API.</>
+            ) : (
+              <>
+                uses TikTok&apos;s official login and Content Posting API. TikTok publishing is{" "}
+                {availabilityPhrase(TIKTOK_STATE, "TikTok")}, so the steps below apply once it is switched on.
+              </>
+            )}{" "}
+            Here is the full flow, or follow the short{" "}
             <Link href="/help/schedule-tiktok-posts">TikTok scheduling help article</Link> inside the app.
           </p>
           <p><strong>Four steps to schedule a TikTok in Poskoo:</strong></p>

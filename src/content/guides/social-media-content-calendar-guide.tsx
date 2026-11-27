@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Callout, DayList, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { pendingNetworksText } from "@/lib/platform-support";
 
 // A method guide: time boxes, pillars and a sample month. No invented statistics; platform
 // facts link to the platform's own help pages in `sources`.
@@ -261,9 +262,10 @@ export const body: GuideBody = {
             <Ext href="https://help.instagram.com/iphone-app/439971288310029">Instagram&apos;s Help Center</Ext>. That
             works for a single account. Once you post to more than one network, a{" "}
             <Link href="/social-media-scheduler">social media scheduler</Link> keeps everything in one queue. Poskoo
-            publishes today to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles, Bluesky and Mastodon, with
-            a week and month calendar view. TikTok, Pinterest, X and LinkedIn Pages publishing are waiting on platform
-            approval.
+            publishes today to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles,{" "}
+            <Link href="/bluesky-scheduler">Bluesky</Link> and{" "}
+            <Link href="/mastodon-scheduler">Mastodon</Link>, with
+            a week and month calendar view. {pendingNetworksText(["tiktok", "pinterest", "x", "linkedin_pages"])}
           </p>
           <InlineCta
             title="Put your month on a calendar"

@@ -6,6 +6,9 @@ import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -30,11 +33,11 @@ const whySwitch = [
 
 const compare: [string, string, string, string][] = [
   ["Social media scheduling", "Yes", "Yes", "Yes"],
-  ["Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon publishing", "Yes", "Check their site", "Depends on the tools"],
+  [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Depends on the tools"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Depends on the DM tool"],
   ["Email capture in the DM", "Yes", "Check their site", "Depends on the DM tool"],
-  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site", "Depends on the DM tool"],
+  ["AI caption ideas", "Built, launching soon", "Check their site", "Check their site"],
+  ["AI DM message ideas", "Built, launching soon", "Check their site", "Depends on the DM tool"],
   ["Lead tracking from comment to DM", "Yes", "Check their site", "Depends on the DM tool"],
   ["Price", priceSummary(planReadiness()), "Check their site", "Two subscriptions"],
 ];
@@ -47,10 +50,23 @@ const faqs = [
   { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
+
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Publer alternative`,
+    description:
+      "Poskoo is a Publer alternative that schedules Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon posts and auto-DMs keyword commenters.",
+    url: `${BRAND.canonicalUrl}/publer-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/publer-alternative#software`,
+  featureList: ["Post scheduling with a calendar view", `Publishing to ${LIVE_PLATFORMS_TEXT}`, "Comment-to-DM automation", "Email capture in DMs"],
 };
 
 function Cell({ v }: { v: string }) {
@@ -59,10 +75,14 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function PublerAlternative() {
+export default async function PublerAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const compareRows = compare.map(row => row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Publer alternative", path: "/publer-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(faqItems)).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
@@ -72,7 +92,7 @@ export default function PublerAlternative() {
             A Publer alternative that also <em className="s">auto-DMs every comment</em>
           </h1>
           <p className="lede">
-            Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. Capture their email, write captions with AI and track every lead.
+            Schedule your Instagram, Facebook Page and Threads posts, and let {BRAND.name} DM everyone who comments a keyword. {ai ? "Capture their email, write captions with AI and track every lead." : "Capture their email and track every lead."}
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -120,7 +140,7 @@ export default function PublerAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, publer, combo]) => (
+                {compareRows.map(([label, ours, publer, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -162,7 +182,7 @@ export default function PublerAlternative() {
             <h2>Publer alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

@@ -3,13 +3,16 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -33,8 +36,8 @@ const compare: [string, string, string, string][] = [
   [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+  ["AI caption ideas", "Built, launching soon", "Check their site", "Check their site"],
+  ["AI DM message ideas", "Built, launching soon", "Check their site", "Check their site"],
   ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
   ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
@@ -45,14 +48,16 @@ const faqs = [
   { q: "Can I import my Tailwind schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
   { q: "Can I schedule Pinterest pins with Poskoo?", a: PLATFORMS_ANSWER },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
 
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span style={{ color: "var(--poskoo-green)", fontWeight: 700 }}>Yes</span>;
@@ -60,10 +65,27 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function TailwindAlternative() {
+export default async function TailwindAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const compareRows: [string, string, string, string][] = compare.map((row) =>
+    row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row
+  );
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const pin = networkAvailability("pinterest");
+  const pinterestFaqItems = faqItems.map((f) =>
+    f.q === "Can I schedule Pinterest pins with Poskoo?"
+      ? {
+          ...f,
+          a:
+            pin === "live"
+              ? "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a time; Poskoo creates the Pin through the official Pinterest API."
+              : `Not yet. Pinterest publishing is ${availabilityPhrase(pin, "Pinterest")}. ` + PLATFORMS_ANSWER,
+        }
+      : f
+  );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Tailwind alternative", path: "/tailwind-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(pinterestFaqItems)).replace(/</g, "\\u003c") }} />
 
       {/* Hero */}
       <header className="hero">
@@ -121,7 +143,7 @@ export default function TailwindAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, tailwind, combo]) => (
+                {compareRows.map(([label, ours, tailwind, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -163,7 +185,7 @@ export default function TailwindAlternative() {
             <h2>Tailwind alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {pinterestFaqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

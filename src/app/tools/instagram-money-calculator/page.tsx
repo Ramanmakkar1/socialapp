@@ -79,7 +79,7 @@ const config: ToolPageConfig = {
               <p>The same post as a Reel estimates at 1.3×, and as a Story at 0.4×</p>
             </div>
             <p>
-              For more ways creators earn beyond one-off posts, read the{" "}
+              For more ways <Link href="/social-media-scheduler-for-creators">creators</Link> earn beyond one-off posts, read the{" "}
               <Link href="/guides/how-to-make-money-on-social-media-2026">
                 guide to making money on social media in 2026
               </Link>

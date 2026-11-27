@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-tiktok",
@@ -176,8 +180,35 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function BestTimeToPostOnTikTokPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How do you turn a test slot into a schedule?"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Once a slot works, post at that time from the TikTok app. TikTok publishing in Poskoo is{" "}
+                        {availabilityPhrase(state, "TikTok")}; see{" "}
+                        <Link href="/help/schedule-tiktok-posts">how to schedule TikTok posts</Link> for the setup
+                        once it is live. Posting on more than TikTok?{" "}
+                        <Link href="/tools/best-time-to-post-on-social-media">See the best time to post on every
+                        platform</Link>.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <BestTimeFinder platform="TikTok" insightsName="TikTok analytics" />
     </ToolPageTemplate>
   );

@@ -2,6 +2,10 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
 import t from "@/components/tools/tools.module.css";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-x",
@@ -180,8 +184,8 @@ const config: ToolPageConfig = {
             <p>
               If you post to several zones at once, use the{" "}
               <Link href="/tools/instagram-time-zone-converter">time zone converter</Link> to convert a single slot into
-              each zone&apos;s local time, or schedule one post per zone with the{" "}
-              <Link href="/x-scheduler">X scheduler</Link>.
+              each zone&apos;s local time, then post once per zone at those times. The{" "}
+              <Link href="/x-scheduler">X scheduler</Link> page shows when X scheduling is available in Poskoo.
             </p>
           </>
         ),
@@ -307,8 +311,32 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function BestTimeToPostOnXPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Turn your best time into a schedule"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Once a slot works, post at that time from the X app. X publishing in Poskoo is{" "}
+                        {availabilityPhrase(state, "X")}; see{" "}
+                        <Link href="/help/schedule-x-posts">how to schedule X posts</Link> for the setup once it is live.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <BestTimeFinder platform="X" insightsName="X post analytics" />
     </ToolPageTemplate>
   );

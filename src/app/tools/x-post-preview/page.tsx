@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import XPostPreview from "./XPostPreview";
+
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/x-post-preview",
@@ -149,8 +152,43 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function XPostPreviewPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((s) =>
+              s.title === "Preview the post, then schedule it"
+                ? {
+                    ...s,
+                    body: (
+                      <p>
+                        Once the text, image and count look right, copy the draft and post it on X yourself. X
+                        publishing in the{" "}
+                        <Link href="/x-scheduler">X scheduler</Link>{" "}
+                        is {availabilityPhrase(state, "X")}. You can also check other X fields with the{" "}
+                        <Link href="/tools/x-character-counter">X character counter</Link> or find the{" "}
+                        <Link href="/tools/best-time-to-post-on-x">best time to post on X</Link>.
+                      </p>
+                    ),
+                  }
+                : s,
+            ),
+          },
+          faqs: config.faqs.map((f) =>
+            f.q === "Can I schedule X posts?"
+              ? {
+                  ...f,
+                  a: `Not yet. X publishing in Poskoo is ${availabilityPhrase(state, "X")}. Until then, preview your draft here, copy it and post it on X yourself.`,
+                }
+              : f,
+          ),
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <XPostPreview />
     </ToolPageTemplate>
   );

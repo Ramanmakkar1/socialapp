@@ -77,8 +77,12 @@ const steps = [
     name: "Pick a date and time",
     body: (
       <>
-        Choose the date and time in your own time zone — the composer shows your time zone under the field, so the post
-        publishes when you expect it to.
+        Choose the{" "}
+        <Link className={s.vlink} href="/tools/best-time-to-post-on-instagram">
+          date and time
+        </Link>{" "}
+        in your own time zone — the composer shows your time zone under the field, so the post publishes when you expect
+        it to.
       </>
     ),
   },
@@ -197,7 +201,7 @@ export default function ScheduleInstagramCarouselHelpPage() {
             <h2>Carousel image specs</h2>
             <p>
               Carousels take image links only — video slides in a carousel are not supported yet. Use the same aspect
-              ratio on every slide so the carousel does not jump as people swipe, for example 1080 × 1350 px (4:5) or
+              ratio on every slide so the carousel does not jump as people swipe, for example <Link className={s.vlink} href="/tools/instagram-carousel-size-checker">1080 × 1350 px (4:5)</Link> or
               1080 × 1080 px (1:1).
             </p>
             <p>

@@ -11,6 +11,7 @@ import { StaySection, SwitchSteps } from "@/components/CompareSections";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
 import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -28,6 +29,7 @@ const whyLook = [
   { no: "03 / Leads", title: "Leads from scheduled content", text: "Ask for an email in the DM before the link is sent, so posts you planned weeks ahead can still fill a lead list." },
 ];
 
+const AI_ROW = "AI caption ideas";
 const compare: [string, string, string][] = [
   ["Networks you can schedule to", LIVE_PLATFORMS_TEXT, "Yes"],
   ["Visual calendar", "Yes", "Yes"],
@@ -35,7 +37,7 @@ const compare: [string, string, string][] = [
   ["Email capture in the DM", "Yes", "Check their site"],
   ["Link click tracking", "Yes", "Check their site"],
   ["Lead CSV export", "Yes", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site"],
+  [AI_ROW, "Built, launching soon", "Check their site"],
 ];
 
 const switchSteps = [
@@ -61,7 +63,7 @@ const appJsonLd = {
   "@id": `${BRAND.canonicalUrl}/later-alternative#software`,
   featureList: [
     "Post scheduling with a calendar view",
-    "Instagram, Facebook Page and Threads publishing",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
     "Comment-to-DM automation",
     "Email capture in DMs",
   ],
@@ -79,7 +81,9 @@ function Cell({ v }: { v: string }) {
   return <span>{v}</span>;
 }
 
-export default function LaterAlternative() {
+export default async function LaterAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const compareRows = compare.map((row): [string, string, string] => (row[0] === AI_ROW && ai ? [row[0], "Yes", row[2]] : row));
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Later alternative", path: "/later-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
@@ -140,7 +144,7 @@ export default function LaterAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, theirs]) => (
+                {compareRows.map(([label, ours, theirs]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>

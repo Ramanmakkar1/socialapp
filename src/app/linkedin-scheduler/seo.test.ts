@@ -18,7 +18,7 @@ test("LinkedIn scheduler emits WebPage, SoftwareApplication and FAQPage JSON-LD"
     "page must keep the SoftwareApplication JSON-LD",
   );
   assert.ok(
-    pageSource.includes("faqJsonLd(faqs)"),
+    pageSource.includes("faqJsonLd(pageFaqs)"),
     "page must keep the FAQPage JSON-LD built from the visible FAQs",
   );
   assert.ok(

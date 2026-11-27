@@ -101,7 +101,7 @@ const config: ToolPageConfig = {
             <p>You can paste styled text into:</p>
             <ul>
               <li>Your TikTok display name and bio.</li>
-              <li>Video captions and comments.</li>
+              <li><Link href="/tools/tiktok-caption-generator">Video captions</Link> and comments.</li>
               <li>Direct messages and profile text.</li>
             </ul>
             <p>

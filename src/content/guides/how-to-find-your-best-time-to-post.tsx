@@ -351,7 +351,7 @@ export const body: GuideBody = {
             according to{" "}
             <Ext href="https://help.instagram.com/iphone-app/439971288310029">Instagram&apos;s Help Center</Ext>. If you
             post to several networks, a scheduler keeps every slot in one place. Poskoo publishes today to Instagram,
-            Facebook Pages, Threads, YouTube, LinkedIn profiles, Bluesky and Mastodon, shows times in your browser&apos;s
+            Facebook Pages, Threads, YouTube, LinkedIn profiles, <Link href="/bluesky-scheduler">Bluesky</Link> and <Link href="/mastodon-scheduler">Mastodon</Link>, shows times in your browser&apos;s
             time zone, and marks each post as published or failed so you can fix and retry. TikTok, Pinterest, X and
             LinkedIn Pages publishing are still waiting on platform approval.
           </p>

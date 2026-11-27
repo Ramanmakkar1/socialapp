@@ -6,6 +6,9 @@ import { BRAND } from "@/lib/brand";
 import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -33,8 +36,8 @@ const compare: [string, string, string, string][] = [
   [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
   ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
   ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-  ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-  ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+  ["AI caption ideas", "Built, launching soon", "Check their site", "Check their site"],
+  ["AI DM message ideas", "Built, launching soon", "Check their site", "Check their site"],
   ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
   ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
 ];
@@ -47,10 +50,28 @@ const faqs = [
   { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+function faqJsonLdFor(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
+
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Agorapulse alternative`,
+    description:
+      "Poskoo is an Agorapulse alternative: schedule Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky, and Mastodon posts & auto-DM commenters. Free plan.",
+    url: `${BRAND.canonicalUrl}/agorapulse-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/agorapulse-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
 };
 
 function Cell({ v }: { v: string }) {
@@ -59,10 +80,14 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function AgorapulseAlternative() {
+export default async function AgorapulseAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const compareRows = compare.map(row => row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row);
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Agorapulse alternative", path: "/agorapulse-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(faqItems)).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
@@ -120,7 +145,7 @@ export default function AgorapulseAlternative() {
                 </tr>
               </thead>
               <tbody>
-                {compare.map(([label, ours, agorapulse, combo]) => (
+                {compareRows.map(([label, ours, agorapulse, combo]) => (
                   <tr key={label} className={s.tr}>
                     <td className={s.td}>{label}</td>
                     <td className={`${s.td} ${s.oursCol}`} style={{ fontWeight: 700, textAlign: "center" }}><Cell v={ours} /></td>
@@ -162,7 +187,7 @@ export default function AgorapulseAlternative() {
             <h2>Agorapulse alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

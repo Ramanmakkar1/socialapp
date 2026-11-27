@@ -168,7 +168,7 @@ export default function ImageSizeFinder() {
           </button>
           <span className="sr-only" aria-live="polite">{copied ? "Copied to clipboard" : ""}</span>
           <Link href={platform.scheduler} className="inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-[var(--poskoo-violet)] underline underline-offset-2">
-            <CalendarClock className="h-4 w-4" aria-hidden="true" />Schedule {platform.name} posts
+            <CalendarClock className="h-4 w-4" aria-hidden="true" />{platform.name} scheduler
           </Link>
         </aside>
       </div>

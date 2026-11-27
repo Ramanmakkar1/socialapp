@@ -47,9 +47,9 @@ const steps = [
     text: "Enter a video title of up to 100 characters; it is required. Write the description in the caption field and add optional comma-separated tags.",
     body: (
       <>
-        Enter a <strong>video title</strong> of up to 100 characters; it is required. Write the{" "}
+        Enter a <Link href="/tools/youtube-title-generator">video title</Link> of up to 100 characters; it is required. Write the{" "}
         <Link href="/tools/youtube-description-generator">YouTube description</Link> in the caption field and add
-        optional <strong>comma-separated tags</strong>. {BRAND.name} sends these details with the scheduled upload.
+        optional <Link href="/tools/youtube-tag-generator">comma-separated tags</Link>. {BRAND.name} sends these details with the scheduled upload.
       </>
     ),
   },
@@ -68,7 +68,7 @@ const steps = [
     text: "For a vertical video under 60 seconds, tick This is a Short. Poskoo adds #Short to the description when it is not already there.",
     body: (
       <>
-        For a vertical video under 60 seconds, tick <strong>This is a Short</strong>. {BRAND.name} adds #Short to the
+        For a <Link className={s.vlink} href="/tools/youtube-shorts-size-checker">vertical video</Link> under 60 seconds, tick <strong>This is a Short</strong>. {BRAND.name} adds #Short to the
         description when it is not already there.
       </>
     ),
@@ -78,7 +78,7 @@ const steps = [
     text: "Choose when the video should go out. Times are shown in your browser's time zone, so the upload starts when you expect it to.",
     body: (
       <>
-        Choose when the video should go out. Times are shown in your browser&apos;s <strong>time zone</strong>, so the
+        Choose <Link className={s.vlink} href="/tools/best-time-to-post-on-youtube">when the video should go out</Link>. Times are shown in your browser&apos;s <strong>time zone</strong>, so the
         upload starts when you expect it to.
       </>
     ),

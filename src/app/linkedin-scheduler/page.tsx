@@ -7,6 +7,7 @@ import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import { faqJsonLd, ldJson, publisherRef, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
@@ -82,7 +83,7 @@ const faqs = [
   },
   {
     q: "Can I post to a LinkedIn company page?",
-    a: "Yes, when company page access is enabled for your account. Poskoo can publish to a company page you administer as well as your personal profile. Company page publishing needs LinkedIn's Community Management API access, which is granted after a separate review.",
+    a: "Yes. Poskoo can publish to a LinkedIn company page you administer as well as your personal profile, through LinkedIn's Community Management API.",
   },
   {
     q: "What can I post to LinkedIn?",
@@ -114,31 +115,51 @@ const webPageJsonLd = {
   publisher: publisherRef(),
 };
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} LinkedIn scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
-  applicationSubCategory: "Social media scheduling",
-  inLanguage: "en",
-  featureList: [
-    "LinkedIn text post scheduling",
-    "Up to 20 images per post",
-    "Personal profile and company page publishing",
-    "Week and month content calendar",
-    "Edit, reschedule and delete scheduled posts",
-    "Publishing status and retries",
-    "Instagram, Facebook Page and Threads scheduling in the same queue",
-  ],
-  // Paid offers only once Pro/Agency checkout is live, matching /pricing.
-  offers: softwareOffers(planReadiness()),
-};
-
 export default function LinkedInSchedulerPage() {
+  const state = networkAvailability("linkedin_pages");
+  const pagesLive = state === "live";
+
+  const pageFaqs =
+    state === "live"
+      ? faqs
+      : faqs.map((faq) =>
+          faq.q === "Can I post to a LinkedIn company page?"
+            ? {
+                ...faq,
+                a: `Not yet. Posting to LinkedIn company Pages is ${availabilityPhrase(
+                  state,
+                  "LinkedIn"
+                )}. Today Poskoo publishes scheduled posts to your personal LinkedIn profile.`,
+              }
+            : faq
+        );
+
+  const appJsonLd = {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} LinkedIn scheduler`,
+      description,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
+    applicationSubCategory: "Social media scheduling",
+    inLanguage: "en",
+    featureList: [
+      "LinkedIn text post scheduling",
+      "Up to 20 images per post",
+      pagesLive
+        ? "Personal profile and company page publishing"
+        : "Personal LinkedIn profile publishing",
+      "Week and month content calendar",
+      "Edit, reschedule and delete scheduled posts",
+      "Publishing status and retries",
+      "Instagram, Facebook Page and Threads scheduling in the same queue",
+    ],
+    // Paid offers only once Pro/Agency checkout is live, matching /pricing.
+    offers: softwareOffers(planReadiness()),
+  };
+
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "LinkedIn scheduler", path: PATH }]}>
-      {[webPageJsonLd, appJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[webPageJsonLd, appJsonLd, faqJsonLd(pageFaqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -269,7 +290,7 @@ export default function LinkedInSchedulerPage() {
             <h2>Accounts, formats and publishing</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq, index) => (
+            {pageFaqs.map((faq, index) => (
               <details key={faq.q} open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>

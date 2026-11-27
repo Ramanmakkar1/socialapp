@@ -3,9 +3,12 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
-import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, LIVE_PLATFORMS_TEXT, OFFICIAL_API_ANSWER } from "@/lib/platform-support";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
+import { withoutAiClaims } from "@/lib/aiClaims";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -33,13 +36,31 @@ const faqs = [
   { q: "What is Vista Social?", a: "Vista Social is a social media management tool for scheduling, engagement and reporting. For its exact features and plans, see their site." },
   { q: "Can I move my Vista Social schedule to Poskoo?", a: `Not yet. Recreate your upcoming posts in the ${BRAND.name} calendar and rebuild your queue there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
-  { q: "Does it use the official APIs?", a: "Yes. We connect through the official Meta login and APIs. We never ask for your password and never scrape." },
+  { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+function faqJsonLd(items: typeof faqs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
+
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Vista Social alternative`,
+    description:
+      "Poskoo is a Vista Social alternative: schedule Instagram, Facebook, Threads, YouTube and LinkedIn posts and auto-DM every keyword commenter. Free plan.",
+    url: `${BRAND.canonicalUrl}/vista-social-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/vista-social-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
 };
 
 function Cell({ v }: { v: string }) {
@@ -48,21 +69,24 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
-export default function VistaSocialAlternative() {
+export default async function VistaSocialAlternative() {
+  const ai = await isFeatureReadyNow("ai");
+  const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
   const compare: [string, string, string, string][] = [
     ["Social media scheduling", "Yes", "Check their site", "Check their site"],
     [`Publishing to ${LIVE_PLATFORMS_TEXT}`, "Yes", "Check their site", "Check their site"],
     ["Instagram comment-to-DM automation", "Yes", "Check their site", "Check their site"],
     ["Email capture in the DM", "Yes", "Check their site", "Check their site"],
-    ["AI caption ideas", "Yes", "Check their site", "Check their site"],
-    ["AI DM message ideas", "Yes", "Check their site", "Check their site"],
+    ["AI caption ideas", ai ? "Yes" : "Built, launching soon", "Check their site", "Check their site"],
+    ["AI DM message ideas", ai ? "Yes" : "Built, launching soon", "Check their site", "Check their site"],
     ["Lead tracking from comment to DM", "Yes", "Check their site", "Check their site"],
     ["Price", priceSummary(planReadiness()), "Check their site", "Check their site"],
   ];
 
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Vista Social alternative", path: "/vista-social-alternative" }]}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqItems)).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
@@ -72,7 +96,7 @@ export default function VistaSocialAlternative() {
             A Vista Social alternative that also <em className="s">auto-DMs every comment</em>
           </h1>
           <p className="lede">
-            {BRAND.name} is a good Vista Social alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. Capture their email, write captions with AI and track every lead.
+            {BRAND.name} is a good Vista Social alternative: it schedules posts to {LIVE_PLATFORMS_TEXT} and auto-DMs everyone who comments a keyword on Instagram. {ai ? "Capture their email, write captions with AI and track every lead." : "Capture their email and track every lead."}
           </p>
           <div className="ctas">
             <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
@@ -162,7 +186,7 @@ export default function VistaSocialAlternative() {
             <h2>Vista Social alternative questions</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqItems.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

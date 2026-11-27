@@ -4,6 +4,10 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import t from "@/components/tools/tools.module.css";
 import { PINTEREST_LIMITS } from "@/lib/pinterestCharCount";
 import PinterestCharCounter from "./PinterestCharCounter";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
 
 const limitRows: [string, string][] = [
   ["Pin title", `${PINTEREST_LIMITS.title.max} characters`],
@@ -167,8 +171,30 @@ export const metadata: Metadata = {
 };
 
 export default function PinterestCharacterCounterPage() {
+  const state = networkAvailability("pinterest");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Check the text, then put it on the calendar"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Use the counter to finish your draft, then paste it into your Pin on Pinterest. Pinterest publishing in the <Link href="/pinterest-scheduler">Pinterest scheduler</Link> is {availabilityPhrase(state, "Pinterest")}. Find the <Link href="/tools/best-time-to-post-on-pinterest">best time to post on Pinterest</Link> and read <Link href="/help/schedule-pinterest-posts">how to schedule Pinterest Pins</Link> for the setup once it is switched on.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <PinterestCharCounter />
     </ToolPageTemplate>
   );

@@ -266,7 +266,7 @@ export const body: GuideBody = {
                 title: "Week 1: Set up properly.",
                 body: (
                   <>
-                    {" "}Claim the same name on both. On Bluesky, set your domain as your handle. Write a bio that says
+                    {" "}Claim the same name on both. On Bluesky, set your domain as your handle. Write a <Link href="/tools/threads-bio-generator">bio</Link> that says
                     who you help in one line. Follow 50 relevant accounts on each, using starter packs on Bluesky and
                     your Instagram community on Threads. Post three times on each.
                   </>

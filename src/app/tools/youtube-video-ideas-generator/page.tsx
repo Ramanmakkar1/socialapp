@@ -133,7 +133,7 @@ const config: ToolPageConfig = {
               <Link href="/tools/youtube-thumbnail-size-checker">YouTube thumbnail size checker</Link> before you upload.
             </p>
             <p>
-              When the title, thumbnail and description are ready, add tags with the{" "}
+              When the title, thumbnail and <Link href="/tools/youtube-description-generator">description</Link> are ready, add tags with the{" "}
               <Link href="/tools/youtube-tag-generator">YouTube tag generator</Link> and queue the upload with the{" "}
               <Link href="/youtube-scheduler">YouTube scheduler</Link> so it publishes at the time you choose.
             </p>

@@ -97,7 +97,10 @@ export const body: GuideBody = {
           </ol>
           <p>
             Business Suite is a solid free choice if Facebook and Instagram are your only channels. It is less useful
-            when you also post to LinkedIn, YouTube, Threads or Bluesky, because you would need a second tool for those.
+            when you also post to <Link href="/linkedin-scheduler">LinkedIn</Link>,{" "}
+            <Link href="/youtube-scheduler">YouTube</Link>,{" "}
+            <Link href="/threads-scheduler">Threads</Link>{" "}
+            or <Link href="/bluesky-scheduler">Bluesky</Link>, because you would need a second tool for those.
           </p>
           <p>
             It also works well for a small team. You can leave a post scheduled and let someone else review the
@@ -183,7 +186,7 @@ export const body: GuideBody = {
             ]}
           />
           <p>
-            Use the Instagram app for a one-off post you are already composing on your phone. Use Meta Business Suite
+            Use the Instagram app for a one-off post you are already composing on your phone. Use <Link href="/meta-business-suite-alternative">Meta Business Suite</Link>{" "}
             if you only manage Facebook and Instagram and want a free desktop planner. Use Poskoo when you want one
             queue for several networks, reliable Reels and Story publishing, or a keyword rule that DMs everyone who
             comments.
