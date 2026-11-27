@@ -209,7 +209,7 @@ export const body: GuideBody = {
             <li><strong>Price:</strong> Bootstrap is $29/mo or $290/yr for 5 profiles and 1 user. Accelerate is $49/mo or $490/yr for 10 profiles. A 14-day trial needs no card.</li>
             <li><strong>Cons:</strong> the priciest entry plan on this list, and no free plan.</li>
           </ul>
-          <p><strong>Best for:</strong> businesses with an evergreen library to reuse.</p>
+          <p><strong>Best for:</strong> businesses with an evergreen library to reuse. Moving off it? See our <Link href="/socialbee-alternative">SocialBee alternative</Link>.</p>
         </>
       ),
     },
