@@ -18,7 +18,7 @@ const ghostBtn = "inline-flex min-h-11 w-full items-center justify-center gap-1.
 const CHIP_CLASS =
   "inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--poskoo-line)] bg-[var(--poskoo-card)] px-4 text-sm font-medium text-[#3d3450] transition-colors hover:border-[var(--poskoo-violet)] hover:text-[var(--poskoo-violet)]";
 
-export default function HookGenerator({ platform = "instagram" }: { platform?: "instagram" | "tiktok" | "linkedin" }) {
+export default function HookGenerator({ platform = "instagram", tiktokLive = true }: { platform?: "instagram" | "tiktok" | "linkedin"; tiktokLive?: boolean }) {
   const isTikTok = platform === "tiktok";
   const isLinkedIn = platform === "linkedin";
   const [topic, setTopic] = useState("");
@@ -241,7 +241,7 @@ export default function HookGenerator({ platform = "instagram" }: { platform?: "
             href={isTikTok ? "/tiktok-scheduler" : isLinkedIn ? "/linkedin-scheduler" : "/signup"}
             className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[var(--poskoo-violet)] px-4 text-sm font-semibold !text-white transition-transform hover:-translate-y-0.5"
           >
-            {isTikTok ? "Schedule your video with Poskoo" : isLinkedIn ? "Schedule your post with Poskoo" : "Schedule your Reel with Poskoo"} <span aria-hidden="true">&nbsp;→</span>
+            {isTikTok && !tiktokLive ? "See the TikTok scheduler" : isTikTok ? "Schedule your video with Poskoo" : isLinkedIn ? "Schedule your post with Poskoo" : "Schedule your Reel with Poskoo"} <span aria-hidden="true">&nbsp;→</span>
           </Link>
           <Link href={isTikTok ? "/tools/tiktok-caption-generator" : isLinkedIn ? "/tools/linkedin-post-generator" : "/tools/instagram-caption-generator"} className={ghostBtn}>
             {isLinkedIn ? "Turn a hook into a post" : "Turn a hook into a caption"}

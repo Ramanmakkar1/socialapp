@@ -288,7 +288,7 @@ export default function TikTokHookGeneratorPage() {
       };
   return (
     <ToolPageTemplate config={pageConfig}>
-      <HookGenerator platform="tiktok" />
+      <HookGenerator platform="tiktok" tiktokLive={state === "live"} />
     </ToolPageTemplate>
   );
 }
