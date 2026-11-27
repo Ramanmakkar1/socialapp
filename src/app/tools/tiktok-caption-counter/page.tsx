@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import t from "@/components/tools/tools.module.css";
 import TikTokCaptionCounter from "./TikTokCaptionCounter";
 
@@ -154,8 +155,34 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function TikTokCaptionCounterPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How do I schedule a checked TikTok caption?"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Finish your caption here, then post it from the TikTok app. Publishing in the{" "}
+                        <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state, "TikTok")};{" "}
+                        the{" "}
+                        <Link href="/help/schedule-tiktok-posts">step-by-step TikTok scheduling guide</Link> shows the
+                        setup once it is live.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <TikTokCaptionCounter />
     </ToolPageTemplate>
   );
