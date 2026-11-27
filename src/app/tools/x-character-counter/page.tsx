@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import t from "@/components/tools/tools.module.css";
 import XCharCounter from "./XCharCounter";
 
@@ -174,8 +175,30 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function XCharacterCounterPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Check the post, then put it on the calendar"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Use the counter to finish your draft, then post it from the X app. Publishing in the <Link href="/x-scheduler">X scheduler</Link> is {availabilityPhrase(state, "X")}; the <Link href="/help/schedule-x-posts">step-by-step X scheduling guide</Link> shows the setup once it is live.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <XCharCounter />
     </ToolPageTemplate>
   );
