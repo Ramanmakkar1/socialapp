@@ -36,7 +36,7 @@ function contentFor(tiktok: ReturnType<typeof networkAvailability>, ai: boolean)
     lede:
       "Film in batches, schedule Reels, Shorts and Stories for the week, and let Poskoo send the link to everyone who comments your keyword. The people who asked for your freebie end up on a list you own.",
     heroArt: "card-dm",
-    heroArtLabel: "A relaxed creator on a beanbag while DMs fly out of his phone to followers",
+    heroArtLabel: "A relaxed creator on a beanbag while DMs fly out of their phone to followers",
     jobsTitle: "What a creator needs from a scheduler",
     jobsIntro: "Posting on time is only half the job. The other half is following up with the people your content reached.",
     jobs: [
