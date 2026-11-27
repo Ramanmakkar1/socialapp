@@ -3,7 +3,8 @@ import { withSocial } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import PublicShell from "@/components/PublicShell";
-import { ChannelStatusNote, networkAvailability } from "@/components/ChannelStatusNote";
+import { ChannelStatusNote, availabilityPhrase, networkAvailability, type NetworkAvailability } from "@/components/ChannelStatusNote";
+import { getPlatformCopy } from "@/lib/platform-support";
 import s from "@/components/site.module.css";
 import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
@@ -72,13 +73,14 @@ const steps = [
   },
 ];
 
-function faqsFor(isLive: boolean) {
+function faqsFor(availability: NetworkAvailability) {
+  const isLive = availability === "live";
   return [
   {
     q: "Can I schedule Pinterest Pins with Poskoo?",
     a: isLive
       ? "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time. Poskoo creates the Pin through the official Pinterest API when it is due."
-      : "Pinterest publishing is built and waiting on Pinterest platform approval. Once it is switched on, connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time; Poskoo creates the Pin through the official Pinterest API. Instagram, Threads and Facebook work today.",
+      : `Not yet. Pinterest publishing is ${availabilityPhrase(availability, "Pinterest")}. Once it is switched on, connect your Pinterest account, choose a board, add an image and Pin details, and pick a publishing time; Poskoo creates the Pin through the official Pinterest API. ${getPlatformCopy().liveText} work today.`,
   },
   {
     q: "Do I need to give Poskoo my Pinterest password?",
@@ -124,7 +126,7 @@ export default function PinterestSchedulerPage() {
   const isLive = availability === "live";
   const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Pick the date and time. Once Pinterest approves Poskoo, the Pin will be created through the official Pinterest API when it is due, with a published or failed status so you can retry if needed." } : st);
-  const faqs = faqsFor(isLive);
+  const faqs = faqsFor(availability);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Pinterest scheduler", path: PATH }]}>
       {[appJsonLd, faqJsonLd(faqs)].map((data) => (
