@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Callout, DayList, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { pendingNetworksText } from "@/lib/platform-support";
 
 // Method guide. We deliberately give no universal "best times" as facts: starting slots are
 // framed as things to test, and platform features link to the platform's own help pages.
@@ -352,8 +353,8 @@ export const body: GuideBody = {
             <Ext href="https://help.instagram.com/iphone-app/439971288310029">Instagram&apos;s Help Center</Ext>. If you
             post to several networks, a scheduler keeps every slot in one place. Poskoo publishes today to Instagram,
             Facebook Pages, Threads, YouTube, LinkedIn profiles, <Link href="/bluesky-scheduler">Bluesky</Link> and <Link href="/mastodon-scheduler">Mastodon</Link>, shows times in your browser&apos;s
-            time zone, and marks each post as published or failed so you can fix and retry. TikTok, Pinterest, X and
-            LinkedIn Pages publishing are still waiting on platform approval.
+            time zone, and marks each post as published or failed so you can fix and retry.{" "}
+            {pendingNetworksText(["tiktok", "pinterest", "x", "linkedin_pages"])}
           </p>
           <InlineCta
             title="Schedule your posts at the times that work"
