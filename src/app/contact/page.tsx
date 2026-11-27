@@ -124,7 +124,7 @@ export default function ContactPage() {
                 width={900}
                 height={900}
                 loading="lazy"
-                alt="A relaxed creator on a beanbag while DMs fly out of his phone to followers"
+                alt="A relaxed creator on a beanbag while DMs fly out of their phone to followers"
               />
             </div>
           </div>
