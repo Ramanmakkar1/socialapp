@@ -107,7 +107,7 @@ function faqsFor(state: ReturnType<typeof networkAvailability>) {
         <>
           Not yet. TikTok publishing in Poskoo is {tiktokPhrase}. Until then, draft your caption, hook and hashtags here
           and post from the TikTok app. Follow the{" "}
-          <Link href="/help/schedule-tiktok-posts">step-by-step guide to scheduling TikTok videos</Link>.
+          <Link href="/guides/how-to-schedule-tiktok-videos">step-by-step guide to scheduling TikTok videos</Link>.
         </>
       ) : (
         <>
@@ -115,7 +115,7 @@ function faqsFor(state: ReturnType<typeof networkAvailability>) {
           <Link href="/tiktok-scheduler">TikTok scheduler</Link> to add the video to your calendar. Connect your TikTok
           account through the official login, pick a date and time, and {BRAND.name} publishes it for you. You can{" "}
           <Link href="/signup">create a free account</Link> to start, or follow the{" "}
-          <Link href="/help/schedule-tiktok-posts">step-by-step guide to scheduling TikTok videos</Link>.
+          <Link href="/guides/how-to-schedule-tiktok-videos">step-by-step guide to scheduling TikTok videos</Link>.
         </>
       ),
     },
