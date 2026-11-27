@@ -131,6 +131,7 @@ function appJsonLdFor(desc: string) {
 export default function TikTokSchedulerPage() {
   const availability = networkAvailability("tiktok");
   const isLive = availability === "live";
+  const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Choose the date and time. Once TikTok approves Poskoo, the post will publish through TikTok's Content Posting API when it is due, with a published or failed status you can retry." } : st);
   const faqs = faqsFor(isLive);
   const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
@@ -206,7 +207,7 @@ export default function TikTokSchedulerPage() {
               <p className="eyebrow">How TikTok scheduling works</p>
               <h2>Schedule your first <em className="s mark">TikTok post.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>
