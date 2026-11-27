@@ -31,6 +31,8 @@ export const metadata: Metadata = {
   },
   // Indexing is controlled by BRAND.indexable (src/lib/brand.ts); the same isPathIndexable helper gates the sitemap.
   robots: isPathIndexable("/") ? { index: true, follow: true } : { index: false, follow: false },
+  // Pinterest website claim for poskoo.com (account @townmedialabs), needed for Pinterest API access.
+  other: { "p:domain_verify": "6632e9af1cebc232bc7231e5fff2e60e" },
 };
 
 const jsonLd = {

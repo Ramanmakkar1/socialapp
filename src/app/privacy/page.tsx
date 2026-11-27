@@ -91,6 +91,17 @@ export default function Page() {
           <p><strong>Limited Use.</strong> {BRAND.name}&apos;s use and transfer of information received from Google APIs to any other app will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener noreferrer" target="_blank">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
           <p><strong>Revoking access.</strong> Disconnect any time in Settings → Connected accounts. You can also revoke {BRAND.name} from Google directly: go to <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer" target="_blank">myaccount.google.com/permissions</a>, find our app under &ldquo;Third-party apps &amp; add-ons&rdquo; and remove it. When you disconnect, we delete your token straight away.</p>
           <p><strong>Google&apos;s policies.</strong> Google&apos;s <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Privacy Policy</a> and, when you connect YouTube, the <a href="https://www.youtube.com/intl/en_US/Terms" rel="noopener noreferrer" target="_blank">YouTube Terms of Service</a> apply to how Google and YouTube handle your data. We access the Google sign-in and YouTube information described above only when you authorize the corresponding feature.</p>
+          <h2 id="pinterest">Pinterest data</h2>
+          <p>When you connect a Pinterest account through Pinterest&apos;s official login, you choose to give {BRAND.name} these permissions. We only use them to publish the Pins you schedule:</p>
+          <ul>
+            <li><strong>Account</strong> (user_accounts:read): your Pinterest username and profile picture, to show which account is connected.</li>
+            <li><strong>Boards</strong> (boards:read): the names of your own boards, so you can pick the board a Pin goes to.</li>
+            <li><strong>Pins</strong> (pins:write): to create the Pins you schedule (image or video, title, description and link) on the board you chose, at the time you pick.</li>
+          </ul>
+          <p>We never read other Pinners&apos; data, never change or delete Pins you did not create with {BRAND.name}, and never post anything you did not schedule.</p>
+          <p><strong>Storage and retention.</strong> Pinterest access and refresh tokens are encrypted (AES-256-GCM) before they are stored and are never shown to anyone. We keep them only while your Pinterest account is connected; when you disconnect, we delete them straight away, and when you delete your {BRAND.name} account we delete all Pinterest data within 30 days.</p>
+          <p><strong>No selling or sharing.</strong> We never sell Pinterest data, never use it for advertising or to train AI models, and never share it with third parties, except service providers that host the service for us.</p>
+          <p><strong>Disconnect.</strong> Disconnect any time in Settings → Connected accounts, or remove {BRAND.name} in Pinterest under Settings → Security and logins → Apps. {BRAND.name} is operated by {BRAND.company}.</p>
           <h2>Deleting your data</h2>
           <p>You can disconnect an account or delete everything at any time — see our <Link href="/data-deletion">data deletion page</Link>.</p>
           <h2 id="cookies">Cookies</h2>
