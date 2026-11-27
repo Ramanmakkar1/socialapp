@@ -4,6 +4,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import t from "@/components/tools/tools.module.css";
 import CoverSizeChecker from "@/components/tools/CoverSizeChecker";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/tiktok-photo-size-checker",
   name: "TikTok photo size checker",
