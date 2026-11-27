@@ -4,6 +4,8 @@ import { ArrowDown, ArrowRight, BookOpen } from "lucide-react";
 import PublicShell from "@/components/PublicShell";
 import { AnimArt, ANIM_LABELS, type AnimName } from "@/components/AnimArt";
 import { BRAND } from "@/lib/brand";
+import { LIVE_PLATFORMS_TEXT } from "@/lib/platform-support";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import { TOOLS, toolByHref, toolPlatform, type ToolEntry, type ToolIconName, type ToolPlatform } from "./registry";
 import { ToolIcon } from "./ToolIcon";
 import { RelatedToolsCarousel } from "./RelatedToolsCarousel";
@@ -61,6 +63,26 @@ export type ToolPageConfig = {
   /** Dark CTA band copy. */
   cta?: { title: string; mark: string; text: string; art?: AnimName; artLabel?: string };
 };
+
+/** Honest CTA for tool pages whose platform is not live yet (TikTok, X, Pinterest). */
+export function ctaForPlatform(config: ToolPageConfig): ToolPageConfig["cta"] {
+  const tool = toolByHref(config.path);
+  if (!tool) return config.cta;
+  const platform = toolPlatform(tool);
+  if (platform !== "tiktok" && platform !== "x" && platform !== "pinterest") return config.cta;
+  const state = networkAvailability(platform);
+  if (state === "live") return config.cta;
+  const name = platform === "tiktok" ? "TikTok" : platform === "x" ? "X" : "Pinterest";
+  const base = config.cta ?? {
+    title: "Post it on time,",
+    mark: "then DM every commenter",
+    text: `Schedule the post with ${BRAND.name}, and send your link to everyone who comments a keyword, on the official Meta API.`,
+  };
+  return {
+    ...base,
+    text: `${name} publishing in ${BRAND.name} is ${availabilityPhrase(state, name)}. Until then, schedule posts to ${LIVE_PLATFORMS_TEXT} on one calendar.`,
+  };
+}
 
 const DEFAULT_STEP_ART: AnimName[] = ["writing", "visual", "card-schedule"];
 
@@ -396,7 +418,7 @@ export function ToolPageTemplate({
         {afterGuide}
         <ToolFaqSection title={config.faqTitle ?? `${config.name} FAQ`} faqs={config.faqs} />
         <RelatedTools hrefs={config.related} self={config.path} />
-        <ToolCta cta={config.cta} />
+        <ToolCta cta={ctaForPlatform(config)} />
       </div>
     </PublicShell>
   );
