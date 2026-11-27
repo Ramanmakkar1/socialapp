@@ -181,8 +181,8 @@ const config: ToolPageConfig = {
             <p>
               If you post to several zones at once, use the{" "}
               <Link href="/tools/instagram-time-zone-converter">time zone converter</Link> to convert a single slot into
-              each zone&apos;s local time, or schedule one post per zone with the{" "}
-              <Link href="/x-scheduler">X scheduler</Link>.
+              each zone&apos;s local time, then post once per zone at those times. The{" "}
+              <Link href="/x-scheduler">X scheduler</Link> page shows when X scheduling is available in Poskoo.
             </p>
           </>
         ),
