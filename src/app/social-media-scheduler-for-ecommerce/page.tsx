@@ -3,6 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import { BRAND } from "@/lib/brand";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+import { pendingNetworksText } from "@/lib/platform-support";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -60,7 +61,7 @@ const content: AudiencePageContent = {
   featuresArtLabel: "A shop owner waters a growing bar chart of product link clicks",
   limitsTitle: "What Poskoo does not do for stores",
   limits:
-    "Poskoo does not sync your product catalogue, tag products in posts or run ads. Its own checkout is for digital products only, so physical goods are sold on your store and Poskoo sends people there. Pinterest and Google Business Profile publishing are waiting for platform approval, and auto-DM works on Instagram only.",
+    "Poskoo does not sync your product catalogue, tag products in posts or run ads. Its own checkout is for digital products only, so physical goods are sold on your store and Poskoo sends people there. Auto-DM works on Instagram only.",
   faqs: [
     { q: "Can Poskoo send the product link when someone comments?", a: "Yes. Set a keyword such as LINK on the post. When someone comments it, Poskoo sends your DM with the product page link through Instagram's official API." },
     { q: "Does Poskoo connect to Shopify or WooCommerce?", a: "No. Poskoo does not read your catalogue. Paste the product page link into the DM and the post; Poskoo tracks the clicks." },
@@ -92,6 +93,7 @@ const content: AudiencePageContent = {
 export default function SocialMediaSchedulerForEcommercePage() {
   const c: AudiencePageContent = {
     ...content,
+    limits: [pendingNetworksText(["pinterest", "gbp"]), content.limits].filter(Boolean).join(" "),
     faqs: content.faqs.map((faq) => {
       if (faq.q === "Can I schedule Pinterest Pins?") {
         const pin = networkAvailability("pinterest");
