@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildPlatformCatalog, PLATFORM_CATALOG, platformCopy } from "@/lib/platform-support";
+import { buildPlatformCatalog, PLATFORM_CATALOG, pendingNetworksText, platformCopy } from "@/lib/platform-support";
 
 const allKeys = Object.fromEntries(PLATFORM_CATALOG.map((e) => [e.id, true]));
 const base = { instagram: true, facebook: true, threads: true, youtube: true, linkedin: true, bluesky: true, mastodon: true };
@@ -56,4 +56,13 @@ test("an override never turns on a network without its keys, and pending overrid
 
 test("reminder-only channels are never counted", () => {
   assert.ok(!PLATFORM_CATALOG.some((e) => e.id === "ig_personal" || e.id === "fb_group"));
+});
+
+test("pendingNetworksText describes not-yet-live networks from live status", () => {
+  const catalog = buildPlatformCatalog({}, {});
+  assert.equal(
+    pendingNetworksText(["tiktok", "pinterest", "x", "gbp"], catalog),
+    "TikTok, Pinterest and Google Business Profile are built and waiting on platform approval; X is coming soon.",
+  );
+  assert.equal(pendingNetworksText(["instagram"], buildPlatformCatalog(allKeys, {})), "");
 });

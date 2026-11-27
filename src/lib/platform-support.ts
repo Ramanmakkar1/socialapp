@@ -134,6 +134,26 @@ export function listText(items: readonly string[]): string {
   return items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }
 
+/**
+ * "TikTok, Pinterest and Google Business Profile are built and waiting on platform approval; X is coming soon."
+ * Empty string when none of the ids is pending.
+ */
+export function pendingNetworksText(ids: readonly string[], catalog: PlatformEntry[] = getPlatformCopy().catalog): string {
+  const awaiting: string[] = [];
+  const soon: string[] = [];
+  for (const id of ids) {
+    const e = catalog.find((x) => x.id === id);
+    if (!e || e.live) continue;
+    if (e.awaiting) awaiting.push(e.label);
+    else soon.push(e.label);
+  }
+  const parts = [
+    awaiting.length ? `${listText(awaiting)} ${awaiting.length === 1 ? "is" : "are"} built and waiting on platform approval` : "",
+    soon.length ? `${listText(soon)} ${soon.length === 1 ? "is" : "are"} coming soon` : "",
+  ].filter(Boolean);
+  return parts.length ? `${parts.join("; ")}.` : "";
+}
+
 export type PlatformCopy = {
   catalog: PlatformEntry[];
   liveCount: number;
