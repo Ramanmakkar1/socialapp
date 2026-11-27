@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AnimArt } from "@/components/AnimArt";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import t from "@/components/tools/tools.module.css";
 import MoneyCalculator from "../instagram-money-calculator/MoneyCalculator";
 
@@ -295,8 +296,46 @@ const signupCta = (
 );
 
 export default function TikTokMoneyCalculatorPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How do you grow TikTok income?"
+                ? {
+                    ...section,
+                    body: (
+                      <>
+                        <p>
+                          Brand deals and rewards both follow reach and engagement. Track your{" "}
+                          <Link href="/tools/tiktok-engagement-rate-calculator">TikTok engagement rate</Link> to see
+                          which videos hold attention, then post consistently so your best formats keep shipping (TikTok
+                          publishing in the <Link href="/tiktok-scheduler">TikTok scheduler</Link> is{" "}
+                          {availabilityPhrase(state, "TikTok")}), and use the{" "}
+                          <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to turn each
+                          video into a ready-to-post caption. See how to plan and schedule those videos in our guide to{" "}
+                          <Link href="/guides/how-to-schedule-tiktok-videos">scheduling TikTok videos</Link>.
+                        </p>
+                        <p>
+                          For more ways creators earn beyond one-off videos, read the{" "}
+                          <Link href="/guides/how-to-make-money-on-social-media-2026">
+                            guide to making money on social media in 2026
+                          </Link>
+                          .
+                        </p>
+                      </>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config} afterTool={payoutFactors} signupCta={signupCta}>
+    <ToolPageTemplate config={pageConfig} afterTool={payoutFactors} signupCta={signupCta}>
       <MoneyCalculator platform="tiktok" />
     </ToolPageTemplate>
   );
