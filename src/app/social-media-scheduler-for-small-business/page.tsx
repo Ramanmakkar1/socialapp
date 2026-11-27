@@ -7,6 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { getPlatformCopy } from "@/lib/platform-support";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -108,12 +109,13 @@ const appJsonLd = {
 };
 
 export default function SocialMediaSchedulerForSmallBusinessPage() {
+  const pageFaqs = faqs.map((f) => f.q === "Which platforms can I schedule to?" ? { ...f, a: getPlatformCopy().answer } : f);
   return (
     <PublicShell
       className={s.sched}
       breadcrumbs={[{ name: "Social media scheduler for small business", path: PATH }]}
     >
-      {[appJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd, faqJsonLd(pageFaqs)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -323,7 +325,7 @@ export default function SocialMediaSchedulerForSmallBusinessPage() {
             <h2>Accounts, safety and limits</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq, index) => (
+            {pageFaqs.map((faq, index) => (
               <details key={faq.q} open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>
