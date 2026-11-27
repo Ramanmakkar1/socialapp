@@ -62,7 +62,7 @@ const platformTables = platforms.map((platform) => (
       <p className="eyebrow">Platform cheat sheet</p>
       <h2 id={`${platform.name.toLowerCase()}-sizes`}>{platform.name} image sizes</h2>
       <p>{platform.note}</p>
-      <p><Link href={platform.scheduler}>Schedule {platform.name} posts</Link></p>
+      <p><Link href={platform.scheduler}>{platform.name} scheduler</Link></p>
     </div>
     <SizeTable rows={platform.rows} label={`${platform.name} image sizes in pixels and aspect ratios`} />
   </section>
