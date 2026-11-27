@@ -123,6 +123,7 @@ export default function XSchedulerPage() {
   const availability = networkAvailability("x");
   const isLive = availability === "live";
   const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Choose the date and time. Once publishing to X is switched on, Poskoo will publish through X's official API when the post is due, with a published or failed status so you can retry if needed." } : st);
+  const featureList = isLive ? features : features.map((f) => f.no === "01 / Text" ? { ...f, text: "Add the text for your tweet, then choose when it should go out. Once publishing to X is switched on, Poskoo will send it to X at the scheduled time, so you can plan ahead instead of posting live." } : f);
   const appJsonLd = appJsonLdFor(availability === "live" ? description : SOON_DESCRIPTION);
   const faqs = faqsFor(isLive);
   return (
@@ -170,7 +171,7 @@ export default function XSchedulerPage() {
             <h2>What you can <em className="s">schedule on X.</em></h2>
           </div>
           <div className="cards">
-            {features.map((feature) => (
+            {featureList.map((feature) => (
               <article key={feature.title} className="pcard">
                 <span className="no">{feature.no}</span>
                 <h3>{feature.title.replace(/-/g, "\u2011")}</h3>
