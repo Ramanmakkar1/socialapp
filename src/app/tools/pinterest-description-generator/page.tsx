@@ -72,8 +72,19 @@ const config: ToolPageConfig = {
             </p>
             <p>
               The descriptions come from fixed writing templates in your browser. The tool does <b>not use AI</b>,
-              upload your text or scrape Pinterest. When a description is ready, plan the Pin on the calendar with the{" "}
-              <Link href="/pinterest-scheduler">Pinterest scheduler</Link>.
+              upload your text or scrape Pinterest.{" "}
+              {networkAvailability("pinterest") === "live" ? (
+                <>
+                  When a description is ready, plan the Pin on the calendar with the{" "}
+                  <Link href="/pinterest-scheduler">Pinterest scheduler</Link>.
+                </>
+              ) : (
+                <>
+                  When a description is ready, paste it into your Pin. Pinterest publishing in the{" "}
+                  <Link href="/pinterest-scheduler">Pinterest scheduler</Link> is{" "}
+                  {availabilityPhrase(networkAvailability("pinterest"), "Pinterest")}.
+                </>
+              )}
             </p>
           </>
         ),
