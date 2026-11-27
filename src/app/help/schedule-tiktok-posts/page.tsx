@@ -9,12 +9,22 @@ import s from "@/components/site.module.css";
 
 export const revalidate = 600;
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: "Schedule TikTok Videos in Poskoo: Step-by-Step Help" },
-  description:
-    `Step-by-step help for scheduling TikTok videos in ${BRAND.name}: connect TikTok with its login, upload a vertical video, set privacy, pick a time and publish.`,
-  alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.canonicalUrl).toString() },
-});
+const title = "Schedule TikTok Videos in Poskoo: Step-by-Step Help";
+
+const liveDescription =
+  "Step-by-step help for scheduling TikTok videos in Poskoo: connect TikTok with its login, upload a vertical video, set privacy, pick a time and publish.";
+
+const soonDescription =
+  "How to schedule TikTok videos in Poskoo: connect TikTok, upload a vertical video, set privacy and pick a time. Publishing awaits TikTok's approval.";
+
+export function generateMetadata(): Metadata {
+  const description = networkAvailability("tiktok") === "live" ? liveDescription : soonDescription;
+  return withSocial({
+    title: { absolute: title },
+    description,
+    alternates: { canonical: new URL("/help/schedule-tiktok-posts", BRAND.canonicalUrl).toString() },
+  });
+}
 
 const steps = [
   {
@@ -105,11 +115,11 @@ const faqJsonLdFor = (list: typeof faqs) => ({
   })),
 });
 
-const howToJsonLd = {
+const howToJsonLdFor = (state: ReturnType<typeof networkAvailability>) => ({
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: "How to schedule TikTok videos",
-  description: metadata.description,
+  description: state === "live" ? liveDescription : soonDescription,
   image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
@@ -119,7 +129,7 @@ const howToJsonLd = {
     text: st.text,
     url: `${BRAND.canonicalUrl}/help/schedule-tiktok-posts#step-${i + 1}`,
   })),
-};
+});
 
 const related = [
   { href: "/tiktok-scheduler", label: "TikTok scheduler" },
@@ -152,7 +162,7 @@ export default function ScheduleTikTokPostsHelpPage() {
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLdFor(state)).replace(/</g, "\\u003c") }}
       />
       <script
         type="application/ld+json"
