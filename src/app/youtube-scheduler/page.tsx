@@ -9,7 +9,7 @@ import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
-import { networkAvailability } from "@/components/ChannelStatusNote";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -118,13 +118,14 @@ const appJsonLd = {
 };
 
 export default function YouTubeSchedulerPage() {
-  const tiktokLive = networkAvailability("tiktok") === "live";
+  const tiktok = networkAvailability("tiktok");
+  const tiktokLive = tiktok === "live";
 
   const pageFaqs = faqs.map((faq) => {
     if (faq.q === "Can I post the same video to TikTok and Instagram Reels too?" && !tiktokLive) {
       return {
         ...faq,
-        a: "Instagram Reels, yes: select YouTube and Instagram in the same composer and tailor each version before scheduling. TikTok publishing is built and waiting on TikTok's platform approval, so post the TikTok version from the TikTok app for now.",
+        a: `Instagram Reels, yes: select YouTube and Instagram in the same composer and tailor each version before scheduling. TikTok publishing is ${availabilityPhrase(tiktok, "TikTok")}, so post the TikTok version from the TikTok app for now.`,
       };
     }
     return faq;
