@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
+import { networkAvailability } from "@/components/ChannelStatusNote";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
@@ -8,15 +9,24 @@ import s from "@/components/site.module.css";
 
 const PATH = "/help/schedule-x-posts";
 const title = "Schedule X (Twitter) Posts in Poskoo: Step-by-Step Help";
-const description =
+
+const liveDescription =
   "Step-by-step help for scheduling X (Twitter) posts in Poskoo: connect X, write the post, add images or one video, pick a time and Poskoo publishes it.";
 
-export const metadata: Metadata = withSocial({
-  title: { absolute: title },
-  description,
-  alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
-  openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
-});
+const comingSoonDescription =
+  "Step-by-step help for scheduling X (Twitter) posts in Poskoo: connect X, write the post, add images or one video and pick a time. Publishing is coming soon.";
+
+export const revalidate = 600;
+
+export function generateMetadata(): Metadata {
+  const description = networkAvailability("x") === "live" ? liveDescription : comingSoonDescription;
+  return withSocial({
+    title: { absolute: title },
+    description,
+    alternates: { canonical: new URL(PATH, BRAND.canonicalUrl).toString() },
+    openGraph: { title, description, url: new URL(PATH, BRAND.canonicalUrl).toString() },
+  });
+}
 
 const steps = [
   {
@@ -142,7 +152,7 @@ const howToJsonLd = {
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: "How to schedule X (Twitter) posts",
-  description: metadata.description,
+  description: networkAvailability("x") === "live" ? liveDescription : comingSoonDescription,
   image: `${BRAND.canonicalUrl}/landing/hero.webp`,
   totalTime: "PT5M",
   step: steps.map((st, i) => ({
