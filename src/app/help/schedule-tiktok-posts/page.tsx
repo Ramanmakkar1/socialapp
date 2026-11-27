@@ -3,8 +3,11 @@ import { withSocial } from "@/lib/page-metadata";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import HelpGuideIllustration from "@/components/HelpGuideIllustration";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
+
+export const revalidate = 600;
 
 export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule TikTok Videos in Poskoo: Step-by-Step Help" },
@@ -92,15 +95,15 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
+const faqJsonLdFor = (list: typeof faqs) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
+  mainEntity: list.map((f) => ({
     "@type": "Question",
     name: f.q,
     acceptedAnswer: { "@type": "Answer", text: f.a },
   })),
-};
+});
 
 const howToJsonLd = {
   "@context": "https://schema.org",
@@ -125,6 +128,21 @@ const related = [
 ];
 
 export default function ScheduleTikTokPostsHelpPage() {
+  const state = networkAvailability("tiktok");
+  const pageFaqs =
+    state === "live"
+      ? faqs
+      : faqs.map((f) =>
+          f.q === "Does TikTok allow scheduling from other apps?"
+            ? {
+                ...f,
+                a: `Yes, TikTok allows approved apps to post through its official Content Posting API. TikTok publishing in Poskoo is ${availabilityPhrase(
+                  state,
+                  "TikTok"
+                )}; once it is switched on you connect with TikTok's own login and never share your password.`,
+              }
+            : f
+        );
   return (
     <PublicShell className={`${s.sched} ${s.pub}`}
       breadcrumbs={[
@@ -138,7 +156,7 @@ export default function ScheduleTikTokPostsHelpPage() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(pageFaqs)).replace(/</g, "\\u003c") }}
       />
       <header className="hero">
         <div className={s.heroText}>
@@ -148,8 +166,18 @@ export default function ScheduleTikTokPostsHelpPage() {
             </h1>
           <p className="lede">
             To schedule a TikTok video, connect TikTok in {BRAND.name} with TikTok&apos;s official login, upload a
-            vertical video, write a caption and pick a date and time. {BRAND.name} then publishes it, or sends it to your
-            TikTok inbox, at that moment. Here is exactly how it works, step by step.
+            vertical video, write a caption and pick a date and time.{" "}
+            {state !== "live" ? (
+              <>
+                TikTok publishing is {availabilityPhrase(state, "TikTok")}; once it is on, {BRAND.name} publishes it or
+                sends it to your TikTok inbox at that moment.
+              </>
+            ) : (
+              <>
+                {BRAND.name} then publishes it, or sends it to your TikTok inbox, at that moment.
+              </>
+            )}{" "}
+            Here is exactly how it works, step by step.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
@@ -239,7 +267,7 @@ export default function ScheduleTikTokPostsHelpPage() {
             <h2>FAQ</h2>
           </div>
           <div className="faq">
-            {faqs.map((f) => (
+            {pageFaqs.map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
