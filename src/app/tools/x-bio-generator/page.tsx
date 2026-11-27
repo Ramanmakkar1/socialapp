@@ -3,6 +3,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import t from "@/components/tools/tools.module.css";
 import BioTool from "../instagram-bio-generator/BioTool";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/x-bio-generator",
   name: "X (Twitter) bio generator",
@@ -185,7 +188,7 @@ const config: ToolPageConfig = {
   cta: {
     title: "Your bio is ready.",
     mark: "Now plan your posts.",
-    text: "X scheduling is coming to Poskoo. In the meantime, schedule your Instagram posts and Reels with Poskoo on Meta's official API.",
+    text: "Plan and schedule your X posts with Poskoo, on X's official API.",
   },
 };
 
