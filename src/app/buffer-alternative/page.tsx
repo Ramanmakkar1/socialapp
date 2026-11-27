@@ -131,7 +131,7 @@ export default async function BufferAlternative() {
           <div className="head">
             <p className="eyebrow">Comparison</p>
             <h2>{BRAND.name} vs Buffer</h2>
-            <p>Buffer schedules posts. To auto-DM commenters you would add a tool like ManyChat. {BRAND.name} does both.</p>
+            <p>Buffer is a social media scheduler founded in 2010. It queues and publishes posts to Instagram, Facebook, X, LinkedIn, TikTok, Pinterest, Threads, Bluesky, Mastodon, YouTube and Google Business Profile, and has a free plan for a few channels. To auto-DM people who comment, you would add a tool like ManyChat. {BRAND.name} does both.</p>
           </div>
           <div className={s.tableWrap}>
             <table className={s.table}>
