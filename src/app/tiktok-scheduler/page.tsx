@@ -163,8 +163,9 @@ export default function TikTokSchedulerPage() {
         </p>
         )}
         <p className="lede">
-          Upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it
-          while you are busy.
+          {isLive
+            ? "Upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it while you are busy."
+            : "Once it is on, you will upload one video or up to 35 photos, write the caption, pick who can see it, and let the queue publish it while you are busy."}
         </p>
         <div className="ctas">
           <Link className="btn btn-dark" href="/signup">Start free <span aria-hidden="true">→</span></Link>
