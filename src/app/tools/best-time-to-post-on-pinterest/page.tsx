@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-pinterest",
@@ -184,8 +185,33 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function BestTimeToPostOnPinterestPage() {
+  const state = networkAvailability("pinterest");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Turn your best time into a schedule"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Once a slot works, pin at that time from the Pinterest app. Pinterest publishing in Poskoo is{" "}
+                        {availabilityPhrase(state, "Pinterest")}; see{" "}
+                        <Link href="/help/schedule-pinterest-posts">how to schedule Pinterest Pins</Link> for the setup
+                        once it is switched on.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <BestTimeFinder platform="Pinterest" insightsName="Pinterest Analytics" />
     </ToolPageTemplate>
   );
