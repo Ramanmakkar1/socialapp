@@ -41,7 +41,7 @@ const compare: [string, string, string][] = [
   ["Visual flow builder", "Not yet", "Yes"],
   ["WhatsApp", "On the roadmap, no date", "Yes"],
   ["Facebook Messenger", "On the roadmap, no date", "Yes"],
-  ["TikTok", "On the roadmap, no date", "Yes"],
+  ["TikTok DM automation", "On the roadmap, no date", "Yes"],
   ["Official Meta API, no password", "Yes", "Yes"],
   ["Price", priceSummary(planReadiness()), "Check their site"],
 ];
@@ -52,7 +52,7 @@ const faqs = [
   { q: "Does it work with Reels comments?", a: "Yes. A comment-to-DM rule can watch a feed post or a Reel, and anyone who comments the keyword gets the DM." },
   { q: "Do I need a Business or Creator account?", a: "Yes. Instagram only allows automated messaging through its API for Business and Creator accounts. Switching is free in the Instagram app settings." },
   { q: "Can it collect emails?", a: "Yes. Turn on the email gate in a rule and the DM asks for an email address before it sends your link." },
-  { q: `Does ${BRAND.name} support WhatsApp, Messenger or TikTok?`, a: "Not yet. Instagram comes first. WhatsApp, Messenger and TikTok are on the roadmap, with no date yet." },
+  { q: `Does ${BRAND.name} support WhatsApp, Messenger or TikTok?`, a: "Not yet. Instagram comes first. Auto-DMs on WhatsApp, Messenger and TikTok are on the roadmap, with no date yet. Scheduling TikTok posts is a separate feature: see the TikTok scheduler page." },
 ];
 
 const faqJsonLd = {
