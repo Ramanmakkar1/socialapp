@@ -44,7 +44,7 @@ const compare: [string, string, string, string][] = [
 
 const faqs = [
   { q: "Is Poskoo an Agorapulse alternative?", a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
-  { q: "What is Agorapulse?", a: "Agorapulse is a social media management tool for scheduling, inbox, monitoring and reporting. See their site for current plans." },
+  { q: "What is Agorapulse?", a: "Agorapulse is a social media management tool founded in 2011 in Paris. It schedules posts, collects comments and messages in a shared social inbox, and adds social listening and reports for teams and agencies on Facebook, Instagram, X, LinkedIn, TikTok, YouTube and Pinterest. See their site for current plans and prices." },
   { q: "Can I import my Agorapulse schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
   { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
@@ -132,7 +132,7 @@ export default async function AgorapulseAlternative() {
           <div className="head">
             <p className="eyebrow">Comparison</p>
             <h2>{BRAND.name} vs Agorapulse</h2>
-            <p>Agorapulse is a social media management tool with scheduling, a social inbox and reporting. For its exact features and plans, see their site. This page focuses on what Poskoo does.</p>
+            <p>Agorapulse is built for teams that manage many accounts: scheduling, a shared social inbox, listening and reports. Poskoo is built around Instagram: it schedules posts and auto-DMs everyone who comments a keyword. For Agorapulse&apos;s exact features and plans, see their site.</p>
           </div>
           <div className={s.tableWrap}>
             <table className={s.table}>
