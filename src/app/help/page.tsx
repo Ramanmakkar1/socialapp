@@ -7,6 +7,9 @@ import { breadcrumbJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 import { AnimArt } from "@/components/AnimArt";
+import { networkAvailability } from "@/components/ChannelStatusNote";
+
+export const revalidate = 600;
 
 const description = `Step-by-step ${BRAND.name} help guides: connect Instagram, schedule posts, set up comment-to-DM rules, fix auto-DMs that are not sending, and use free templates.`;
 
@@ -189,6 +192,15 @@ const crumbsJsonLd = breadcrumbJsonLd([
 ]);
 
 export default function HelpHubPage() {
+  const cards = guides.map((g) => {
+    if (g.href === "/help/schedule-tiktok-posts" && networkAvailability("tiktok") !== "live") {
+      return { ...g, text: "Connect TikTok with its official login, upload a vertical video and choose who can see it. TikTok publishing is waiting on TikTok's approval." };
+    }
+    if (g.href === "/help/schedule-pinterest-posts" && networkAvailability("pinterest") !== "live") {
+      return { ...g, text: "Connect Pinterest with its official login, pick a board and add an image and link. Pinterest publishing is waiting on Pinterest's approval." };
+    }
+    return g;
+  });
   return (
     <PublicShell className={`${s.sched} ${s.pub}`}>
       <script
@@ -219,7 +231,7 @@ export default function HelpHubPage() {
             <h2>Guides</h2>
           </div>
           <div className="cards">
-            {guides.map((g) => (
+            {cards.map((g) => (
               <article key={g.href} className="pcard">
                 <span className="no">{g.no}</span>
                 <h3>{g.title.replace(/-/g, "\u2011")}</h3>
