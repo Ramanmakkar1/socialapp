@@ -171,8 +171,16 @@ export default function SchedulePinterestPostsHelpPage() {
             </h1>
           <p className="lede">
             To schedule a Pinterest Pin, connect Pinterest with its official login in {BRAND.name}, pick a destination
-            board, add an image, title and link, then choose a date and time. {BRAND.name} creates the Pin through the
-            official Pinterest API at that moment. Here is exactly how it works, step by step.
+            board, add an image, title and link, then choose a date and time. {state === "live" ? (
+              <>
+                {BRAND.name} creates the Pin through the official Pinterest API at that moment.
+              </>
+            ) : (
+              <>
+                Pinterest publishing in {BRAND.name} is {availabilityPhrase(state, "Pinterest")}, so these steps work
+                once it is switched on.
+              </>
+            )} Here is exactly how it works, step by step.
           </p>
         </div>
         <HelpGuideIllustration variant="schedule" className="hero-art" />
