@@ -20,6 +20,8 @@ export const metadata: Metadata = withSocial({
   alternates: { canonical: "/meta-business-suite-alternative" },
 });
 
+export const revalidate = 600;
+
 const whyLook = [
   {
     no: "01 / Reliability",
