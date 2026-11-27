@@ -128,7 +128,7 @@ export default async function HootsuiteAlternative() {
           <div className="head">
             <p className="eyebrow">Comparison</p>
             <h2>{BRAND.name} vs Hootsuite vs ManyChat</h2>
-            <p>Hootsuite is a full social media management suite. ManyChat automates DMs but does not schedule posts. {BRAND.name} does Instagram scheduling and comment-to-DM in one tool.</p>
+            <p>Hootsuite is a social media management suite from Vancouver, Canada, founded in 2008. Teams use it to schedule posts, answer messages in one inbox and report on many networks, including Instagram, Facebook, LinkedIn, X, TikTok, Pinterest and YouTube, on paid plans. ManyChat automates DMs but does not schedule posts. {BRAND.name} does Instagram scheduling and comment-to-DM in one tool.</p>
           </div>
           <div className={s.tableWrap}>
             <table className={s.table}>
