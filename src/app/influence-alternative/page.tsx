@@ -8,7 +8,7 @@ import { ASSISTANT_TOOLS } from "@/lib/aiAssistantGuides";
 import { PLANS } from "@/lib/plans";
 import { featureReadiness, planReadiness } from "@/lib/featureReadiness";
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
-import { faqJsonLd, ldJson } from "@/lib/tool-schema";
+import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -99,6 +99,21 @@ const faqs = [
   { q: "Are there independent reviews of influence.so?", a: `We could not find independent reviews when we checked on ${CHECKED_ON}. Try both on a free plan or trial with your own content before you decide.` },
 ];
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} influence.so alternative`,
+    description,
+    url: `${BRAND.canonicalUrl}${PATH}`,
+  }),
+  "@id": `${BRAND.canonicalUrl}${PATH}#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Instagram comment-to-DM automation",
+    "Lead capture in DMs",
+  ],
+};
+
 function Cell({ v }: { v: string }) {
   if (v === "Yes") return <span className={s.yes}>Yes</span>;
   if (v === "No" || v === "Not listed") return <span style={{ color: "var(--poskoo-muted)" }}>{v}</span>;
@@ -111,6 +126,7 @@ export default async function InfluenceAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Social media scheduler comparison", path: "/social-media-scheduler-comparison" }, { name: "Influence.so alternative", path: PATH }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(faqJsonLd(faqs)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       <header className="hero">
         <div className={s.heroText}>
