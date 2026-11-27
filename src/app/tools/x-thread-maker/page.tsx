@@ -2,6 +2,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import ThreadMaker from "./ThreadMaker";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/x-thread-maker",
   name: "X (Twitter) thread maker",
