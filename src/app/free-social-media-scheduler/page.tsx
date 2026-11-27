@@ -8,6 +8,7 @@ import { PLANS, PLANS_NOTE, softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
+import { getPlatformCopy, listText } from "@/lib/platform-support";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -95,6 +96,8 @@ const appJsonLd = {
 };
 
 export default function FreeSocialMediaSchedulerPage() {
+  const pc = getPlatformCopy();
+  const pending = [...pc.awaiting, ...pc.soon];
   return (
     <PublicShell
       className={s.sched}
@@ -173,8 +176,7 @@ export default function FreeSocialMediaSchedulerPage() {
               <p className="eyebrow">Supported platforms</p>
               <h2>Which platforms can I schedule to for free?</h2>
               <p>
-                Instagram, Facebook Pages, Threads, LinkedIn, YouTube, Bluesky and Mastodon publish today. TikTok,
-                Pinterest, X and Google Business Profile are waiting for API approval.
+                {listText(pc.live.social)} publish today.{pending.length ? ` ${listText(pending)} ${pending.length === 1 ? "is" : "are"} not live yet.` : ""}
               </p>
               <ul>
                 {platforms.map((platform) => (
