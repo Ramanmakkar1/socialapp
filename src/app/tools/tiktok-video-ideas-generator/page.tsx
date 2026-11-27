@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import PostIdeasGenerator from "../instagram-post-ideas-generator/PostIdeasGenerator";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+
+export const revalidate = 600;
 
 const config: ToolPageConfig = {
   path: "/tools/tiktok-video-ideas-generator",
@@ -213,8 +216,23 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function TikTokVideoIdeasGeneratorPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          faqs: config.faqs.map((f) =>
+            f.q === "Can I schedule these TikTok videos automatically?"
+              ? {
+                  ...f,
+                  a: `Not yet. TikTok publishing in Poskoo is ${availabilityPhrase(state, "TikTok")}. Until then, copy an idea, film the video and post it from the TikTok app.`,
+                }
+              : f,
+          ),
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <PostIdeasGenerator platform="tiktok" />
     </ToolPageTemplate>
   );
