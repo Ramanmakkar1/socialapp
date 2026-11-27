@@ -4,6 +4,9 @@ import BestTimeFinder from "./BestTimeFinder";
 import t from "@/components/tools/tools.module.css";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-x",
   name: "Best time to post on X finder",
