@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Callout, DayList, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { getPlatformCopy, listText } from "@/lib/platform-support";
+
+const AWAITING = getPlatformCopy().awaiting.filter((l) => l === "TikTok" || l === "Pinterest");
 
 // Sources (all opened while writing, November 2026).
 const SRC = {
@@ -329,7 +332,7 @@ export const body: GuideBody = {
           <p>
             Clusters are easier when you plan a month at a time. With Poskoo you can schedule the same series to
             Instagram, Facebook Pages, Threads, YouTube, LinkedIn, <Link href="/bluesky-scheduler">Bluesky</Link> and <Link href="/mastodon-scheduler">Mastodon</Link> from one calendar, and adjust
-            each caption per platform (TikTok and Pinterest are waiting on platform approval). See the{" "}
+            each caption per platform{AWAITING.length ? ` (${listText(AWAITING)} ${AWAITING.length === 1 ? "is" : "are"} waiting on platform approval)` : ""}. See the{" "}
             <Link href="/youtube-scheduler">YouTube scheduler</Link> and{" "}
             <Link href="/linkedin-scheduler">LinkedIn scheduler</Link> for details.
           </p>
