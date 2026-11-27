@@ -122,6 +122,7 @@ function appJsonLdFor(desc: string) {
 export default function XSchedulerPage() {
   const availability = networkAvailability("x");
   const isLive = availability === "live";
+  const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Choose the date and time. Once publishing to X is switched on, Poskoo will publish through X's official API when the post is due, with a published or failed status so you can retry if needed." } : st);
   const appJsonLd = appJsonLdFor(availability === "live" ? description : SOON_DESCRIPTION);
   const faqs = faqsFor(isLive);
   return (
@@ -187,7 +188,7 @@ export default function XSchedulerPage() {
               <p className="eyebrow">How X scheduling works</p>
               <h2>Schedule your first <em className="s mark">post on X.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>
