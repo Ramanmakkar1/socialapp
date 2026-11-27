@@ -99,12 +99,13 @@ function faqsFor(isLive: boolean) {
   ];
 }
 
-const appJsonLd = {
-  ...toolSoftwareJsonLd({
-    name: `${BRAND.name} Pinterest scheduler`,
-    description,
-    url: `${BRAND.canonicalUrl}${PATH}`,
-  }),
+function appJsonLdFor(desc: string) {
+  return {
+    ...toolSoftwareJsonLd({
+      name: `${BRAND.name} Pinterest scheduler`,
+      description: desc,
+      url: `${BRAND.canonicalUrl}${PATH}`,
+    }),
   featureList: [
     "Pinterest board selection",
     "Pin titles up to 100 characters and descriptions up to 500 characters",
@@ -115,11 +116,13 @@ const appJsonLd = {
   ],
   // Paid offers only once Pro/Agency checkout is live, matching /pricing.
   offers: softwareOffers(planReadiness()),
-};
+  };
+}
 
 export default function PinterestSchedulerPage() {
   const availability = networkAvailability("pinterest");
   const isLive = availability === "live";
+  const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Pick the date and time. Once Pinterest approves Poskoo, the Pin will be created through the official Pinterest API when it is due, with a published or failed status so you can retry if needed." } : st);
   const faqs = faqsFor(isLive);
   return (
