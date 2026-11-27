@@ -3,6 +3,9 @@ import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/component
 import t from "@/components/tools/tools.module.css";
 import EngagementCalculator from "../instagram-engagement-rate-calculator/EngagementCalculator";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/x-engagement-rate-calculator",
   name: "X (Twitter) engagement rate calculator",
