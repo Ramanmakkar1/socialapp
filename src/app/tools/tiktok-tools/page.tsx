@@ -156,7 +156,10 @@ export default function TikTokToolsPage() {
           <h1>Free TikTok tools for every video</h1>
           <p className="lede">
             These free TikTok tools run in your browser to write captions, hooks and hashtags, size your video and
-            photos, set up your profile and estimate your earnings, then schedule it all with {BRAND.name}.
+            photos, set up your profile and estimate your earnings
+            {state === "live"
+              ? `, then schedule it all with ${BRAND.name}.`
+              : `, then post from the TikTok app. TikTok publishing in ${BRAND.name} is ${availabilityPhrase(state, "TikTok")}.`}
           </p>
           <div className={t.heroCtas}>
             <Link className="btn btn-dark" href="/tiktok-scheduler">
