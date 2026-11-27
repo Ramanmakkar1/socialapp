@@ -12,7 +12,7 @@ import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
-import { networkAvailability } from "@/components/ChannelStatusNote";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -71,14 +71,15 @@ export default async function TailwindAlternative() {
     row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row
   );
   const faqItems = ai ? faqs : faqs.map((f) => ({ ...f, a: withoutAiClaims(f.a) }));
+  const pin = networkAvailability("pinterest");
   const pinterestFaqItems = faqItems.map((f) =>
     f.q === "Can I schedule Pinterest pins with Poskoo?"
       ? {
           ...f,
           a:
-            networkAvailability("pinterest") === "live"
+            pin === "live"
               ? "Yes. Connect your Pinterest account, choose a board, add an image and Pin details, and pick a time; Poskoo creates the Pin through the official Pinterest API."
-              : "Not yet. Pinterest publishing is built and waiting on Pinterest platform approval. " + PLATFORMS_ANSWER,
+              : `Not yet. Pinterest publishing is ${availabilityPhrase(pin, "Pinterest")}. ` + PLATFORMS_ANSWER,
         }
       : f
   );
