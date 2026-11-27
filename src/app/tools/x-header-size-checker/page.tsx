@@ -4,6 +4,9 @@ import t from "@/components/tools/tools.module.css";
 import CoverSizeChecker from "@/components/tools/CoverSizeChecker";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const config: ToolPageConfig = {
   path: "/tools/x-header-size-checker",
   name: "X header size checker",
