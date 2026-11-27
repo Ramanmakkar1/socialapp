@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import { BRAND } from "@/lib/brand";
-import { planReadiness } from "@/lib/featureReadiness";
+import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
@@ -19,9 +19,7 @@ export const metadata: Metadata = withSocial({
   alternates: { canonical: PATH },
 });
 
-const { ai } = planReadiness();
-
-function contentFor(tiktok: ReturnType<typeof networkAvailability>): AudiencePageContent {
+function contentFor(tiktok: ReturnType<typeof networkAvailability>, ai: boolean): AudiencePageContent {
   const limits = tiktok === "live"
     ? `TikTok videos schedule from the same calendar. Auto-DM works on Instagram only. Poskoo has no brand-deal, media-kit or sponsorship tools.${ai ? "" : " AI caption ideas are built and launching soon, so for now you write the captions yourself."}`
     : `TikTok publishing is ${availabilityPhrase(tiktok, "TikTok")}, so you cannot schedule TikToks from Poskoo today. Auto-DM works on Instagram only. Poskoo has no brand-deal, media-kit or sponsorship tools.${ai ? "" : " AI caption ideas are built and launching soon, so for now you write the captions yourself."}`;
@@ -98,7 +96,8 @@ function contentFor(tiktok: ReturnType<typeof networkAvailability>): AudiencePag
   };
 }
 
-export default function SocialMediaSchedulerForCreatorsPage() {
+export default async function SocialMediaSchedulerForCreatorsPage() {
   const tiktok = networkAvailability("tiktok");
-  return <AudienceSchedulerPage c={contentFor(tiktok)} />;
+  const ai = await isFeatureReadyNow("ai");
+  return <AudienceSchedulerPage c={contentFor(tiktok, ai)} />;
 }
