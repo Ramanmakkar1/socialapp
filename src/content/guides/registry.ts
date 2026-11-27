@@ -130,7 +130,7 @@ export const GUIDES: GuideEntry[] = [
       src: "/landing/card-dm.webp",
       width: 1024,
       height: 1024,
-      alt: "A relaxed creator on a beanbag while DMs fly out of his phone to new followers",
+      alt: "A relaxed creator on a beanbag while DMs fly out of their phone to new followers",
     },
     takeaways: [
       "Post original Reels and carousels on one clear topic 3-5 times a week, and keep the schedule for months.",
