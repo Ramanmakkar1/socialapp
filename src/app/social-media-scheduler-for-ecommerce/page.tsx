@@ -3,7 +3,7 @@ import { withSocial } from "@/lib/page-metadata";
 import { BRAND } from "@/lib/brand";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
-import { pendingNetworksText } from "@/lib/platform-support";
+import { getPlatformCopy, pendingNetworksText } from "@/lib/platform-support";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -18,6 +18,8 @@ export const metadata: Metadata = withSocial({
   description,
   alternates: { canonical: PATH },
 });
+
+const pinterestLive = getPlatformCopy().catalog.find((e) => e.id === "pinterest")?.live ?? false;
 
 const content: AudiencePageContent = {
   path: PATH,
@@ -66,7 +68,7 @@ const content: AudiencePageContent = {
     { q: "Can Poskoo send the product link when someone comments?", a: "Yes. Set a keyword such as LINK on the post. When someone comments it, Poskoo sends your DM with the product page link through Instagram's official API." },
     { q: "Does Poskoo connect to Shopify or WooCommerce?", a: "No. Poskoo does not read your catalogue. Paste the product page link into the DM and the post; Poskoo tracks the clicks." },
     { q: "Can I schedule carousels and Facebook albums?", a: "Yes. Instagram carousels and Facebook Page albums of 2 to 10 photos can both be scheduled from the same calendar." },
-    { q: "Can I schedule Pinterest Pins?", a: "Not yet. Pinterest publishing is built and waiting for Pinterest to approve Poskoo's API access." },
+    { q: "Can I schedule Pinterest Pins?", a: pinterestLive ? "Yes. Connect Pinterest with its official login, pick a board, add the image, title and link, and schedule the Pin on the same calendar." : "Not yet. Pinterest publishing is built and waiting for Pinterest to approve Poskoo's API access." },
     { q: "How do I know which post sold?", a: "Poskoo counts clicks on the links it sends in DMs for each rule, and each rule belongs to a post. Add UTM tags to the link so your store analytics shows the sales from each post too." },
   ],
   related: [
