@@ -223,7 +223,10 @@ export default function TikTokToolsPage() {
           cta={{
             title: "Draft it here,",
             mark: "schedule it on TikTok.",
-            text: `${BRAND.name} publishes your videos on time on the official TikTok API, so you can plan a week of posts in one sitting.`,
+            text:
+              state === "live"
+                ? `${BRAND.name} publishes your videos on time on the official TikTok API, so you can plan a week of posts in one sitting.`
+                : `TikTok publishing in ${BRAND.name} is ${availabilityPhrase(state, "TikTok")}. Draft your caption, hook and hashtags here and post from the TikTok app for now.`,
           }}
         />
       </div>
