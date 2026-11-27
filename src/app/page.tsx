@@ -305,7 +305,7 @@ return <main className={`${styles.landing} ${instrumentSans.variable} ${instrume
     <div className="copy">
       <p className="eyebrow">One subscription</p>
       <h2>Stop paying <em className="s">here and there</em></h2>
-      <p>Most creators pay for a stack of apps. Poskoo puts it all in one plan, with one login and one bill.</p>
+      <p>Most <Link href="/social-media-scheduler-for-creators">creators</Link> pay for a stack of apps. Poskoo puts it all in one plan, with one login and one bill.</p>
       <div className="replace">
         <div className="old"><span>Content scheduler</span><span>Comment-to-DM tool</span><span>Link in bio app</span><span>AI caption writer</span><span>Analytics tool</span></div>
         <span className="to" aria-hidden="true">→</span>
