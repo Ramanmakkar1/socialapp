@@ -7,6 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
+import { PLATFORMS_ANSWER } from "@/lib/platform-support";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -91,7 +92,7 @@ const faqs = [
   },
   {
     q: "Which networks can agencies schedule to today?",
-    a: "Instagram, Facebook Pages, Threads, LinkedIn, YouTube, Bluesky and Mastodon publish today. TikTok, Pinterest, X and Google Business Profile are built and waiting for each platform's API approval, so they can be connected once switched on.",
+    a: PLATFORMS_ANSWER,
   },
   {
     q: "How does Instagram lead capture work for clients?",
