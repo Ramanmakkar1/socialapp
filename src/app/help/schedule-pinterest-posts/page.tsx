@@ -7,6 +7,9 @@ import { networkAvailability, availabilityPhrase } from "@/components/ChannelSta
 import PublicShell from "@/components/PublicShell";
 import s from "@/components/site.module.css";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 export const metadata: Metadata = withSocial({
   title: { absolute: "Schedule Pinterest Pins in Poskoo: Step-by-Step Help" },
   description:
