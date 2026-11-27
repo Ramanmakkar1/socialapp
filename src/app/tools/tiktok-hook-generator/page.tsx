@@ -262,7 +262,30 @@ export const metadata = toolMetadata(config);
 
 export default function TikTokHookGeneratorPage() {
   const state = networkAvailability("tiktok");
-  const pageConfig = state === "live" ? config : { ...config, faqs: config.faqs.map((f) => f.q === "Can I schedule the video once I have a hook?" ? { ...f, a: `Not yet. TikTok publishing in Poskoo is ${availabilityPhrase(state, "TikTok")}. Until then, write the hook, film the video and post it from the TikTok app.` } : f) };
+  const pageConfig = state === "live"
+    ? config
+    : {
+        ...config,
+        faqs: config.faqs.map((f) => f.q === "Can I schedule the video once I have a hook?"
+          ? { ...f, a: `Not yet. TikTok publishing in Poskoo is ${availabilityPhrase(state, "TikTok")}. Until then, write the hook, film the video and post it from the TikTok app.` }
+          : f),
+        guide: {
+          ...config.guide,
+          sections: config.guide.sections.map((section) =>
+            section.title === "From hook to published TikTok"
+              ? {
+                  ...section,
+                  body: (
+                    <p>
+                      Once the hook is chosen, film the video, write the caption and plan when it goes out. Draft the rest of the caption with the <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link>, add a small set of tags with the <Link href="/tools/tiktok-hashtag-generator">TikTok hashtag generator</Link>, and pick a starting time with the{" "}
+                      <Link href="/tools/best-time-to-post-on-tiktok">best time to post on TikTok</Link> finder. Then post it from the TikTok app; TikTok publishing in the <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state, "TikTok")}. The <Link href="/tools">free social media tools hub</Link> has the rest of the caption, hashtag and timing tools for the same video.
+                    </p>
+                  ),
+                }
+              : section
+          ),
+        },
+      };
   return (
     <ToolPageTemplate config={pageConfig}>
       <HookGenerator platform="tiktok" />
