@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { withSocial } from "@/lib/page-metadata";
 import { BRAND } from "@/lib/brand";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
-import { networkAvailability } from "@/components/ChannelStatusNote";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -93,10 +93,17 @@ export default function SocialMediaSchedulerForEcommercePage() {
   const c: AudiencePageContent = {
     ...content,
     faqs: content.faqs.map((faq) => {
-      if (faq.q === "Can I schedule Pinterest Pins?" && networkAvailability("pinterest") === "live") {
+      if (faq.q === "Can I schedule Pinterest Pins?") {
+        const pin = networkAvailability("pinterest");
+        if (pin === "live") {
+          return {
+            ...faq,
+            a: "Yes. Connect Pinterest, pick a board, add the product image and link, and choose a time; Poskoo creates the Pin through the official Pinterest API.",
+          };
+        }
         return {
           ...faq,
-          a: "Yes. Connect Pinterest, pick a board, add the product image and link, and choose a time; Poskoo creates the Pin through the official Pinterest API.",
+          a: `Not yet. Pinterest publishing is ${availabilityPhrase(pin, "Pinterest")}.`,
         };
       }
       return faq;
