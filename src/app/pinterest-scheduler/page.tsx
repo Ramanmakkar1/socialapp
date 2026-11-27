@@ -120,6 +120,7 @@ const appJsonLd = {
 export default function PinterestSchedulerPage() {
   const availability = networkAvailability("pinterest");
   const isLive = availability === "live";
+  const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Pick the date and time. Once Pinterest approves Poskoo, the Pin will be created through the official Pinterest API when it is due, with a published or failed status so you can retry if needed." } : st);
   const faqs = faqsFor(isLive);
   return (
     <PublicShell className={s.sched} breadcrumbs={[{ name: "Pinterest scheduler", path: PATH }]}>
@@ -185,7 +186,7 @@ export default function PinterestSchedulerPage() {
               <p className="eyebrow">How Pinterest scheduling works</p>
               <h2>Schedule your first <em className="s mark">Pinterest Pin.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>
