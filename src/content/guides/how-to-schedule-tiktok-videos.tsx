@@ -33,9 +33,21 @@ export const body: GuideBody = {
         and the reasons a scheduled TikTok sometimes fails.
       </p>
       <p>
-        Ready to plan a week of TikToks? Open the <Link href="/tiktok-scheduler">TikTok scheduler</Link> to queue
-        videos on a calendar, and use the <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link>{" "}
-        to write captions and hashtags before you schedule.
+        {TIKTOK_STATE === "live" ? (
+          <>
+            Ready to plan a week of TikToks? Open the <Link href="/tiktok-scheduler">TikTok scheduler</Link> to queue
+            videos on a calendar, and use the{" "}
+            <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to write captions and
+            hashtags before you schedule.
+          </>
+        ) : (
+          <>
+            Ready to plan a week of TikToks? TikTok publishing in the{" "}
+            <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(TIKTOK_STATE, "TikTok")};
+            until then, use the <Link href="/tools/tiktok-caption-generator">TikTok caption generator</Link> to write
+            captions and hashtags, then post from the TikTok app.
+          </>
+        )}
       </p>
     </>
   ),
