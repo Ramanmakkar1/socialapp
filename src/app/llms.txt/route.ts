@@ -37,11 +37,16 @@ const GROUPS: { heading: string; match: (path: string) => boolean }[] = [
 export async function GET() {
   const indexable = isSiteIndexable();
 
+  const platforms = getPlatformCopy();
+  const smsLive = ["tiktok", "pinterest", "x"].every((id) => platforms.catalog.find((e) => e.id === id)?.live);
+
   const grouped = new Map<string, string[]>(GROUPS.map((g) => [g.heading, []]));
   for (const path of PUBLIC_PATHS) {
     if (!LINK_PATHS.has(path) || isNoindex(path) || !META[path]) continue;
     const title = PAGE_TITLES[path] || path;
-    const description = PAGE_DESCRIPTIONS[path];
+    const description = path === "/social-media-scheduler" && !smsLive
+      ? "Free social media scheduler for Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon on one calendar. Official APIs, no credit card."
+      : PAGE_DESCRIPTIONS[path];
     if (!description) continue;
     const heading = GROUPS.find((g) => g.match(path))!.heading;
     grouped.get(heading)!.push(`- [${title}](${SITE_URL}${path === "/" ? "/" : path}): ${description}`);
@@ -53,7 +58,6 @@ export async function GET() {
 
   // Only networks that can publish on this server today count as live (keys + platform approvals,
   // src/lib/platform-support.ts); the rest carry "awaiting approval" / "not available yet".
-  const platforms = getPlatformCopy();
   const awaiting = platforms.awaiting;
   const soon = [...platforms.soon, "WhatsApp", "Messenger"];
   const list = listText;
