@@ -248,7 +248,7 @@ export default function PinterestSchedulerPage() {
             <h2>Plan Pinterest next to <em className="s">Instagram on one calendar.</em></h2>
             <p>
               Select Pinterest and Instagram in the same composer, tailor the copy for each channel, and review the
-              week or month without switching between separate planning tools. Scheduled posts stay in one queue where
+              week or month without switching between separate planning tools such as <Link className={s.vlink} href="/tailwind-alternative">Tailwind</Link>. Scheduled posts stay in one queue where
               you can edit, reschedule or delete them before they go live.
             </p>
           </div>
