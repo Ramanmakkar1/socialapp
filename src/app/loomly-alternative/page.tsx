@@ -9,6 +9,7 @@ import { priceSummary } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { withoutAiClaims } from "@/lib/aiClaims";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import PublicShell from "@/components/PublicShell";
 import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
@@ -57,6 +58,22 @@ function Cell({ v }: { v: string }) {
   return <>{v}</>;
 }
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Loomly alternative`,
+    description:
+      "Poskoo is a Loomly alternative that schedules Instagram, Facebook and Threads posts and auto-DMs every keyword commenter to capture leads. Free plan.",
+    url: `${BRAND.canonicalUrl}/loomly-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/loomly-alternative#software`,
+  featureList: [
+    "Post scheduling with week and month calendar views",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
+};
+
 export default async function LoomlyAlternative() {
   const ai = await isFeatureReadyNow("ai");
   const compareRows = compare.map(row => row[0].startsWith("AI ") && ai ? [row[0], "Yes", row[2], row[3]] : row);
@@ -69,6 +86,7 @@ export default async function LoomlyAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Loomly alternative", path: "/loomly-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
