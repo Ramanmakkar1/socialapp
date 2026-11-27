@@ -22,6 +22,40 @@ const SITE_URL = APPROVED_PRODUCTION_URL;
 // List every public page, including the legal pages, so AI answers can cite the right one.
 const LINK_PATHS = new Set(PUBLIC_PATHS);
 
+// Live descriptions for scheduler and help pages whose network is not live yet.
+// Text is copied verbatim from each page's `description` const (or metadata description).
+// Used in the PUBLIC_PATHS loop only when the matching platform catalog entry is live.
+const LIVE_DESCRIPTIONS: Partial<Record<string, { id: string; text: string }>> = {
+  "/tiktok-scheduler": {
+    id: "tiktok",
+    text: "Schedule TikTok videos and photo posts on one calendar and publish them automatically through TikTok's official API. Plan ahead and post on time.",
+  },
+  "/pinterest-scheduler": {
+    id: "pinterest",
+    text: "Schedule Pinterest Pins to any board with the official API. Add a title and destination link, upload a JPG or PNG image, and choose the publishing time.",
+  },
+  "/x-scheduler": {
+    id: "x",
+    text: "Poskoo schedules posts to X through X's official API: connect your account, write the post, add up to 4 images or one video, and pick a time.",
+  },
+  "/google-business-profile-scheduler": {
+    id: "gbp",
+    text: "Schedule Google Business Profile posts, offers and events to your locations with the official API. Add a photo and a button like Book or Call. Free plan.",
+  },
+  "/help/schedule-tiktok-posts": {
+    id: "tiktok",
+    text: "Step-by-step help for scheduling TikTok videos in Poskoo: connect TikTok with its login, upload a vertical video, set privacy, pick a time and publish.",
+  },
+  "/help/schedule-x-posts": {
+    id: "x",
+    text: "Step-by-step help for scheduling X (Twitter) posts in Poskoo: connect X, write the post, add images or one video, pick a time and Poskoo publishes it.",
+  },
+  "/help/schedule-pinterest-posts": {
+    id: "pinterest",
+    text: "Step-by-step help for scheduling Pinterest Pins in Poskoo: connect Pinterest, pick a board, add an image, title and link, then choose a time.",
+  },
+};
+
 /** Page groups, matched in order. New pages (help, tools, guides) fall into a group by their path. */
 const GROUPS: { heading: string; match: (path: string) => boolean }[] = [
   { heading: "Product", match: (p) => ["/", "/features", "/pricing", "/developers", "/contact", "/social-media-scheduler-for-small-business"].includes(p) || p.startsWith("/instagram-auto-dm") || ["/instagram-dm-automation", "/instagram-link-in-bio", "/instagram-content-planner"].includes(p) },
@@ -44,9 +78,13 @@ export async function GET() {
   for (const path of PUBLIC_PATHS) {
     if (!LINK_PATHS.has(path) || isNoindex(path) || !META[path]) continue;
     const title = PAGE_TITLES[path] || path;
-    const description = path === "/social-media-scheduler" && !smsLive
-      ? "Free social media scheduler for Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon on one calendar. Official APIs, no credit card."
-      : PAGE_DESCRIPTIONS[path];
+    const liveDesc = LIVE_DESCRIPTIONS[path];
+    const description =
+      path === "/social-media-scheduler" && !smsLive
+        ? "Free social media scheduler for Instagram, Facebook, Threads, LinkedIn, YouTube, Bluesky and Mastodon on one calendar. Official APIs, no credit card."
+        : liveDesc && platforms.catalog.find((e) => e.id === liveDesc.id)?.live
+          ? liveDesc.text
+          : PAGE_DESCRIPTIONS[path];
     if (!description) continue;
     const heading = GROUPS.find((g) => g.match(path))!.heading;
     grouped.get(heading)!.push(`- [${title}](${SITE_URL}${path === "/" ? "/" : path}): ${description}`);
