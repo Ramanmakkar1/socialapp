@@ -283,7 +283,13 @@ export default function YouTubeSchedulerPage() {
             <article className="pcard">
               <span className="no">03 / More channels</span>
               <h3>Reuse your video across social channels</h3>
-              <p>Schedule the same idea with the <Link className={s.vlink} href="/tiktok-scheduler">TikTok video scheduler</Link> and <Link className={s.vlink} href="/instagram-scheduler">Instagram Reels scheduler</Link>, with details tailored to each channel.</p>
+              <p>
+                {tiktokLive ? (
+                  <>Schedule the same idea with the <Link className={s.vlink} href="/tiktok-scheduler">TikTok video scheduler</Link> and <Link className={s.vlink} href="/instagram-scheduler">Instagram Reels scheduler</Link>, with details tailored to each channel.</>
+                ) : (
+                  <>Schedule the same idea with the <Link className={s.vlink} href="/instagram-scheduler">Instagram Reels scheduler</Link>, with details tailored to each channel. <Link className={s.vlink} href="/tiktok-scheduler">TikTok publishing</Link> is {availabilityPhrase(tiktok, "TikTok")}.</>
+                )}
+              </p>
             </article>
           </div>
         </div>
