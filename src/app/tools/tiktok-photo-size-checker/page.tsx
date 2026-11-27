@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
 import CoverSizeChecker from "@/components/tools/CoverSizeChecker";
@@ -227,8 +228,39 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function TikTokPhotoSizeCheckerPage() {
+  const state = networkAvailability("tiktok");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "How do I post photos on TikTok?"
+                ? {
+                    ...section,
+                    body: (
+                      <>
+                        <p>
+                          In the TikTok app, tap <b>+</b>, choose <b>Upload</b> and select your photos. Add a caption, pick a
+                          cover and post. For a slideshow, select up to 35 images in the order you want them to appear.
+                        </p>
+                        <p>
+                          Before you post, check the file here and with the{" "}
+                          <Link href="/tools/social-media-image-sizes">social media image sizes guide</Link>. Check the caption
+                          with the <Link href="/tools/tiktok-caption-counter">TikTok caption counter</Link>, then post them from the
+                          TikTok app. Publishing in the <Link href="/tiktok-scheduler">TikTok scheduler</Link> is {availabilityPhrase(state, "TikTok")}.
+                        </p>
+                      </>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <CoverSizeChecker
         platform="TikTok"
         targetW={1080}
