@@ -132,6 +132,7 @@ export default function TikTokSchedulerPage() {
   const availability = networkAvailability("tiktok");
   const isLive = availability === "live";
   const stepList = isLive ? steps : steps.map((st) => st.n === "3" ? { ...st, text: "Choose the date and time. Once TikTok approves Poskoo, the post will publish through TikTok's Content Posting API when it is due, with a published or failed status you can retry." } : st);
+  const comparisonRows = isLive ? comparison : comparison.map((row) => row.task === "Posting while busy or offline" ? { ...row, scheduled: "Once TikTok approves Poskoo, the worker will publish at the scheduled time" } : row);
   const faqs = faqsFor(isLive);
   const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
@@ -249,7 +250,7 @@ export default function TikTokSchedulerPage() {
                 </tr>
               </thead>
               <tbody>
-                {comparison.map((row) => (
+                {comparisonRows.map((row) => (
                   <tr key={row.task}>
                     <td className={s.td} style={{ fontWeight: 600 }}>{row.task}</td>
                     <td className={s.td}>{row.manual}</td>
