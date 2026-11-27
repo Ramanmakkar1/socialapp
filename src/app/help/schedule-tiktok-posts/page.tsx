@@ -134,7 +134,7 @@ const howToJsonLdFor = (state: ReturnType<typeof networkAvailability>) => ({
 const related = [
   { href: "/tiktok-scheduler", label: "TikTok scheduler" },
   { href: "/tools/tiktok-safe-zone-checker", label: "9:16 safe zone checker" },
-  { href: "/help/getting-started", label: "Getting started guide" },
+  { href: "/guides/how-to-schedule-tiktok-videos", label: "How to schedule TikTok videos (full guide)" },
 ];
 
 export default function ScheduleTikTokPostsHelpPage() {
