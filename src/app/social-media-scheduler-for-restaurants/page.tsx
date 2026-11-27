@@ -8,6 +8,7 @@ import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
+import { getPlatformCopy } from "@/lib/platform-support";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -131,12 +132,13 @@ const appJsonLd = {
 };
 
 export default function SocialMediaSchedulerForRestaurantsPage() {
+  const faqList = faqs.map((f) => f.q === "Which platforms can I schedule to?" ? { ...f, a: getPlatformCopy().answer } : f);
   return (
     <PublicShell
       className={s.sched}
       breadcrumbs={[{ name: "Social media scheduler for restaurants", path: PATH }]}
     >
-      {[appJsonLd, faqJsonLd(faqs)].map((data) => (
+      {[appJsonLd, faqJsonLd(faqList)].map((data) => (
         <script
           key={data["@type"]}
           type="application/ld+json"
@@ -387,7 +389,7 @@ export default function SocialMediaSchedulerForRestaurantsPage() {
             <h2>Menus, bookings and limits</h2>
           </div>
           <div className="faq">
-            {faqs.map((faq, index) => (
+            {faqList.map((faq, index) => (
               <details key={faq.q} open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>
