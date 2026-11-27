@@ -25,6 +25,7 @@ const whyLook = [
     no: "01 / Reliability",
     title: "Posts stuck or failing",
     text: "Scheduled posts that sit in a failed or stuck state are the most common reason creators start looking for another scheduler. Most of the time the post never goes out and you only notice hours later.",
+    body: <>Scheduled posts that sit in a failed or stuck state are the most common reason <Link className={s.vlink} href="/social-media-scheduler-for-creators">creators</Link> start looking for another scheduler. Most of the time the post never goes out and you only notice hours later.</>,
   },
   {
     no: "02 / Automation",
@@ -112,7 +113,7 @@ export default async function MetaBusinessSuiteAlternative() {
               <article key={c.title} className="pcard">
                 <span className="no">{c.no}</span>
                 <h3>{c.title.replace(/-/g, "\u2011")}</h3>
-                <p>{c.text}</p>
+                <p>{"body" in c && c.body ? c.body : c.text}</p>
               </article>
             ))}
           </div>
