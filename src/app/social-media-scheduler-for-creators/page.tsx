@@ -4,6 +4,7 @@ import { BRAND } from "@/lib/brand";
 import { isFeatureReadyNow } from "@/lib/featureReadinessNow";
 import { AudienceSchedulerPage, type AudiencePageContent } from "@/components/AudienceSchedulerPage";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+import { getPlatformCopy, listText } from "@/lib/platform-support";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
 export const revalidate = 600;
@@ -20,6 +21,7 @@ export const metadata: Metadata = withSocial({
 });
 
 function contentFor(tiktok: ReturnType<typeof networkAvailability>, ai: boolean): AudiencePageContent {
+  const liveSocial = listText(getPlatformCopy().live.social.filter((n) => n !== "TikTok"));
   const limits = tiktok === "live"
     ? `TikTok videos schedule from the same calendar. Auto-DM works on Instagram only. Poskoo has no brand-deal, media-kit or sponsorship tools.${ai ? "" : " AI caption ideas are built and launching soon, so for now you write the captions yourself."}`
     : `TikTok publishing is ${availabilityPhrase(tiktok, "TikTok")}, so you cannot schedule TikToks from Poskoo today. Auto-DM works on Instagram only. Poskoo has no brand-deal, media-kit or sponsorship tools.${ai ? "" : " AI caption ideas are built and launching soon, so for now you write the captions yourself."}`;
@@ -70,7 +72,7 @@ function contentFor(tiktok: ReturnType<typeof networkAvailability>, ai: boolean)
       { q: "Is the Free plan enough for a creator?", a: "It is enough to test the workflow: 2 social accounts, 10 scheduled posts a month, 500 auto-DMs a month and a link-in-bio page with 5 links. Daily posters usually move to Pro for unlimited scheduling and 2,500 auto-DMs." },
       { q: "Is comment-to-DM allowed on Instagram?", a: "Yes. Poskoo uses Instagram's official messaging API, only messages people who commented or replied first, and never asks for your password." },
       { q: "Can I DM people who commented before I set up the rule?", a: "Yes, for comments from the past 7 days. Use “Send to past comments” on the rule, and Poskoo sends the DM to those commenters once." },
-      { q: "Can I schedule TikToks?", a: tiktok === "live" ? "Yes. Poskoo publishes TikTok videos through TikTok's official Content Posting API, next to Instagram, YouTube, Threads, Facebook Pages, LinkedIn, Bluesky and Mastodon." : `Not yet. TikTok publishing is ${availabilityPhrase(tiktok, "TikTok")}. Instagram, YouTube, Threads, Facebook Pages, LinkedIn, Bluesky and Mastodon publish today.` },
+      { q: "Can I schedule TikToks?", a: tiktok === "live" ? `Yes. Poskoo publishes TikTok videos through TikTok's official Content Posting API, next to ${liveSocial}.` : `Not yet. TikTok publishing is ${availabilityPhrase(tiktok, "TikTok")}. ${liveSocial} publish today.` },
       { q: "Can I make people follow me before they get the link?", a: "Yes. A rule can ask the person to follow your account first, and Poskoo checks the follow before it sends the link." },
     ],
     related: [
