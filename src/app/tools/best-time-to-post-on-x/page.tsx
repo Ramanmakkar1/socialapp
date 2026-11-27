@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import BestTimeFinder from "./BestTimeFinder";
 import t from "@/components/tools/tools.module.css";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
 const config: ToolPageConfig = {
   path: "/tools/best-time-to-post-on-x",
@@ -307,8 +308,32 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function BestTimeToPostOnXPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Turn your best time into a schedule"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Once a slot works, post at that time from the X app. X publishing in Poskoo is{" "}
+                        {availabilityPhrase(state, "X")}; see{" "}
+                        <Link href="/help/schedule-x-posts">how to schedule X posts</Link> for the setup once it is live.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <BestTimeFinder platform="X" insightsName="X post analytics" />
     </ToolPageTemplate>
   );
