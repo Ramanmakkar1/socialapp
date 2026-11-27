@@ -6,6 +6,9 @@ import { PINTEREST_LIMITS } from "@/lib/pinterestCharCount";
 import PinterestCharCounter from "./PinterestCharCounter";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 
+// Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
+export const revalidate = 600;
+
 const limitRows: [string, string][] = [
   ["Pin title", `${PINTEREST_LIMITS.title.max} characters`],
   ["Pin description", `${PINTEREST_LIMITS.description.max} characters`],
