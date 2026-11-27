@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ToolPageTemplate, toolMetadata, type ToolPageConfig } from "@/components/tools/ToolPageTemplate";
 import t from "@/components/tools/tools.module.css";
+import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
 import HashtagGenerator from "../instagram-hashtag-generator/HashtagGenerator";
 
 const config: ToolPageConfig = {
@@ -239,8 +240,37 @@ const config: ToolPageConfig = {
 export const metadata = toolMetadata(config);
 
 export default function XHashtagGeneratorPage() {
+  const state = networkAvailability("x");
+  const pageConfig =
+    state === "live"
+      ? config
+      : {
+          ...config,
+          guide: {
+            ...config.guide,
+            sections: config.guide.sections.map((section) =>
+              section.title === "Check the post before you schedule it"
+                ? {
+                    ...section,
+                    body: (
+                      <p>
+                        Hashtags are only one part of an X post. Before you publish, check the whole post with the{" "}
+                        <Link href="/tools/x-character-counter">X character counter</Link> and see how it looks in the feed with the{" "}
+                        <Link href="/tools/x-post-preview">X post preview</Link>. If the post is part of a longer thread, the{" "}
+                        <Link href="/tools/x-thread-maker">X thread maker</Link> splits it into numbered posts. If you are planning
+                        ahead, the <Link href="/tools/best-time-to-post-on-x">best time to post on X</Link> finder gives you three
+                        starting slots. Post from the X app for now; publishing in the{" "}
+                        <Link href="/x-scheduler">X scheduler</Link> is{" "}
+                        {availabilityPhrase(state, "X")}.
+                      </p>
+                    ),
+                  }
+                : section
+            ),
+          },
+        };
   return (
-    <ToolPageTemplate config={config}>
+    <ToolPageTemplate config={pageConfig}>
       <HashtagGenerator platform="x" />
     </ToolPageTemplate>
   );
