@@ -7,7 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { softwareOffers } from "@/lib/plans";
 import { planReadiness } from "@/lib/featureReadiness";
 import { faqJsonLd, ldJson, toolSoftwareJsonLd } from "@/lib/tool-schema";
-import { PLATFORMS_ANSWER } from "@/lib/platform-support";
+import { PLATFORMS_ANSWER, pendingNetworksText } from "@/lib/platform-support";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -58,7 +58,7 @@ const platforms = [
   { name: "Bluesky and Mastodon", text: "Text posts with images, connected with an app password or OAuth." },
   {
     name: "TikTok, Pinterest, X and Google Business Profile",
-    text: "Built and waiting for each platform's API approval; connect as soon as it is switched on.",
+    text: `${pendingNetworksText(["tiktok", "pinterest", "x", "gbp"])} Connect each as soon as it is switched on.`,
   },
 ];
 
@@ -208,11 +208,13 @@ export default function SocialMediaSchedulerForAgenciesPage() {
                 through its own official API, with a clear status when it is done.
               </p>
               <ul>
-                {platforms.map((platform) => (
-                  <li key={platform.name}>
-                    <strong>{platform.name}:</strong> {platform.text}
-                  </li>
-                ))}
+                {platforms
+                  .filter((p) => !p.text.startsWith(" Connect"))
+                  .map((platform) => (
+                    <li key={platform.name}>
+                      <strong>{platform.name}:</strong> {platform.text}
+                    </li>
+                  ))}
               </ul>
               <p className="small">
                 Start with the{" "}
