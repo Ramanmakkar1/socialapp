@@ -54,6 +54,14 @@ const LIVE_DESCRIPTIONS: Partial<Record<string, { id: string; text: string }>> =
     id: "pinterest",
     text: "Step-by-step help for scheduling Pinterest Pins in Poskoo: connect Pinterest, pick a board, add an image, title and link, then choose a time.",
   },
+  "/tools/tiktok-tools": {
+    id: "tiktok",
+    text: "Free TikTok tools for captions, hooks, hashtags, video ideas, bios, usernames and video sizes. Use them in your browser, then schedule in Poskoo.",
+  },
+  "/tools/x-tools": {
+    id: "x",
+    text: "Free X (Twitter) tools for posts, threads, bios, fonts, hashtags, character counts, previews, header sizes and engagement stats. No signup, then schedule.",
+  },
 };
 
 /** Page groups, matched in order. New pages (help, tools, guides) fall into a group by their path. */
