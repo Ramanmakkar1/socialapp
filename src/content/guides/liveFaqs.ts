@@ -30,3 +30,16 @@ export function liveGuideFaqs(slug: string, faqs: { q: string; a: string }[]): {
     return f;
   });
 }
+
+export function liveGuideTakeaways(slug: string, items: string[]): string[] {
+  if (slug !== "how-to-schedule-tiktok-videos") return items;
+  const entry = getPlatformCopy().catalog.find((e) => e.id === "tiktok");
+  if (entry?.live === true) return items;
+  const phrase = entry?.awaiting ? "built and waiting on TikTok's platform approval" : "coming soon";
+  return items.map((item, i) => {
+    if (i === 0) return `You can schedule TikTok videos free in TikTok Studio on a desktop. TikTok publishing in Poskoo, through TikTok's official Content Posting API, is ${phrase}.`;
+    if (i === 1) return "TikTok Studio accepts a schedule up to about 10 days ahead.";
+    if (i === 4) return "Once TikTok publishing in Poskoo is switched on, the queue shows Published or Failed status so you can fix the cause and retry.";
+    return item;
+  });
+}

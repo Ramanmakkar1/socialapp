@@ -15,7 +15,7 @@ import { faqJsonLd, ldJson } from "@/lib/tool-schema";
 import { guideArticleJsonLd } from "@/lib/guide-schema";
 import { GUIDES, categoryLabel, guideBySlug, guidePath, readingMinutes } from "@/content/guides/registry";
 import { GUIDE_BODIES } from "@/content/guides/bodies";
-import { liveGuideFaqs } from "@/content/guides/liveFaqs";
+import { liveGuideFaqs, liveGuideTakeaways } from "@/content/guides/liveFaqs";
 
 // Only the slugs in the registry exist; anything else is a 404.
 export const dynamicParams = false;
@@ -163,7 +163,7 @@ export default async function GuidePage({ params }: Props) {
           </aside>
 
           <article className={g.prose}>
-            <Takeaways items={guide.takeaways} />
+            <Takeaways items={liveGuideTakeaways(guide.slug, guide.takeaways)} />
             <div className={g.lead}>{body.intro}</div>
             {body.sections.map((s) => (
               <section key={s.id} aria-labelledby={s.id}>
