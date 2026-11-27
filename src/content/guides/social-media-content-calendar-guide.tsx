@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Callout, DayList, Ext, GuideTable, InlineCta, type GuideBody } from "@/components/guides/GuideBlocks";
+import { pendingNetworksText } from "@/lib/platform-support";
 
 // A method guide: time boxes, pillars and a sample month. No invented statistics; platform
 // facts link to the platform's own help pages in `sources`.
@@ -264,8 +265,7 @@ export const body: GuideBody = {
             publishes today to Instagram, Facebook Pages, Threads, YouTube, LinkedIn profiles,{" "}
             <Link href="/bluesky-scheduler">Bluesky</Link> and{" "}
             <Link href="/mastodon-scheduler">Mastodon</Link>, with
-            a week and month calendar view. TikTok, Pinterest, X and LinkedIn Pages publishing are waiting on platform
-            approval.
+            a week and month calendar view. {pendingNetworksText(["tiktok", "pinterest", "x", "linkedin_pages"])}
           </p>
           <InlineCta
             title="Put your month on a calendar"
