@@ -14,6 +14,7 @@ import { getPlatformCopy, pendingNetworksText } from "@/lib/platform-support";
 export const revalidate = 600;
 
 const PATH = "/social-media-scheduler-for-restaurants";
+const pendingNote = pendingNetworksText(["tiktok", "pinterest", "x", "gbp"]);
 const title = `Social Media Scheduler for Restaurants | ${BRAND.name}`;
 const description =
   "Schedule weekly menus, specials and event posts in one calendar, then auto-DM Instagram commenters your menu or booking link and capture leads.";
@@ -306,14 +307,15 @@ export default function SocialMediaSchedulerForRestaurantsPage() {
               </tbody>
             </table>
           </div>
-          <p className="small" style={{ marginTop: 16 }}>
-            TikTok, Pinterest, X and{" "}
-            <Link className={s.vlink} href="/google-business-profile-scheduler">
-              Google Business Profile
-            </Link>{" "}
-            are built and waiting for each platform&apos;s API approval. They are not listed as available until they
-            are switched on.
-          </p>
+          {pendingNote ? (
+            <p className="small" style={{ marginTop: 16 }}>
+              {pendingNote} They are not listed as available until they are switched on. See the{" "}
+              <Link className={s.vlink} href="/google-business-profile-scheduler">
+                Google Business Profile
+              </Link>{" "}
+              scheduler.
+            </p>
+          ) : null}
         </div>
       </section>
 
