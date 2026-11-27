@@ -130,6 +130,7 @@ const appJsonLdFor = (desc: string) => ({
 
 export default function GoogleBusinessProfileSchedulerPage() {
   const isLive = networkAvailability("gbp") === "live";
+  const stepList = isLive ? steps : steps.map((st) => st.n === "4" ? { ...st, text: "Choose the date and time. Once Google approves Poskoo, the local post will be created through Google's official Business Profile API when it is due, with a published or failed status." } : st);
   const faqs = faqsFor(isLive);
   const appJsonLd = appJsonLdFor(isLive ? description : SOON_DESCRIPTION);
   return (
@@ -221,7 +222,7 @@ export default function GoogleBusinessProfileSchedulerPage() {
               <p className="eyebrow">How Google Business Profile scheduling works</p>
               <h2>Schedule your first <em className="s mark">Google post.</em></h2>
               <ol className={s.steps}>
-                {steps.map((step) => (
+                {stepList.map((step) => (
                   <li key={step.n}>
                     <span className={s.stepNo} aria-hidden="true">{step.n}</span>
                     <div>
