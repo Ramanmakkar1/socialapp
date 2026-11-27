@@ -15,6 +15,7 @@ import { faqJsonLd, ldJson } from "@/lib/tool-schema";
 import { guideArticleJsonLd } from "@/lib/guide-schema";
 import { GUIDES, categoryLabel, guideBySlug, guidePath, readingMinutes } from "@/content/guides/registry";
 import { GUIDE_BODIES } from "@/content/guides/bodies";
+import { liveGuideFaqs } from "@/content/guides/liveFaqs";
 
 // Only the slugs in the registry exist; anything else is a 404.
 export const dynamicParams = false;
@@ -74,6 +75,7 @@ export default async function GuidePage({ params }: Props) {
   const path = guidePath(guide.slug);
   const url = `${BRAND.canonicalUrl}${path}`;
   const minutes = readingMinutes(guide);
+  const faqs = liveGuideFaqs(guide.slug, guide.faqs);
   const toc = [
     ...body.sections.map((s) => ({ id: s.id, title: s.title })),
     { id: "faq", title: "FAQ" },
@@ -105,7 +107,7 @@ export default async function GuidePage({ params }: Props) {
         { name: guide.crumb, path },
       ]}
     >
-      {[articleJsonLd, faqJsonLd(guide.faqs)].map((data, i) => (
+      {[articleJsonLd, faqJsonLd(faqs)].map((data, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(data) }} />
       ))}
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
@@ -172,7 +174,7 @@ export default async function GuidePage({ params }: Props) {
             <section aria-labelledby="faq">
               <h2 id="faq">Frequently asked questions</h2>
               <div className="faq">
-                {guide.faqs.map((f) => (
+                {faqs.map((f) => (
                   <details key={f.q}>
                     <summary>{f.q}</summary>
                     <p>{f.a}</p>
