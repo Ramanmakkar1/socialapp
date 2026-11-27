@@ -45,7 +45,7 @@ const compare: [string, string, string, string][] = [
 
 const faqs = [
   { q: "Is Poskoo a Tailwind alternative?", a: `Yes. ${BRAND.name} schedules and publishes your posts, and also sends an automatic DM to everyone who comments a keyword, with email capture and AI caption ideas built in.` },
-  { q: "What is Tailwind?", a: "Tailwind is a scheduling and marketing tool known for Pinterest and Instagram. See their site for current plans." },
+  { q: "What is Tailwind?", a: "Tailwind (tailwindapp.com) is a social media marketing tool best known for scheduling Pinterest Pins, and it also schedules Instagram and Facebook posts. It suggests posting times with its SmartSchedule feature and makes post designs with Tailwind Create. See their site for current plans and prices." },
   { q: "Can I import my Tailwind schedule?", a: `Not yet. Add your upcoming posts in the ${BRAND.name} calendar and recreate your queue there.` },
   { q: "Can I schedule Pinterest pins with Poskoo?", a: PLATFORMS_ANSWER },
   { q: "Which platforms are supported?", a: PLATFORMS_ANSWER },
@@ -148,7 +148,7 @@ export default async function TailwindAlternative() {
           <div className="head">
             <p className="eyebrow">Comparison</p>
             <h2>{BRAND.name} vs Tailwind</h2>
-            <p>Tailwind is a scheduling and marketing tool known for Pinterest and Instagram. For its exact features and plans, see their site. This page focuses on what Poskoo does.</p>
+            <p>Tailwind is a scheduling tool built around Pinterest, with Instagram and Facebook scheduling too. Poskoo is built around Instagram: it schedules posts and auto-DMs everyone who comments a keyword. For Tailwind&apos;s exact features and plans, see their site.</p>
           </div>
           <div className={s.tableWrap}>
             <table className={s.table}>
