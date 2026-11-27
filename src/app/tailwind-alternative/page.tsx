@@ -13,6 +13,7 @@ import { CompareAlternativesNav } from "@/components/CompareAlternativesNav";
 import { CompareNote } from "@/components/CompareNote";
 import s from "@/components/site.module.css";
 import { networkAvailability, availabilityPhrase } from "@/components/ChannelStatusNote";
+import { toolSoftwareJsonLd, ldJson } from "@/lib/tool-schema";
 import { AnimArt } from "@/components/AnimArt";
 
 // Readiness / platform copy follows the RUNTIME env (the Docker build has no env): regenerate at most every 10 minutes.
@@ -51,6 +52,22 @@ const faqs = [
   { q: "Does it use the official APIs?", a: OFFICIAL_API_ANSWER },
 ];
 
+const appJsonLd = {
+  ...toolSoftwareJsonLd({
+    name: `${BRAND.name} Tailwind alternative`,
+    description:
+      "Poskoo is a Tailwind alternative: schedule Instagram, Facebook, Threads, YouTube, LinkedIn, Bluesky and Mastodon posts and auto-DM commenters. Free plan.",
+    url: `${BRAND.canonicalUrl}/tailwind-alternative`,
+  }),
+  "@id": `${BRAND.canonicalUrl}/tailwind-alternative#software`,
+  featureList: [
+    "Post scheduling with a calendar view",
+    `Publishing to ${LIVE_PLATFORMS_TEXT}`,
+    "Comment-to-DM automation",
+    "Email capture in DMs",
+  ],
+};
+
 function faqJsonLdFor(items: typeof faqs) {
   return {
     "@context": "https://schema.org",
@@ -86,6 +103,7 @@ export default async function TailwindAlternative() {
   return (
     <PublicShell className={`${s.sched} ${s.pub}`} breadcrumbs={[{ name: "Tailwind alternative", path: "/tailwind-alternative" }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLdFor(pinterestFaqItems)).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(appJsonLd) }} />
 
       {/* Hero */}
       <header className="hero">
